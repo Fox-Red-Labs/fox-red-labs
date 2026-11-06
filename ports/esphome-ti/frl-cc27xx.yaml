@@ -1,0 +1,30 @@
+# E192: the same device as frl-esphome-fit.yaml, on our own ESPHome platform `cc27xx` instead of the nrf52 template.
+# `esphome compile frl-cc27xx.yaml` builds it with TI's compiler; `esphome upload frl-cc27xx.yaml` flashes it.
+# Pin DIO16 is the red LED on the LP-EM-CC2755P10. No logger, no Wi-Fi, no API, no OTA.
+esphome:
+  name: frl-cc27xx
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [cc27xx, die_temperature]
+
+cc27xx:
+  board: LP_EM_CC2755P10
+  # probe_serial: LB07021W      # the debug probe's serial (xdsdfu -e lists it); or pass --device LB07021W to upload
+
+zigbee:
+  router: true
+  model: "FRL cc27xx"
+
+switch:
+  - platform: gpio
+    name: "LED"
+    pin: DIO16
+    restore_mode: ALWAYS_OFF
+
+sensor:
+  - platform: die_temperature
+    name: "Chip temperature"
+    update_interval: 30s

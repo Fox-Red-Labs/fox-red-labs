@@ -1,0 +1,7 @@
+# Fox Red Labs BoosterPack shields for Zephyr (Apache-2.0).
+# Add with: -DZEPHYR_EXTRA_MODULES=<path to this folder>
+name: foxredlabs-boosterpacks
+build:
+  settings:
+    board_root: .
+    dts_root: .

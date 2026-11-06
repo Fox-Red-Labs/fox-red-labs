@@ -1,0 +1,30 @@
+/*
+ * LP-MSPM33C321A devicetree additions for MicroPython's machine.I2C.
+ * I2C on UNICOMM13_0: SDA PB12 and SCL PB13 (BoosterPack header pins 10 and 9), with the chip's pull-ups on.
+ * Used as: -DEXTRA_DTC_OVERLAY_FILE=<this file>
+ */
+&pinctrl {
+	uc13_0_sda_pb12_pu: uc13_0_sda_pb12_pu {
+		pinmux = <MSP_PINMUX(29, MSPM0_PIN_FUNCTION_3)>;
+		input-enable;
+		drive-open-drain;
+		bias-pull-up;
+	};
+
+	uc13_0_scl_pb13_pu: uc13_0_scl_pb13_pu {
+		pinmux = <MSP_PINMUX(30, MSPM0_PIN_FUNCTION_4)>;
+		input-enable;
+		drive-open-drain;
+		bias-pull-up;
+	};
+};
+
+&unicomm13_0 {
+	status = "okay";
+};
+
+&unicomm13_0_i2c {
+	pinctrl-0 = <&uc13_0_sda_pb12_pu &uc13_0_scl_pb13_pu>;
+	pinctrl-names = "default";
+	status = "okay";
+};

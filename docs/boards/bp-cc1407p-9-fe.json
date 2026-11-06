@@ -1,0 +1,69 @@
+{
+ "name": "BP-CC1407P-9-FE BoosterPack plug-in module",
+ "sources": "EVM user guide SWRU633 (September 2026, Figure 2-1 board drawing, Table 2-1 header signals, section 2.5 LEDs, BOM); CC1407P data sheet SWRS301 (September 2026, ADVANCE INFORMATION, sections 6.4, 6.5, 6.17); both read 2026-10-07",
+ "columns": [
+  {
+   "head": "The chip: CC1407P",
+   "items": [
+    [
+     "Radios: sub-1 GHz transceiver",
+     "Sends and receives only. It runs no program of yours: a host LaunchPad kit drives it over SPI"
+    ],
+    [
+     "Speed: 0.75 kbps to 2.4 Mbps",
+     "Slow modes reach farthest (-131 dBm), fast OFDM modes carry more data"
+    ],
+    [
+     "Power: up to +22 dBm out",
+     "134 mA while sending at full power, 6.9 mA listening, 0.8 uA in standby"
+    ],
+    [
+     "Limit: 902 to 928 MHz on this board",
+     "A SAW filter in the receive path fixes the band to the US 915 MHz band"
+    ]
+   ]
+  },
+  {
+   "head": "Connections to the host",
+   "items": [
+    [
+     "SPI: pins 7, 14, 15, 18",
+     "Clock, data in, data out, chip select, up to 12 MHz"
+    ],
+    [
+     "GPIO: pin 23 INT, pin 36 RESET",
+     "INT says 'I have data'; the host also watches pin 14 for 'ready'"
+    ],
+    [
+     "Debug link: 20-pin edge connector",
+     "For an LP-XDS110 or LP-XDS110ET probe and SmartRF Studio 8 (Windows only)"
+    ],
+    [
+     "Software",
+     "TI's TRX plug-in (F2 SDK hosts) or TI's Zephyr shield; both preview quality"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "SMA antenna socket, red and green LEDs on jumper P2, 48 MHz crystal, RF switch"
+    ],
+    [
+     "Headers",
+     "40-pin BoosterPack connectors J1 and J2, male and female, so it stacks"
+    ],
+    [
+     "Not fitted",
+     "No antenna is listed in the kit or the parts list: bring a 915 MHz SMA antenna"
+    ],
+    [
+     "Watch out",
+     "Preview part: prototype board in limited quantity, and the setup API changes at release"
+    ]
+   ]
+  }
+ ]
+}

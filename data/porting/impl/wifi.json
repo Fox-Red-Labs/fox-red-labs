@@ -1,0 +1,538 @@
+{
+ "target": "TI Wi-Fi SoC (CC35X1)",
+ "impl": [
+  {
+   "idiom": "storage.wad_lump_read",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "mapped",
+   "difficulty": "direct",
+   "replace": "wad_file_t.mapped = address of a read-only array in the flash image; lumps are used in place and never copied into the zone.",
+   "trap": "The 4.2 MB WAD does not fit the default over-the-air layout (2,688 kB slot): switch OTA off in the Memory Configurator for a 6,248 kB slot.",
+   "check": "SHA-1 of the mapped bytes at boot",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "SHA-1 5b2e249b matches DOOM1.WAD at boot; demo1 ran from it",
+     "path": "ports/doom/target-cc35x1/results/d1.txt",
+     "results": "cc35x1:port_wad_sha1"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:storage.wad_lump_read/mapped",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "memory.place_big_array",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "named-section",
+   "difficulty": "adapter",
+   "replace": "A named input section (.bss.I_ZoneBase.fox_zone) placed first in DRAM; the rest of .bss spills to TCM, CRAM and DRAM.",
+   "trap": "The function-static array section name includes the function name, so *(.bss.fox_zone) matched nothing; use *(.bss.*fox_zone*).",
+   "check": "map shows .fox_zone 0x77400 at 0x28000db0",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "zone of 477 kB in use when the demo stopped at frame 2030",
+     "path": "ports/doom/target-cc35x1/results/d1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:memory.place_big_array/named-section",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "memory.use_code_ram_for_data",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Add CRAM to the .bss spill list; 30 kB more zone.",
+   "trap": "Reading and writing data in the code RAM is assumed to work as on the vector table copy.",
+   "check": "data in the block reads back",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "image with data in CRAM ran demo1 to frame 2030",
+     "path": "ports/doom/target-cc35x1/results/d1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:memory.use_code_ram_for_data/default",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "flash.application_slot_size",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "ota-off",
+   "difficulty": "direct",
+   "replace": "Mem_cfg.ota = false and FreeRTOS.heapSize in the example .syscfg.",
+   "trap": "The 4 MB WAD is signed with the image; the Toolbox converts a 6.4 MB .out without complaint.",
+   "check": "signed image builds and boots",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "signed image 4,405 kB booted",
+     "path": "ports/doom/target-cc35x1/results/d1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:flash.application_slot_size/ota-off",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "rtos.big_thread_stack",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "THREADSTACKSIZE 16384 in main_freertos.c; the FreeRTOS heap must hold it.",
+   "trap": "The default is 1 kB, far too small for the engine.",
+   "check": "demo runs without a stack fault",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "demo1 ran 2030 frames",
+     "path": "ports/doom/target-cc35x1/results/d1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:rtos.big_thread_stack/default",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "udp.server_bind",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "lwip-raw",
+   "difficulty": "adapter",
+   "replace": "udp_new, udp_bind(pcb, IP_ANY_TYPE, 53) and a udp_recv callback; sockets also exist but the SDK UDP server uses the raw API.",
+   "trap": "Raw callbacks run on the tcpip thread: no blocking calls inside, and setup from another thread goes through tcpip_callback.",
+   "check": "a query gets an answer",
+   "proof": [
+    {
+     "port": "dns-sinkhole",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "blocked name answered in a median of 6 ms",
+     "path": "ports/dns-sinkhole/firmware/dns_min.c",
+     "results": "cc35x1:dns_blocked_latency_median_ms"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:udp.server_bind/lwip-raw",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "net.wifi_join_static",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "WIFI_IF_init, WIFI_IF_start(handler, WIFI_SERVICE_LVL_IP, timeout, &h), credentials in wifi_settings.h, wait for WIFI_STATUS_CONNECTED_IP.",
+   "trap": "Credentials are compile-time in the SDK demo; the build copy must stay out of git.",
+   "check": "board gets an address",
+   "proof": [
+    {
+     "port": "dns-sinkhole",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "joined and answered queries",
+     "path": "ports/dns-sinkhole/firmware/dns_boot.h"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:net.wifi_join_static/default",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "rodata.table_in_flash",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "incbin",
+   "difficulty": "direct",
+   "replace": ".incbin in file-scope inline asm into .rodata, which the linker places in execute-in-place QSPI flash.",
+   "trap": ".incbin needs an absolute path (passed as a define); the size comes from a label difference.",
+   "check": "lookup of listed names answers blocked",
+   "proof": [
+    {
+     "port": "dns-sinkhole",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "71,492-name table of 357,460 B in flash, lookups answered",
+     "path": "ports/dns-sinkhole/firmware/dns_sinkhole.c",
+     "results": "cc35x1:dns_image_flash_bytes"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:rodata.table_in_flash/incbin",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "http.status_page",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "lwip-raw",
+   "difficulty": "redesign",
+   "replace": "tcp_new, tcp_bind, tcp_listen, tcp_accept, tcp_recv; answer with tcp_write and tcp_close.",
+   "trap": "One tcp_recv per request, no parser; close after one write.",
+   "check": "a browser or curl gets the page",
+   "proof": [
+    {
+     "port": "dns-sinkhole",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "status page served",
+     "path": "ports/dns-sinkhole/firmware/dns_sinkhole.c"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:http.status_page/lwip-raw",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "storage.data_file_in_flash_xip",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "incbin-page-aligned",
+   "difficulty": "direct",
+   "replace": "The converted file included in the image by .incbin at a page-aligned symbol; TINY_WAD_ADDR=fox_whx names it, so every pointer read goes to the mapped flash.",
+   "trap": "The macro is used in a static initializer: an array symbol is a link-time constant, a function call is not.",
+   "check": "first 400 frame checksums equal the reference",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "three demos play from the in-place data",
+     "path": "ports/doom/target-cc35x1-whx/results/run-crc400.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:storage.data_file_in_flash_xip/incbin-page-aligned",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "memory.short_pointer_window",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "shortptr-base-dram",
+   "difficulty": "adapter",
+   "replace": "-DSHORTPTR_BASE=0x28000000 (start of DRAM) with the zone and all engine .bss inside 256 kB.",
+   "trap": "Not only the zone is pointed at: thinkercap and players are statics. The first link put the zone's end 4 kB past the window; the build now checks the three addresses.",
+   "check": "build.sh check passes and the CRCs equal the reference",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "window check in build.sh; CRCs equal",
+     "path": "ports/doom/target-cc35x1-whx/build.sh"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:memory.short_pointer_window/shortptr-base-dram",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "memory.bss_all_in_dram",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "linker-file-split",
+   "difficulty": "adapter",
+   "replace": "In the SDK linker file, .bss : > DRAM and the zone section before it; .data keeps the TCM spill.",
+   "trap": "A custom NOBITS output section for the zone is zero-filled by the start-up record; the output order follows the script, not the link order.",
+   "check": "map shows the sections in DRAM",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "engine runs from the changed layout",
+     "path": "ports/doom/target-cc35x1-whx/results/run-crc400.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:memory.bss_all_in_dram/linker-file-split",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "time.virtual_game_clock",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "35ms-per-read",
+   "difficulty": "direct",
+   "replace": "A counter that adds 35 ms per read.",
+   "trap": "A real clock makes the tics per frame depend on speed, so checksums differ between a fast and a slow host.",
+   "check": "checksums equal the emulator",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "checksums equal the emulator run",
+     "path": "ports/doom/target-cc35x1-whx/results/emulator-reference.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:time.virtual_game_clock/35ms-per-read",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "test.demo_end_report",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "one-line-patch",
+   "difficulty": "direct",
+   "replace": "A one-line build-time patch at the top of G_CheckDemoStatus.",
+   "trap": "A linker --wrap cannot see calls inside the same file, so wrapping the symbol would have missed the calls that matter.",
+   "check": "one DEMOEND line per demo",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "demo ends at frames 1,736, 3,092 and 3,881",
+     "path": "ports/doom/target-cc35x1-whx/results/run-crcall.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:test.demo_end_report/one-line-patch",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "video.frame_sink_crc",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "crc32-chain",
+   "difficulty": "direct",
+   "replace": "CRC-32 chain over the 320 x 168 buffer, printed every 100 frames.",
+   "trap": "Use the same bytes the emulator checksums, so the numbers compare.",
+   "check": "checksums equal the emulator run",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "chain over 3,881 frames equals the emulator",
+     "path": "ports/doom/target-cc35x1-whx/results/run-crcall.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:video.frame_sink_crc/crc32-chain",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "memory.fast_ram_for_hot_data",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "tcm-statics-zone-stack",
+   "difficulty": "adapter",
+   "replace": "Statics, zone, render list and thread stack in the 128 kB TCM, window base 0x20000000, big buffers in DRAM; linker sections per object.",
+   "trap": "The 512 kB DRAM costs 6 cycles an access, TCM 1: the first port ran at half speed with identical code. Measure load latency per memory before blaming the flash.",
+   "check": "load cycles per memory measured, then frames per second",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "measured",
+     "what": "22.5 to 39.2 frames/s (render files at -O2) with checksums equal to the emulator",
+     "path": "ports/doom/target-cc35x1-whx/results/memory-latency.txt",
+     "results": "cc35x1:load_cycles_per_word"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:memory.fast_ram_for_hot_data/tcm-statics-zone-stack",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "storage.lump_ram_cache",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "ram-arena-on-first-use",
+   "difficulty": "adapter",
+   "replace": "A lump_data() hook copies a lump to a RAM arena on first use (a word from flash costs 44 cycles and there is no data cache).",
+   "trap": "Lump pointers live on, so level data has its own arena that restarts on a level change; keep the lump's address alignment (the colormap needs 256).",
+   "check": "frame checksums equal the emulator",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "measured",
+     "what": "36.7 frames/s with the lump cache, checksums equal",
+     "path": "docs/experiments/2026-10-20-doom-smallest-ti-chip.md",
+     "results": "cc35x1:port_frames_per_second"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:storage.lump_ram_cache/ram-arena-on-first-use",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "perf.cycle_counter_without_dwt",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "tick-times-reload-plus-systick",
+   "difficulty": "direct",
+   "replace": "RTOS tick count times the SysTick reload plus the SysTick count.",
+   "trap": "CYCCNT reads 0 on this chip; a profile built on it shows nothing.",
+   "check": "the profile (PROF=1) shows cycles per function",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "profile before and after the TCM move read from the serial port",
+     "path": "ports/doom/target-cc35x1-whx/results/profile-after.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:perf.cycle_counter_without_dwt/tick-times-reload-plus-systick",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "tooling.uninitialized_stack_array",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "zero-the-array-then-compare",
+   "difficulty": "none",
+   "replace": "Fix the engine so draw_composite_columns zeroes its stack array; the checksums at -O2 and -Os then agree.",
+   "trap": "Before the fix a compiler flag change (-O2) altered the demo 3 checksum; the earlier reference e9db8f1d was the unfixed engine and the fixed one is fc7b6c2d.",
+   "check": "frame chain after demo 3 equals the emulator at -O2 and at -Os",
+   "instead": "Do not judge an optimisation level by checksums until the engine zeroes the array; patch the array in the build copy (the stack-array fix) and recompute the reference from the emulator.",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "ran",
+     "what": "chain fc7b6c2d equal to the emulator at -O2 and -Os, 39.2 frames/s at -O2",
+     "path": "ports/doom/target-cc35x1-whx/results/run-o2-crcall.txt",
+     "results": "cc35x1:port_frame_crc_end"
+    }
+   ],
+   "status": "proven",
+   "id": "wifi:tooling.uninitialized_stack_array/zero-the-array-then-compare",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "display.indexed_to_rgb565_bands",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "palette-table-two-dram-buffers",
+   "difficulty": "direct",
+   "replace": "A 256-entry table of byte-swapped RGB565 words; bands of 8 rows converted into two DRAM buffers while the previous band goes out by DMA. 1:1 pixels, because the panel is 320 wide.",
+   "trap": "The 128 kB fast RAM is full (307 bytes free at a 32 kB zone); the driver statics took 1.3 kB, so the panel build needs a 31 kB zone and the band buffers go to the DRAM arena, not .bss.",
+   "check": "the build links and signs; on a panel the title screen shows the right colours (not yet run)",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "built",
+     "what": "PANEL=1 build.sh 31 links and signs; 2,084,118 B flash",
+     "path": "ports/doom/target-cc35x1-whx/panel_cc35x1.c",
+     "results": "cc35x1:port_flash_bytes"
+    }
+   ],
+   "status": "built",
+   "id": "wifi:display.indexed_to_rgb565_bands/palette-table-two-dram-buffers",
+   "boards": [
+    "cc35x1"
+   ]
+  },
+  {
+   "idiom": "spi.cs_gpio_between_commands",
+   "families": [
+    "WIFI"
+   ],
+   "variant": "ti-drivers-spi-callback-dma-gpio-cs",
+   "difficulty": "adapter",
+   "replace": "TI Drivers SPI in three-pin controller mode with a callback and DMA, 8-bit frames; chip select is a GPIO.",
+   "trap": "The board silkscreen prints ball numbers (BP.7 reads P18), not GPIO numbers; the SDK board file has the map. The build.sh default zone is 32 kB but the README stated 40 kB, which no longer links with the driver.",
+   "check": "the generated pin list shows SPI0 on GPIO27/28/29 and CS, DC, RST and BL on GPIO26/16/19/31",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "cc35x1",
+     "level": "built",
+     "what": "generated pins confirmed in the build; not run, no wire placed",
+     "path": "ports/doom/target-cc35x1-whx/PANEL-WIRING.md"
+    }
+   ],
+   "status": "built",
+   "id": "wifi:spi.cs_gpio_between_commands/ti-drivers-spi-callback-dma-gpio-cs",
+   "boards": [
+    "cc35x1"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,46 @@
+// Pico SDK on MSPM0, LP-MSPM0G3519: UART0 PA10/PA11 115200 (probe backchannel, the Pico's default UART), I2C2 PC3 (SDA) / PC2 (SCL)
+// 100 kHz (the Pico's default I2C), ADC0 channel 0 on PA27 (the Pico's ADC input 0), touch reset PB11 held high. 32 MHz SYSOSC.
+// The LED on PB27 and the PWM timer TIMA1 are set up at run time by the layer (gpio_init, pwm_init), so they are not here.
+//@cliArgs --device "MSPM0G351X" --package "LQFP-100(PZ)" --part "Default"
+//@v2CliArgs --device "MSPM0G3519" --package "LQFP-100(PZ)"
+// @cliArgs --board /ti/boards/LP_MSPM0G3519 --rtos nortos
+const Board  = scripting.addModule("/ti/driverlib/Board", {}, false);
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GB     = GPIO.addInstance();
+const I2C    = scripting.addModule("/ti/driverlib/I2C", {}, false);
+const I2C2   = I2C.addInstance();
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const ADC12  = scripting.addModule("/ti/driverlib/ADC12", {}, false);
+const ADC121 = ADC12.addInstance();
+
+GB.$name = "PB";
+GB.port  = "PORTB";
+GB.associatedPins.create(1);
+GB.associatedPins[0].$name = "TP_RST"; GB.associatedPins[0].assignedPin = "11"; GB.associatedPins[0].initialValue = "SET";
+
+I2C2.$name                     = "PICO_I2C0";
+I2C2.basicEnableController     = true;
+I2C2.basicControllerBusSpeed   = 100000;
+I2C2.peripheral.$assign        = "I2C2";
+I2C2.peripheral.sdaPin.$assign = "PC3";
+I2C2.peripheral.sclPin.$assign = "PC2";
+
+UART1.$name                    = "PICO_UART0";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+UART1.targetBaudRate           = 115200;
+
+ADC121.$name                      = "PICO_ADC";
+ADC121.sampClkSrc                 = "DL_ADC12_CLOCK_SYSOSC";
+ADC121.sampClkDiv                 = "DL_ADC12_CLOCK_DIVIDE_8";
+ADC121.adcMem0chansel             = "DL_ADC12_INPUT_CHAN_0";
+ADC121.sampleTime0                = "125 us";
+ADC121.adcMem0vrefp               = "VDDA";
+ADC121.peripheral.$assign         = "ADC0";
+ADC121.peripheral.adcPin0.$assign = "PA27";
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;

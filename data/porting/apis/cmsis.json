@@ -1,0 +1,57 @@
+{
+ "api": "cmsis",
+ "vendor": "Arm",
+ "detect": "\\bNVIC_\\w+|__disable_irq|__set_MSP|\\w+_IRQHandler|SystemCoreClockUpdate",
+ "symbol_re": "\\b(?:NVIC_[A-Za-z]+|__(?:set_MSP|disable_irq|enable_irq|get_PRIMASK|set_PRIMASK|WFI|WFE)|[A-Za-z0-9_]+_IRQHandler|SystemCoreClockUpdate|SystemInit|SysTick_Config)\\b",
+ "calls_only": true,
+ "entries": [
+  {
+   "match": "NVIC_EnableIRQ|NVIC_DisableIRQ|NVIC_ClearPendingIRQ|NVIC_GetPendingIRQ|NVIC_SetPendingIRQ",
+   "idiom": "irq.enable",
+   "note": "same call on every Cortex-M; the line number differs",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "NVIC_SetPriority|NVIC_GetPriorityGrouping|NVIC_EncodePriority",
+   "idiom": "irq.priority",
+   "note": "the number of priority bits differs by core (M0+ has 2)",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "__disable_irq|__enable_irq|__get_PRIMASK|__set_PRIMASK",
+   "idiom": "irq.global_disable",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "NVIC_SystemReset",
+   "idiom": "system.reset",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "__WFI|__WFE",
+   "idiom": "power.sleep",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "[A-Za-z0-9_]+_IRQHandler",
+   "idiom": "irq.vector_name",
+   "note": "Cortex-M core handlers (SysTick, HardFault, NMI) keep their names; peripheral handler names and which pins share a vector differ",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "SystemCoreClockUpdate|SystemInit|SysTick_Config",
+   "idiom": "clock.system_config",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "__set_MSP",
+   "idiom": "boot.jump_to_app",
+   "note": "loads the application's initial stack pointer just before the jump; the hand-off needs more than that line (see the entry)",
+   "from": "port stm32-bootloader source"
+  }
+ ]
+}

@@ -1,0 +1,55 @@
+# ESPHome Bluetooth proxy on an ESP32-C6-DevKitC-1-N8, for Home Assistant on the Mac mini (Docker cannot use
+# the host's own Bluetooth). Built from esphome.io's recommended Wi-Fi proxy configuration (read 2026-10-07),
+# with the variant and flash size for this board and the debug sensors our plan reads (heap free at boot).
+# Secrets come from secrets.yaml beside this file (see secrets.example.yaml; never committed).
+#   esphome run frl-ble-proxy.yaml --device /dev/cu.usbmodemXXXX     first time, over USB
+#   esphome run frl-ble-proxy.yaml --device frl-ble-proxy.local      after that, over Wi-Fi
+substitutions:
+  name: frl-ble-proxy
+
+esphome:
+  name: ${name}
+  friendly_name: FRL Bluetooth proxy
+
+esp32:
+  variant: esp32c6
+  flash_size: 8MB
+  framework:
+    type: esp-idf
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+esp32_ble_tracker:
+
+bluetooth_proxy:
+  active: true
+
+debug:
+  update_interval: 60s
+
+sensor:
+  - platform: debug
+    free:
+      name: "Heap free"
+    block:
+      name: "Heap largest block"
+  - platform: wifi_signal
+    name: "Wi-Fi signal"
+    update_interval: 60s
+
+text_sensor:
+  - platform: debug
+    reset_reason:
+      name: "Reset reason"

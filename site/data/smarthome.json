@@ -1,0 +1,238 @@
+{
+ "note": "The smart-home lane: which home ecosystems a TI LaunchPad demo reaches, by which route, with what measured. Every 'works' claim names its source file. Rendered to site/smart-home.html by tools/render_smarthome.py. Checked against the vendors' public pages listed in sources.",
+ "checked": "2026-10-12",
+ "intro": "Will it show up in the app you already use? Home Assistant over Zigbee and Apple Home with a Matter device on the LP-EM-CC35X1 are measured. Apple Find My has a beacon that a Mac scanner matched. A green mark means it ran here and the write-up is linked.",
+ "boards": [
+  {
+   "id": "cc2340r5",
+   "name": "LP-EM-CC2340R5",
+   "page": "board-cc2340r5.html",
+   "radios": "Bluetooth LE, Zigbee, Thread radio for a host, proprietary 2.4 GHz"
+  },
+  {
+   "id": "cc1354p10",
+   "name": "LP-CC1354P10-1",
+   "page": "board-cc1354p10.html",
+   "radios": "Bluetooth LE, Zigbee, Thread, sub-1 GHz"
+  },
+  {
+   "id": "cc2755p10",
+   "name": "LP-EM-CC2755P10",
+   "page": "board-cc2755p10.html",
+   "radios": "Bluetooth LE, Zigbee, Thread, Matter over Thread as a TI evaluation build"
+  },
+  {
+   "id": "cc3551e",
+   "name": "LP-EM-CC35X1",
+   "page": "board-cc3551e.html",
+   "radios": "Wi-Fi, Bluetooth LE, Matter over Wi-Fi as a TI evaluation build"
+  }
+ ],
+ "ecosystems": [
+  {
+   "id": "home-assistant",
+   "name": "Home Assistant",
+   "status": "works",
+   "one_line": "Reached over Zigbee from three boards, one of them through ESPHome, and over Bluetooth from a BTHome beacon. The Thread pieces run.",
+   "routes": [
+    {
+     "name": "Zigbee through ZHA",
+     "status": "building",
+     "board": "cc2340r5",
+     "proof": "Worked on 2026-10-05; the 2026-10-16 repeat did not join Home Assistant in three tries (cause open). TI's on/off light example with two settings changed joined the house network 37 s after flashing, through a ZBT-2 coordinator: 20 of 20 switches landed, median 95 ms (one run of 20). Two hours later, after re-pairing, the same board answered in about 5 s (30 of 30 landed); cause unknown, suspected radio environment. The over-the-air update from Home Assistant started and stalled at 0.32% to 1.34% in four tries that were not identical (the fourth with the board moved closer); cause unknown, suspected radio environment.",
+     "source": "cc2340r5/zigbee/README.md",
+     "faq": [
+      "faq-cc2340r5.html#why-does-your-zigbee-board-answer-in-5-seconds-instead-of-un",
+      "faq-cc2340r5.html#the-zigbee-update-starts-and-stalls-at-about-1"
+     ],
+     "sources_more": [
+      "cc2340r5/matrix/zigbee_ota.progress.md"
+     ],
+     "summary": "Worked on 2026-10-05 (20 of 20, median 95 ms); the 2026-10-16 repeat did not join Home Assistant, cause open."
+    },
+    {
+     "name": "Zigbee sleepy sensor through ZHA",
+     "status": "works",
+     "board": "cc1354p10",
+     "proof": "TI's temperature-sensor example with one patch joined ZHA 6.0 s after boot (the one clean join; four of six earlier attempts lost the network key), showed as an entity 162 s later, and answered 20 of 20 reads at a median 1.6 s against a 3 s poll. The radio sleeps between polls; the sleep current is not measured.",
+     "source": "cc1354p10/zigbee-sleepy-sensor/README.md",
+     "faq": [
+      "board-cc1354p10.html#why-does-a-sleepy-zigbee-sensor-associate-but-not-get-the-ne",
+      "faq-cc1354p10.html#the-sensor-joined-but-home-assistant-took-almost-three-minut",
+      "faq-cc1354p10.html#home-assistant-shows-the-board-as-unk-manufacturer-unk-model"
+     ],
+     "summary": "TI's temperature sensor joined 6.0 s after boot, the one clean join in six tries. It answered 20 of 20 reads, median 1.6 s."
+    },
+    {
+     "name": "Thread, as the radio of a border router",
+     "status": "building",
+     "board": "cc2340r5",
+     "proof": "TI's radio co-processor image on the CC2340R5, driven by an OpenThread host, joined a live Thread mesh as a router (ping median 42 to 44 ms, 20 of 20), and later served as the radio of an OpenThread host running on the LP-CC1354P10-1, which formed a network and was leader within 16 s (one check). Home Assistant's Thread and Matter integrations have not been pointed at it.",
+     "source": "border-router/README.md",
+     "sources_more": [
+      "border-router/host-cc1354/README.md"
+     ],
+     "faq": [
+      "faq-cc1354p10.html#the-openthread-host-on-the-cc1354p10-goes-silent-within-a-se",
+      "faq-cc2340r5.html#can-the-cc2340r5-be-a-thread-end-device-or-router"
+     ],
+     "summary": "The CC2340R5 joined a live Thread mesh as a router. Ping median 42 to 44 ms, 20 of 20."
+    },
+    {
+     "name": "Bluetooth, BTHome beacon (a port of a public example)",
+     "status": "works",
+     "board": "cc2340r5",
+     "proof": "TI's basic_ble example as a broadcaster plus one C file sends BTHome v2 advertisements. Home Assistant runs in Docker on a Mac, so an ESPHome Bluetooth proxy (an ESP32-C6) relays them; Home Assistant offered the device on its own and the first temperature arrived 60 s after power-on (one run, 2026-10-12).",
+     "source": "ports/bthome/README.md",
+     "faq": [
+      "faq-cc2340r5.html#home-assistant-in-docker-on-a-mac-cannot-see-bluetooth-devic"
+     ],
+     "summary": "Home Assistant found the BTHome v2 beacon through a Bluetooth proxy and showed the chip temperature, with no pairing (one run)."
+    },
+    {
+     "name": "ESPHome on a TI chip",
+     "status": "works",
+     "board": "cc2755p10",
+     "proof": "Two ESPHome platforms (cc27xx, cc23xx) in ports/esphome-ti/. The CC2755P10 appeared in ZHA 5.7 to 6.3 s after the flash and switched its LED 32 of 32 times from Home Assistant. A second flash with the old device still listed never rejoined; removing the device first fixed it (cause unknown).",
+     "source": "docs/experiments/2026-10-13-esphome-cc27xx-platform.md",
+     "summary": "Point an ESPHome YAML at the repository's cc27xx platform and the LP-EM-CC2755P10 joins Home Assistant's Zigbee network as a router; 32 of 32 switches landed. The LP-EM-CC2340R5 runs the same way as an end device."
+    }
+   ],
+   "need": "Home Assistant (tested in Docker on a Mac), a Zigbee coordinator (tested with a Home Assistant Connect ZBT-2) or a Thread border router, and for Bluetooth beacons a proxy or a host whose Bluetooth Home Assistant can reach.",
+   "next": "Point Home Assistant's Thread integration at the two-board border router; check the BTHome beacon's temperature against a thermometer; measure join and command latency three times each so the medians are quoted properly."
+  },
+  {
+   "id": "apple-home",
+   "name": "Apple Home (HomeKit)",
+   "status": "works",
+   "one_line": "Measured over Matter on Wi-Fi on one board. A Matter thermostat on the LP-EM-CC35X1 pairs into the Home app and takes setpoint changes from the phone.",
+   "routes": [
+    {
+     "name": "Matter over Wi-Fi, directly",
+     "status": "works",
+     "board": "cc3551e",
+     "proof": "A Matter thermostat built from TI's lighting example (thermostat and occupancy data models swapped in; 1.7 MB of application, 579 kB of RAM) pairs into Apple Home from the Home app's setup code and the heating setpoint changes from the phone (2026-10-11, one pairing). Pair within 300 s of a fresh erase and program. Google Home, Alexa and Home Assistant have no recorded run.",
+     "source": "docs/experiments/2026-10-10-cc35x1-matter-thermostat.md",
+     "faq": [],
+     "summary": "A Matter thermostat pairs into Apple Home, and the heating setpoint changes from the phone. One pairing, 2026-10-11."
+    }
+   ],
+   "need": "An Apple home hub that is also a Thread border router: HomePod mini, HomePod (2nd generation), Apple TV 4K (2nd generation, or 3rd generation Wi-Fi + Ethernet). Apple says iPhone 15 Pro and later can control Thread accessories without a hub on iOS 18, but recommends one. An Apple TV is also a Thread border router; Home Assistant holds its network dataset, and a script to join a CC2340R5 radio to that network is written (border-router/host-cc1354/join_home_network.py). Joining the Apple TV's network is untested.",
+   "next": "Build TI's Matter lighting example on the LP-EM-CC2755P10, commission it from the Home app with a HomePod mini, time the pairing, then the same from Home Assistant's Matter server."
+  },
+  {
+   "id": "find-my",
+   "name": "Apple Find My",
+   "status": "building",
+   "one_line": "An AirTag-style beacon, on the air, not seen by Apple. The OpenHaystack advertisement runs on the CC2340R5, and a Mac scanner matched it 9 s after flashing. No iPhone location report has been fetched. It has the same shape as the Bluetooth beacon already running here: a public key in a Bluetooth LE advertisement, read back on a Mac.",
+   "routes": [
+    {
+     "name": "OpenHaystack-style beacon",
+     "status": "building",
+     "board": "cc2340r5",
+     "proof": "OpenHaystack (SEEMOO lab, TU Darmstadt) turns any Bluetooth LE device into an accessory tracked by Apple's Find My network: the board advertises a P-224 public key, nearby iPhones report its location encrypted to Apple, and a Mac app fetches and decrypts the reports. The app needs macOS 11 or later and an Apple Mail plugin that runs with elevated privileges (Gatekeeper is turned off for its install; Mail stays open while it runs). The project ships firmware for the BBC micro:bit v1 (nRF51), the ESP32 and Linux, and says any Bluetooth LE device can be ported. The port was built from TI's basic_ble example with one SysConfig patch: a random static address and 31 bytes of Apple manufacturer data made from a throwaway test key. The build reads the generated config and confirms both match the key (104.6 kB of flash, 28 kB of RAM). Flashed on 2026-10-12: a Mac scanner matched the exact payload 9 s after the flash, two packets in 40 s at RSSI -55. Whether an iPhone has reported it is unknown until a report is fetched, which needs an Apple ID login. Caveats from the project itself: experimental software, a fixed key makes the tag trackable by others, and it uses a private Apple interface; it is not an Apple-certified accessory.",
+     "source": "ports/findmy/README.md",
+     "summary": "The image passes its byte check. A Mac scanner matched the payload 9 s after the flash. No iPhone report was fetched."
+    }
+   ],
+   "need": "A Mac running the OpenHaystack app and iPhones passing by; nothing else in the house.",
+   "next": "Fetch reports with OpenHaystack or a third-party fetcher (an Apple ID is needed and whether the Mail plugin works on macOS 15 is unknown), take it for a walk and time the first location report, then measure the beacon's current so a coin-cell estimate goes in the battery calculator."
+  }
+ ],
+ "matrix_note": "Works: it ran here and did what it should, write-up linked. Could work: the pieces run and the last step does not. Not for this chip: the vendor offers no software for it on that chip.",
+ "matrix": {
+  "cc2340r5": {
+   "home-assistant": "building",
+   "find-my": "building"
+  },
+  "cc1354p10": {
+   "home-assistant": "works"
+  },
+  "cc2755p10": {
+   "home-assistant": "works"
+  },
+  "cc3551e": {
+   "apple-home": "works"
+  }
+ },
+ "matrix_notes": {
+  "cc2340r5:home-assistant": "Zigbee through ZHA: 20 of 20 switches landed, median 95 ms (one run, 2026-10-05); the 2026-10-16 repeat did not join Home Assistant (cause open).",
+  "cc1354p10:home-assistant": "Zigbee sleepy sensor through ZHA: joined and answered 20 of 20 reads; the one clean join in six tries.",
+  "cc2755p10:home-assistant": "ESPHome Zigbee router through ZHA: joined 5.7 to 6.3 s after the flash, 32 of 32 switches.",
+  "cc2340r5:find-my": "Needs the OpenHaystack advertisement ported to the BTHome beacon, and a Mac with the app.",
+  "cc3551e:apple-home": "A Matter thermostat pairs and takes setpoint changes from the Home app (2026-10-11)."
+ },
+ "how_we_test": [
+  "Every join is timed from power-on to the device appearing in the app, three runs before a median is quoted (one run is marked as one run).",
+  "Every command is timed twenty times from the app to the state change, and the ones that landed are counted.",
+  "Every 'works' line links the write-up with the exact commands, the settings changed in the SDK example, and the traps with their cause.",
+  "Nothing is claimed that was only seen on screen without a saved log."
+ ],
+ "sources": [
+  "cc2340r5/zigbee/README.md",
+  "cc1354p10/zigbee-sleepy-sensor/README.md",
+  "border-router/host-cc1354/README.md",
+  "ports/bthome/README.md",
+  "docs/archive/esphome-on-ti-plan.md",
+  "docs/research/ti-portfolio-specs-2026-10-06.md",
+  "docs/guides/choose.md",
+  "border-router/README.md",
+  "docs/inventory.md"
+ ],
+ "external": [
+  {
+   "what": "TI Matter releases (supported devices, evaluation-only status)",
+   "url": "https://github.com/TexasInstruments/matter/releases"
+  },
+  {
+   "what": "OpenHaystack (SEEMOO lab): how a DIY Find My accessory works",
+   "url": "https://github.com/seemoo-lab/openhaystack"
+  },
+  {
+   "what": "Apple Support: Thread-enabled home hubs (HomePod and Apple TV models)",
+   "url": "https://support.apple.com/en-us/102287"
+  }
+ ],
+ "terms": [
+  [
+   "Matter",
+   "A common language for smart-home devices from the Connectivity Standards Alliance; runs over Thread, Wi-Fi or Ethernet, so one device can be added to several home apps."
+  ],
+  [
+   "Commissioning",
+   "Adding a Matter device to a home: scan its QR code in the app, and the hub gives it the network keys. Multi-admin means the same device can be added to several apps at once."
+  ],
+  [
+   "Thread border router",
+   "The hub box that connects a Thread mesh to the home Wi-Fi; HomePod mini, Nest Hub (2nd generation) and Echo (4th generation) each contain one."
+  ],
+  [
+   "Early access, evaluation only",
+   "TI's labels for a software release that is published for trying out but not certified or supported for products; a general-availability (GA) release is."
+  ],
+  [
+   "ZHA",
+   "Home Assistant's built-in Zigbee integration, which talks to a coordinator stick such as the ZBT-2."
+  ],
+  [
+   "Radio co-processor (RCP)",
+   "A Thread chip that only runs the radio while a bigger host runs the network stack; the CC2340R5 plays this part in the border router here."
+  ],
+  [
+   "BTHome",
+   "An open format for Bluetooth LE sensor beacons that Home Assistant decodes without pairing."
+  ],
+  [
+   "P-224 key",
+   "The public key an OpenHaystack beacon advertises; the matching private key stays on the Mac and decrypts the location reports."
+  ],
+  [
+   "OTA",
+   "Over-the-air update: new firmware sent over the radio instead of a cable."
+  ],
+  [
+   "RSSI, weak link",
+   "Received signal strength in dBm; -30 is next to the hub, -90 is barely heard. A weak link can make commands slow; it is suspected, but was not shown, that it caused the slow commands and stalled updates."
+  ]
+ ]
+}

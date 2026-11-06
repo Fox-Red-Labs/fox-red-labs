@@ -1,0 +1,136 @@
+# In the Hall of the Mountain King
+# Composer: Edvard Grieg (1843-1907). Work: Peer Gynt Suite No. 1, Op. 46, No. 4 (1874-75), public domain.
+# Arrangement: ours, for four chip voices, 2026-10-25. Notes written from Grieg's own piano score (The University
+# Society, 1918; public-domain edition typeset by the Mutopia Project, piece 1888): melody, the pizzicato bass and the
+# off-beat chords. Shortened (each phrase pair once per tempo step) and the octave doublings are our choices.
+# The accelerando: the score starts at quarter = 138 and speeds up to the end ("sempre stretto sin al fine");
+# here every bar is a little faster, from quarter = 120 to 200, which keeps the staccato notes clear on a small
+# speaker; the closing hits stay at 200.
+# One row is a sixteenth note, so each tempo value is twice the quarter-note BPM.
+# Columns: lead (pulse 25%) | harmony (pulse 50%) | bass (triangle) | drums (noise). Tokens as in fox_run.tune.
+vol 11 7 13 7
+# intro: the fermata F# octave in the low strings
+tempo 240
+F#4 - - - - - - - - - - - - - - - | F#3 - - - - - - - - - - - - - - - | F#2 - - - - - - - - - - - - - - - | . . . . . . . . . . . . . . . .
+tempo 240
+# A: B minor, staccato, pp
+B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 - - . | . . . . . . . . . . . . . . . . | B2 . . . F#3 . . . B2 . . . F#3 . . . | . . . . . . . . . . . . . . . .
+tempo 243
+F5 . C#5 . F5 - - . E5 . C5 . E5 - - . | . . . . . . . . . . . . . . . . | B2 . . . F#3 . . . B2 . . . F#3 . . . | . . . . . . . . . . . . . . . .
+tempo 246
+B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 . B5 . | . . . . . . . . . . . . . . . . | B2 . . . F#3 . . . B2 . . . F#3 . . . | . . . . . . . . . . . . . . . .
+tempo 249
+A5 . F#5 . D5 . F#5 . A5 - - - - - - . | . . . . . . . . . . . . . . . . | D3 . . . A3 . . . D3 . . . A3 . . . | . . . . . . . . . . . . . . . .
+tempo 252
+# A again
+B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 - - . | . . . . . . . . . . . . . . . . | B2 . . . F#3 . . . B2 . . . F#3 . . . | . . . . . . . . . . . . . . . .
+tempo 255
+F5 . C#5 . F5 - - . E5 . C5 . E5 - - . | . . . . . . . . . . . . . . . . | B2 . . . F#3 . . . B2 . . . F#3 . . . | . . . . . . . . . . . . . . . .
+tempo 257
+B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 . B5 . | . . . . . . . . . . . . . . . . | B2 . . . F#3 . . . B2 . . . F#3 . . . | . . . . . . . . . . . . . . . .
+tempo 260
+A5 . F#5 . D5 . F#5 . A5 - - - - - - . | . . . . . . . . A3 - - - - - - . | D3 . . . A3 . . . D3 . . . A3 . . . | . . . . . . . . . . . . . . . .
+tempo 263
+# B: on F#
+F#4 . G#4 . A#4 . B4 . C#5 . A#4 . C#5 - - . | . . . . . . . . . . . . . . . . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | . . . . . . . . . . . . . . . .
+tempo 266
+D5 . A#4 . D5 - - . C#5 . A#4 . C#5 - - . | . . . . . . . . . . . . . . . . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | . . . . . . . . . . . . . . . .
+tempo 269
+F#4 . G#4 . A#4 . B4 . C#5 . A#4 . C#5 - - . | . . . . . . . . . . . . . . . . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | . . . . . . . . . . . . . . . .
+tempo 272
+D5 . A#4 . D5 - - . C#5 - - - - - - . | . . . . . . . . . . . . . . . . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | . . . . . . . . . . . . . . . .
+tempo 275
+# B again, a soft kick enters
+F#4 . G#4 . A#4 . B4 . C#5 . A#4 . C#5 - - . | . . . . . . . . . . . . . . . . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | k - - - - - - - - - - - - - - -
+tempo 278
+D5 . A#4 . D5 - - . C#5 . A#4 . C#5 - - . | . . . . . . . . . . . . . . . . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | k - - - - - - - - - - - - - - -
+tempo 281
+F#4 . G#4 . A#4 . B4 . C#5 . A#4 . C#5 - - . | . . . . . . . . . . . . . . . . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | k - - - - - - - - - - - - - - -
+tempo 283
+D5 . A#4 . D5 - - . C#5 - - - - - - . | . . . . . . . . . . . . . . . . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | k - - - - - - - - - - - - - - -
+tempo 286
+# A an octave up, off-beat chords
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 - - . | . . . . F#4 - - . . . . . F#4 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - - - - - - - k - - - - - - -
+tempo 289
+F6 . C#6 . F6 - - . E6 . C6 . E6 - - . | . . . . F#4 - - . . . . . F#4 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - - - - - - - k - - - - - - -
+tempo 292
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 . B6 . | . . . . F#4 - - . . . . . F#4 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - - - - - - - k - - - - - - -
+tempo 295
+A6 . F#6 . D6 . F#6 . A6 - - - - - - . | . . . . A4 - - . . . . . D5 - - . | D3 . . . A3 . . . D3 . . . A3 . . . | k - - - - - - - k - - - - - - -
+tempo 298
+# B, crescendo
+F#5 . G#5 . A#5 . B5 . C#6 . A#5 . C#6 - - . | . . . . F#4 - - . . . . . A#4 - - . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | k - - - . . . . s - - - . . . .
+tempo 301
+D6 . A#5 . D6 - - . C#6 . A#5 . C#6 - - . | . . . . F#4 - - . . . . . A#4 - - . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | k - - - . . . . s - - - . . . .
+tempo 304
+F#5 . G#5 . A#5 . B5 . C#6 . A#5 . C#6 - - . | . . . . F#4 - - . . . . . A#4 - - . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | k - - - . . . . s - - - . . . .
+tempo 307
+D6 . A#5 . D6 - - . C#6 - - - - - - . | . . . . F#4 - - . . . . . A#4 - - . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | k - - - . . . . s - - - . . . .
+tempo 310
+# Piu vivo: lead and harmony in octaves
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 - - . | B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - h - h - s - h - h - h -
+tempo 312
+F6 . C#6 . F6 - - . E6 . C6 . E6 - - . | F5 . C#5 . F5 - - . E5 . C5 . E5 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - h - h - s - h - h - h -
+tempo 315
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 . B6 . | B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 . B5 . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - h - h - s - h - h - h -
+tempo 318
+A6 . F#6 . D6 . F#6 . A6 - - - - - - . | A5 . F#5 . D5 . F#5 . A5 - - - - - - . | D3 . . . A3 . . . D3 . . . A3 . . . | k - h - h - h - s - h - h - h -
+tempo 321
+# A again
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 - - . | B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - h - h - s - h - h - h -
+tempo 324
+F6 . C#6 . F6 - - . E6 . C6 . E6 - - . | F5 . C#5 . F5 - - . E5 . C5 . E5 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - h - h - s - h - h - h -
+tempo 327
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 . B6 . | B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 . B5 . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - h - h - s - h - h - h -
+tempo 330
+A6 . F#6 . D6 . F#6 . A6 - - - - - - . | A5 . F#5 . D5 . F#5 . A5 - - - - - - . | D3 . . . A3 . . . D3 . . . A3 . . . | k - h - h - h - s - h - h - h -
+tempo 333
+# stretto: B in octaves
+F#5 . G#5 . A#5 . B5 . C#6 . A#5 . C#6 - - . | F#4 . G#4 . A#4 . B4 . C#5 . A#4 . C#5 - - . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | k - h - k - h - s - h - k - s -
+tempo 336
+D6 . A#5 . D6 - - . C#6 . A#5 . C#6 - - . | D5 . A#4 . D5 - - . C#5 . A#4 . C#5 - - . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | k - h - k - h - s - h - k - s -
+tempo 339
+F#5 . G#5 . A#5 . B5 . C#6 . A#5 . C#6 - - . | F#4 . G#4 . A#4 . B4 . C#5 . A#4 . C#5 - - . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | k - h - k - h - s - h - k - s -
+tempo 341
+D6 . A#5 . D6 - - . C#6 . A#5 . C#6 - - . | D5 . A#4 . D5 - - . C#5 . A#4 . C#5 - - . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | k - h - k - h - s - h - k - s -
+tempo 344
+# B again
+F#5 . G#5 . A#5 . B5 . C#6 . A#5 . C#6 - - . | F#4 . G#4 . A#4 . B4 . C#5 . A#4 . C#5 - - . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | k - h - k - h - s - h - k - s -
+tempo 347
+D6 . A#5 . D6 - - . C#6 . A#5 . C#6 - - . | D5 . A#4 . D5 - - . C#5 . A#4 . C#5 - - . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | k - h - k - h - s - h - k - s -
+tempo 350
+F#5 . G#5 . A#5 . B5 . C#6 . A#5 . C#6 - - . | F#4 . G#4 . A#4 . B4 . C#5 . A#4 . C#5 - - . | F#2 . . . C#3 . . . F#2 . . . C#3 . . . | k - h - k - h - s - h - k - s -
+tempo 353
+D6 . A#5 . D6 - - . C#6 - - - - - - . | D5 . A#4 . D5 - - . C#5 - - - - - - . | D2 . . . A#2 . . . F#2 . . . C#3 . . . | k - h - k - h - s - h - k - s -
+tempo 356
+# A, last time
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 - - . | B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - k - h - s - h - k - s -
+tempo 359
+F6 . C#6 . F6 - - . E6 . C6 . E6 - - . | F5 . C#5 . F5 - - . E5 . C5 . E5 - - . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - k - h - s - h - k - s -
+tempo 362
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 . B6 . | B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 . B5 . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - k - h - s - h - k - s -
+tempo 365
+A6 . F#6 . D6 . F#6 . A6 - - - - - - . | A5 . F#5 . D5 . F#5 . A5 - - - - - - . | D3 . . . A3 . . . D3 . . . A3 . . . | k - h - k - h - s - h - k - s -
+tempo 400
+# ending: hits, the run, hits, the last crash
+. . . . G#5 A5 A#5 B5 . . . . . . . . | . . . . D5 . . . . . . . . . . . | B2 . . . . . . . . . . . . . . . | k - - - k - - - . . . . . . . .
+tempo 400
+. . . . G#5 A5 A#5 B5 . . . . . . . . | . . . . D5 . . . . . . . . . . . | B2 . . . . . . . . . . . . . . . | k - - - k - - - . . . . . . . .
+tempo 400
+B5 . C#6 . D6 . E6 . F#6 . D6 . F#6 . B6 . | B4 . C#5 . D5 . E5 . F#5 . D5 . F#5 . B5 . | B2 . . . F#3 . . . B2 . . . F#3 . . . | k - h - k - h - s - h - k - s -
+tempo 400
+A#5 . F#5 . A#5 . C#6 . B5 - - - - - - . | A#4 . F#4 . A#4 . C#5 . B4 - - - - - - . | F#2 . . . F#3 . . . B2 - - - - - - . | k - h - k - h - s - - - - - - -
+tempo 400
+. . . . G#5 A5 A#5 B5 . . . . . . . . | . . . . D5 . . . . . . . . . . . | B2 . . . . . . . . . . . . . . . | k - - - k - - - . . . . . . . .
+tempo 400
+. . . . G#5 A5 A#5 B5 . . . . . . . . | . . . . D5 . . . . . . . . . . . | B2 . . . . . . . . . . . . . . . | k - - - k - - - . . . . . . . .
+tempo 400
+. . . . G#5 A5 A#5 B5 G#5 A5 A#5 B5 G#5 A5 A#5 B5 | . . . . D5 . . . D5 . . . D5 . . . | . . . . B2 . . . B2 . . . B2 . . . | . . . . k - - - k - - - k - - -
+tempo 400
+G#5 A5 A#5 B5 G#5 A5 A#5 B5 G#5 A5 A#5 B5 G#5 A5 A#5 B5 | D5 . . . D5 . . . D5 . . . D5 . . . | B2 . . . B2 . . . B2 . . . B2 . . . | k - - - k - - - k - - - k - - -
+tempo 400
+. . . . . . . . . . . . . . . . | . . . . . . . . . . . . . . . . | B1 B2 B1 B2 B1 B2 B1 B2 B1 B2 B1 B2 B1 B2 B1 B2 | h h h h h h h h s s s s s s s s
+tempo 400
+. . . . G#5 A5 A#5 B5 - - - - - - - . | . . . . D5 - - - - - - - - - - . | . . . . B2 - - - - - - - - - - . | . . . . k - - - - - - - - - - -
+tempo 400
+. . . . . . . . | . . . . . . . . | . . . . . . . . | . . . . . . . .

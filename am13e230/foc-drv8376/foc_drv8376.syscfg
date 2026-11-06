@@ -1,0 +1,398 @@
+/**
+ * Ported from TI's 3sh_hall_sen_foc_drv8323rh.syscfg (AM13E2X SDK 26.01.00.03) to the DRV8376EVM on the
+ * LP-AM13E230. Every change from the SDK file is listed in ../PORT-LOG.md (file foc_drv8376.syscfg).
+ * Naming kept from the SDK so the C sources need no macro renames: U = phase A (ISENA, VSENA), V = phase B,
+ * W = phase C.
+ *
+ * ADC placement (forced by what each pin offers; proven on the bench in ../bldc-drv8376/bldc.syscfg):
+ *   ADC0  SOC0 VSENA PA17 (MTR1_VU_SEN)   SOC1 VSENVM PA16 (MTR1_VDC_SEN)
+ *   ADC1  SOC0 ISENC PA27 (MTR1_IW_SEN)   SOC1 VSENC PA18 (MTR1_VW_SEN)
+ *   ADC2  SOC0 ISENB PA30 (MTR1_IV_SEN)   SOC1 ISENA PA29 (MTR1_IU_SEN)   SOC2 VSENB PA28 (MTR1_VV_SEN)
+ * The control interrupt is ADC2 INT1 on the last conversion (SOC2), so every result is in when the ISR reads it.
+ *
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "TI MCU SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "TI MCU SDK@26.01.00"
+ * @versions {"tool":"1.28.0+4696"}
+ */
+
+/**
+ * Import the modules used in this configuration.
+ */
+const adc         = scripting.addModule("/drivers/adc", {}, false);
+const adc1        = adc.addInstance();
+const adc2        = adc.addInstance();
+const adc3        = adc.addInstance();
+const cmpsslite   = scripting.addModule("/drivers/cmpsslite", {}, false);
+const cmpsslite1  = cmpsslite.addInstance();
+const cmpsslite2  = cmpsslite.addInstance();
+const cmpsslite3  = cmpsslite.addInstance();
+const config      = scripting.addModule("/drivers/config");
+const ecap        = scripting.addModule("/drivers/ecap", {}, false);
+const ecap1       = ecap.addInstance();
+const ecap2       = ecap.addInstance();
+const gpio        = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1       = gpio.addInstance();
+const gpio2       = gpio.addInstance();
+const gpio3       = gpio.addInstance();
+const inputxbar   = scripting.addModule("/drivers/inputxbar", {}, false);
+const inputxbar1  = inputxbar.addInstance();
+const inputxbar2  = inputxbar.addInstance();
+const inputxbar3  = inputxbar.addInstance();
+const inputxbar4  = inputxbar.addInstance();
+const inputxbar5  = inputxbar.addInstance();
+const mcpwm       = scripting.addModule("/drivers/mcpwm", {}, false);
+const mcpwm1      = mcpwm.addInstance();
+const outputxbar  = scripting.addModule("/drivers/outputxbar", {}, false);
+const outputxbar1 = outputxbar.addInstance();
+const pwmxbar     = scripting.addModule("/drivers/pwmxbar", {}, false);
+const pwmxbar1    = pwmxbar.addInstance();
+const pwmxbar2    = pwmxbar.addInstance();
+const pwmxbar3    = pwmxbar.addInstance();
+const sysctl      = scripting.addModule("/drivers/sysctl");
+const uart        = scripting.addModule("/drivers/uart", {}, false);
+const uart1       = uart.addInstance();
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+adc1.$name                    = "ADC_0";
+adc1.numberOfSOCs             = 2;
+adc1.enableSEQs               = true;
+adc1.numberOfSEQs             = 1;
+adc1.SOC0.independentNameMode = true;
+adc1.SOC0.name                = "MTR1_VU_SEN";   // VSENA
+adc1.SOC0.channel             = "PA17";
+adc1.SOC1.independentNameMode = true;
+adc1.SOC1.name                = "MTR1_VDC_SEN";  // VSENVM, the bus
+adc1.SOC1.channel             = "PA16";
+adc1.SEQ1.independentNameMode = true;
+adc1.SEQ1.triggerSel          = "DL_ADC_TRIGGER_PWM4_SOCA";
+adc1.SEQ1.numberOfSOCs        = 2;
+
+adc2.$name                    = "ADC_1";
+adc2.adcBase                  = "ADC1";
+adc2.numberOfSEQs             = 1;
+adc2.numberOfSOCs             = 2;
+adc2.enableSEQs               = true;
+adc2.enabledPPBs              = ["PPB1"];
+adc2.SEQ1.triggerSel          = "DL_ADC_TRIGGER_PWM4_SOCA";
+adc2.SEQ1.numberOfSOCs        = 2;
+adc2.SOC0.independentNameMode = true;
+adc2.SOC0.name                = "MTR1_IW_SEN";   // physical ISENC, confirmed six-vector test
+adc2.SOC0.channel             = "PA27";
+adc2.SOC1.independentNameMode = true;
+adc2.SOC1.name                = "MTR1_VW_SEN";   // VSENC
+adc2.SOC1.channel             = "PA18";
+
+adc3.$name                     = "ADC_2";
+adc3.adcBase                   = "ADC2";
+adc3.interruptPulseMode        = "DL_ADC_PULSE_END_OF_CONV";
+adc3.enabledInts               = ["INT1"];
+adc3.registerInterrupts        = ["INT1"];
+adc3.INT1.enableInterrupt      = true;
+adc3.INT1.continuousMode       = true;
+adc3.INT1.SOCSource            = "SOC2";
+adc3.adc_INT1.$name            = "motor1CtrlISR";
+adc3.numberOfSEQs              = 1;
+adc3.enableSEQs                = true;
+adc3.numberOfSOCs              = 3;
+adc3.SEQ1.triggerSel           = "DL_ADC_TRIGGER_PWM4_SOCA";
+adc3.SEQ1.enableSampleCAPReset = true;
+adc3.SEQ1.sampleWindow         = 50;
+adc3.SEQ1.numberOfSOCs         = 3;
+adc3.SOC0.independentNameMode  = true;
+adc3.SOC0.name                 = "MTR1_IV_SEN";   // ISENB
+adc3.SOC0.channel              = "PA30";
+adc3.SOC1.independentNameMode  = true;
+adc3.SOC1.name                 = "MTR1_IU_SEN";   // physical ISENA, confirmed six-vector test
+adc3.SOC1.channel              = "PA29";
+adc3.SOC2.name                 = "MTR1_VV_SEN";   // VSENB
+adc3.SOC2.independentNameMode  = true;
+adc3.SOC2.channel              = "PA28";
+
+cmpsslite1.cmpssliteBase             = "CMPSS1";   // phase C, ISENC on PA27
+cmpsslite1.$name                     = "MTR1_CMPSS_W_BASE";
+cmpsslite1.useLowComparator          = true;   // H5: two-sided trip (low comparator, inverted: high when the sense falls below DACL)
+cmpsslite1.useFilterLow              = true;
+cmpsslite1.lowComp.tripSourceSelect  = "DL_CMPSSLITE_TRIP_FILTER";
+cmpsslite1.lowComp.invert            = true;
+cmpsslite1.lowComp.pMuxSel           = "PA27";
+cmpsslite1.lowComp.nMuxSel           = "DAC";
+cmpsslite1.lowFilter.initFilter      = true;
+cmpsslite1.lowFilter.threshold       = 8;
+cmpsslite1.lowFilter.sampleWindow    = 8;
+cmpsslite1.lowFilter.samplePrescale  = 1;
+cmpsslite1.lowFilter.asyncEnable     = true;
+cmpsslite1.lowFilter.latchReset      = true;
+cmpsslite1.lowDAC.initialDacValue    = 100;      // under any sense reading until the HAL sets the mirror threshold
+cmpsslite1.useDACLow                 = true;       // H5: the low comparator's reference (internal, no pin)
+cmpsslite1.syncSourceL               = "DL_CMPSSLITE_SYNCSOURCE_MCPWM4_SYNCPER";
+cmpsslite1.highComp.tripSourceSelect = "DL_CMPSSLITE_TRIP_FILTER";
+cmpsslite1.highComp.invert           = false;
+cmpsslite1.highComp.pMuxSel          = "PA27";
+cmpsslite1.highComp.nMuxSel          = "DAC";
+cmpsslite1.highFilter.initFilter     = true;
+cmpsslite1.highFilter.threshold      = 8;
+cmpsslite1.highFilter.sampleWindow   = 8;
+cmpsslite1.highFilter.samplePrescale = 1;
+cmpsslite1.highFilter.asyncEnable    = true;
+cmpsslite1.highFilter.latchReset     = true;
+cmpsslite1.highDAC.initialDacValue   = 1800;
+
+cmpsslite2.$name                     = "MTR1_CMPSS_V_BASE";
+cmpsslite2.cmpssliteBase             = "CMPSS2";   // phase B, ISENB on PA30
+cmpsslite2.useLowComparator          = false;
+cmpsslite2.useFilterLow              = false;
+cmpsslite2.useDACLow                 = false;      // leave PA4 high impedance; J4 DIV supplies ILIMIT
+cmpsslite2.syncSourceL               = "DL_CMPSSLITE_SYNCSOURCE_MCPWM4_SYNCPER";
+cmpsslite2.highComp.tripSourceSelect = "DL_CMPSSLITE_TRIP_FILTER";
+cmpsslite2.highComp.invert           = false;
+cmpsslite2.highComp.pMuxSel          = "PA30";
+cmpsslite2.highComp.nMuxSel          = "DAC";
+cmpsslite2.highFilter.initFilter     = true;
+cmpsslite2.highFilter.sampleWindow   = 8;
+cmpsslite2.highFilter.threshold      = 8;
+cmpsslite2.highFilter.samplePrescale = 1;
+cmpsslite2.highFilter.asyncEnable    = true;
+cmpsslite2.highFilter.latchReset     = true;
+cmpsslite2.highDAC.initialDacValue   = 1800;
+
+cmpsslite3.$name                     = "MTR1_CMPSS_U_BASE";
+cmpsslite3.cmpssliteBase             = "CMPSS0";   // phase A, ISENA on PA29
+cmpsslite3.useLowComparator          = true;   // H5: two-sided trip (low comparator, inverted: high when the sense falls below DACL)
+cmpsslite3.useFilterLow              = true;
+cmpsslite3.lowComp.tripSourceSelect  = "DL_CMPSSLITE_TRIP_FILTER";
+cmpsslite3.lowComp.invert            = true;
+cmpsslite3.lowComp.pMuxSel           = "PA29";
+cmpsslite3.lowComp.nMuxSel           = "DAC";
+cmpsslite3.lowFilter.initFilter      = true;
+cmpsslite3.lowFilter.threshold       = 8;
+cmpsslite3.lowFilter.sampleWindow    = 8;
+cmpsslite3.lowFilter.samplePrescale  = 1;
+cmpsslite3.lowFilter.asyncEnable     = true;
+cmpsslite3.lowFilter.latchReset      = true;
+cmpsslite3.lowDAC.initialDacValue    = 100;      // under any sense reading until the HAL sets the mirror threshold
+cmpsslite3.useDACLow                 = true;       // H5: the low comparator's reference (internal, no pin)
+cmpsslite3.syncSourceL               = "DL_CMPSSLITE_SYNCSOURCE_MCPWM4_SYNCPER";
+cmpsslite3.highComp.tripSourceSelect = "DL_CMPSSLITE_TRIP_FILTER";
+cmpsslite3.highComp.invert           = false;
+cmpsslite3.highComp.pMuxSel          = "PA29";
+cmpsslite3.highComp.nMuxSel          = "DAC";
+cmpsslite3.highFilter.initFilter     = true;
+cmpsslite3.highFilter.sampleWindow   = 8;
+cmpsslite3.highFilter.threshold      = 8;
+cmpsslite3.highFilter.samplePrescale = 1;
+cmpsslite3.highFilter.latchReset     = true;
+cmpsslite3.highFilter.asyncEnable    = true;
+cmpsslite3.highDAC.initialDacValue   = 1800;
+
+ecap1.$name         = "IPD_CAPTURE";
+ecap1.emulationMode = "DL_ECAP_EMULATION_FREE_RUN";
+ecap1.syncOutMode   = "DL_ECAP_SYNC_OUT_DISABLED";
+ecap1.ecapInput     = "DL_ECAP_INPUT_OUTPUTXBAR5";
+ecap1.resetCounters = true;
+
+ecap2.ecapBase            = "ECAP1";
+ecap2.ecapInput           = "DL_ECAP_INPUT_INPUTXBAR3";
+ecap2.$name               = "HALL_SPEED_CAP";
+ecap2.emulationMode       = "DL_ECAP_EMULATION_FREE_RUN";
+ecap2.resetCounters       = true;
+ecap2.counterResetOnEvent = ["DL_ECAP_EVENT_1"];
+
+gpio1.$name                              = "MTR1_GATE_DRIVER";
+gpio1.associatedPins.create(3);
+gpio1.associatedPins[0].$name            = "NSLEEP_GPIO";     // nSLEEP, J1 pin 9. High = awake. Starts low (asleep).
+gpio1.associatedPins[0].ioStructure      = "SD";
+gpio1.associatedPins[0].initialValue     = "CLEARED";
+gpio1.associatedPins[0].pin.$assign      = "PA23";
+gpio1.associatedPins[1].direction        = "INPUT";
+gpio1.associatedPins[1].$name            = "nFAULT_GPIO";     // nFAULT, J1 pin 8 / EVM J9 pin 6. Low = fault.
+gpio1.associatedPins[1].ioStructure      = "SD";
+gpio1.associatedPins[1].pin.$assign      = "PB4";
+gpio1.associatedPins[1].internalResistor = "PULL_DOWN";
+gpio1.associatedPins[2].$name            = "DRVOFF_GPIO";     // DRVOFF, J2 pin 13. High = outputs off. Starts high.
+gpio1.associatedPins[2].ioStructure      = "SD";
+gpio1.associatedPins[2].initialValue     = "SET";
+gpio1.associatedPins[2].pin.$assign      = "PB18";
+
+// The SDK's second group held FAULT_OUTPUT (PB6, Hall B on the EVM; nothing in the C sources used it) and
+// ISR_TIMING (PA23, nSLEEP on the EVM). FAULT_OUTPUT is dropped; ISR_TIMING moves to LED4 (PA5, active low).
+gpio2.$name                         = "MTR1_FOC_CTRL";
+gpio2.associatedPins.create(1);
+gpio2.associatedPins[0].$name       = "ISR_TIMING";
+gpio2.associatedPins[0].pin.$assign = "PA5";
+
+// Hall inputs: A PB7 (J4 34), B PB6 (J4 33), C PA12 (J4 32). The EVM pulls them up to 3.3 V (10 k).
+gpio3.$name                         = "MTR1_HALL";
+gpio3.associatedPins.create(3);
+gpio3.associatedPins[0].direction   = "INPUT";
+gpio3.associatedPins[0].$name       = "C";
+gpio3.associatedPins[0].pin.$assign = "PA12";
+gpio3.associatedPins[1].direction   = "INPUT";
+gpio3.associatedPins[1].$name       = "B";
+gpio3.associatedPins[1].pin.$assign = "PB6";
+gpio3.associatedPins[2].direction   = "INPUT";
+gpio3.associatedPins[2].$name       = "A";
+gpio3.associatedPins[2].pin.$assign = "PB7";
+
+inputxbar1.$name         = "MTR1_STOP_ACTION";
+inputxbar1.inputxbarGpio = "DL_XBAR_DRIVE_LOW";
+
+inputxbar2.inputxbarInput = "DL_XBAR_INPUT2";
+inputxbar2.$name          = "MTR1_nFAULT_TRIP";
+inputxbar2.inputxbarGpio  = "GPIO36_PB4";    // nFAULT; PA22 path has unpopulated R25
+
+inputxbar3.inputxbarInput = "DL_XBAR_INPUT3";
+inputxbar3.inputxbarGpio  = "GPIO38_PB6";    // Hall B
+inputxbar3.$name          = "HALL_SPEED_CAP_ECAP_INPUT_HALL_B";
+
+inputxbar4.inputxbarInput = "DL_XBAR_INPUT4";
+inputxbar4.inputxbarGpio  = "GPIO39_PB7";    // Hall A
+inputxbar4.$name          = "HALL_SPEED_CAP_ECAP_INPUT_HALL_A";
+
+inputxbar5.inputxbarInput = "DL_XBAR_INPUT5";
+inputxbar5.inputxbarGpio  = "GPIO12_PA12";   // Hall C
+inputxbar5.$name          = "HALL_SPEED_CAP_ECAP_INPUT_HALL_C";
+
+mcpwm1.enableTripZone                              = true;
+mcpwm1.enableDeadBand                              = true;
+mcpwm1.enableEventTrigger                          = true;
+mcpwm1.$name                                       = "MTR1_MCPWM_BASE";
+mcpwm1.timeBase.$name                              = "drivers_mcpwm_v0_mcpwm_timeBase0";
+mcpwm1.timeBase.counterMode                        = "DL_MCPWM_COUNTER_MODE_UP_DOWN";
+mcpwm1.timeBase.emulationMode                      = "DL_MCPWM_EMULATION_FREE_RUN";
+mcpwm1.timeBase.periodValue                        = 5000;   // 20 kHz up-down; HAL_setupPWMs rewrites it from user_motor.h
+mcpwm1.timeBase.syncPerSource                      = "DL_MCPWM_SYNCPERSEL_SOURCE_PERIOD";
+mcpwm1.timeBase.syncOutPulseMode                   = "DL_MCPWM_SYNC_OUT_PULSE_DISABLED";
+mcpwm1.counterCompare.$name                        = "drivers_mcpwm_v0_mcpwm_counterCompare0";
+mcpwm1.actionQualifier.$name                       = "drivers_mcpwm_v0_mcpwm_actionQualifier0";
+mcpwm1.actionQualifier.PWM1A.$name                 = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents0";
+mcpwm1.actionQualifier.PWM1A.actionAtZero          = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM1A.actionAtPeriod        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM1A.actionAtCountUpCmpA   = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM1A.actionAtCountDownCmpB = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM1B.$name                 = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents1";
+mcpwm1.actionQualifier.PWM1B.actionAtZero          = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM1B.actionAtPeriod        = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM1B.actionAtCountUpCmpA   = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM1B.actionAtCountDownCmpB = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM2A.$name                 = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents2";
+mcpwm1.actionQualifier.PWM2A.actionAtZero          = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM2A.actionAtPeriod        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM2A.actionAtCountUpCmpA   = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM2A.actionAtCountDownCmpB = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM2B.$name                 = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents3";
+mcpwm1.actionQualifier.PWM2B.actionAtZero          = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM2B.actionAtPeriod        = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM2B.actionAtCountUpCmpA   = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM2B.actionAtCountDownCmpB = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM3A.$name                 = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents4";
+mcpwm1.actionQualifier.PWM3A.actionAtZero          = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM3A.actionAtPeriod        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM3A.actionAtCountUpCmpA   = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM3A.actionAtCountDownCmpB = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM3B.$name                 = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents5";
+mcpwm1.actionQualifier.PWM3B.actionAtZero          = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM3B.actionAtPeriod        = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM3B.actionAtCountUpCmpA   = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM3B.actionAtCountDownCmpB = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.loadMode.$name                              = "drivers_mcpwm_v0_mcpwm_loadMode0";
+mcpwm1.tripZone.$name                              = "drivers_mcpwm_v0_mcpwm_tripZone0";
+mcpwm1.tripZone.actionOnA                          = "DL_MCPWM_TZ_ACTION_LOW";
+mcpwm1.tripZone.actionOnB                          = "DL_MCPWM_TZ_ACTION_LOW";
+mcpwm1.tripZone.oneShotSource                      = ["DL_MCPWM_TZ_SIGNAL_OST1","DL_MCPWM_TZ_SIGNAL_OST2","DL_MCPWM_TZ_SIGNAL_OST3"];
+mcpwm1.deadBand.$name                              = "drivers_mcpwm_v0_mcpwm_deadBand0";
+mcpwm1.deadBand.enableRED                          = true;
+mcpwm1.deadBand.delayRED                           = 20;
+mcpwm1.deadBand.polarityFED                        = "DL_MCPWM_DB_POLARITY_ACTIVE_LOW";
+mcpwm1.deadBand.delayFED                           = 10;
+mcpwm1.deadBand.enableFED                          = true;
+mcpwm1.eventTrigger.$name                          = "drivers_mcpwm_v0_mcpwm_eventTrigger0";
+mcpwm1.eventTrigger.SOCA_enable                    = true;
+mcpwm1.eventTrigger.SOCA_eventSource               = "DL_MCPWM_SOC_TBCTR_U_CMPC";
+mcpwm1.peripheral.$assign                          = "MCPWM4";
+mcpwm1.peripheral["1A"].$assign                    = "PB3";
+mcpwm1.peripheral["1B"].$assign                    = "PA7";
+mcpwm1.peripheral["2A"].$assign                    = "PB1";
+mcpwm1.peripheral["2B"].$assign                    = "PA2";
+mcpwm1.peripheral["3A"].$assign                    = "PB2";
+mcpwm1.peripheral["3B"].$assign                    = "PA25";
+
+outputxbar1.sourceSignals                    = ["DL_XBAR_OUT_CMPSS0_CTRIPOUTH","DL_XBAR_OUT_CMPSS1_CTRIPOUTH","DL_XBAR_OUT_CMPSS2_CTRIPOUTH"];
+outputxbar1.$name                            = "IPD_ECAP_INPUT";
+outputxbar1.peripheral.outputXbarPin.$assign = "PB0";   // SDK used PA11 (EVM J4 31, VREF net); PB0 is LaunchPad LED5 (green, active low)
+
+pwmxbar1.sourceSignals = ["DL_XBAR_PWM_INPUTXBAR1"];
+pwmxbar1.$name         = "MTR_STOP_INPUT";
+
+pwmxbar2.tripInput     = "DL_XBAR_TRIP2";
+pwmxbar2.sourceSignals = ["DL_XBAR_PWM_INPUTXBAR2"];
+pwmxbar2.$name         = "MTR1_GD_nFAULT_XBAR_INP";
+
+pwmxbar3.tripInput     = "DL_XBAR_TRIP3";
+pwmxbar3.$name         = "MTR1_CMP_nFAULT_XBAR_INP";
+pwmxbar3.sourceSignals = ["DL_XBAR_PWM_CMPSS0_CTRIPH","DL_XBAR_PWM_CMPSS1_CTRIPH","DL_XBAR_PWM_CMPSS2_CTRIPH","DL_XBAR_PWM_CMPSS0_CTRIPL","DL_XBAR_PWM_CMPSS1_CTRIPL"];  // H5: low trips added
+pwmxbar3.invertMode    = true;
+
+sysctl.VREFSource         = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
+sysctl.useHFCLK           = true;
+sysctl.SYSPLLSource       = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv        = 32;
+sysctl.peripheral.$assign = "SYSCTL";
+
+uart1.enableFIFO                       = true;
+uart1.$name                            = "SERIAL_DATA_PLOT";
+uart1.targetBaudRate                   = 9200000;
+uart1.ovsRate                          = "DL_UART_OVERSAMPLING_RATE_8X";
+uart1.txFifoThreshold                  = "DL_UART_TX_FIFO_LEVEL_EMPTY";
+uart1.rxFifoThreshold                  = "DL_UART_RX_FIFO_LEVEL_NOT_EMPTY";
+uart1.enabledInterrupts                = ["DL_UART_INTERRUPT_RX"];
+uart1.registerInterrupt                = true;
+uart1.digitalGlitchFilter              = 4;
+uart1.peripheral.rxPin.$assign         = "PA1";
+uart1.peripheral.txPin.$assign         = "PA0";
+uart1.txPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig0";
+uart1.txPinConfig.direction            = scripting.forceWrite("OUTPUT");
+uart1.txPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.txPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.txPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+uart1.rxPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig1";
+uart1.rxPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.rxPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+adc1.SOC0.peripheral.$suggestSolution                 = "ANALOG";
+adc1.SOC0.peripheral.AIN17.$suggestSolution           = "PA17";
+adc1.SOC1.peripheral.$suggestSolution                 = "ANALOG";
+adc1.SOC1.peripheral.AIN16.$suggestSolution           = "PA16";
+adc2.SOC0.peripheral.$suggestSolution                 = "ANALOG";
+adc2.SOC0.peripheral.AIN29.$suggestSolution           = "PA27";
+adc2.SOC1.peripheral.$suggestSolution                 = "ANALOG";
+adc2.SOC1.peripheral.AIN18.$suggestSolution           = "PA18";
+adc3.SOC0.peripheral.$suggestSolution                 = "ANALOG";
+adc3.SOC0.peripheral.AIN32.$suggestSolution           = "PA30";
+adc3.SOC1.peripheral.$suggestSolution                 = "ANALOG";
+adc3.SOC1.peripheral.AIN31.$suggestSolution           = "PA29";
+adc3.SOC2.peripheral.$suggestSolution                 = "ANALOG";
+adc3.SOC2.peripheral.AIN30.$suggestSolution           = "PA28";
+cmpsslite1.highComp.peripheral.$suggestSolution       = "ANALOG";
+cmpsslite1.highComp.peripheral.AIN29.$suggestSolution = "PA27";
+cmpsslite2.highComp.peripheral.$suggestSolution       = "ANALOG";
+cmpsslite2.highComp.peripheral.AIN32.$suggestSolution = "PA30";
+cmpsslite3.highComp.peripheral.$suggestSolution       = "ANALOG";
+cmpsslite3.highComp.peripheral.AIN31.$suggestSolution = "PA29";
+cmpsslite1.lowComp.peripheral.$suggestSolution        = "ANALOG";
+cmpsslite1.lowComp.peripheral.AIN29.$suggestSolution  = "PA27";
+cmpsslite3.lowComp.peripheral.$suggestSolution        = "ANALOG";
+cmpsslite3.lowComp.peripheral.AIN31.$suggestSolution  = "PA29";
+outputxbar1.peripheral.$suggestSolution               = "OUTPUTXBAR5";
+sysctl.peripheral.x1Pin.$suggestSolution              = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution              = "PC17_X2";
+uart1.peripheral.$suggestSolution                     = "UC1";

@@ -1,0 +1,35 @@
+{
+ "direction": "G3519_TO_G5187",
+ "examples": 258,
+ "built": 90,
+ "built_behaviour_changed": 51,
+ "failed": 117,
+ "dropped_properties_in_built_ports": [
+  [
+   "advControllerTXFIFOTRIG",
+   1
+  ],
+  [
+   "advAnalogGlitchFilter",
+   1
+  ],
+  [
+   "const DAC12  = scripting.addModule(\"/ti/",
+   1
+  ],
+  [
+   "dacOutputPinEn",
+   1
+  ],
+  [
+   "dacRes",
+   1
+  ]
+ ],
+ "generated_change_kinds_in_built_ports": {
+  "unknown": 6,
+  "peripheral": 91,
+  "pin": 267,
+  "other": 3
+ }
+}

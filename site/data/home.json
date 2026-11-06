@@ -1,0 +1,302 @@
+{
+ "note": "Words and picks for the home page (tools/render_home.py). Each demo and radio names a project slug in projects.json that has a recipe; the renderer fails if one does not. The rail runs smallest to Linux, with the motor-control F2800137 beside the AM13 (maintainer, 2026-10-30). Each rail stop's id is its row in data/boards.csv (core, clock, flash, RAM for the hover panel); hi is one line on what it is or ran here. Rail lines are the last serial line each board printed in portability/three-ways (shown on site/one-app-eleven-boards.html).",
+ "demos": [
+  {
+   "slug": "doom",
+   "title": "Doom on a Cortex-M33",
+   "line": "The engine runs on the kit and draws on the BoosterPack's 128 by 128 screen.",
+   "board": "LP-MSPM33C321A",
+   "img": "media/hero/slides/doom.jpg",
+   "alt": "An LP-MSPM33C321A under the Educational BoosterPack, its small screen showing the Doom title"
+  },
+  {
+   "slug": "arcade",
+   "title": "2048 on a 3.5 inch touch screen",
+   "line": "Swipe to play 2048 on a 3.5 inch touch screen; Game Boy and more share the project.",
+   "board": "LP-MSPM0G3519",
+   "img": "media/hero/slides/2048.jpg",
+   "alt": "A finger swiping tiles in 2048 on a 3.5 inch touch screen wired to a development kit"
+  },
+  {
+   "slug": "handwritten-digits",
+   "title": "Handwriting recognized on the chip",
+   "line": "Draw a digit with your finger and the chip names it on the screen.",
+   "board": "LP-MSPM0G3507",
+   "img": "media/bitnetmcu-touch-demo-poster.jpg",
+   "alt": "A finger draws a 9 on a small touch screen wired to a LaunchPad; the screen shows its answer"
+  },
+  {
+   "slug": "radar-presence",
+   "title": "Radar presence sensing",
+   "line": "Held a seated person at 2 m and 4 m, one pass each, the farthest distances tried.",
+   "board": "IWRL6432BOOST",
+   "img": "media/hero/slides/radar.jpg",
+   "alt": "The IWRL6432BOOST radar kit with its LEDs lit"
+  },
+  {
+   "slug": "linux-vision",
+   "title": "A vision model on a Linux board",
+   "line": "14 ready-made vision models run on the board's C7x accelerator; on 8 of them the two Arm CPU cores took 13 to 135 times longer.",
+   "board": "SK-TDA4VM",
+   "img": "media/sk-tda4vm-on-bench.jpg",
+   "alt": "The SK-TDA4VM board with its heatsink, held over the bench with its cables plugged in"
+  },
+  {
+   "slug": "blink",
+   "title": "Blink, then change the pattern",
+   "line": "Plug in the board, build the blink, then ask for a new pattern in plain English.",
+   "board": "LP-MSPM0G3507",
+   "img": "media/hero/slides/blink.jpg",
+   "alt": "An MSPM0 G3507 development kit on a wooden bench, USB cable in, a green LED lit"
+  }
+ ],
+ "rail": [
+  {
+   "name": "MSPM0 C1104",
+   "note": "1 kB RAM",
+   "line": [
+    "t=19 adc=549",
+    "avg=536"
+   ],
+   "size": 14,
+   "id": "mspm0c1104",
+   "page": "board-mspm0c1104.html",
+   "fam": "MSPM0 family",
+   "hi": "The smallest chip here. Blink, a voltage reading and the serial line fit in 1 kB of RAM."
+  },
+  {
+   "name": "MSPM0 L1306",
+   "note": "4 kB RAM",
+   "line": [
+    "t=13 adc=2645",
+    "avg=2644"
+   ],
+   "size": 16,
+   "id": "mspm0l1306",
+   "page": "board-mspm0l1306.html",
+   "fam": "MSPM0 family",
+   "hi": "The board the start script supports: first blink from a fresh clone."
+  },
+  {
+   "name": "MSPM0 G5187",
+   "note": "NPU",
+   "line": [
+    "t=18 adc=1449",
+    "avg=1449"
+   ],
+   "size": 18,
+   "id": "mspm0g5187",
+   "page": "board-mspm0g5187.html",
+   "fam": "MSPM0 family",
+   "hi": "An MSPM0 with a neural processing unit; the Sub-1 GHz link and the sensors pack ran here."
+  },
+  {
+   "name": "MSPM0 G3519",
+   "note": "128 kB RAM",
+   "line": [
+    "t=14 adc=1085",
+    "avg=1085"
+   ],
+   "size": 20,
+   "id": "mspm0g3519",
+   "page": "board-mspm0g3519.html",
+   "fam": "MSPM0 family",
+   "hi": "The biggest MSPM0: 2048 on a 3.5 inch touch screen and the thermostat screen ran here."
+  },
+  {
+   "name": "MSPM33 C321A",
+   "note": "160 MHz",
+   "line": [
+    "t=24 adc=3165",
+    "avg=3184"
+   ],
+   "size": 22,
+   "id": "mspm33c321a",
+   "page": "board-mspm33c321a.html",
+   "fam": "MSPM33 family",
+   "hi": "A Cortex-M33 at 160 MHz; Doom ran here on the BoosterPack screen."
+  },
+  {
+   "name": "F2800137",
+   "note": "Motor control, 120 MHz",
+   "line": [
+    "t=14 adc=2035",
+    "avg=2036"
+   ],
+   "size": 24,
+   "id": "f2800137",
+   "page": "board-f2800137.html",
+   "fam": "C2000 family",
+   "hi": "A real-time control MCU for motors and power, with its own C28x core instead of an Arm core."
+  },
+  {
+   "name": "AM13E230",
+   "note": "200 MHz",
+   "line": [
+    "t=9 adc=128",
+    "avg=128"
+   ],
+   "size": 26,
+   "id": "am13e230",
+   "page": "board-am13e230.html",
+   "fam": "AM13 family",
+   "hi": "A real-time control MCU with a neural processing unit; motor control and small models ran here."
+  },
+  {
+   "name": "CC2340R5",
+   "note": "2.4 GHz radio",
+   "line": [
+    "t=22 adc=1368",
+    "avg=1368"
+   ],
+   "size": 28,
+   "id": "cc2340r5",
+   "page": "board-cc2340r5.html",
+   "fam": "CC23xx radios",
+   "hi": "Bluetooth LE; the gamepad and the asset-tracking tag ran here."
+  },
+  {
+   "name": "CC2755P10",
+   "note": "2.4 GHz, +20 dBm",
+   "line": [
+    "t=32 adc=1374",
+    "avg=1374"
+   ],
+   "size": 30,
+   "id": "cc2755p10",
+   "page": "board-cc2755p10.html",
+   "fam": "CC27xx radios",
+   "hi": "Bluetooth LE and 802.15.4 with a +20 dBm radio."
+  },
+  {
+   "name": "CC35X1",
+   "note": "Wi-Fi 6",
+   "line": [
+    "t=16 adc=1210",
+    "avg=1182"
+   ],
+   "size": 32,
+   "id": "cc35x1",
+   "page": "board-cc3551e.html",
+   "fam": "CC35xx radios",
+   "hi": "Wi-Fi 6 and Bluetooth; the Matter light, the DNS ad blocker and the asset-tracking hub ran here."
+  },
+  {
+   "name": "AM62L",
+   "note": "Linux",
+   "line": [
+    "t=13 adc=1032",
+    "avg=1032"
+   ],
+   "size": 40,
+   "id": "am62l-evm",
+   "page": "board-am62l32.html",
+   "fam": "AM62L, Linux",
+   "hi": "Two Arm Cortex-A53 cores running Linux; the same app.c built with GCC and reads the ADC through sysfs."
+  }
+ ],
+ "rail_ends": [
+  "Smallest: 1 kB of RAM, 24 MHz",
+  "Linux: 2 Arm cores, 1.25 GHz"
+ ],
+ "boards": [
+  {
+   "name": "LP-MSPM0G3507",
+   "img": "media/g3507-on-bench.jpg",
+   "page": "board-mspm0g3507.html",
+   "alt": "An LP-MSPM0G3507 on a desk with its green power LED on"
+  },
+  {
+   "name": "LP-EM-CC2340R5",
+   "img": "media/cc2340r5-blinking.jpg",
+   "page": "board-cc2340r5.html",
+   "alt": "An LP-EM-CC2340R5 beside its debug probe, red LED lit"
+  },
+  {
+   "name": "LP-MSPM0G5187",
+   "img": "media/g5187-sensors-boosterpack-bench.jpg",
+   "page": "board-mspm0g5187.html",
+   "alt": "The Sensors BoosterPack plugged on top of an LP-MSPM0G5187"
+  },
+  {
+   "name": "LP-AM13E230",
+   "img": "media/am13e230-on-bench.jpg",
+   "page": "board-am13e230.html",
+   "alt": "An LP-AM13E230 development kit on the bench"
+  },
+  {
+   "name": "IWRL6432BOOST",
+   "img": "media/iwrl6432boost-leds.jpg",
+   "page": "board-iwrl6432.html",
+   "alt": "The IWRL6432BOOST radar board powered over USB, with its antenna area at the left"
+  },
+  {
+   "name": "LP-EM-CC35X1",
+   "img": "media/thermostat-g3519-cc35x1-wired.jpg",
+   "page": "board-cc3551e.html",
+   "alt": "Development kits wired together on the bench: a Wi-Fi radio kit beside an MSPM0 kit and a radar kit"
+  },
+  {
+   "name": "LP-MSPM33C321A",
+   "img": "media/hero/slides/doom.jpg",
+   "page": "board-mspm33c321a.html",
+   "alt": "An LP-MSPM33C321A under the Educational BoosterPack, its small screen showing the Doom title"
+  },
+  {
+   "name": "SK-TDA4VM",
+   "img": "media/sk-tda4vm-on-bench.jpg",
+   "page": "board-tda4.html",
+   "alt": "The SK-TDA4VM board with its heatsink, held over the bench with its cables plugged in"
+  }
+ ],
+ "radios": [
+  {
+   "slug": "ble-gamepad",
+   "radio": "Bluetooth LE",
+   "title": "Bluetooth gamepad",
+   "line": "A kit that shows up as a game controller on a Mac.",
+   "img": "media/illus/ble-gamepad.svg",
+   "board": "LP-EM-CC2340R5"
+  },
+  {
+   "slug": "battery-sensor-home-assistant",
+   "radio": "Zigbee",
+   "title": "Zigbee sensor",
+   "line": "A Zigbee temperature sensor on a CC1354P10 joins Home Assistant and answers 20 of 20 reads. Battery life has no number.",
+   "img": "media/illus/battery-sensor-home-assistant.svg",
+   "board": "LP-CC1354P10-1"
+  },
+  {
+   "slug": "matter-device",
+   "radio": "Matter over Wi-Fi",
+   "title": "Matter light",
+   "line": "Appears in Apple Home as a light you switch from the phone.",
+   "img": "media/apple-home-matter-light.png",
+   "board": "LP-EM-CC35X1"
+  },
+  {
+   "slug": "sub-ghz-link",
+   "radio": "Sub-1 GHz",
+   "title": "Sub-1 GHz link",
+   "line": "Sensor readings at 915 MHz to a second board: 21,658 of 21,658 packets.",
+   "img": "media/illus/sub-ghz-link.svg",
+   "board": "LP-MSPM0G5187 + CC1407P"
+  },
+  {
+   "slug": "dns-ad-blocker",
+   "radio": "Wi-Fi",
+   "title": "DNS ad blocker",
+   "line": "A Wi-Fi board answers 0.0.0.0 for 71,492 ad and tracker names.",
+   "img": "svg:dns",
+   "board": "LP-EM-CC35X1"
+  },
+  {
+   "slug": "tool-telemetry",
+   "radio": "Bluetooth LE",
+   "title": "Asset tracking",
+   "line": "A Bluetooth tag on each machine and a Wi-Fi hub carried 283 of 283 events to a phone app, no internet.",
+   "img": "media/illus/tool-telemetry.svg",
+   "board": "LP-EM-CC2340R5 + LP-EM-CC35X1"
+  }
+ ]
+}

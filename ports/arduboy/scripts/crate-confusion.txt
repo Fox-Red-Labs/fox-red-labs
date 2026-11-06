@@ -1,0 +1,10 @@
+# Crate Confusion: move the menu cursor down and back up, start with A, then thrust up and right.
+0 NONE
+15 DOWN
+18 NONE
+30 UP
+33 NONE
+45 A
+48 NONE
+90 UP+RIGHT
+200 NONE

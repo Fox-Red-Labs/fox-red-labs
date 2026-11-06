@@ -1,0 +1,72 @@
+/* Fox Red Labs: TI AM263P4, one R5F core's view (each core sees its own TCMs at 0x0 and 0x80000 and its own VIM at 0x50F00000). Addresses from TI's MCU+ SDK 26.01 (cslr_soc_baseaddress.h):
+ * VIM 0x50F00000, UART0 0x52300000 (IRQ 38), TCMA at 0x0 and TCMB at 0x80000 for this core, on-chip RAM from
+ * 0x70000000 (TI's SDK reserves the first 256 kB for its bootloader; we start at 0x70040000 like TI's examples). */
+#include <mem.h>
+#include <freq.h>
+#include <arm/armv7-r.dtsi>
+#include <zephyr/dt-bindings/memory-attr/memory-attr-arm.h>
+#include <zephyr/dt-bindings/interrupt-controller/ti-vim.h>
+
+/ {
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cpu0: cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-r5f";
+			reg = <0>;
+			clock-frequency = <DT_FREQ_M(400)>;
+		};
+	};
+
+	atcm: memory@0 {
+		device_type = "memory";
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0x0 DT_SIZE_K(32)>;
+		zephyr,memory-region = "ATCM";
+		zephyr,memory-attr = <DT_MEM_ARM(ATTR_MPU_RAM)>;
+	};
+
+	btcm: memory@80000 {
+		device_type = "memory";
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0x80000 DT_SIZE_K(32)>;
+		zephyr,memory-region = "BTCM";
+		zephyr,memory-attr = <DT_MEM_ARM(ATTR_MPU_RAM)>;
+	};
+
+	sram: memory@70040000 {
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0x70040000 DT_SIZE_K(1024)>;
+		zephyr,memory-region = "SRAM";
+	};
+
+	vim: interrupt-controller@50f00000 {
+		#address-cells = <1>;
+		compatible = "ti,vim";
+		reg = <0x50f00000 0x4000>;
+		interrupt-controller;
+		#interrupt-cells = <4>;
+	};
+
+	soc {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		compatible = "simple-bus";
+		ranges;
+
+		uart0: serial@52300000 {
+			compatible = "ns16550";
+			reg = <0x52300000 0x100>;
+			clock-frequency = <48000000>;
+			current-speed = <115200>;
+			reg-shift = <2>;
+			interrupt-parent = <&vim>;
+			interrupts = <0 38 IRQ_TYPE_LEVEL IRQ_DEFAULT_PRIORITY>;
+			status = "disabled";
+		};
+	};
+};

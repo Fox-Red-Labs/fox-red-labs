@@ -1,0 +1,2 @@
+19:01:28 4762AC7E-C79D-B93A-4671-3C12C258F2BF 'Zephyr Peripheral Sample Long' rssi -35
+1 devices matching 'Zephyr Peripheral'

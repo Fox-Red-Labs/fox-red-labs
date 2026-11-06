@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="Two small chips joined by three wires: one runs the network software, the other is its Thread radio">
+<style>
+  .arc { animation: arc 1.8s infinite; opacity:.15; } .a2 { animation-delay:.3s } .a3 { animation-delay:.6s }
+  @keyframes arc { 0%{opacity:.1} 40%{opacity:1} 100%{opacity:.1} }
+  @media (prefers-reduced-motion: reduce) { .arc,.pulse,.tw,.mv { animation: none; opacity: 1; } }
+</style>
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="60" y="110" width="130" height="80" rx="6" fill="#161312"/><text x="125" y="146" font-size="14" font-weight="700" text-anchor="middle" fill="#F4EFE9">Host chip</text><text x="125" y="168" font-size="12" text-anchor="middle" fill="#F4EFE9">OpenThread</text>
+<rect x="270" y="110" width="130" height="80" rx="6" fill="#161312"/><text x="335" y="146" font-size="14" font-weight="700" text-anchor="middle" fill="#F4EFE9">Radio chip</text><text x="335" y="168" font-size="12" text-anchor="middle" fill="#F4EFE9">802.15.4</text>
+<g stroke="#B42418" stroke-width="4"><line x1="190" y1="130" x2="270" y2="130"/><line x1="190" y1="150" x2="270" y2="150"/><line x1="190" y1="170" x2="270" y2="170"/></g>
+<g fill="none" stroke="#B42418" stroke-width="5" stroke-linecap="round"><path class="arc a1" d="M420 135 a24 24 0 0 1 0 30"/><path class="arc a2" d="M438 124 a42 42 0 0 1 0 52"/><path class="arc a3" d="M456 112 a60 60 0 0 1 0 76"/></g>
+<text x="230" y="105" font-size="12" text-anchor="middle" fill="#6B625B">3 wires</text>
+</svg>

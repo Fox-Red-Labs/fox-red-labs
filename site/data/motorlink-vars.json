@@ -1,0 +1,904 @@
+{
+ "guard_version": 12,
+ "layout_sha": "ffd0e7757cc7fea0",
+ "note": "Written by tools/motorlink/varmap.py from the firmware's C table (motorvision_hash.c); never edit by hand. Permissions come from the SDK JSON by name. States and fault bits are from tools/motorlink/link.py; guard words from am13e230/foc-drv8376/frl_guard.h.",
+ "vars": [
+  {
+   "name": "motorVars_M1.outVars.motorState",
+   "index": 0,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.outVars.faultMtrNow",
+   "index": 1,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.startupMode",
+   "index": 2,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.estimatorMode",
+   "index": 3,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.svmMode",
+   "index": 4,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.version",
+   "index": 5,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.state",
+   "index": 6,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.reason",
+   "index": 7,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.heartbeat",
+   "index": 8,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.hall",
+   "index": 9,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.hallEdgesA",
+   "index": 10,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.hallEdgesB",
+   "index": 11,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.hallEdgesC",
+   "index": 12,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.nFault",
+   "index": 13,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "hallSensorData.state",
+   "index": 14,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.obsMode",
+   "index": 15,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.onObs",
+   "index": 16,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.hallFree",
+   "index": 17,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capChan[0]",
+   "index": 18,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capChan[1]",
+   "index": 19,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capChan[2]",
+   "index": 20,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capChan[3]",
+   "index": 21,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capDecim",
+   "index": 22,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capTrig",
+   "index": 23,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capArm",
+   "index": 24,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capState",
+   "index": 25,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capWinMs",
+   "index": 26,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.hallPll",
+   "index": 27,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.hallTable",
+   "index": 28,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.hallTableOk",
+   "index": 29,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.ilimMode",
+   "index": 30,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.ilimOk",
+   "index": 31,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.dirRotor",
+   "index": 32,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.testMode",
+   "index": 33,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.ilimCode",
+   "index": 34,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.drvReset",
+   "index": 35,
+   "type": "uint16",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.drvResets",
+   "index": 36,
+   "type": "uint16",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.ISRCount",
+   "index": 37,
+   "type": "uint32",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.runMs",
+   "index": 38,
+   "type": "uint32",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capMs",
+   "index": 39,
+   "type": "uint32",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.hostPackets",
+   "index": 40,
+   "type": "uint32",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capLen",
+   "index": 41,
+   "type": "uint32",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capPre",
+   "index": 42,
+   "type": "uint32",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capCount",
+   "index": 43,
+   "type": "uint32",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capStart",
+   "index": 44,
+   "type": "uint32",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capIndex",
+   "index": 45,
+   "type": "uint32",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.capWinIdxA",
+   "index": 46,
+   "type": "uint32",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capWinIdxB",
+   "index": 47,
+   "type": "uint32",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.dirFlips",
+   "index": 48,
+   "type": "uint32",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.statusVars.flagMotorIdentified",
+   "index": 49,
+   "type": "bool",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.flagEnableRunAndIdentify",
+   "index": 50,
+   "type": "bool",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.flagClearFaults",
+   "index": 51,
+   "type": "bool",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.flagEnableFlyingStart",
+   "index": 52,
+   "type": "bool",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.flagEnableDTC",
+   "index": 53,
+   "type": "bool",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.flagEnableFWC",
+   "index": 54,
+   "type": "bool",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.flagEnableMTPA",
+   "index": 55,
+   "type": "bool",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.flagStartHallCal",
+   "index": 56,
+   "type": "bool",
+   "permissions": "RW"
+  },
+  {
+   "name": "hallSensorData.flagCalValid",
+   "index": 57,
+   "type": "bool",
+   "permissions": "R"
+  },
+  {
+   "name": "hallSensorData.flagCalDone",
+   "index": 58,
+   "type": "bool",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.outVars.speed_Hz",
+   "index": 59,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.outVars.Is_A",
+   "index": 60,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.statusVars.Irms_A[0]",
+   "index": 61,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.outVars.Idq_in_A.value[1]",
+   "index": 62,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.outVars.Idq_in_A.value[0]",
+   "index": 63,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.statusVars.angleObs_rad",
+   "index": 64,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.inputCtrl.speedRef_Hz",
+   "index": 65,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.Kp_spd",
+   "index": 66,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.Ki_spd",
+   "index": 67,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.overVoltageFault_V",
+   "index": 68,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.underVoltageFault_V",
+   "index": 69,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.Kp_fwc",
+   "index": 70,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.Ki_fwc",
+   "index": 71,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.Kp_Id",
+   "index": 72,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.Ki_Id",
+   "index": 73,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.Kp_Iq",
+   "index": 74,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.Ki_Iq",
+   "index": 75,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.maxCurrent_A",
+   "index": 76,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.overCurrent_A",
+   "index": 77,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.accelerationMax_Hzps",
+   "index": 78,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "halFOCDataObj_M1.adcData.VdcBus_V",
+   "index": 79,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "halFOCDataObj_M1.adcData.I_A.value[0]",
+   "index": 82,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "halFOCDataObj_M1.adcData.I_A.value[1]",
+   "index": 83,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "halFOCDataObj_M1.adcData.I_A.value[2]",
+   "index": 84,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "halFOCDataObj_M1.adcData.V_V.value[0]",
+   "index": 85,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "halFOCDataObj_M1.adcData.V_V.value[1]",
+   "index": 86,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "halFOCDataObj_M1.adcData.V_V.value[2]",
+   "index": 87,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorSetVars_M1.olSpeedThr",
+   "index": 88,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.accelerationStart_Hzps",
+   "index": 89,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "motorSetVars_M1.startCurrent_A",
+   "index": 90,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.peak_A",
+   "index": 91,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.limit_A",
+   "index": 92,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.speedMax_Hz",
+   "index": 93,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.handover_Hz",
+   "index": 94,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.obsSpeed_Hz",
+   "index": 95,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.obsErr_deg",
+   "index": 96,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.obsErrPk_deg",
+   "index": 97,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.obsTrim_deg",
+   "index": 98,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.obsTrimSet_deg",
+   "index": 99,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.angleAdj_deg",
+   "index": 100,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.busMin_V",
+   "index": 101,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.busMax_V",
+   "index": 102,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.isrUs_avg",
+   "index": 103,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.isrUs_max",
+   "index": 104,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.cpuLoad_pct",
+   "index": 105,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capScale[0]",
+   "index": 106,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capScale[1]",
+   "index": 107,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capScale[2]",
+   "index": 108,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capScale[3]",
+   "index": 109,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capWin[0]",
+   "index": 110,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capWin[1]",
+   "index": 111,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capWin[2]",
+   "index": 112,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.capWin[3]",
+   "index": 113,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.pllSpeed_Hz",
+   "index": 114,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.pllErr_deg",
+   "index": 115,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calFwd_deg[0]",
+   "index": 116,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calFwd_deg[1]",
+   "index": 117,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calFwd_deg[2]",
+   "index": 118,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calFwd_deg[3]",
+   "index": 119,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calFwd_deg[4]",
+   "index": 120,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calFwd_deg[5]",
+   "index": 121,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calRev_deg[0]",
+   "index": 122,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calRev_deg[1]",
+   "index": 123,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calRev_deg[2]",
+   "index": 124,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calRev_deg[3]",
+   "index": 125,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calRev_deg[4]",
+   "index": 126,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calRev_deg[5]",
+   "index": 127,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.calSpread_deg",
+   "index": 128,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.ilim_V",
+   "index": 129,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.dirNow",
+   "index": 130,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.testAngle_deg",
+   "index": 131,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.testId_A",
+   "index": 132,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.testRamp_Aps",
+   "index": 133,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.testVd_V",
+   "index": 134,
+   "type": "float",
+   "permissions": "RW"
+  },
+  {
+   "name": "frlGuard.testIdNow_A",
+   "index": 135,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.cmpLimit_A",
+   "index": 136,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.outVars.Vdq_out_V.value[0]",
+   "index": 137,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "motorVars_M1.outVars.Vdq_out_V.value[1]",
+   "index": 138,
+   "type": "float",
+   "permissions": "R"
+  },
+  {
+   "name": "frlGuard.ilimTest_V",
+   "index": 139,
+   "type": "float",
+   "permissions": "RW"
+  }
+ ],
+ "states": {
+  "0": "stop idle",
+  "1": "fault stop",
+  "2": "brake stop",
+  "3": "normal stop",
+  "4": "charge",
+  "5": "seek position",
+  "6": "alignment",
+  "7": "parameter identification",
+  "8": "initial position detection",
+  "9": "open-loop start",
+  "10": "open-loop end",
+  "11": "closed loop running",
+  "12": "control run",
+  "13": "field weakening run",
+  "14": "brake run",
+  "15": "motor ID start",
+  "16": "motor ID run",
+  "17": "motor ID done",
+  "18": "Rs calibration start",
+  "19": "Rs calibration run",
+  "20": "Rs calibration done",
+  "21": "parameters store",
+  "22": "code update",
+  "23": "offset calibration",
+  "24": "Hall calibration",
+  "25": "Hall startup"
+ },
+ "fault_bits": [
+  "DC bus over voltage",
+  "DC bus under voltage",
+  "motor over temperature",
+  "power module over temperature",
+  "hardware over current",
+  "comparator over current",
+  "over load",
+  "motor lost phase",
+  "phase current unbalance",
+  "motor stall",
+  "startup failed",
+  "over speed",
+  "estimator error",
+  "gate driver fault",
+  "current offset check",
+  "voltage offset check"
+ ],
+ "guard_states": {
+  "0": "idle",
+  "1": "calibrating",
+  "2": "running",
+  "3": "stopped by the guard"
+ },
+ "guard_reasons": {
+  "0": "none",
+  "1": "cap reached",
+  "2": "host lost",
+  "3": "over current",
+  "4": "controller fault",
+  "5": "bus out of range",
+  "6": "refused: controller fault present",
+  "7": "refused: bus out of range",
+  "8": "refused: Hall table not calibrated",
+  "9": "host stop",
+  "10": "calibration done",
+  "11": "background stall",
+  "12": "refused: currents not near zero at standstill",
+  "13": "guard clock check failed",
+  "14": "over current while stopping"
+ }
+}

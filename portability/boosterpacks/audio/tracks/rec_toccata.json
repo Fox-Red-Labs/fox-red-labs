@@ -1,0 +1,15 @@
+{
+ "name": "rec_toccata",
+ "title": "Toccata in D minor, BWV 565 (Bach)",
+ "rate": 10000,
+ "nsamples": 300000,
+ "bytes": 150000,
+ "start_s": 0.0,
+ "length_s": 30.0,
+ "credit": "Ashtar Moira, Tamburini organ, c. 2006",
+ "license": "Public domain",
+ "source": "https://commons.wikimedia.org/wiki/File:Toccata_et_Fugue_BWV565.ogg",
+ "source_sha256": "12bfa09ff64f6c59267302f37b3d74de55af2e01f8cf6ce1e8b33742846630b8",
+ "adpcm_rms_error": 574.3,
+ "filter": "highpass=f=120,lowpass=f=4500,acompressor=threshold=-24dB:ratio=3:attack=5:release=120:makeup=2, peak -1 dBFS, 0.3 s fades"
+}

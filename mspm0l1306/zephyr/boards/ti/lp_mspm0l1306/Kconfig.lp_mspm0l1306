@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Out-of-tree board for the LP-MSPM0L1306 LaunchPad development kit.
+# Copied in shape from Zephyr 4.4.2 boards/ti/lp_mspm0l2228.
+
+config BOARD_LP_MSPM0L1306
+	select SOC_MSPM0L1306

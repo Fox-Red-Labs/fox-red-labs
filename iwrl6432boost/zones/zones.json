@@ -1,0 +1,11 @@
+{
+  "_note": "Room zones for the IWRL6432BOOST Motion and Presence 2D demo, radar on the short wall at 1.5 m, looking down the room. x is sideways from the radar (metres), y is straight out from it. The demo reads only x and y of a cluster's centre (z is not used in the 2D build, read from mpdproc.c), so a zone is a floor-plan rectangle. Layout is from the antenna evaluation (E178): the radar on a stand at about 1.5 m, a chair at 2 m and at 4 m on the tape line, the door at the far end (a walk-in from behind it was first flagged near 6.5 m). Not surveyed with a tape for this run; the walk-through checks it.",
+  "sensor_height_m": 1.5,
+  "x_half_width_m": 3.5,
+  "zones": [
+    {"name": "desk",      "y_min": 0.25, "y_max": 3.5, "note": "the 2 m chair is here"},
+    {"name": "middle",    "y_min": 3.5,  "y_max": 5.5, "note": "the 4 m chair is here"},
+    {"name": "far room",  "y_min": 5.5,  "y_max": 6.5, "note": "between the middle and the door"},
+    {"name": "door end",  "y_min": 6.5,  "y_max": 7.5, "note": "the door and the strip inside it"}
+  ]
+}

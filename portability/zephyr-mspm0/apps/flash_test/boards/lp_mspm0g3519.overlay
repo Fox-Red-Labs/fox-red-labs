@@ -1,0 +1,6 @@
+/* The flash API wants the controller; the board names only the memory node. */
+/ {
+	chosen {
+		zephyr,flash-controller = &flashctl;
+	};
+};

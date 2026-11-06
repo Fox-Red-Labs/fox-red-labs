@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: Apache-2.0
+
+if SHIELD_BOOSTXL_AUDIO
+
+# Amplifier shutdown and microphone power are regulator-fixed outputs.
+# The header pins are driven through the GPIO API.
+config GPIO
+	default y
+
+config REGULATOR
+	default y
+
+config DAC
+	default y
+
+endif # SHIELD_BOOSTXL_AUDIO

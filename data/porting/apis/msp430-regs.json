@@ -1,0 +1,148 @@
+{
+ "api": "msp430-regs",
+ "vendor": "TI",
+ "detect": "\\bPM5CTL0\\b|\\bWDTCTL\\b|\\bUCA\\dCTLW0\\b|\\bSYSRSTIV\\b|\\bCSCTL\\d\\b|\\bSFRIE1\\b|\\bLPM[0-4]_bits\\b",
+ "symbol_re": "\\b(?:P[1-9]OUT|P[1-9]DIR|P[1-9]REN|P[1-9]SEL[01]|P[1-9]IN|P[1-9]IES|P[1-9]IE|P[1-9]IFG|PM5CTL0|WDTCTL|WDT_ADLY_\\w+|WDTIE|SFRIE1|SFRIFG1|SYSRSTIV|SYSRSTIV_\\w+|SYSCFG0|FRWPPW|PFWP|DFWP|PMMCTL0_[LH]|PMMREGOFF|CSCTL\\d|SELA__\\w+|SELMS__\\w+|DCOFTRIM\\w*|DCORSEL_\\d|FLLD_\\d|UCA\\d\\w+|UCB\\d\\w+|UCSWRST|UCSSEL__\\w+|UCOS16|UCRXIE|TA\\d(?:CTL|EX0|R|IV)|TA\\dCCTL\\d|TA\\dCCR\\d|RTC\\w+|LPM[0-4]_bits|PERSISTENT|NOINIT|__persistent|__no_init|__even_in_range)\\b",
+ "calls_only": false,
+ "note": "Register-level MSP430 code (the MSP430Ware code examples) moved to MSPM0 or AM13. Names are those of the MSP430FR2xx/4xx and FR5xx headers; other families use the same idioms under slightly different names.",
+ "entries": [
+  {
+   "match": "P[1-9]OUT",
+   "idiom": "gpio.write",
+   "note": "also toggled with ^= for gpio.toggle",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "P[1-9]DIR|P[1-9]REN|P[1-9]SEL[01]",
+   "idiom": "gpio.config_pin",
+   "note": "direction, pull enable and function select are three registers on the source and one SysConfig block on the target",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "P[1-9]IN",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "P[1-9]IES|P[1-9]IE|P[1-9]IFG",
+   "idiom": "gpio.input_irq_edge",
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "PM5CTL0",
+   "idiom": "gpio.release_after_lowpower_reset",
+   "note": "clearing LOCKLPM5 releases the pins after reset and after LPMx.5",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "WDTCTL",
+   "idiom": [
+    "wdt.watchdog",
+    "timer.interval_watchdog_as_timer"
+   ],
+   "note": "WDTPW|WDTHOLD stops it; WDT_ADLY_* makes an interval timer",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "WDT_ADLY_\\w+|WDTIE|SFRIE1|SFRIFG1",
+   "idiom": "timer.interval_watchdog_as_timer",
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "SYSRSTIV|SYSRSTIV_\\w+",
+   "idiom": "system.reset",
+   "note": "reset-cause vector; SYSRSTIV_LPM5WU is the wake from LPMx.5",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "SYSCFG0|FRWPPW|PFWP|DFWP",
+   "idiom": "memory.nvm_write_unprotect",
+   "note": "FRAM write protection for program and data FRAM",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "PMMCTL0_[LH]|PMMREGOFF",
+   "idiom": "power.shutdown_pin_wake",
+   "note": "PMMREGOFF with LPM4 gives LPM4.5",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "CSCTL\\d|SELA__\\w+|SELMS__\\w+",
+   "idiom": [
+    "clock.system_config",
+    "clock.low_freq_aclk"
+   ],
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "DCOFTRIM\\w*|DCORSEL_\\d|FLLD_\\d",
+   "idiom": "clock.fll_dco_trim",
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "UCA\\d(?:CTLW0|BRW|BR0|BR1|MCTLW|STATW|ABCTL)|UCSWRST|UCSSEL__\\w+|UCOS16",
+   "idiom": "uart.init_8n1",
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "UCA\\dTXBUF",
+   "idiom": "uart.tx_byte_blocking",
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "UCA\\dRXBUF",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "UCA\\d(?:IE|IV|IFG)|UCRXIE|__even_in_range",
+   "idiom": "uart.rx_wake_deep_sleep",
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "UCB\\d\\w+",
+   "idiom": [
+    "i2c.controller_init",
+    "spi.controller_init"
+   ],
+   "note": "the same eUSCI_B block is I2C or SPI; the mode bits decide",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "TA\\d(?:CTL|EX0|R|IV)|TA\\dCCTL\\d|TA\\dCCR\\d",
+   "idiom": [
+    "timer.capture_compare_pwm",
+    "time.periodic_irq"
+   ],
+   "note": "",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "RTC\\w+",
+   "idiom": "vendor.no_equivalent",
+   "note": "no tested replacement",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "LPM[0-4]_bits",
+   "idiom": "power.sleep",
+   "note": "LPM3 and LPM4 are STANDBY or STOP; LPM3.5 and LPM4.5 are SHUTDOWN",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  },
+  {
+   "match": "PERSISTENT|NOINIT|__persistent|__no_init",
+   "idiom": "memory.persistent_variable",
+   "note": "FRAM parts keep the value: no initializer runs at reset",
+   "from": "MSP430FR2433 register headers (ccs_base/msp430/include/msp430fr2433.h) and the originals in ports/msp430-to-mspm0"
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+// CC1407P host on an LP-MSPM0L1306 (X45): TI's host driver over SPI0, backchannel UART0 for the trace.
+// SPI0: PA6 SCLK, PA5 PICO, PA4 POCI. Chip select PA3, RESET_N PA7, SPI_INT PA2 (falling edge).
+//@cliArgs --device "MSPM0L130X" --package "VQFN-32(RHB)" --part "Default"
+//@v2CliArgs --device "MSPM0L1306" --package "VQFN-32(RHB)"
+// @cliArgs --board /ti/boards/LP_MSPM0L1306 --rtos nortos
+
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const SPI    = scripting.addModule("/ti/driverlib/SPI", {}, false);
+const SPI1   = SPI.addInstance();
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const Board  = scripting.addModule("/ti/driverlib/Board", {}, false);
+
+SYSCTL.clockTreeEn = true;
+
+UART1.$name                    = "UART_0";
+UART1.enableFIFO               = true;
+UART1.targetBaudRate           = 115200;
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA9";
+UART1.peripheral.txPin.$assign = "PA8";
+
+SPI1.$name                          = "SPI_0";
+SPI1.frameFormat                    = "MOTO3";
+SPI1.targetBitRate                  = 1000000;
+SPI1.peripheral.$assign             = "SPI0";
+SPI1.peripheral.sclkPin.$assign     = "PA6";
+SPI1.peripheral.mosiPin.$assign     = "PA5";
+SPI1.peripheral.misoPin.$assign     = "PA4";
+
+const GPIO5 = GPIO.addInstance();
+GPIO5.$name                          = "RADIO";
+GPIO5.associatedPins.create(2);
+GPIO5.associatedPins[0].$name        = "CS";
+GPIO5.associatedPins[0].initialValue = "SET";
+GPIO5.associatedPins[0].pin.$assign  = "PA3";
+GPIO5.associatedPins[1].$name        = "RST";
+GPIO5.associatedPins[1].initialValue = "SET";
+GPIO5.associatedPins[1].pin.$assign  = "PA7";
+
+const GPIO6 = GPIO.addInstance();
+GPIO6.$name                             = "RADIO_INT";
+GPIO6.associatedPins[0].$name           = "IRQ";
+GPIO6.associatedPins[0].direction       = "INPUT";
+GPIO6.associatedPins[0].internalResistor = "PULL_UP";
+GPIO6.associatedPins[0].interruptEn     = true;
+GPIO6.associatedPins[0].polarity        = "FALL";
+GPIO6.associatedPins[0].pin.$assign     = "PA2";

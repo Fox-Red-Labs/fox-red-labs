@@ -1,0 +1,39 @@
+{
+ "api": "ti-drivers",
+ "vendor": "TI",
+ "detect": "ti/drivers/|\\bGPIO_setConfig\\b",
+ "symbol_re": "\\b(?:UART2?_[A-Za-z]+|GPIO_[a-z][A-Za-z]+|SPI_[a-z][A-Za-z]+|I2C_[a-z][A-Za-z]+)\\b",
+ "calls_only": true,
+ "entries": [
+  {
+   "match": "UART2?_(open|close|read|write|readTimeout|writeTimeout|readCancel|writeCancel|flushRx|rxEnable|rxDisable|getRxCount|Params_init)",
+   "idiom": "uart.driver_api",
+   "note": "same 13 calls; F3 names them UART2_*, MSPM0 UART_*",
+   "from": "portability/shim"
+  },
+  {
+   "match": "GPIO_write",
+   "idiom": "gpio.write",
+   "note": "",
+   "from": "portability/shim"
+  },
+  {
+   "match": "GPIO_toggle",
+   "idiom": "gpio.toggle",
+   "note": "",
+   "from": "portability/shim"
+  },
+  {
+   "match": "GPIO_read",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "portability/shim"
+  },
+  {
+   "match": "GPIO_setConfig|GPIO_init",
+   "idiom": "gpio.config_pin",
+   "note": "the MSPM0 HIZ flags do not exist on F3",
+   "from": "portability/shim"
+  }
+ ]
+}

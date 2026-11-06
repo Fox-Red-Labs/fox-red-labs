@@ -1,0 +1,177 @@
+{
+ "image": "mspm0l1306.png",
+ "image_size": [
+  3020,
+  2948
+ ],
+ "crop": {
+  "x": 990,
+  "y": 1085,
+  "w": 1040,
+  "h": 515,
+  "why": "the two header blocks with their silkscreen names; the card shows only this part of the drawing"
+ },
+ "method": "Measured 2026-10-17 on the 3020 x 2948 drawing (TI SLAU869E board picture, leader lines removed). The gold pad ring of every header hole was found by colour (R>200, G>170, B<140), joined into blobs and the blob centres taken, in the four columns J1 (x 1114), J3 (x 1156), J4 (x 1861) and J2 (x 1903). Ten rows each, 43.67 px apart: a straight line through the ten measured row centres of the J2 column fits within 3 px (row k at y = 1148.1 + 43.81 k). Pin numbers follow TI's Figure 2-9: J1 pins 1 to 10 and J3 pins 21 to 30 run top to bottom, J2 pins 20 to 11 and J4 pins 40 to 31 run top to bottom (pin 40 at the top of the right-hand block, checked against the silkscreen PA12 at J4 pin 40, PA13 at 39, PA26 at 38, PA27 at 37, and PA3 at J2 pin 19, PA23 at J2 pin 12).",
+ "positions": {
+  "J1 pin 1": [
+   1114,
+   1148.1
+  ],
+  "J1 pin 2": [
+   1114,
+   1191.9
+  ],
+  "J1 pin 3": [
+   1114,
+   1235.7
+  ],
+  "J1 pin 4": [
+   1114,
+   1279.5
+  ],
+  "J1 pin 5": [
+   1114,
+   1323.3
+  ],
+  "J1 pin 6": [
+   1114,
+   1367.1
+  ],
+  "J1 pin 7": [
+   1114,
+   1410.9
+  ],
+  "J1 pin 8": [
+   1114,
+   1454.7
+  ],
+  "J1 pin 9": [
+   1114,
+   1498.5
+  ],
+  "J1 pin 10": [
+   1114,
+   1542.3
+  ],
+  "J3 pin 21": [
+   1156,
+   1148.1
+  ],
+  "J3 pin 22": [
+   1156,
+   1191.9
+  ],
+  "J3 pin 23": [
+   1156,
+   1235.7
+  ],
+  "J3 pin 24": [
+   1156,
+   1279.5
+  ],
+  "J3 pin 25": [
+   1156,
+   1323.3
+  ],
+  "J3 pin 26": [
+   1156,
+   1367.1
+  ],
+  "J3 pin 27": [
+   1156,
+   1410.9
+  ],
+  "J3 pin 28": [
+   1156,
+   1454.7
+  ],
+  "J3 pin 29": [
+   1156,
+   1498.5
+  ],
+  "J3 pin 30": [
+   1156,
+   1542.3
+  ],
+  "J4 pin 40": [
+   1861,
+   1148.1
+  ],
+  "J4 pin 39": [
+   1861,
+   1191.9
+  ],
+  "J4 pin 38": [
+   1861,
+   1235.7
+  ],
+  "J4 pin 37": [
+   1861,
+   1279.5
+  ],
+  "J4 pin 36": [
+   1861,
+   1323.3
+  ],
+  "J4 pin 35": [
+   1861,
+   1367.1
+  ],
+  "J4 pin 34": [
+   1861,
+   1410.9
+  ],
+  "J4 pin 33": [
+   1861,
+   1454.7
+  ],
+  "J4 pin 32": [
+   1861,
+   1498.5
+  ],
+  "J4 pin 31": [
+   1861,
+   1542.3
+  ],
+  "J2 pin 20": [
+   1903,
+   1148.1
+  ],
+  "J2 pin 19": [
+   1903,
+   1191.9
+  ],
+  "J2 pin 18": [
+   1903,
+   1235.7
+  ],
+  "J2 pin 17": [
+   1903,
+   1279.5
+  ],
+  "J2 pin 16": [
+   1903,
+   1323.3
+  ],
+  "J2 pin 15": [
+   1903,
+   1367.1
+  ],
+  "J2 pin 14": [
+   1903,
+   1410.9
+  ],
+  "J2 pin 13": [
+   1903,
+   1454.7
+  ],
+  "J2 pin 12": [
+   1903,
+   1498.5
+  ],
+  "J2 pin 11": [
+   1903,
+   1542.3
+  ]
+ }
+}

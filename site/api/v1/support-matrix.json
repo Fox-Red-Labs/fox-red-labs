@@ -1,0 +1,1261 @@
+{
+ "schema_version": "1.0",
+ "generated": "2026-11-04",
+ "source": "data/support-matrix.json",
+ "what_a_row_is": "the works-with grid per TI family: ran, partial, built, ships, early, community, untried, with evidence",
+ "row_fields": [
+  "families",
+  "faq",
+  "groups",
+  "next",
+  "next_note",
+  "note"
+ ],
+ "rows": {
+  "note": "What works with what, per TI family: the tools, operating systems and maker platforms engineers already use. Rendered as the works-with grid on site/portability.html by portability/render.py. A cell is [state, short note, evidence path or site page], optionally followed by a fourth element, an object with `changed` (one short line: what had to change to run it, e.g. \"316-line layer, 0 app edits\") and `files` (the repo path of the folder's \"Take it with you\" section: the files a reader copies). Three-field cells stay valid. States: ran (run on a board), partial (ran up to a step; shown as Could work, the note names the blocker), built (built, not run; shown as Should work), ships (vendor tested: the SDK release notes name the tool and version as tested; cited, not repeated here), early (vendor early access), community (a third-party port exists), untried, gap (nothing found, dated in the source) and na (does not apply) draw an empty cell, and a row of only empty cells is not drawn. A family missing from a row is empty too. Sources: data/toolchains/ (what TI ships, scanned 2026-10-14), docs/research/toolchain-support-2026-10-14.md (third-party support, read 2026-10-14), the per-board results and project pages for anything marked ran or built.",
+  "families": [
+   {
+    "id": "mspm0",
+    "name": "MSPM0",
+    "boards": "C1104, L1306, G3507, G3519, G5187"
+   },
+   {
+    "id": "mspm33",
+    "name": "MSPM33",
+    "boards": "MSPM33C321A"
+   },
+   {
+    "id": "radio",
+    "name": "CC23xx, CC27xx, CC13xx",
+    "boards": "CC2340R5, CC2755P10, CC1354P10"
+   },
+   {
+    "id": "wifi",
+    "name": "CC35xx Wi-Fi",
+    "boards": "CC35X1"
+   },
+   {
+    "id": "am13",
+    "name": "AM13",
+    "boards": "AM13E230"
+   },
+   {
+    "id": "am26",
+    "name": "AM26x",
+    "boards": "AM263P"
+   },
+   {
+    "id": "c2000",
+    "name": "C2000",
+    "boards": "F2800137, F28P65X"
+   },
+   {
+    "id": "radar",
+    "name": "mmWave radar",
+    "boards": "IWRL6432BOOST"
+   },
+   {
+    "id": "linux",
+    "name": "TDA4 Linux",
+    "boards": "SK-TDA4VM"
+   },
+   {
+    "id": "am62l",
+    "name": "AM62L",
+    "boards": "TMDS62LEVM"
+   },
+   {
+    "id": "am67a",
+    "name": "AM67A",
+    "boards": "BeagleY-AI"
+   }
+  ],
+  "groups": [
+   {
+    "name": "Compilers",
+    "rows": [
+     {
+      "name": "TI's own compiler",
+      "sub": "TI Arm Clang; C2000 CGT on C2000",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "262 of 270 G3507 examples built (222 with one make each); 213 flashed, 203 ran, none crashed",
+        "project-build-from-terminal.html"
+       ],
+       "mspm33": [
+        "ran",
+        "Blink to benchmarks",
+        "board-mspm33c321a.html"
+       ],
+       "radio": [
+        "ran",
+        "Every board",
+        "board-cc2755p10.html"
+       ],
+       "wifi": [
+        "ran",
+        "Blink, Matter, Wi-Fi",
+        "board-cc3551e.html"
+       ],
+       "am13": [
+        "ran",
+        "100 built, 80 run",
+        "board-am13e230.html"
+       ],
+       "am26": [
+        "ran",
+        "CoreMark, FOC step",
+        "benchmarks.html?board=am263p"
+       ],
+       "c2000": [
+        "ran",
+        "C2000 CGT 25.11",
+        "board-f2800137.html"
+       ],
+       "radar": [
+        "ran",
+        "2 of 23 driver examples ran (UART echo, GPIO)",
+        "portability-proven.html#x35"
+       ],
+       "linux": [
+        "na",
+        "Linux uses GCC",
+        ""
+       ]
+      }
+     },
+     {
+      "name": "GCC",
+      "sub": "TI names Arm GNU; the build used the Zephyr SDK's GCC 12.2",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "DriverLib, no RTOS: 224 of 224 built, 87 of 87 ran on the L1306",
+        "../portability/toolchains/gcc-mspm0/README.md"
+       ],
+       "mspm33": [
+        "ships",
+        "Arm GNU 9-2019-q4; 176 of 259 examples",
+        "../data/toolchains/README.md"
+       ],
+       "radio": [
+        "ran",
+        "Zephyr's GCC ran on the CC2340R5; 144 of 144 TI driver examples build; Bluetooth and Zigbee stacks ship no GCC libraries",
+        "../portability/toolchains/gcc-f3/README.md"
+       ],
+       "wifi": [
+        "ships",
+        "GCC 12.3.Rel1; 64 of 64 examples",
+        "../data/toolchains/README.md"
+       ],
+       "am13": [
+        "ships",
+        "GCC 15.2.rel1, CMake command line",
+        "../data/toolchains/README.md"
+       ],
+       "am26": [
+        "gap",
+        "No GCC projects in the SDK",
+        "../data/toolchains/README.md"
+       ],
+       "c2000": [
+        "gap",
+        "C28x has no GCC",
+        "../data/toolchains/README.md"
+       ],
+       "radar": [
+        "gap",
+        "No GCC projects in the SDK",
+        "../data/toolchains/README.md"
+       ],
+       "linux": [
+        "ran",
+        "TI's MSPM0 FFT example ran on the A72",
+        "portability-proven.html#x33"
+       ]
+      }
+     },
+     {
+      "name": "IAR Embedded Workbench",
+      "sub": "EWARM 9.70",
+      "cells": {
+       "mspm0": [
+        "ships",
+        "IAR 9.70.2; 1,357 of 1,911 examples",
+        "../data/toolchains/README.md"
+       ],
+       "mspm33": [
+        "ships",
+        "IAR 9.70.4 plus TI's device patch; 166 of 259",
+        "../data/toolchains/README.md"
+       ],
+       "radio": [
+        "ships",
+        "IAR 9.70.2; 554 of 643 F3 examples",
+        "../data/toolchains/README.md"
+       ],
+       "wifi": [
+        "gap",
+        "No IAR examples or mention",
+        "../data/toolchains/README.md"
+       ],
+       "am13": [
+        "ships",
+        "IAR 9.70.1, Windows only; 165 of 193",
+        "../data/toolchains/README.md"
+       ],
+       "am26": [
+        "gap",
+        "No IAR example projects",
+        "../data/toolchains/README.md"
+       ],
+       "c2000": [
+        "gap",
+        "No IAR compiler for C28x",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "radar": [
+        "gap",
+        "Not in the SDK",
+        "../data/toolchains/README.md"
+       ],
+       "linux": [
+        "na",
+        "Linux builds use GCC",
+        ""
+       ]
+      }
+     },
+     {
+      "name": "Keil MDK",
+      "sub": "Arm Compiler 6",
+      "cells": {
+       "mspm0": [
+        "ships",
+        "uVision 5.38, Arm Clang 6.16+; 1,307 of 1,911",
+        "../data/toolchains/README.md"
+       ],
+       "mspm33": [
+        "ships",
+        "uVision 5.38, Arm Clang 6.16+; 157 of 259",
+        "../data/toolchains/README.md"
+       ],
+       "radio": [
+        "gap",
+        "No Keil projects in the F3 SDK",
+        "../data/toolchains/README.md"
+       ],
+       "wifi": [
+        "gap",
+        "No Keil projects",
+        "../data/toolchains/README.md"
+       ],
+       "am13": [
+        "ships",
+        "uVision 5; 1 example",
+        "../data/toolchains/README.md"
+       ],
+       "am26": [
+        "gap",
+        "Not in the SDK",
+        "../data/toolchains/README.md"
+       ],
+       "c2000": [
+        "gap",
+        "No Arm compiler for C28x",
+        "../data/toolchains/README.md"
+       ],
+       "radar": [
+        "gap",
+        "Not in the SDK",
+        "../data/toolchains/README.md"
+       ],
+       "linux": [
+        "na",
+        "Linux builds use GCC",
+        ""
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "name": "Ways to build and flash",
+    "rows": [
+     {
+      "name": "Terminal, no IDE",
+      "sub": "make or a script",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "262 of 270 G3507 examples",
+        "project-build-from-terminal.html"
+       ],
+       "mspm33": [
+        "ran",
+        "19 s to a changed blink",
+        "board-mspm33c321a.html"
+       ],
+       "radio": [
+        "ran",
+        "41 s to a changed blink",
+        "board-cc2755p10.html"
+       ],
+       "wifi": [
+        "ran",
+        "60 s edit to blink",
+        "board-cc3551e.html"
+       ],
+       "am13": [
+        "ran",
+        "22 s to a changed blink",
+        "board-am13e230.html"
+       ],
+       "am26": [
+        "ran",
+        "Build 5.9 s, RAM load",
+        "benchmarks.html?board=am263p"
+       ],
+       "c2000": [
+        "ran",
+        "Blink by script, 4.6 s",
+        "board-f2800137.html"
+       ],
+       "radar": [
+        "ran",
+        "Built and flashed from the Mac",
+        "portability-proven.html#x35"
+       ],
+       "linux": [
+        "ran",
+        "Native gcc on the board",
+        "board-tda4.html"
+       ],
+       "am67a": [
+        "ran",
+        "Native gcc 13.3 on the board built the portable app in 2.3 s",
+        "../beagley-ai/bench/portability/three-ways-run.log"
+       ]
+      }
+     },
+     {
+      "name": "The frl tool",
+      "sub": "./start.sh: back up, build, flash, check the LED through the debugger",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "L1306: 13 to 14 s, pattern checked on the pin",
+        "../docs/frl.md"
+       ],
+       "mspm33": [
+        "untried",
+        "tools/frl has one route so far, the L1306 (data/routes.json)",
+        "../data/routes.json"
+       ],
+       "radio": [
+        "untried",
+        "tools/frl has one route so far, the L1306 (data/routes.json)",
+        "../data/routes.json"
+       ],
+       "wifi": [
+        "untried",
+        "tools/frl has one route so far, the L1306 (data/routes.json)",
+        "../data/routes.json"
+       ],
+       "am13": [
+        "untried",
+        "tools/frl has one route so far, the L1306 (data/routes.json)",
+        "../data/routes.json"
+       ],
+       "am26": [
+        "untried",
+        "tools/frl has one route so far, the L1306 (data/routes.json)",
+        "../data/routes.json"
+       ],
+       "c2000": [
+        "untried",
+        "tools/frl has one route so far, the L1306 (data/routes.json)",
+        "../data/routes.json"
+       ],
+       "radar": [
+        "untried",
+        "tools/frl has one route so far, the L1306 (data/routes.json)",
+        "../data/routes.json"
+       ],
+       "linux": [
+        "na",
+        "Microcontroller tool; this board runs Linux",
+        ""
+       ]
+      }
+     },
+     {
+      "name": "Renode (simulate before silicon)",
+      "sub": "open-source machine simulator; platform from the Zephyr build's device tree with dts2repl",
+      "cells": {
+       "am62l": [
+        "ran",
+        "Bare-EL3 Zephyr hello world booted and printed on UART0 in Renode 1.17.0 before the board arrived; 6 translation tables were too few, 8 work",
+        "../docs/guides/simulate-before-silicon.md"
+       ],
+       "mspm0": [
+        "untried",
+        "Zephyr's dashboard runs Cortex-M boards in Renode through the same dts2repl path",
+        "../docs/guides/simulate-before-silicon.md"
+       ],
+       "radio": [
+        "untried",
+        "Same path; the radio has no model, so only the core and UART would run",
+        "../docs/guides/simulate-before-silicon.md"
+       ],
+       "linux": [
+        "untried",
+        "A Linux boot needs TF-A, U-Boot and the DDR controller modeled; not attempted",
+        "../docs/guides/simulate-before-silicon.md"
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "name": "Operating systems",
+    "rows": [
+     {
+      "name": "FreeRTOS",
+      "sub": "",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "11 tasks in 4 kB on the L1306",
+        "project-run-freertos.html"
+       ],
+       "mspm33": [
+        "ran",
+        "397 tasks with the heap raised to about 248 kB",
+        "../data/results/mspm33c321a.csv"
+       ],
+       "radio": [
+        "ran",
+        "TI's FreeRTOS: task switch 3.5 µs and 238 tasks on the CC2755P10, 7.4 µs on the CC1354P10, 10.6 µs on the CC2340R5",
+        "../data/results/cc2755p10.csv"
+       ],
+       "am13": [
+        "ran",
+        "Task switch 1.49 µs at 200 MHz",
+        "board-am13e230.html"
+       ],
+       "c2000": [
+        "gap",
+        "Not in public C2000Ware",
+        "project-run-freertos.html"
+       ],
+       "wifi": [
+        "ran",
+        "TI's FreeRTOS blink, and CoreMark in a FreeRTOS thread at 160 MHz",
+        "../data/results/cc35x1.csv"
+       ],
+       "am26": [
+        "ran",
+        "TI's FreeRTOS example: semaphore task switch 6.06 µs at 400 MHz",
+        "../data/results/am263p.csv"
+       ],
+       "radar": [
+        "ships",
+        "The SDK guide lists FreeRTOS 10.4.3 among its tools; no RTOS run on it",
+        "board-iwrl6432.html"
+       ],
+       "linux": [
+        "na",
+        "Linux board; the R5F firmware is TI's, loaded by the bootloader",
+        ""
+       ]
+      }
+     },
+     {
+      "name": "Zephyr",
+      "sub": "upstream or TI's tree",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "G3507 ran; 88 of 93 upstream samples build on G3507, G3519, L2228; L1306 on an out-of-tree board file; BoosterPack screen, Sharp128 and Audio shields build on main for G3507 and G3519 (4.4.2 has no MSPM0 SPI driver); I2C (open pull request #117311) and internal flash (a new driver) ran on the G3519: loopback 12 of 12, touch chip read at 0x38, flash 18 of 18",
+        "../portability/zephyr-mspm0/README.md",
+        {
+         "changed": "Two patches on upstream: the open I2C pull request #117311 and an internal-flash driver",
+         "files": "portability/zephyr-mspm0/README.md#take-it-with-you"
+        }
+       ],
+       "mspm33": [
+        "ran",
+        "Zephyr main plus two open TI pull requests (UART and clock, GPIO): MicroPython's Zephyr port boots and runs on the MSPM33C321A (25 Oct 2026). hello_world builds on main alone; blinky does not (no led0)",
+        "../ports/micropython/zephyr-mspm33c321a/README.md"
+       ],
+       "radio": [
+        "ran",
+        "CC2340R5 blink and benchmark; 24 of 26 upstream samples build; CC2755P10 hello_world printed its greeting and blinky toggled the green LED in TI's fork v3.7.0-ti-1.00.01_ga (flashed 2026-10-17)",
+        "../cc2755p10/build/zephyr-ti-fork/run-2026-10-17/hello_world.uart.txt"
+       ],
+       "am13": [
+        "partial",
+        "Upstream main: hello_world builds, an LED image ran; Zephyr's blinky does not build (no GPIO driver)",
+        "../docs/experiments/2026-10-09-am13e230-zephyr-upstream.md"
+       ],
+       "linux": [
+        "na",
+        "Runs Linux",
+        ""
+       ],
+       "wifi": [
+        "partial",
+        "TI's fork (v3.7.0-ti-1.00.01_ga): hello_world and blinky link (65 kB flash); the signed-image step fails on Toolbox 4.3.23",
+        "../cc35x1/build/zephyr-ti-fork/hello_world.log"
+       ],
+       "am26": [
+        "ran",
+        "An out-of-tree board: hello_world boots and prints on R5FSS0-0 beside TI's FreeRTOS; upstream has none",
+        "../am263p/RESULTS-am263p.md"
+       ],
+       "c2000": [
+        "gap",
+        "C28x is not in upstream Zephyr (issue 96186); TI said no plans",
+        "../data/results/f2800137.csv"
+       ],
+       "radar": [
+        "gap",
+        "No board or SoC in Zephyr 4.4.2",
+        "../data/results/iwrl6432boost.csv"
+       ]
+      }
+     },
+     {
+      "name": "Linux",
+      "sub": "",
+      "cells": {
+       "linux": [
+        "ran",
+        "Boots in 24 s; models on the C7x",
+        "project-linux-vision.html"
+       ],
+       "mspm0": [
+        "na",
+        "Microcontroller; no Linux port",
+        ""
+       ],
+       "mspm33": [
+        "na",
+        "Microcontroller; no Linux port",
+        ""
+       ],
+       "radio": [
+        "na",
+        "Wireless microcontroller; no Linux port",
+        ""
+       ],
+       "wifi": [
+        "na",
+        "Wi-Fi companion chip; Linux runs on the host; no Linux port",
+        ""
+       ],
+       "am13": [
+        "na",
+        "Microcontroller; no Linux port",
+        ""
+       ],
+       "am26": [
+        "na",
+        "Microcontroller; no Linux port",
+        ""
+       ],
+       "c2000": [
+        "na",
+        "Microcontroller; no Linux port",
+        ""
+       ],
+       "radar": [
+        "na",
+        "Microcontroller; no Linux port",
+        ""
+       ],
+       "am62l": [
+        "ran",
+        "TI SDK 12.01 (Arago, kernel 6.18) with Docker 29.3, Python 3.14, Node 22",
+        "../am62l-evm/linux-apps/README.md"
+       ],
+       "am67a": [
+        "ran",
+        "BeagleBoard Edge AI 11.00.00.08 (Arago, kernel 6.12.33): models on the C7x, hardware video codec, Docker",
+        "../beagley-ai/README.md"
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "name": "Maker platforms",
+    "rows": [
+     {
+      "name": "ESPHome",
+      "sub": "ESPHome platforms for the CC23xx, CC27xx and CC35xx",
+      "cells": {
+       "radio": [
+        "ran",
+        "CC2340R5 and CC2755P10 in Home Assistant",
+        "project-esphome.html"
+       ],
+       "wifi": [
+        "partial",
+        "Wi-Fi and native API answer; Home Assistant could not reach the board on the test network",
+        "project-esphome.html"
+       ],
+       "mspm0": [
+        "gap",
+        "No ESPHome platform; the platforms cover only CC23xx, CC27xx and CC35xx",
+        "../ports/esphome-ti/README.md"
+       ],
+       "mspm33": [
+        "gap",
+        "No ESPHome platform; the platforms cover only CC23xx, CC27xx and CC35xx",
+        "../ports/esphome-ti/README.md"
+       ],
+       "am13": [
+        "gap",
+        "No ESPHome platform; the platforms cover only CC23xx, CC27xx and CC35xx",
+        "../ports/esphome-ti/README.md"
+       ],
+       "am26": [
+        "gap",
+        "No ESPHome platform; the platforms cover only CC23xx, CC27xx and CC35xx",
+        "../ports/esphome-ti/README.md"
+       ],
+       "c2000": [
+        "gap",
+        "No ESPHome platform; the platforms cover only CC23xx, CC27xx and CC35xx",
+        "../ports/esphome-ti/README.md"
+       ],
+       "radar": [
+        "gap",
+        "No ESPHome platform; the platforms cover only CC23xx, CC27xx and CC35xx",
+        "../ports/esphome-ti/README.md"
+       ],
+       "linux": [
+        "na",
+        "ESPHome builds firmware for chips; it does not run on this board's job",
+        ""
+       ]
+      }
+     },
+     {
+      "name": "Arduino",
+      "sub": "",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "A 649-line layer; Arduino_GFX ran. G3519 also runs Blink, AnalogReadSerial, Wire (touch controller at 0x38, 100 of 100 reads), SPI (256 of 256 loopback), analogWrite and attachInterrupt through the Zephyr-based core on Zephyr main plus the MSPM0 I2C pull request",
+        "project-arduino.html",
+        {
+         "changed": "One devicetree overlay per board (about 40 to 70 lines), 0 sketch edits; the G3507 screen demo uses a 649-line layer instead",
+         "files": "portability/arduino/zephyr/README.md#take-it-with-you"
+        }
+       ],
+       "radio": [
+        "ran",
+        "CC2340R5: Blink, AnalogReadSerial, attachInterrupt, analogWrite, SPI and Wire run through the Zephyr-based core (27.7 to 38.3 kB flash, 6.1 kB RAM); Wire reads the OPT3001 (1594 lux); a Wire address scan finds nothing on the CC23x0 I2C driver, so probe with a register read",
+        "../portability/arduino/zephyr/README.md",
+        {
+         "changed": "One devicetree overlay (about 40 to 70 lines), 0 sketch edits",
+         "files": "portability/arduino/zephyr/README.md#take-it-with-you"
+        }
+       ],
+       "mspm33": [
+        "gap",
+        "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "wifi": [
+        "gap",
+        "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "am13": [
+        "gap",
+        "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "am26": [
+        "gap",
+        "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "c2000": [
+        "gap",
+        "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "radar": [
+        "gap",
+        "No core found",
+        "../iwrl6432boost/README.md"
+       ],
+       "linux": [
+        "na",
+        "Arduino is for microcontrollers",
+        ""
+       ]
+      }
+     },
+     {
+      "name": "PlatformIO",
+      "sub": "",
+      "cells": {
+       "mspm0": [
+        "community",
+        "One third-party platform",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "radio": [
+        "gap",
+        "None in the registry",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "wifi": [
+        "gap",
+        "None in the registry",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "mspm33": [
+        "gap",
+        "None in the registry 17 Oct 2026; its only TI platform is MSP430",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "am13": [
+        "gap",
+        "None in the registry 17 Oct 2026; its only TI platform is MSP430",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "am26": [
+        "gap",
+        "None in the registry 17 Oct 2026; its only TI platform is MSP430",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "c2000": [
+        "gap",
+        "None in the registry 17 Oct 2026; its only TI platform is MSP430",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "radar": [
+        "gap",
+        "None found",
+        "../iwrl6432boost/README.md"
+       ],
+       "linux": [
+        "na",
+        "PlatformIO is for microcontrollers",
+        ""
+       ]
+      }
+     },
+     {
+      "name": "MicroPython",
+      "sub": "",
+      "cells": {
+       "mspm0": [
+        "partial",
+        "A new port (no upstream one): full build boots on the G3519 with a REPL at 115200 baud (175.6 kB flash, 122 kB heap); minimal build built for the G3507, not flashed. Zephyr's port does not fit",
+        "../ports/micropython/README.md",
+        {
+         "changed": "A new MSPM0 port (console, time, pins, clock, SPI); MicroPython files unmodified"
+        }
+       ],
+       "radio": [
+        "ran",
+        "CC2340R5: upstream MicroPython's Zephyr port runs with a REPL, Pin, ADC, Pin.irq (10 of 10), PWM (duty_ns; duty_u16 needs a one-cast patch), SPI and I2C (OPT3001 read, 1596 lux; I2C.scan() returns [] on the CC23x0 driver) in 174.8 kB flash, 29.9 kB RAM",
+        "../ports/micropython/zephyr-cc2340r5/README.md",
+        {
+         "changed": "One config file and one devicetree overlay, 0 MicroPython or Zephyr edits",
+         "files": "ports/micropython/zephyr-cc2340r5/README.md#take-it-with-you"
+        }
+       ],
+       "wifi": [
+        "gap",
+        "No port found",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "mspm33": [
+        "ran",
+        "MicroPython's own prj.conf on Zephyr main plus two open TI pull requests (UART and clock, GPIO): REPL, Pin, float and SPI run; 292.3 kB flash, 83.6 kB RAM, 48 kB heap; I2C reads hang; no Zephyr ADC or PWM driver for this chip",
+        "../ports/micropython/zephyr-mspm33c321a/README.md",
+        {
+         "changed": "No port code: one watchdog-off conf and overlays; needs the pinned Zephyr tree",
+         "files": "ports/micropython/zephyr-mspm33c321a/README.md#take-it-with-you"
+        }
+       ],
+       "am13": [
+        "gap",
+        "Needs Zephyr first; the board file has no GPIO or serial driver",
+        "../docs/experiments/2026-10-09-am13e230-zephyr-upstream.md"
+       ],
+       "am26": [
+        "gap",
+        "Needs Zephyr first; upstream has no AM263P board",
+        "../am263p/RESULTS-am263p.md"
+       ],
+       "c2000": [
+        "gap",
+        "No Zephyr, so no port",
+        "../data/results/f2800137.csv"
+       ],
+       "radar": [
+        "gap",
+        "No Zephyr board, so no port",
+        "../data/results/iwrl6432boost.csv"
+       ],
+       "linux": [
+        "untried",
+        "MicroPython's unix port should run on the A72",
+        "../docs/proof-backlog.md"
+       ]
+      }
+     },
+     {
+      "name": "Rust (embassy)",
+      "sub": "",
+      "cells": {
+       "mspm0": [
+        "community",
+        "embassy-mspm0, git only",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "radio": [
+        "community",
+        "Peripheral crate for the CC13x4 only (CC1354P10, ti-lprf-pacs); none for CC23xx or CC27xx",
+        "https://github.com/seanmlyons22/ti-lprf-pacs/"
+       ],
+       "mspm33": [
+        "gap",
+        "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "wifi": [
+        "gap",
+        "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "am13": [
+        "gap",
+        "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "am26": [
+        "gap",
+        "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "c2000": [
+        "gap",
+        "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "radar": [
+        "gap",
+        "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
+        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+       ],
+       "linux": [
+        "untried",
+        "Rust builds natively for aarch64 Linux",
+        "../docs/proof-backlog.md"
+       ]
+      }
+     },
+     {
+      "name": "MSP430 projects",
+      "sub": "TI MSP430FR examples ported by hand",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "Three MSP430FR2433 FRAM examples ran on the L1306: a counter that survives resets and power-off, a watchdog wake from deep sleep, a UART echo from deep sleep",
+        "../ports/msp430-to-mspm0/README.md"
+       ],
+       "radio": [
+        "untried",
+        "",
+        "../ports/msp430-to-mspm0/README.md"
+       ],
+       "mspm33": [
+        "untried",
+        "",
+        "../ports/msp430-to-mspm0/README.md"
+       ],
+       "wifi": [
+        "untried",
+        "",
+        "../ports/msp430-to-mspm0/README.md"
+       ],
+       "am13": [
+        "built",
+        "Three examples build; the deep-sleep test locked the debugger out (cause not confirmed; the image's only wake source was the watchdog, which the SDK does not list for STANDBY), so none is checked",
+        "../ports/msp430-to-mspm0/README.md"
+       ],
+       "am26": [
+        "untried",
+        "",
+        "../ports/msp430-to-mspm0/README.md"
+       ],
+       "c2000": [
+        "untried",
+        "",
+        "../ports/msp430-to-mspm0/README.md"
+       ],
+       "radar": [
+        "untried",
+        "",
+        "../ports/msp430-to-mspm0/README.md"
+       ],
+       "linux": [
+        "untried",
+        "",
+        "../ports/msp430-to-mspm0/README.md"
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "name": "Code from other ecosystems",
+    "rows": [
+     {
+      "name": "Raspberry Pi Pico SDK",
+      "sub": "pico-examples",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "LP-MSPM0G3519: blink, serial hello, I2C bus scan, PWM fade and ADC read run with their .c files unchanged, 1.8 to 10.6 kB of flash",
+        "../ports/pico-sdk/README.md",
+        {
+         "changed": "316-line layer over DriverLib plus an 81-line board folder, 0 app edits",
+         "files": "portability/pico-on-mspm0/README.md#take-it-with-you"
+        }
+       ]
+      }
+     },
+     {
+      "name": "Renesas FSP examples",
+      "sub": "ra-fsp-examples",
+      "cells": {
+       "mspm0": [
+        "ran",
+        "LP-MSPM0G3519: sci_uart, adc and gpt run unchanged and iic_master with five constants changed (4 of 5); the timer-triggered ADC example converts on time but its DMA half does not finish",
+        "../ports/renesas-ra-fsp/README.md",
+        {
+         "changed": "577-line FSP layer over DriverLib plus a 189-line board folder, 0 app edits in three examples",
+         "files": "portability/fsp-on-mspm0/README.md#take-it-with-you"
+        }
+       ]
+      }
+     },
+     {
+      "name": "Nordic BLE apps",
+      "sub": "LED Button and UART services",
+      "cells": {
+       "radio": [
+        "partial",
+        "CC2340R5: a Mac finds the board by either Nordic service; LED write 24.3 ms median, UART echo 60 of 60 lines",
+        "../ports/nordic-apps/README.md",
+        {
+         "changed": "Two 8-line service files through tools/gatt_gen and one app file on TI's basic_ble; no Nordic code",
+         "files": "ports/nordic-apps/README.md#take-it-with-you"
+        }
+       ]
+      }
+     },
+     {
+      "name": "Wi-Fi provisioning over BLE",
+      "sub": "phone sends the network name",
+      "cells": {
+       "wifi": [
+        "ran",
+        "CC35X1: TI's provisioning example joined from a Mac script in 7.13 s, 2 runs; the version that adds MQTT and saved credentials boots and advertises",
+        "../cc35x1/RESULTS-cc35x1.md",
+        {
+         "changed": "No port code: TI's provisioning service unmodified; a Python script stands in for the phone app",
+         "files": "ports/wifi-provisioning-ble/README.md#take-it-with-you"
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "name": "Smart home",
+    "rows": [
+     {
+      "name": "Home Assistant",
+      "sub": "",
+      "cells": {
+       "radio": [
+        "partial",
+        "Zigbee light: 95 ms on 2026-10-05; the 2026-10-16 repeat did not join",
+        "project-zigbee-light.html"
+       ],
+       "wifi": [
+        "partial",
+        "MQTT example answers a Mac; not in Home Assistant",
+        "project-wifi-sensor.html"
+       ],
+       "mspm0": [
+        "ran",
+        "LP-MSPM0G5187 with a CC1407P radio: mailbox, doorbell and panic events seen in Home Assistant",
+        "../mspm0g5187/radio/README.md"
+       ],
+       "radar": [
+        "partial",
+        "Bridge passed its self test and a replay; Home Assistant answered a ping; live run not finished",
+        "../iwrl6432boost/README.md"
+       ],
+       "mspm33": [
+        "untried",
+        "No run yet; needs a serial or radio bridge",
+        "../docs/proof-backlog.md"
+       ],
+       "am13": [
+        "untried",
+        "No run yet; needs a serial or radio bridge",
+        "../docs/proof-backlog.md"
+       ],
+       "am26": [
+        "untried",
+        "No run yet; needs a serial or radio bridge",
+        "../docs/proof-backlog.md"
+       ],
+       "c2000": [
+        "untried",
+        "No run yet; needs a serial or radio bridge",
+        "../docs/proof-backlog.md"
+       ],
+       "linux": [
+        "untried",
+        "No run yet",
+        "../docs/proof-backlog.md"
+       ],
+       "am62l": [
+        "ran",
+        "Container 2026.10.4 ran; an MQTT sensor appeared (557 MiB, 67.7 s to first answer)",
+        "../am62l-evm/linux-apps/README.md"
+       ],
+       "am67a": [
+        "ran",
+        "Container started on the Arm cores; first HTTP answer at 52.7 s, 531 MB",
+        "../beagley-ai/bench/docker/ha-and-pull.log"
+       ]
+      }
+     },
+     {
+      "name": "BTHome",
+      "sub": "Bluetooth sensor format Home Assistant reads",
+      "cells": {
+       "radio": [
+        "ran",
+        "CC2340R5 beacon in Home Assistant, no pairing",
+        "hub-smart-home.html#home-assistant"
+       ],
+       "mspm0": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "mspm33": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "am13": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "am26": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "c2000": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "radar": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "linux": [
+        "na",
+        "A host, not a radio device",
+        ""
+       ],
+       "wifi": [
+        "untried",
+        "The chip has Bluetooth LE; no BTHome run yet",
+        "../cc35x1/RESULTS-cc35x1.md"
+       ]
+      }
+     },
+     {
+      "name": "Matter",
+      "sub": "",
+      "cells": {
+       "radio": [
+        "partial",
+        "Thread smoke alarm boots and reports; pairing not done",
+        "project-matter-device.html"
+       ],
+       "wifi": [
+        "partial",
+        "Thermostat pairs into Apple Home only, with a test ID that is not certified; TI's light paired in 63 s",
+        "project-matter-device.html"
+       ],
+       "mspm0": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "mspm33": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "am13": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "am26": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "c2000": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "radar": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "linux": [
+        "na",
+        "A host, not a radio device",
+        ""
+       ]
+      }
+     },
+     {
+      "name": "Thread",
+      "sub": "",
+      "cells": {
+       "radio": [
+        "ran",
+        "Apple TV network, 0.44% loss",
+        "project-thread-device.html"
+       ],
+       "mspm0": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "mspm33": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "am13": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "am26": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "c2000": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "radar": [
+        "na",
+        "No radio on the chip",
+        ""
+       ],
+       "linux": [
+        "na",
+        "A host, not a radio device",
+        ""
+       ],
+       "wifi": [
+        "na",
+        "Wi-Fi and Bluetooth only; no 802.15.4",
+        ""
+       ]
+      }
+     }
+    ]
+   }
+  ],
+  "faq": [
+   {
+    "q": "Can I build TI's Bluetooth or Zigbee examples for the CC23xx and CC27xx with GCC?",
+    "a": "Not from the F3 SDK as shipped. Those examples have no GCC makefile, and the Bluetooth stack libraries ship only for TI Arm Clang and IAR, the Zigbee libraries only for TI Arm Clang. **Tag: Tool or docs.** The driver examples do build with GCC (144 of 144 on two boards); for radio apps use TI Arm Clang, or IAR for Bluetooth (portability/toolchains/gcc-f3/README.md)."
+   },
+   {
+    "q": "Why did only 5 of 10 MSPM0 driver apps run on the CC2340R5 unchanged?",
+    "a": "The other 5 put chip detail into calls that are meant to be portable: MSPM0 apps put a pin-mux index into the GPIO_setConfig flags, some call DriverLib directly, and UART is named UART2 on the CC2340R5's SDK. **Tag: Tool or docs.** Each needs a few app edits; the card for test X1 lists them (portability/README.md)."
+   },
+   {
+    "q": "Why do some low-power examples lose the debugger?",
+    "a": "Examples that enter STOP, STANDBY or SHUTDOWN turn off the part of the chip the debugger talks to, so the probe cannot reconnect until the board is reset or power-cycled. **Tag: Setup or handling.** The runner skips or resets them; 10 G3507 examples were counted as not run for this reason."
+   },
+   {
+    "q": "Why does the Zigbee light answer slower after re-pairing?",
+    "a": "Not explained. Two hours after a re-pairing the same image answered in 3.5 to 7.0 s instead of 95 ms median, while the coordinator reported a weaker link; the signal strengths were seen but not saved for every run. **Tag: Unknown (suspected: Radio environment).** One board, one network (cc2340r5/FAQ.md)."
+   },
+   {
+    "q": "Why is the CC35X1 ESPHome device not in Home Assistant?",
+    "a": "The test Wi-Fi network keeps its clients apart, so Home Assistant on the home network cannot reach it. On the board, the ESPHome API answered 20 of 20 commands from a client. **Tag: Setup or handling.**"
+   },
+   {
+    "q": "Does IAR or Keil build TI's projects for my chip?",
+    "a": "TI ships IAR projects for most MSPM0, CC23xx and CC27xx, MSPM33 and AM13 examples and Keil projects for most MSPM0 and MSPM33 examples; the Works with grid gives the counts. IAR's IDE is Windows only. **Tag: Tool or docs.** The counts come from scanning every example folder on 2026-10-14 (data/toolchains/claims.csv)."
+   },
+   {
+    "q": "What is the difference between TI ships it, built and ran?",
+    "a": "TI ships it means TI's SDK has a project or makefile for that compiler; nobody here has built it. Built means it compiled and linked here. Ran means it was flashed to the board and ran with no fault; Verified means the board's behavior also matched a reference, such as TI's own build of the same example."
+   },
+   {
+    "q": "Will my own GCC work, or only the Zephyr SDK's?",
+    "a": "The build used GCC 12.2 from the Zephyr SDK, through three small scripts that give it the arm-none-eabi names TI's makefiles call. TI names Arm GNU 9-2019-q4 for MSPM0. **Tag: Setup or handling.** The scripts and logs are in portability/toolchains/gcc-mspm0."
+   },
+   {
+    "q": "Can I trust ran with no fault as works?",
+    "a": "Not on its own. It means the example started and kept running without a crash; it does not prove the example did its job. That is why each card and milestone says how many were also checked for behavior (for GCC on the L1306, 24 of 87)."
+   },
+   {
+    "q": "Which computer and versions are these results from?",
+    "a": "Most runs used one Intel Mac on macOS 15.7, with CCStudio 21.0.1 (TI Arm Clang 5.1.1), SysConfig 1.26.3, MSPM0 SDK 2.11.00.07, F3 SDK 9.21.00.36 and Zephyr 4.4.2, unless a card says otherwise. The L1306 blink image also built on Ubuntu 24.04 and Apple Silicon; each image was flashed and verified on the board from the Intel Mac (docs/frl.md). No Windows host run is recorded."
+   },
+   {
+    "q": "What does ported by changing the device in SysConfig mean?",
+    "a": "TI's SysConfig tool writes the pin and peripheral setup code from a .syscfg file. Changing the device line in that file and rebuilding is the smallest port there is. When the new chip lacks a pin or peripheral, SysConfig stops or drops the setting, and the card says which."
+   },
+   {
+    "q": "Which operating systems are covered?",
+    "a": "FreeRTOS, Zephyr and, on the TDA4 board, Linux."
+   }
+  ],
+  "next": [],
+  "next_note": ""
+ }
+}

@@ -1,0 +1,11 @@
+--- st-gpio-iotoggle/main_st.c	2026-10-09 23:18:58
++++ st-gpio-iotoggle/main.c	2026-10-09 23:19:21
+@@ -132,2 +132,4 @@
+ {
++  SYSCFG_DL_init(); /* TI: the clock comes from the .syscfg */
++#if 0 /* TI: ST RCC/PWR clock tree, no equivalent in the layer */
+   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+@@ -164,2 +166,3 @@
+   }
++#endif
+ }

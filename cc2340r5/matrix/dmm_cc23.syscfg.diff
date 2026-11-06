@@ -1,0 +1,18 @@
+32c32
+< // @cliArgs --board /ti/boards/LP_EM_CC2755P10 --rtos freertos
+---
+> // @cliArgs --board /ti/boards/LP_EM_CC2340R5 --rtos freertos
+225c225
+< zigbee.nvs.internalFlash.regionBase = 0xE6000;
+---
+> zigbee.nvs.internalFlash.regionBase = 0x7C000; // Fox Red Labs: was 0xE6000 (CC27xx)
+230c230
+< nvs_ble.internalFlash.regionBase   = 0xE3000;
+---
+> nvs_ble.internalFlash.regionBase   = 0x79000; // Fox Red Labs: was 0xE3000 (CC27xx)
+241,242c241,242
+< const CryptoKeyKeyStore_PSA = scripting.addModule("/ti/drivers/CryptoKeyKeyStore_PSA");
+< CryptoKeyKeyStore_PSA.flashRegionType = "Pointer";
+---
+> // Fox Red Labs: CC27xx-only key store, removed for CC23xx // const CryptoKeyKeyStore_PSA = scripting.addModule("/ti/drivers/CryptoKeyKeyStore_PSA");
+> // Fox Red Labs: CC27xx-only key store, removed for CC23xx // CryptoKeyKeyStore_PSA.flashRegionType = "Pointer";

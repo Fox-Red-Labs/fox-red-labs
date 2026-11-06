@@ -1,0 +1,369 @@
+{
+    "id": "mspm33c321a",
+    "board": "LP-MSPM33C321A",
+    "part": "MSPM33C321A",
+    "family": "MSPM33",
+    "title": "Is the TI LP-MSPM33C321A the right board for my project?",
+    "short": "A LaunchPad development kit for TI's MSPM33C321A, a 160 MHz Cortex-M33 with TrustZone, 1 MB of flash, 256 kB of RAM and a hardware security block. CoreMark is 544 at 160 MHz (3.40 per MHz). Hardware AES-256 is 41.7 times faster than tiny-AES-c on 1 kB. TI's post-quantum examples pass their test vectors. There is no math accelerator and no NPU. A 50 kHz ADC-triggered control loop runs in 5.17 us at 160 MHz (178 kHz maximum rate at 59.5 percent CPU load), and a FreeRTOS task switch takes 11.5 us at 32 MHz. Power and UART speed were not measured.",
+    "meet": {
+        "what": "A LaunchPad development kit for TI's MSPM33C321A, with an XDS110 probe and EnergyTrace on the board. It has a 0.91 inch 128 x 32 OLED, 8 MB of QSPI flash, an RGB LED, two buttons and a mikroBUS socket. Out of the box the OLED shows TI's logo and S2 plays a short video from the QSPI flash. We saved the flash first and restored it afterwards. It is a prototype kit sold in limited quantity.",
+        "facts": [
+            [
+                "Chip",
+                "MSPM33C321A"
+            ],
+            [
+                "CPU",
+                "Arm Cortex-M33 at up to 160 MHz, with TrustZone, FPU and DSP extensions (TI product page, read 2026-10-09). No math accelerator"
+            ],
+            [
+                "Flash",
+                "1 MB with ECC, dual bank; 32 kB of data flash (TI product page)"
+            ],
+            [
+                "RAM",
+                "256 kB with ECC (TI product page)"
+            ],
+            [
+                "Radios",
+                "None"
+            ],
+            [
+                "On the chip",
+                "Hardware AES-256, SHA-256, public-key engine and random number generator, plus an immutable root of trust; two 12-bit ADCs rated 9.4 Msps; two CAN-FD; QSPI. TI lists post-quantum software library support. No NPU (TI's edge-AI device table)"
+            ],
+            [
+                "Debug probe",
+                "XDS110 with EnergyTrace, on the board. Probe firmware 3.0.0.43"
+            ],
+            [
+                "Headers",
+                "80-pin BoosterPack, mikroBUS socket, 3.3 V logic"
+            ],
+            [
+                "Software",
+                "MSPM33 SDK 1.04.00.00, CCStudio 21.0.1 (compiler and DSLite only), TI Arm Clang 5.1.1.LTS"
+            ],
+            [
+                "Board price",
+                "US$39.99 on TI.com (read 2026-10-04)"
+            ]
+        ],
+        "source": "docs/arrivals/mspm33c321a.md"
+    },
+    "projects": [
+        {
+            "t": "Blink an LED with TI's SDK",
+            "st": "works",
+            "result": "19 s from the command to a verified faster blink (build 4.8 s, flash 11.3 s), board plugged in and backed up. Pin PA2 toggled across 8 reads. Nobody has yet confirmed the LED by eye, and the CCStudio AI-tools path was not run",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "CoreMark",
+            "st": "works",
+            "result": "544.05 per second at 160 MHz (3.40 per MHz) and 140.28 at 32 MHz (4.38 per MHz), -O3, 3 runs each, validated. Per MHz it drops 22 percent at 160 MHz: the flash needs 2 wait states there and none at 32 MHz",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "Dhrystone 2.1",
+            "st": "works",
+            "result": "Rules followed (no inlining): 1.224 DMIPS per MHz at 32 MHz and 0.876 at 160 MHz. With inlining allowed, 1.079 at 160 MHz; that run is marked as not rule-compliant",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "Post-quantum and public-key crypto, TI's examples",
+            "st": "works",
+            "result": "At 32 MHz: ML-KEM-768 keygen, encaps and decaps take 1.48, 1.72 and 1.99 million cycles; ML-DSA-44 keygen, sign and verify 2.73, 23.2 and 3.47 million; ECDSA P-256 sign 5.21 million and verify 10.5 million. Each passes TI's own check against NIST test vectors. TI publishes 11 to 14 ms for ML-KEM at 160 MHz; we did not run that clock",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "Hardware AES and CRC",
+            "st": "works",
+            "result": "AES-256 ECB in hardware is 41.7 times faster than tiny-AES-c on 1 kB (7.6k against 317k cycles, key setup inside) and 25.6 times on one block. Output matches software and NIST SP 800-38A. The CRC module is 2.75 times faster than a table (2.3k against 6.2k cycles for 1 kB)",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "Room-occupancy neural nets (500 to 30k weights), plain C",
+            "st": "works",
+            "result": "0.749 / 1.856 / 7.377 / 27.2 ms per inference at 160 MHz -O3, 20 of 20 test vectors right on every build. Same models at 32 MHz: 3.05 / 7.79 / 31.5 / 116.7 ms",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "ADC speed",
+            "st": "partial",
+            "result": "5.0 million samples a second, not the 9.4 in TI's product page. One DMA transfer per conversion, trigger swept down to 25 ns, always 200 ns a sample. Cause not isolated. TI's hsadc_max_freq_dma example does not measure the rate; see the FAQ",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "Education BoosterPack screen",
+            "st": "works",
+            "result": "A full 128 x 128 fill takes 35 ms polled at a 16 MHz SPI clock, and 19.5 ms by DMA. The light sensor answers on I2C. Nobody has yet looked at the screen test pattern",
+            "source": "data/results/mspm33c321a.csv"
+        }
+    ],
+    "chains": [
+        {
+            "t": "TI's SDK examples, built and run from a terminal",
+            "st": "works",
+            "verdict": "Yes",
+            "why": "252 of 258 examples build (the 6 that do not are TrustZone non-secure halves that need their secure image first). 178 were flashed, verified and run for 4 seconds: 177 left the debugger connected. 'Ran' means flashed and left running, not proved correct",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "Motor-control math on the CPU",
+            "st": "works",
+            "verdict": "Software only",
+            "why": "The chip has no math accelerator. The C2000 bench's foc.c takes 531 cycles per step at 160 MHz; sine plus cosine takes 495. The LP-AM13E230 does the step in 117 cycles with its TMU",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "Power numbers",
+            "st": "waiting",
+            "verdict": "Not run",
+            "why": "The board's EnergyTrace needs jumpers lifted. Run, sleep, stop and shutdown current are waiting",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "UART and DAC-to-ADC loops",
+            "st": "waiting",
+            "verdict": "Not run",
+            "why": "Both need wires under the stacked Education BoosterPack",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "Touch display with LVGL, FreeRTOS switch time, FFT, Embench",
+            "st": "waiting",
+            "verdict": "Not run",
+            "why": "The touch display was not wired. The others needed new test code, which was not written",
+            "source": "data/results/mspm33c321a.csv"
+        },
+        {
+            "t": "The neural-network accelerator",
+            "st": "no",
+            "verdict": "Not possible",
+            "why_not": "no-software",
+            "why": "The chip has none. TI's edge-AI table lists MSPM33C as NPU: none. Models run on the CPU",
+            "source": "docs/arrivals/mspm33c321a.md"
+        },
+        {
+            "t": "A radio or wireless demo on the chip",
+            "st": "no",
+            "verdict": "Not possible",
+            "why_not": "no-radio",
+            "why": "The chip has no radio. Radio demos need a separate radio board",
+            "source": "docs/arrivals/mspm33c321a.md"
+        }
+    ],
+    "combine_title": "What else we tried, and how it went",
+    "combine_lede": "Each row is something we tried beyond the standard list. A row that did not work is recorded with its reason, not left out.",
+    "benchmarks": [
+        [
+            "CoreMark, -O3, 160 MHz",
+            "544.05/s (3.40/MHz)",
+            "2 flash wait states, both caches on"
+        ],
+        [
+            "CoreMark, -O3, 32 MHz",
+            "140.28/s (4.38/MHz)",
+            "0 wait states, cache off"
+        ],
+        [
+            "CoreMark, 160 MHz, -O2 / -Os / -Oz",
+            "376.9 / 323.9 / 285.3 per s",
+            ""
+        ],
+        [
+            "Dhrystone 2.1, no inlining",
+            "0.876 DMIPS/MHz (160 MHz)",
+            "1.224 at 32 MHz"
+        ],
+        [
+            "GPIO toggle, one store",
+            "8.0 cycles (160 MHz)",
+            "3.0 at 32 MHz; cause unexplained"
+        ],
+        [
+            "Interrupt latency, direct vector",
+            "32 cycles (160 MHz)",
+            "20 at 32 MHz"
+        ],
+        [
+            "sinf plus cosf, C library on the FPU",
+            "495.5 cycles (160 MHz)",
+            "454.4 at 32 MHz; no math accelerator"
+        ],
+        [
+            "One FOC step, C library",
+            "531.1 cycles (160 MHz)",
+            "489.1 at 32 MHz"
+        ],
+        [
+            "AES-256 ECB, 1 kB, hardware vs software",
+            "41.7 times faster",
+            "7.6k vs 317k cycles, 32 MHz"
+        ],
+        [
+            "CRC-32, 1 kB, hardware vs table",
+            "2.75 times faster",
+            "2.3k vs 6.2k cycles"
+        ],
+        [
+            "ML-KEM-768 keygen / encaps / decaps",
+            "1.48M / 1.72M / 1.99M cycles",
+            "TI's example, 32 MHz"
+        ],
+        [
+            "ML-DSA-44 keygen / sign / verify",
+            "2.73M / 23.2M / 3.47M cycles",
+            "TI's example, 32 MHz; sign is one sample"
+        ],
+        [
+            "ECDSA P-256 sign / verify",
+            "5.21M / 10.5M cycles",
+            "TI's example, 32 MHz"
+        ],
+        [
+            "Occupancy model, 500 weights",
+            "0.749 ms (160 MHz, -O3)",
+            "3.045 ms at 32 MHz"
+        ],
+        [
+            "Occupancy model, 2k weights",
+            "1.856 ms",
+            "7.793 ms at 32 MHz"
+        ],
+        [
+            "Occupancy model, 8k weights",
+            "7.377 ms",
+            "31.52 ms at 32 MHz"
+        ],
+        [
+            "Occupancy model, 30k weights",
+            "27.21 ms",
+            "116.65 ms at 32 MHz; 20 of 20 right on all"
+        ],
+        [
+            "ADC maximum rate",
+            "5.0 Msps",
+            "TI's page says 9.4"
+        ],
+        [
+            "Screen fill, 128 x 128, 16 MHz SPI",
+            "35.3 ms polled",
+            "19.5 ms by DMA"
+        ],
+        [
+            "Blink build / flash",
+            "4.8 s / 11.3 s",
+            "DSLite, over the on-board probe"
+        ],
+        [
+            "Blink image size",
+            "800 B flash, 256 B RAM",
+            "TI gpio_toggle_output"
+        ]
+    ],
+    "benchmarks_source": "mspm33c321a/bench/RESULTS-mspm33c321a.md",
+    "glance": [
+        [
+            "3.40",
+            "CoreMark per MHz at 160 MHz",
+            "544 per second, -O3; 4.38 per MHz at 32 MHz",
+            "data/results/mspm33c321a.csv"
+        ],
+        [
+            "41.7x",
+            "Hardware AES-256 over software",
+            "1 kB of AES-256 ECB, key setup inside the timing",
+            "data/results/mspm33c321a.csv"
+        ],
+        [
+            "19 s",
+            "Blink, from the command",
+            "Board plugged in and backed up; build 4.8 s, flash 11.3 s",
+            "data/results/mspm33c321a.csv"
+        ],
+        [
+            "1.72M cycles",
+            "ML-KEM-768 encapsulation",
+            "TI's post-quantum example, 32 MHz; passes the NIST test vector",
+            "data/results/mspm33c321a.csv"
+        ],
+        [
+            "27.2 ms",
+            "Largest occupancy model",
+            "30k weights, plain C at 160 MHz, 20 of 20 right",
+            "data/results/mspm33c321a.csv"
+        ],
+        [
+            "252 of 258",
+            "SDK examples that build",
+            "178 were flashed and run",
+            "data/results/mspm33c321a.csv"
+        ]
+    ],
+    "good_for": [
+        "Security work on an Arm chip: TrustZone, hardware AES, SHA, public-key and random-number blocks, and TI's post-quantum examples",
+        "A screen with no wiring: the OLED is on the board (the SDK has no OLED example, so you write the driver)",
+        "More RAM and flash than an MSPM0: 256 kB of RAM and 1 MB of flash",
+        "Building and flashing from a Mac terminal with TI's own tools"
+    ],
+    "not_for": [
+        "Motor control that needs fast sine and cosine: there is no math accelerator, and the control step takes 531 cycles",
+        "Neural nets on an accelerator: the chip has none",
+        "Anything with a radio: the chip has none",
+        "Projects that need power numbers: none were measured"
+    ],
+    "instead": [
+        {
+            "match": [
+                "Motor control"
+            ],
+            "try": "LP-AM13E230",
+            "why": "a TMU does the control step in 117 cycles",
+            "source": "docs/experiments/2026-10-08-am13e230-foc-step.md"
+        }
+    ],
+    "buy": "US$39.99 on TI.com (ti.com/tool/LP-MSPM33C321A, read 2026-10-04), a prototype kit in limited quantity. The probe is on the board, so one USB cable does power, flashing and the serial port.",
+    "gotchas": [
+        [
+            "Some SDK examples rewrite the chip's boot settings",
+            "Check every map file before flashing: `grep -E '^ +(BCR_CONFIG|BSL_CONFIG) ' <image>.map` must show 0 bytes used. Two AES-GCM examples do it without saying so. **Tag: TI example default.**"
+        ],
+        [
+            "TI's `hsadc_max_freq_dma` shows a rate it does not measure",
+            "The DMA copies the first result 2,000 times in one block. Use single-transfer mode to time real conversions. **Tag: TI example default.**"
+        ],
+        [
+            "An I2C scan on the Education BoosterPack finds nothing",
+            "Use PB13 for SCL and PB12 for SDA. Several SDK READMEs say PB0 and PB1. **Tag: Tool or docs.**"
+        ],
+        [
+            "A GPIO that SysConfig set as an output always reads low",
+            "Turn the input stage on after SysConfig has run. **Tag: Setup or handling.**"
+        ],
+        [
+            "CoreMark per MHz is 22 percent lower at 160 MHz than at 32 MHz",
+            "Expected: the flash needs 2 wait states at 160 MHz. We did not split the loss between wait states and cache. **Tag: Unknown (suspected: Chip limit).**"
+        ],
+        [
+            "The FreeRTOS blink example leaves the debugger unable to connect",
+            "Pulse reset from the probe: `xds110reset -s <serial> -a toggle -d 200`. No unplugging needed. **Tag: TI example default.**"
+        ]
+    ],
+    "faq_page": "faq-mspm33c321a.html",
+    "faq_source": "mspm33c321a/FAQ.md",
+    "updated": "2026-10-09",
+    "measured_on": "Measured 2026-10-08 and 2026-10-09 on an Intel Mac (macOS 15.7.9) with TI Arm Clang 5.1.1.LTS, SysConfig 1.28.0, MSPM33 SDK 1.04.00.00 and UniFlash 9.6.0 DSLite. Code runs from flash at 32 MHz (0 wait states) and 160 MHz (2 wait states), cycles counted on the chip. Board revision not recorded.",
+    "next": {
+        "title": "What do I do first with the LP-MSPM33C321A?",
+        "steps": [
+            "Find the probe serial with `xdsdfu -e`, then run `mspm33c321a/tools/identify.sh <serial>`. It reads only.",
+            "Save the flash before you change anything. The out-of-box OLED demo is not in the SDK.",
+            "Build and flash TI's blink with your own period: `mspm33c321a/blink.sh 250 <serial>`.",
+            "Do not flash the examples that place a boot configuration in NONMAIN; the FAQ lists them."
+        ],
+        "source": "mspm33c321a/README.md"
+    },
+    "line": "TrustZone, hardware AES-256 and a root of trust, with post-quantum library support. No math accelerator or neural accelerator."
+}

@@ -1,0 +1,476 @@
+:toc:
+:toclevels: 4
+
+:sectnums:
+
+= MLPerf Tiny Inference Rules
+
+Version 1.2
+Updated August 19th, 2024.
+
+This version has been updated, but is not yet final.
+
+Chairs (tiny-chairs@mlcommons.org):
+
+* Jeremy Holleman (jeremy@mlcommons.org)
+* Peter Change (peterchang@mlcommons.org)
+
+Benchmark Owners:
+
+* Visual Wake Words - Guoyang Chen
+* Anomaly Detection - Csaba Kiraly
+* Keyword Spotting - Jeremy Holleman
+* Image Classification - Pietro Montino
+
+== Overview
+
+This document describes how to implement one or more benchmarks in the MLPerf Tiny
+Inference Suite and how to use those implementations to measure the performance
+of an ML system performing inference.
+
+There are separate rules for the submission, review, and publication process for all MLPerf benchmarks https://github.com/mlperf/policies/blob/master/submission_rules.adoc[here].
+
+The MLPerf name and logo are trademarks. In order to refer to a result using the
+MLPerf name, the result must conform to the letter and spirit of the rules
+specified in this document. The MLPerf organization reserves the right to solely
+determine if a use of its name or logo is acceptable.
+
+=== Definitions (read this section carefully)
+
+The following definitions are used throughout this document:
+
+A _sample_ is the unit on which inference is run. E.g., an image, or a sentence.
+
+_Quality_ always refers to a model’s ability to produce “correct” outputs.
+
+A _system under test_ consists of a defined set of hardware and software
+resources that will be measured for performance.  The hardware resources may
+include processors, accelerators, memories, disks, and interconnect. The
+software resources may include an operating system, compilers, libraries, and
+drivers that significantly influences the running time of a benchmark.
+
+A _reference implementation_ is a specific implementation of a benchmark
+provided by the MLPerf organization.  The reference implementation is the
+canonical implementation of a benchmark. All valid submissions to the closed division
+of a benchmark must be *equivalent* to the reference implementation.
+
+A _run_ is a complete execution of a benchmark implementation on a system under
+the control of the load generator that consists of completing a set of inference
+queries, including data pre- and post-processing, meeting a quality requirement
+ in accordance with the division.
+
+A _run result_ consists of the scenario-specific metric.
+
+== General rules
+
+The following rules apply to all benchmark implementations.
+
+=== Strive to be fair
+
+Benchmarking should be conducted to measure the framework and system performance
+as fairly as possible. Ethics and reputation matter.
+
+=== System and framework must be consistent
+
+The same system and framework must be used for a suite result or set of
+benchmark results reported in a single context.
+
+=== Several submissions allowed from the same organization
+
+If an organization submits results using different systems and/or frameworks,
+these should be clearly separated in the submission and in the reporting of
+results.
+
+=== Replicability is mandatory
+
+Results that cannot be replicated are not valid results. The submission should
+contain enough information to unequivocally replicate the run, and these should
+lead to the same run results (up to a reasonable margin due to non-determinism and
+variance in hardware manufacturing and environmental conditions).
+
+=== Benchmark implementations must be shared
+
+As part of the submission, benchmark implementation should be documented to a level
+of detail that allows reproduction of the results by a third party. These submissions
+will be shared publicly together with the publication of results under a permissive
+license. For more details on what is accepted as a reproducible submission, see the
+dedicated section later on.
+
+=== Non-determinism is restricted
+
+The only forms of acceptable non-determinism are:
+
+* Floating point operation order
+
+* Random traversal of the inputs
+
+* Rounding
+
+All random numbers must be based on fixed random seeds and a deterministic random
+number generator. The deterministic random number generator is the Mersenne Twister
+19937 generator ([std::mt19937](http://www.cplusplus.com/reference/random/mt19937/)).
+The random seeds will be announced two weeks before the benchmark submission deadline.
+
+=== Benchmark detection is not allowed
+
+The framework and system should not detect and behave differently for
+benchmarks.
+
+=== Input-based optimization is not allowed
+
+The implementation should not encode any information about the content of the
+input dataset in any form.
+
+=== Progressively Larger Submissions Required
+
+For benchmarks with multiple sizes (as of spring 2026, only Image Classification),
+if an organization submits one size of the benchmark, it must also submit all
+smaller sizes.  So for example, you may submit IC01 (smaller image classification)
+and IC02 (larger image classification), or only IC01, but you may not submit IC02
+without also submitting IC01.  This is to maximize the availability of direct comparisons
+in the results.
+
+=== Audit Process
+
+In depth audits will not be conducted in this version (v1.2) of MLPerf Tiny
+
+
+== Scenarios
+
+MLPerf Tiny only supports the Single Stream scenario in this version (v1.2).
+
+== Benchmarks
+
+The MLPerf organization provides a reference implementation of each benchmark,
+which includes the following elements: Code that implements the model in a
+framework.  A plain text “README.md” file that describes:
+
+* Problem
+
+** Dataset/Environment
+
+** Publication/Attribution
+
+** Data pre- and post-processing
+
+** Performance, accuracy, and calibration data sets
+
+* Model
+
+** Publication/Attribution
+
+** List of layers
+
+** Weights and biases
+
+* Quality target
+
+* Directions
+
+** Steps to configure machine
+
+** Steps to download the dataset
+
+** Steps to run and time
+
+
+=== Benchmarks
+
+==== Constraints for the Closed division
+
+The suite includes the following benchmarks:
+
+|===
+|       Use Case       |                   Description                   |          Dataset          |       Model      | Quality Target 
+|   Keyword Spotting   |        Small vocabulary keyword spotting        |      Speech Commands      |      DS-CNN      |   90% (Top 1)
+|   Visual Wake Words  |           Binary image classification           | Visual Wake Words Dataset |     MobileNet    |   80% (Top 1)
+| Image Classification |            Small image classification           |          Cifar10          |      ResNet      |   85% (Top 1)
+|   Anomaly Detection  | Detecting anomalies in machine operating sounds |          ToyADMOS         | Deep AutoEncoder |   0.85 (AUC)
+|   Streaming Wakeword | Detecting wakewords in a continuous stream of audio| Custom                 | 1D DS-CNN        | <= 8 FP, <= 8 FN
+|===
+
+
+For the quality target, keyword spotting, visual wakewords, and image classification all use top-1 accuracy as the key metric.  Anomaly detection
+uses the area under the ROC curve (true positive rate vs false positive rate), as computed by
+https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html[sklearn.metrics.roc_auc_score].
+
+The streaming wakeword benchmark uses a combination of false positives and false negatives, requiring no more than 8 of either.
+
+==== Relaxed constraints for the Open division
+
+1. An Open benchmark must perform a task matching an existing Closed benchmark, and be substitutable in LoadGen for that benchmark.
+1. The accuracy dataset must be the same as an existing Closed benchmark.
+1. Accuracy constraints are not applicable: instead the submission must report the accuracy obtained.
+1. An open submission must be classified as "Available", "Preview", or "Research, Development, or Internal". See the https://github.com/mlcommons/policies/blob/master/submission_rules.adoc#73-results-categories[submission rules] for more information on these classifications.
+1. The model can be of any origin (trained on any dataset, quantized in any way, and sparsified in anyway).
+
+== Benchmark Runner
+
+
+
+=== EnergyRunner™ benchmark framework
+
+The benchmark suite is run using the EnergyRunner™ benchmark framework from EEMBC, which detects the DUT, sends inputs, and reads outputs over UART.  The EEMBC runner is being phased out.  It will be permitted for the KWS, VWW, IC, and AD benchmarks in the summer 2025 submission.  After that, only the MLCommons Runner will be permitted.  The EEMBC runner does not support the streaming wakeword benchmark.
+
+The EEMBC runner is available here: https://github.com/eembc/energyrunner
+The MLCommons runner is available in this repository: https://github.com/mlcommons/tiny/tree/master/benchmark/runner
+
+Note: The same code must be run for both the accuracy and performance Runner modes.
+
+== Divisions
+
+There are two divisions of the benchmark suite, the Closed division and the Open
+division.
+
+=== Closed Division
+
+The Closed division requires using pre-processing, post-processing, and model
+that is equivalent to the reference or alternative implementation.  The closed
+division allows calibration for quantization and does not allow any retraining.
+
+The unqualified name “MLPerf” must be used when referring to a Closed Division
+suite result, e.g. “a MLPerf result of 4.5.”
+
+=== Open Division
+
+The Open division allows using an arbitrary training dataset, training script, or model.
+The qualified name “MLPerf Open” must be used when
+referring to an Open Division suite result, e.g. “a MLPerf Open result of 7.2.”
+
+Pre- and Post-processing are not timed in v1.2 of the benchmark and are therefore
+can not be changed.
+
+== Data Sets
+
+For each benchmark, MLPerf will provide pointers to:
+
+* An accuracy data set, to be used to determine whether a submission meets the
+  quality target, and used as a validation set
+
+* A speed/performance data set that is a subset of the accuracy data set to be
+  used to measure performance
+
+For each benchmark, MLPerf will provide pointers to:
+
+* A calibration data set, to be used for quantization (see quantization
+  section), that is a small subset of the training data set used to generate the
+  weights
+
+The dataset must be unchanged at the start of each run.
+
+=== Pre- and post-processing
+
+Pre- and post-processing is untimed for all benchmarks.
+
+Pre- and post-processing must be the same as the reference implementation, except in the open division of Keyword Spotting where there are three options provided for pre-processing.
+
+== Model
+
+CLOSED: MLPerf provides a reference implementation of each benchmark. The benchmark implementation must use a model that is
+equivalent, as defined in these rules, to the model used in the reference implementation.
+
+OPEN: The benchmark implementation may use a different model to perform the same
+task. Retraining is allowed.
+
+=== Weight Definition and Quantization
+
+CLOSED: MLPerf will provide trained weights and biases in fp32 format for both
+the reference and alternative implementations.
+
+MLPerf will provide a calibration data set for all models. 
+Submitters may do arbitrary purely mathematical, reproducible quantization
+using only the calibration data and weight and bias tensors from the benchmark
+owner provided model to any numerical format
+that achieves the desired quality. The quantization method must be publicly
+described at a level where it could be reproduced.
+
+To be considered principled, the description of the quantization method must be
+much much smaller than the non-zero weights it produces.
+
+Calibration is allowed and must only use the calibration data set provided by
+the benchmark owner. Submitters may choose to use only a subset of the calibration data set.
+
+Additionally, MLPerf may provide an INT8 reference for all models. This INT8 version is purely
+informational, and serves only to demonstrate post-training quantization in the reference
+implementation.
+
+OPEN: Weights and biases must be initialized to the same values for each run,
+any quantization scheme is allowed that achieves the desired quality.
+
+=== Model Equivalence
+
+All implementations are allowed as long as the accuracy bounds are
+met and the reference weights are used. Reference weights may be modified
+according to the quantization rules.
+
+Examples of allowed techniques include, but are not limited to:
+
+* Arbitrary frameworks and runtimes: TensorFlow lite for microcontrollers, CMSIS-NN, Micro TVM
+  etc, provided they conform to the rest of the rules
+
+* Running any given control flow or operations on or off an accelerator
+
+* Arbitrary data arrangement
+
+* Different in-memory representations of inputs, weights, activations, and outputs
+
+* Variation in matrix-multiplication or convolution algorithm provided the
+  algorithm produces asymptotically accurate results when evaluated with
+  asymptotic precision
+
+* Mathematically equivalent transformations (e.g. Tanh versus Logistic, ReluX
+  versus ReluY, any linear transformation of an activation function)
+
+* Approximations (e.g. replacing a transcendental function with a polynomial)
+
+* Processing queries out-of-order within discretion provided by scenario
+
+* Replacing dense operations with mathematically equivalent sparse operations
+
+* Hand picking different numerical precisions for different operations
+
+* Fusing or unfusing operations
+
+* Mixture of experts combining differently quantized weights
+
+* Stochastic quantization algorithms with seeds for reproducibility
+
+* Dead code elimination
+
+* Incorporating explicit statistical information about the calibration set
+  (eg. min, max, mean, distribution)
+
+* Empirical performance and accuracy tuning based on the performance and accuracy
+  set (eg. selecting numerics experimentally)
+  
+* Sorting an embedding table based on frequency of access in the training set.
+  (Submtters should include in their submission details of how the ordering was
+  derived.)
+
+The following techniques are disallowed:
+
+* Wholesale weight replacement or supplements
+
+* Discarding non-zero weight elements, including pruning
+
+* Caching queries or responses between files.  However, in the streaming test, it is
+permitted to store intermediate activations between frames of the same waveform.
+
+* Coalescing identical queries
+
+* Modifying weights during the timed portion of an inference run (no online
+  learning or related techniques)
+
+* Weight quantization algorithms that are similar in size to the non-zero
+  weights they produce
+
+* Hard coding the total number of queries
+
+* Incorporating explicit statistical information about the performance or
+  accuracy sets (eg. min, max, mean, distribution)
+
+* Techniques that only improve performance when there are identical
+  samples in a query.
+
+== Reproducibility and Availability
+
+A reproducible submission should unequivocally identify the hardware, the
+software, and any other important part of the test setup to a level that allows
+the reproduction of the test run and verification of the run results.
+
+Systems can be submitted in three categories of "availability", according to
+which different requirements hold:
+
+=== Available Systems
+for the most stringent "available" category both the hardware and the software
+should be available to 3rd parties, freely or commercially. When evaluating
+whether a submission should be in the available category, the submission (source
+code, binaries, documentation), the hardware, and the software stack needed to
+compile the source code and/or load binaries should all be considered.
+
+All source code, binaries, and documentation which are part of the submission
+will be made public on the date of results publication, and thus are considered
+available. (TBC question of license: "the implementation should be submitted
+under a license that permits a commercial entity to freely use the
+implementation for benchmarking.")
+
+An **Available component or system** must (1) have available pricing (either
+publicly advertised or available by request), (2) have been shipped to at least
+one third party, (3) have public evidence of availability (web page saying
+product is available, statement by company, etc), and (4) be “reasonably
+available” for purchase by additional third parties **by the submission date**.
+In addition, submissions for on-premise systems must describe the system and its
+components in sufficient detail to enable third parties to build a similar
+system.
+
+Available systems must use an **Available software stack**. A software stack
+consists of the set of software components that substantially determine ML
+performance **but are not in the uploaded code (as source code or in binary
+form)**. For instance, for training this includes at a minimum any required ML
+framework (e.g. TensorFlow, pyTorch) and ML accelerator library (e.g. cuDNN,
+MKL). An Available software stack consists of only Available software
+components.
+
+An Available software component must be well supported for general use. For open
+source software, the software may be based on any commit in an "official" repo
+plus optionally any PRs to support a particular architecture. For binaries, the
+binary must be made available as release, or as a "beta" release with the
+requirement that optimizations will be included in a future "official" release.
+The beta must be made available to customers as a clear part of the release
+sequence. The software must be available at the time of submission.
+
+An Available software component must be available at least as long as the
+results are expected to be actively used.
+
+For any questions not defined above, please refer to the subsequent FAQ section
+and to the
+https://github.com/mlcommons/policies/blob/master/submission_rules.adoc#731-available-systems[General
+MLPerf Submission Rules]. Ultimately, it is the role of the Review Committee to
+decide in questions of availability as part of the review process.
+
+=== Preview Systems
+
+Please refer to the
+https://github.com/mlcommons/policies/blob/master/submission_rules.adoc#732-preview-systems[General MLPerf Submission Rules].
+
+=== Research, Development, or Internal Systems
+
+Please refer to the
+https://github.com/mlcommons/policies/blob/master/submission_rules.adoc#research-development-or-internal-systems[General MLPerf Submission Rules].
+
+== FAQ
+
+Q: Do I have to use the reference implementation framework?
+
+A: No, you can use another framework provided that it matches the reference in
+the required areas.
+
+Q: Do I have to use the reference implementation scripts?
+
+A: No, you don’t have to use the reference scripts. The reference is there to
+settle conformance questions - with a few exceptions, a submission to the closed
+division must match what the reference is doing.
+
+Q: Can I submit a single benchmark (e.g., Visual Wake Words) or do I have to submit all benchmarks?
+
+A: You can submit any of the benchmarks that are interesting, from just one benchmark to the entire set of benchmarks.
+
+Q: For my submission, I am going to use a different model format (e.g., ONNX vs
+TensorFlow Lite).  Should the conversion routine/script be included in the
+submission? Or is it sufficient to submit the converted model?
+
+A: The goal is reproducibility, so you should include the conversion
+routine/scripts.
+
+Q: Can we give the driver a hint to preload the image data to somewhere closer to the accelerator?
+
+A: No.
+
+Q: Can we preload image data somewhere closer to the accelerator that is mapped into host memory?
+
+A: No.
+
+Q: Can we preload image data in host memory somewhere that is mapped into accelerator memory?
+
+A: Yes, provided the image data isn't eventually cached on the device.
+

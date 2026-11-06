@@ -1,0 +1,70 @@
+{
+ "schema": 1,
+ "id": "stm32-usart-dma-rx-tx",
+ "source": {"repo": "https://github.com/MaJerle/stm32-usart-uart-dma-rx-tx", "commit": "c242589d766eada3ad1d795630f2b1c2482a2af8",
+            "file": "ports/stm32-usart-dma-rx-tx/SOURCE.md", "example": "projects/usart_rx_idle_line_irq_ringbuff_tx_G0"},
+ "paths": ["ports/stm32-usart-dma-rx-tx/**"],
+ "original": {
+  "board": "nucleo-u083rc",
+  "captured": "2026-10-20",
+  "source": "ports/stm32-usart-dma-rx-tx/runs/2026-10-20/checks/u083-115200-1.json",
+  "note": "The example moved from the NUCLEO-G071RB to the NUCLEO-U083RC by renames only; numbers are the median of 3 runs (the check here repeats 3 times and takes the median) at 115200 baud (data/results/nucleo-u083rc.csv, tests uartdma_*).",
+  "expect": {
+   "console": "USART DMA example: DMA HT & TC \\+ USART IDLE LINE interrupts",
+   "capture": "ports/stm32-usart-dma-rx-tx/runs/2026-10-20/checks/u083-115200-1.json",
+   "json": [
+    {"path": "tests.packet.pass", "equals": true},
+    {"path": "tests.packet.len1", "equals": "55ff00aa"},
+    {"path": "tests.packet.len0", "equals": "55ff00aa"},
+    {"path": "tests.packet.len8", "equals": "55ff00aa"},
+    {"path": "tests.junk.pass", "equals": true},
+    {"path": "tests.chunks.pass", "equals": true},
+    {"path": "tests.chunks.replies", "equals": 200},
+    {"path": "tests.burst.pass", "equals": true},
+    {"path": "tests.burst.lost", "equals": 0}
+   ]
+  },
+  "metrics": {"burst_pps": 2259.4, "burst_lost": 0, "rtt_ms": 1.72}
+ },
+ "check": {
+  "cmd": "{py} ports/stm32-usart-dma-rx-tx/tools/check.py {port} --baud {baud} --tests packet,junk,chunks,burst,latency --json {out}/check.json",
+  "json": "{out}/check.json",
+  "exit0": false,
+  "timeout_s": 240,
+  "repeat": 3,
+  "pass": "The banner appears after the flash (console window), and the host check gets 55 FF 00 AA for good packets of length 1, 0 and 8, no reply to a packet with a wrong stop byte, 200 of 200 replies to randomly chunked packets, and 500 of 500 replies to a back-to-back burst. The latency test is reported, not required: its round trip is set by the probe's USB serial bridge.",
+  "metrics": {
+   "burst_pps": {"json": "tests.burst.packets_per_s"},
+   "burst_lost": {"json": "tests.burst.lost"},
+   "rtt_ms": {"json": "tests.latency.median_ms"}
+  },
+  "record": {
+   "burst_pps": {"test": "uartdma_burst_pps", "variant": "baud-115200-hil", "note": "ports/stm32-usart-dma-rx-tx/tools/check.py burst, 500 packets"},
+   "burst_lost": {"test": "uartdma_burst_lost", "variant": "baud-115200-hil", "note": "ports/stm32-usart-dma-rx-tx/tools/check.py burst, lost of 500"}
+  }
+ },
+ "boards": {
+  "nucleo-u083rc": {
+   "build": "bash ports/stm32-usart-dma-rx-tx/boards/nucleo-u083rc/build.sh {out}",
+   "image": "{out}/app.elf",
+   "flash": "STM32_Programmer_CLI over SWD (the board's ST-LINK), write and verify; the console is the ST-LINK virtual COM port.",
+   "secs": 4,
+   "budget": [
+    {"metric": "burst_pps", "rule": "min_pct_of_original", "pct": 95},
+    {"metric": "burst_lost", "rule": "max", "value": 0},
+    {"metric": "rtt_ms", "rule": "info"}
+   ]
+  },
+  "mspm0g3519": {
+   "build": "bash ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/build.sh {out}",
+   "image": "{out}/usart_dma.out",
+   "flash": "OpenOCD (xPack) over the board's XDS110, program and verify, reset run; the console is the XDS110 application UART. The probe lock is held through the check.",
+   "secs": 4,
+   "budget": [
+    {"metric": "burst_pps", "rule": "min_pct_of_original", "pct": 95},
+    {"metric": "burst_lost", "rule": "max", "value": 0},
+    {"metric": "rtt_ms", "rule": "info"}
+   ]
+  }
+ }
+}

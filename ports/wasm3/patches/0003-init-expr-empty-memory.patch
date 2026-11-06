@@ -1,0 +1,23 @@
+--- m3_env.c
++++ m3_env.c
+@@ -311,9 +311,18 @@
+         if (not result)
+         {
+ # if (d_m3EnableOpProfiling || d_m3EnableOpTracing)
+-            m3ret_t r = RunCode (m3code, stack, NULL, d_m3OpDefaultArgs, d_m3BaseCstr);
++            M3MemoryHeader noMemory;
++            memset (& noMemory, 0, sizeof (noMemory));
++            noMemory.runtime = & runtime;
++            noMemory.maxStack = (m3slot_t *) stack + runtime.numStackSlots;
++            m3ret_t r = RunCode (m3code, stack, & noMemory, d_m3OpDefaultArgs, d_m3BaseCstr);
+ # else
+-            m3ret_t r = RunCode (m3code, stack, NULL, d_m3OpDefaultArgs);
++            // Defense in depth: a constant expression has no memory, but give it an empty header rather than NULL
++            M3MemoryHeader noMemory;
++            memset (& noMemory, 0, sizeof (noMemory));
++            noMemory.runtime = & runtime;
++            noMemory.maxStack = (m3slot_t *) stack + runtime.numStackSlots;
++            m3ret_t r = RunCode (m3code, stack, & noMemory, d_m3OpDefaultArgs);
+ # endif
+             
+             if (r == 0)

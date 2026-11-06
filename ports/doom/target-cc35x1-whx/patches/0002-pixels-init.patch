@@ -1,0 +1,12 @@
+diff -ruN a/src/pd_render.cpp b/src/pd_render.cpp
+--- a/src/pd_render.cpp
++++ b/src/pd_render.cpp
+@@ -2144,7 +2144,7 @@
+                     i = col_heads[col];
+                     if (i != -1) {
+     #if 1
+-                        uint8_t pixels[129];
++                        uint8_t pixels[129]; memset(pixels, 0, sizeof pixels);
+                         for(int r=0;r<run_count;r++) {
+                             const auto &run = runs[r];
+                             assert(run.y + run.count <= 128);

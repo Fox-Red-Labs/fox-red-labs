@@ -1,0 +1,13 @@
+# Snake: press B twice (sound off, then on: one beep), A to start, then steer.
+# frame keys
+0 NONE
+5 B
+8 NONE
+11 B
+14 NONE
+30 A
+34 NONE
+100 DOWN
+104 NONE
+150 LEFT
+155 NONE

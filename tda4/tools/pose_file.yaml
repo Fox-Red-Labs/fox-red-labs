@@ -1,0 +1,21 @@
+title: "Pose, file in, file out (Fox Red Labs H2)"
+log_level: 2
+inputs:
+    input1:
+        source: /opt/edgeai-test-data/videos/left-1280x768.h264
+        format: h264
+        width: 1280
+        height: 768
+        framerate: 30
+        loop: True
+models:
+    model0:
+        model_path: /opt/model_zoo/ONR-KD-7060-human-pose-yolox-s-640x640
+        viz_threshold: 0.6
+outputs:
+    output1:
+        sink: /opt/edgeai-test-data/output/pose_out.mkv
+        width: 1280
+        height: 720
+flows:
+    flow0: [input1,model0,output1]

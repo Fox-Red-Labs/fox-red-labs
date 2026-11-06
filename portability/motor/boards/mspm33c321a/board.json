@@ -1,0 +1,26 @@
+{
+ "board": "LP-MSPM33C321A",
+ "driver_board": "DRV8376EVM",
+ "site": "boosterpack (site 1, J1 to J4); checked by the pin scan 2026-10-20",
+ "cpu": {"core": "Cortex-M33", "clock_hz_used": 32000000, "fpu": true},
+ "pins": {
+  "INHA": "PC17", "INLA": "PC29", "INHB": "PC18", "INLB": "PC19", "INHC": "PB6", "INLC": "PB7",
+  "HALLA": "PA10", "HALLB": "PA11", "HALLC": "PC21",
+  "nSLEEP": "PB13", "DRVOFF": "PB28", "nFAULT": "PB30",
+  "ISENA": "PC3", "ISENB": "PC4", "ISENC": "PC5",
+  "VSENA": "PB27", "VSENB": "PA15", "VSENC": "PA16", "VSENVM": "PA17",
+  "ILIMIT": "PC2"
+ },
+ "pwm": {"timer": "TIMA0_1", "phase_channel": {"A": "C1", "B": "C3", "C": "C0"}, "complementary": true, "driver_mode": "6x (rung 3)"},
+ "adc": {"ISENA": "ADC0 ch21", "ISENB": "ADC0 ch13", "ISENC": "ADC0 ch14", "VSENVM": "ADC1 ch2", "VSENA": "ADC1 ch14", "VSENB": "ADC1 ch0", "VSENC": "ADC1 ch1",
+         "simultaneous": "the three currents share ADC0, so they sample in turn; one current on ADC1 would need a wire"},
+ "sense": {"gain_v_per_a": 1.0, "csa_ref_v": 3.0, "adc_ref_v": 3.3, "zero_counts": [1845, 1856, 1852], "vdiv": "143k over 6.04k (24.68)"},
+ "protect": {
+  "current_comparator": "none on PC3, PC4, PC5",
+  "nfault_to_timer_fault": "no (PB30 has no timer fault function); a wire to PA1, PA13, PA29, PB8, PB24, PC2 or PC20 would give one",
+  "ilimit": "PC2 has no DAC; driven to 3.3 V, the driver's cycle-by-cycle limit is off",
+  "software": "phase current, bus window and stall checked every PWM period; nFAULT on a top-priority GPIO interrupt sets DRVOFF high in 0.97 to 1.31 us at 32 MHz (fault-and-sweep-20261020.md)"
+ },
+ "console": "none: Halls sit on the backchannel UART pins; results in RAM over the probe",
+ "evidence": ["mspm33c321a/motor/results/drvcheck-20261020.md", "mspm33c321a/motor/results/sixstep-20261020.md"]
+}

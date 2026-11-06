@@ -1,0 +1,389 @@
+{
+  "note": "The Software page's own words (site/software.html, tools/render_software.py): the answer, family and SDK names, plain labels for the SDKs' example folders, and the questions firmware engineers ask before choosing a part. Each faq entry has a kind: run (answered by these runs), mix (these runs plus TI's documents), ti (answered from TI's public documents, quoted in the source), forum (a TI forum thread, not a TI document) or gap (not published as far as we found, dated). The answer text may use {counts}, which the renderer fills from the kinds. Research behind the questions and answers: docs/research/software-page-needs-2026-10-14.md. Compare on public facts only.",
+  "answer": "TI's examples ran from a terminal with TI Arm Clang, and with GCC for MSPM0 and the CC23xx and CC27xx drivers. ESPHome, Matter, Zephyr and FreeRTOS ran on TI boards, code moved between TI families, and other vendors' examples and open-source libraries ran on TI chips.",
+  "answer_more": "TI's documents are the source for the rest. Its SDK release notes name the IAR and Keil versions the examples were tested with; those builds were not repeated here. Licenses, support policy, qualification and safety are quoted from TI's pages. Where TI has not published something, the page says so. {counts}",
+  "family_order": [
+    "MSPM0",
+    "MSPM33",
+    "F3",
+    "WIFI",
+    "AM13",
+    "AM263P",
+    "C2000",
+    "MMWAVE"
+  ],
+  "family_names": {
+    "MSPM0": "MSPM0",
+    "MSPM33": "MSPM33",
+    "F3": "CC23xx, CC27xx",
+    "WIFI": "CC35xx Wi-Fi",
+    "AM13": "AM13",
+    "AM263P": "AM26x",
+    "C2000": "C2000",
+    "MMWAVE": "mmWave radar"
+  },
+  "sdk_names": {
+    "mspm0_sdk_2_11_00_07": "MSPM0 SDK",
+    "mspm33_sdk_1_04_00_00": "MSPM33 SDK",
+    "simplelink_lowpower_f3_sdk_9_21_00_36_LTS": "SimpleLink Low Power F3 SDK (LTS)",
+    "simplelink_wifi_sdk_10_20_00_39": "SimpleLink Wi-Fi SDK",
+    "am13e230x_sdk_26_01_00_03": "AM13E230x SDK (pre-release)",
+    "mcu_plus_sdk_am263px_26_01_00_08": "MCU+ SDK for AM263Px",
+    "c2000ware_core_26_02_00_00": "C2000Ware (core)",
+    "mmwave_l_sdk_05_05_04_02": "MMWAVE-L-SDK"
+  },
+  "category_labels": {
+    "driverlib": "Register-level drivers (DriverLib)",
+    "drivers": "Portable drivers (TI Drivers)",
+    "ble": "Bluetooth LE stack",
+    "zigbee": "Zigbee stack",
+    "prop_rf": "Proprietary sub-1 GHz and 2.4 GHz radio",
+    "mcuboot": "MCUboot bootloader",
+    "hsm": "Hardware security module",
+    "secureboot": "Secure boot",
+    "dmm": "Two radio stacks at once",
+    "crypto": "Cryptography",
+    "edgeAI": "AI models on the chip",
+    "ai": "AI models on the chip",
+    "bsl": "Bootloader (BSL)",
+    "eeprom": "EEPROM emulation",
+    "smbus": "SMBus",
+    "pmbus": "PMBus",
+    "lin": "LIN bus",
+    "boot_manager": "Boot manager",
+    "cmsis_dsp": "CMSIS-DSP",
+    "cmsis-dsp": "CMSIS-DSP",
+    "gui_composer": "GUI Composer demos",
+    "msp_subsystems": "Small subsystem recipes",
+    "demos": "Demos",
+    "security": "Security (TrustZone)",
+    "trusted-firmware-m": "Trusted Firmware-M",
+    "hal": "Hardware abstraction layer",
+    "compatibility": "STM32 HAL compatibility layer",
+    "dcl": "Digital control library",
+    "mathlib": "Math library",
+    "kernel": "RTOS kernel",
+    "networking": "Networking",
+    "pru_io": "PRU real-time I/O",
+    "alg": "Radar algorithms",
+    "datapath": "Radar data path",
+    "mmw_demo": "Radar out-of-box demo",
+    "control": "Control",
+    "benchmarks": "Benchmarks",
+    "boot": "Boot",
+    "empty": "Empty starting project",
+    "cmsis": "CMSIS",
+    "_peripheral": "Peripheral examples (C2000Ware)"
+  },
+  "faq_lede": "The questions that come up most when engineers weigh a vendor's software, ranked from practitioner write-ups and forum threads (the research is dated 2026-10-14). Each answer says whether it comes from these runs, from TI's own documents, from a TI forum thread, or is not published as far as we found. Counts per kind are in the first paragraph.",
+  "faq": [
+    {
+      "kind": "run",
+      "q": "Can I build and flash without TI's IDE?",
+      "a": "Yes, on every family we ran. The grid's \"Terminal, no IDE\" row has a run for each: make or a script on most, CMake on the AM13, a script on C2000, a build and flash from the Mac for the mmWave board, and a native build on the TDA4 board. On the LP-MSPM0G3507, 262 of 270 examples built from a terminal, most with one make command and 41 with a shared build script. The other 8 hit duplicate vectors, compile errors or a missing build rule. Flashing works with TI's command-line programmer, and Zephyr flashes through OpenOCD. CCStudio is optional; Claude Code can also drive CCStudio's build and flash tools.",
+      "sources": [
+        {
+          "t": "Build without TI's app",
+          "url": "project-build-from-terminal.html"
+        },
+        {
+          "t": "Every way to build, by family",
+          "url": "portability-proven.html#works-with"
+        }
+      ]
+    },
+    {
+      "kind": "run",
+      "q": "Can I use GCC instead of TI Arm Clang?",
+      "a": "For two sets of examples, yes. TI ships a GCC makefile with 1,453 MSPM0 projects (counted per board and kind). We tried 224 of them, the no-RTOS DriverLib examples for the LP-MSPM0G3507 and LP-MSPM0L1306, and all 224 built unchanged; the other 1,229 are untried. 87 of those 224 ran on the LP-MSPM0L1306 with no fault, and 24 had a pin or serial check that matched the TI Arm Clang build. The G3507 builds were not run. On the CC2340R5 and CC2755P10, 144 of 144 driver examples (no RTOS and FreeRTOS) built, and none has run yet. TI's Bluetooth and Zigbee stack libraries ship only for TI Arm Clang (and IAR for Bluetooth), so radio apps need TI's compiler today. We used GCC 12.2 from the Zephyr SDK, not the versions TI names: Arm GNU 9-2019-q4 for MSPM0 and 12.3.Rel1 for the F3 SDK.",
+      "sources": [
+        {
+          "t": "GCC on MSPM0, the runs",
+          "url": "../portability/toolchains/gcc-mspm0/README.md"
+        },
+        {
+          "t": "GCC on the F3 SDK, the builds",
+          "url": "../portability/toolchains/gcc-f3/README.md"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "Does IAR or Keil build TI's projects?",
+      "a": "TI ships IAR projects for 1,357 of 1,911 MSPM0 examples, 554 of 643 F3 examples, 166 MSPM33 and 165 AM13 examples, and Keil projects for 1,307 MSPM0 and 157 MSPM33 examples. These counts are per board and kind in each SDK's build folders, so they differ from the inventory table below. We have not built any of them. IAR's IDE runs on Windows only, so our test will use IAR's Linux build tools in a container.",
+      "sources": [
+        {
+          "t": "What TI's SDKs ship, per compiler",
+          "url": "../data/toolchains/README.md"
+        }
+      ]
+    },
+    {
+      "kind": "run",
+      "q": "Do TI's examples actually build and run?",
+      "a": "Mostly. On the LP-MSPM0G3507, 262 of the 270 examples in our sweep built from a terminal. The run sweep covered the first 222 that built: 213 were flashed and run, and 203 of those ran with no fault recorded; 10 low-power examples could not be reached after flashing. Ran without a fault is the claim; each example's behavior was not checked. Per-board sweeps are on each board page.",
+      "sources": [
+        {
+          "t": "The G3507 example sweep",
+          "url": "../mspm0g3507/example-sweep/README.md"
+        },
+        {
+          "t": "Boards",
+          "url": "hardware.html"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "How long is an SDK release supported, and will the API change?",
+      "a": "For the SimpleLink SDKs, TI publishes an LTS and STS policy. A long-term-support (LTS) stream starts every 2 years and is supported for 3 years with critical and security fixes only. TI describes it as API/ABI compatible within a Major.Minor, with the toolchain and dependencies frozen. Short-term (STS) releases come up to three times a year, are supported for about 4 months, get no backports and carry no compatibility guarantee. The F3 SDK 9.21.00.36, released 26 Aug 2026, is its first LTS release, so its 3 years run to about Aug 2029 (our arithmetic; TI's page prints no end date). The release notes also warn that an upcoming 10.10 release may break backward compatibility in the NVOCMP module. The AM263x MCU+ SDK uses an .LTS label, but we found no support length for it, and none for the MSPM0 SDK or the CC35xx Wi-Fi SDK.",
+      "sources": [
+        {
+          "t": "TI: Understanding LTS and STS releases for SimpleLink SDKs",
+          "url": "https://software-dl.ti.com/simplelink/esd/documents/understanding_lts_and_sts_releases_for_simplelink_sdk.html"
+        },
+        {
+          "t": "F3 SDK 9.21.00.36 LTS release notes",
+          "url": "https://software-dl.ti.com/simplelink/esd/simplelink_lowpower_f3_sdk/9.21.00.36.LTS/exports/release_notes_simplelink_lowpower_f3_sdk_9_21_00_36_LTS.html"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "What license is the code under, and what ships as source?",
+      "a": "From the manifests we read: the MSPM0 SDK 2.06 manifest lists its core and DriverLib as BSD-3-Clause, source and binary (TI Drivers appear in the 1.x manifests), and TI's FAQ says most of the SDK is BSD-3-Clause. The MSPM0 Diagnostic Library is under a TI commercial license. TI's user guide adds that full source is provided \"except for some middleware examples which might be released as pre-built binaries due to licensing restrictions\". The F3 SDK 9.11 manifest lists the SDK under TI's Text File License, binary and limited source, which licenses redistribution only for use with TI devices; some Bluetooth files are also listed as BSD-3-Clause. The AM263x MCU+ SDK manifest lists BSD-3-Clause, with third-party components such as FreeRTOS and lwIP under their own licenses. We did not re-read the manifests for MSPM0 SDK 2.11 or F3 SDK 9.21, and we did not read the CC35xx Wi-Fi SDK's license (its GitHub page says \"Other\"). Read the manifest of the exact version you ship.",
+      "sources": [
+        {
+          "t": "MSPM0 SDK 2.06 manifest",
+          "url": "https://software-dl.ti.com/msp430/esd/MSPM0-SDK/2_06_00_05/manifest_mspm0_sdk_2_06_00_05.html"
+        },
+        {
+          "t": "F3 SDK 9.11 manifest",
+          "url": "https://software-dl.ti.com/simplelink/esd/simplelink_lowpower_f3_sdk/9.11.00.18/exports/manifest_simplelink_lowpower_f3_sdk_9_11_00_18.html"
+        },
+        {
+          "t": "AM263x MCU+ SDK manifest",
+          "url": "https://software-dl.ti.com/mcu-plus-sdk/esd/AM263X/latest/exports/docs/mcu_plus_sdk_am263x_manifest.html"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "Is the Bluetooth stack qualified?",
+      "a": "TI says it provides Bluetooth SIG qualification listings for its Bluetooth LE stacks, so integrators need no stack testing; you still need RF-PHY testing and your own declaration and fee. SWRA601 (Rev N) lists the IDs by SDK range. CC2340: 201833 (Bluetooth Core 5.3, SDK 7.10 and later) and Q301991 (Core 5.4, SDK 8.20 and later). CC27xx: Q310649 and Q339148 (Core 5.4, SDK 8.40 and later) and Q371076 (Core 6.0, SDK 9.14 and later). The CC2755 data sheet says \"Bluetooth Core 6.0 Qualified\". These are TI's statements; we did not check the Bluetooth SIG listings. We found no qualification ID for the CC35xx Wi-Fi SDK's Bluetooth LE 5.4 stack (NimBLE 1.7.0).",
+      "sources": [
+        {
+          "t": "TI SWRA601: Bluetooth qualification",
+          "url": "https://www.ti.com/lit/an/swra601n/swra601n.pdf"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "Is Matter or Zigbee certified on these chips?",
+      "a": "The CC2755R10 data sheet (Rev E) lists Matter and Thread and says \"Zigbee 3.0 Certified\". These are TI's statements; we did not check the CSA certified-products database. We found no listing of TI as a Matter Compliant Platform, and CSA's 30 Sep 2025 announcement of that program did not name TI among the first. That is not found, not proof there is none. TI's Matter page lists the CC2755 parts for Matter end devices and the CC2340R5 only for a Thread RCP gateway. On this bench, TI Zigbee boards joined Home Assistant and a TI Matter device paired into Apple Home as an uncertified accessory with a test vendor ID.",
+      "sources": [
+        {
+          "t": "CC2755R10 data sheet",
+          "url": "https://www.ti.com/lit/ds/symlink/cc2755r10.pdf"
+        },
+        {
+          "t": "TI Matter overview",
+          "url": "https://www.ti.com/technologies/wired-wireless-connectivity/matter/overview.html"
+        },
+        {
+          "t": "CSA: Matter Compliant Platform program",
+          "url": "https://csa-iot.org/newsroom/matter-compliant-platform-certification-building-on-proven-foundations-for-faster-trusted-smart-home-innovation/"
+        },
+        {
+          "t": "Matter device, this run",
+          "url": "project-matter-device.html"
+        }
+      ]
+    },
+    {
+      "kind": "mix",
+      "q": "Is Zephyr supported upstream, or only in a TI fork?",
+      "a": "Both. Upstream Zephyr 4.4 has boards for the LP-MSPM0G3507, LP-MSPM0G3519, LP-MSPM0L2228 and LP-EM-CC2340R5; the MSPM33C321A and AM13E230 are on Zephyr's main branch only. TI keeps its own SimpleLink Zephyr tree for the CC23xx and CC27xx. TI's v3.7.0-1.00.00 GA release notes call it \"production grade\"; the current tree, v4.4.0-ti-10.10.00, is also marked GA. We ran upstream Zephyr on the G3507 and CC2340R5, and on the LP-MSPM0L1306 through an out-of-tree board file. Upstream's own samples build for all four upstream boards: 88 of the 93 that apply, with the misses explained in portability/toolchains/zephyr-upstream.",
+      "sources": [
+        {
+          "t": "TI SimpleLink Zephyr releases",
+          "url": "https://github.com/TexasInstruments/simplelink-zephyr/releases/"
+        },
+        {
+          "t": "Run Zephyr, these runs",
+          "url": "project-run-zephyr.html"
+        }
+      ]
+    },
+    {
+      "kind": "mix",
+      "q": "Which debug probes and open tools work?",
+      "a": "TI states the XDS110 includes CMSIS-DAP, usable from Keil uVision, IAR and OpenOCD. The LP-EM radio boards have no on-board probe. OpenOCD has an XDS110 driver and an MSPM0 target; we flashed Zephyr images through xPack OpenOCD 0.12 and TI images through TI's command-line programmer. We did not run pyOCD. Its documentation names one XDS110 firmware, 03.00.00.25, as having a known issue with multiple outstanding packets, with the workaround `-Ocmsis_dap.limit_packets=1`. TI's MSPM0 FAQ says Keil cannot connect through the LaunchPad kit's XDS110 and suggests CMSIS-DAP mode, a ULINK or a J-Link. TI's notes also mention J-Link for Zephyr RTT on the CC23xx and CC27xx. SEGGER lists these parts, but we have not tested a J-Link here.",
+      "sources": [
+        {
+          "t": "TI XDS110 User's Guide",
+          "url": "https://www.ti.com/lit/pdf/sprui94"
+        },
+        {
+          "t": "OpenOCD: debug adapter configuration",
+          "url": "https://openocd.org/doc/html/Debug-Adapter-Configuration.html"
+        },
+        {
+          "t": "OpenOCD MSPM0 target change",
+          "url": "https://review.openocd.org/c/openocd/+/8385"
+        },
+        {
+          "t": "pyOCD: debug probes",
+          "url": "https://pyocd.io/docs/debug_probes.html"
+        }
+      ]
+    },
+    {
+      "kind": "run",
+      "q": "What is the bootloader and firmware-update story?",
+      "a": "The F3 SDK ships MCUboot examples and the MSPM0 SDK ships bootloader (BSL) examples. On this bench, one firmware update over Bluetooth took 43 s on the LP-EM-CC2340R5; it sent a 236 kB image (241,664 bytes, 18.5% of it padding), and 31 s of the 43 s was the transfer. One update over Wi-Fi installed a 27.7 kB image (28,384 bytes) on the LP-EM-CC35X1 in 8 s from the download command. The images and the links differ, so the two times do not compare.",
+      "sources": [
+        {
+          "t": "Update firmware by radio, these runs",
+          "url": "project-ota-update.html"
+        },
+        {
+          "t": "Bluetooth update notes",
+          "url": "../cc2340r5/oad/README.md"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "Are there functional-safety kits for the compiler and libraries?",
+      "a": "TI's compiler qualification kits are free for TI customers and were independently assessed by TÜV Nord. TI says it does not certify compilers; you still do the qualification work. The Arm kits cover TI Arm Clang 3.2.3 and 5.1.1 LTS. Those are not the compilers the SDKs name: MSPM0 SDK 2.11 names TI Arm Clang 3.2.2 and 4.0.0, and the F3 SDK names 4.0.4. For MSPM0, TI says the Diagnostic Library reduces development effort for applications up to Class B under IEC 60730, and it is available on request. TI's MSPM0 ASIL claims cover the -Q1 parts, not the parts on these LaunchPad kits. For C2000, TI's brochure says independent certification by UL, VDE and TÜV SÜD (systematic capability up to SIL 3), and the safety packages are by request and need an NDA. For AM26x, TI lists a TÜV SÜD certificate for its software diagnostics library (ASIL D, SIL 3), valid until 2030-02-03. We did not look for safety material on the CC23xx, CC27xx, CC35xx, AM13 or mmWave.",
+      "sources": [
+        {
+          "t": "TI compiler qualification kit",
+          "url": "https://www.ti.com/tool/SAFETI_CQKIT"
+        },
+        {
+          "t": "MSPM0 Diagnostic Library overview",
+          "url": "https://software-dl.ti.com/msp430/esd/MSPM0-SDK/latest/docs/english/middleware/diagnostic/Diagnostic_Library_Overview.html"
+        },
+        {
+          "t": "C2000 safety brochure",
+          "url": "https://www.ti.com/lit/po/swab013f/swab013f.pdf"
+        },
+        {
+          "t": "AM26x diagnostics library certificate",
+          "url": "https://www.ti.com/lit/fs/sffs714b/sffs714b.pdf"
+        }
+      ]
+    },
+    {
+      "kind": "gap",
+      "q": "Is DriverLib MISRA-C compliant?",
+      "a": "We found no published MISRA-C report for the MSPM0 DriverLib. A TI forum reply said one was planned; we could not confirm it shipped.",
+      "sources": [
+        {
+          "t": "TI forum: MISRA-C report for MSPM0 DriverLib",
+          "url": "https://e2e.ti.com/support/microcontrollers/arm-based-microcontrollers-group/arm-based-microcontrollers/f/arm-based-microcontrollers-forum/1348675/mspm0g3107-q1-official-report-on-driverlib-s-compliance-with-misra-c"
+        }
+      ]
+    },
+    {
+      "kind": "gap",
+      "q": "Which security certifications do the parts hold?",
+      "a": "TI's CC27xx security guide says its hardware security module enables PSA Certified Level 2 and Level 3 certification paths. That is a path, not a certificate. We found no PSA Certified or SESIP certificate for a TI MCU. TI runs a product security incident response team (PSIRT); its public page says how to report a vulnerability, and advisories are in a product security advisory portal that needs a login. We did not log in, so we do not know what it lists. Post-quantum key exchange ran on these boards; see Security.",
+      "sources": [
+        {
+          "t": "CC27xx security guide: architecture",
+          "url": "https://software-dl.ti.com/simplelink/esd/simplelink_lowpower_f3_sdk/9.21.00.36.LTS/exports/docs/security/cc27xx_security_guide/html/cc27xx-security/getting-started/architecture-overview-cc27xx.html"
+        },
+        {
+          "t": "TI PSIRT",
+          "url": "https://www.ti.com/quality-reliability/quality/ti-psirt.html"
+        },
+        {
+          "t": "Security, these runs",
+          "url": "security.html"
+        }
+      ]
+    },
+    {
+      "kind": "forum",
+      "q": "Are builds reproducible, for CI?",
+      "a": "A TI forum thread reports the same MSPM0 project giving different HEX files when built in different workspaces, fixed with the compiler option -fno-unique-string-section-names. That is one user's report with a TI reply, not a TI document. We build from scripts with pinned tool versions; a byte-for-byte reproducibility test across two folders is a test not run yet.",
+      "sources": [
+        {
+          "t": "TI forum: reproducible images",
+          "url": "https://e2e.ti.com/support/tools/code-composer-studio-group/ccs/f/code-composer-studio-forum/1420263/codecomposer-unable-to-build-reproduceable-images"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "How long will the parts be made?",
+      "a": "TI says its product life cycles are \"typically 10 to 15 years and often extend longer\". A standard product is not eligible for obsolescence while it had sales in the last five years (seven for automotive), has been in production under 10 years, or has current demand. TI publishes no per-part end date that we could find.",
+      "sources": [
+        {
+          "t": "TI product life cycle",
+          "url": "https://www.ti.com/quality-reliability/quality/product-life-cycle.html"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "DriverLib or TI Drivers: which is smaller?",
+      "a": "TI's MSPM0 FAQ says DriverLib \"allows for more efficient code and smaller footprint\", and that TI Drivers \"have a larger code size since they have more functionality already implemented\". That FAQ is for SDK 1.00.00.04. We have not measured the two layers against each other.",
+      "sources": [
+        {
+          "t": "MSPM0 SDK Known Issues and FAQ",
+          "url": "https://dev.ti.com/tirex/content/mspm0_sdk_1_00_00_04/docs/english/known_issues_faq/known_issues_faq_mspm0_sdk_1_00_00_04.html"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "Are there CMSIS packs or an SBOM?",
+      "a": "On the CMSIS pack index (read 14 Oct 2026), TI has packs for several MSPM0 families, the MSPM33C321A and the AM13E230X. We found none for the CC23xx or CC27xx. TI's MSPM0 Keil guide cites pack versions 1.3.2 and later while the index listed 1.3.1 for the G3x0x family. Each SDK ships a license manifest (see the license question). We did not look for an SBOM in a standard format, so we make no claim either way.",
+      "sources": [
+        {
+          "t": "CMSIS pack index: Texas Instruments",
+          "url": "https://www.keil.arm.com/packs/?pack-search=&q=Texas+Instruments"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "Where do I file an SDK bug?",
+      "a": "TI's MSPM0 FAQ (SDK 1.00.00.04) says to contact your local sales representative or TI support to file one. The MSPM0 SDK's GitHub README sends questions to TI's E2E forum. Whether the GitHub issue tracker accepts bug reports was not checked.",
+      "sources": [
+        {
+          "t": "MSPM0 SDK Known Issues and FAQ",
+          "url": "https://dev.ti.com/tirex/content/mspm0_sdk_1_00_00_04/docs/english/known_issues_faq/known_issues_faq_mspm0_sdk_1_00_00_04.html"
+        },
+        {
+          "t": "MSPM0 SDK on GitHub",
+          "url": "https://github.com/TexasInstruments/mspm0-sdk"
+        }
+      ]
+    },
+    {
+      "kind": "ti",
+      "q": "Where do the code and the answers live?",
+      "a": "The MSPM0 SDK and the SimpleLink Wi-Fi SDK are on GitHub; questions go to TI's E2E forums. Our code, results and every prompt are in this project's repository.",
+      "sources": [
+        {
+          "t": "MSPM0 SDK on GitHub",
+          "url": "https://github.com/TexasInstruments/mspm0-sdk"
+        },
+        {
+          "t": "SimpleLink Wi-Fi SDK on GitHub",
+          "url": "https://github.com/TexasInstruments/simplelink-wifi-sdk"
+        },
+        {
+          "t": "Get the code",
+          "url": "community.html"
+        }
+      ]
+    }
+  ]
+}

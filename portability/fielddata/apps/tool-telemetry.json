@@ -1,0 +1,26 @@
+{
+ "id": 1,
+ "name": "tool-telemetry",
+ "title": "Power tools",
+ "schema": 1,
+ "about": "A cordless tool's motor controller reports trigger pulls, run time, trips and a summary of every pull. Its frames on the air are the fixed tool format (tool-telemetry/PROTOCOL.md), not the generic one; the hub turns them into the records below.",
+ "device_noun": "tool",
+ "record_kind": "pull",
+ "fields": [
+  {"id": 1, "name": "dur_ms", "type": "int", "unit": "ms", "about": "trigger held"},
+  {"id": 2, "name": "rpm_avg", "type": "int", "unit": "rpm"},
+  {"id": 3, "name": "rpm_max", "type": "int", "unit": "rpm"},
+  {"id": 4, "name": "i_avg_ma", "type": "int", "unit": "mA", "about": "0 when the tool cannot measure current"},
+  {"id": 5, "name": "i_peak_ma", "type": "int", "unit": "mA"},
+  {"id": 6, "name": "v_min_mv", "type": "int", "unit": "mV"},
+  {"id": 7, "name": "temp_c", "type": "int", "unit": "deg C"},
+  {"id": 8, "name": "load", "type": "enum", "values": ["light", "normal", "heavy", "jam"], "about": "the on-tag model's class"}
+ ],
+ "headline": ["trig", "oc", "run"],
+ "label": {"field": "load", "classes": ["light", "normal", "heavy", "jam"], "source": "a load rig, a person's tag, or the simulator; the on-tag model's class is not the truth"},
+ "training": {
+  "task": "tabular_classification",
+  "channels": ["dur_ms", "rpm_avg", "rpm_max", "i_avg_ma", "i_peak_ma", "v_min_mv", "temp_c"]
+ },
+ "wire": "fixed"
+}

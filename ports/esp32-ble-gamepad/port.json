@@ -1,0 +1,57 @@
+{
+ "schema": 1,
+ "id": "esp32-ble-gamepad",
+ "source": {"repo": "https://github.com/lemmingDev/ESP32-BLE-Gamepad", "commit": "65d5178", "file": "ports/esp32-ble-gamepad/README.md"},
+ "paths": ["ports/esp32-ble-gamepad/**"],
+ "original": {
+  "board": "esp32c6",
+  "captured": "2026-10-20",
+  "source": "ports/esp32-ble-gamepad/runs/2026-10-20/check-esp32c6.txt",
+  "note": "The golden file is the unmodified library's output on the ESP32-C6: the 96-byte HID descriptor and the four 19-byte input reports after fixed call sequences. Report-pack times are not comparable between boards (each core was written by a different agent), so they are reported, not budgeted.",
+  "expect": {
+   "capture": "ports/esp32-ble-gamepad/check/golden.txt",
+   "stdout_all": ["MAP: SAME", "RPT1: SAME", "RPT2: SAME", "RPT3: SAME", "RPT4: SAME", "GP SERIAL CHECK: PASS"]
+  },
+  "metrics": {}
+ },
+ "check": {
+  "cmd": "{py} ports/esp32-ble-gamepad/check/gp_serial.py {board} 12",
+  "exit0": true,
+  "timeout_s": 90,
+  "pass": "Within 12 s the board prints one FRL-GP1 block, and its MAP line and RPT1 to RPT4 lines are byte for byte the golden lines.",
+  "metrics": {"pack_us": {"regex": "pack_us=([0-9]+)"}}
+ },
+ "boards": {
+  "esp32c6": {
+   "build": null,
+   "build_note": "Arduino sketch harness/frl_gp_check.ino with the library at the commit above; the arduino-cli commands are in boards/esp32c6/README.md and are not scripted.",
+   "image": null,
+   "flash": "esptool write-flash of the sketch's build folder (bench.py, kind esp). Board A is the house Bluetooth proxy: restore its full flash backup afterwards.",
+   "secs": 1,
+   "budget": [{"metric": "pack_us", "rule": "info"}]
+  },
+  "nucleo-u083rc": {
+   "build": "bash ports/esp32-ble-gamepad/boards/nucleo-u083rc/build.sh",
+   "image": "ports/esp32-ble-gamepad/boards/nucleo-u083rc/fw.elf",
+   "flash": "STM32_Programmer_CLI over SWD, write and verify; the console is the ST-LINK virtual COM port.",
+   "secs": 1,
+   "budget": [{"metric": "pack_us", "rule": "info"}]
+  },
+  "mspm0g3519": {
+   "build": null,
+   "build_note": "No scripted build in the repo: boards/mspm0g3519/ has frl_gp1.c, frl_gamepad.c and frl_gp1.syscfg, and flash_and_read.sh flashes ticlang/frl_gp1.out, which is not tracked.",
+   "image": null,
+   "flash": "OpenOCD over the XDS110; see boards/mspm0g3519/flash_and_read.sh.",
+   "secs": 1,
+   "budget": [{"metric": "pack_us", "rule": "info"}]
+  },
+  "cc2340r5": {
+   "build": "bash ports/esp32-ble-gamepad/boards/cc2340r5/build.sh",
+   "image": "ports/esp32-ble-gamepad/boards/cc2340r5/build/basic_ble.hex",
+   "flash": "DSLite flash of the .hex without verify (CC23xx; bench.py drops -v for this board).",
+   "protected": "This board runs a live demo; hil.py flashes it only with --allow-protected.",
+   "secs": 1,
+   "budget": [{"metric": "pack_us", "rule": "info"}]
+  }
+ }
+}

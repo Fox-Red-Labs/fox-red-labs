@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site hub dashboard</title>
+<style>
+/*FONTS*/
+:root{--red:#B42418;--ember:#8E1C13;--ink:#161312;--stone:#6B625B;--paper:#F4EFE6;--cream:#F7F3EC;--tan:#F4EFE9;--line:#E2D8C9;--ok:#2F6B3A;--warn:#8A5A00;
+--bg:var(--paper);--card:var(--cream);--text:var(--ink);--sub:var(--stone);--mark:var(--red)}
+@media (prefers-color-scheme:dark){:root{--bg:#161312;--card:#211C1A;--text:#F7F3EC;--sub:#B9AFA6;--line:#3A322E;--ok:#7FC08A;--warn:#E0B060;--tan:#2A2421;--mark:#F0563F}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 Barlow,"Helvetica Neue",Arial,system-ui,sans-serif}
+a{color:var(--red)} @media (prefers-color-scheme:dark){a{color:#F7F3EC}}
+header{background:var(--bg);border-bottom:1px solid var(--line);padding:14px 24px}
+.bar{max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{font-size:24px;font-weight:700;letter-spacing:.2px}
+.brand span{color:var(--sub);font-size:14px}
+#status{font-size:15px;color:var(--sub);flex:1;min-width:220px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--sub);margin-right:7px;vertical-align:1px}
+.dot.on{background:var(--ok)}
+.ctl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+button,select,input{font:600 15px Barlow,system-ui,sans-serif;color:var(--text)}
+.b{border:1.5px solid var(--text);background:transparent;border-radius:8px;padding:6px 14px;cursor:pointer}
+.b.pri{background:var(--red);border-color:var(--red);color:#F7F3EC}
+.b:active{opacity:.8}
+select{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px 8px}
+input[type=range]{width:min(320px,60vw);accent-color:var(--red)}
+input[type=text]{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;font-weight:400}
+main{display:block;max-width:1240px;margin:0 auto;padding:18px 24px 48px}
+.note{background:var(--tan);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:16px;font-size:15px}
+.grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:16px;align-items:start}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card.sel{border-color:var(--text);box-shadow:0 0 0 1px var(--text)}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);margin:0 0 10px;font-weight:600}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tname{font-size:22px;font-weight:700}
+.sub{color:var(--sub);font-size:14px}
+.pill{font-weight:600;font-size:14px}
+.pill.on{color:var(--ok)} .pill.off{color:var(--sub)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0 4px}
+.stat b{display:block;font-size:26px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--sub)}
+.stat.alert b{color:var(--mark)}
+.batt{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--sub);margin-top:6px}
+.batt i{display:inline-block;width:64px;height:10px;border:1.5px solid var(--sub);border-radius:3px;position:relative;overflow:hidden}
+.batt i u{position:absolute;left:0;top:0;bottom:0;background:var(--ok);display:block}
+.batt i u.low{background:var(--mark)}
+svg.tl{width:100%;height:76px;display:block;margin-top:10px}
+.axis{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-top:2px}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--sub);margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0;font-size:15px}
+dt{color:var(--sub)} dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.ev{display:grid;grid-template-columns:78px 1fr;gap:4px 12px;padding:9px 0;border-top:1px solid var(--line)}
+.ev:first-of-type{border-top:0}
+.ev .when{color:var(--sub);font-size:14px;font-variant-numeric:tabular-nums}
+.ev.bad .what b{color:var(--mark)}
+.ev .what small{color:var(--sub);font-size:13px;margin-left:6px}
+.empty{color:var(--sub);padding:14px 0;text-align:center}
+.wide .ev{grid-template-columns:90px 130px 1fr}
+.foot{margin-top:20px;font-size:14px;color:var(--sub)}
+details summary{cursor:pointer;font-weight:600}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){header{padding:12px 16px}main{padding:14px 16px 40px}.wide .ev{grid-template-columns:78px 1fr}.wide .ev .when{grid-row:1/3}.wide .ev>div:nth-child(2){grid-column:2;grid-row:2;color:var(--sub);font-size:13px}.wide .ev .what{grid-column:2;grid-row:1}.brand b{font-size:21px}}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <div class="brand"><b>Site hub</b><span>Fox Red Labs</span></div>
+  <div id="status"></div>
+  <div class="ctl" id="ctl"></div>
+</div></header>
+<main><div id="main"></div><div class="foot" id="foot"></div></main>
+<script>
+"use strict";
+// Site hub dashboard: the browser version of the phone app. It reads a hub's HTTP/JSON API (PROTOCOL.md section 3) when
+// the computer is on the hub's network, or replays recorded bench runs (demo mode). One file, no requests except to the
+// hub address you give it.
+const DEMO = /*DEMO*/null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num = n => (n ?? 0).toLocaleString();
+const mmss = s => { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); };
+const fmtRun = s => { s = Math.round(s); const h = (s / 3600) | 0, m = ((s % 3600) / 60) | 0; return h ? `${h}h ${m}m` : m ? `${m}m ${s % 60}s` : `${s}s`; };
+const ago = s => s == null ? "not heard yet" : s < 2 ? "just now" : s < 60 ? `${Math.round(s)} s ago` : s < 3600 ? `${Math.floor(s / 60)} min ago` : `${Math.floor(s / 3600)} h ago`;
+const clock = t => new Date(t * 1000).toLocaleTimeString([], {hour: "2-digit", minute: "2-digit", second: "2-digit"});
+const median = a => { if (!a.length) return null; const b = a.slice().sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+const ONLINE_S = 30;      // a tag not heard for this long counts as offline
+const EVNAME = {1: "Run ended", 2: "Overcurrent trip", 3: "Driver fault"};
+
+const hash = new URLSearchParams(location.hash.replace(/^#/, ""));
+const S = {mode: "demo", T: 0, play: false, speed: 5, sel: null, win: 3600, tags: [], events: [], info: null, hub: "", err: "", next: 0, boot: 0, now: 0};
+let maxT = DEMO ? Math.ceil(Math.max(...DEMO.tags.map(t => t.ev[t.ev.length - 1][0] + t.ev[t.ev.length - 1][3]))) + 4 : 0;
+
+// ---------- demo: the recorded runs, as the hub's API would have shown them at replay second T ----------
+function demoState(T){
+  const tags = [], events = [];
+  let frames = {ext: 0, legacy: 0};
+  DEMO.tags.forEach(t => {
+    const seen = t.ev.filter(e => e[0] + e[3] <= T);
+    seen.forEach(e => events.push({a: t.id, ts: e[0], type: e[1], v: e[2]}));
+    const last = seen[seen.length - 1];
+    tags.push({id: t.id, name: t.name, tool: t.tool,
+      trig: seen.filter(e => e[1] == 1).length, oc: seen.filter(e => e[1] == 2).length,
+      run: seen.filter(e => e[1] == 1).reduce((a, e) => a + e[2] / 1000, 0),
+      soc: last && last[4] != null ? last[4] : 255, age: last ? T - last[0] : null});
+  });
+  const f = Math.min(1, T / 600);
+  frames = {ext: Math.round(DEMO.frames.ext * f), legacy: Math.round(DEMO.frames.legacy * f)};
+  S.tags = tags; S.events = events.sort((a, b) => b.ts - a.ts);
+  S.info = {hub: "Demo hub", up: DEMO.hub.up0 + T, recs: events.length, ext: frames.ext, legacy: frames.legacy};
+  S.now = T;
+}
+
+// ---------- live: poll a hub ----------
+function liveBase(){ return "http://" + S.hub; }
+async function getJson(path){
+  const c = new AbortController(), t = setTimeout(() => c.abort(), 3000);
+  try { const r = await fetch(liveBase() + path, {signal: c.signal, cache: "no-store"}); if (!r.ok) throw new Error(r.status); return await r.json(); }
+  finally { clearTimeout(t); }
+}
+const n0 = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+async function poll(){
+  try {
+    const info = await getJson("/api/info");
+    const now = Date.now() / 1000;
+    const hubName = String(info.hub ?? "").slice(0, 24);
+    if (!/^FRL-HUB-[0-9A-F]{4}$/.test(hubName)) throw new Error("not a hub");
+    const up = n0(info.up);
+    if (!S.boot || up < (S.lastUp ?? 0) || S.next > n0(info.recs)) { S.boot = now - up; S.next = 0; S.events = []; }
+    S.lastUp = up;
+    const tags = (await getJson("/api/tags")).map(t => ({id: String(t.addr ?? "").slice(0, 24), name: String(t.name ?? "").slice(0, 32), tool: String(t.tool ?? "").slice(0, 32),
+      trig: n0(t.trig), oc: n0(t.oc), flt: n0(t.flt), run: n0(t.run), soc: t.soc == null ? 255 : n0(t.soc), age: n0(t.age), rssi: n0(t.rssi)}));
+    for (let guard = 0; guard < 20; guard++) {
+      const page = await getJson("/api/log?since=" + S.next);
+      page.items.filter(i => i.k == "e" && [1, 2, 3].includes(Number(i.type))).forEach(i =>
+        S.events.push({a: String(i.a).slice(0, 24), type: Number(i.type), v: n0(i.v), ts: n0(i.unix) || (i.up != null ? now - (up - n0(i.up)) : now), key: n0(i.i)}));
+      S.next = n0(page.next);
+      if (!page.more) break;
+    }
+    S.events.sort((a, b) => b.ts - a.ts);
+    S.events = S.events.slice(0, 4000);
+    S.tags = tags; S.now = now; S.err = "";
+    S.info = {hub: hubName, up, recs: n0(info.recs), ext: n0(info.scan?.ext), legacy: n0(info.scan?.legacy)};
+  } catch (e) { S.err = "No hub answered at " + S.hub + ". Is this computer on the hub's Wi-Fi?"; S.info = null; }
+  render();
+}
+
+// ---------- views ----------
+function axis(){ return S.mode == "demo" ? [0, 600] : [S.now - S.win, S.now]; }
+function timeLabel(ts){ return S.mode == "demo" ? mmss(ts) : clock(ts); }
+
+function buckets(tag){
+  const [t0, t1] = axis(), N = 60, w = (t1 - t0) / N;
+  const runs = new Array(N).fill(0), bad = new Array(N).fill(0);
+  S.events.filter(e => e.a == tag.id && e.ts >= t0 && e.ts <= t1).forEach(e => {
+    const k = Math.min(N - 1, Math.floor((e.ts - t0) / w));
+    if (e.type == 1) runs[k]++; else bad[k]++;
+  });
+  return {runs, bad, w, N};
+}
+
+function timeline(tag, mx){
+  const [t0, t1] = axis(), {runs, bad, w, N} = buckets(tag), bw = 600 / N;
+  let bars = "";
+  runs.forEach((r, k) => {
+    const hr = 66 * r / mx, hb = 66 * bad[k] / mx, x = (k * bw + 1).toFixed(1);
+    if (r) bars += `<rect x="${x}" y="${(70 - hr).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${hr.toFixed(1)}" fill="var(--text)" opacity=".78"/>`;
+    if (bad[k]) bars += `<rect x="${x}" y="${(70 - hr - hb - (r ? 1 : 0)).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${hb.toFixed(1)}" fill="var(--mark)"/>`;
+  });
+  const total = runs.reduce((a, b) => a + b, 0), trips = bad.reduce((a, b) => a + b, 0);
+  return `<svg class="tl" viewBox="0 0 600 76" preserveAspectRatio="none" role="img" aria-label="${esc(tag.tool || tag.name)}: ${total} runs and ${trips} over-limit events in the window">
+    <line x1="0" y1="71" x2="600" y2="71" stroke="var(--line)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>${bars}</svg>
+    <div class="axis"><span>${timeLabel(t0)}</span><span>runs per ${Math.round(w)} s</span><span>${timeLabel(t1)}</span></div>`;
+}
+
+function tagStats(tag){
+  const [t0, t1] = axis();
+  const mine = S.events.filter(e => e.a == tag.id && e.ts >= t0 && e.ts <= t1);
+  const lens = mine.filter(e => e.type == 1).map(e => e.v / 1000);
+  return {n: lens.length, med: median(lens), max: lens.length ? Math.max(...lens) : null, bad: mine.filter(e => e.type != 1).length, total: lens.reduce((a, b) => a + b, 0)};
+}
+
+function tagCard(t, mx){
+  const online = t.age != null && t.age <= ONLINE_S, st = tagStats(t);
+  const batt = t.soc == 255 || t.soc == null ? `<span>Battery: no data</span>` :
+    `<i aria-hidden="true"><u class="${t.soc < 20 ? "low" : ""}" style="width:${Math.max(0, Math.min(100, t.soc))}%"></u></i><span>Battery ${t.soc}%</span>`;
+  const seen = t.age == null ? "not heard yet" : (S.mode == "demo" ? "last event " : "last heard ") + ago(t.age);
+  return `<div class="card ${S.sel == t.id ? "sel" : ""}" data-tag="${esc(t.id)}" tabindex="0" role="button" aria-pressed="${S.sel == t.id}" aria-label="${esc(t.tool || t.name)}, show only this asset tag">
+    <div class="row"><span class="tname">${esc(t.tool || t.name)}</span><span class="pill ${online ? "on" : "off"}"><span class="dot ${online ? "on" : ""}"></span>${online ? "Online" : t.age == null ? "Waiting" : "Offline"}</span></div>
+    <div class="sub">${esc(t.name)} · ${seen}</div>
+    <div class="batt">${batt}</div>
+    <div class="stats">
+      <div class="stat"><b>${num(t.trig)}</b><span>runs ended</span></div>
+      <div class="stat ${t.oc ? "alert" : ""}"><b>${num(t.oc)}</b><span>overcurrent trips</span></div>
+      <div class="stat"><b>${st.med == null ? "–" : st.med.toFixed(1) + " s"}</b><span>median run length${st.max == null ? "" : ", longest " + st.max.toFixed(1) + "\u00a0s"}</span></div>
+      <div class="stat"><b>${fmtRun(t.run)}</b><span>time running</span></div>
+    </div>${timeline(t, mx)}</div>`;
+}
+
+function evDetail(e){
+  return e.type == 1 ? (e.v / 1000).toFixed(1) + " s run" : e.type == 2 ? (e.v ? (e.v / 1000).toFixed(1) + " A peak" : "no current reading") : "code " + e.v;
+}
+function evRows(list, wide){
+  const name = id => { const t = S.tags.find(x => x.id == id); return t ? (t.tool || t.name) : "Unknown"; };
+  if (!list.length) return `<div class="empty">No events yet.</div>`;
+  return list.map(e => wide
+    ? `<div class="ev ${e.type != 1 ? "bad" : ""}"><div class="when">${timeLabel(e.ts)}</div><div>${esc(name(e.a))}</div><div class="what"><b>${EVNAME[e.type]}</b> <small>${evDetail(e)}</small></div></div>`
+    : `<div class="ev bad"><div class="when">${timeLabel(e.ts)}</div><div class="what"><b>${EVNAME[e.type]}</b> <small>${evDetail(e)}</small><div class="sub">${esc(name(e.a))}</div></div></div>`).join("");
+}
+
+function render(){
+  const online = S.tags.filter(t => t.age != null && t.age <= ONLINE_S).length;
+  const [t0, t1] = axis();
+  const mx = Math.max(4, ...S.tags.map(t => { const b = buckets(t); return Math.max(0, ...b.runs.map((r, k) => r + b.bad[k])); }));
+  const inWin = S.events.filter(e => e.ts >= t0 && e.ts <= t1);
+  const bad = inWin.filter(e => e.type != 1);
+  const shown = S.sel ? inWin.filter(e => e.a == S.sel) : inWin;
+  const demo = S.mode == "demo", hub = S.info, rec = DEMO && DEMO.hub.recorded;
+  $("#status").innerHTML = demo ? `<span class="dot on"></span>Demo: recorded bench runs, replayed`
+    : hub ? `<span class="dot on"></span>Connected to <b>${esc(hub.hub)}</b> · ${S.tags.length} asset tag${S.tags.length == 1 ? "" : "s"}` : `<span class="dot"></span>${esc(S.err || "Connecting…")}`;
+  if (demo) {
+    $("#play").textContent = S.play ? "Pause" : S.T >= maxT ? "Replay" : "Play";
+    if (document.activeElement !== $("#scrub")) $("#scrub").value = Math.round(S.T);
+    $("#pos").textContent = mmss(S.T) + " of " + mmss(maxT);
+  }
+  const demoNote = demo ? `<div class="note"><b>Demo.</b> Replaying three bench runs recorded on ${esc(DEMO.tags[0].recorded)} and played side by side. They are three different runs of a simulated machine sent through a real tag and hub: Equipment 01 is the 10-minute run, Equipment 02 an earlier 10-minute run made with an older simulator, Equipment 03 a 4-minute run; Equipment 01 and 03 use the same simulator seed. A tag shows Offline ${ONLINE_S} s after its last recorded event. Battery is the simulated machine's own (Equipment 02 recorded none). Hub uptime and frame counts are spread evenly over the replay, not recorded.</div>` : "";
+  const cards = S.tags.length ? S.tags.slice().sort((a, b) => (a.tool || a.name).localeCompare(b.tool || b.name)).map(t => tagCard(t, mx)).join("")
+    : `<div class="card empty">${hub ? "The hub has not heard an asset tag yet. Tags advertise every 0.5 s." : "No hub in reach. Use the box at the bottom to connect, or go back to the demo."}</div>`;
+  const selName = S.sel ? esc((S.tags.find(t => t.id == S.sel) || {}).tool || "") : "";
+  $("#main").innerHTML = demoNote + `<div class="grid"><div class="col"><h2 style="margin:0">Asset tags</h2>${cards}
+    <div class="legend"><span><i style="background:var(--text);opacity:.78"></i>runs ended</span><span><i style="background:var(--mark)"></i>over-limit events</span></div></div>
+    <div class="col"><div class="card"><h2>Hub status</h2><dl>
+      <dt>Hub</dt><dd>${hub ? esc(hub.hub) : "No hub in reach"}</dd>
+      <dt>Uptime</dt><dd>${hub ? fmtRun(hub.up) : "–"}</dd>
+      <dt>Asset tags online</dt><dd>${online} of ${S.tags.length}</dd>
+      <dt>Run events logged</dt><dd>${hub ? num(hub.recs) : "–"}</dd>
+      <dt>Over-limit events</dt><dd>${num(bad.length)}</dd>
+      <dt>Frames heard</dt><dd>${hub ? `${num(hub.ext)} extended · ${num(hub.legacy)} legacy` : "–"}</dd>
+      <dt>Last event</dt><dd>${inWin.length ? ago(Math.max(0, S.now - inWin[0].ts)) : "–"}</dd>
+      ${demo && rec ? `<dt>Equipment 01, whole run</dt><dd>${rec.seen} of ${rec.sent} events reached the hub, median delay ${rec.median.toFixed(1)} s</dd>` : ""}
+    </dl></div>
+    <div class="card"><h2>Over-limit events${bad.length ? " · " + bad.length : ""}</h2>${evRows(bad.slice(0, 7), false)}${bad.length > 7 ? `<div class="sub">${bad.length - 7} older in the window</div>` : ""}</div></div></div>
+    <div class="card wide" style="margin-top:16px"><div class="row"><h2>Run events${selName ? " · " + selName : ""}</h2>${S.sel ? `<button class="b" data-act="all">Show all asset tags</button>` : ""}</div>${evRows(shown.slice(0, 10), true)}${shown.length > 10 ? `<div class="sub" style="padding-top:8px">${num(shown.length - 10)} older in the window</div>` : ""}</div>`;
+}
+
+// Controls and the connect box are built once, so a drag on the slider or typing an address survives the redraws.
+function setup(){
+  $("#ctl").innerHTML = `<span id="democtl" class="ctl"><button class="b pri" id="play"></button>
+      <input type="range" id="scrub" min="0" max="${maxT}" step="1" value="0" aria-label="Replay position">
+      <span class="sub" id="pos" style="min-width:92px"></span>
+      <select id="speed" aria-label="Replay speed">${[1, 5, 10, 30, 60].map(x => `<option value="${x}">${x}x</option>`).join("")}</select></span>
+    <span id="livectl" class="ctl" hidden><select id="win" aria-label="Window">${[[300, "5 minutes"], [3600, "1 hour"], [21600, "6 hours"], [86400, "24 hours"]].map(([s, l]) => `<option value="${s}" ${s == S.win ? "selected" : ""}>${l}</option>`).join("")}</select>
+      <button class="b" id="back">Back to demo</button></span>`;
+  $("#foot").innerHTML = `<details><summary>Use a live hub</summary>
+    <p>Join the hub's Wi-Fi (or the site network the hub is on), then enter its address. This page sends nothing anywhere else.</p>
+    <form id="conn" class="ctl"><input type="text" id="addr" inputmode="url" autocomplete="off" placeholder="hub address" aria-label="Hub address"><button class="b pri" type="submit">Connect</button></form></details>`;
+  try { $("#addr").value = localStorage.getItem("frl-hub") || ""; } catch {}
+  $("#play").onclick = () => { if (S.T >= maxT) S.T = 0; S.play = !S.play; lastTick = performance.now(); demoState(S.T); render(); };
+  $("#scrub").oninput = e => { S.T = Number(e.target.value); demoState(S.T); render(); };
+  $("#speed").onchange = e => { S.speed = Number(e.target.value); };
+  $("#win").onchange = e => { S.win = Number(e.target.value); render(); };
+  $("#back").onclick = () => { stopLive(); startDemo(); };
+  $("#conn").onsubmit = e => { e.preventDefault(); const v = $("#addr").value.trim().replace(/^http:\/\//i, "").replace(/\/+$/, "");
+    if (!/^[A-Za-z0-9.\-]+(:\d{1,5})?$/.test(v)) { $("#addr").setCustomValidity("Enter a host name or address"); $("#addr").reportValidity(); return; }
+    $("#addr").setCustomValidity("");
+    try { localStorage.setItem("frl-hub", v); } catch {}
+    startLive(v); };
+  // pointerdown, not click: the cards are redrawn while the replay runs, and a click needs the same element at both ends
+  $("#main").addEventListener("pointerdown", e => {
+    if (e.target.closest("[data-act=all]")) { S.sel = null; render(); return; }
+    const c = e.target.closest("[data-tag]"); if (c) { S.sel = S.sel == c.dataset.tag ? null : c.dataset.tag; render(); } });
+  $("#main").addEventListener("keydown", e => {
+    const c = e.target.closest && e.target.closest("[data-tag]");
+    if (c && (e.key == "Enter" || e.key == " ")) { e.preventDefault(); S.sel = S.sel == c.dataset.tag ? null : c.dataset.tag; render(); } });
+}
+
+let timer = null, lastTick = 0;
+function stopLive(){ clearInterval(timer); timer = null; }
+function modeUi(){ $("#democtl").hidden = S.mode != "demo"; $("#livectl").hidden = S.mode == "demo"; }
+function startDemo(){
+  stopLive(); S.mode = "demo"; S.hub = ""; S.sel = hash.get("tag") || null;
+  S.T = Math.min(maxT, Number(hash.get("t")) || 0); S.speed = Number(hash.get("speed")) || 10; S.play = !hash.has("t");
+  $("#speed").value = String(S.speed); modeUi();
+  demoState(S.T); render(); lastTick = performance.now();
+  timer = setInterval(() => {
+    const n = performance.now(), dt = (n - lastTick) / 1000; lastTick = n;
+    if (!S.play) return;
+    S.T = Math.min(maxT, S.T + dt * S.speed);
+    if (S.T >= maxT) S.play = false;
+    demoState(S.T); render();
+  }, 250);
+}
+function startLive(host){
+  stopLive(); S.mode = "live"; S.hub = host; S.tags = []; S.events = []; S.info = null; S.next = 0; S.boot = 0; S.sel = null;
+  modeUi(); render(); poll(); timer = setInterval(poll, 2000);
+}
+setup();
+if (hash.get("hub")) startLive(hash.get("hub").replace(/[^A-Za-z0-9.\-:]/g, "")); else startDemo();
+</script>
+</body>
+</html>

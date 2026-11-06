@@ -1,0 +1,190 @@
+{
+ "api": "msp430-driverlib",
+ "vendor": "TI",
+ "detect": "\\bmsp430\\b|driverlib\\.h|\\bMSP430\\w*",
+ "symbol_re": "\\b(?:GPIO_\\w+|CS_\\w+|EUSCI_[AB]_\\w+|Timer_[AB]_\\w+|WDT_A_\\w+|PMM_\\w+|FRAMCtl_\\w+|RTC_\\w+|MPU_\\w+|__bis_SR_register|__bic_SR_register|__enable_interrupt|__disable_interrupt|__delay_cycles|__low_power_mode_\\d\\w*)\\b",
+ "calls_only": true,
+ "note": "Source side for MSP430 projects (MSP430Ware DriverLib calls and the compiler intrinsics) moved to MSPM0 or AM13. Register-level MSP430 code is in msp430-regs. Seeded from the TI migration guide SLAAE74B and the three originals in ports/msp430-to-mspm0.",
+ "entries": [
+  {
+   "match": "GPIO_setAsOutputPin|GPIO_setAsInputPin|GPIO_setAsInputPinWithPullUpResistor|GPIO_setAsInputPinWithPullDownResistor|GPIO_setAsPeripheralModuleFunctionOutputPin|GPIO_setAsPeripheralModuleFunctionInputPin",
+   "idiom": "gpio.config_pin",
+   "note": "SysConfig pin block on the target",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "GPIO_setOutputHighOnPin|GPIO_setOutputLowOnPin",
+   "idiom": "gpio.write",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "GPIO_toggleOutputOnPin",
+   "idiom": "gpio.toggle",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "GPIO_getInputPinValue",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "GPIO_enableInterrupt|GPIO_disableInterrupt|GPIO_selectInterruptEdge|GPIO_clearInterrupt|GPIO_getInterruptStatus",
+   "idiom": "gpio.input_irq_edge",
+   "note": "all MSP430 pins of a port share one vector; MSPM0 shares one GROUP vector per port",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "PMM_unlockLPM5",
+   "idiom": "gpio.release_after_lowpower_reset",
+   "note": "the MSP430 high-impedance lock after LPMx.5 and reset",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "PMM_turnOffRegulator|PMM_enableLowPowerLPMx5|PMM_disableSVSH",
+   "idiom": "power.shutdown_pin_wake",
+   "note": "LPM4.5 entry on FRAM parts",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "CS_setDCOFreq|CS_initClockSignal|CS_setExternalClockSource|CS_turnOnXT1|CS_turnOnXT1LF|CS_turnOffXT1|CS_getACLK|CS_getSMCLK|CS_getMCLK",
+   "idiom": "clock.system_config",
+   "note": "ACLK, SMCLK and MCLK are separate MSP430 dividers; MSPM0 has MCLK, ULPCLK, LFCLK and MFCLK",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "CS_initFLL|CS_initFLLSettle",
+   "idiom": "clock.fll_dco_trim",
+   "note": "frequency-locked loop; MSPM0 SYSOSC is factory-trimmed",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "CS_setupDCO|CS_clearAllOscFlagsWithTimeout",
+   "idiom": "clock.low_freq_aclk",
+   "note": "oscillator fault flags",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "EUSCI_A_UART_init|EUSCI_A_UART_enable|EUSCI_A_UART_disable",
+   "idiom": "uart.init_8n1",
+   "note": "baud divisor and modulation come from SysConfig on the target",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "EUSCI_A_UART_transmitData",
+   "idiom": "uart.tx_byte_blocking",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "EUSCI_A_UART_receiveData",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "EUSCI_A_UART_enableInterrupt|EUSCI_A_UART_clearInterrupt|EUSCI_A_UART_getInterruptStatus",
+   "idiom": "uart.rx_wake_deep_sleep",
+   "note": "receive interrupt that wakes the CPU",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "EUSCI_A_SPI_initMaster|EUSCI_B_SPI_initMaster|EUSCI_A_SPI_enable|EUSCI_B_SPI_enable",
+   "idiom": "spi.controller_init",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "EUSCI_B_I2C_initMaster|EUSCI_B_I2C_enable|EUSCI_B_I2C_setSlaveAddress",
+   "idiom": "i2c.controller_init",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "EUSCI_B_I2C_masterSendSingleByte|EUSCI_B_I2C_masterReceiveSingleByte|EUSCI_B_I2C_masterSendMultiByteStart|EUSCI_B_I2C_masterReceiveMultiByteStart",
+   "idiom": "i2c.controller_poll",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "Timer_A_initUpMode|Timer_A_initContinuousMode|Timer_A_startCounter|Timer_A_stopTimer|Timer_A_clearTimerInterrupt",
+   "idiom": "time.periodic_irq",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "Timer_A_initCompareMode|Timer_A_initCaptureMode|Timer_A_outputPWM|Timer_A_generatePWM|Timer_A_setCompareValue|Timer_A_getCaptureCompareCount",
+   "idiom": "timer.capture_compare_pwm",
+   "note": "Timer_A channels map to MSPM0 TIMG or TIMA capture/compare; counts differ by one",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "WDT_A_hold",
+   "idiom": "wdt.watchdog",
+   "note": "stopping the watchdog at start: the MSPM0 watchdog is off after reset, so the call is deleted",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "WDT_A_initWatchdog|WDT_A_resetTimer|WDT_A_start",
+   "idiom": "wdt.watchdog",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "WDT_A_initIntervalTimer",
+   "idiom": "timer.interval_watchdog_as_timer",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "FRAMCtl_write8|FRAMCtl_write16|FRAMCtl_write32|FRAMCtl_fillMemory32|FRAMCtl_memoryWrite",
+   "idiom": "flash.write",
+   "note": "FRAM byte writes become erase-block flash writes",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "FRAMCtl_enableWriteProtection|FRAMCtl_disableWriteProtection",
+   "idiom": "memory.nvm_write_unprotect",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "FRAMCtl_configureWaitStateControl",
+   "idiom": "memory.nvm_wait_states",
+   "note": "FRAM wait states above 8 MHz",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "RTC_init|RTC_start|RTC_stop|RTC_enableInterrupt|RTC_clearInterrupt",
+   "idiom": "vendor.no_equivalent",
+   "note": "no tested replacement; see the vendor.no_equivalent entries",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "MPU_initThreeSegments|MPU_enable|MPU_start",
+   "idiom": "memory.nvm_write_unprotect",
+   "note": "FRAM memory protection unit; MSPM0 has a Cortex-M0+ MPU on some parts and per-sector flash protection",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "__bis_SR_register|__bic_SR_register|__low_power_mode_0|__low_power_mode_3|__low_power_mode_4",
+   "idiom": "power.sleep",
+   "note": "LPM bits plus GIE in one write; target splits the power policy from WFI",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "__enable_interrupt|__disable_interrupt",
+   "idiom": "irq.global_disable",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  },
+  {
+   "match": "__delay_cycles",
+   "idiom": "time.delay_cycles",
+   "note": "",
+   "from": "SLAAE74B (Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B) and ports/msp430-to-mspm0 originals"
+  }
+ ]
+}

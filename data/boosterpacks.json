@@ -1,0 +1,2755 @@
+{
+ "note": "Read 2026-10-18. Pin numbers are BoosterPack pin numbers 1 to 40 (SLAA542 Figure 4). 'pins_used_set' lists the pins the board puts a signal on, for the clash matrix; empty means not resolved. Price and stock are TI.com page values read 2026-10-18. No em dashes.",
+ "standard": {
+  "doc": "SLAA542, Dec 2012, https://www.ti.com/lit/an/slaa542/slaa542.pdf",
+  "40pin_outline_mil": "2000 wide x 1700 high, or 1350 if J5 need not be reached (Figure 4, p.5)",
+  "pitch_mil": 100,
+  "stackable_header_part": "Samtec SSW-110-23-S-D (p.1)"
+ },
+ "clash_matrix": {
+  "basis": "Each BoosterPack's pin use against each LaunchPad kit's pin map, as shipped. H = hard: pin is NC, SWD, XDS110 UART net, or a part you cannot remove with a shunt. J = fixable by moving or pulling a jumper or shunt. Loads on analog parts are ignored. Counts include optional pins. G3519 and G5187 rows added 2026-10-20; their sources are under host_sources. On the G5187 a pin counts as hard when the header that carries it (J2 or J4) is not fitted on our unit.",
+  "rows": {
+   "boostxl-edumkii": {
+    "G3507": {
+     "hard": [
+      6,
+      33,
+      34
+     ],
+     "jumper": [
+      26
+     ]
+    },
+    "L1306": {
+     "hard": [
+      13,
+      17,
+      31,
+      32,
+      33,
+      34
+     ],
+     "jumper": [
+      2,
+      10,
+      11,
+      23,
+      26,
+      37,
+      38,
+      39
+     ]
+    },
+    "M33C321A": {
+     "hard": [
+      33,
+      34
+     ],
+     "jumper": [
+      2,
+      40
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      2,
+      5,
+      6,
+      23,
+      24,
+      32,
+      34,
+      39
+     ],
+     "jumper": [
+      17,
+      19,
+      31,
+      33,
+      40
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      33,
+      34,
+      40
+     ]
+    },
+    "G5187": {
+     "hard": [
+      11,
+      13,
+      15,
+      17,
+      19,
+      31,
+      32,
+      33,
+      34,
+      37,
+      38,
+      39,
+      40
+     ],
+     "jumper": [
+      5
+     ]
+    }
+   },
+   "boostxl-bassensors": {
+    "G3507": {
+     "hard": [
+      6
+     ],
+     "jumper": [
+      26
+     ]
+    },
+    "L1306": {
+     "hard": [
+      27,
+      28
+     ],
+     "jumper": [
+      2,
+      10,
+      23,
+      26
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": [
+      2
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      2,
+      6,
+      23,
+      24,
+      27,
+      28
+     ],
+     "jumper": []
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      27,
+      28
+     ]
+    },
+    "G5187": {
+     "hard": [],
+     "jumper": []
+    }
+   },
+   "bp-bassensorsmkii": {
+    "G3507": {
+     "hard": [
+      6
+     ],
+     "jumper": [
+      26
+     ]
+    },
+    "L1306": {
+     "hard": [
+      13,
+      27,
+      28
+     ],
+     "jumper": [
+      2,
+      10,
+      23,
+      26,
+      39
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": [
+      2,
+      40
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      2,
+      5,
+      6,
+      23,
+      24,
+      27,
+      28,
+      39
+     ],
+     "jumper": [
+      40
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      27,
+      28,
+      40
+     ]
+    },
+    "G5187": {
+     "hard": [
+      13,
+      39,
+      40
+     ],
+     "jumper": [
+      5
+     ]
+    }
+   },
+   "boostxl-audio": {
+    "G3507": {
+     "hard": [
+      6
+     ],
+     "jumper": []
+    },
+    "L1306": {
+     "hard": [
+      13,
+      30
+     ],
+     "jumper": []
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": []
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      5,
+      6,
+      30
+     ],
+     "jumper": [
+      19
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": []
+    },
+    "G5187": {
+     "hard": [
+      12,
+      13,
+      15,
+      19
+     ],
+     "jumper": [
+      5
+     ]
+    }
+   },
+   "boostxl-sharp128": {
+    "G3507": {
+     "hard": [
+      6
+     ],
+     "jumper": []
+    },
+    "L1306": {
+     "hard": [],
+     "jumper": [
+      2
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": [
+      2
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      2,
+      5,
+      6
+     ],
+     "jumper": [
+      19
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": []
+    },
+    "G5187": {
+     "hard": [
+      14,
+      15,
+      19
+     ],
+     "jumper": [
+      5
+     ]
+    }
+   },
+   "boostxl-k350qvg-s1": {
+    "G3507": {
+     "hard": [],
+     "jumper": []
+    },
+    "L1306": {
+     "hard": [
+      13,
+      17
+     ],
+     "jumper": [
+      11,
+      23
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": []
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      23,
+      24
+     ],
+     "jumper": [
+      17
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": []
+    },
+    "G5187": {
+     "hard": [
+      11,
+      12,
+      13,
+      15,
+      17
+     ],
+     "jumper": []
+    }
+   },
+   "boostxl-drv8323rs": {
+    "G3507": {
+     "hard": [
+      6,
+      33,
+      34
+     ],
+     "jumper": [
+      26
+     ]
+    },
+    "L1306": {
+     "hard": [
+      13,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34
+     ],
+     "jumper": [
+      2,
+      11,
+      23,
+      26,
+      35,
+      37,
+      38,
+      39
+     ]
+    },
+    "M33C321A": {
+     "hard": [
+      33,
+      34
+     ],
+     "jumper": [
+      2,
+      40
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      2,
+      5,
+      6,
+      23,
+      24,
+      27,
+      28,
+      29,
+      30,
+      32,
+      34,
+      35,
+      36,
+      39
+     ],
+     "jumper": [
+      19,
+      31,
+      33,
+      40
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      27,
+      28,
+      33,
+      34,
+      40
+     ]
+    },
+    "G5187": {
+     "hard": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      18,
+      19,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40
+     ],
+     "jumper": [
+      5
+     ]
+    }
+   },
+   "drv8376evm": {
+    "G3507": {
+     "hard": [
+      33,
+      34
+     ],
+     "jumper": [
+      26
+     ]
+    },
+    "L1306": {
+     "hard": [
+      13,
+      27,
+      28,
+      29,
+      32,
+      33,
+      34
+     ],
+     "jumper": [
+      10,
+      23,
+      26,
+      35,
+      37,
+      38,
+      39
+     ]
+    },
+    "M33C321A": {
+     "hard": [
+      33,
+      34
+     ],
+     "jumper": [
+      40
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      23,
+      24,
+      27,
+      28,
+      29,
+      32,
+      34,
+      35,
+      36,
+      39
+     ],
+     "jumper": [
+      33,
+      40
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      27,
+      28,
+      33,
+      34,
+      40
+     ]
+    },
+    "G5187": {
+     "hard": [
+      13,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40
+     ],
+     "jumper": []
+    }
+   },
+   "boostxl-canfd-lin": {
+    "G3507": {
+     "hard": [
+      33
+     ],
+     "jumper": [
+      3
+     ]
+    },
+    "L1306": {
+     "hard": [
+      13,
+      17,
+      31,
+      32,
+      33
+     ],
+     "jumper": [
+      3,
+      4
+     ]
+    },
+    "M33C321A": {
+     "hard": [
+      33
+     ],
+     "jumper": []
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      5,
+      16,
+      32
+     ],
+     "jumper": [
+      17,
+      31,
+      33
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      33
+     ]
+    },
+    "G5187": {
+     "hard": [
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      31,
+      32,
+      33
+     ],
+     "jumper": [
+      5
+     ]
+    }
+   },
+   "boostxl-batpakmkii": {
+    "G3507": {
+     "hard": [
+      34
+     ],
+     "jumper": []
+    },
+    "L1306": {
+     "hard": [
+      34
+     ],
+     "jumper": [
+      10,
+      35,
+      38,
+      39
+     ]
+    },
+    "M33C321A": {
+     "hard": [
+      34
+     ],
+     "jumper": [
+      40
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      34,
+      35,
+      36,
+      39
+     ],
+     "jumper": [
+      40
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      34,
+      40
+     ]
+    },
+    "G5187": {
+     "hard": [
+      34,
+      35,
+      36,
+      38,
+      39,
+      40
+     ],
+     "jumper": []
+    }
+   },
+   "boostxl-capkeypad": {
+    "G3507": {
+     "hard": [],
+     "jumper": []
+    },
+    "L1306": {
+     "hard": [
+      27
+     ],
+     "jumper": [
+      10
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": []
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      27
+     ],
+     "jumper": []
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      27
+     ]
+    },
+    "G5187": {
+     "hard": [
+      12
+     ],
+     "jumper": []
+    }
+   },
+   "cc3100boost": {
+    "G3507": {
+     "hard": [
+      33,
+      34
+     ],
+     "jumper": [
+      3
+     ]
+    },
+    "L1306": {
+     "hard": [
+      33,
+      34
+     ],
+     "jumper": [
+      3,
+      4,
+      37
+     ]
+    },
+    "M33C321A": {
+     "hard": [
+      33,
+      34
+     ],
+     "jumper": []
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      5,
+      16,
+      34,
+      36
+     ],
+     "jumper": [
+      19,
+      33
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      33,
+      34
+     ]
+    },
+    "G5187": {
+     "hard": [
+      14,
+      15,
+      16,
+      18,
+      19,
+      33,
+      34,
+      36,
+      37
+     ],
+     "jumper": [
+      5
+     ]
+    }
+   },
+   "bp-cc1407p-9-fe": {
+    "G3507": {
+     "hard": [
+      6
+     ],
+     "jumper": []
+    },
+    "L1306": {
+     "hard": [
+      27,
+      28
+     ],
+     "jumper": [
+      2,
+      23
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": [
+      2
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      2,
+      6,
+      23,
+      24,
+      27,
+      28,
+      36
+     ],
+     "jumper": [
+      19
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      27,
+      28
+     ]
+    },
+    "G5187": {
+     "hard": [
+      14,
+      15,
+      18,
+      19,
+      36
+     ],
+     "jumper": []
+    }
+   },
+   "boostxl-ads1119": {
+    "G3507": {
+     "hard": [],
+     "jumper": []
+    },
+    "L1306": {
+     "hard": [],
+     "jumper": [
+      10
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": []
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [],
+     "jumper": []
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": []
+    },
+    "G5187": {
+     "hard": [],
+     "jumper": []
+    }
+   },
+   "iwrl6432boost": {
+    "G3507": {
+     "hard": [],
+     "jumper": [
+      3
+     ]
+    },
+    "L1306": {
+     "hard": [
+      13,
+      27,
+      31,
+      32
+     ],
+     "jumper": [
+      3,
+      4,
+      10
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": [
+      40
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      16,
+      27,
+      32
+     ],
+     "jumper": [
+      31,
+      40
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      27,
+      40
+     ]
+    },
+    "G5187": {
+     "hard": [
+      13,
+      14,
+      15,
+      16,
+      18,
+      31,
+      32,
+      40
+     ],
+     "jumper": []
+    }
+   },
+   "bp-iwrl6432wmod": {
+    "G3507": {
+     "hard": [],
+     "jumper": [
+      3
+     ]
+    },
+    "L1306": {
+     "hard": [
+      13,
+      32
+     ],
+     "jumper": [
+      3,
+      4,
+      10,
+      38,
+      39
+     ]
+    },
+    "M33C321A": {
+     "hard": [],
+     "jumper": [
+      40
+     ]
+    },
+    "AM13E230": {
+     "hard": [],
+     "jumper": []
+    },
+    "CC35X1": {
+     "hard": [
+      32,
+      39
+     ],
+     "jumper": [
+      19,
+      40
+     ]
+    },
+    "G3519": {
+     "hard": [],
+     "jumper": [
+      40
+     ]
+    },
+    "G5187": {
+     "hard": [
+      13,
+      14,
+      15,
+      19,
+      32,
+      38,
+      39,
+      40
+     ],
+     "jumper": []
+    }
+   }
+  },
+  "host_sources": {
+   "G3519": {
+    "doc": "SLAU947 (LP-MSPM0G3519 user guide, Oct 2024) Table 2-1 and Figure 4-2, read 2026-10-07 and 2026-10-20",
+    "jumper_pins": {
+     "27": "RGB red LED on PB26 (J20)",
+     "28": "RGB green LED on PB27 (J21)",
+     "33": "PA11 UART0 RX through selector J13",
+     "34": "PA10 UART0 TX through selector J12",
+     "40": "S2 button on PB3 (J23)",
+     "9": "I2C pull-up PC2 (J15), harmless to every pack here",
+     "10": "I2C pull-up PC3 (J14), harmless to every pack here"
+    },
+    "hard_pins": {},
+    "note": "No header pin 1 to 40 is unconnected. SLAU947 lists headers J1 to J4 as unpopulated; our unit has them fitted."
+   },
+   "G5187": {
+    "doc": "SLAU967 (LP-MSPM0G5187 user guide, Nov 2025) Table 2-1 and Figure 2-3; unfitted headers from mspm0g5187/FAQ.md; read 2026-10-20",
+    "jumper_pins": {
+     "5": "PB21 also reaches the USB2 VBUS divider through J23 (a shunt is fitted on our unit); pull J23"
+    },
+    "hard_pins": "11 to 20 and 31 to 40: headers J2 and J4 are not fitted on our unit, so a pack seated on it reaches only J1 and J3 (pins 1 to 10 and 21 to 30). A wire from the pack's top socket to a spare J1 pin works around it.",
+    "note": "Pack signals on J2 or J4 (pins 11 to 20, 31 to 40) need wires or soldered headers."
+   }
+  }
+ },
+ "boards": [
+  {
+   "id": "boostxl-edumkii",
+   "name": "Educational BoosterPack MKII",
+   "ti_part": "BOOSTXL-EDUMKII",
+   "maker": "TI",
+   "category": "multi-function (display, joystick, sensors, audio)",
+   "year": "2015 (guide SLAU599 Aug 2015, rev B Jul 2021)",
+   "status": "listed and orderable on TI.com, stock 201",
+   "function": "128x128 color LCD, 2-axis joystick, 2 buttons, RGB LED, buzzer, mic, 3-axis analog accelerometer, OPT3001 light sensor, servo header (TMP006 no longer fitted)",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3), 21 (5V), 22/20 GND",
+    "SPI (LCD)": "7 SCLK, 13 CS, 15 MOSI, 17 LCD reset, 31 LCD RS",
+    "I2C": "9 SCL, 10 SDA (OPT3001)",
+    "analog": "2 joystick X, 26 joystick Y, 6 mic, 23/24/25 accelerometer",
+    "GPIO": "5 joystick select, 8 OPT3001 INT, 11 (TMP006 INT), 19 servo PWM, 32/33 buttons, 34 gator-clip input, 37/38/39 RGB LED, 39 also LCD backlight via J5, 40 buzzer"
+   },
+   "respects": "UART not used. SPI CLK on 7, CS on 13 (the standard's display CS), MOSI on 15. I2C on 9 and 10.",
+   "violates": "Uses 17 (TEST in SLAA542 Figure 4) as LCD reset. Uses 16 never. Multiplexes pin 39 between RGB red and LCD backlight on jumper J5.",
+   "stackable": "Yes: male and female headers (SLAU599 2.1.1)",
+   "power": "Header rails only. Needs both 3.3 V and 5 V; a 20-pin LaunchPad without 5 V loses functions (SLAU599 2.2)",
+   "current": "not stated",
+   "own_mcu": "None",
+   "size": "not read; guide shows a 40-pin outline",
+   "mounting": "not stated in guide",
+   "price": "$36.29, 201 in stock (TI.com, 2026-10-18)",
+   "compatible": "TI lists MSP-EXP430F5529LP, MSP-EXP430FR6989, EK-TM4C123GXL on the tool page; guide software targets MSP-EXP432P401R",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "SimpleLink MSP432 SDK examples (SLAU599 sec 3); Energia library (Energia unmaintained since Dec 2019, https://github.com/energia/energia); our repo has it running stacked on LP-MSPM33C321A (docs/parts-catalog.md, 2026-10-08) and driver examples per host (docs/archive/example-coverage-2026-10-08.md)",
+   "complaints": [
+    {
+     "text": "LCD and buzzer dead on arrival, answer blamed 9 incompatible pins against the CC3220 LaunchPad",
+     "url": "https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/657961/boostxl-edumkii-improper-working-of-educational-booster-pack"
+    },
+    {
+     "text": "MOSI and accelerometer wiring conflict on a TM4C board, checker gave a note not 'fully compatible'",
+     "url": "https://e2e.ti.com/support/microcontrollers/arm-based-microcontrollers-group/arm-based-microcontrollers/f/arm-based-microcontrollers-forum/538949/lcd-issues-with-boostxl-edumkii-dev-board"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau599b/slau599b.pdf",
+    "https://www.ti.com/tool/BOOSTXL-EDUMKII"
+   ],
+   "confidence": "high (text tables read)",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    2,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    13,
+    15,
+    17,
+    19,
+    23,
+    24,
+    25,
+    26,
+    31,
+    32,
+    33,
+    34,
+    37,
+    38,
+    39,
+    40
+   ]
+  },
+  {
+   "id": "boostxl-bassensors",
+   "name": "Building Automation Sensors BoosterPack",
+   "ti_part": "BOOSTXL-BASSENSORS",
+   "maker": "TI",
+   "category": "sensors",
+   "year": "quick start Apr 2018; user guide rev B Sep 2022",
+   "status": "listed and orderable on TI.com, stock 147",
+   "function": "TMP116 temperature, HDC2010 humidity, OPT3001 light, DRV5055 Hall sensor; breakaway sensor coupon",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3)",
+    "I2C": "9 SCL, 10 SDA",
+    "sensor supply driven by GPIO": "6 HDC2010 enable, 24 DRV5055 supply (also must be driven low), 27 OPT3001 V+, 28 TMP116 V+",
+    "interrupts": "23 HDC INT, 25 OPT INT, 26 TMP ALERT",
+    "analog": "2 DRV5055 output"
+   },
+   "respects": "I2C on 9 and 10",
+   "violates": "Powers sensors from GPIO pins (6, 24, 27, 28) so a host must drive those pins or the sensors stay off",
+   "stackable": "Yes: male and female headers (SLAU762 2.1.1); guide warns heat and shade from stacked packs skew readings",
+   "power": "3V3 header pin only (SLAU762 sec 2.3 'Power is provided through the 3V3 (J1.1) pin')",
+   "current": "not stated",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated in guide",
+   "price": "$22.00, 147 in stock (TI.com, 2026-10-18)",
+   "compatible": "TI says compatibility via www.ti.com/launchpad; not listed by part",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "SimpleLink SDK TI-RTOS examples (SLAU762 sec 3); not verified to build in 2026",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau762/slau762.pdf",
+    "https://www.ti.com/tool/BOOSTXL-BASSENSORS"
+   ],
+   "confidence": "high (text tables read)",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    2,
+    6,
+    9,
+    10,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28
+   ]
+  },
+  {
+   "id": "bp-bassensorsmkii",
+   "name": "Building Automation Sensors BoosterPack MKII",
+   "ti_part": "BP-BASSENSORSMKII",
+   "maker": "TI",
+   "category": "sensors",
+   "year": "2020 (SLAU829 May 2020)",
+   "status": "listed and orderable on TI.com, stock 60",
+   "function": "OPT3001, TMP117 (on a breakaway board with a flat cable), HDC2080, DRV5055, BME150, BMI160 IMU, two LEDs",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3), 21 (5V)",
+    "I2C": "9 SCL, 10 SDA",
+    "GPIO-switched sensor supply": "6 HDC V+, 24 DRV V+, 27 OPT V+, 28 TMP V+",
+    "interrupts": "5 IMU INT1, 8 MAG INT, 13 IMU INT2, 23 HDC INT, 25 OPT INT, 26 TEMP ALERT",
+    "other": "2 DRV out, 39 and 40 LEDs"
+   },
+   "respects": "I2C on 9 and 10",
+   "violates": "Takes pin 13 (standard SPI CS) for IMU INT2 and powers sensors from GPIO pins. Figure 3 marks only the pins that align with the standard",
+   "stackable": "Yes: male and female headers (SLAU829 2.1.1)",
+   "power": "Header rails only",
+   "current": "not stated",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated in guide",
+   "price": "$27.50, 60 in stock (TI.com, 2026-10-18)",
+   "compatible": "not listed by part",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Our repo: runs stacked on LP-MSPM0G5187 (docs/parts-catalog.md, 2026-10-10)",
+   "complaints": [
+    {
+     "text": "TMP117 flat cable can kill the whole I2C bus fitted one way round, cable is not keyed (SLAU829 2.1.4)"
+    },
+    {
+     "text": "Takes every J1 and J3 signal on the LP-MSPM0G5187 but five, leaving no room for a second pack"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau829/slau829.pdf",
+    "https://www.ti.com/tool/BP-BASSENSORSMKII"
+   ],
+   "confidence": "high (figure and text read)",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    2,
+    5,
+    6,
+    8,
+    9,
+    10,
+    13,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    39,
+    40
+   ]
+  },
+  {
+   "id": "boostxl-audio",
+   "name": "Audio BoosterPack",
+   "ti_part": "BOOSTXL-AUDIO",
+   "maker": "TI",
+   "category": "audio",
+   "year": "2016 (SLAU670A Mar 2016, rev Nov 2016)",
+   "status": "listed and orderable on TI.com, stock 322",
+   "function": "DAC8311 14-bit DAC (16-bit frame: 2 power-down bits then 14 data bits), TPA301 speaker amp, 1 W 8 ohm speaker, TS3A44159 analog switches, electret mic with preamp, 3.5 mm jack with TS3A225E headset detection",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3), 21 (5V pad only), 20/22 GND",
+    "SPI to DAC": "7 SCLK (DAC_SCLK), 15 MOSI (DAC_MOSI), 12 SYNC (DAC_SYNC, the DAC's chip select)",
+    "analog": "6 mic output (alternate 26, R4 to R5), 30 LaunchPad DAC output (J5 position LP DAC)",
+    "GPIO": "5 mic power (alternate 31, R1 to R3), 13 amplifier shutdown line (alternate 38, R6 to R8), 19 PWM audio (alternate 39, R9 to R10)",
+    "not connected to the header": "8, 9, 10 (the TS3A225E I2C lines only go to a pull-up), 11, 14, 16 to 18, 23 to 25, 27 to 29, 32 to 37"
+   },
+   "respects": "SPI CLK on 7, MOSI on 15",
+   "violates": "SYNC on 12 and amplifier line on 13 (the standard's other chip-select pins); mic, amp and PWM alternates on 26, 31, 38, 39 by 0 ohm resistor",
+   "stackable": "Not stated in SLAU670A (the figure draws only the bottom sockets)",
+   "power": "Header rails only",
+   "current": "1 W speaker amp; draw not stated",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated in guide",
+   "price": "$36.29, 322 in stock (TI.com, 2026-10-18)",
+   "compatible": "TI lists MSP-EXP430FR5994 on the tool page",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Example i2secho cannot run on CC13xx because of audio BoosterPack pin conflicts (https://sir.ext.ti.com/jira/browse/EXT_EP-9686)",
+   "complaints": [
+    {
+     "text": "CC13xx LaunchPad pins clash with the audio BoosterPack so the i2secho example needs jumper wires",
+     "url": "https://sir.ext.ti.com/jira/browse/EXT_EP-9686"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau670a/slau670a.pdf",
+    "https://www.ti.com/tool/BOOSTXL-AUDIO",
+    "https://www.ti.com/lit/ds/symlink/dac8311.pdf",
+    "https://www.ti.com/lit/ds/symlink/tpa301.pdf"
+   ],
+   "confidence": "high for pins 5, 6, 7, 12, 13, 15, 19, 30 (SLAU670A Figure 12 read at 200 dpi, 2026-10-20; the text of 2.1.2.1 lists J1.8 and J1.9 for SYNC and SCLK, which the figure contradicts: the figure is used). Amplifier polarity: TPA301 SHUTDOWN is active high (data sheet); R33 100 k ties it to the supply as drawn, so a low level on pin 13 should enable the amplifier; to be confirmed on hardware (experiment E237)",
+   "read": "2026-10-18, pins re-read 2026-10-20",
+   "pins_used_set": [
+    5,
+    6,
+    7,
+    12,
+    13,
+    15,
+    19,
+    30
+   ],
+   "alternate_pins": [
+    26,
+    31,
+    38,
+    39
+   ]
+  },
+  {
+   "id": "boostxl-sharp128",
+   "name": "Sharp 128x128 Memory LCD and microSD BoosterPack",
+   "ti_part": "BOOSTXL-SHARP128",
+   "maker": "TI",
+   "category": "display",
+   "year": "2018 (SLAU786 Aug 2018)",
+   "status": "listed and orderable on TI.com, stock 243",
+   "function": "Sharp LS013B7DH03 128x128 monochrome memory LCD plus microSD slot; TPS61222 3 V to 5 V boost",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3), 21 (5V option via R4); pin 2 (LCD_PWR) powers the board from a GPIO by default",
+    "SPI": "7 CLK, 14 MISO, 15 MOSI, 6 LCD CS, 8 SD CS (0 ohm options move LCD CS to 13 and SD CS to 12)",
+    "GPIO": "5 LCD_DISP, 19 EXTCOMIN, SD detect on one of 11, 17, 18"
+   },
+   "respects": "SPI CLK 7, MISO 14, MOSI 15",
+   "violates": "Default powers the pack from GPIO pin 2; default CS on 6 and 8 rather than 13 and 18; 0 ohm resistors on the back select alternates",
+   "stackable": "Not stated in SLAU786",
+   "power": "Default: GPIO pin 2 at the LaunchPad GPIO voltage; 0 ohm R1 or R2 select other sources; R4 selects 5 V from pin 21 (SLAU786 2.3.3)",
+   "current": "not stated (ultra-low power panel)",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated in guide",
+   "price": "$30.24, 243 in stock (TI.com, 2026-10-18)",
+   "compatible": "TI says compatible with all 20-pin and 40-pin LaunchPad kits that comply with the standard (SLAU786 2.2); tool page lists SimpleLink MSP432 SDK",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "SimpleLink SDKs and MSP430Ware, BSD (SLAU786 1.5); our repo has per-host driver examples (docs/archive/example-coverage-2026-10-08.md)",
+   "complaints": [
+    {
+     "text": "Older Sharp memory LCD BoosterPack had no pass-through and was not pin compatible with Tiva LaunchPad kits (2014 thread)",
+     "url": "https://e2e.ti.com/support/microcontrollers/arm-based-microcontrollers-group/arm-based-microcontrollers/f/arm-based-microcontrollers-forum/373121/boosterpacks-compatibility-sensorhub-memory-lcd-boosterpack"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau786/slau786.pdf",
+    "https://www.ti.com/tool/BOOSTXL-SHARP128"
+   ],
+   "confidence": "high for default pins (figure at 80 dpi), 0 ohm option pins from figure",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    2,
+    5,
+    6,
+    7,
+    8,
+    14,
+    15,
+    19
+   ]
+  },
+  {
+   "id": "boostxl-k350qvg-s1",
+   "name": "Kentec QVGA Display BoosterPack",
+   "ti_part": "BOOSTXL-K350QVG-S1",
+   "maker": "TI with Kentec",
+   "category": "display",
+   "year": "2015 (SLAU601B Mar 2015, rev Apr 2020)",
+   "status": "listed and orderable on TI.com, stock 563",
+   "function": "3.5 in 320x240 TFT with resistive touch, SSD2119 controller, boost converter for a 20 V backlight from the 5 V rail",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3), 21 (VUSB 5 V for backlight)",
+    "SPI": "7 SCL, 13 SCS, 15 SDI, 8 SDC (data/command) by eye, 17 reset by eye",
+    "touch": "X+, Y+ on 23 and 24, X- and Y- on 11 and 12, by eye"
+   },
+   "respects": "SPI wired as 4-wire 8-bit; 0 ohm R2/R3/R8/R9 switch to 3-wire 9-bit",
+   "violates": "Needs 5 V, so it will not work on a 20-pin LaunchPad without modification (SLAU601B 2.1.1); display overhangs the standard outline",
+   "stackable": "Not stated; Figure 3 shows headers on the bottom only",
+   "power": "Header 3V3 and 5 V",
+   "current": "backlight boost from 5 V; draw not stated",
+   "own_mcu": "None",
+   "size": "76.90 x 63.90 mm (SLAU601B Figure 3), wider than the 2,000 mil (50.8 mm) standard width",
+   "mounting": "not stated in guide",
+   "price": "$30.24, 563 in stock (TI.com, 2026-10-18)",
+   "compatible": "TI tool page lists MSP-EXP430F5529LP, EK-TM4C123GXL, EK-TM4C1294XL",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "MSP Graphics Library (grlib) demos with MSP-EXP432P401R (SLAU601B sec 3.1); not verified in 2026",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau601b/slau601b.pdf",
+    "https://www.ti.com/tool/BOOSTXL-K350QVG-S1"
+   ],
+   "confidence": "medium (pins read by eye from a mirrored bottom view)",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    7,
+    8,
+    11,
+    12,
+    13,
+    15,
+    17,
+    23,
+    24
+   ]
+  },
+  {
+   "id": "boostxl-drv8323rs",
+   "name": "DRV8323RS three-phase smart gate driver BoosterPack (SPI)",
+   "ti_part": "BOOSTXL-DRV8323RS (RH twin: BOOSTXL-DRV8323RH)",
+   "maker": "TI",
+   "category": "motor driver",
+   "year": "2017 (SLVUB01C Feb 2017, rev Mar 2018)",
+   "status": "listed and orderable on TI.com, stock 703 (RH 457)",
+   "function": "15 A, 6 to 54 V three-phase driver, DRV8323 gate driver, three-shunt amps, 0.6 A LMR16006 buck makes 3.3 V",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3 output from the pack's own buck)",
+    "bus sense": "2 VSENVM",
+    "SPI (RS)": "7 SCLK, 15 SDI, 14 SDO, 12 nSCS",
+    "PWM": "40 INHA, 39 INLA, 38 INHB, 37 INLB, 36 INHC, 35 INLC",
+    "Hall": "19 A, 18 B, 13 C",
+    "sense": "23, 24, 25 phase voltages; 26, 27, 28 phase currents; 2 bus voltage",
+    "control": "5 ENABLE, 8 nFAULT, 6 POT, 33 LED, 34 MODE (RH), 29 IDRIVE (RH), 30 VDS (RH) or SCLK, 11 CAL, 31 and 32 EVM ID"
+   },
+   "respects": "SPI CLK 7, MOSI 15, MISO 14. Leaves 9, 10, 16 and 17 unused, so I2C, reset and TEST stay free",
+   "violates": "Uses 28 of 40 pins; CS on 12; E2E users report pin 30 doubles as SCLK on the RS part and cannot be used as GPIO",
+   "stackable": "No pass-through shown; motor power connectors on the board",
+   "power": "Own motor input J1 (+VM, 6 to 54 V, polarity matters). The pack's buck feeds 3.3 V to the LaunchPad and Hall sensors",
+   "current": "15 A drive; 0.6 A buck",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated in guide",
+   "price": "$86.90, 703 in stock (TI.com, 2026-10-18)",
+   "compatible": "TI lists LAUNCHXL-F280039C and LAUNCHXL-F2800137 among recommended hosts",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Sensorless and sensored firmware for MSP430F5529 (SLVUB01C); C2000 InstaSPIN; on MSPM0G3507 a user hit a pin-30 clash (E2E 1615566); our AM13 port in progress (docs/parts-catalog.md)",
+   "complaints": [
+    {
+     "text": "GPIO on J3.20 (BP 30) pulled SCLK high and broke SPI on LP-MSPM0G3507; pin table lists it as VDS only",
+     "url": "https://e2e.ti.com/support/microcontrollers/arm-based-microcontrollers-group/arm-based-microcontrollers/f/arm-based-microcontrollers-forum/1615566/mspm0g3507-bug-report-mspm0g3507-configuring-pa15-as-gpio-causes-spi1-to-stop-working"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/lit/ug/slvub01c/slvub01c.pdf",
+    "https://www.ti.com/tool/BOOSTXL-DRV8323RS"
+   ],
+   "confidence": "high (text tables, mapped with the two-row rule in this file's note)",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    2,
+    5,
+    6,
+    7,
+    8,
+    11,
+    12,
+    13,
+    14,
+    15,
+    18,
+    19,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40
+   ]
+  },
+  {
+   "id": "boostxl-drv8301",
+   "name": "DRV8301 three-phase driver BoosterPack",
+   "ti_part": "BOOSTXL-DRV8301",
+   "maker": "TI",
+   "category": "motor driver",
+   "year": "2013 (SLVU974 Oct 2013)",
+   "status": "listed and orderable on TI.com, stock 282",
+   "function": "10 A, 6 to 24 V, DRV8301 pre-driver with six CSD18533Q5A FETs, 1.5 A buck",
+   "header": "40-pin ('XL J1, J2, J5, J6' in C2000 numbering)",
+   "pins_used": {
+    "power": "3.3 V on pin 1",
+    "SPI": "SCLK on J1, SCS, SDI, SDO on J2",
+    "control": "FAULT, OCTW on J1; EN-GATE, DC-CAL on J2",
+    "feedback": "J5 (pins 22 to 30): DC-V-FB, VA, VB, VC, IA, IB, IC",
+    "PWM": "six PWM on J6 (pins 31 to 40 area)"
+   },
+   "respects": "SPI on the standard pins by figure",
+   "violates": "Not resolved to pin numbers; figure only",
+   "stackable": "Headers on the bottom layer only (SLVU974 Figure 4)",
+   "power": "Own motor supply; buck feeds the LaunchPad 3.3 V",
+   "current": "14 A peak sensing range",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated",
+   "price": "$86.90, 282 in stock (TI.com, 2026-10-18)",
+   "compatible": "C2000 LaunchPad kits (guide names LAUNCHXL-F28027, F28069M)",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "InstaSPIN-FOC and MOTION on C2000 (SPRUHJ1); not verified",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slvu974/slvu974.pdf",
+    "https://www.ti.com/tool/BOOSTXL-DRV8301"
+   ],
+   "confidence": "medium (figure only, not mapped to numbers)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-drv8305evm",
+   "name": "DRV8305 three-phase driver BoosterPack",
+   "ti_part": "BOOSTXL-DRV8305EVM",
+   "maker": "TI",
+   "category": "motor driver",
+   "year": "2015 (SLVUAI8A Aug 2015, rev Jun 2017)",
+   "status": "listed and orderable on TI.com, stock 879",
+   "function": "15 A, 4.4 to 45 V, DRV8305 gate driver with CSD18540Q5B FETs, LMR16006 buck for 3.3 V",
+   "header": "40-pin ('XL J1, J2, J5, J6')",
+   "pins_used": {
+    "power": "3.3 V on pin 1",
+    "SPI": "SCLK on J1; SCS, SDI, SDO on J2",
+    "control": "FAULT on J1; PWRGD, ENGATE, WAKE on J2",
+    "feedback": "VSENA, B, C, VSENPVDD, ISENA, B, C on J5",
+    "PWM": "six on J6"
+   },
+   "respects": "figure only",
+   "violates": "not resolved",
+   "stackable": "Headers on the bottom layer only (SLVUAI8A Figure 6)",
+   "power": "Own supply 4.4 to 45 V (SLVUAI8A Table 1); buck feeds the LaunchPad",
+   "current": "150 mA supply with EN_GATE low",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated",
+   "price": "$86.90, 879 in stock (TI.com, 2026-10-18)",
+   "compatible": "C2000 and MSP430 LaunchPad kits",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "InstaSPIN, MSP430 and C2000 firmware; not verified",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slvuai8a/slvuai8a.pdf",
+    "https://www.ti.com/tool/BOOSTXL-DRV8305EVM"
+   ],
+   "confidence": "medium (figure only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boost-drv8848",
+   "name": "DRV8848 dual brushed DC motor BoosterPack",
+   "ti_part": "BOOST-DRV8848",
+   "maker": "TI",
+   "category": "motor driver",
+   "year": "2014 (SLVUAE1 Dec 2014)",
+   "status": "listed and orderable on TI.com, stock 22",
+   "function": "Dual H-bridge, 4 to 18 V, parallel mode, current-limit pot",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "3.3 V on pin 1",
+    "control": "BIN1 and BIN2 near the bottom of J1 (pins 9 and 10 by eye, the I2C pins), AIN1, AIN2, nSLEEP, nFAULT on J2, POT analog on J1"
+   },
+   "respects": "none stated",
+   "violates": "Appears to use the I2C pins for PWM inputs (by eye); not resolved",
+   "stackable": "Headers on the bottom layer only (SLVUAE1 Figure 4)",
+   "power": "Own motor supply on terminal block J5, 4 to 18 V",
+   "current": "not stated",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated",
+   "price": "$27.50, 22 in stock (TI.com, 2026-10-18)",
+   "compatible": "not listed by part",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "MSP430 examples; not verified",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slvuae1/slvuae1.pdf",
+    "https://www.ti.com/tool/BOOST-DRV8848"
+   ],
+   "confidence": "medium (figure only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "drv8376evm",
+   "name": "DRV8376 three-phase driver EVM (40-pin BoosterPack)",
+   "ti_part": "DRV8376EVM",
+   "maker": "TI",
+   "category": "motor driver",
+   "year": "not read",
+   "status": "owned (docs/parts-catalog.md)",
+   "function": "4.5 to 65 V, 4.5 A peak three-phase driver with integrated FETs, 3.3 V and 5 V regulators on the chip",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3.3 V on EVM pin 20 to J1 pin 1)",
+    "PWM": "40 to 35 INHA to INLC",
+    "Hall": "34, 33, 32",
+    "control": "9 nSLEEP, 10 nFAULT, 13 DRVOFF",
+    "sense": "26, 25, 24 phase voltage; 23 bus; 27 to 29 current"
+   },
+   "respects": "none of the SPI/UART standard functions",
+   "violates": "nSLEEP and nFAULT sit on 9 and 10, the I2C pins",
+   "stackable": "no pass-through noted",
+   "power": "Own motor input VBAT and PGND, 4.5 to 65 V, reverse-polarity protected; Hall supply jumper J13",
+   "current": "4.5 A peak",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated",
+   "price": "not read (owned)",
+   "compatible": "our AM13E230 bench",
+   "checker": "n/a",
+   "software": "Our repo am13e230/foc-drv8376",
+   "complaints": [],
+   "sources": [
+    "docs/parts-catalog.md (drv8376evm, 2026-10-17)"
+   ],
+   "confidence": "medium (copied from our catalog entry)",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    9,
+    10,
+    13,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40
+   ]
+  },
+  {
+   "id": "boostxl-3phganinv",
+   "name": "48 V three-phase GaN inverter BoosterPack",
+   "ti_part": "BOOSTXL-3PHGANINV",
+   "maker": "TI",
+   "category": "motor driver",
+   "year": "not read (SLUUBP1)",
+   "status": "listed and orderable on TI.com, stock 452",
+   "function": "48 V, 10 A GaN inverter with in-line shunt current sensing (INA240) for servo drives",
+   "header": "40-pin BoosterPack compatible interface, 3.3 V I/O",
+   "pins_used": {
+    "not read": "pin table not read"
+   },
+   "respects": "not read",
+   "violates": "not read",
+   "stackable": "not stated",
+   "power": "Own 48 V bus",
+   "current": "10 A",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$53.90, 452 in stock (TI.com, 2026-10-18)",
+   "compatible": "C2000 LaunchPad kits (F280013x guide lists it, SPRUJ32 Table 1-2)",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "C2000 DesignDRIVE; not verified",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/sluubp1/sluubp1.pdf",
+    "https://www.ti.com/tool/BOOSTXL-3PHGANINV",
+    "https://www.ti.com/lit/ug/spruj32/spruj32.pdf"
+   ],
+   "confidence": "low (description only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-canfd-lin",
+   "name": "SPI to CAN FD SBC + LIN BoosterPack",
+   "ti_part": "BOOSTXL-CANFD-LIN",
+   "maker": "TI",
+   "category": "bus interface",
+   "year": "2019 (SLLU216 Jul 2019)",
+   "status": "listed and orderable on TI.com, stock 66",
+   "function": "TCAN4550-Q1 CAN FD controller with transceiver over SPI, TLIN2029-Q1 LIN on UART, DC jack",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3), 21 (5V)",
+    "SPI": "7 SCLK, 15 SDI, 14 SDO, 13 nCS_0, 12 nCS_1 (alternate)",
+    "UART (LIN)": "3 RX, 4 TX",
+    "GPIO": "5 GPIO1, 8 LIN_EN, 16 reset connection by jumper, 17 GPIO_RST, 33 nWKRQ, 32 GPO2, 31 nINT"
+   },
+   "respects": "UART 3 and 4, SPI 7, 13 to 15, 16 reset (on a jumper)",
+   "violates": "Uses 17 (TEST) as GPIO_RST; ties the TCAN reset to the LaunchPad reset line with a jumper; uses 31 to 33 which are LEDs or XDS UART nets on some hosts",
+   "stackable": "Yes: male and female headers (SLLU216 2.4.1)",
+   "power": "Header rails or the pack's DC jack (barrel jack on the board)",
+   "current": "not stated",
+   "own_mcu": "None (TCAN4550 is a controller)",
+   "size": "not read",
+   "mounting": "not stated",
+   "price": "$156.45, 66 in stock (TI.com, 2026-10-18)",
+   "compatible": "not listed by part",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "TCAN45xx software user's guide (SLLU270)",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/sllu216/sllu216.pdf",
+    "https://www.ti.com/tool/BOOSTXL-CANFD-LIN"
+   ],
+   "confidence": "high (figure read at 75 dpi)",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    3,
+    4,
+    5,
+    7,
+    8,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    31,
+    32,
+    33
+   ]
+  },
+  {
+   "id": "boostxl-rs232",
+   "name": "RS-232 BoosterPack",
+   "ti_part": "BOOSTXL-RS232",
+   "maker": "TI",
+   "category": "bus interface",
+   "year": "not read (SLLU249)",
+   "status": "listed on TI.com, stock 3",
+   "function": "TRS3122E dual RS-232 transceiver, DB9, 1.8 V or 3.3 V logic LDO",
+   "header": "40-pin; any of 10 GPIO pins assignable to RX, TX, RTS, CTS via header J9",
+   "pins_used": {
+    "UART": "routed by J9 to one of 10 GPIO pins"
+   },
+   "respects": "user-selectable",
+   "violates": "no fixed UART pins",
+   "stackable": "Yes; guide has a caution about header pins touching vias on a stacked board (SLLU249 sec 2)",
+   "power": "Header rails, on-board LDO",
+   "current": "not stated",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$31.90, 3 in stock (TI.com, 2026-10-18)",
+   "compatible": "not listed",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "not read",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/sllu249/sllu249.pdf",
+    "https://www.ti.com/tool/BOOSTXL-RS232"
+   ],
+   "confidence": "medium",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-tlv8544pir",
+   "name": "TLV8544 PIR motion detector BoosterPack",
+   "ti_part": "BOOSTXL-TLV8544PIR",
+   "maker": "TI",
+   "category": "sensing (analog front end)",
+   "year": "2017 (SNOU148A Apr 2017)",
+   "status": "listed and orderable on TI.com, stock 52",
+   "function": "Nanopower quad op-amp PIR front end with INA226 supply-current monitor over I2C",
+   "header": "40-pin",
+   "pins_used": {
+    "not read": "pin table not read; intended for LAUNCHXL-CC2650"
+   },
+   "respects": "not read",
+   "violates": "not read",
+   "stackable": "not stated",
+   "power": "Header rails (current sensor measures TLV8544 supply)",
+   "current": "nanoamps (amplifier)",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$31.90, 52 in stock (TI.com, 2026-10-18)",
+   "compatible": "Built for LAUNCHXL-CC2650 (TI tool page)",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "GUI streams motion and current (SNOU148A)",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/snou148/snou148.pdf",
+    "https://www.ti.com/tool/BOOSTXL-TLV8544PIR"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-batpakmkii",
+   "name": "Fuel Tank MKII battery BoosterPack",
+   "ti_part": "BOOSTXL-BATPAKMKII",
+   "maker": "TI",
+   "category": "power",
+   "year": "2016 (quick start Jun 2016; SLAU618A Jun 2018)",
+   "status": "listed and orderable on TI.com, stock 133",
+   "function": "Li-Po pack with bq24250 charger, bq27441 gauge, TPS63001 3.3 V and TPS63002 5 V buck-boost that power the LaunchPad",
+   "header": "40-pin",
+   "pins_used": {
+    "outputs onto power pins": "1 (3V3, 1200 mA max) and 21 (5V, 800 mA max)",
+    "I2C": "9, 10",
+    "control": "40 BIN, 39 INT, 38 Charge, 36 EN2, 35 EN1, 34 CE"
+   },
+   "respects": "I2C on 9 and 10",
+   "violates": "Drives pins 1 and 21 as outputs, so the LaunchPad kit's own USB rails must be disconnected by jumper first (SLAU618A 2.2.2)",
+   "stackable": "Yes: male and female headers for stacking on top or bottom (SLAU618A)",
+   "power": "Own battery, charged over micro USB; powers the LaunchPad",
+   "current": "3.3 V rail 1.2 A, 5 V rail 0.8 A; charge 1.1 A; discharge 2.2 A",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not stated",
+   "price": "$30.24, 133 in stock (TI.com, 2026-10-18)",
+   "compatible": "TI lists MSP-EXP430FR5994",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Software examples zip on tool page",
+   "complaints": [
+    {
+     "text": "FR4133 LaunchPad kits shipped with clipped header pins; BATPAKMKII could still attach because its own pins are male (2018)",
+     "url": "https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/703876/faq-msp430fr4133-production-issue---male-boosterpack-headers-missing"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau618a/slau618a.pdf",
+    "https://www.ti.com/tool/BOOSTXL-BATPAKMKII"
+   ],
+   "confidence": "high",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    9,
+    10,
+    34,
+    35,
+    36,
+    38,
+    39,
+    40
+   ]
+  },
+  {
+   "id": "boost-ir",
+   "name": "Infrared BoosterPack",
+   "ti_part": "BOOST-IR",
+   "maker": "TI",
+   "category": "sensing / user input",
+   "year": "2014 (SLAU598A Dec 2014, rev Jul 2015)",
+   "status": "listed and orderable on TI.com, stock 38",
+   "function": "12-key keypad, IR LED, IR receiver and demodulator",
+   "header": "20-pin",
+   "pins_used": {
+    "keys and IR": "Key Out 1 to 4 on the left rows, Key In 1 to 3 on the right rows, IR transmit PWM on 19, IR receive on 18 (by eye, not resolved to numbers)"
+   },
+   "respects": "Deliberately leaves I2C and SPI pins free so other packs can stack under it (SLAU598A 2.1.1)",
+   "violates": "no UART use; keys on analog and GPIO pins",
+   "stackable": "No: only female headers, 'the keypad is too large' so it goes on top (SLAU598A 2.1.1)",
+   "power": "Header 3.3 V",
+   "current": "not stated",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$24.19, 38 in stock (TI.com, 2026-10-18)",
+   "compatible": "MSP-EXP430FR4133, MSP-EXP430F5529LP",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "MSP430FR4xx examples; not verified",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau598a/slau598a.pdf",
+    "https://www.ti.com/tool/BOOST-IR"
+   ],
+   "confidence": "medium",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-capkeypad",
+   "name": "Capacitive touch keypad BoosterPack",
+   "ti_part": "BOOSTXL-CAPKEYPAD",
+   "maker": "TI",
+   "category": "user input",
+   "year": "2018 (SLAU758 Jan 2018)",
+   "status": "listed and orderable on TI.com, stock 617",
+   "function": "12-key capacitive keypad on its own MSP430FR2522 CapTIvate MCU",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3), 21 (5V), 22 GND",
+    "I2C": "9 SCL, 10 SDA",
+    "IRQ": "12 or 27 by jumper"
+   },
+   "respects": "I2C on 9 and 10; only four pins used",
+   "violates": "none",
+   "stackable": "not stated",
+   "power": "Header rails",
+   "current": "not stated",
+   "own_mcu": "MSP430FR2522 (CapTIvate); programmable with CAPTIVATE-PGMR",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$36.29, 617 in stock (TI.com, 2026-10-18)",
+   "compatible": "LaunchPad kits, CapTIvate dev kit, CAPTIVATE-PGMR",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "CapTIvate Design Center; not verified",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau758/slau758.pdf",
+    "https://www.ti.com/tool/BOOSTXL-CAPKEYPAD"
+   ],
+   "confidence": "high",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    9,
+    10,
+    12,
+    27
+   ]
+  },
+  {
+   "id": "cc3100boost",
+   "name": "CC3100 SimpleLink Wi-Fi BoosterPack",
+   "ti_part": "CC3100BOOST",
+   "maker": "TI",
+   "category": "wireless (Wi-Fi)",
+   "year": "2014 (SWRU371B Jun 2014, rev Jan 2015)",
+   "status": "listed and orderable on TI.com, stock 208",
+   "function": "CC3100 network processor, SPI slave host interface",
+   "header": "40-pin",
+   "pins_used": {
+    "power": "1 (3V3), 21 (5V into a 3.3 V LDO)",
+    "UART": "3 TX, 4 RX (CC3100 UART1), 36 and 37 RTS and CTS",
+    "SPI (slave)": "7 CLK, 15 MOSI, 14 MISO, 18 CS",
+    "control": "5 nHIB, 16 nRESET (input), 19 IRQ",
+    "logs": "33 and 34 (NWP and WLAN logger TX, unused by default)"
+   },
+   "respects": "UART 3 and 4, SPI 7, 14, 15, reset 16",
+   "violates": "Takes pin 18 for CS and 19 for IRQ (the standard's 'wireless' CS); logger pins on 33 and 34",
+   "stackable": "Not stated",
+   "power": "Header 3V3 (up to 350 mA) or the on-board LDO from 5 V; own micro USB on the pack shares load with Schottky diodes when a LaunchPad cannot source the peak current (SWRU371B 2.4)",
+   "current": "350 mA 3.3 V peak",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$59.29, 208 in stock (TI.com, 2026-10-18)",
+   "compatible": "Tiva, MSP430, MSP432 LaunchPad kits; E2E shows a stack with CC2650MA clashes on 4 pins",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "SimpleLink CC3100 SDK; Energia; not verified in 2026",
+   "complaints": [
+    {
+     "text": "CC3120BOOST and BOOSTXL-CC2650MA share four pins, cannot stack on one MSP432 LaunchPad",
+     "url": "https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/673062/msp-exp432p401r-compatible-booster-packs-for-both-wi-fi-and-ble-connectivity"
+    },
+    {
+     "text": "CC3100 plus Sensor Hub fails when stacked; checker said not compatible",
+     "url": "https://e2e.ti.com/support/microcontrollers/arm-based-microcontrollers-group/arm-based-microcontrollers/f/arm-based-microcontrollers-forum/496237/launchpad-tiva-c-series-tm4c123g-cc3100-boosterpack-sensor-hub-boosterpack"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/lit/ug/swru371b/swru371b.pdf",
+    "https://www.ti.com/tool/CC3100BOOST"
+   ],
+   "confidence": "high",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    3,
+    4,
+    5,
+    7,
+    14,
+    15,
+    16,
+    18,
+    19,
+    33,
+    34,
+    36,
+    37
+   ]
+  },
+  {
+   "id": "cc3120boost",
+   "name": "CC3120 SimpleLink Wi-Fi BoosterPack",
+   "ti_part": "CC3120BOOST",
+   "maker": "TI",
+   "category": "wireless (Wi-Fi)",
+   "year": "not read",
+   "status": "listed and orderable on TI.com, stock 135",
+   "function": "CC3120 network processor, SPI host interface",
+   "header": "40-pin",
+   "pins_used": {
+    "not read": "guide not read"
+   },
+   "respects": "not read",
+   "violates": "E2E thread says it shares four pins with CC2650MA",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$48.39, 135 in stock (TI.com, 2026-10-18)",
+   "compatible": "MSP432 and others",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "SimpleLink CC32xx SDK",
+   "complaints": [
+    {
+     "text": "Shares four pins with BOOSTXL-CC2650MA on MSP-EXP432P401R",
+     "url": "https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/673062/msp-exp432p401r-compatible-booster-packs-for-both-wi-fi-and-ble-connectivity"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/tool/CC3120BOOST",
+    "https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/673062/msp-exp432p401r-compatible-booster-packs-for-both-wi-fi-and-ble-connectivity"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-cc2650ma",
+   "name": "CC2650 module BLE BoosterPack",
+   "ti_part": "BOOSTXL-CC2650MA",
+   "maker": "TI",
+   "category": "wireless (BLE)",
+   "year": "not read (SWRU486A)",
+   "status": "listed and orderable on TI.com, stock 311",
+   "function": "CC2650MODA BLE module, JTAG header, current-measurement link, status LEDs",
+   "header": "40-pin",
+   "pins_used": {
+    "not read": "pin table is a figure not read"
+   },
+   "respects": "not read",
+   "violates": "E2E thread says it shares four pins with CC3120BOOST",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "CC2650 module (runs its own firmware)",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$35.09, 311 in stock (TI.com, 2026-10-18)",
+   "compatible": "MSP432 LaunchPad (TI page)",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "SimpleLink BLE SDK",
+   "complaints": [
+    {
+     "text": "Four pins clash with CC3120BOOST",
+     "url": "https://e2e.ti.com/support/microcontrollers/msp-low-power-microcontrollers-group/msp430/f/msp-low-power-microcontroller-forum/673062/msp-exp432p401r-compatible-booster-packs-for-both-wi-fi-and-ble-connectivity"
+    }
+   ],
+   "sources": [
+    "https://www.ti.com/tool/BOOSTXL-CC2650MA",
+    "https://www.ti.com/lit/pdf/swru486"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "bp-cc1407p-9-fe",
+   "name": "CC1407P sub-1 GHz radio BoosterPack",
+   "ti_part": "BP-CC1407P-9-FE",
+   "maker": "TI",
+   "category": "wireless (sub-1 GHz)",
+   "year": "2026 (data sheet SWRS301 Sep 2026)",
+   "status": "owned; TI.com tool page name not found on 2026-10-18 (404 for the string BP-CC1407P-9-FE)",
+   "function": "CC1407P radio, +14 dBm and +22 dBm paths, SAW filter, SMA",
+   "header": "40-pin",
+   "pins_used": {
+    "mandatory": "1 3V3, 7 SPI_SCLK, 14 SPI_POCI, 15 SPI_PICO, 18 SPI_CS_N, 20 GND, 23 SPI_INT, 36 RESET_N",
+    "optional": "2 DIO4, 6 DIO7, 19 DIO5, 21 5V, 22 GND, 24 DIO3, 25 DIO6, 27 DIO2, 28 DIO0"
+   },
+   "respects": "SPI on 7, 14, 15, 18",
+   "violates": "Reset on 36 and interrupt on 23, not the standard's reset on 16",
+   "stackable": "not stated in our plan",
+   "power": "Header 3V3 (and 5 V optional)",
+   "current": "not read",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "not read",
+   "compatible": "TI TRX plug-in lists LaunchPad kits; our plan covers 10 hosts",
+   "checker": "n/a",
+   "software": "SimpleLink TRX plug-in 1.00.00.52, SmartRF Studio 8 (our docs/arrivals/bp-cc1407p-9-fe.md)",
+   "complaints": [
+    {
+     "text": "Four of its signals sit on J2/J4 rows the LP-MSPM0G5187 ships without pins"
+    },
+    {
+     "text": "TI's Zephyr shield needs a boosterpack_spi node missing from the LP-EM-CC2755P10 board file"
+    }
+   ],
+   "sources": [
+    "docs/arrivals/bp-cc1407p-9-fe.md"
+   ],
+   "confidence": "medium (from our own arrival plan)",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    7,
+    14,
+    15,
+    18,
+    23,
+    36,
+    2,
+    6,
+    19,
+    24,
+    25,
+    27,
+    28
+   ]
+  },
+  {
+   "id": "boostxl-pga460",
+   "name": "PGA460 ultrasonic BoosterPack",
+   "ti_part": "BOOSTXL-PGA460",
+   "maker": "TI",
+   "category": "sensing (ultrasonic)",
+   "year": "not read (SLAU659)",
+   "status": "listed on TI.com, stock 7",
+   "function": "PGA460-Q1 ultrasonic signal conditioner, optional 5 V buck and 7.2 V boost, OWI transceiver",
+   "header": "40-pin",
+   "pins_used": {
+    "not read": "table not read"
+   },
+   "respects": "not read",
+   "violates": "Requires a specific master: MSP-EXP430F5529LP runs the GUI bridge (SLAU659 sec 1)",
+   "stackable": "not read",
+   "power": "USB or external 5 to 7.5 V, jumper-selected (SLAU659 Table 1)",
+   "current": "not read",
+   "own_mcu": "None; 'requires an external master controller'",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$261.45, 7 in stock (TI.com, 2026-10-18)",
+   "compatible": "MSP-EXP430F5529LP",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "PGA460 GUI",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slau659/slau659.pdf",
+    "https://www.ti.com/tool/BOOSTXL-PGA460"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-ads1119",
+   "name": "ADS1119 16-bit ADC BoosterPack",
+   "ti_part": "BOOSTXL-ADS1119",
+   "maker": "TI",
+   "category": "data acquisition",
+   "year": "2017 (SBAU322)",
+   "status": "listed on TI.com, stock 17",
+   "function": "16-bit delta-sigma ADC, 4 channels, I2C, protected inputs, EEPROM board ID",
+   "header": "40-pin",
+   "pins_used": {
+    "I2C": "9, 10 (host table for MSP432E401Y, SBAU322 Table 4)"
+   },
+   "respects": "I2C",
+   "violates": "GUI needs a specific LaunchPad (MSP-EXP432E401Y) used as a USB bridge, with a jumper move JP6 to JP1 for power",
+   "stackable": "not read",
+   "power": "Pack powered from the LaunchPad bottom USB after a jumper move (SBAU322 2.3); 3.3 or 5 V analog supply selectable",
+   "current": "not read",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$157.49, 17 in stock (TI.com, 2026-10-18)",
+   "compatible": "MSP-EXP432E401Y for the GUI",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "ADS1119 GUI",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/sbau322/sbau322.pdf",
+    "https://www.ti.com/tool/BOOSTXL-ADS1119"
+   ],
+   "confidence": "medium",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    9,
+    10
+   ]
+  },
+  {
+   "id": "boostxl-ads7841-q1",
+   "name": "ADS7841-Q1 4-channel SAR ADC BoosterPack",
+   "ti_part": "BOOSTXL-ADS7841-Q1",
+   "maker": "TI",
+   "category": "data acquisition",
+   "year": "not read (SNAU229)",
+   "status": "listed on TI.com, stock 2",
+   "function": "12-bit SAR ADC over SPI with buffers, reference, SPI level translation, EEPROM",
+   "header": "40-pin",
+   "pins_used": {
+    "SPI": "host is TM4C1294 LaunchPad"
+   },
+   "respects": "SPI",
+   "violates": "GUI path needs TM4C1294 LaunchPad as USB bridge",
+   "stackable": "not read",
+   "power": "LaunchPad USB through an adjustable linear regulator for 5 V (SNAU229)",
+   "current": "not read",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$157.49, 2 in stock (TI.com, 2026-10-18)",
+   "compatible": "EK-TM4C1294XL",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "GUI for TM4C1294",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/snau229/snau229.pdf",
+    "https://www.ti.com/tool/BOOSTXL-ADS7841-Q1"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-tmp107",
+   "name": "TMP107 daisy-chain temperature BoosterPack",
+   "ti_part": "BOOSTXL-TMP107",
+   "maker": "TI",
+   "category": "sensing",
+   "year": "not read",
+   "status": "listed on TI.com, stock 34",
+   "function": "Three TMP107 sensors on a one-wire UART chain, 32 sensors max, breakaway sections",
+   "header": "40-pin",
+   "pins_used": {
+    "UART": "selectable transmit path"
+   },
+   "respects": "UART",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$31.90, 34 in stock (TI.com, 2026-10-18)",
+   "compatible": "not read",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "not read",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/tool/BOOSTXL-TMP107"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-buckconv",
+   "name": "Digital power buck converter BoosterPack",
+   "ti_part": "BOOSTXL-BUCKCONV",
+   "maker": "TI",
+   "category": "power",
+   "year": "not read",
+   "status": "listed on TI.com, stock 410",
+   "function": "9 V in buck converter for learning digital power control on C2000",
+   "header": "40-pin",
+   "pins_used": {
+    "not read": "not read"
+   },
+   "respects": "not read",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "External 9 V",
+   "current": "not read",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$71.39, 410 in stock (TI.com, 2026-10-18)",
+   "compatible": "C2000 LaunchPad kits (SPRUJ32)",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "C2000Ware digital power examples",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/tool/BOOSTXL-BUCKCONV",
+    "https://www.ti.com/lit/ug/spruj32/spruj32.pdf"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-posmgr",
+   "name": "PositionManager BoosterPack",
+   "ti_part": "BOOSTXL-POSMGR",
+   "maker": "TI",
+   "category": "sensing (encoder)",
+   "year": "not read",
+   "status": "listed on TI.com, stock 8",
+   "function": "Interfaces to absolute encoders, resolvers and sin/cos transducers",
+   "header": "40-pin",
+   "pins_used": {
+    "not read": "not read"
+   },
+   "respects": "not read",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$59.29, 8 in stock (TI.com, 2026-10-18)",
+   "compatible": "C2000 LaunchPad kits",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "DesignDRIVE position manager",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/tool/BOOSTXL-POSMGR"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boost-drv8711",
+   "name": "DRV8711 stepper motor BoosterPack",
+   "ti_part": "BOOST-DRV8711",
+   "maker": "TI",
+   "category": "motor driver",
+   "year": "not read",
+   "status": "listed on TI.com, stock 917",
+   "function": "Stepper pre-driver, four dual N-channel FETs, 8 to 52 V, 1/256 microstep, SPI",
+   "header": "40-pin",
+   "pins_used": {
+    "SPI": "not read"
+   },
+   "respects": "not read",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "Own 8 to 52 V",
+   "current": "not read",
+   "own_mcu": "None",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$27.50, 917 in stock (TI.com, 2026-10-18)",
+   "compatible": "not read",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "not read",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/tool/BOOST-DRV8711"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-sensors",
+   "name": "Sensors BoosterPack (original)",
+   "ti_part": "BOOSTXL-SENSORS",
+   "maker": "TI",
+   "category": "obsolete or removed",
+   "year": "not read",
+   "status": "TI.com tool page returned 404 on 2026-10-18; Energia pin-map page lists it as NRND",
+   "function": "Sensors BoosterPack (original)",
+   "header": "40-pin",
+   "pins_used": {},
+   "respects": "not read",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "not read",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "not for sale on TI.com",
+   "compatible": "not read",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Energia unmaintained since Dec 2019",
+   "complaints": [],
+   "sources": [
+    "https://energia.nu/pinmaps/",
+    "https://www.ti.com/tool/BOOSTXL-SENSORS"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-battpack",
+   "name": "Fuel Tank BoosterPack (original)",
+   "ti_part": "BOOSTXL-BATTPACK",
+   "maker": "TI",
+   "category": "obsolete or removed",
+   "year": "not read",
+   "status": "TI.com tool page returned 404 on 2026-10-18; Energia pin-map page lists it as NRND",
+   "function": "Fuel Tank BoosterPack (original)",
+   "header": "40-pin",
+   "pins_used": {},
+   "respects": "not read",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "not read",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "not for sale on TI.com",
+   "compatible": "not read",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Energia unmaintained since Dec 2019",
+   "complaints": [],
+   "sources": [
+    "https://energia.nu/pinmaps/",
+    "https://www.ti.com/tool/BOOSTXL-BATTPACK"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-uln2003",
+   "name": "Dual stepper motor BoosterPack",
+   "ti_part": "BOOSTXL-ULN2003",
+   "maker": "TI",
+   "category": "obsolete or removed",
+   "year": "not read",
+   "status": "TI.com tool page returned 404 on 2026-10-18; guide SLCU002 (Sep 2016) exists, tool page returns 404",
+   "function": "Dual stepper motor BoosterPack",
+   "header": "40-pin",
+   "pins_used": {},
+   "respects": "not read",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "not read",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "not for sale on TI.com",
+   "compatible": "not read",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Energia unmaintained since Dec 2019",
+   "complaints": [],
+   "sources": [
+    "https://energia.nu/pinmaps/",
+    "https://www.ti.com/tool/BOOSTXL-ULN2003"
+   ],
+   "confidence": "low",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "boostxl-rs485",
+   "name": "RS-485 BoosterPack",
+   "ti_part": "BOOSTXL-RS485 (no such page)",
+   "maker": "TI",
+   "category": "not found",
+   "year": "n/a",
+   "status": "no TI.com page found; the name in the brief does not exist as written",
+   "function": "n/a",
+   "header": "n/a",
+   "pins_used": {},
+   "respects": "n/a",
+   "violates": "n/a",
+   "stackable": "n/a",
+   "power": "n/a",
+   "current": "n/a",
+   "own_mcu": "n/a",
+   "size": "n/a",
+   "mounting": "n/a",
+   "price": "n/a",
+   "compatible": "n/a",
+   "checker": "n/a",
+   "software": "n/a",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/tool/BOOSTXL-RS485 (404, 2026-10-18)"
+   ],
+   "confidence": "high that the page is absent",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "iwrl6432boost",
+   "name": "IWRL6432BOOST (PROC117 Rev B, drawn by Mistral)",
+   "ti_part": "IWRL6432BOOST",
+   "maker": "TI with Mistral",
+   "category": "radar",
+   "year": "not read",
+   "status": "listed on TI.com, stock 20 (prior-art file)",
+   "function": "60 GHz radar, XDS110 on board",
+   "header": "two 2x10 headers J8, J9",
+   "pins_used": {
+    "UART": "3, 4",
+    "SPI": "7 CLK, 18 CS, 15 MOSI, 14 MISO",
+    "I2C": "9, 10",
+    "reset/SOP": "16 nRESET, 32 SOP1, 31 SOP0",
+    "other": "8 GPIO, 13 HOST_INTR, 27 PGOOD, 40 nERROR"
+   },
+   "respects": "UART, SPI, I2C, reset 16",
+   "violates": "Uses 18 for CS; SOP on 31 and 32",
+   "stackable": "yes (headers)",
+   "power": "Own: USB 5 V and barrel jack through TPS2116 priority mux, jack wins; LaunchPad rails joined only by DNP 0 ohm R87 and R132",
+   "current": "not read",
+   "own_mcu": "XDS110 (TM4C1294)",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$125.00 (our notes)",
+   "compatible": "LaunchPad kits via J8 and J9",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "mmWave SDK; Uniflash",
+   "complaints": [
+    {
+     "text": "Every flash needs a switch moved and two hand reset presses; moving the UART to the header takes it off USB"
+    }
+   ],
+   "sources": [
+    "SWRU596 pp.8, 12 to 18"
+   ],
+   "confidence": "reused from prior-art file",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    3,
+    4,
+    7,
+    8,
+    9,
+    10,
+    13,
+    14,
+    15,
+    16,
+    18,
+    27,
+    31,
+    32,
+    40
+   ]
+  },
+  {
+   "id": "bp-iwrl6432wmod",
+   "name": "BP-IWRL6432WMOD",
+   "ti_part": "BP-IWRL6432WMOD",
+   "maker": "TI",
+   "category": "radar",
+   "year": "2025 (SLVUDD2)",
+   "status": "listed, stock 111, $163.90 (TI.com page read 2026-10-18)",
+   "function": "IWRL6432W radar module on a BoosterPack",
+   "header": "40-pin (J14, J15)",
+   "pins_used": {
+    "SPI": "13 CS, 15 MOSI, 14 MISO, 7 CLK",
+    "UART": "3, 4",
+    "I2C": "9, 10",
+    "reset/SOP": "19 nRESET, 38 SOP1, 32 SOP0",
+    "other": "40 HOST_INTR, 39 presence"
+   },
+   "respects": "SPI CS on 13, UART, I2C",
+   "violates": "Reset on 19, not 16",
+   "stackable": "not read",
+   "power": "5 V from USB or DC jack (jack wins); LaunchPad 5 V only with jumper J22 closed; LaunchPad 3V3 only through J24",
+   "current": "current sensors on board",
+   "own_mcu": "Second USB with XDS110 for patch updates",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$163.90, stock 111 (TI.com, 2026-10-18)",
+   "compatible": "LaunchPad kits",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "mmWave L-SDK",
+   "complaints": [],
+   "sources": [
+    "https://www.ti.com/lit/ug/slvudd2/slvudd2.pdf"
+   ],
+   "confidence": "reused, pins by eye",
+   "read": "2026-10-18",
+   "pins_used_set": [
+    3,
+    4,
+    7,
+    9,
+    10,
+    13,
+    14,
+    15,
+    19,
+    32,
+    38,
+    39,
+    40
+   ]
+  },
+  {
+   "id": "click-boosterpack-2",
+   "name": "Click BoosterPack 2",
+   "ti_part": "n/a (third party)",
+   "maker": "MikroElektronika",
+   "category": "adapter (two mikroBUS sockets)",
+   "year": "not read",
+   "status": "$12.00, current listing",
+   "function": "adapter (two mikroBUS sockets)",
+   "header": "see notes",
+   "pins_used": {},
+   "respects": "adheres to the 40-pin standard; input 3.3 V or 5 V",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "none noted",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$12.00, current listing",
+   "compatible": "adheres to the 40-pin standard; input 3.3 V or 5 V",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Mikroe says 1,645 Click boards fit; listing says 'Compatibility: LaunchPad'",
+   "complaints": [],
+   "sources": [
+    "https://www.mikroe.com/click-booster-pack-2"
+   ],
+   "confidence": "medium (vendor page only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "grove-base-boosterpack",
+   "name": "Grove Base BoosterPack",
+   "ti_part": "n/a (third party)",
+   "maker": "Seeed Studio",
+   "category": "adapter (13 Grove ports: 5 analog, 5 digital, 3 serial)",
+   "year": "not read",
+   "status": "$4.30, in stock (Seeed, read 2026-10-18)",
+   "function": "adapter (13 Grove ports: 5 analog, 5 digital, 3 serial)",
+   "header": "see notes",
+   "pins_used": {},
+   "respects": "designed around the inner pins 21 to 40; a 20-pin LaunchPad needs jumper wires (Seeed wiki)",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "none noted",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$4.30, in stock (Seeed, read 2026-10-18)",
+   "compatible": "designed around the inner pins 21 to 40; a 20-pin LaunchPad needs jumper wires (Seeed wiki)",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Energia examples; Energia unmaintained since Dec 2019",
+   "complaints": [],
+   "sources": [
+    "https://www.seeedstudio.com/Grove-Base-BoosterPack-p-2177.html"
+   ],
+   "confidence": "medium (vendor page only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "43oh-bluepack",
+   "name": "The BluePack (43oh)",
+   "ti_part": "n/a (third party)",
+   "maker": "43oh via Seeed",
+   "category": "wireless (HC-05/06 Bluetooth)",
+   "year": "not read",
+   "status": "$4.00, discontinued, out of stock",
+   "function": "wireless (HC-05/06 Bluetooth)",
+   "header": "see notes",
+   "pins_used": {},
+   "respects": "20-pin MSP430 LaunchPad era",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "none noted",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$4.00, discontinued, out of stock",
+   "compatible": "20-pin MSP430 LaunchPad era",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "Energia",
+   "complaints": [],
+   "sources": [
+    "https://www.seeedstudio.com/The-BluePack-43oh-Bluetooth-Launchpad-Boosterpack-p-1400.html"
+   ],
+   "confidence": "medium (vendor page only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "43oh-smdprotopad",
+   "name": "The SMDProtopad (43oh)",
+   "ti_part": "n/a (third party)",
+   "maker": "43oh via Seeed",
+   "category": "prototyping board",
+   "year": "not read",
+   "status": "$5.00, discontinued, out of stock",
+   "function": "prototyping board",
+   "header": "see notes",
+   "pins_used": {},
+   "respects": "MSP430 LaunchPad",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "none noted",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$5.00, discontinued, out of stock",
+   "compatible": "MSP430 LaunchPad",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "n/a",
+   "complaints": [],
+   "sources": [
+    "https://www.seeedstudio.com/The-SMDProtopad-43oh-SMD-Prototyping-Launchpad-Boosterpack-p-1396.html"
+   ],
+   "confidence": "medium (vendor page only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "easy-booster",
+   "name": "Easy Booster (Tindie, Ivan Jajcevic)",
+   "ti_part": "n/a (third party)",
+   "maker": "Ivan Jajcevic",
+   "category": "adapter: BoosterPack to any board with jumper wires; also takes Click boards",
+   "year": "not read",
+   "status": "$13.00, seller on a break",
+   "function": "adapter: BoosterPack to any board with jumper wires; also takes Click boards",
+   "header": "see notes",
+   "pins_used": {},
+   "respects": "80 x 100 mm, two 2x10 male and two 2x10 female headers; made because some LaunchPad kits and BoosterPacks do not comply",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "none noted",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "$13.00, seller on a break",
+   "compatible": "80 x 100 mm, two 2x10 male and two 2x10 female headers; made because some LaunchPad kits and BoosterPacks do not comply",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "n/a",
+   "complaints": [],
+   "sources": [
+    "https://www.tindie.com/products/IvanJ/easy-booster/"
+   ],
+   "confidence": "medium (vendor page only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  },
+  {
+   "id": "terjeio-cnc-boosterpack",
+   "name": "CNC BoosterPack (terjeio)",
+   "ti_part": "n/a (third party)",
+   "maker": "terjeio (open source)",
+   "category": "motor driver (3-axis stepper, Pololu sockets)",
+   "year": "not read",
+   "status": "open design files, KiCad 5; bare boards for sale at cost (2018 repo, last push 2021)",
+   "function": "motor driver (3-axis stepper, Pololu sockets)",
+   "header": "see notes",
+   "pins_used": {},
+   "respects": "for MSP432, TM4C, MSP430F5529 with grblHAL drivers",
+   "violates": "not read",
+   "stackable": "not read",
+   "power": "not read",
+   "current": "not read",
+   "own_mcu": "none noted",
+   "size": "not read",
+   "mounting": "not read",
+   "price": "open design files, KiCad 5; bare boards for sale at cost (2018 repo, last push 2021)",
+   "compatible": "for MSP432, TM4C, MSP430F5529 with grblHAL drivers",
+   "checker": "BoosterPack Checker retired: dev.ti.com/bpchecker says 'The BoosterPack checker tool is no longer available' (read 2026-10-18)",
+   "software": "grblHAL drivers; design in KiCad 5",
+   "complaints": [],
+   "sources": [
+    "https://github.com/terjeio/CNC_Boosterpack"
+   ],
+   "confidence": "medium (vendor page only)",
+   "read": "2026-10-18",
+   "pins_used_set": []
+  }
+ ]
+}

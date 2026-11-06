@@ -1,0 +1,21 @@
+{
+ "api": "freertos",
+ "vendor": "FreeRTOS",
+ "detect": "xTaskCreate|vTaskDelay|FreeRTOS\\.h",
+ "symbol_re": "\\b(?:xTask[A-Za-z]+|vTask[A-Za-z]+|xQueue[A-Za-z]+|xSemaphore[A-Za-z]+)\\b",
+ "calls_only": true,
+ "entries": [
+  {
+   "match": "xTaskCreate\\w*",
+   "idiom": "rtos.task_create",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "vTaskDelay\\w*",
+   "idiom": "rtos.delay",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  }
+ ]
+}

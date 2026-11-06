@@ -1,0 +1,210 @@
+{
+ "schema_version": "1.0",
+ "generated": "2026-11-04",
+ "source": "data/questions.json",
+ "what_a_row_is": "one question the site answers: the question as typed, the files that hold the answer, what a correct answer contains, and whether a model is needed (tokens)",
+ "row_fields": [
+  "expect",
+  "files",
+  "id",
+  "kind",
+  "question",
+  "tokens"
+ ],
+ "rows": [
+  {
+   "id": "g3507-first-blink-time",
+   "kind": "number",
+   "tokens": "none",
+   "question": "How long did it take to get the LP-MSPM0G3507 LaunchPad from the USB cable to a blinking LED with an AI assistant driving CCStudio, and was the board a sealed box?",
+   "files": [
+    "data/results/mspm0g3507.csv",
+    "mspm0g3507/STOPWATCH.md",
+    "mspm0g3507/README.md"
+   ],
+   "expect": [
+    [
+     "149",
+     "2 min 29 s",
+     "2:29"
+    ],
+    [
+     "borrowed",
+     "not sealed",
+     "not a sealed"
+    ]
+   ]
+  },
+  {
+   "id": "l1306-led2-pin",
+   "kind": "fact",
+   "tokens": "none",
+   "question": "On the LP-MSPM0L1306 LaunchPad, which chip pin drives the red channel of LED2, the LED TI's gpio_toggle_output example blinks?",
+   "files": [
+    "mspm0l1306/AGENTS.md",
+    "mspm0l1306/FAQ.md",
+    "mspm0l1306/zephyr/README.md",
+    "mspm0l1306/README.md"
+   ],
+   "expect": [
+    [
+     "PA26"
+    ]
+   ]
+  },
+  {
+   "id": "f28p65x-coremark-ram",
+   "kind": "number",
+   "tokens": "none",
+   "question": "What CoreMark score did the LAUNCHXL-F28P65X reach with code running from RAM, and at what clock?",
+   "files": [
+    "data/results/f28p65x.csv",
+    "c2000-launchpad/README.md",
+    "c2000-launchpad/bench/coremark-f28p65x"
+   ],
+   "expect": [
+    [
+     "258.86",
+     "258.9"
+    ],
+    [
+     "200 MHz",
+     "200"
+    ]
+   ]
+  },
+  {
+   "id": "tda4-first-boot",
+   "kind": "number",
+   "tokens": "none",
+   "question": "How long did the SK-TDA4VM take to boot TI's Edge AI Linux on its first boot, from the first bootloader byte to the login prompt?",
+   "files": [
+    "data/results/tda4.csv",
+    "tda4/README.md",
+    "tda4/RESULTS-tda4.md"
+   ],
+   "expect": [
+    [
+     "27.7"
+    ]
+   ]
+  },
+  {
+   "id": "esp32c6-blink-time",
+   "kind": "number",
+   "tokens": "none",
+   "question": "How many seconds did the ESP32-C6-DevKitC-1 take from plugged in to a changed blink with ESP-IDF, on this bench?",
+   "files": [
+    "data/results/esp32c6.csv",
+    "esp32c6/README.md"
+   ],
+   "expect": [
+    [
+     "184"
+    ]
+   ]
+  },
+  {
+   "id": "cc2340r5-zephyr-blink",
+   "kind": "number",
+   "tokens": "none",
+   "question": "How long did the Zephyr blink take on the LP-EM-CC2340R5, from the first command to the program printing on serial?",
+   "files": [
+    "data/results/cc2340r5.csv",
+    "cc2340r5/zephyr/README.md",
+    "cc2340r5/README.md"
+   ],
+   "expect": [
+    [
+     "82"
+    ]
+   ]
+  },
+  {
+   "id": "frl-e002",
+   "kind": "fix",
+   "tokens": "none",
+   "question": "The Fox Red Labs start script stopped with FRL-E002 REFUSED: 2 probes on USB. What does it mean and what do I do?",
+   "files": [
+    "docs/frl-errors.md",
+    "mspm0l1306/FAQ.md",
+    "docs/frl.md"
+   ],
+   "expect": [
+    [
+     "more than one",
+     "two",
+     "2 probes",
+     "several"
+    ],
+    [
+     "--probe"
+    ]
+   ]
+  },
+  {
+   "id": "pico2-reload-no-button",
+   "kind": "fix",
+   "tokens": "none",
+   "question": "On a Raspberry Pi Pico 2, how do I load a new program with picotool without holding the BOOTSEL button, and what must the running program include for that to work?",
+   "files": [
+    "pico2/FAQ.md",
+    "pico2/README.md"
+   ],
+   "expect": [
+    [
+     "picotool"
+    ],
+    [
+     "-f"
+    ],
+    [
+     "pico_stdio_usb",
+     "reset interface",
+     "RESET_INTERFACE",
+     "USB stdio"
+    ]
+   ]
+  },
+  {
+   "id": "cc2340r5-dap",
+   "kind": "fix",
+   "tokens": "none",
+   "question": "UniFlash says Unable to access the DAP when flashing an LP-EM-CC2340R5. What were the causes on this bench and what fixed it?",
+   "files": [
+    "cc2340r5/FAQ.md"
+   ],
+   "expect": [
+    [
+     "SWD"
+    ],
+    [
+     "ccxml",
+     "connection file"
+    ]
+   ]
+  },
+  {
+   "id": "l1306-coremark-per-mhz",
+   "kind": "number",
+   "tokens": "none",
+   "question": "What is the LP-MSPM0L1306's CoreMark per MHz with TI Arm Clang at -O3, bare metal, and how was the number checked?",
+   "files": [
+    "data/results/mspm0l1306.csv",
+    "mspm0l1306/bench/RESULTS-mspm0l1306.md",
+    "mspm0l1306/README.md"
+   ],
+   "expect": [
+    [
+     "2.446",
+     "2.45"
+    ],
+    [
+     "crc",
+     "CRC",
+     "EEMBC"
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+--- SDK/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/freertos/ticlang/makefile	2026-08-26 10:48:45
++++ ble_occ_8k/freertos/ticlang/makefile	2026-10-11 16:15:06
+@@ -20,7 +20,7 @@
+   V :=
+ endif
+ 
+-OBJECTS = app_app_main.obj app_app_menu.obj app_Profiles_app_dev_info.obj common_Services_dev_info_dev_info_service.obj common_BLEAppUtil_bleapputil_task.obj common_BLEAppUtil_bleapputil_init.obj common_BLEAppUtil_bleapputil_process.obj common_BLEAppUtil_bleapputil_stack_callbacks.obj common_BLEAppUtil_bleapputil_timers.obj common_Startup_osal_icall_ble.obj common_Startup_rom_init.obj common_lib_opt_ctrl_opt_rssi_monitor.obj common_lib_opt_ctrl_opt_connection_handover.obj common_lib_opt_ctrl_opt_dmm.obj common_lib_opt_ctrl_opt_dmm_dynamic_priority.obj common_lib_opt_ctrl_opt_ts_periodic.obj common_lib_opt_ctrl_opt_cm.obj common_lib_opt_ctrl_opt_health_check.obj common_lib_opt_ctrl_opt_ble_health.obj common_lib_opt_ctrl_opt_padv.obj common_lib_opt_ctrl_opt_pscan.obj common_lib_opt_ctrl_opt_pawr_scan.obj common_lib_opt_ctrl_opt_pawr_advertiser.obj common_lib_opt_ctrl_opt_cs.obj common_lib_opt_ctrl_opt_cs_test.obj common_lib_opt_ctrl_opt_initiator.obj common_lib_opt_ctrl_opt_connectable.obj common_lib_opt_ctrl_opt_scanner.obj common_lib_opt_ctrl_opt_power_control.obj common_lib_opt_ctrl_opt_adv_conn.obj common_lib_opt_ctrl_opt_adv_nconn.obj common_lib_opt_ctrl_opt_ae.obj common_lib_opt_ctrl_opt_adaptivity.obj common_lib_opt_ctrl_opt_past_sender.obj common_lib_opt_ctrl_opt_past_receiver.obj common_lib_opt_ctrl_opt_vendor_specific_cmd.obj common_lib_opt_ctrl_opt_ext_vendor_specific_cmd.obj common_lib_opt_ctrl_opt_coex.obj common_lib_opt_ctrl_opt_legacy_cmd.obj common_lib_opt_host_opt_gap_bond_mgr.obj common_lib_opt_host_opt_gap_pawr_scan.obj common_lib_opt_host_opt_gap_pawr_adv.obj common_lib_opt_host_opt_gap_past_receiver.obj common_lib_opt_host_opt_gap_past_sender.obj common_Drivers_NV_crc.obj common_Drivers_NV_nvocmp.obj common_iCall_icall.obj common_iCall_icall_user_config.obj common_config_ble_user_config.obj common_config_hci_supported_cmd.obj app_app_broadcaster.obj app_app_peripheral.obj app_app_observer.obj app_app_central.obj app_app_connection.obj app_app_pairing.obj app_app_data.obj app_app_time_sync.obj app_app_padv_time_sync.obj app_Profiles_app_oad.obj common_Services_oad_oad_service.obj common_Services_oad_oad_reset_service.obj common_Profiles_oad_ms_oad_profile.obj app_app_ms_oad_peripheral.obj app_app_ms_oad_pairing.obj common_Profiles_oad_oad_profile.obj common_Util_SwUpdate_sw_update.obj common_Util_SwUpdate_flash_interface_oad.obj common_Util_util.obj HealthToolkit_debugInfo.obj HealthToolkit_ble_sys_stat.obj common_MenuModule_menu_module.obj app_Profiles_app_simple_gatt.obj common_Profiles_simple_gatt_simple_gatt_profile.obj app_app_l2cap_coc.obj common_iCall_icall_POSIX.obj common_Startup_main_freertos.obj $(patsubst %.c,%.obj,$(notdir $(SYSCFG_C_FILES)))
++OBJECTS = app_occ_task.obj app_app_main.obj app_app_menu.obj app_Profiles_app_dev_info.obj common_Services_dev_info_dev_info_service.obj common_BLEAppUtil_bleapputil_task.obj common_BLEAppUtil_bleapputil_init.obj common_BLEAppUtil_bleapputil_process.obj common_BLEAppUtil_bleapputil_stack_callbacks.obj common_BLEAppUtil_bleapputil_timers.obj common_Startup_osal_icall_ble.obj common_Startup_rom_init.obj common_lib_opt_ctrl_opt_rssi_monitor.obj common_lib_opt_ctrl_opt_connection_handover.obj common_lib_opt_ctrl_opt_dmm.obj common_lib_opt_ctrl_opt_dmm_dynamic_priority.obj common_lib_opt_ctrl_opt_ts_periodic.obj common_lib_opt_ctrl_opt_cm.obj common_lib_opt_ctrl_opt_health_check.obj common_lib_opt_ctrl_opt_ble_health.obj common_lib_opt_ctrl_opt_padv.obj common_lib_opt_ctrl_opt_pscan.obj common_lib_opt_ctrl_opt_pawr_scan.obj common_lib_opt_ctrl_opt_pawr_advertiser.obj common_lib_opt_ctrl_opt_cs.obj common_lib_opt_ctrl_opt_cs_test.obj common_lib_opt_ctrl_opt_initiator.obj common_lib_opt_ctrl_opt_connectable.obj common_lib_opt_ctrl_opt_scanner.obj common_lib_opt_ctrl_opt_power_control.obj common_lib_opt_ctrl_opt_adv_conn.obj common_lib_opt_ctrl_opt_adv_nconn.obj common_lib_opt_ctrl_opt_ae.obj common_lib_opt_ctrl_opt_adaptivity.obj common_lib_opt_ctrl_opt_past_sender.obj common_lib_opt_ctrl_opt_past_receiver.obj common_lib_opt_ctrl_opt_vendor_specific_cmd.obj common_lib_opt_ctrl_opt_ext_vendor_specific_cmd.obj common_lib_opt_ctrl_opt_coex.obj common_lib_opt_ctrl_opt_legacy_cmd.obj common_lib_opt_host_opt_gap_bond_mgr.obj common_lib_opt_host_opt_gap_pawr_scan.obj common_lib_opt_host_opt_gap_pawr_adv.obj common_lib_opt_host_opt_gap_past_receiver.obj common_lib_opt_host_opt_gap_past_sender.obj common_Drivers_NV_crc.obj common_Drivers_NV_nvocmp.obj common_iCall_icall.obj common_iCall_icall_user_config.obj common_config_ble_user_config.obj common_config_hci_supported_cmd.obj app_app_broadcaster.obj app_app_peripheral.obj app_app_observer.obj app_app_central.obj app_app_connection.obj app_app_pairing.obj app_app_data.obj app_app_time_sync.obj app_app_padv_time_sync.obj app_Profiles_app_oad.obj common_Services_oad_oad_service.obj common_Services_oad_oad_reset_service.obj common_Profiles_oad_ms_oad_profile.obj app_app_ms_oad_peripheral.obj app_app_ms_oad_pairing.obj common_Profiles_oad_oad_profile.obj common_Util_SwUpdate_sw_update.obj common_Util_SwUpdate_flash_interface_oad.obj common_Util_util.obj HealthToolkit_debugInfo.obj HealthToolkit_ble_sys_stat.obj common_MenuModule_menu_module.obj app_Profiles_app_simple_gatt.obj common_Profiles_simple_gatt_simple_gatt_profile.obj app_app_l2cap_coc.obj common_iCall_icall_POSIX.obj common_Startup_main_freertos.obj $(patsubst %.c,%.obj,$(notdir $(SYSCFG_C_FILES)))
+ 
+ NAME = basic_ble
+ 
+@@ -83,6 +83,7 @@
+     -Wl,--rom_model \
+     -Wl,--warn_sections \
+     "-L$(TICLANG_ARMCOMPILER)/lib" \
++    -l$(FRL_OCC)/occ_cnn_8k/model.a \
+     -llibc.a
+ 
+ all: postbuild
+@@ -125,6 +126,11 @@
+ endef
+ 
+ $(foreach c_file,$(SYSCFG_C_FILES),$(eval $(call C_RULE,$(c_file))))
++
++FRL_OCC ?= ../../../../../mspm0g3507/mcu-bench/edgeai/uci-room-occupancy
++app_occ_task.obj: ../../app/occ_task.c $(SYSCFG_H_FILES) prebuild
++	@ echo Building $@
++	$(V) $(CC) $(CFLAGS) -I$(FRL_OCC) -c $< -o $@
+ 
+ app_app_main.obj: ../../app/app_main.c $(SYSCFG_H_FILES) prebuild
+ 	@ echo Building $@

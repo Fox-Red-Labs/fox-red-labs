@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="A Bluetooth LE game controller: radio arcs rise from its centre while buttons 1 and 2 light in turn">
+<style>
+  .b1 { animation: b1 6s infinite; }
+  .b2 { animation: b2 6s infinite; }
+  .arc { animation: arc 1.5s infinite; opacity: .15; }
+  .a2 { animation-delay: .25s; } .a3 { animation-delay: .5s; }
+  @keyframes b1 { 0%,8%{fill:#F7F3EC} 10%,24%{fill:#B42418} 26%,58%{fill:#F7F3EC} 60%,74%{fill:#B42418} 76%,100%{fill:#F7F3EC} }
+  @keyframes b2 { 0%,33%{fill:#F7F3EC} 35%,49%{fill:#B42418} 51%,58%{fill:#F7F3EC} 60%,74%{fill:#B42418} 76%,100%{fill:#F7F3EC} }
+  @keyframes arc { 0%{opacity:.15} 40%{opacity:1} 100%{opacity:.15} }
+  @media (prefers-reduced-motion: reduce) { .b1,.b2,.arc { animation: none; opacity: 1; } }
+</style>
+<rect width="600" height="260" fill="#F4EFE9"/>
+<g transform="translate(0,-9)">
+<g fill="none" stroke="#B42418" stroke-width="5" stroke-linecap="round">
+  <path class="arc a1" d="M282 98 a26 26 0 0 1 36 0"/>
+  <path class="arc a2" d="M268 80 a46 46 0 0 1 64 0"/>
+  <path class="arc a3" d="M254 62 a66 66 0 0 1 92 0"/>
+</g>
+<path d="M220 110 h160 a46 46 0 0 1 44 32 l20 70 a28 28 0 0 1 -50 24 l-24 -30 h-140 l-24 30 a28 28 0 0 1 -50 -24 l20 -70 a46 46 0 0 1 44 -32 z" fill="#161312"/>
+<rect x="216" y="152" width="12" height="40" rx="2" fill="#6B625B"/>
+<rect x="202" y="166" width="40" height="12" rx="2" fill="#6B625B"/>
+<rect x="268" y="140" width="64" height="44" rx="3" fill="#2A2421" stroke="#6B625B"/>
+<text x="300" y="168" fill="#F4EFE9" font-size="17" font-weight="700" text-anchor="middle">BLE</text>
+<circle class="b1" cx="360" cy="176" r="13" fill="#F7F3EC"/>
+<circle class="b2" cx="390" cy="152" r="13" fill="#F7F3EC"/>
+<text x="360" y="180" font-size="11" text-anchor="middle" fill="#161312" font-weight="700">1</text>
+<text x="390" y="156" font-size="11" text-anchor="middle" fill="#161312" font-weight="700">2</text>
+</g>
+</svg>

@@ -1,0 +1,10 @@
+# Line endings for scripts: stored and checked out with LF on every OS, so a clone on Windows still
+# runs its bash and Python (a CRLF shebang fails with "bad interpreter"); Windows command files keep CRLF.
+# No "* text=auto" rule: some upstream copies in third-party/ and ports/ are committed with CRLF and
+# their checksums in SOURCE.md must not change.
+*.sh    text eol=lf
+*.bash  text eol=lf
+*.py    text eol=lf
+*.ps1   text eol=crlf
+*.cmd   text eol=crlf
+*.bat   text eol=crlf

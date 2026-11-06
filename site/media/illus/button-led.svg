@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="The setup for Light an LED with a button: Button, then GPIO, then LP-MSPM0G3507, then LED">
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="20" y="103" width="150" height="54" rx="10" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="95.0" y="131" text-anchor="middle" font-size="20" font-weight="500" fill="#161312">Button</text>
+<rect x="430" y="103" width="150" height="54" rx="10" fill="#B42418" stroke="#B42418" stroke-width="2"/>
+<text x="505.0" y="131" text-anchor="middle" font-size="20" font-weight="600" fill="#F7F3EC">LP-MSPM0G3507</text>
+<line x1="174" y1="130" x2="420" y2="130" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M414 124 L424 130 L414 136" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="300.0" y="118" text-anchor="middle" font-size="17" fill="#6B625B">GPIO</text>
+<text x="588" y="250" text-anchor="end" font-size="12" fill="#6B625B">drawing of the setup</text>
+</svg>

@@ -1,0 +1,491 @@
+--- a/doomgeneric/doomgeneric.c
++++ b/doomgeneric/doomgeneric.c
+@@ -18,7 +18,9 @@
+ 
+ 	M_FindResponseFile();
+ 
++#ifndef FOX_DIRECT
+ 	DG_ScreenBuffer = malloc(DOOMGENERIC_RESX * DOOMGENERIC_RESY * 4);
++#endif
+ 
+ 	DG_Init();
+ 
+--- a/doomgeneric/doomgeneric.h
++++ b/doomgeneric/doomgeneric.h
+@@ -42,6 +42,11 @@
+ int DG_GetKey(int* pressed, unsigned char* key);
+ void DG_SetWindowTitle(const char * title);
+ 
++#ifdef FOX_DIRECT
++// Direct mode: no output buffer in the engine. The platform reads the 320x200 8-bit frame and the 256-entry RGB palette.
++void DG_DrawFrame8(const uint8_t *index320x200, const uint8_t *rgb256x3);
++#endif
++
+ #ifdef __cplusplus
+ }
+ #endif
+--- a/doomgeneric/f_wipe.c
++++ b/doomgeneric/f_wipe.c
+@@ -234,6 +234,9 @@
+   int	width,
+   int	height )
+ {
++#ifdef FOX_NOWIPE
++    return 0;   /* Fox Red Labs: no screen melt, saves two 64,000-byte copies of the frame plus 64,000 for the melt */
++#endif
+     wipe_scr_start = Z_Malloc(SCREENWIDTH * SCREENHEIGHT, PU_STATIC, NULL);
+     I_ReadScreen(wipe_scr_start);
+     return 0;
+@@ -246,6 +249,9 @@
+   int	width,
+   int	height )
+ {
++#ifdef FOX_NOWIPE
++    return 0;
++#endif
+     wipe_scr_end = Z_Malloc(SCREENWIDTH * SCREENHEIGHT, PU_STATIC, NULL);
+     I_ReadScreen(wipe_scr_end);
+     V_DrawBlock(x, y, width, height, wipe_scr_start); // restore start scr.
+@@ -261,6 +267,9 @@
+   int	height,
+   int	ticks )
+ {
++#ifdef FOX_NOWIPE
++    return 1;
++#endif
+     int rc;
+     static int (*wipes[])(int, int, int) =
+     {
+--- a/doomgeneric/g_game.c
++++ b/doomgeneric/g_game.c
+@@ -1809,6 +1809,7 @@
+     else
+ 	respawnmonsters = false;
+ 
++#ifndef FOX_CONST_TABLES   /* the state and object tables are const in flash: Nightmare and -fast do not speed monsters up */
+     if (fastparm || (skill == sk_nightmare && gameskill != sk_nightmare) )
+     {
+ 	for (i=S_SARG_RUN1 ; i<=S_SARG_PAIN2 ; i++)
+@@ -1825,6 +1826,7 @@
+ 	mobjinfo[MT_HEADSHOT].speed = 10*FRACUNIT;
+ 	mobjinfo[MT_TROOPSHOT].speed = 10*FRACUNIT;
+     }
++#endif
+ 
+     // force players to be initialized upon first level load
+     for (i=0 ; i<MAXPLAYERS ; i++)
+--- a/doomgeneric/i_system.c
++++ b/doomgeneric/i_system.c
+@@ -142,6 +142,25 @@
+     // Specify the heap size, in MiB (default 16).
+     //
+ 
++#ifdef FOX_ZONE_STATIC
++    /* Fox Red Labs: the zone is a fixed array in RAM (size set at build time) */
++    {
++        static byte fox_zone[FOX_ZONE_STATIC] __attribute__((aligned(8)));
++        *size = FOX_ZONE_STATIC;
++        printf("zone memory: static %d bytes\n", *size);
++        return fox_zone;
++    }
++#else
++    p = M_CheckParmWithArgs("-zkb", 1);   /* Fox Red Labs: zone size in KiB */
++    if (p > 0)
++    {
++        *size = atoi(myargv[p+1]) * 1024;
++        zonemem = malloc(*size);
++        if (zonemem == NULL) I_Error("Unable to allocate %d KiB for zone", *size / 1024);
++        printf("zone memory: %p, %x allocated for zone\n", zonemem, *size);
++        return zonemem;
++    }
++#endif
+     p = M_CheckParmWithArgs("-mb", 1);
+ 
+     if (p > 0)
+--- a/doomgeneric/i_video.c
++++ b/doomgeneric/i_video.c
+@@ -85,6 +85,9 @@
+ #else  // CMAP256
+ 
+ static struct color colors[256];
++#ifdef FOX_DIRECT
++unsigned char fox_palette[768];
++#endif
+ 
+ 
+ #endif  // CMAP256
+@@ -320,6 +323,10 @@
+ 
+ void I_FinishUpdate (void)
+ {
++#ifdef FOX_DIRECT
++    DG_DrawFrame8(I_VideoBuffer, fox_palette);
++    return;
++#endif
+     int y;
+     int x_offset, y_offset, x_offset_end;
+     unsigned char *line_in, *line_out;
+@@ -410,6 +417,9 @@
+         colors[i].r = gammatable[usegamma][*palette++];
+         colors[i].g = gammatable[usegamma][*palette++];
+         colors[i].b = gammatable[usegamma][*palette++];
++#ifdef FOX_DIRECT
++        fox_palette[i*3] = colors[i].r; fox_palette[i*3+1] = colors[i].g; fox_palette[i*3+2] = colors[i].b;
++#endif
+     }
+ 
+ #ifdef CMAP256
+--- a/doomgeneric/info.c
++++ b/doomgeneric/info.c
+@@ -124,7 +124,7 @@
+ void A_BrainExplode();
+ 
+ 
+-state_t	states[NUMSTATES] = {
++FOX_CONST state_t	states[NUMSTATES] = {
+     {SPR_TROO,0,-1,{NULL},S_NULL,0,0},	// S_NULL
+     {SPR_SHTG,4,0,{A_Light0},S_NULL,0,0},	// S_LIGHTDONE
+     {SPR_PUNG,0,1,{A_WeaponReady},S_PUNCH,0,0},	// S_PUNCH
+@@ -1095,7 +1095,7 @@
+ };
+ 
+ 
+-mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
++FOX_CONST mobjinfo_t mobjinfo[NUMMOBJTYPES] = {
+ 
+     {		// MT_PLAYER
+ 	-1,		// doomednum
+--- a/doomgeneric/info.h
++++ b/doomgeneric/info.h
+@@ -1153,7 +1153,12 @@
+     int misc2;
+ } state_t;
+ 
+-extern state_t	states[NUMSTATES];
++#ifdef FOX_CONST_TABLES
++#define FOX_CONST const
++#else
++#define FOX_CONST
++#endif
++extern FOX_CONST state_t	states[NUMSTATES];
+ extern char *sprnames[];
+ 
+ typedef enum {
+@@ -1326,6 +1331,6 @@
+ 
+ } mobjinfo_t;
+ 
+-extern mobjinfo_t mobjinfo[NUMMOBJTYPES];
++extern FOX_CONST mobjinfo_t mobjinfo[NUMMOBJTYPES];
+ 
+ #endif
+--- a/doomgeneric/m_misc.c
++++ b/doomgeneric/m_misc.c
+@@ -67,6 +67,10 @@
+ {
+     FILE *fstream;
+ 
++#ifdef FOX_WAD_MEM
++    return strcmp(filename, "doom1.wad") == 0;
++#endif
++
+     fstream = fopen(filename, "r");
+ 
+     if (fstream != NULL)
+--- a/doomgeneric/net_defs.h
++++ b/doomgeneric/net_defs.h
+@@ -42,7 +42,10 @@
+ 
+ // Networking and tick handling related.
+ 
+-#define BACKUPTICS 128
++#ifndef FOX_BACKUPTICS
++#define FOX_BACKUPTICS 128
++#endif
++#define BACKUPTICS FOX_BACKUPTICS
+ 
+ typedef struct _net_module_s net_module_t;
+ typedef struct _net_packet_s net_packet_t;
+--- a/doomgeneric/r_defs.h
++++ b/doomgeneric/r_defs.h
+@@ -48,7 +48,10 @@
+ #define SIL_TOP			2
+ #define SIL_BOTH		3
+ 
+-#define MAXDRAWSEGS		256
++#ifndef FOX_MAXDRAWSEGS
++#define FOX_MAXDRAWSEGS 256
++#endif
++#define MAXDRAWSEGS		FOX_MAXDRAWSEGS
+ 
+ 
+ 
+--- a/doomgeneric/r_plane.c
++++ b/doomgeneric/r_plane.c
+@@ -42,14 +42,20 @@
+ //
+ 
+ // Here comes the obnoxious "visplane".
+-#define MAXVISPLANES	128
++#ifndef FOX_MAXVISPLANES
++#define FOX_MAXVISPLANES 128
++#endif
++#define MAXVISPLANES	FOX_MAXVISPLANES
+ visplane_t		visplanes[MAXVISPLANES];
+ visplane_t*		lastvisplane;
+ visplane_t*		floorplane;
+ visplane_t*		ceilingplane;
+ 
+ // ?
+-#define MAXOPENINGS	SCREENWIDTH*64
++#ifndef FOX_MAXOPENINGS
++#define FOX_MAXOPENINGS (SCREENWIDTH*64)
++#endif
++#define MAXOPENINGS	FOX_MAXOPENINGS
+ short			openings[MAXOPENINGS];
+ short*			lastopening;
+ 
+--- a/doomgeneric/r_things.c
++++ b/doomgeneric/r_things.c
+@@ -317,6 +317,30 @@
+ //
+ vissprite_t	overflowsprite;
+ 
++#ifdef FOX_ZSTATS
++extern visplane_t visplanes[], *lastvisplane;
++extern short openings[];
++#ifndef FOX_MAXVISPLANES
++#define FOX_MAXVISPLANES 128
++#endif
++#ifndef FOX_MAXOPENINGS
++#define FOX_MAXOPENINGS (SCREENWIDTH*64)
++#endif
++static long fox_mx_vp, fox_mx_open, fox_mx_ds, fox_mx_spr;
++void fox_limits_print(void)
++{
++    printf("LIMITS visplanes=%ld/%d openings=%ld/%d drawsegs=%ld/%d vissprites=%ld/%d\n", fox_mx_vp, FOX_MAXVISPLANES, fox_mx_open, FOX_MAXOPENINGS, fox_mx_ds, MAXDRAWSEGS, fox_mx_spr, MAXVISSPRITES);
++}
++void fox_note_limits(void)
++{
++    long v = lastvisplane - visplanes, o = lastopening - openings, d = ds_p - drawsegs, s = vissprite_p - vissprites;
++    if (v > fox_mx_vp) fox_mx_vp = v;
++    if (o > fox_mx_open) fox_mx_open = o;
++    if (d > fox_mx_ds) fox_mx_ds = d;
++    if (s > fox_mx_spr) fox_mx_spr = s;
++}
++#endif
++
+ vissprite_t* R_NewVisSprite (void)
+ {
+     if (vissprite_p == &vissprites[MAXVISSPRITES])
+@@ -950,6 +974,10 @@
+ //
+ void R_DrawMasked (void)
+ {
++#ifdef FOX_ZSTATS
++    fox_note_limits();
++#endif
++
+     vissprite_t*	spr;
+     drawseg_t*		ds;
+ 	
+--- a/doomgeneric/r_things.h
++++ b/doomgeneric/r_things.h
+@@ -22,7 +22,10 @@
+ 
+ 
+ 
+-#define MAXVISSPRITES  	128
++#ifndef FOX_MAXVISSPRITES
++#define FOX_MAXVISSPRITES 128
++#endif
++#define MAXVISSPRITES  	FOX_MAXVISSPRITES
+ 
+ extern vissprite_t	vissprites[MAXVISSPRITES];
+ extern vissprite_t*	vissprite_p;
+--- a/doomgeneric/w_file.c
++++ b/doomgeneric/w_file.c
+@@ -50,10 +50,18 @@
+     &stdc_wad_file,
+ };
+ 
++#ifdef FOX_WAD_MEM
++extern wad_file_class_t fox_wad_file;
++#endif
++
+ wad_file_t *W_OpenFile(char *path)
+ {
+     wad_file_t *result;
+     int i;
++
++#ifdef FOX_WAD_MEM
++    return fox_wad_file.OpenFile(path);   /* Fox Red Labs: the WAD is in QSPI flash, not in a file system */
++#endif
+ 
+     //!
+     // Use the OS's virtual memory subsystem to map WAD files
+--- a/doomgeneric/w_file_stdc.c
++++ b/doomgeneric/w_file_stdc.c
+@@ -18,6 +18,9 @@
+ 
+ #include <stdio.h>
+ 
++#ifdef FOX_MMAP_WAD
++#include <sys/mman.h>
++#endif
+ #include "m_misc.h"
+ #include "w_file.h"
+ #include "z_zone.h"
+@@ -48,6 +51,13 @@
+     result->wad.file_class = &stdc_wad_file;
+     result->wad.mapped = NULL;
+     result->wad.length = M_FileLength(fstream);
++#ifdef FOX_MMAP_WAD
++    /* Host stand-in for a WAD sitting in memory-mapped flash: lumps are used in place, never copied into the zone. */
++    {
++        void *m = mmap(NULL, result->wad.length, PROT_READ, MAP_PRIVATE, fileno(fstream), 0);
++        if (m != MAP_FAILED) result->wad.mapped = m;
++    }
++#endif
+     result->fstream = fstream;
+ 
+     return &result->wad;
+--- a/doomgeneric/w_wad.c
++++ b/doomgeneric/w_wad.c
+@@ -89,7 +89,13 @@
+     lumpinfo_t *newlumpinfo;
+     unsigned int i;
+ 
++#ifdef FOX_ZONE_STATIC
++    /* Fox Red Labs: the heap is a few KB on the target; the directory goes in the zone. */
++    newlumpinfo = Z_Malloc(newnumlumps * sizeof(lumpinfo_t), PU_STATIC, NULL);
++    memset(newlumpinfo, 0, newnumlumps * sizeof(lumpinfo_t));
++#else
+     newlumpinfo = calloc(newnumlumps, sizeof(lumpinfo_t));
++#endif
+ 
+     if (newlumpinfo == NULL)
+     {
+@@ -118,7 +124,11 @@
+     }
+ 
+     // All done.
++#ifdef FOX_ZONE_STATIC
++    if (lumpinfo != NULL) Z_Free(lumpinfo);
++#else
+     free(lumpinfo);
++#endif
+     lumpinfo = newlumpinfo;
+     numlumps = newnumlumps;
+ }
+@@ -411,6 +421,9 @@
+     }
+     else
+     {
++#if defined(FOX_ZSTATS) && defined(FOX_ZLOG)
++        if (tag < PU_PURGELEVEL) printf("ZLUMP %.8s size=%d tag=%d\n", lump->name, lump->size, tag);
++#endif
+         // Not yet loaded, so load it now
+ 
+         lump->cache = Z_Malloc(W_LumpLength(lumpnum), tag, &lump->cache);
+--- a/doomgeneric/z_zone.c
++++ b/doomgeneric/z_zone.c
+@@ -41,6 +41,10 @@
+     int			size;	// including the header and possibly tiny fragments
+     void**		user;
+     int			tag;	// PU_FREE if this is free
++#ifdef FOX_ZSTATS
++    int			req;	// bytes asked for (instrumentation)
++    void		*site;	// who asked (instrumentation)
++#endif
+     int			id;	// should be ZONEID
+     struct memblock_s*	next;
+     struct memblock_s*	prev;
+@@ -174,6 +178,63 @@
+ 
+ 
+ 
++#ifdef FOX_ZSTATS
++// Zone high-water marks as a 32-bit target would see them: each used block costs
++// its request rounded up to 4 bytes plus a 24-byte header (six 4-byte fields).
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++static long fox_hw_all, fox_hw_static, fox_hw_blocks, fox_calls, fox_hw_req_all;
++static int fox_registered;
++#ifdef FOX_HOST
++static int fox_zlog;   /* set ZSTATS_LOG=1 on the host to print every large static allocation */
++#else
++#define fox_zlog 0
++#endif
++static long fox_peak_tag[128], fox_peak_tag_n[128];
++static void *fox_peak_site[256]; static long fox_peak_site_sum[256], fox_peak_site_n[256]; static int fox_peak_nsite;
++void fox_limits_print(void);
++static void fox_zstats_report(void)
++{
++    fox_limits_print();
++    printf("ZSTATS calls=%ld peak_all_bytes=%ld peak_nonpurgeable_bytes=%ld peak_blocks=%ld (each used block = request rounded up to 4 plus a 24-byte header; request sizes are those of this build, so only a 32-bit build gives the board numbers)\n",
++           fox_calls, fox_hw_all, fox_hw_static, fox_hw_blocks);
++    { int i; for (i = 0; i < fox_peak_nsite; i++) printf("ZSITE ra=%p blocks=%ld bytes=%ld\n", fox_peak_site[i], fox_peak_site_n[i], fox_peak_site_sum[i]); }
++    { int t; for (t = 0; t < 128; t++) if (fox_peak_tag_n[t]) printf("ZSTATS_AT_PEAK_NONPURGEABLE tag=%d blocks=%ld bytes=%ld\n", t, fox_peak_tag_n[t], fox_peak_tag[t]); }
++}
++static void fox_zstats_update(void)
++{
++    memblock_t *b; long all = 0, st = 0, n = 0; long tg[128] = {0}, tn[128] = {0};
++    if (!fox_registered) { atexit(fox_zstats_report); fox_registered = 1;
++#ifdef FOX_HOST
++        fox_zlog = getenv("ZSTATS_LOG") != NULL;
++#endif
++    }
++    fox_calls++;
++    for (b = mainzone->blocklist.next; b != &mainzone->blocklist; b = b->next)
++    {
++        long c;
++        if (b->tag == PU_FREE) continue;
++        c = ((b->req + 3) & ~3) + 24;
++        all += c; n++;
++        if (b->tag < PU_PURGELEVEL) { st += c; tg[b->tag] += c; tn[b->tag]++; }
++    }
++    if (all > fox_hw_all) fox_hw_all = all;
++    if (st > fox_hw_static) {
++        int i, ns = 0; void *sites[256]; long sums[256], ns_n[256];
++        for (b = mainzone->blocklist.next; b != &mainzone->blocklist; b = b->next)
++        {
++            if (b->tag == PU_FREE || b->tag >= PU_PURGELEVEL) continue;
++            for (i = 0; i < ns; i++) if (sites[i] == b->site) break;
++            if (i == ns) { if (ns == 256) continue; sites[ns] = b->site; sums[ns] = 0; ns_n[ns] = 0; ns++; }
++            sums[i] += ((b->req + 3) & ~3) + 24; ns_n[i]++;
++        }
++        memcpy(fox_peak_site, sites, sizeof(void *) * ns); memcpy(fox_peak_site_sum, sums, sizeof(long) * ns); memcpy(fox_peak_site_n, ns_n, sizeof(long) * ns); fox_peak_nsite = ns;
++        fox_hw_static = st; memcpy(fox_peak_tag, tg, sizeof tg); memcpy(fox_peak_tag_n, tn, sizeof tn); }
++    if (n > fox_hw_blocks) fox_hw_blocks = n;
++}
++#endif
++
+ //
+ // Z_Malloc
+ // You can pass a NULL user if the tag is < PU_PURGELEVEL.
+@@ -194,6 +255,9 @@
+     memblock_t*	base;
+     void *result;
+ 
++#ifdef FOX_ZSTATS
++    int reqsize = size;
++#endif
+     size = (size + MEM_ALIGN - 1) & ~(MEM_ALIGN - 1);
+     
+     // scan through the block list,
+@@ -285,7 +349,12 @@
+     mainzone->rover = base->next;	
+ 	
+     base->id = ZONEID;
+-    
++#ifdef FOX_ZSTATS
++    base->req = reqsize;
++    base->site = __builtin_return_address(0);
++    if (reqsize >= 2048 && tag < PU_PURGELEVEL && fox_zlog) printf("ZALLOC size=%d tag=%d off=%ld\n", reqsize, tag, (long)((char*)__builtin_return_address(0) - (char*)Z_Malloc));
++    fox_zstats_update();
++#endif
+     return result;
+ }
+ 

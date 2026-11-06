@@ -1,0 +1,27 @@
+{
+  // Fox Red Labs: the frl commands as VS Code tasks (Terminal > Run Task). Each runs the same tool as the
+  // terminal lines on the board pages; tools/frl/README.md explains each step. On Windows the "windows" lines use py.
+  "version": "2.0.0",
+  "options": { "cwd": "${workspaceFolder}" },
+  "tasks": [
+    { "label": "frl: list probes on USB", "type": "process", "command": "python3", "windows": { "command": "py" },
+      "args": ["tools/frl/frl.py", "detect"], "problemMatcher": [] },
+    { "label": "frl: check the tools a board needs", "type": "process", "command": "python3", "windows": { "command": "py" },
+      "args": ["tools/frl/frl.py", "doctor", "--board", "${input:board}"], "problemMatcher": [] },
+    { "label": "frl: back up the board's flash", "type": "process", "command": "python3", "windows": { "command": "py" },
+      "args": ["tools/frl/frl.py", "backup", "--board", "${input:board}", "--probe", "${input:probe}"], "problemMatcher": [] },
+    { "label": "frl: build, flash and check a blink pattern", "type": "process", "command": "python3", "windows": { "command": "py" },
+      "args": ["tools/frl/frl.py", "run", "--board", "${input:board}", "--pattern", "${input:pattern}", "--probe", "${input:probe}"], "problemMatcher": [] },
+    { "label": "frl: write a built image", "type": "process", "command": "python3", "windows": { "command": "py" },
+      "args": ["tools/frl/frl.py", "flash", "--board", "${input:board}", "--image", "${input:image}", "--probe", "${input:probe}"], "problemMatcher": [] },
+    { "label": "frl: put a backup back", "type": "process", "command": "python3", "windows": { "command": "py" },
+      "args": ["tools/frl/frl.py", "restore", "${input:backup}", "--probe", "${input:probe}"], "problemMatcher": [] }
+  ],
+  "inputs": [
+    { "id": "board", "type": "promptString", "description": "Board id (frl writes to mspm0l1306 so far)", "default": "mspm0l1306" },
+    { "id": "probe", "type": "promptString", "description": "Probe serial, from \"frl: list probes on USB\"" },
+    { "id": "pattern", "type": "promptString", "description": "On, off, on, off ... in milliseconds", "default": "150,150,150,900" },
+    { "id": "image", "type": "promptString", "description": "Image file, for example prebuilt/mspm0l1306/thermometer/firmware.out" },
+    { "id": "backup", "type": "promptString", "description": "Backup folder that frl backup printed" }
+  ]
+}

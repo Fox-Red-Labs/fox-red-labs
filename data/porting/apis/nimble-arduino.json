@@ -1,0 +1,128 @@
+{
+ "api": "nimble-arduino",
+ "vendor": "NimBLE-Arduino",
+ "detect": "NimBLE\\w+",
+ "symbol_re": "\\bNimBLE[A-Za-z]+(?:::[A-Za-z]+)?",
+ "calls_only": false,
+ "methods": [
+  "setValue",
+  "notify",
+  "getValue",
+  "createService",
+  "createCharacteristic",
+  "createDescriptor",
+  "getInputReport",
+  "getOutputReport",
+  "setReportMap",
+  "setHidInfo",
+  "startServices",
+  "getHidService",
+  "getAdvertising",
+  "addServiceUUID",
+  "setAppearance",
+  "advertiseOnDisconnect",
+  "enableScanResponse",
+  "setScanResponseData",
+  "onStarted",
+  "setManufacturer",
+  "setPnp",
+  "setSerialNumber",
+  "setModelNumber",
+  "setHardwareRevision",
+  "setFirmwareRevision",
+  "setSoftwareRevision",
+  "setBatteryLevel",
+  "setCallbacks",
+  "getPeerInfo",
+  "getConnHandle",
+  "subscriberCount",
+  "disconnect",
+  "getConnectedCount",
+  "isConnected",
+  "getPeerDevices",
+  "isEncrypted",
+  "isBonded",
+  "updateConnParams"
+ ],
+ "note": "Instance method calls (pServer->createCharacteristic) are counted only when the method name is in this list; a method not listed is invisible, not reported as missing.",
+ "entries": [
+  {
+   "match": "NimBLEDevice(::(init|deinit|setPower|getPower|setDefaultPhy|setMTU|setDeviceName))?",
+   "idiom": "ble.stack_init",
+   "note": "setPower and setDefaultPhy are radio settings: TX power and PHY",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "NimBLEDevice::(createServer|getServer)|NimBLEServer",
+   "idiom": "ble.gatt_server",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "NimBLEService|NimBLECharacteristic|NimBLEDescriptor|NimBLEUUID|NimBLEAttValue|\\.createService|\\.createCharacteristic|\\.createDescriptor",
+   "idiom": "ble.gatt_characteristic",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "NimBLEHIDDevice|\\.getInputReport|\\.getOutputReport|\\.setReportMap|\\.setHidInfo|\\.startServices|\\.getHidService",
+   "idiom": "ble.hid_service",
+   "note": "TI ships no HID over GATT service for its Bluetooth LE SDKs; the table is written by hand",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "\\.setValue|\\.notify|\\.getValue",
+   "idiom": "ble.hid_report_notify",
+   "note": "setValue plus notify on the input report characteristic",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "NimBLEAdvertising|\\.getAdvertising|\\.addServiceUUID|\\.setAppearance|\\.advertiseOnDisconnect|\\.enableScanResponse|\\.setScanResponseData|\\.onStarted",
+   "idiom": "ble.advertise",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "\\.setManufacturer|\\.setPnp|\\.setSerialNumber|\\.setModelNumber|\\.setHardwareRevision|\\.setFirmwareRevision|\\.setSoftwareRevision",
+   "idiom": "ble.device_info",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "\\.setBatteryLevel",
+   "idiom": "ble.battery_service",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "NimBLEServerCallbacks|NimBLECharacteristicCallbacks|NimBLEConnInfo|\\.setCallbacks|\\.getPeerInfo|\\.getConnHandle|\\.subscriberCount|\\.disconnect|\\.getConnectedCount|\\.isConnected|\\.getPeerDevices",
+   "idiom": "ble.conn_callbacks",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "NimBLEDevice::(setSecurityAuth|deleteBond|deleteAllBonds)|\\.isEncrypted|\\.isBonded",
+   "idiom": "ble.security_bonding",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "\\.updateConnParams",
+   "idiom": "ble.conn_params",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "NimBLELog|NimBLEUtils",
+   "idiom": "console.print",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "NimBLEAddress",
+   "idiom": "ble.conn_callbacks",
+   "note": "the peer address a connection callback receives",
+   "from": "port esp32-ble-gamepad source"
+  }
+ ]
+}

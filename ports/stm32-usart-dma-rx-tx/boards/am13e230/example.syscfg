@@ -1,0 +1,46 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+const uart   = scripting.addModule("/drivers/uart", {}, false);
+const uart1  = uart.addInstance();
+const dma    = scripting.addModule("/drivers/dma");
+const dma1   = dma.addInstance();
+const dma2   = dma.addInstance();
+const sysctl = scripting.addModule("/drivers/sysctl", {}, false);
+
+uart1.$name                    = "UART_0";
+uart1.enableFIFO               = true;
+uart1.targetBaudRate           = 115200;
+uart1.rxFifoThreshold          = "DL_UART_RX_FIFO_LEVEL_1_2_FULL";
+uart1.txFifoThreshold          = "DL_UART_TX_FIFO_LEVEL_1_2_EMPTY";
+uart1.peripheral.$assign       = "UC4";
+uart1.peripheral.rxPin.$assign = "PA1";
+uart1.peripheral.txPin.$assign = "PA0";
+
+dma.registerIntDMA0 = true;
+
+dma1.$name                 = "DMA_RX";
+dma1.chanInstName          = "DMA0_CH0";
+dma1.enableInterrupt       = true;
+dma1.triggerSelectInternal = 1;
+dma1.addressMode           = "f2b";
+dma1.configureTransferSize = true;
+dma1.transferSize          = 64;
+dma1.transferMode          = "FULL_CH_REPEAT_SINGLE";
+dma1.triggerSelect         = "DL_DMA_TRIGGER_SOURCE_UC4_RX";
+
+dma2.$name                 = "DMA_TX";
+dma2.chanInstName          = "DMA0_CH1";
+dma2.enableInterrupt       = true;
+dma2.triggerSelectInternal = 1;
+dma2.addressMode           = "b2f";
+dma2.transferMode          = "SINGLE";
+dma2.triggerSelect         = "DL_DMA_TRIGGER_SOURCE_UC4_TX";
+
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+sysctl.peripheral.$suggestSolution       = "SYSCTL";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";

@@ -1,0 +1,26 @@
+if SOC_SERIES_AM26X
+
+config KERNEL_ENTRY
+	default "_vector_table"
+
+config NUM_IRQS
+	default 256
+
+# no Zephyr driver for the AM263P's RTI timers yet: first boot runs with no system clock
+config SYS_CLOCK_EXISTS
+	default n
+
+if SERIAL
+config UART_NS16550
+	default y
+config UART_NS16550_TI_K3
+	default y
+choice UART_NS16550_VARIANT
+	default UART_NS16550_VARIANT_NS16750
+endchoice
+endif
+
+config BUILD_OUTPUT_BIN
+	default n
+
+endif

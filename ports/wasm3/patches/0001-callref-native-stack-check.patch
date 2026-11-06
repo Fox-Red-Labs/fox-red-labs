@@ -1,0 +1,11 @@
+--- m3_exec.h
++++ m3_exec.h
+@@ -593,6 +593,8 @@
+ // reference the validator only knows as $t, and null has to trap.
+ d_m3Op  (CallRef)
+ {
++    d_m3CheckNativeStack ();
++
+     IM3Function function        = slot (IM3Function);
+     IM3FuncType type            = immediate (IM3FuncType);
+     i32 stackOffset             = immediate (i32);

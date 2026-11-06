@@ -1,0 +1,246 @@
+# Fox Red Labs: border-router
+
+Every reader page concatenated, for AI assistants. 3 files. Each starts with a line giving its path and heading. Links inside keep the paths they have in the repo.
+
+==============================================================================
+FILE: border-router/README.md | Can a CC35X1 and a CC2755P10 or CC1354P10 make a Thread border router with no Linux?
+==============================================================================
+
+# Can a CC35X1 and a CC2755P10 or CC1354P10 make a Thread border router with no Linux?
+
+The host half works: a CC1354P10 running OpenThread with a CC2340R5 as its radio over three wires formed a Thread network and became leader (2026-10-07). The Wi-Fi half (M2 on) has not run. Goal: Thread devices reach the home network and the internet through a border router made of two TI chips and no Linux computer. A Wi-Fi chip runs OpenThread as the host, with border routing; a Thread chip is its radio.
+
+```text
+ Thread devices  ~~802.15.4~~  [ RCP: CC2755P10 or CC1354P10 ]  --UART (spinel)--  [ Host: CC35X1, Cortex-M33 ]  ~~Wi-Fi 6~~  home router  --  internet
+                                 TI ot-rcp image                                    OpenThread core + border routing
+                                                                                     + lwIP (IPv6) on the Wi-Fi netif
+```
+
+What this is not: a Linux border router (OpenThread's `ot-br-posix` on a Raspberry Pi with a TI RCP: the documented path, already half proven in `cc1354p10/thread/`), and not a single chip (no TI part has both Wi-Fi and an 802.15.4 radio).
+
+Terms: [docs/vocab.md](../docs/vocab.md). **RCP** is a radio co-processor: the chip does the radio, the host does the Thread logic. **Spinel** is OpenThread's host-to-radio protocol. **Border router** joins a Thread network to the home network. Public sources only: TI's public SDKs and `ot-ti`, OpenThread (BSD-3), Espressif's open-source border router (Apache-2.0) as a reference design. No TI internal material.
+
+## What is here, and what is not
+
+In this folder: `host/` and `host-cc1354/` (the host-side build and notes), `rcp-cc2340r5-hostpins.syscfg`, `WIRING.md` (every wire between the two chips, both ends), `img/`. Not here: TI's SDKs, the OpenThread and ot-ti sources (you fetch the pinned versions the README names), built images, and the raw join logs, which print the test network's name and keys; the numbers they gave are in this page. This is a plan with milestones, not a finished product: the milestones table says which have run. Take it alone with `git sparse-checkout add border-router cc1354p10 board-to-board tools data` (the Thread demo it builds on is in `cc1354p10/thread/`).
+
+## What is already proven (2026-10-06)
+
+Sizes: 1 kB = 1,024 bytes.
+
+**The wiring for M1 is in place and tested** (it also survived flashing and restoring the radio board twice on 2026-10-06 while wired; with the wired pins left unconfigured the host saw only harmless input glitches): see [`WIRING.md`](WIRING.md) and the picture below. The check drove each wire from one chip and read it on the other through the two debuggers (no reflash), with a wire-less control pin as the negative control.
+
+![Thread border router test: host board to radio board, 3 wires](img/m1-wiring.png)
+
+| Piece | Status | Where |
+|---|---|---|
+| TI RCP on the CC1354P10, driven by an OpenThread host over spinel at 921600 baud | **Works** (Mac host formed a network and became leader) | `cc1354p10/thread/README.md` |
+| TI RCP on the **CC2340R5** (the border router's radio) driven by an OpenThread host, joining a CC1354 leader over the air | **Works**: router on the mesh, pings 42 to 44 ms median, 20 of 20 | `board-to-board/thread-two-radios-2026-10-06/` |
+| OpenThread full Thread device on the CC1354P10 | **Works** (leader of its own network) | same |
+| **The host side on a TI MCU (M1)**: OpenThread on the CC1354P10 with the CC2340R5 as its RCP over the three wires; the image that ran uses 456.7 kB of flash (code plus initialized data) and 125.9 kB of RAM with console logging compiled in; leader in 16 s on a fresh dataset and 37 to 39 s after a restart | **Works** (2026-10-07) | `host-cc1354/README.md` |
+| CC35xx SDK has what a host needs | **Checked by reading the SDK** (Wi-Fi SDK 10.20.00.39): Cortex-M33 application core, 512 kB of application RAM in the default linker file, FreeRTOS, lwIP with IPv6, neighbor discovery and autoconfiguration on in the Wi-Fi port (`lwip-port/osi/include/lwipopts.h`), mbedTLS, UART and SPI drivers | `/Applications/ti/simplelink_wifi_sdk_10_20_00_39` |
+| CC2755P10 as RCP | Not run as an RCP here; TI's `ot-ti` release notes list RCP for it | `ot-ti/docs/ti-openthread-release-notes.md` |
+
+## M0 result (2026-10-06): the host builds for the Cortex-M33 and fits on paper
+
+OpenThread (commit `c9c19aa`, the one TI's `ot-ti` pins, so host and RCP speak the same spinel version) built for the Cortex-M33 with hard float (the CC35xx's flags: `-mcpu=cortex-m33 -mfloat-abi=hard -mfpu=fpv5-sp-d16`), GCC 12.2, with border routing, SRP server, DNS-SD server, OpenThread's own mDNS, NAT64 (border routing and translator), border agent, network-data publisher, the CLI, and the host side of the radio link (`openthread-radio-spinel`, `openthread-hdlc`). Project config: `host/openthread-core-cc35xx-config.h`; build command in `host/build.sh`.
+
+A trial link of a small program that starts all of these (dead code removed, platform functions not written left unresolved) gives **276 kB of code and 145 kB of RAM** (`text` and `bss` of the linked program). The CC35X1's default linker file gives the application 512 kB of RAM. Not included: the radio-over-spinel glue and the CC35xx platform layer (tens of kB), and Wi-Fi plus lwIP, which share the same RAM. RAM with Wi-Fi running is the number M2 has to settle.
+
+Build traps found: OpenThread renamed `OPENTHREAD_CONFIG_PLATFORM_RADIO_SPINEL_RX_FRAME_BUFFER_SIZE` to `OPENTHREAD_LIB_SPINEL_RX_FRAME_BUFFER_SIZE`; SRP needs `TMF_NETDATA_SERVICE`, `ECDSA` and `DETERMINISTIC_ECDSA` switched on too; and the generated `openthread-mbedtls-config.h` is made once from the project config and not regenerated when the config changes (delete it, or start a fresh build folder, after editing the config).
+
+## The work, in milestones
+
+Each milestone ends in something measured on the bench.
+
+| # | Milestone | Needs | Proof |
+|---|---|---|---|
+| M0 | **Done (compile and size)**: OpenThread host (core + radio spinel + border routing) compiles for the CC35xx's Cortex-M33 with the Wi-Fi SDK's FreeRTOS and lwIP; platform layer stubbed where hardware is needed | Nothing new | Links; size against the 512 kB budget |
+| M1 | **Done (2026-10-07)**: the CC1354P10 runs OpenThread as a full Thread device with the CC2340R5 as its radio over the wired UART, forms a network and becomes leader (16 s on a fresh dataset, 37 to 39 s after a restart; 61 frames sent, no errors). `host-cc1354/README.md` | Wired and proven 2026-10-06 (`tools/wirecheck.sh`) | `state` = leader, from the host board: **seen**, EUI64 is the CC2340R5's |
+| M2 | Wi-Fi up on the same image; OpenThread's infrastructure interface (`otPlatInfraIf`) on lwIP's Wi-Fi netif; router advertisements for the Thread prefix on the home Wi-Fi | M1 | Mac on the home Wi-Fi sees the Thread route (`netstat -rn -f inet6`) |
+| M3 | A second Thread device (CC2755P10, or the CC1354P10 as FTD with the CC2755P10 as RCP) joins; ping it from the Mac over Wi-Fi; then SRP and mDNS so it is discoverable | M2, second Thread board | `ping6` from the Mac, round trip recorded |
+| M4 | NAT64 so Thread devices reach the IPv4 internet; Matter-over-Thread commissioning through this border router | M3 | Matter device added in Home Assistant |
+
+## How it is ported
+
+OpenThread's border routing lives in its core (`src/core/border_router`) and is platform independent. A host needs:
+
+1. **Radio over spinel**: OpenThread's `RadioSpinel` and HDLC framing over a UART, as on Linux but on FreeRTOS. Espressif runs the same code on an ESP32-S3 (`esp-idf` `components/openthread`).
+2. **Platform layer**: alarms, entropy (the CC35xx has a TRNG), settings in flash, logging, the task loop.
+3. **Infrastructure interface**: `otPlatInfraIf*` (send and receive ICMPv6 router and neighbor messages on the Wi-Fi netif), plus moving IPv6 packets between the Thread netif and lwIP. Espressif's port does this on lwIP; it is the model to follow.
+4. **mDNS and SRP server, NAT64**: OpenThread has these in its core for embedded border routers; they need the lwIP glue above.
+
+Risks to check early: whether the CC35xx application core can open raw IPv6 sockets or hooks on the Wi-Fi netif through the SDK's lwIP port (M2); RAM once Wi-Fi, lwIP and OpenThread run together (M0 gives the first number); the UART speed the CC35xx and RCP agree on (921600 in TI's RCP).
+
+==============================================================================
+FILE: border-router/WIRING.md | How do you wire a LP-CC1354P10-1 host to a LP-EM-CC2340R5 radio for the Thread border router test (M1)?
+==============================================================================
+
+# How do you wire a LP-CC1354P10-1 host to a LP-EM-CC2340R5 radio for the Thread border router test (M1)?
+
+Three jumper wires: host UART1 TX (DIO23) to radio DIO12, host RX (DIO22) from radio DIO18, and ground. Terms: [docs/vocab.md](../docs/vocab.md). **RCP** is a radio co-processor. **DIO** is a chip's numbered I/O pin.
+
+![Thread border router test: host board to radio board, 3 wires](img/m1-wiring.png)
+
+Drawn over TI's own top-down board drawings (quick start guides SPRUIZ8 for the CC1354P10 and SWRU588 for the CC2340R5, page 2, rendered at 600 dpi; TI's annotation arrows masked near the headers). All 40 header pin positions on each drawing were checked with a numbered overlay before any wire was placed. Pin numbers, DIO names and header geometry come from TI's board `.syscfg.json` files. One caveat: TI's drawing is the LP-EM-CC1354P10-1 (no onboard probe); the LP-CC1354P10-1 has an XDS110 section, so the header is the same but the board outline differs. Wired 2026-10-06 and **verified from the chips**: a script that drives each pin from one chip and reads it on the other through the two debuggers (`tools/wirecheck.sh`) drove DIO23 high and low on the host and read it on the radio's DIO12, then DIO18 on the radio read on the host's DIO22, four transitions each, all matched; a wire-less control pin (DIO24 on both) did not move. Both programs were halted during the test and resumed after.
+
+Host: LP-CC1354P10-1 (stands in for the CC35X1 until it arrives). Radio (RCP): LP-EM-CC2340R5. Three jumper wires. No level shifter: both boards run 3.3 V I/O.
+
+Pin numbers below are the BoosterPack header pins, read from TI's own board files (`LP_EM_CC2340R5.syscfg.json`, `LP_EM_CC1354P10_1.syscfg.json`) and the CC2340R5 pin-mux table in SysConfig 1.26.3. Each board keeps its own XDS110 debugger UART untouched, so the Mac can still see both consoles.
+
+```text
+            LP-CC1354P10-1  (HOST)                          LP-EM-CC2340R5  (RCP)
+            BoosterPack header                              BoosterPack header
+
+   pin 2   DIO23  UART1 TX  o---------------------------->o  pin 14  DIO12  UART0 RX
+   pin 5   DIO22  UART1 RX  o<----------------------------o  pin 7   DIO18  UART0 TX
+   pin 20  GND              o-----------------------------o  pin 22  GND  (pin 20 is GND too)
+
+   pin 3   DIO12  (XDS110 UART RX, leave alone)              pin 3   DIO22  (XDS110 UART RX, leave alone)
+   pin 4   DIO13  (XDS110 UART TX, leave alone)              pin 4   DIO20  (XDS110 UART TX, leave alone)
+```
+
+TX on one board goes to RX on the other, and GND to GND. That is all.
+
+## Finding the pins on the boards
+
+From TI's board files (`dimensions.columns`, identical for both LaunchPad development kits): the 40-pin BoosterPack header is four columns of 10. Pin 1 is the outer-left pin nearest the USB end. Pins 1 to 10 run down the outer left column and 21 to 30 down the inner left column; on the right side, 40 down to 31 is the inner column and 20 down to 11 the outer. Every pin is silkscreened with its DIO name on these LP-EM boards, so match the name rather than counting.
+
+- CC1354P10 host: DIO23 (pin 2) and DIO22 (pin 5) in the outer left column near the USB end; GND is pin 20, top of the outer right column.
+- CC2340R5 radio: DIO12 (pin 14) and DIO18 (pin 7) in the outer right and outer left columns; GND pin 22, top of the inner left column (pin 20, top of the outer right column, is also GND).
+
+Photograph each board after wiring and before power, so you can compare it with the picture above.
+
+## Why these pins
+
+- The XDS110 debugger of each LaunchPad development kit is hard-wired to the pins the SDK calls `XDS110UART` (CC2340R5: DIO20 TX, DIO22 RX; CC1354P10: DIO13 TX, DIO12 RX). TI's RCP image and every TI example use those by default. Tying the two boards together on them would put three drivers on one wire. So both UARTs move to free header pins.
+- The CC2340R5's UART0 is not fully muxable. From the SysConfig pin-mux table, UART0 TX can land on DIO4, DIO6, DIO13, DIO17, DIO18 or DIO20, and UART0 RX on DIO12, DIO15, DIO16, DIO20 or DIO22. DIO18 and DIO12 are both free on the header and are not debugger pins.
+- The CC1354P10 (CC13x4) muxes any UART onto any DIO. UART1 on DIO23/DIO22 keeps UART0 for the debugger console.
+
+## Settings that match the wiring
+
+RCP (`ot-ti`, in `src/cc23xx_cc27xx/openthread.syscfg`, the `UART` instance): replace the `$hardware = XDS110UART` line with explicit pins, the same `$assign` form ot-ti already uses for its log UART:
+
+```text
+UART.uart.txPin.$assign = "boosterpack.7";    /* DIO18 */
+UART.uart.rxPin.$assign = "boosterpack.14";   /* DIO12 */
+```
+
+Host (CC1354P10, this repo's `border-router/host` project): a second `UART2` instance on UART1 with `txPin.$assign = "boosterpack.2"` (DIO23) and `rxPin.$assign = "boosterpack.5"` (DIO22), at 921600 baud to match TI's RCP (`ot-ti/src/uart.c`). The RCP image with these pins is built: `rcp-cc2340r5-hostpins.syscfg` in this folder is the full SysConfig file (drop it over `ot-ti/src/cc23xx_cc27xx/openthread.syscfg` and run `./script/build LP_EM_CC2340R5`); the generated `ti_drivers_config.h` reads `CONFIG_GPIO_UART2_0_TX 18` and `CONFIG_GPIO_UART2_0_RX 12`, matching the diagram. The host side is in [host-cc1354](host-cc1354/README.md).
+
+## Speed check before Thread
+
+At 921600 baud on 20 cm jumper wires: fine. TI's own release note (TIOP-1438) says sleepy devices "may not function properly" at 921600 on the CC1354/CC2674; that is about SSED timing on the device, not the RCP link, and the RCP link runs at 921600 by TI's default. If the spinel link shows CRC errors, drop both ends to 460800 first.
+
+==============================================================================
+FILE: border-router/host-cc1354/README.md | Can a TI LP-CC1354P10-1 run a Thread border router's host side, with a LP-EM-CC2340R5 as its radio and no Linux?
+==============================================================================
+
+# Can a TI LP-CC1354P10-1 run a Thread border router's host side, with a LP-EM-CC2340R5 as its radio and no Linux?
+
+Yes, the first half. On 2026-10-07 the CC1354P10 ran OpenThread as a full Thread device whose radio was the CC2340R5 (TI's `ot-rcp` image) on a UART wired between the two LaunchPad development kits, formed a Thread network and became leader within 16 s of `thread start` on a fresh dataset, then again in 37 to 39 s after each of three `thread stop` and `thread start` restarts. 61 frames sent, every error counter 0, still leader after a 60 s soak. No Linux, no Raspberry Pi: two TI chips and three jumper wires. It then joined a home Thread network through an Apple TV border router, and an hour of pings from a Mac on Wi-Fi came back 3,584 of 3,600 (0.44% loss, median 28.5 ms). This is milestone M1 of [the border-router plan](../README.md); Wi-Fi and the routing between the two networks come next.
+
+Terms: RCP (radio co-processor), spinel, HDLC, FTD and leader are defined in [docs/vocab.md](../../docs/vocab.md). CCFG is the chip's boot configuration area; EUI64 is a radio's 64-bit factory address; CCStudio is TI's Code Composer Studio IDE and DSLite its command-line flasher. Sizes: 1 kB = 1,024 bytes. Where builders get stuck on this board: [docs/ways-in.md](../../docs/ways-in.md).
+
+## What ran
+
+| Board | Image | Role |
+|---|---|---|
+| LP-CC1354P10-1 (CC1354P10, Cortex-M33, 1 MB flash, 256 kB RAM). SysConfig and the build call this board `LP_EM_CC1354P10_1`: same header and pins, the LP-CC1354P10-1 adds the onboard XDS110 debugger | `otbr-host-cc1354.out`, built here | Host: OpenThread full Thread device with the CLI on the debugger UART. Its own 802.15.4 radio is not used. |
+| LP-EM-CC2340R5 (CC2340R5, 36 kB RAM) | TI `ot-rcp` from `ot-ti` thread-v1.4-ti-2.1, UART moved to the header pins, CCFG CRCs filled | Radio: receives spinel commands over HDLC at 921600 baud and runs the 802.15.4 radio |
+
+Wiring: three wires, [../WIRING.md](../WIRING.md) (host DIO23 to radio DIO12, radio DIO18 to host DIO22, ground to ground). The RCP image is built from `ot-ti` with the SysConfig file in [../rcp-cc2340r5-hostpins.syscfg](../rcp-cc2340r5-hostpins.syscfg) as WIRING.md describes, then its CCFG CRC fields are filled with upstream Zephyr's `soc/ti/simplelink/cc23x0/ti_ccfg_crc32_calculate.py` (see [cc2340r5/thread/README.md](../../cc2340r5/thread/README.md)). Built images are not in this repo; build them as described.
+
+Proof that the radio is the other chip: the host reports EUI64 `a02c0020082c0020`, the CC2340R5's address. The CC1354P10's own address starts with TI's `00:12:4B` prefix, so the two cannot be confused.
+
+## Results (measured 2026-10-07)
+
+| What | Number | Basis |
+|---|---|---|
+| Host image with console logging compiled in (the image that ran) | 437.8 kB of code and constants, 125.9 kB of RAM (18.9 kB initialized plus 107.0 kB zeroed) | `size` output |
+| Host image with logging left out | 407.5 kB of code, 117.9 kB of RAM | build output 2026-10-07; not saved |
+| `thread start` to leader, fresh dataset | leader at the first check, 16 s after `thread start` (one check, so the true time is anywhere up to 16 s) | console timestamps: start at 8.8 s, `leader` at 24.9 s |
+| `thread start` to leader after `thread stop`, three runs | 37.1, 39.4, 37.2 s; each poll of `state` takes about 1.6 s, so the true times are up to 1.6 s shorter | bench script run |
+| MAC counters after the three runs | TxTotal 61, RxTotal 3, every error counter 0 | bench script run |
+| Soak | still leader 60 s later | bench script run |
+
+Why a restart takes 37 s and the first form 16 s: **Unknown**. Suspected: after `thread stop` the device still holds a network it was leader of, and OpenThread tries to re-attach to that network before deciding to lead it again; on a fresh dataset there is nothing to look for. Not checked: the same stop-and-start on this board with TI's own `ot-cli-ftd` and the on-chip radio, which would separate the stack's behavior from the UART link. For scale, that image formed a fresh network (not a restart) in about 8 s with its on-chip radio, against this page's 16 s polled figure ([board-to-board/thread-two-radios-2026-10-06](../../board-to-board/thread-two-radios-2026-10-06/README.md)).
+
+Not measured: a second Thread device joining this network (the only other radio on the bench is the one being used as the RCP), latency across the UART link, and current. Those come with the CC2755P10 and the next milestones.
+
+## It joined a home Thread network, and a Mac reached it through the Apple TV (2026-10-07)
+
+With the Apple TV's Thread network dataset (read from Home Assistant after the iPhone app synced Apple's credentials), the host joined the home Thread network (its name is kept out of this repo) on channel 25 through the CC2340R5 radio, in six runs: `child` 3.5 to 4.7 s after `thread start`, promoted to `router` within a minute in three of them; parent the Apple border router (link quality 2 in, 1 to 2 out). The home's network data arrived: on-mesh prefix `fd7c:3830:129e::/64`, a default route and a NAT64 prefix via the Apple TV, SRP and DNS services.
+
+Measured from this Mac on the home Wi-Fi, after a route to the Thread prefix was added by hand (macOS does not install the route the Apple TV advertises; `sudo route add -inet6 fd7c:3830:129e::/64 <Apple TV link-local>%en0`):
+
+| What | Number | Basis |
+|---|---|---|
+| Mac to host, through the Apple TV, 10 pings at 0.5 s | 10 of 10, 20.5 / 50.9 / 142.0 ms min / avg / max | ping output |
+| Mac to host, 30 pings at 0.3 s | 30 of 30, 19.4 / 32.1 / 98.9 ms | ping output |
+| Service the host registered with SRP (`frl-cc1354`, `_frl._udp`, port 12345), seen from the Mac | `dns-sd -B` lists it; `dns-sd -L` resolves it to `frl-cc1354-host.local.:12345` via the Apple TV's advertising proxy | `dns-sd` output |
+| Host to Mac (the Mac's global address), 10 pings | 0 of 10 | host console |
+| Host to its parent's mesh address, 5 pings | 1 of 5 (60 ms) | host console |
+| Host to the Apple TV's Wi-Fi address and to 8.8.8.8 through NAT64 | 0 of 5, 0 of 3 | host console |
+| Task stack high-water mark after all of this | 4.7 kB used of 32 kB (7,026 of 8,192 stack words still free) | host console |
+
+Pings into the host work; pings out of it reach the mesh but not the Wi-Fi side. The 2026-10-08 battery below settles where it stops: the host's pings to its Apple TV parent on the mesh answered 60 of 60, its pings to this Mac 0 of 60. So the host's radio path works both ways, and what fails is a packet from the Thread mesh out to Wi-Fi, in that direction only, while the same hop carries the Mac's pings in and their replies back out. It is not this repo's code: TI's own `ot-cli-ftd` on the CC1354P10's on-chip radio, joined to the same network on 2026-10-08, shows the same pattern (to its Apple TV parent 10 of 10, 21 ms; to this Mac 0 of 30; Mac to board 30 of 30, 29 ms average; saved ping output), and the Mac's firewall is off (`socketfilterfw`: disabled, stealth mode off). Cause: **Unknown (suspected: Third-party behavior, the Apple border router not forwarding echo requests that start on the mesh towards Wi-Fi)**. Not checked: a different border router (Home Assistant's own, once the ZBT-2 carries Thread), and other traffic than ICMP from the mesh out.
+
+The 16 kB stack fault (item 6 below) is gone with 32 kB. A second fault of the same class (`CFSR 0x00100000`) happened twice, on 2026-10-07 and 2026-10-08, both inside `vsnprintf` during a console command in the first seconds after joining, with the stack pointer at the stack base while the high-water mark says only 4.7 kB of 32 kB was ever used, which a slow fill cannot produce. Cause: **Unknown (suspected: a corrupted stack pointer rather than a deep stack)**. The image now dumps every return address on the stack when it faults; it ran the two hours of the battery below without faulting, so there is no backtrace.
+
+## Two hours on the home network (measured 2026-10-08)
+
+The host joined the Apple TV's network as a child and ran an unattended test script, with nothing on the bench touched.
+
+| What | Number | Basis |
+|---|---|---|
+| Rejoin after `thread stop` / `thread start`, dataset already held | child in 3.7, 3.4 and 3.7 s (polled about every 0.3 s) | test log |
+| **One hour of pings from the Mac through the Apple TV, 1 per second** | **3,584 of 3,600 answered (0.44% loss); median 28.5 ms, 95th percentile 70.9 ms, 99th 110.7 ms, min 18.8, max 197.7** | ping output |
+| Host's MAC counters across the hour | 3,787 frames sent, 9,007 received, every error and retry counter 0; still a child at every 10-minute check | test log |
+| Task stack across the hour | 4.7 kB used of 32 kB, unchanged at every check | test log |
+| UDP from the Mac to the host, 200 datagrams at 20 per second | 32 B: 200 of 200; 128 B: 200 of 200; 512 B: 149 of 200; 1 kB: 78 of 200 (about 57 kbit/s delivered) | test summary |
+| Pings out of the host, two sets of 3 rounds of 10 | to its parent on the mesh: 60 of 60, 26 and 29 ms average; to this Mac: 0 of 60 | test log |
+
+The UDP drop above 128 bytes is what the link allows, not a fault: a 512 or 1,024 byte datagram is split into 5 or 9 radio frames, and 20 of them a second is more than a Thread link carries (802.15.4 runs at 250 kbit/s on air before any overhead). Not measured: the delivered rate at a send rate the link can sustain, which is the throughput number worth quoting.
+
+Rows in `data/results/cc1354p10.csv`: `packet_loss_1h` 0.44%, `b2b_rtt` to the Mac 28.5 ms median, `radio_join` 3.4 to 3.7 s on restart and 3.5 to 4.7 s on a fresh join.
+
+## How it is built
+
+`./build.sh <build dir>` configures and builds in about 4 minutes on this Intel MacBook, macOS 15.7.9 (watched, not timed). It needs TI's OpenThread port `ot-ti` (release thread-v1.4-ti-2.1, commit `eaac0de`, with its OpenThread submodule at `c9c19aa`) in `~/ot-ti`, GCC 12.2 (Zephyr SDK), CMake 3.31, ninja, SysConfig 1.26.3 and the CC13xx/CC26xx SDK 8.33.00.16, set up as in [cc2340r5/thread/README.md](../../cc2340r5/thread/README.md).
+
+The build is `ot-ti`'s own platform for the CC1354P10 with one part swapped. Line counts are `wc -l`, blank lines included:
+
+| Piece | From | Lines here |
+|---|---|---|
+| Alarm, settings in flash, entropy, console UART, process loop (`alarm.c`, `settings.c`, `entropy.c`, `uart.c`, `system.c`) | `ot-ti/src`, unchanged, by path | 0 |
+| On-chip radio (`radio.c`, `diag.c`) | left out | 0 |
+| Radio over spinel: `RadioSpinel`, `SpinelDriver`, HDLC | OpenThread's own libraries (`openthread-radio-spinel`, `openthread-spinel-rcp`, `openthread-hdlc`) | 0 |
+| `platform/spinel_uart.cpp` and `.hpp`: the spinel interface over a TI UART2 instance (ring buffer filled by the read callback, drained in the OpenThread task, a semaphore for the wait) | written here, modeled on OpenThread's POSIX `hdlc_interface.cpp` | 328 |
+| `platform/radio_spinel_glue.cpp`: init, the process-loop and timer glue, and the `otPlatRadio*` functions | the first 188 lines written here; the 453 lines after the marker comment are OpenThread's POSIX `radio.cpp` wrappers, unchanged | 641 |
+| `platform/openthread.syscfg` | `ot-ti`'s, minus the RF core and NCP SPI, plus the second UART and no standby | 1 file |
+| `app/freertos_main.c` (`ot-ti`'s FreeRTOS entry with a 16 kB task stack) and `app/die.c` (crash reporter); `main.c` and `cli_uart.cpp` are `ot-ti`'s by path | | 174 |
+
+Config: `platform/openthread-core-host-cc1354-config.h` is `ot-ti`'s CC13xx/CC26xx config with diag off (no on-chip radio to drive), the CSL receiver off (CSL is Thread's scheduled listening for sleepy devices; a mains-powered router never sleeps, and RadioSpinel has no CSL receiver hooks), and logs on the console (`log level 5` shows every spinel frame). `platform/openthread-host-lib-config.h` sets the spinel receive buffer to 2 kB (the POSIX host uses 8 kB).
+
+## How it is run
+
+`python3 m1_bench.py run <host.out> <rcp.hex>` takes the host image from `build.sh` and the RCP hex described above, and does the whole thing with the safety rules of `tools/demo_flash.py` (repo root): backs up the CC2340R5's flash and CCFG with DSLite (length in words), flashes the RCP image, pulses its reset with `xds110reset` (a DSLite flash alone does not start it), backs up the CC1354P10 in a CCStudio scripting connection and loads the host (`tools/ccs_backup_load.py` in this folder; a DSLite flash would not start it without a power cycle), then talks to the host CLI on `/dev/cu.usbmodem<id>` at 921600. `python3 m1_bench.py restore <run dir>` puts both boards back and verifies. Backups go to a folder outside the repo, because they can hold network keys.
+
+Two console tools: `tools/console_capture.py` (this folder) keeps every byte the console prints with a timestamp, including the last words before a hang; `tools/ot_cli.py` (repo root) is enough for commands.
+
+## What went wrong, and the fix
+
+1. **The console went silent within a second of the first radio commands.** `dataset commit active` answered at 4.7 s; `ifconfig up` (5.7 s) and `thread start` (8.8 s) got no echo and no reply, and the log ends with a lone `i` flushed when the capture stopped ; no assert, no fault, no exit from the crash reporter. Cause: **Unknown (suspected: Tool or docs)**. The SysConfig default power policy lets the CC1354P10 enter standby whenever no driver objects. With the policy set to `PowerCC26XX_doWFI` (never standby) in `openthread.syscfg`, the next run formed the network , and a border router has no reason to sleep. Not checked: whether the RCP link or the console dropped first (only the console stall is in the saved log), and whether a pending callback-mode read on the second UART should have kept the chip awake (TI's UART2 documentation does not say).
+2. **Two link errors on the first build**: `undefined reference to 'otPlatRadioUpdateCslSampleTime'` and `'otPlatRadioEnableCsl'`. **Our mistake**: `ot-ti`'s config turns the CSL receiver on and RadioSpinel does not implement those hooks. Off in this repo's config.
+3. **`"OPENTHREAD_CONFIG_PING_SENDER_ENABLE" redefined [-Werror]`** stopped the build in mbedtls. **Tool or docs**, small: `ot-ti`'s config header sets the ping sender on, OpenThread's CMake derives the same option from `OT_APP_CLI` (off here) and passes `=0`. `-DOT_PING_SENDER=ON` in `build.sh`.
+4. **The first crash reporter said nothing.** **Our mistake**: it called `UART2_open` on the console UART, which `ot-ti` already holds, and that returns NULL. `die.c` now writes straight to the UART0 registers.
+5. **A debugger connect resets this chip**, so the halted state after a hang is the reset vector, not the hang. **Tool or docs**: the CC1354P10's GEL script (the debugger's board setup script) runs a board reset on connect, printing `GEL Output: Board Reset Complete`. Post-mortems on this board need a reporter in the firmware (`die.c`), not the debugger. The debugger also failed three times with `Error -242 ... A router subpath could not be accessed` while the board's previous Bluetooth demo was running; a power cycle cleared it. Both in [docs/ways-in.md](../../docs/ways-in.md).
+6. **Stack overflow in the OpenThread task, about 4 s after joining a real network.** **Our mistake.** The Cortex-M33 stack-limit check raised a UsageFault (`CFSR 0x00100000`, STKOF) inside `vsnprintf` with the stack pointer 40 bytes above the task stack's base; the 16 kB task stack is exhausted when a console command formats output while the stack is busy with a live network. Seen three times at the same command, the first console command after joining. The task stack is now 32 kB and `frl status` prints its high-water mark; with it the host ran six joins and twenty minutes on the Apple network with 4.7 kB of stack used (section above).
+7. **Every reporter was mute for most of the day.** **Our mistake.** Writing to the UART data register does nothing while TI's UART2 driver has the transmitter disabled (it enables TXE only around its own writes). The fault handler, assert hook and exit hook printed nothing, and the three hangs were wrongly read as "no fault". Now every polled write sets `UART_CTL_TXE` first. Rule: a reporter is tested once on purpose (`frl fault`, `frl spin`) before its silence means anything.
+8. **The image's own watchdog killed the next flash load.** **Our mistake.** A report-and-reset watchdog added for diagnosis stayed armed while the debugger's flash loader ran on the chip, timed out, reset the chip mid-write, and left the flash half programmed. The watchdog is gone from the image; the fault handler is enough.
+9. **The debugger reaches this board only in the first seconds after a power-on boot, or after it reset the chip itself.** Cause: **Unknown (suspected: the debug power domain drops once the CPU idles unless a debugger connection holds it)**. Observed all day on two images, one that sleeps and one that only idles: connects fail with `Operation was aborted on 'Cortex_M33_0'` (CCStudio) or `-242 A router subpath could not be accessed` (DSLite), while the board answers on its console. Every connect that worked was within about 10 s of a USB replug, or in a run right after a debugger-driven reset. Recovery that works: start `tools/ccs_load_retry.py` (connect loop, load only, no backup) and then replug the board; the first connect inside the window loads the image in about 15 s. A 60 s backup before the load misses the window. The image also sets `Power.enablePolicy = false` so the CPU never idles. That did not change the rule: a connect landed 20 s after a debugger-driven load, and another run got the same -242 against it later while it sat parked after its radio was taken away. Only the loop-then-power-cycle recipe has worked every time.
+
+## What it shows
+
+The Thread border routers TI documents are Linux plus a TI RCP. This is the host side on a TI microcontroller: OpenThread's core plus its own spinel libraries ran on `ot-ti`'s platform with two new source files, and the first image that linked talked to the RCP on its first load. The CC1354P10 stands in for the CC35X1 Wi-Fi chip until that board arrives; the same two files move with it, because they touch only a UART and a timer.

@@ -1,0 +1,91 @@
+{
+ "id": 2,
+ "name": "presence",
+ "title": "Room presence",
+ "schema": 1,
+ "about": "A presence sensor (mmWave radar, Wi-Fi sensing or a PIR) reports, twice a second, whether a room is empty, holds someone still, or someone moving, with the features a model would learn from.",
+ "device_noun": "sensor",
+ "record_kind": "sample",
+ "fields": [
+  {
+   "id": 1,
+   "name": "state",
+   "type": "enum",
+   "values": [
+    "empty",
+    "still",
+    "moving"
+   ],
+   "about": "what the sensor's own logic decided"
+  },
+  {
+   "id": 2,
+   "name": "confidence_pct",
+   "type": "int",
+   "unit": "%",
+   "about": "the sensor's confidence in that state"
+  },
+  {
+   "id": 3,
+   "name": "range_cm",
+   "type": "int",
+   "unit": "cm",
+   "about": "distance to the nearest target, 0 if none"
+  },
+  {
+   "id": 4,
+   "name": "motion_energy",
+   "type": "int",
+   "unit": "",
+   "about": "summed Doppler energy, larger for bigger movement"
+  },
+  {
+   "id": 5,
+   "name": "still_energy",
+   "type": "int",
+   "unit": "",
+   "about": "energy at zero Doppler near the target (breathing, small motion)"
+  },
+  {
+   "id": 6,
+   "name": "people",
+   "type": "int",
+   "unit": "count",
+   "about": "targets tracked"
+  },
+  {
+   "id": 7,
+   "name": "temp_c",
+   "type": "int",
+   "unit": "deg C",
+   "about": "sensor board temperature"
+  }
+ ],
+ "headline": [
+  "state",
+  "people",
+  "range_cm"
+ ],
+ "label": {
+  "field": "state",
+  "classes": [
+   "empty",
+   "still",
+   "moving"
+  ],
+  "source": "a person's tag, a door switch, or a simulator; the sensor's own state is not the truth"
+ },
+ "training": {
+  "task": "timeseries_classification",
+  "channels": [
+   "range_cm",
+   "motion_energy",
+   "still_energy",
+   "confidence_pct"
+  ],
+  "rate_hz": 1,
+  "window": 6,
+  "stride": 2,
+  "note": "rate_hz is what the hub logs (about 1 sample a second over advertising), not what the sensor sends"
+ }
+}

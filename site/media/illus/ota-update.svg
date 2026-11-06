@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="The setup for OTA update">
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="20" y="96" width="104" height="68" rx="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="72.0" y="126.0" text-anchor="middle" font-size="16" font-weight="600" fill="#161312">new</text>
+<text x="72.0" y="146.0" text-anchor="middle" font-size="16" font-weight="400" fill="#161312">firmware</text>
+<path d="M155 127 A11 11 0 0 1 177 127" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="1.0"/>
+<path d="M144 116 A22 22 0 0 1 188 116" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+<path d="M133 105 A33 33 0 0 1 199 105" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+<circle cx="166" cy="135" r="3" fill="#161312"/>
+<text x="166" y="166" text-anchor="middle" font-size="15" fill="#6B625B">Wi-Fi or Bluetooth</text>
+<rect x="224" y="64" width="190" height="132" rx="10" fill="#B42418"/>
+<text x="319" y="86" text-anchor="middle" font-size="17" font-weight="600" fill="#F7F3EC">Your device</text>
+<rect x="236" y="100" width="166" height="40" rx="4" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="319" y="125" text-anchor="middle" font-size="15" font-weight="600" fill="#161312">slot 1: running image</text>
+<rect x="236" y="146" width="166" height="40" rx="4" fill="#F7F3EC" stroke="#161312" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="319" y="171" text-anchor="middle" font-size="15" font-weight="600" fill="#B42418">slot 2: new image arrives</text>
+<line x1="418" y1="130" x2="456" y2="130" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M450 124 L460 130 L450 136" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="440.0" y="118" text-anchor="middle" font-size="15" fill="#6B625B">reboot</text>
+<rect x="466" y="96" width="114" height="68" rx="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="523.0" y="126.0" text-anchor="middle" font-size="16" font-weight="600" fill="#161312">runs the</text>
+<text x="523.0" y="146.0" text-anchor="middle" font-size="16" font-weight="400" fill="#161312">new image</text>
+<text x="319" y="222" text-anchor="middle" font-size="15" fill="#6B625B">the device keeps running while the image downloads</text>
+<text x="588" y="250" text-anchor="end" font-size="12" fill="#6B625B">drawing</text></svg>

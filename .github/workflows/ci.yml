@@ -1,0 +1,51 @@
+# The reader's path on all three computers a reader uses: the one-command start (dry run, no board),
+# the tool check, probe listing and the results check, on Linux, macOS and Windows. No TI tools are
+# installed here, so doctor must stop with FRL-E020 and an install line, never a traceback.
+name: Reader path
+
+on: [push, pull_request]
+
+jobs:
+  reader:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the test requirements
+        run: python -m pip install -r requirements.txt
+      - name: Start, dry run (macOS and Linux)
+        if: runner.os != 'Windows'
+        run: ./start.sh mspm0l1306 blink --dry-run
+      - name: Start, dry run (Windows PowerShell)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: py start.py mspm0l1306 blink --dry-run
+      - name: Doctor names what to install and stops cleanly
+        shell: python
+        run: |
+          import subprocess, sys
+          p = subprocess.run([sys.executable, "tools/frl/frl.py", "doctor", "--board", "mspm0l1306"], capture_output=True, text=True)
+          print(p.stdout, p.stderr)
+          assert p.returncode in (0, 2), p.returncode
+          assert "Traceback" not in p.stdout + p.stderr
+          assert p.returncode == 0 or "FRL-E02" in p.stdout
+      - name: Detect lists probes (none here) without failing
+        shell: python
+        run: |
+          import subprocess, sys
+          p = subprocess.run([sys.executable, "tools/frl/frl.py", "detect"], capture_output=True, text=True)
+          print(p.stdout, p.stderr)
+          assert "Traceback" not in p.stdout + p.stderr, p.stderr
+      - name: Results store
+        run: python tools/results/check.py
+      - name: OS path finder and launcher tests
+        run: python -m pytest -q tools/tests/test_toolfind_os.py tools/tests/test_frl.py
+      - name: Whole test suite (Linux)
+        if: runner.os == 'Linux'
+        run: bash tools/run_tests.sh

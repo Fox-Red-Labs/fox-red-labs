@@ -1,0 +1,6 @@
+shield:
+  name: boostxl_sharp128
+  full_name: BOOSTXL-SHARP128 128 x 128 memory display BoosterPack
+  vendor: ti
+  supported_features:
+    - display

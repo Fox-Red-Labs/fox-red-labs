@@ -1,0 +1,19 @@
+/* Image C/D (E242): the 144 KB map has a hole in it. Linux's oc_sram node owns 0x70800000 to 0x7080FFFF and puts the SCMI shared-memory
+ * mailbox in its first 0x100 bytes; every Linux clock and power call goes through it, so Zephyr must not write 0x70800000 to 0x708000FF.
+ * Layout here: code and read-only data run in place from the 64 KB of WKUP SRAM (0x707F0000 to 0x707FFFFF, "flash"), data, bss, stacks and
+ * translation tables take 0x70801000 up to 0x70813000 (72 KB), and 0x70813000 to 0x70814000 stays free for the ring. 0x70800000 to 0x70800FFF is never touched.
+ * Apply after sram-all.overlay. */
+/ {
+	flash_sram: flash@707f0000 {
+		compatible = "soc-nv-flash";
+		reg = <0x707f0000 0x10000>;
+	};
+	chosen {
+		zephyr,flash = &flash_sram;
+		/delete-property/ zephyr,console;
+		/delete-property/ zephyr,shell-uart;
+	};
+};
+&sram_all { reg = <0x70801000 0x12000>; };
+&main_uart0 { status = "disabled"; };
+&main_uart1 { status = "disabled"; };

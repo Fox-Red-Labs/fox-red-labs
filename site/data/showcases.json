@@ -1,0 +1,60 @@
+{
+ "note": "Built examples shown on a subject hub (site-next/hub-<subject>.html, tools/render_hubs.py): one thing we built end to end, with the pictures a reader needs to see the app, the screen and the hardware together. Every picture names what it is: photo, screenshot or drawing. Keys are subject ids from tools/site_chrome.SUBJECTS.",
+ "smart-home": [
+  {
+   "id": "connected-thermostat-demo",
+   "title": "A thermostat you can build: radar presence, a touch screen, Matter into Apple Home",
+   "one_line": "Three boards and four wires. An IWRL6432BOOST radar board sees whether anyone is in the room, an LP-MSPM0G3519 draws the thermostat screen, and an LP-EM-CC35X1 is the Matter thermostat that Apple Home controls from the phone.",
+   "pictures": [
+    {
+     "src": "media/thermostat-apple-home.png",
+     "kind": "screenshot",
+     "alt": "The Home app on an iPhone showing a Matter accessory heating to 67 with the current temperature 69",
+     "caption": "In the Home app: the Matter thermostat on the LP-EM-CC35X1, setpoint moved from the phone (2026-10-11)"
+    },
+    {
+     "src": "media/thermostat-demo-bench.jpg",
+     "kind": "photo",
+     "alt": "The thermostat demo on the bench: a 3.5 inch display showing Room is empty, 20.8 C and a 21.5 C setpoint in Fox Red Labs colors, with the three boards wired around it",
+     "caption": "The whole demo: the screen on the LP-MSPM0G3519, the LP-EM-CC35X1 beside it and the radar board behind (2026-10-12)"
+    },
+    {
+     "src": "media/thermostat-g3519-cc35x1-wired.jpg",
+     "kind": "photo",
+     "alt": "Two LaunchPad boards on the bench joined by a bundle of jumper wires, one with a whip antenna",
+     "caption": "The screen board and the radio board, wired: the LP-MSPM0G3519 sends one status line a second to the LP-EM-CC35X1 (2026-10-12)"
+    },
+    {
+     "src": "media/iwrl6432boost-leds.jpg",
+     "kind": "photo",
+     "alt": "The IWRL6432BOOST radar board straight on, antenna patterns at the left, three LEDs lit",
+     "caption": "The radar: an IWRL6432BOOST, antennas on the board, no lens, no camera (2026-10-12)"
+    }
+   ],
+   "facts": [
+    "Apple Home pairs and controls the thermostat (LP-EM-CC35X1, Matter over Wi-Fi)",
+    "6 to 8 screen refreshes a second with the radar live, no dropped frames (LP-MSPM0G3519)",
+    "Radar frames reach the screen in under 50 ms (replay runs)"
+   ],
+   "links": [
+    {
+     "t": "How it was built",
+     "href": "../thermostat-system/README.md"
+    },
+    {
+     "t": "The Matter thermostat experiment",
+     "href": "project-matter-device.html#e169"
+    },
+    {
+     "t": "The screen experiment",
+     "href": "../docs/experiments/2026-10-10-thermostat-mcu-only.md"
+    }
+   ],
+   "boards": [
+    "cc35x1",
+    "g3519",
+    "iwrl6432"
+   ]
+  }
+ ]
+}

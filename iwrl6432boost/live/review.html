@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Room Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1114;--panel:#181b20;--line:#2a2f37;--text:#e8eaed;--dim:#8b929c;--accent:#ff6a2b;--ok:#3ccf7a;--blue:#4ea3ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Barlow,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px}
+h1{font-size:24px;margin:0}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.label{color:var(--dim);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.big{font-size:32px;font-weight:700}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+canvas{width:100%;display:block}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--dim);font-weight:600}
+a,button{font:600 14px Barlow;background:var(--accent);color:#0f1114;border:0;border-radius:6px;padding:8px 12px;cursor:pointer;text-decoration:none}
+input{font:15px Barlow;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:6px;padding:6px}
+.note{color:var(--dim);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Room review</h1>
+    <div><input type="date" id="day"> <a id="csv" href="#">Export events (CSV)</a> <button id="learn">Re-learn the room now</button> <a href="/" style="background:#2a2f37;color:#e8eaed">Live view</a></div>
+  </header>
+  <div class="tiles">
+    <div class="card"><div class="label">Occupied</div><div class="big" id="occ">–</div></div>
+    <div class="card"><div class="label">Used, 08:00 to 18:00</div><div class="big" id="util" style="font-size:24px">–</div></div>
+    <div class="card"><div class="label">Came in</div><div class="big" id="in">–</div></div>
+    <div class="card"><div class="label">Left</div><div class="big" id="out">–</div></div>
+    <div class="card"><div class="label">Seat used</div><div class="big" id="seat">–</div></div>
+    <div class="card"><div class="label">Logged</div><div class="big" id="span" style="font-size:22px">–</div></div>
+  </div>
+  <div class="card" id="empty" style="margin-bottom:12px;display:none;color:#cfe3ff"></div>
+  <div class="card" style="margin-bottom:12px"><div class="label">People in the room, most seen in each 5 minutes</div><canvas id="people" height="160"></canvas></div>
+  <div class="grid2">
+    <div class="card"><div class="label">Where people went (learned from the log)</div><canvas id="map" height="360"></canvas><div class="note" id="mapnote"></div></div>
+    <div class="card">
+      <div class="label">Occupied periods</div><table id="periods"></table>
+      <div class="label" style="margin-top:12px">Doors</div><table id="doors"></table>
+      <div class="label" style="margin-top:12px">By hour</div><table id="hours"></table>
+    </div>
+  </div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const today=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+$('day').value=today;
+function fit(cv){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=cv.getAttribute('height')*d;const x=cv.getContext('2d');x.setTransform(d,0,0,d,0,0);return [x,r.width,+cv.getAttribute('height')]}
+const mins=m=>m>=60?(m/60).toFixed(1)+' h':Math.round(m)+' min';
+async function load(){
+  const d=$('day').value; $('csv').href='/export.csv?d='+d;
+  const s=await (await fetch('/api/day?d='+d)).json();
+  $('occ').textContent=mins(s.occupied_minutes); $('in').textContent=s.entries; $('out').textContent=s.exits;
+  $('util').textContent=s.utilization_pct==null?'before 08:00':s.utilization_pct+'% of '+s.window_hours+' h logged';
+  $('empty').style.display=s.events?'none':'block';
+  $('empty').textContent=s.frames?`No room events yet since logging started at ${s.first}. Counts appear after someone comes in, leaves or the room changes between occupied and empty.`:'No log for this day.';
+  $('seat').textContent=mins(s.seat_minutes); $('span').textContent=s.first?s.first+' to '+s.last:'no log';
+  $('periods').innerHTML='<tr><th>From</th><th>To</th><th>Length</th></tr>'+s.occupied_periods.map(p=>`<tr><td>${p.start}</td><td>${p.end}</td><td>${mins(p.minutes)}</td></tr>`).join('');
+  $('doors').innerHTML='<tr><th>Door</th><th>In</th><th>Out</th></tr>'+Object.entries(s.per_door).map(([k,v])=>`<tr><td>door ${+k+1}</td><td>${v.in}</td><td>${v.out}</td></tr>`).join('');
+  $('hours').innerHTML='<tr><th>Hour</th><th>In</th><th>Out</th></tr>'+Object.entries(s.per_hour).map(([k,v])=>`<tr><td>${k}:00</td><td>${v.in}</td><td>${v.out}</td></tr>`).join('');
+  // people per 5 minutes
+  const [x,W,H]=fit($('people')); const e=Object.entries(s.people_per_5min); x.clearRect(0,0,W,H);
+  const mx=Math.max(1,...e.map(v=>v[1])); const bw=Math.max(2,(W-30)/Math.max(1,e.length));
+  x.fillStyle='#8b929c'; x.font='12px Barlow';
+  for(let k=0;k<=mx;k++){const y=H-20-(H-30)*k/mx; x.fillText(k,0,y+4); x.fillStyle='#2a2f37'; x.fillRect(20,y,W-20,1); x.fillStyle='#8b929c';}
+  e.forEach(([t,v],i)=>{x.fillStyle='#3ccf7a'; const h=(H-30)*v/mx; x.fillRect(24+i*bw,H-20-h,bw-1,h); if(i%12===0){x.fillStyle='#8b929c'; x.fillText(t,24+i*bw,H-4);}});
+  drawMap();
+}
+async function drawMap(){
+  const r=await (await fetch('/room-learned')).json().catch(()=>({}));
+  const [x,W,H]=fit($('map')); x.clearRect(0,0,W,H); if(!r.heat){ $('mapnote').textContent='Nothing learned yet.'; return; }
+  const RM=Math.max(5,r.extent.ymax+0.5), s=Math.min((H-20)/RM, W/(2*Math.max(Math.abs(r.extent.xmin),Math.abs(r.extent.xmax))+1)), ox=W/2, oy=H-10, P=(a,b)=>[ox+a*s,oy-b*s];
+  x.strokeStyle='#2a2f37'; for(let m=1;m<=RM;m++){x.beginPath();x.arc(ox,oy,m*s,Math.PI,2*Math.PI);x.stroke();}
+  const mx=Math.max(...r.heat.map(h=>h[2]));
+  r.heat.forEach(h=>{const [px,py]=P(h[0]-0.125,h[1]+0.125); x.fillStyle='rgba(78,163,255,'+(0.1+0.6*Math.sqrt(h[2]/mx)).toFixed(2)+')'; x.fillRect(px,py,0.25*s,0.25*s);});
+  (r.interference||[]).forEach(c=>{const [px,py]=P(c.x-0.25,c.y+0.25); x.strokeStyle='#ff4d4d'; x.strokeRect(px,py,0.5*s,0.5*s);});
+  const tag=(xy,l,c)=>{const [px,py]=P(xy[0],xy[1]); x.fillStyle=c; x.fillRect(px-7,py-7,14,14); x.font='13px Barlow'; x.fillText(l,px+10,py+4);};
+  (r.doors||[]).forEach((d,i)=>tag(d,'door '+(i+1),'#3ccf7a')); (r.seats||[]).filter(q=>q.seconds>=60).forEach(q=>tag([q.x,q.y],'seat','#b48cff'));
+  x.fillStyle='#ff6a2b'; x.fillRect(ox-9,oy-4,18,8);
+  $('mapnote').textContent=`From ${Math.round(r.frames/4/60)} minutes of radar. Blue: where people stood or walked, darker is more. Red boxes: movement with nobody in the room (a fan, a curtain, a lamp). Radar at the bottom, 1 m rings.`;
+}
+$('day').onchange=load;
+$('learn').onclick=async()=>{ $('learn').textContent='Learning…'; await fetch('/api/learn'); $('learn').textContent='Re-learn the room now'; load(); };
+load(); setInterval(load,60000);
+</script>
+</body>
+</html>

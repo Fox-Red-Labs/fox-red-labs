@@ -1,0 +1,197 @@
+[
+ {
+  "way": "DriverLib",
+  "board": "g3507",
+  "shared": 81,
+  "glue": 39,
+  "config": 35,
+  "flash": 2352,
+  "ram": 528,
+  "unused_heap": 0,
+  "build_s": 3.4,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "driverlib/glue_driverlib.c"
+  ],
+  "config_files": [
+   "driverlib/g3507.syscfg"
+  ]
+ },
+ {
+  "way": "TI Drivers + FreeRTOS",
+  "board": "g3507",
+  "shared": 81,
+  "glue": 59,
+  "config": 136,
+  "flash": 21040,
+  "ram": 7059,
+  "unused_heap": 0,
+  "build_s": 2.7,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "tidrivers/glue_tidrivers.c",
+   "tidrivers/main_freertos.c"
+  ],
+  "config_files": [
+   "tidrivers/g3507/ti_drivers_config.c",
+   "tidrivers/g3507/ti_drivers_config.h",
+   "tidrivers/g3507/ti_msp_dl_config.c",
+   "tidrivers/g3507/ti_msp_dl_config.h"
+  ]
+ },
+ {
+  "way": "TI Drivers, no RTOS",
+  "board": "g3507",
+  "shared": 81,
+  "glue": 49,
+  "config": 136,
+  "flash": 13848,
+  "ram": 4207,
+  "unused_heap": 2048,
+  "build_s": 2.5,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "tidrivers/glue_tidrivers.c",
+   "tidrivers/main_nortos.c"
+  ],
+  "config_files": [
+   "tidrivers/g3507/ti_drivers_config.c",
+   "tidrivers/g3507/ti_drivers_config.h",
+   "tidrivers/g3507/ti_msp_dl_config.c",
+   "tidrivers/g3507/ti_msp_dl_config.h"
+  ]
+ },
+ {
+  "way": "Zephyr 4.4.2",
+  "board": "g3507",
+  "shared": 81,
+  "glue": 68,
+  "config": 6,
+  "flash": 12704,
+  "ram": 3992,
+  "unused_heap": 0,
+  "build_s": 65.4,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "zephyr/src/glue_zephyr.c"
+  ],
+  "config_files": [
+   "zephyr/prj.conf",
+   "zephyr/boards/lp_mspm0g3507.overlay"
+  ]
+ },
+ {
+  "way": "DriverLib",
+  "board": "l1306",
+  "shared": 81,
+  "glue": 39,
+  "config": 34,
+  "flash": 2320,
+  "ram": 272,
+  "unused_heap": 0,
+  "build_s": 18.4,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "driverlib/glue_driverlib.c"
+  ],
+  "config_files": [
+   "driverlib/l1306.syscfg"
+  ]
+ },
+ {
+  "way": "DriverLib",
+  "board": "g5187",
+  "shared": 81,
+  "glue": 39,
+  "config": 33,
+  "flash": 2456,
+  "ram": 272,
+  "unused_heap": 0,
+  "build_s": 4.5,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "driverlib/glue_driverlib.c"
+  ],
+  "config_files": [
+   "driverlib/g5187.syscfg"
+  ]
+ },
+ {
+  "way": "DriverLib (HSADC glue)",
+  "board": "m33c321a",
+  "shared": 81,
+  "glue": 37,
+  "config": 41,
+  "flash": 2816,
+  "ram": 272,
+  "unused_heap": 0,
+  "build_s": 9.9,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "driverlib/glue_driverlib_hsadc.c"
+  ],
+  "config_files": [
+   "driverlib/m33c321a.syscfg"
+  ]
+ },
+ {
+  "way": "DriverLib (AM13 glue)",
+  "board": "am13e230",
+  "shared": 81,
+  "glue": 38,
+  "config": 35,
+  "flash": 9376,
+  "ram": 9205,
+  "unused_heap": 4096,
+  "build_s": 14.3,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "driverlib/glue_am13.c"
+  ],
+  "config_files": [
+   "driverlib/am13e230.syscfg"
+  ]
+ },
+ {
+  "way": "TI Drivers, no RTOS",
+  "board": "l1306",
+  "shared": 81,
+  "glue": 49,
+  "config": 130,
+  "flash": 10744,
+  "ram": 3413,
+  "unused_heap": 2048,
+  "build_s": 2.9,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "tidrivers/glue_tidrivers.c",
+   "tidrivers/main_nortos.c"
+  ],
+  "config_files": [
+   "tidrivers/l1306/ti_drivers_config.c",
+   "tidrivers/l1306/ti_drivers_config.h",
+   "tidrivers/l1306/ti_msp_dl_config.c",
+   "tidrivers/l1306/ti_msp_dl_config.h"
+  ]
+ },
+ {
+  "way": "Zephyr 4.4.2",
+  "board": "l1306",
+  "shared": 81,
+  "glue": 68,
+  "config": 7,
+  "flash": 11888,
+  "ram": 3888,
+  "unused_heap": 0,
+  "build_s": 69.7,
+  "nonmain_bytes": 0,
+  "glue_files": [
+   "zephyr/src/glue_zephyr.c"
+  ],
+  "config_files": [
+   "zephyr/prj.conf",
+   "zephyr/boards/lp_mspm0l1306.overlay",
+   "zephyr/boards/lp_mspm0l1306.conf"
+  ]
+ }
+]

@@ -1,0 +1,341 @@
+{
+  "generated_by": "hand-written from the files cited; verify with: python3 tools/toolchains/inventory.py --check-quotes",
+  "sdks": [
+    {
+      "sdk": "mspm0_sdk_2_11_00_07",
+      "version": "2.11.00.07",
+      "compilers": [
+        {
+          "name": "TI Arm Clang",
+          "version": "3.2.2 LTS and 4.0.0 LTS",
+          "file": "/Applications/ti/mspm0_sdk_2_11_00_07/release_notes_mspm0_sdk_2_11_00_07.html",
+          "quote": "TI Clang v3.2.2_LTS",
+          "note": "Release notes list both; v4.0.0_LTS line reads: TI Clang v4.0.0_LTS. Also included with CCS 20.0.0+"
+        },
+        {
+          "name": "TI Arm Clang",
+          "version": "4.0.0 LTS",
+          "file": "/Applications/ti/mspm0_sdk_2_11_00_07/release_notes_mspm0_sdk_2_11_00_07.html",
+          "quote": "TI Clang v4.0.0_LTS"
+        },
+        {
+          "name": "Arm GNU (gcc-arm-none-eabi)",
+          "version": "9-2019-q4-major",
+          "file": "/Applications/ti/mspm0_sdk_2_11_00_07/release_notes_mspm0_sdk_2_11_00_07.html",
+          "quote": "Arm gcc-arm-none-eabi-9-2019-q4-major"
+        },
+        {
+          "name": "IAR Embedded Workbench for Arm",
+          "version": "9.70.2",
+          "file": "/Applications/ti/mspm0_sdk_2_11_00_07/release_notes_mspm0_sdk_2_11_00_07.html",
+          "quote": "IAR for Arm 9.70.2"
+        },
+        {
+          "name": "Keil uVision (Arm Compiler 6 / armclang)",
+          "version": "uVision 5.38, Arm Clang v6.16 or later",
+          "file": "/Applications/ti/mspm0_sdk_2_11_00_07/release_notes_mspm0_sdk_2_11_00_07.html",
+          "quote": "5.38, with Arm Clang compiler v6.16 or later"
+        },
+        {
+          "name": "Keil (as written in the project files)",
+          "version": "Arm Compiler V6.16 (ARMCLANG)",
+          "file": "/Applications/ti/mspm0_sdk_2_11_00_07/examples/nortos/LP_MSPM0G3507/driverlib/empty/keil/empty_LP_MSPM0G3507_nortos_keil.uvprojx",
+          "quote": "6160000::V6.16::ARMCLANG",
+          "note": "Same string in all 1307 uvprojx files"
+        }
+      ],
+      "cmake_toolchains": [],
+      "notes": "Project files seen: projectspec toolChain=TICLANG (1911), toolChain=GNU (1453). The imports.mak ships placeholders (TICLANG_ARMCOMPILER ?= /path/to/clang/compiler, GCC_ARMCOMPILER with ##GCC_ARM_VER##), no version."
+    },
+    {
+      "sdk": "mspm33_sdk_1_04_00_00",
+      "version": "1.04.00.00",
+      "compilers": [
+        {
+          "name": "Summary line",
+          "version": "TI-Clang, Arm GCC, IAR, Keil (ARMCC)",
+          "file": "/Applications/ti/mspm33_sdk_1_04_00_00/release_notes_mspm33_sdk_1_04_00_00.html",
+          "quote": "Compilers: TI-Clang, Arm GCC, IAR, Keil (ARMCC)"
+        },
+        {
+          "name": "TI Arm Clang",
+          "version": "5.1.1 LTS",
+          "file": "/Applications/ti/mspm33_sdk_1_04_00_00/release_notes_mspm33_sdk_1_04_00_00.html",
+          "quote": "TI Clang v5.1.1_LTS"
+        },
+        {
+          "name": "Arm GNU (gcc-arm-none-eabi)",
+          "version": "9-2019-q4-major",
+          "file": "/Applications/ti/mspm33_sdk_1_04_00_00/release_notes_mspm33_sdk_1_04_00_00.html",
+          "quote": "Arm gcc-arm-none-eabi-9-2019-q4-major"
+        },
+        {
+          "name": "Arm GNU Toolchain (TF-M examples only)",
+          "version": "12.2.Rel1 or later",
+          "file": "/Applications/ti/mspm33_sdk_1_04_00_00/release_notes_mspm33_sdk_1_04_00_00.html",
+          "quote": "Trusted Firmware-M (TF-M) examples require GNU Arm Toolchain v12.2.Rel1 or later."
+        },
+        {
+          "name": "IAR Embedded Workbench for Arm",
+          "version": "9.70.4 plus an IAR patch for MSPM33 device support",
+          "file": "/Applications/ti/mspm33_sdk_1_04_00_00/release_notes_mspm33_sdk_1_04_00_00.html",
+          "quote": "IAR for Arm 9.70.4"
+        },
+        {
+          "name": "Keil uVision (Arm Compiler 6 / armclang)",
+          "version": "uVision 5.38, Arm Clang v6.16 or later",
+          "file": "/Applications/ti/mspm33_sdk_1_04_00_00/release_notes_mspm33_sdk_1_04_00_00.html",
+          "quote": "5.38, with Arm Clang compiler v6.16 or later"
+        }
+      ],
+      "cmake_toolchains": [],
+      "notes": "The 'Keil (ARMCC)' wording in the summary conflicts with the dependency list, which says Arm Clang v6.16 (armclang). The uvprojx files say V6.16 ARMCLANG. Arm GCC 9-2019-q4 is old; only the TF-M examples ask for 12.2 or later."
+    },
+    {
+      "sdk": "am13e230x_sdk_26_01_00_03",
+      "version": "26.01.00.03",
+      "compilers": [
+        {
+          "name": "TI Arm Clang",
+          "version": "5.1.1 LTS",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/docs/am13e230x/user_guide/chapters/release_notes/am13e230x/release_notes_26_01_00.html",
+          "quote": "TI Arm Clang Compiler v5.1.1.LTS (Installed as part of CCS v21.0.0)"
+        },
+        {
+          "name": "IAR EWARM",
+          "version": "9.70.1",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/docs/am13e230x/user_guide/chapters/release_notes/am13e230x/release_notes_26_01_00.html",
+          "quote": "IAR EWARM v9.70.1"
+        },
+        {
+          "name": "Arm GNU Toolchain (GCC)",
+          "version": "15.2.rel1",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/docs/am13e230x/user_guide/chapters/release_notes/am13e230x/release_notes_26_01_00.html",
+          "quote": "GCC v15.2.rel1"
+        },
+        {
+          "name": "Keil uVision",
+          "version": "v5 (Arm Clang)",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/docs/am13e230x/user_guide/chapters/release_notes/am13e230x/release_notes_26_01_00.html",
+          "quote": "Keil uVision v5"
+        },
+        {
+          "name": "GCC limit",
+          "version": "command line only",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/docs/am13e230x/user_guide/chapters/release_notes/am13e230x/release_notes_26_01_00.html",
+          "quote": "Out of box CCS IDE build not supported for GCC in this SDK. Only build from command-line is enabled."
+        },
+        {
+          "name": "Keil limit",
+          "version": "libraries built by the user",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/docs/am13e230x/user_guide/chapters/release_notes/am13e230x/release_notes_26_01_00.html",
+          "quote": "Libraries for Keil are not packaged in SDK and need to be built from Command-Line."
+        },
+        {
+          "name": "TI Arm Clang (build file)",
+          "version": "ti-cgt-armllvm_5.1.1.LTS",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/imports_am13e230x.mk",
+          "quote": "TI_ARM_CLANG_TOOLCHAIN_VERSION=ti-cgt-armllvm_5.1.1.LTS"
+        },
+        {
+          "name": "IAR (build file)",
+          "version": "9.70.1",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/imports_am13e230x.mk",
+          "quote": "IAR_ARM_TOOLCHAIN_VERSION=9.70.1"
+        },
+        {
+          "name": "GCC (build file)",
+          "version": "arm-gnu-toolchain-15.2.rel1",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/imports_am13e230x.mk",
+          "quote": "GCC_ARM_TOOLCHAIN_DEFAULT_VERSION=arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi"
+        },
+        {
+          "name": "Keil (build file)",
+          "version": "v5",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/imports_am13e230x.mk",
+          "quote": "KEIL_ARM_CLANG_TOOLCHAIN_VERSION=v5"
+        },
+        {
+          "name": "Build-enable defaults",
+          "version": "only TI Arm Clang on",
+          "file": "/Applications/ti/am13e230x_sdk_26_01_00_03/imports_am13e230x.mk",
+          "quote": "M33_GCC_ARM_BUILD_ENABLE?=n"
+        }
+      ],
+      "cmake_toolchains": [
+        "toolchain_m33_gcc_arm.cmake",
+        "toolchain_m33_iar_arm.cmake",
+        "toolchain_m33_keil_arm_clang.cmake",
+        "toolchain_m33_ti_arm_clang.cmake"
+      ],
+      "cmake_toolchain_dir": "/Applications/ti/am13e230x_sdk_26_01_00_03/cmake/toolchain",
+      "notes": "GCC has no per-example folder. It is reached through the CMake toolchain file and the command-line makefile. Keil has one example folder only."
+    },
+    {
+      "sdk": "simplelink_lowpower_f3_sdk_9_21_00_36_LTS",
+      "version": "9.21.00.36 LTS",
+      "compilers": [
+        {
+          "name": "TI Arm Clang",
+          "version": "4.0.4 LTS",
+          "file": "/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/release_notes_simplelink_lowpower_f3_sdk_9_21_00_36_LTS.html",
+          "quote": "TI ARM Clang Compiler : 4.0.4.LTS"
+        },
+        {
+          "name": "IAR Embedded Workbench",
+          "version": "9.70.2",
+          "file": "/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/release_notes_simplelink_lowpower_f3_sdk_9_21_00_36_LTS.html",
+          "quote": "IAR Embedded Workbench : 9.70.2"
+        },
+        {
+          "name": "Arm GNU Toolchain (GCC)",
+          "version": "12.3.Rel1-0",
+          "file": "/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/release_notes_simplelink_lowpower_f3_sdk_9_21_00_36_LTS.html",
+          "quote": "GCC 12.3.Rel1-0"
+        },
+        {
+          "name": "Support policy",
+          "version": "earlier not supported",
+          "file": "/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/release_notes_simplelink_lowpower_f3_sdk_9_21_00_36_LTS.html",
+          "quote": "Earlier IDE/toolchain versions are not supported and compatibility with newer versions of supported IDEs is not assured."
+        },
+        {
+          "name": "TI Arm Clang (build file)",
+          "version": "ti-cgt-armllvm_4.0.4.LTS",
+          "file": "/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/imports.mak",
+          "quote": "ti-cgt-armllvm_4.0.4.LTS"
+        },
+        {
+          "name": "GCC (build file)",
+          "version": "12.3.Rel1-0",
+          "file": "/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/imports.mak",
+          "quote": "GCC_ARMCOMPILER ?= /Applications/arm-none-eabi-gcc/12.3.Rel1-0"
+        }
+      ],
+      "cmake_toolchains": [
+        "ticlang.cmake",
+        "iar.cmake",
+        "gcc.cmake",
+        "native.cmake"
+      ],
+      "cmake_toolchain_dir": "/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/source/cmake/toolchains",
+      "notes": "No Keil. 32 ticlang projectspecs pin cgtVersion TICLANG_3.2.0 (older than the 4.0.4 the notes name). No CC13xx/CC26xx SimpleLink SDK is installed under /Applications/ti or ~/ti."
+    },
+    {
+      "sdk": "simplelink_wifi_sdk_10_20_00_39",
+      "version": "10.20.00.39",
+      "compilers": [
+        {
+          "name": "TI Arm Clang",
+          "version": "4.0.4 LTS",
+          "file": "/Applications/ti/simplelink_wifi_sdk_10_20_00_39/release_notes_simplelink_wifi_sdk_10_20_00_39.html",
+          "quote": "TI Clang 4.0.4 LTS"
+        },
+        {
+          "name": "Arm GNU (arm-none-eabi-gcc)",
+          "version": "12.3.Rel1-0",
+          "file": "/Applications/ti/simplelink_wifi_sdk_10_20_00_39/release_notes_simplelink_wifi_sdk_10_20_00_39.html",
+          "quote": "ARM-none-eabi-gcc 12.3.Rel1-0"
+        },
+        {
+          "name": "Support policy",
+          "version": "listed versions only",
+          "file": "/Applications/ti/simplelink_wifi_sdk_10_20_00_39/release_notes_simplelink_wifi_sdk_10_20_00_39.html",
+          "quote": "Using a version not listed may result in compatibility issues."
+        }
+      ],
+      "cmake_toolchains": [],
+      "notes": "IAR and Keil are not named. No example ships an iar or keil folder (7 iar folders exist, all in source/ libraries and tools)."
+    },
+    {
+      "sdk": "c2000ware_26_02_00_00",
+      "version": "26.02.00.00 LTS",
+      "compilers": [
+        {
+          "name": "TI C2000 CGT (cl2000)",
+          "version": "25.11.1.LTS, with CCS 21.0.1 or later",
+          "file": "/Applications/ti/c2000/C2000Ware_26_02_00_00/change_log.html",
+          "quote": "The minimum version of Code Composer Studio required is CCSv21.0.1 and compiler version is 25.11.1.LTS."
+        },
+        {
+          "name": "TI C2000 CGT",
+          "version": "25.11.1.LTS",
+          "file": "/Applications/ti/c2000/C2000Ware_26_02_00_00/change_log.html",
+          "quote": "Migrated to 25.11.1.LTS version of C2000-CGT compiler"
+        },
+        {
+          "name": "TI C2000 CGT (release notes PDF)",
+          "version": "v25.11.1.LTS",
+          "file": "/Applications/ti/c2000/C2000Ware_26_02_00_00/C2000Ware_v26.02.00.00.LTS_Release_Notes.pdf",
+          "quote": "TI C2000 Compiler v25.11.1.LTS",
+          "note": "PDF, found with pdftotext",
+          "quote_checkable": false
+        },
+        {
+          "name": "TI Arm CGT (CM core)",
+          "version": "v20.2.7.LTS",
+          "file": "/Applications/ti/c2000/C2000Ware_26_02_00_00/C2000Ware_v26.02.00.00.LTS_Release_Notes.pdf",
+          "quote": "TI ARM Compiler v20.2.7.LTS",
+          "note": "PDF, found with pdftotext",
+          "quote_checkable": false
+        }
+      ],
+      "cmake_toolchains": [],
+      "notes": "CCS projectspecs only. No GCC, IAR or Keil. Projectspec cgtVersion values: 25.11.1.LTS (3324 of 3584), 22.6.3.LTS, 20.2.7.LTS, 22.6.2.LTS, 21.6.0.LTS, 20.2.1.LTS, 20.2.6.LTS, so older families stay on older compilers."
+    },
+    {
+      "sdk": "c2000ware_core_26_02_00_00",
+      "version": "26.02.00.00",
+      "compilers": [],
+      "cmake_toolchains": [],
+      "notes": "A subset copy of C2000Ware (driverlib, device_support, boards, libraries). No docs of its own. Compiler claim is the C2000Ware one above; every projectspec says cgtVersion 25.11.1.LTS."
+    },
+    {
+      "sdk": "mcu_plus_sdk_am263px_26_01_00_08",
+      "version": "26.01.00.08",
+      "compilers": [
+        {
+          "name": "TI Arm Clang",
+          "version": "4.0.4 LTS",
+          "file": "~/ti/mcu_plus_sdk_am263px_26_01_00_08/docs/api_guide_am263px/RELEASE_NOTES_26_01_00_PAGE.html",
+          "quote": "TI ARM CLANG R5F 4.0.4.LTS"
+        },
+        {
+          "name": "Code Composer Studio",
+          "version": "20.5.0",
+          "file": "~/ti/mcu_plus_sdk_am263px_26_01_00_08/docs/api_guide_am263px/RELEASE_NOTES_26_01_00_PAGE.html",
+          "quote": "Code Composer Studio R5F 20.5.0"
+        },
+        {
+          "name": "IAR (build file only)",
+          "version": "9.70.1",
+          "file": "~/ti/mcu_plus_sdk_am263px_26_01_00_08/imports.mak",
+          "quote": "IAR_TOOL_PATH?=C:/iar/ewarm-9.70.1",
+          "note": "imports.mak sets an IAR path but the release notes do not list IAR and no example ships an IAR project."
+        },
+        {
+          "name": "TI PRU CGT",
+          "version": "2.3.3",
+          "file": "~/ti/mcu_plus_sdk_am263px_26_01_00_08/imports.mak",
+          "quote": "CGT_TI_PRU_PATH=$(TOOLS_PATH)/ti-cgt-pru_2.3.3"
+        }
+      ],
+      "cmake_toolchains": [],
+      "notes": "Examples ship ti-arm-clang folders only. The 48 .ewp and 22 .uvproj/.uvprojx files in the tree are third-party ThreadX port samples, not TI examples. cmake_example and coverity folders exist but are not examples."
+    },
+    {
+      "sdk": "mmwave_l_sdk_05_05_04_02",
+      "version": "05.05.04.02",
+      "compilers": [
+        {
+          "name": "TI Arm Clang",
+          "version": "3.2.2 LTS",
+          "file": "~/ti/mmwave_l_sdk_05_05_04_02/imports.mak",
+          "quote": "ti-cgt-armllvm_3.2.2.LTS"
+        }
+      ],
+      "cmake_toolchains": [],
+      "notes": "No release notes in the install; the README_FIRST files name no compiler. The version comes from imports.mak. Every example folder is ti-arm-clang."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+board,test,variant,status,value,value_hi,runs,clock_mhz,conditions,date,source,checked,note
+mspm0c1104,display_full_frame,sharp128-ls013b7dh03-1mhz-bands-1row,measured,153.7,,1,24,"scene drawn and sent in 1-row bands, no frame buffer; SPI 1.000 MHz read back; 2560 bytes on the wire; includes drawing time; BOOSTXL-SHARP128 stacked; Mac load not recorded",2026-10-20,portability/boosterpacks/sharp128/README.md,readback,ms; 128 bands of one row each
+mspm0c1104,display_full_frame,sharp128-ls013b7dh03-1mhz-bands-16row,measured,41.1,,1,24,scene drawn and sent in 16-row bands; 2320 bytes on the wire; includes drawing time,2026-10-20,portability/boosterpacks/sharp128/README.md,readback,ms; 8 bands; wire time alone is 21 to 24 ms
+mspm0c1104,display_ready,sharp128-power-to-picture,waiting,,,,24,not measured: start-up time needs a scope or camera timing,2026-10-20,portability/boosterpacks/sharp128/README.md,,"picture seen by eye, counter counting (maintainer, 2026-10-20); start-up time itself not measured"
+mspm0c1104,port_flash_bytes,sharp128-hello-bands,measured,4960,,1,24,TI Arm Clang 5.1.1.LTS -Os; hello with 1-row bands; no card code,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,text plus data from tiarmsize
+mspm0c1104,port_ram_bytes,sharp128-hello-bands,measured,609,,1,24,512 B stack included; the code used 352 B of it (painted-stack readback),2026-10-20,portability/boosterpacks/sharp128/README.md,readback,RAM total from tiarmsize
+mspm0c1104,port_flash_bytes,sharp128-player-pff,measured,7336,,1,24,Petit FatFs R0.03a; 8-row reads; built and run to the card check only,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm0c1104,port_ram_bytes,sharp128-player-pff,measured,779,,1,24,512 B stack included; 128 B read buffer,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm0c1104,gui_fps,sharp128-player-pff,waiting,,,,24,no microSD card on the bench; the player stops with error -2 (card not ready),2026-10-20,portability/boosterpacks/sharp128/README.md,,simulated bus-time ceiling 30 fps at a 30 fps target (not a measurement)
+mspm0g3519,port_flash_bytes,sharp128-hello,measured,12536,,1,32,FatFs R0.16 with long names; 2 kB frame buffer; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm0g3519,port_ram_bytes,sharp128-hello,measured,5601,,1,32,2 kB frame buffer and 2 kB stack included; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm0g3519,display_full_frame,sharp128-ls013b7dh03-1mhz-framebuffer,waiting,,,,32,the BoosterPack was on the LP-MSPM0C1104; expect 19 to 22 ms (wire time 18.4 ms),2026-10-20,portability/boosterpacks/sharp128/README.md,,
+mspm0g3519,gui_fps,sharp128-player-fatfs,waiting,,,,32,no board run and no microSD card; built only (player 10152 B flash and 5845 B RAM),2026-10-20,portability/boosterpacks/sharp128/README.md,,
+mspm0g3507,port_flash_bytes,sharp128-hello,measured,12520,,1,32,FatFs R0.16 with long names; 2 kB frame buffer; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm0g3507,port_ram_bytes,sharp128-hello,measured,5601,,1,32,2 kB frame buffer and 2 kB stack included; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm0g3507,display_full_frame,sharp128-ls013b7dh03-1mhz-framebuffer,waiting,,,,32,board not on the bench; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,,
+mspm0l1306,port_flash_bytes,sharp128-hello,measured,4448,,1,32,screen only; 2 kB frame buffer; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm0l1306,port_ram_bytes,sharp128-hello,measured,3153,,1,32,2 kB frame buffer and 1 kB stack in 4 kB; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm0l1306,display_full_frame,sharp128-ls013b7dh03-1mhz-framebuffer,waiting,,,,32,the LaunchPad carries the Educational BoosterPack this wave; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,,
+mspm33c321a,port_flash_bytes,sharp128-hello,measured,30144,,1,160,FatFs R0.16; built through TI's example makefile (debug-sized flags); not run,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm33c321a,port_ram_bytes,sharp128-hello,measured,3769,,1,160,built only,2026-10-20,portability/boosterpacks/sharp128/README.md,build-log,
+mspm33c321a,display_full_frame,sharp128-ls013b7dh03-1mhz-framebuffer,waiting,,,,160,the LaunchPad carries the Educational BoosterPack this wave; built only,2026-10-20,portability/boosterpacks/sharp128/README.md,,

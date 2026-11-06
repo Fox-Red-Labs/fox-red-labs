@@ -1,0 +1,6 @@
+shield:
+  name: boostxl_audio
+  full_name: BOOSTXL-AUDIO Audio BoosterPack
+  vendor: ti
+  supported_features:
+    - dac

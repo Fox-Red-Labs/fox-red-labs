@@ -1,0 +1,62 @@
+//@cliArgs --device "MSPM0G351X" --package "LQFP-100(PZ)" --part "Default"
+//@v2CliArgs --device "MSPM0G3519" --package "LQFP-100(PZ)"
+// @cliArgs --board /ti/boards/LP_MSPM0G3519 --rtos nortos
+// LVGL demo: same pins as the G3519 display test, plus UART0 (XDS110 backchannel, PA10 and PA11) for the stats line.
+// Waveshare 3.5inch Capacitive Touch LCD on the LP-MSPM0G3519.
+// SPI1 SCLK PB31, MOSI PB8, MISO PB7; LCD CS PB12, DC PB9, BL PC4, RST PC5; touch I2C2 SDA PC3, SCL PC2, INT PB14, RST PB11.
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GB     = GPIO.addInstance();
+const GA     = GPIO.addInstance();
+const GC     = GPIO.addInstance();
+const SPI    = scripting.addModule("/ti/driverlib/SPI", {}, false);
+const SPI1   = SPI.addInstance();
+const I2C    = scripting.addModule("/ti/driverlib/I2C", {}, false);
+const I2C2   = I2C.addInstance();
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const Board  = scripting.addModule("/ti/driverlib/Board", {}, false);
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL", {}, false);
+
+GB.$name = "PB";
+GB.port  = "PORTB";
+GB.associatedPins.create(4);
+GB.associatedPins[0].$name = "LCD_DC";  GB.associatedPins[0].assignedPin = "9";
+GB.associatedPins[1].$name = "LCD_CS";  GB.associatedPins[1].assignedPin = "12"; GB.associatedPins[1].initialValue = "SET";
+GB.associatedPins[2].$name = "TP_RST";  GB.associatedPins[2].assignedPin = "11"; GB.associatedPins[2].initialValue = "SET";
+GB.associatedPins[3].$name = "TP_INT";  GB.associatedPins[3].assignedPin = "14"; GB.associatedPins[3].direction = "INPUT";
+GB.associatedPins[3].internalResistor = "PULL_UP";
+
+GA.$name = "PA";
+GA.port  = "PORTA";
+GA.associatedPins.create(1);
+GA.associatedPins[0].$name = "LED1";   GA.associatedPins[0].assignedPin = "0";
+
+GC.$name = "PC";
+GC.port  = "PORTC";
+GC.associatedPins.create(2);
+GC.associatedPins[0].$name = "LCD_BL";  GC.associatedPins[0].assignedPin = "4";
+GC.associatedPins[1].$name = "LCD_RST"; GC.associatedPins[1].assignedPin = "5"; GC.associatedPins[1].initialValue = "SET";
+
+SPI1.$name                      = "LCD_SPI";
+SPI1.targetBitRate              = 8000000;
+SPI1.frameFormat                = "MOTO3";
+SPI1.peripheral.$assign         = "SPI1";
+SPI1.peripheral.sclkPin.$assign = "PB31";
+SPI1.peripheral.mosiPin.$assign = "PB8";
+SPI1.peripheral.misoPin.$assign = "PB7";
+
+I2C2.$name                     = "TP_I2C";
+I2C2.basicEnableController     = true;
+I2C2.basicControllerBusSpeed   = 100000;
+I2C2.peripheral.$assign        = "I2C2";
+I2C2.peripheral.sdaPin.$assign = "PC3";
+I2C2.peripheral.sclPin.$assign = "PC2";
+
+SYSCTL.forceDefaultClkConfig = true;
+UART1.$name                     = "DBG_UART";
+UART1.targetBaudRate            = 115200;
+UART1.peripheral.$assign        = "UART0";
+UART1.peripheral.rxPin.$assign  = "PA11";
+UART1.peripheral.txPin.$assign  = "PA10";
+
+SYSCTL.clockTreeEn           = true;

@@ -1,0 +1,21 @@
+/*
+ * BoosterPack header of the LP-MSPM0G3507, pins 1 to 40.
+ * Pin map: LP-MSPM0G3507 user guide SLAU873 (BoosterPack header table).
+ * Pin 3 is PB23 with J14 at 1-2 (PA9 at 2-3). Pin 29 is PA16 with J15 at 1-2.
+ * Pins 33 and 34 are the XDS110 backchannel UART until J21 and J22 move.
+ * Pin 12 and pin 19 both read PB12 in the CCStudio board note; both are mapped
+ * to PB12 and the schematic should settle it before a flash.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include "lp_mspm0g3507_header.dtsi"
+
+/* SPI1 clock PB9, data out PB8, data in PB7: the BoosterPack standard. */
+boosterpack_spi: &spi1 {
+	status = "okay";
+	pinctrl-0 = <&spi1_sclk_pb9 &spi1_pico_pb8 &spi1_poci_pb7>;
+	pinctrl-names = "default";
+	#address-cells = <1>;
+	#size-cells = <0>;
+};

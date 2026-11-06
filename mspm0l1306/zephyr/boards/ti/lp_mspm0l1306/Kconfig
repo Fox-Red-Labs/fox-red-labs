@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: Apache-2.0
+# Board-specific options for the out-of-tree lp_mspm0l1306 board.
+
+config BOARD_LP_MSPM0L1306_GPIO
+	bool "GPIO driver with the MSPM0L1306 pin table (board-local copy)"
+	default y
+	depends on BOARD_LP_MSPM0L1306 && GPIO && DT_HAS_TI_MSPM0_GPIO_ENABLED
+	select USE_MSPM0_DL_GPIO
+	help
+	  Zephyr 4.4.2's gpio_mspm0.c has one pin table for the whole MSPM0L series, the
+	  80-pin MSPM0L222x one. It does not compile for the MSPM0L1306. This builds
+	  gpio_mspm0_l1306.c from the board folder instead, with a 28-pin table.

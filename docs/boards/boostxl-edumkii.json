@@ -1,0 +1,69 @@
+{
+ "name": "BOOSTXL-EDUMKII Educational BoosterPack plug-in module Mark II",
+ "sources": "User guide SLAU599B (revised July 2021: Figure 1-1 photo, Tables 2-1 to 2-10 header pins, section 2.2 power, J5 note); CCStudio 21.0.1 AI board file ai/boards/BOOSTXL-EDUMKII/AGENTS.md (pin list from schematic SLAR105 rev 03); read 2026-10-07",
+ "columns": [
+  {
+   "head": "The parts",
+   "items": [
+    [
+     "Screen: 128 x 128 color",
+     "Crystalfontz TFT with an ST7735S controller, up to 20 frames a second, no touch"
+    ],
+    [
+     "Joystick and 2 buttons",
+     "Two analog axes plus a push, and buttons S1 and S2"
+    ],
+    [
+     "Sensors",
+     "OPT3001 light (I2C address 0x44), 3-axis analog accelerometer, microphone"
+    ],
+    [
+     "Outputs",
+     "Color LED, buzzer, servo header J8, gator-clip touch input"
+    ]
+   ]
+  },
+  {
+   "head": "Header pins it uses",
+   "items": [
+    [
+     "SPI: 7, 13, 15",
+     "Screen clock, chip select, data; 17 is screen reset, 31 data/command, 39 backlight"
+    ],
+    [
+     "ADC: 2, 6, 23 to 26",
+     "Joystick X and Y, microphone, accelerometer X, Y, Z: six analog inputs"
+    ],
+    [
+     "PWM: 19, 37 to 40",
+     "Servo, blue, green, red (or backlight), buzzer"
+    ],
+    [
+     "I2C: 9, 10",
+     "Light sensor; its alert goes to pin 8"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "Jumper J5 picks what pin 39 drives: the red LED (1-2) or the screen backlight (2-3)"
+    ],
+    [
+     "Power",
+     "Needs both 3.3 V (pin 1) and 5 V (pin 21)"
+    ],
+    [
+     "Not fitted",
+     "The TMP006 temperature sensor: discontinued in 2017 and no longer placed"
+    ],
+    [
+     "Watch out",
+     "Uses 26 header pins, so most LaunchPad kits lose a part or need a wire"
+    ]
+   ]
+  }
+ ]
+}

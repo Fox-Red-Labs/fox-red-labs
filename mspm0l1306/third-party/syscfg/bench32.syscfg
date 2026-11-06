@@ -1,0 +1,21 @@
+/**
+ * LP-MSPM0L1306 bench setup: 32 MHz SYSOSC (default clock tree), UART0 at 115200 on PA8 (TX) and PA9 (RX).
+ */
+//@cliArgs --device "MSPM0L130X" --package "VQFN-32(RHB)" --part "Default"
+//@v2CliArgs --device "MSPM0L1306" --package "VQFN-32(RHB)"
+// @cliArgs --board /ti/boards/LP_MSPM0L1306 --rtos nortos
+
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const Board  = scripting.addModule("/ti/driverlib/Board", {}, false);
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+
+SYSCTL.clockTreeEn = true;
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA9";
+UART1.peripheral.txPin.$assign = "PA8";
+UART1.targetBaudRate           = 115200;
+UART1.enableFIFO               = true;
+UART1.enabledInterrupts        = [];

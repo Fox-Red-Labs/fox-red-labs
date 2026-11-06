@@ -1,0 +1,36 @@
+diff --git a/drivers/interrupt_controller/Kconfig.gic b/drivers/interrupt_controller/Kconfig.gic
+index ef8b46d3644..c2f2d24beac 100644
+--- a/drivers/interrupt_controller/Kconfig.gic
++++ b/drivers/interrupt_controller/Kconfig.gic
+@@ -80,6 +80,16 @@ config HEAP_MEM_POOL_ADD_SIZE_GIC_V3_ITS
+ 	int
+ 	default 851968 if GIC_V3_ITS
+ 
++config GIC_SKIP_DISTRIBUTOR
++	bool "Never program the GIC distributor (another OS owns it)"
++	depends on GIC_V3
++	help
++	  Skip gicv3_dist_init() entirely: no GICD_CTLR write, no SPI group, priority,
++	  trigger or enable programming. Only this core redistributor wake, the CPU
++	  interface (ICC_* registers) and the SGI/PPI registers in its own redistributor
++	  are touched. For a second OS on another core that must not disturb the first.
++	  Unlike GIC_SAFE_CONFIG this does not look at GICD_CTLR at run time.
++
+ config GIC_SAFE_CONFIG
+ 	bool "GIC Distributor Safe Configuration"
+ 	depends on GIC
+diff --git a/drivers/interrupt_controller/intc_gicv3.c b/drivers/interrupt_controller/intc_gicv3.c
+index 77b77bb1d28..013f5d49bfa 100644
+--- a/drivers/interrupt_controller/intc_gicv3.c
++++ b/drivers/interrupt_controller/intc_gicv3.c
+@@ -556,6 +556,10 @@ static void gicv3_dist_init(void)
+ 	unsigned int idx;
+ 	mem_addr_t base = GIC_DIST_BASE;
+ 
++	if (IS_ENABLED(CONFIG_GIC_SKIP_DISTRIBUTOR)) {
++		return;
++	}
++
+ #ifdef CONFIG_GIC_SAFE_CONFIG
+ 	/*
+ 	 * Currently multiple OSes can run one the different CPU Cores which share single GIC,

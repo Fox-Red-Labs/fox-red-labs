@@ -1,0 +1,35 @@
+{
+ "name": "LP-MSPM33C321A LaunchPad development kit",
+ "sources": "MSPM33C321x data sheet SLASFB6A (Rev. A, revised September 2026; features, supply currents, flash wait states); LaunchPad user guide SLAU969 (December 2025; Table 2-1 jumpers, section 2.3 J101, 2.8 NOR flash, 2.9 OLED, Figure 4-2 header pinout); TI product and tool pages; MSPM33 SDK 1.04.00.00 on this Mac. All read 2026-10-07.",
+ "columns": [
+  {
+   "head": "The chip: MSPM33C321A",
+   "items": [
+    ["Processor: Arm Cortex-M33", "Up to 160 million steps a second (160 MHz), with a floating-point unit, DSP instructions and TrustZone (a hardware wall between trusted and normal code)"],
+    ["Flash: 1 MB", "Holds the program, in two banks that can swap for safe updates. Plus 32 kB of data flash for settings"],
+    ["RAM: 256 kB", "Working memory. Eight times the LP-MSPM0G3507, so full graphics buffers and big models fit"],
+    ["Power: 3.3 V on this board", "The chip accepts 1.71 to 3.6 V. Data sheet: 33.7 mA running CoreMark at 160 MHz, 8 µA in STANDBY"]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    ["GPIO: up to 93", "Plain on/off pins: LEDs, buttons, control lines"],
+    ["UART: 8 / SPI: 5 / I2C: up to 9", "Serial text, fast buses for screens and memory, two-wire sensor buses (many pins can be any of the three)"],
+    ["ADC: 2", "Two 12-bit converters, 9.4 million samples a second each, sampling at the same instant"],
+    ["Comparators: 2", "Each with an 8-bit DAC; the two DACs can also drive a pin"],
+    ["Timers: 9", "Up to 30 PWM outputs; two advanced timers for motors and power"],
+    ["Chip: security engines", "AES-256 and SHA-256 engines, a public-key engine (ECC, RSA), a true random number generator, secure boot from ROM"]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    ["On the board", "XDS110 debug probe with EnergyTrace (current measurement), 0.91 inch 128 x 32 OLED, 8 MB QSPI NOR flash, RGB LED, red LED, 2 buttons, 100 mF super capacitor for the battery domain, mikroBUS socket"],
+    ["Headers", "80-pin BoosterPack layout (J1 to J8) plus a mikroBUS socket"],
+    ["Not on the chip", "No neural accelerator (NPU), no radio, no trig math unit"],
+    ["Watch out", "Prototype kit in limited quantity. The out-of-box OLED demo is not in the SDK: back up flash and the NOR chip before writing anything"]
+   ]
+  }
+ ]
+}

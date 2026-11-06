@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="The setup for How fast a chip reacts to a signal: Signal, then interrupt, then LP-MSPM0G3507, then output">
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="20" y="58" width="120" height="68" rx="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<path d="M34 110 L66 110 L66 74 L126 74" fill="none" stroke="#161312" stroke-width="2.5" stroke-linejoin="round"/>
+<text x="80" y="148" text-anchor="middle" font-size="15" fill="#6B625B">signal in</text>
+<line x1="144" y1="92" x2="200" y2="92" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M194 86 L204 92 L194 98" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="175.0" y="80" text-anchor="middle" font-size="15" fill="#6B625B">interrupt</text>
+<rect x="210" y="58" width="170" height="68" rx="10" fill="#B42418"/>
+<text x="295.0" y="99.0" text-anchor="middle" font-size="18" font-weight="600" fill="#F7F3EC">LP-MSPM0L1306</text>
+<line x1="384" y1="92" x2="424" y2="92" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M418 86 L428 92 L418 98" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="434" y="58" width="146" height="68" rx="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="507.0" y="88.0" text-anchor="middle" font-size="15" font-weight="600" fill="#161312">handler runs</text>
+<text x="507.0" y="108.0" text-anchor="middle" font-size="15" font-weight="400" fill="#161312">cycles counted</text>
+<line x1="66" y1="196" x2="434" y2="196" stroke="#6B625B" stroke-width="1.5"/>
+<rect x="66" y="191" width="368" height="10" fill="#B42418"/>
+<line x1="66" y1="186" x2="66" y2="206" stroke="#161312" stroke-width="2.5"/>
+<text x="66" y="226" text-anchor="middle" font-size="15" fill="#6B625B">interrupt pends</text>
+<line x1="434" y1="186" x2="434" y2="206" stroke="#161312" stroke-width="2.5"/>
+<text x="434" y="226" text-anchor="middle" font-size="15" fill="#6B625B">handler starts</text>
+<text x="250" y="180" text-anchor="middle" font-size="16" font-weight="600" fill="#161312">25 to 28 cycles</text>
+<text x="588" y="250" text-anchor="end" font-size="12" fill="#6B625B">drawing; cycles as measured on this board</text></svg>

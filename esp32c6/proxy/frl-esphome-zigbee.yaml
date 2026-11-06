@@ -1,0 +1,45 @@
+# E38: ESPHome as a Zigbee end device on the ESP32-C6, the closest yardstick for a TI port. No Wi-Fi, no API,
+# no OTA: Zigbee and the logger only, as a CC2340R5 build would be. ESPHome's Zigbee on ESP32 supports sensors and
+# binary sensors only (its page: switch and number are nRF52 only), so the 20 "toggles" of the plan become
+# 20 counter reports from the board to ZHA.
+substitutions:
+  name: frl-esphome-zigbee
+
+esphome:
+  name: ${name}
+
+esp32:
+  variant: esp32c6
+  flash_size: 8MB
+  framework:
+    type: esp-idf
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+
+globals:
+  - id: zcount
+    type: int
+    initial_value: "0"
+
+zigbee:
+  model: "FRL zigbee test"
+
+sensor:
+  - platform: template
+    name: "Test counter"
+    id: test_counter
+    accuracy_decimals: 0
+    update_interval: never
+    report: force
+  - platform: internal_temperature
+    name: "Chip temperature"
+    update_interval: 30s
+
+interval:
+  - interval: 2s
+    then:
+      - lambda: |-
+          id(zcount)++;
+          id(test_counter).publish_state(id(zcount));
+          ESP_LOGW("e38", "count=%d heap=%u", id(zcount), (unsigned) esp_get_free_heap_size());

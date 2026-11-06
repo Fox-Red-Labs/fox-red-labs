@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="The setup for Run a small AI model on the chip: Room sensor data, then model, then LP-MSPM0G3507, then occupied or empty">
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="24" y="86" width="20" height="20" fill="#161312" stroke="#161312" stroke-width="1"/>
+<rect x="46" y="86" width="20" height="20" fill="#6B625B" stroke="#161312" stroke-width="1"/>
+<rect x="68" y="86" width="20" height="20" fill="#C9C0B7" stroke="#161312" stroke-width="1"/>
+<rect x="90" y="86" width="20" height="20" fill="#F7F3EC" stroke="#161312" stroke-width="1"/>
+<rect x="24" y="108" width="20" height="20" fill="#F7F3EC" stroke="#161312" stroke-width="1"/>
+<rect x="46" y="108" width="20" height="20" fill="#161312" stroke="#161312" stroke-width="1"/>
+<rect x="68" y="108" width="20" height="20" fill="#6B625B" stroke="#161312" stroke-width="1"/>
+<rect x="90" y="108" width="20" height="20" fill="#C9C0B7" stroke="#161312" stroke-width="1"/>
+<rect x="24" y="130" width="20" height="20" fill="#C9C0B7" stroke="#161312" stroke-width="1"/>
+<rect x="46" y="130" width="20" height="20" fill="#F7F3EC" stroke="#161312" stroke-width="1"/>
+<rect x="68" y="130" width="20" height="20" fill="#161312" stroke="#161312" stroke-width="1"/>
+<rect x="90" y="130" width="20" height="20" fill="#6B625B" stroke="#161312" stroke-width="1"/>
+<rect x="24" y="152" width="20" height="20" fill="#6B625B" stroke="#161312" stroke-width="1"/>
+<rect x="46" y="152" width="20" height="20" fill="#C9C0B7" stroke="#161312" stroke-width="1"/>
+<rect x="68" y="152" width="20" height="20" fill="#F7F3EC" stroke="#161312" stroke-width="1"/>
+<rect x="90" y="152" width="20" height="20" fill="#161312" stroke="#161312" stroke-width="1"/>
+<text x="67" y="200" text-anchor="middle" font-size="15" fill="#6B625B">sensor window</text>
+<line x1="150" y1="58" x2="200" y2="76" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="58" x2="200" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="58" x2="200" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="58" x2="200" y2="184" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="94" x2="200" y2="76" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="94" x2="200" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="94" x2="200" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="94" x2="200" y2="184" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="130" x2="200" y2="76" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="130" x2="200" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="130" x2="200" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="130" x2="200" y2="184" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="166" x2="200" y2="76" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="166" x2="200" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="166" x2="200" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="166" x2="200" y2="184" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="202" x2="200" y2="76" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="202" x2="200" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="202" x2="200" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="150" y1="202" x2="200" y2="184" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="200" y1="76" x2="250" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="200" y1="76" x2="250" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="200" y1="112" x2="250" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="200" y1="112" x2="250" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="200" y1="148" x2="250" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="200" y1="148" x2="250" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="200" y1="184" x2="250" y2="112" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<line x1="200" y1="184" x2="250" y2="148" stroke="#6B625B" stroke-width="1" opacity=".55"/>
+<circle cx="150" cy="58" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="150" cy="94" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="150" cy="130" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="150" cy="166" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="150" cy="202" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="200" cy="76" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="200" cy="112" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="200" cy="148" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="200" cy="184" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="250" cy="112" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="250" cy="148" r="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="200" y="236" text-anchor="middle" font-size="15" fill="#6B625B">the model, plain C</text>
+<line x1="118" y1="130" x2="134" y2="130" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M128 124 L138 130 L128 136" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="262" y1="130" x2="312" y2="130" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M306 124 L316 130 L306 136" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="290.0" y="118" text-anchor="middle" font-size="15" fill="#6B625B">runs on</text>
+<rect x="322" y="100" width="150" height="60" rx="10" fill="#B42418"/>
+<text x="397.0" y="137.0" text-anchor="middle" font-size="18" font-weight="600" fill="#F7F3EC">LP-MSPM0G3507</text>
+<line x1="476" y1="130" x2="494" y2="130" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M488 124 L498 130 L488 136" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="504" y="96" width="84" height="68" rx="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="546" y="124" text-anchor="middle" font-size="16" font-weight="600" fill="#161312">occupied</text>
+<text x="546" y="150" text-anchor="middle" font-size="15" fill="#6B625B">or empty</text>
+<text x="588" y="250" text-anchor="end" font-size="12" fill="#6B625B">drawing</text></svg>

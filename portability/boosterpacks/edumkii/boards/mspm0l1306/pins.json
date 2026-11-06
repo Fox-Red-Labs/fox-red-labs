@@ -1,0 +1,112 @@
+{
+ "board": "mspm0l1306",
+ "launchpad": "LP-MSPM0L1306",
+ "family": "mspm0",
+ "sysconfig_head": [
+  "--device \"MSPM0L130X\" --package \"VQFN-32(RHB)\" --part \"Default\"",
+  "--device \"MSPM0L1306\" --package \"VQFN-32(RHB)\""
+ ],
+ "lcd": false,
+ "lcd_variant": {
+  "gpio": {
+   "LCD_CS": "PA7",
+   "LCD_DC": "PA3"
+  },
+  "spi": {
+   "peripheral": "SPI0",
+   "sclk": "PA6",
+   "mosi": "PA5",
+   "miso": "PA4",
+   "bitrate": 8000000
+  },
+  "note": "build check only: the screen needs jumper wires from pin 18 to pin 13 (chip select) and from pin 19 to pin 31 (data/command); reset is the software reset"
+ },
+ "gpio": {
+  "BL_RED": "PA13",
+  "LED_GREEN": "PA26",
+  "LED_BLUE": "PA27",
+  "BUZZER": "PA12",
+  "I2C_SCL": "PA1",
+  "I2C_SDA": "PA0"
+ },
+ "uart": {
+  "peripheral": "UART0",
+  "tx": "PA8",
+  "baud": 115200
+ },
+ "adc": {
+  "kind": "adc12",
+  "map": {
+   "JOY_X": [
+    "ADC0",
+    2,
+    "PA25"
+   ],
+   "JOY_Y": [
+    "ADC0",
+    7,
+    "PA18"
+   ],
+   "MIC": [
+    "ADC0",
+    5,
+    "PA21"
+   ],
+   "ACC_X": [
+    "ADC0",
+    9,
+    "PA15"
+   ],
+   "ACC_Y": [
+    "ADC0",
+    8,
+    "PA16"
+   ]
+  }
+ },
+ "bp": {
+  "2": "PA25",
+  "5": "PA24",
+  "6": "PA21",
+  "9": "PA1",
+  "10": "PA0",
+  "13": "PA20 (SWCLK)",
+  "17": "PA19 (SWDIO)",
+  "23": "PA15",
+  "24": "PA16",
+  "25": "PA17 (op-amp input, no ADC)",
+  "26": "PA18",
+  "31": "not connected",
+  "32": "not connected",
+  "33": "not connected",
+  "37": "PA27",
+  "38": "PA26",
+  "39": "PA13",
+  "40": "PA12",
+  "7": "PA6 (SPI0 clock)",
+  "15": "PA5 (SPI0 data out)",
+  "34": "not connected"
+ },
+ "notes": {
+  "2": "PA25 reaches the on-board light sensor through J4: pull J4",
+  "5": "PA24 is not a GPIO in the VQFN-32 package (SysConfig lists no PA24): the press is read as analog channel 3 (ADC0.3) against 2048; PA24 also reaches the light sensor through J5: pull J5",
+  "10": "PA0 is also the red LED D2 through J2: pull J2 or the LED loads the I2C data line",
+  "13": "SWCLK: no screen select while the debugger is attached",
+  "17": "SWDIO: no screen reset while the debugger is attached",
+  "23": "PA15 carries the thermistor through J1: pull J1",
+  "37": "PA27 is the on-board blue LED through J13",
+  "38": "PA26 is the on-board red LED through J12",
+  "39": "PA13 is the on-board green LED through J3",
+  "25": "PA17 is an op-amp input: no accelerometer Z",
+  "31": "no pin: the screen has no data/command line",
+  "32": "no pin: no S2",
+  "33": "no pin: no S1",
+  "34": "no pin: the hello console is on pin 4 (PA8, UART TX through J16, the default routing to the probe)"
+ },
+ "joy_sel_adc": [
+  "ADC0",
+  3,
+  "PA24"
+ ],
+ "sysctl": []
+}

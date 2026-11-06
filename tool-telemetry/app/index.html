@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F4EFE6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Field Data</title>
+<style>
+:root{--red:#B42418;--ember:#8E1C13;--ink:#161312;--stone:#6B625B;--paper:#F4EFE6;--cream:#F7F3EC;--line:#E2D8C9;--ok:#2F6B3A;--warn:#8A5A00;
+--bg:var(--paper);--card:var(--cream);--text:var(--ink);--sub:var(--stone)}
+@media (prefers-color-scheme:dark){:root{--bg:#161312;--card:#211C1A;--text:#F7F3EC;--sub:#B9AFA6;--line:#3A322E;--ok:#7FC08A;--warn:#E0B060}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:16px/1.4 Barlow,"Helvetica Neue",Arial,system-ui,sans-serif}
+.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace}
+header{position:sticky;top:0;z-index:2;background:var(--bg);border-bottom:1px solid var(--line);padding:calc(10px + env(safe-area-inset-top)) 16px 10px}
+.brand{display:flex;align-items:baseline;gap:8px}
+.brand b{font-size:20px;font-weight:700;letter-spacing:.2px}
+.brand span{color:var(--sub);font-size:13px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--sub);margin-right:6px;vertical-align:1px}
+.dot.on{background:var(--ok)}
+#status{font-size:14px;color:var(--sub);margin-top:2px}
+nav{display:flex;gap:4px;margin-top:10px}
+nav button{flex:1;border:1px solid var(--line);background:transparent;color:var(--text);font:600 15px Barlow,system-ui,sans-serif;padding:8px 0;border-radius:8px}
+nav button[aria-selected=true]{background:var(--text);color:var(--bg);border-color:var(--text)}
+main{padding:12px 16px 40px;max-width:720px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+button.card{display:block;width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.tname{font-size:20px;font-weight:700}
+.sub{color:var(--sub);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stat b{display:block;font-size:24px;font-weight:700;line-height:1.1}
+.stat span{font-size:12px;color:var(--sub)}
+.stat.alert b{color:var(--red)}
+@media (prefers-color-scheme:dark){.stat.alert b{color:#F7F3EC;text-decoration:underline 2px #B42418}}
+.state{font-weight:600}
+.state.run{color:var(--ok)} .state.fault{color:var(--red)}
+.ev{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.ev:first-child{border-top:0}
+.ev .when{min-width:70px;color:var(--sub);font-size:13px}
+.ev.oc .what b,.ev.flt .what b,.ev.jam .what b{color:var(--red)}
+.mix{display:flex;height:14px;border-radius:7px;overflow:hidden;margin:10px 0 6px;background:var(--line)}
+.mix span{display:block;height:100%}
+.mix .c0{background:#C9BFB2}.mix .c1{background:#8A7F76}.mix .c2{background:#161312}.mix .c3{background:var(--red)}
+@media (prefers-color-scheme:dark){.mix .c2{background:#F7F3EC}}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--sub)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.btn{display:block;width:100%;border:0;border-radius:10px;padding:13px;font:600 16px Barlow,system-ui,sans-serif;background:var(--red);color:#F7F3EC;margin-top:10px}
+.btn:active{background:var(--ember)}
+.btn.sec{background:transparent;color:var(--text);border:1.5px solid var(--text)}
+.btn:disabled{opacity:.45}
+input{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);font:15px "JetBrains Mono",ui-monospace,monospace}
+label{font-size:13px;color:var(--sub);display:block;margin:12px 0 4px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:8px 0 0;font-size:15px}
+dt{color:var(--sub)} dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+svg.spark{width:100%;height:56px;display:block;margin-top:8px}
+.empty{color:var(--sub);text-align:center;padding:32px 8px}
+.back{background:none;border:0;color:var(--text);font:600 15px Barlow,system-ui,sans-serif;padding:4px 0 10px}
+.msg{font-size:14px;margin-top:8px}
+h2{font-size:15px;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);margin:18px 0 8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><b>Field Data</b><span>Fox Red Labs</span></div>
+  <div id="status"><span class="dot"></span>Starting…</div>
+  <nav role="tablist">
+    <button role="tab" data-tab="tools" aria-selected="true">Devices</button>
+    <button role="tab" data-tab="log" aria-selected="false">Events</button>
+    <button role="tab" data-tab="sync" aria-selected="false">Saved</button>
+  </nav>
+</header>
+<main id="main"></main>
+<script>
+"use strict";
+// Tool Tracker: reads a tool-telemetry hub (PROTOCOL.md section 3), keeps everything on the phone (IndexedDB), and
+// uploads to a home base later (section 4). Works the same served by the CC35X1 hub, the simulator or the home base.
+const EV = {1:["trig","Trigger pull"],2:["oc","Overcurrent trip"],3:["flt","Driver fault"],4:["boot","Tool restarted"],5:["boot","Tag restarted"],6:["model","Model installed"],7:["cmd","Command passed to the tool"]};
+const CMD = ["", "Stop", "Lock", "Unlock", "Run", "Lease"];
+// Event 7: v = command | argument << 8 (PROTOCOL.md section 7). A lock with 255 is the tag's own: the lease ran out.
+const cmdText = v => { const c = v & 255, a = v >> 8;
+  return c == 2 && a == 255 ? "Locked by the tag: no site hub renewed its lease in time" : c == 5 ? (a ? `Lease of ${a} min from the site hub` : "Lease rule ended")
+    : (CMD[c] || "Command") + (c == 4 ? ` at ${a}%` : "") + ", signature checked"; };
+const ST = ["Idle","Running","Fault","Locked"];
+const LOAD = ["Light","Normal","Heavy","Jam"];
+// App schemas from portability/fielddata/apps/*.json, put here by app/embed.py. App 1 is the tool format.
+const APPS = Object.fromEntries((/*APPS*/[]).map(a => [a.id, a]));
+const appOf = t => APPS[t.app || 1] || {id: t.app, title: "App " + t.app, fields: [], headline: []};
+const fieldVal = (f, raw) => raw == null ? "–" : f.type == "enum" ? (f.values[raw] ?? raw) : num(raw) + (f.unit && f.unit != "count" ? " " + f.unit : "");
+const named = (app, f) => Object.fromEntries((app.fields || []).filter(x => f && f[x.id] != null).map(x => [x.name, fieldVal(x, f[x.id])]));
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmtRun = s => { s = s|0; const h = (s/3600)|0, m = ((s%3600)/60)|0; return h ? `${h}h ${m}m` : `${m}m ${s%60}s`; };
+const ago = t => { const d = Math.max(0, Date.now()/1000 - t); return d < 60 ? `${d|0}s ago` : d < 3600 ? `${(d/60)|0}m ago` : d < 86400 ? `${(d/3600)|0}h ago` : new Date(t*1000).toLocaleDateString(); };
+const clock = t => new Date(t*1000).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit",second:"2-digit"});
+const num = n => (n ?? 0).toLocaleString();
+
+// ---------- storage ----------
+let db;
+function openDb(){ return new Promise((ok, bad) => {
+  const r = indexedDB.open("frl-tooltracker", 1);
+  r.onupgradeneeded = () => { const d = r.result;
+    d.createObjectStore("items", {keyPath: "key"}).createIndex("up", "uploaded");
+    d.createObjectStore("tags", {keyPath: "key"}); d.createObjectStore("meta"); };
+  r.onsuccess = () => ok(r.result); r.onerror = () => bad(r.error); }); }
+const tx = (store, mode="readonly") => db.transaction(store, mode).objectStore(store);
+const req = r => new Promise((ok, bad) => { r.onsuccess = () => ok(r.result); r.onerror = () => bad(r.error); });
+const getMeta = k => req(tx("meta").get(k));
+const setMeta = (k, v) => req(tx("meta", "readwrite").put(v, k));
+async function putMany(store, rows){ if (!rows.length) return; await new Promise((ok, bad) => {
+  const t = db.transaction(store, "readwrite"), s = t.objectStore(store); rows.forEach(r => s.put(r));
+  t.oncomplete = ok; t.onerror = () => bad(t.error); }); }
+const all = store => req(tx(store).getAll());
+
+// ---------- state ----------
+const S = {ctlMsg: "", tab: "tools", hub: null, info: null, tags: [], items: [], savedTags: [], detail: null, lastPoll: 0, msg: "", busy: false, boot: null};
+// The page may have been opened on the site network (the hub's site address) and the phone then moved to the hub's own
+// Wi-Fi, where only 10.0.0.3 answers: try where the page came from, then the hub's access point, and keep what works.
+let base = location.protocol.startsWith("http") ? "" : "http://10.0.0.3";
+const AP = "http://10.0.0.3";
+
+async function fetchOnce(b, path, opt, ms){
+  const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
+  try { const r = await fetch(b + path, {...opt, signal: c.signal, cache: "no-store"}); if (!r.ok) throw new Error(r.status); return await r.json(); }
+  finally { clearTimeout(t); } }
+
+async function fetchJson(path, opt = {}, ms = 2500){
+  try { return await fetchOnce(base, path, opt, ms); }
+  catch (e) {
+    const alt = base ? "" : (location.origin == AP ? null : AP);
+    if (alt === null || (alt === "" && !location.protocol.startsWith("http"))) throw e;
+    const j = await fetchOnce(alt, path, opt, ms);
+    base = alt;
+    return j;
+  } }
+
+// Everything from a hub is rendered later, so numbers are forced to numbers and only known text fields stay text.
+const TEXT = new Set(["addr", "name", "tool", "a", "k", "hub"]);
+const tidy = o => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, TEXT.has(k) ? String(v ?? "").slice(0, 40) :
+  k == "f" && v && typeof v == "object" ? Object.fromEntries(Object.entries(v).slice(0, 16).map(([i, x]) => [Number(i), Number(x)])) : (v == null ? null : Number(v))]));
+
+// One poll: info, tags, new log items. Items get a phone-clock time when the hub has none.
+async function poll(){
+  let info;
+  try { info = await fetchJson("/api/info"); } catch { S.hub = null; render(); return; }
+  // Only the fields the page uses, as numbers or a hub name in the hubs' own pattern; anything else is no hub.
+  const n = v => Number.isFinite(Number(v)) ? Number(v) : 0;
+  info = {hub: String(info.hub ?? ""), up: n(info.up), unix: n(info.unix), recs: n(info.recs),
+          scan: {ext: n(info.scan?.ext), legacy: n(info.scan?.legacy)},
+          site: info.site && Number.isFinite(Number(info.site.lat)) && Number.isFinite(Number(info.site.lon)) ? {lat: Number(info.site.lat), lon: Number(info.site.lon)} : null};
+  if (!/^FRL-HUB-[0-9A-F]{4}$/.test(info.hub)) { S.hub = null; render(); return; }
+  const now = Date.now()/1000;
+  if (!info.unix || Math.abs(info.unix - now) > 30) {
+    try { await fetchJson("/api/time", {method: "POST", headers: {"Content-Type": "application/x-www-form-urlencoded"}, body: "unix=" + Math.round(now)}); } catch {}
+  }
+  // A hub that restarted starts its log at 0 again: give that run its own key space.
+  let cur = (await getMeta("hub:" + info.hub)) || {};
+  if (!cur.boot || info.up < (cur.up ?? 0) || (cur.next ?? 0) > info.recs) cur = {boot: Math.round(now - info.up), next: 0};
+  cur.up = info.up;
+  S.hub = info.hub; S.info = info; S.lastPoll = now;
+  const tags = (await fetchJson("/api/tags")).map(tidy);
+  S.tags = tags;
+  await putMany("tags", tags.map(t => ({...t, key: t.addr, hub: info.hub, seen: Math.round(now - t.age)})));
+  for (let guard = 0; guard < 20; guard++) {
+    const page = await fetchJson("/api/log?since=" + cur.next, {}, 5000);
+    const rows = page.items.map(tidy).map(it => {
+      const unix = it.unix || (it.up != null ? Math.round(now - (info.up - it.up)) : 0);
+      return {...it, unix, hub: info.hub, key: `${info.hub}:${cur.boot}:${it.i}`, uploaded: 0};
+    });
+    await putMany("items", rows);
+    cur.next = page.next;
+    if (!page.more) break;
+  }
+  await setMeta("hub:" + info.hub, cur);
+  await loadSaved(); render();
+}
+
+async function loadSaved(){
+  S.items = await all("items");
+  S.items.sort((a, b) => (b.unix - a.unix) || (b.i - a.i));
+  S.savedTags = await all("tags");
+}
+
+// ---------- views ----------
+function statusLine(){
+  const el = $("#status");
+  if (S.hub) el.innerHTML = `<span class="dot on"></span>Connected to <b>${esc(S.hub)}</b> · ${S.tags.length} device${S.tags.length==1?"":"s"} · ${num(S.info.scan.ext)} extended, ${num(S.info.scan.legacy)} legacy frames${S.info.site ? ` · site <a href="https://www.google.com/maps?q=${S.info.site.lat.toFixed(3)},${S.info.site.lon.toFixed(3)}" target="_blank" rel="noopener">${S.info.site.lat.toFixed(3)}, ${S.info.site.lon.toFixed(3)}</a>` : ""}`;
+  else el.innerHTML = `<span class="dot"></span>No hub in reach · showing ${num(S.items.length)} saved records`;
+}
+
+// A tag whose tool MCU went quiet must not keep saying Running.
+function stateTag(t){
+  const quiet = t.link != null && t.link > 15, st = t.st|0;
+  const cls = quiet ? "" : st == 1 ? "run" : st == 2 ? "fault" : "";
+  const text = quiet ? (t.link == 65535 ? "No tool link" : "Tool silent " + fmtRun(t.link)) : ST[st] + (st == 1 && t.rpm ? " · " + num(t.rpm) + " rpm" : "");
+  return `<span class="state ${cls}">${text}</span>`;
+}
+
+function devicesView(){
+  const live = S.hub ? S.tags : S.savedTags;
+  const ids = [...new Set(live.map(t => t.app || 1))].sort();
+  if (ids.length <= 1 && (ids[0] || 1) == 1) return toolsView();
+  return ids.map(id => `<h2>${esc(APPS[id]?.title || "App " + id)}</h2>` + (id == 1 ? toolsView(live.filter(t => (t.app || 1) == 1)) :
+    live.filter(t => t.app == id).map(genericCard).join(""))).join("");
+}
+
+function genericCard(t){
+  const app = appOf(t), v = named(app, t.f);
+  const last = S.hub ? `heard ${t.age}s ago · ${t.rssi} dBm` : `last seen ${ago(t.seen)}`;
+  const head = app.headline.map(h => `<div class="stat"><b>${esc(v[h] ?? "–")}</b><span>${esc(h.replace(/_/g, " "))}</span></div>`).join("");
+  return `<button class="card" data-addr="${esc(t.addr)}"><div class="row"><span class="tname">${esc(t.name || t.addr)}</span><span class="state">${esc(app.device_noun || "")}</span></div>
+    <div class="sub">${esc(app.title)} · ${last}</div><div class="stats">${head}</div></button>`;
+}
+
+function genericDetail(t){
+  const app = appOf(t), v = named(app, t.f);
+  const mine = S.items.filter(i => i.a == t.addr && i.k == "g").slice(0, 300);
+  const lab = app.label && app.fields.find(f => f.name == app.label.field);
+  let mix = "";
+  if (lab && mine.length) {
+    const n = lab.values.map((_, k) => mine.filter(i => i.f && i.f[lab.id] == k).length), tot = n.reduce((a, b) => a + b, 0) || 1;
+    mix = `<h2>Time in each ${esc(lab.name)}</h2><div class="card"><div class="sub">${num(tot)} saved samples, as the ${esc(app.device_noun)} reported them</div>
+      <div class="mix">${n.map((c, k) => c ? `<span class="c${Math.min(k, 3)}" style="width:${100 * c / tot}%"></span>` : "").join("")}</div>
+      <div class="legend">${lab.values.map((w, k) => `<span><i class="c${Math.min(k, 3)}" style="background:${["#C9BFB2","#8A7F76","currentColor","#B42418"][Math.min(k, 3)]}"></i>${esc(w)} ${Math.round(100 * n[k] / tot)}%</span>`).join("")}</div></div>`;
+  }
+  const rows = mine.slice(0, 30).map(i => { const w = named(app, i.f); return `<div class="ev"><div class="when">${i.unix ? clock(i.unix) : ""}</div>
+    <div class="what"><b>${esc(w[app.headline[0]] ?? "")}</b>${app.headline.slice(1).map(h => " · " + esc(w[h] ?? "–")).join("")}</div></div>`; }).join("");
+  return `<button class="back" data-back>‹ All devices</button>
+  <div class="card"><div class="row"><span class="tname">${esc(t.name || t.addr)}</span><span class="state">${esc(app.title)}</span></div>
+  <div class="sub mono">${esc(t.addr)}</div><dl>${app.fields.map(f => `<dt>${esc(f.name.replace(/_/g, " "))}</dt><dd>${esc(v[f.name] ?? "–")}</dd>`).join("")}</dl></div>
+  ${mix}<h2>Recent samples</h2><div class="card">${rows || `<div class="sub">None saved yet.</div>`}</div>`;
+}
+
+function toolsView(list){
+  const live = list || (S.hub ? S.tags : S.savedTags);
+  if (!live.length) return `<div class="empty">${S.hub ? "The hub has not heard a tool yet. Tags advertise every 0.5 s; give it a few seconds." : "No hub in reach and nothing saved yet. Join the hub's Wi-Fi (FRL-HUB-…) and open this page again."}</div>`;
+  return live.slice().sort((a, b) => (a.tool || a.name).localeCompare(b.tool || b.name)).map(t => {
+    const st = t.st|0;
+    const last = S.hub ? `heard ${t.age}s ago · ${t.rssi} dBm` : `last seen ${ago(t.seen)}`;
+    return `<button class="card" data-addr="${esc(t.addr)}">
+      <div class="row"><span class="tname">${esc(t.tool || t.name || t.addr)}</span>${stateTag(t)}</div>
+      <div class="sub">${esc(t.name || "")} · ${last}${t.soc != 255 && t.soc != null ? " · battery " + t.soc + "%" : ""}</div>
+      <div class="stats">
+        <div class="stat"><b>${num(t.trig)}</b><span>trigger pulls</span></div>
+        <div class="stat ${t.oc ? "alert" : ""}"><b>${num(t.oc)}</b><span>overcurrent trips</span></div>
+        <div class="stat"><b>${fmtRun(t.run)}</b><span>motor run time</span></div>
+      </div></button>`; }).join("");
+}
+
+function evRow(it, showTool){
+  const [cls, label] = EV[it.type] || ["", "Event " + it.type];
+  const tag = S.savedTags.find(t => t.addr == it.a);
+  if (it.k == "c") {                     // the hub's record of delivering a signed command (PROTOCOL.md section 7)
+    const why = {1: "bad signature", 2: "old counter, a replay", 3: "not a command", 40: "tag out of reach", 50: "timed out"}[Number(it.err)|0] || `code ${Number(it.err)|0}`;
+    return `<div class="ev ${it.ok ? "" : "jam"}"><div class="when">${it.unix ? clock(it.unix) : ""}</div>
+    <div class="what"><b>${CMD[Number(it.cmd)|0] || "Command"} sent by the hub</b> · ${it.ok ? `delivered in ${((Number(it.ms)|0)/1000).toFixed(1)} s` : `refused: ${why}`}${showTool ? `<div class="sub">${esc(tag ? (tag.tool || tag.name) : it.a)}</div>` : ""}</div></div>`;
+  }
+  if (it.k == "m") {                     // the hub's record of sending a model to this tag (PROTOCOL.md section 5)
+    return `<div class="ev ${it.ok ? "" : "jam"}"><div class="when">${it.unix ? clock(it.unix) : ""}</div>
+    <div class="what"><b>Model v${Number(it.ver)|0} sent by the hub</b> · ${it.ok ? `installed in ${((Number(it.ms)|0)/1000).toFixed(1)} s` : `not installed (code ${Number(it.err)|0})`}${showTool ? `<div class="sub">${esc(tag ? (tag.tool || tag.name) : it.a)}</div>` : ""}</div></div>`;
+  }
+  const detail = it.type == 1 ? (it.v/1000).toFixed(1) + " s pull" : it.type == 2 ? (it.v ? (it.v/1000).toFixed(1) + " A peak" : "no current reading") : it.type == 3 ? "code " + it.v : it.type == 5 ? "start " + it.v : it.type == 6 ? "version " + (Number(it.v)|0) + ", signature checked on the tag" : it.type == 7 ? cmdText(Number(it.v)|0) : "";
+  return `<div class="ev ${cls}"><div class="when">${it.unix ? clock(it.unix) : "before restart"}</div>
+    <div class="what"><b>${label}</b>${detail ? " · " + detail : ""}${showTool ? `<div class="sub">${esc(tag ? (tag.tool || tag.name) : it.a)}</div>` : ""}</div></div>`;
+}
+
+function logView(){
+  const evs = S.items.filter(i => i.k == "e" || i.k == "m" || i.k == "c").slice(0, 200);
+  if (!evs.length) return `<div class="empty">No events yet. A trigger pull or an overcurrent trip shows up here a second or two after it happens.</div>`;
+  return `<div class="card">${evs.map(e => evRow(e, true)).join("")}</div>`;
+}
+
+function spark(snaps){
+  if (snaps.length < 2) return "";
+  const xs = snaps.map(s => s.unix), ys = snaps.map(s => s.trig);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const pts = snaps.map(s => `${((s.unix - x0) / Math.max(1, x1 - x0) * 300).toFixed(1)},${(52 - (s.trig - y0) / Math.max(1, y1 - y0) * 48).toFixed(1)}`).join(" ");
+  return `<svg class="spark" viewBox="0 0 300 56" preserveAspectRatio="none" aria-label="trigger pulls over time"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>
+    <div class="row sub"><span>${clock(x0)}</span><span>trigger pulls, ${num(y0)} to ${num(y1)}</span><span>${clock(x1)}</span></div>`;
+}
+
+function detailView(){
+  const t = S.tags.find(x => x.addr == S.detail) || S.savedTags.find(x => x.addr == S.detail);
+  if (t && (t.app || 1) != 1) return genericDetail(t);
+  if (!t) return `<button class="back" data-back>‹ All devices</button><div class="empty">Waiting for this tool…</div>`;
+  const mine = S.items.filter(i => i.a == t.addr);
+  let snaps = mine.filter(i => i.k == "s" && i.unix).sort((a, b) => a.unix - b.unix);
+  const reset = snaps.findLastIndex((s, k) => k > 0 && s.trig < snaps[k - 1].trig);   // totals restart with the tool MCU
+  if (reset > 0) snaps = snaps.slice(reset);
+  const evs = mine.filter(i => i.k == "e" || i.k == "m" || i.k == "c");
+  const linkTxt = t.link == null ? "–" : t.link == 65535 ? "never" : t.link + " s ago";
+  return `<button class="back" data-back>‹ All devices</button>
+  <div class="card"><div class="row"><span class="tname">${esc(t.tool || t.name)}</span>${stateTag(t)}</div>
+  <div class="sub mono">${esc(t.addr)} · ${esc(t.name || "")}</div>
+  <div class="stats"><div class="stat"><b>${num(t.trig)}</b><span>trigger pulls</span></div>
+  <div class="stat ${t.oc?"alert":""}"><b>${num(t.oc)}</b><span>overcurrent trips</span></div>
+  <div class="stat"><b>${fmtRun(t.run)}</b><span>motor run time</span></div></div>${spark(snaps)}</div>
+  <div class="card"><dl>
+    <dt>Speed now / peak</dt><dd>${num(t.rpm)} / ${num(t.rpmx)} rpm</dd>
+    <dt>Peak phase current</dt><dd>${((t.ipk|0)/1000).toFixed(2)} A</dd>
+    <dt>Supply</dt><dd>${((t.vb|0)/1000).toFixed(2)} V</dd>
+    <dt>Tool temperature</dt><dd>${t.tc} °C</dd>
+    <dt>Driver faults</dt><dd>${num(t.flt)}</dd>
+    <dt>Battery</dt><dd>${t.soc == 255 || t.soc == null ? "no data" : `${t.soc}% · ${num(t.cyc)} cycles · ${((t.bvb|0)/1000).toFixed(1)} V`}</dd>
+    <dt>Tool to tag link</dt><dd>${linkTxt}${t.rxbad ? ` · ${t.rxbad} bad lines` : ""}</dd>
+    <dt>Frames heard</dt><dd>${t.ne != null ? `${num(t.ne)} extended · ${num(t.nl)} legacy` : "–"}</dd>
+    <dt>Model on the tag</dt><dd>${t.mv ? `v${Number(t.mv)|0}, installed over the air` : t.fw >= 2 ? "v0, built in" : "built in"}${t.fw ? ` · tag firmware ${Number(t.fw)|0}` : ""}</dd>
+  </dl></div>
+  <div class="card"><b>Lock or unlock this tool</b>
+    <div class="sub">The home base signs the command (this phone holds no key) and the hub carries it to the tool. Needs the home base address from the Saved tab (and its token, if it was started with one), and this phone on the same network.</div>
+    <button class="btn sec" data-ctl="lock" data-tool="${esc(t.addr)}">Lock</button>
+    <button class="btn sec" data-ctl="unlock" data-tool="${esc(t.addr)}">Unlock</button>
+    ${S.ctlMsg ? `<div class="msg">${esc(S.ctlMsg)}</div>` : ""}</div>
+  ${loadView(mine.filter(i => i.k == "p"))}
+  <h2>Events</h2><div class="card">${evs.length ? evs.slice(0, 100).map(e => evRow(e, false)).join("") : `<div class="sub">None saved for this tool.</div>`}</div>`;
+}
+
+// How the tool is being used, one trigger pull at a time, as the model on the tag classified each pull.
+function loadView(pulls){
+  if (!pulls.length) return "";
+  const n = [0, 0, 0, 0];
+  pulls.forEach(p => { if (p.cls < 4) n[p.cls]++; });
+  const tot = n.reduce((a, b) => a + b, 0) || 1;
+  const pct = k => Math.round(100 * n[k] / tot);
+  const bar = n.map((c, k) => c ? `<span class="c${k}" style="width:${100 * c / tot}%"></span>` : "").join("");
+  const hard = pct(2) + pct(3);
+  const note = hard >= 40 ? `${hard}% of runs are heavy or jammed: the job may want larger equipment, and the battery and motor run hot.`
+    : pct(3) >= 10 ? `${pct(3)}% of runs jammed: worth checking the load and drivetrain.`
+    : `Mostly light and normal work.`;
+  const rows = pulls.slice(0, 25).map(p => `<div class="ev ${p.cls == 3 ? "jam" : ""}"><div class="when">${p.unix ? clock(p.unix) : ""}</div>
+    <div class="what"><b>${LOAD[p.cls] ?? "Unclassified"}</b> · ${(p.dur/1000).toFixed(1)} s · ${num(p.ravg)} rpm avg${p.iavg ? " · " + (p.iavg/1000).toFixed(1) + " A" : ""}</div></div>`).join("");
+  return `<h2>How it is used</h2><div class="card"><div class="sub">${num(tot)} trigger pulls, each classified on the tag by a small model</div>
+    <div class="mix" role="img" aria-label="load mix">${bar}</div>
+    <div class="legend">${LOAD.map((l, k) => `<span><i class="c${k}" style="background:${["#C9BFB2","#8A7F76","currentColor","#B42418"][k]}"></i>${l} ${pct(k)}%</span>`).join("")}</div>
+    <div class="msg">${note}</div></div>
+    <h2>Recent pulls</h2><div class="card">${rows}</div>`;
+}
+
+function syncView(){
+  const pending = S.items.filter(i => !i.uploaded).length;
+  const hubs = [...new Set(S.items.map(i => i.hub))];
+  const oldest = S.items.length ? S.items[S.items.length - 1].unix : 0;
+  return `<div class="card"><dl>
+    <dt>Saved on this phone</dt><dd>${num(S.items.length)} records</dd>
+    <dt>Tools</dt><dd>${S.savedTags.length}</dd>
+    <dt>Hubs</dt><dd>${esc(hubs.join(", ") || "–")}</dd>
+    <dt>Oldest</dt><dd>${oldest ? new Date(oldest*1000).toLocaleString() : "–"}</dd>
+    <dt>Waiting to upload</dt><dd>${num(pending)}</dd></dl>
+    <button class="btn sec" data-act="csv" ${S.items.length ? "" : "disabled"}>Save a copy (CSV)</button>
+    <button class="btn sec" data-act="json" ${S.items.length ? "" : "disabled"}>Save a copy (JSON)</button></div>
+  <div class="card"><b>Upload to home base</b>
+    <div class="sub">When this phone has internet or is on the home network, it sends what it saved. Records already there are skipped.</div>
+    <label for="hb">Home base address</label><input id="hb" value="${esc(localStorage.getItem("frl-hb") || "")}" placeholder="http://<server address>:8090" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <label for="hbt">Upload token (if the home base asks for one)</label><input id="hbt" type="password" value="${esc(sessionStorage.getItem("frl-hbt") || "")}" autocomplete="off">
+    <button class="btn" data-act="upload" ${pending && !S.busy ? "" : "disabled"}>Upload ${num(pending)} records</button>
+    <div class="msg">${esc(S.msg)}</div></div>`;
+}
+
+// Deep links: #tools, #events, #saved, #tool=<tag address>
+function fromHash(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith("tool=")) { S.tab = "tools"; S.detail = h.slice(5); }
+  else if (["tools", "events", "saved"].includes(h)) { S.tab = h == "events" ? "log" : h == "saved" ? "sync" : "tools"; S.detail = null; }
+}
+function toHash(){
+  const h = S.detail ? "tool=" + S.detail : S.tab == "log" ? "events" : S.tab == "sync" ? "saved" : "tools";
+  if (location.hash.slice(1) != h) history.replaceState(null, "", "#" + h);
+}
+window.addEventListener("hashchange", () => { fromHash(); render(); });
+
+function render(){
+  toHash();
+  statusLine();
+  document.querySelectorAll("nav button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab == S.tab));
+  const m = $("#main");
+  m.innerHTML = S.tab == "tools" ? (S.detail ? detailView() : devicesView()) : S.tab == "log" ? logView() : syncView();
+}
+
+// ---------- actions ----------
+function download(name, text, type){
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], {type})); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000); }
+const stamp = () => new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
+
+async function upload(){
+  const url = ($("#hb").value || "").trim().replace(/\/$/, "");
+  if (!/^https?:\/\//.test(url)) { S.msg = "Enter the home base address, starting with http:// or https://"; render(); return; }
+  localStorage.setItem("frl-hb", url);
+  // The token is kept for this browser session only: every hub serves this page from the same address, so
+  // anything kept long-term here could be read by any page that hub address serves later.
+  const token = ($("#hbt").value || "").trim();
+  sessionStorage.setItem("frl-hbt", token);
+  const host = new URL(url).hostname;
+  const local = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)|\.local$/.test(host);
+  if (token && url.startsWith("http://") && !local) { S.msg = "Send the token only over https, or to a home base on your own network."; render(); return; }
+  S.busy = true; S.msg = "Uploading…"; render();
+  let sent = 0;
+  try {
+    const pending = S.items.filter(i => !i.uploaded);
+    for (let k = 0; k < pending.length; k += 500) {
+      const batch = pending.slice(k, k + 500);
+      const byHub = {};
+      batch.forEach(b => (byHub[b.hub] ||= []).push(b));
+      for (const [hub, items] of Object.entries(byHub)) {
+        const tags = S.savedTags.filter(t => t.hub == hub);
+        const r = await fetch(url + "/api/ingest", {method: "POST", headers: {"Content-Type": "application/json", "X-Token": token},
+          body: JSON.stringify({via: "phone", hub, items, tags})});
+        if (!r.ok) throw new Error("home base answered " + r.status);
+      }
+      await putMany("items", batch.map(b => ({...b, uploaded: Math.round(Date.now()/1000)})));
+      sent += batch.length;
+    }
+    S.msg = `Uploaded ${num(sent)} records.`;
+  } catch (e) { S.msg = `Stopped after ${num(sent)} records: ${e.message}. They stay on the phone; try again later.`; }
+  S.busy = false; await loadSaved(); render();
+}
+
+// Lock or unlock through the home base: it signs, the hub delivers, the tag checks, the tool acts.
+async function control(addr, cmd){
+  const url = (localStorage.getItem("frl-hb") || "").replace(/\/$/, ""), token = sessionStorage.getItem("frl-hbt") || "";
+  if (!url) { S.ctlMsg = "Enter the home base address on the Saved tab first."; render(); return; }
+  S.ctlMsg = (cmd == "lock" ? "Locking" : "Unlocking") + "…"; render();
+  try {
+    const r = await fetch(url + "/api/control", {method: "POST", headers: {"Content-Type": "application/json", "X-Token": token},
+                                                 body: JSON.stringify({tag: addr, cmd})});
+    const j = await r.json();
+    S.ctlMsg = j.ok ? `${cmd == "lock" ? "Locked" : "Unlocked"}: ${String(j.result || "").slice(0, 60)}. The tool shows it within seconds.` : `Not done: ${String(j.error || j.result || r.status).slice(0, 80)}`;
+  } catch { S.ctlMsg = "The home base did not answer: this phone must be on the home network."; }
+  render();
+}
+
+document.addEventListener("click", e => {
+  const tab = e.target.closest("nav button");
+  if (tab) { S.tab = tab.dataset.tab; S.detail = null; render(); return; }
+  const ctl = e.target.closest("[data-ctl]");
+  if (ctl) { control(ctl.dataset.tool, ctl.dataset.ctl); return; }
+  const card = e.target.closest("[data-addr]");
+  if (card) { S.detail = card.dataset.addr; render(); window.scrollTo(0, 0); return; }
+  if (e.target.closest("[data-back]")) { S.detail = null; render(); return; }
+  const act = e.target.closest("[data-act]")?.dataset.act;
+  if (act == "csv") {
+    const cols = ["hub","a","k","unix","seq","st","trig","oc","flt","run","rpm","soc","tc","id","type","v","pid","dur","ravg","rmax","iavg","ipk","vmin","cls","app"];
+    const fcols = [...new Map(Object.values(APPS).filter(a => a.id != 1).flatMap(a => a.fields.map(f => [a.name + "." + f.name, [a.id, f.id]])))];
+    download(`field-data-${stamp()}.csv`, cols.concat(fcols.map(c => c[0])).join(",") + "\n" + S.items.map(i => cols.map(c => i[c] ?? "")
+      .concat(fcols.map(([, [aid, fid]]) => i.k == "g" && i.app == aid && i.f ? (i.f[fid] ?? "") : "")).join(",")).join("\n"), "text/csv");
+  } else if (act == "json") download(`tools-${stamp()}.json`, JSON.stringify({items: S.items, tags: S.savedTags}), "application/json");
+  else if (act == "upload") upload();
+});
+
+(async () => {
+  fromHash();
+  db = await openDb(); await loadSaved(); render();
+  const loop = async () => { if (!document.hidden && !(S.tab == "sync" && ["hb", "hbt"].includes(document.activeElement?.id))) { try { await poll(); } catch (e) { S.hub = null; render(); } } setTimeout(loop, 2000); };
+  loop();
+})();
+</script>
+</body>
+</html>

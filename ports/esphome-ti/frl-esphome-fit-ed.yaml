@@ -1,0 +1,25 @@
+# E105: the smallest ESPHome device that uses everything the Zigbee component needs: one switch (the red LED) and one
+# sensor (the chip's own temperature), Zigbee on, nothing else. No logger, no Wi-Fi, no API, no OTA.
+# It is written for ESPHome's existing nrf52 platform (the only platform whose Zigbee component exposes switches),
+# so `esphome compile --only-generate` produces the C++ that ports/esphome-ti/build.sh then builds for the TI chip.
+# Pin "P0.16" is the red LED (DIO16) on the LP-EM-CC2755P10; the TI shim maps the pin number to the board's LED.
+esphome:
+  name: frl-esphome-fit
+
+nrf52:
+  board: adafruit_itsybitsy_nrf52840
+
+zigbee:
+  router: false
+  model: "FRL fit test"
+
+switch:
+  - platform: gpio
+    name: "LED"
+    pin: P0.16
+    restore_mode: ALWAYS_OFF
+
+sensor:
+  - platform: internal_temperature
+    name: "Chip temperature"
+    update_interval: 30s

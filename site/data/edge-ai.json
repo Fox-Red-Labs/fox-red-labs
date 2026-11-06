@@ -1,0 +1,340 @@
+{
+  "about": "Inputs for the Edge AI section of site/benchmarks.html (tools/edge_ai_section.py, called by tools/render_benchmarks.py). Timings are not here: they are rows in data/results/<board>.csv. This file holds what the store does not: each model's size, each chip's core features, the boards on order to project, and which TI AI examples ship for which board. Every block names its source.",
+  "models": {
+    "source": "mspm0g3507/mcu-bench/edgeai/uci-room-occupancy/<model>/layers.json (macs, scratch_ram_bytes, weight_and_param_bytes) and mspm0g3507/mcu-bench/edgeai/README.md (parameters: weights plus biases after batch norm is folded). MACs counted per layer from the shapes in layers.json: occ_cnn_500 = 8x4x5x32 + 16x8x3x16 + 16x4 = 11,328; the same sum checked for the other three.",
+    "list": [
+      {
+        "id": "occ_cnn_500",
+        "params": 636,
+        "macs": 11328,
+        "ram_bytes": 1152,
+        "weight_bytes": 860
+      },
+      {
+        "id": "occ_cnn_2k",
+        "params": 1748,
+        "macs": 33856,
+        "ram_bytes": 1152,
+        "weight_bytes": 2164
+      },
+      {
+        "id": "occ_cnn_8k",
+        "params": 8484,
+        "macs": 157824,
+        "ram_bytes": 2176,
+        "weight_bytes": 9284
+      },
+      {
+        "id": "occ_cnn_30k",
+        "params": 32836,
+        "macs": 610560,
+        "ram_bytes": 4224,
+        "weight_bytes": 34404
+      }
+    ],
+    "kind": "1-D convolutional nets, int8 weights and integer arithmetic only, 4 sensor channels by 32 time steps in, 4 classes out (0 to 3 people in a room)"
+  },
+  "chips": {
+    "source": "data/boards.csv for core and clock; FPU and accelerators from each board's bench notes: cc1354p10/bench/results/ai_occ_nnc-occ_cnn_8k.txt (Cortex-M33F), c2000-launchpad/bench/fft-and-adc.md (TI FPU DSP library), c2000-launchpad/bench/control-loop.md (TMU), mspm0g3507/mcu-bench/ctrl/README.md (MATHACL), mspm0g3507/mcu-bench/README.md (no NPU on the G3507; it is on the MSPM0G5187); compilers from each board's result files (cc2340r5/bench/results/ai_occ_c-O3.txt: prebuilt model libraries from mcu-bench/edgeai, TI Arm Clang 4.0.4; cc1354p10/bench/results/ai_occ_c-O3.txt: model C compiled with TI Arm Clang 5.1.1) and c2000-launchpad/bench/ai-models.md (NNC 2.1.2, C2000 compiler 25.11.1); the C28x stores each byte in 16 bits, so its weights take about 2 bytes per parameter (65.7 kB for 33k parameters in data/results/f2800137.csv)",
+    "boards": {
+      "mspm0g3507": {
+        "core": "M0+",
+        "fpu": false,
+        "helper": "MATHACL",
+        "compiler": "TI Arm Clang 4.0.4 prebuilt model library (built for the G3507), test program 5.1.1",
+        "nnc": "TI NNC 2.1.2 with TI Arm Clang 5.1.1",
+        "cc": "Clang 4.0.4 library"
+      },
+      "mspm0l1306": {
+        "core": "M0+",
+        "fpu": false,
+        "helper": "",
+        "compiler": "TI Arm Clang 4.0.4 prebuilt model library (built for the G3507), test program 5.1.1",
+        "cc": "Clang 4.0.4 library"
+      },
+      "mspm0c1104": {
+        "core": "M0+",
+        "fpu": false,
+        "helper": "",
+        "compiler": "TI Arm Clang 5.1.1"
+      },
+      "cc2340r5": {
+        "core": "M0+",
+        "fpu": false,
+        "helper": "",
+        "compiler": "TI Arm Clang 4.0.4 prebuilt model library (built for the G3507), test program 5.1.1",
+        "nnc": "TI NNC 2.1.2 with TI Arm Clang 5.1.1 (the G3507 prebuilt model library)",
+        "cc": "Clang 4.0.4 library"
+      },
+      "cc1354p10": {
+        "core": "M33",
+        "fpu": true,
+        "helper": "",
+        "compiler": "TI Arm Clang 5.1.1, model compiled for this chip",
+        "nnc": "TI NNC 2.1.2 C output for the G3507, recompiled with TI Arm Clang 5.1.1",
+        "cc": "Clang 5.1.1"
+      },
+      "f2800137": {
+        "core": "C28x",
+        "fpu": true,
+        "helper": "TMU",
+        "compiler": "TI C2000 compiler 25.11.1",
+        "bytes_per_param": 2,
+        "nnc": "TI NNC 2.1.2 with TI C2000 compiler 25.11.1",
+        "cc": "C2000 compiler 25.11.1"
+      },
+      "mspm0g3519": {
+        "core": "M0+",
+        "fpu": false,
+        "helper": "MATHACL",
+        "cc": "Clang prebuilt library"
+      },
+      "mspm0g5187": {
+        "core": "M0+",
+        "fpu": false,
+        "helper": "NPU",
+        "cc": "Clang prebuilt library"
+      },
+      "mspm33c321a": {
+        "core": "M33",
+        "fpu": true,
+        "helper": "",
+        "cc": "Clang 5.1.1"
+      },
+      "am13e230": {
+        "core": "M33",
+        "fpu": true,
+        "helper": "TMU and NPU",
+        "cc": "Clang 5.1.1"
+      },
+      "cc2755p10": {
+        "core": "M33",
+        "fpu": true,
+        "helper": "",
+        "cc": "Clang 5.1.1"
+      },
+      "cc35x1": {
+        "core": "M33",
+        "fpu": true,
+        "helper": "",
+        "cc": "Clang 5.1.1"
+      },
+      "f28p65x": {
+        "core": "C28x",
+        "fpu": true,
+        "helper": "TMU",
+        "bytes_per_param": 2,
+        "cc": "C2000 compiler"
+      },
+      "nucleo-u083rc": {
+        "core": "M0+",
+        "fpu": false,
+        "helper": "",
+        "cc": "GCC, not a TI compiler"
+      }
+    },
+    "fpu_source": "FPU means the chip has one, not that the int8 model code uses it. TI's data sheet for the TMS320F28P65x (SPRSP69, ti.com/product/TMS320F28P650DK) lists an \"IEEE 754 double-precision (64-bit) Floating-Point Unit (FPU)\" and a Trigonometric Math Unit (TMU) on the C28x core."
+  },
+  "projections": {
+    "about": "Boards on order are projected in the calculator from a measured board with the same core, scaled by clock. Not measured. CPU only: an NPU would change the answer. Empty now: every TI board that was on this list has measured rows.",
+    "list": []
+  },
+  "npu_planned": {
+    "source": "mspm0g3507/mcu-bench/edgeai/README.md (G5187 NPU builds) and docs/showcase/README.md",
+    "list": [
+      {
+        "board": "mspm0g5187",
+        "text": "TI NNC has already compiled all four occupancy models for this chip's NPU (for the 33k-parameter model it kept one convolution on the CPU)"
+      },
+      {
+        "board": "am13e230",
+        "text": "Cortex-M33 at 200 MHz with an NPU and a TMU. TI's compiler built the four models for the NPU and for the CPU, both measured here; TI's own motor fault example is not run, because the SDK ships them as prebuilt libraries with no CPU twin"
+      }
+    ]
+  },
+  "vendor_demos": {
+    "source": "docs/showcase/README.md and docs/showcase/_fragments/*.csv (which SDK ships which example for which board); timings are ai_vendor_example rows in data/results/",
+    "columns": [
+      "f2800137",
+      "mspm0g3507",
+      "am13e230",
+      "mspm33c321a",
+      "mspm0g5187"
+    ],
+    "rows": [
+      {
+        "name": "Motor bearing fault",
+        "what": "Stored vibration data sorted into bearing fault classes",
+        "cells": {
+          "f2800137": {
+            "example": "motor_fault"
+          },
+          "mspm0g3507": {
+            "example": "motor_bearing_fault_detection_ai",
+            "twin": true
+          },
+          "am13e230": {
+            "example": "motor_fault"
+          },
+          "mspm33c321a": {
+            "example": "motor_fault"
+          },
+          "mspm0g5187": {
+            "example": "motor_bearing_fault_detection_ai",
+            "npu_example": "motor_bearing_fault_detection_ai_npu"
+          }
+        }
+      },
+      {
+        "name": "Fan blade anomaly",
+        "what": "A net trained on normal vibration flags a stored sample as unusual",
+        "cells": {
+          "f2800137": {
+            "example": "fan_blade_anomalydetection"
+          },
+          "mspm0g3507": {
+            "none": "No version in the MSPM0 SDK"
+          },
+          "am13e230": {
+            "example": "fan_blade_anomalydetection"
+          },
+          "mspm33c321a": {
+            "none": "No version in the MSPM33 SDK"
+          },
+          "mspm0g5187": {
+            "none": "No version in the MSPM0 SDK"
+          }
+        }
+      },
+      {
+        "name": "Blower imbalance",
+        "what": "A stored vibration trace is called balanced or imbalanced",
+        "cells": {
+          "f2800137": {
+            "example": "blower_imbalance"
+          },
+          "mspm0g3507": {
+            "none": "Nearest is motor_fan_blade_fault_ai, which needs an ADXL355 accelerometer"
+          },
+          "am13e230": {
+            "none": "No version found in the AM13E2x SDK"
+          },
+          "mspm33c321a": {
+            "example": "blower_imbalance"
+          },
+          "mspm0g5187": {
+            "none": "Nearest is motor_fan_blade_fault_ai, which needs an ADXL355 accelerometer"
+          }
+        }
+      },
+      {
+        "name": "Torque estimate",
+        "what": "Motor torque estimated from stored electrical signals",
+        "cells": {
+          "f2800137": {
+            "example": "torque_measurement"
+          },
+          "mspm0g3507": {
+            "none": "No version in the MSPM0 SDK"
+          },
+          "am13e230": {
+            "none": "No version found in the AM13E2x SDK"
+          },
+          "mspm33c321a": {
+            "example": "torque_measurement"
+          },
+          "mspm0g5187": {
+            "none": "No version in the MSPM0 SDK"
+          }
+        }
+      },
+      {
+        "name": "Time-series anomaly",
+        "what": "TI's starter autoencoder on a stored waveform",
+        "cells": {
+          "f2800137": {
+            "example": "generic_timeseries_anomalydetection"
+          },
+          "mspm0g3507": {
+            "none": "No version in the MSPM0 SDK"
+          },
+          "am13e230": {
+            "none": "No version found in the AM13E2x SDK"
+          },
+          "mspm33c321a": {
+            "example": "generic_timeseries_anomalydetection"
+          },
+          "mspm0g5187": {
+            "none": "No version in the MSPM0 SDK"
+          }
+        }
+      },
+      {
+        "name": "Waveform classifier",
+        "what": "Sine, square or sawtooth, named by a small net",
+        "cells": {
+          "f2800137": {
+            "example": "generic_timeseries_classification",
+            "untimed": "In C2000Ware; not timed"
+          },
+          "mspm0g3507": {
+            "example": "hello_world_ai",
+            "twin": true
+          },
+          "am13e230": {
+            "none": "No version found in the AM13E2x SDK"
+          },
+          "mspm33c321a": {
+            "example": "generic_timeseries_classification"
+          },
+          "mspm0g5187": {
+            "example": "hello_world_ai",
+            "npu_example": "hello_world_ai_npu"
+          }
+        }
+      },
+      {
+        "name": "Waveform classifier on the ADC",
+        "what": "The same kind of net, fed from the ADC; the model call is timed",
+        "cells": {
+          "mspm0g5187": {
+            "example": "waveform_classifier_ai",
+            "npu_example": "waveform_classifier_ai_npu"
+          }
+        }
+      },
+      {
+        "name": "Gearbox fault",
+        "what": "Stored gearbox vibration called healthy or broken tooth",
+        "cells": {
+          "mspm0g5187": {
+            "example": "gearbox_fault_diagnosis_ai",
+            "npu_example": "gearbox_fault_diagnosis_ai_npu"
+          }
+        }
+      },
+      {
+        "name": "PIR presence",
+        "what": "A real PIR sensor: person, dog or background",
+        "cells": {
+          "f2800137": {
+            "none": "No version in C2000Ware"
+          },
+          "mspm0g3507": {
+            "example": "pir_detection_ai",
+            "untimed": "In the MSPM0 SDK; needs a PIR sensor, not run"
+          },
+          "am13e230": {
+            "none": "No version found in the AM13E2x SDK"
+          },
+          "mspm33c321a": {
+            "example": "pir_detection_ai"
+          },
+          "mspm0g5187": {
+            "example": "pir_detection_ai"
+          }
+        }
+      }
+    ]
+  }
+}

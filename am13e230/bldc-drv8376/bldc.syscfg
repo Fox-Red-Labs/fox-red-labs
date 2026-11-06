@@ -1,0 +1,174 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+// DRV8376EVM plugged onto the LaunchPad kit's BoosterPack headers (its J9 pin 20, the 3.3 V end, on J1 pin 1).
+// MCPWM4: 1A/1B = INHA/INLA (J4 40/39, PB3/PA7), 2A/2B = INHB/INLB (J4 38/37, PB1/PA2), 3A/3B = INHC/INLC (J4 36/35, PB2/PA25).
+// Up-count, 10,000 clocks a period at 200 MHz = 20 kHz. The A outputs carry the duty; the B outputs are forced by software.
+// Halls: A PB7 (J4 34), B PB6 (J4 33), C PA12 (J4 32). nSLEEP PA23 (J1 9), nFAULT PB4 (J1 8); PA22 (J1 10) diagnostic only, DRVOFF PB18 (J2 13), MCU LED PB11 (J2 11).
+// ADC: VSENA PA17 (J3 26) and VSENVM PA16 (J3 23), software triggered, for the PWM-mode check and the bus voltage.
+// UART: the backchannel, UC4 on PA0/PA1, 115200.
+const adc    = scripting.addModule("/drivers/adc", {}, false);
+const adc1   = adc.addInstance();
+const adc2   = adc.addInstance();
+const adc3   = adc.addInstance();
+const gpio   = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1  = gpio.addInstance();
+const gpio2  = gpio.addInstance();
+const gpio3  = gpio.addInstance();
+const gpio4  = gpio.addInstance();
+const mcpwm  = scripting.addModule("/drivers/mcpwm", {}, false);
+const mcpwm1 = mcpwm.addInstance();
+const sysctl = scripting.addModule("/drivers/sysctl");
+const uart   = scripting.addModule("/drivers/uart", {}, false);
+const uart1  = uart.addInstance();
+
+adc1.$name             = "APP_ADC";
+adc1.adcBase           = "ADC0";
+adc1.numberOfSOCs      = 2;
+adc1.enableSEQs        = true;
+adc1.numberOfSEQs      = 1;
+adc1.SOC0.channel      = "PA17";
+adc1.SOC1.channel      = "PA16";
+adc1.SEQ1.numberOfSOCs = 2;
+adc1.SEQ1.triggerSel   = "DL_ADC_TRIGGER_PWM4_SOCA";
+
+adc2.$name             = "ADC_B";          // ISENA on PA27, VSENC on PA18
+adc2.adcBase           = "ADC1";
+adc2.numberOfSOCs      = 3;
+adc2.enableSEQs        = true;
+adc2.numberOfSEQs      = 1;
+adc2.SOC0.channel      = "PA27";
+adc2.SOC1.channel      = "PA18";
+adc2.SOC2.channel      = "PA4"; // ADC1 channel 17; meter input, EVM J9 pin 1 / LaunchPad J3 pin 30
+adc2.SEQ1.numberOfSOCs = 3;
+adc2.SEQ1.triggerSel   = "DL_ADC_TRIGGER_PWM4_SOCA";
+
+adc3.$name             = "ADC_C";          // ISENB on PA30, ISENC on PA29, VSENB on PA28
+adc3.adcBase           = "ADC2";
+adc3.numberOfSOCs      = 3;
+adc3.enableSEQs        = true;
+adc3.numberOfSEQs      = 1;
+adc3.SOC0.channel      = "PA30";
+adc3.SOC1.channel      = "PA29";
+adc3.SOC2.channel      = "PA28";
+adc3.SEQ1.numberOfSOCs = 3;
+adc3.SEQ1.triggerSel   = "DL_ADC_TRIGGER_PWM4_SOCA";
+
+gpio1.$name                          = "HALLB";          // halls A and B, port B
+gpio1.associatedPins.create(2);
+gpio1.associatedPins[0].$name        = "A";
+gpio1.associatedPins[0].direction    = "INPUT";
+gpio1.associatedPins[0].internalResistor = "PULL_DOWN";
+gpio1.associatedPins[0].pin.$assign  = "PB7";
+gpio1.associatedPins[1].$name        = "B";
+gpio1.associatedPins[1].direction    = "INPUT";
+gpio1.associatedPins[1].internalResistor = "PULL_DOWN";
+gpio1.associatedPins[1].pin.$assign  = "PB6";
+
+gpio2.$name                          = "HALLA";          // hall C, port A
+gpio2.associatedPins[0].$name        = "C";
+gpio2.associatedPins[0].direction    = "INPUT";
+gpio2.associatedPins[0].internalResistor = "PULL_DOWN";
+gpio2.associatedPins[0].pin.$assign  = "PA12";
+
+gpio3.$name                          = "DRVA";           // driver pins on port A
+gpio3.associatedPins.create(3);
+gpio3.associatedPins[0].$name        = "NSLEEP";
+gpio3.associatedPins[0].initialValue = "CLEARED";
+gpio3.associatedPins[0].pin.$assign  = "PA23";
+gpio3.associatedPins[1].$name        = "NFAULT";
+gpio3.associatedPins[1].direction    = "INPUT";
+gpio3.associatedPins[1].internalResistor = "PULL_DOWN"; // a disconnected J9 fault contact must read as a fault
+gpio3.associatedPins[1].pin.$assign  = "PA22";
+gpio3.associatedPins[2].$name        = "LED4";
+gpio3.associatedPins[2].initialValue = "SET";
+gpio3.associatedPins[2].pin.$assign  = "PA5";
+
+gpio4.$name                          = "DRVB";           // driver pins on port B
+gpio4.associatedPins.create(3);
+gpio4.associatedPins[0].$name        = "DRVOFF";
+gpio4.associatedPins[0].initialValue = "SET";
+gpio4.associatedPins[0].pin.$assign  = "PB18";
+gpio4.associatedPins[1].$name        = "MCULED";
+gpio4.associatedPins[1].initialValue = "CLEARED";
+gpio4.associatedPins[1].pin.$assign  = "PB11";
+// EVM schematic also routes nFAULT to J9 pin 6 (table marks it DNP).
+// On this board PB4 follows the reset/fault transitions; PA22 stays high.
+gpio4.associatedPins[2].$name        = "NFAULT_ALT";
+gpio4.associatedPins[2].direction    = "INPUT";
+gpio4.associatedPins[2].internalResistor = "PULL_DOWN";
+gpio4.associatedPins[2].pin.$assign  = "PB4";
+
+// PA4 is now an ADC input, with no DAC output enabled. J4 stays on DIV.
+
+mcpwm1.$name                                     = "MOTOR_PWM";
+mcpwm1.mcpwmBase                                 = "MCPWM4";
+mcpwm1.enableEventTrigger                        = true;
+mcpwm1.pinList                                   = ["1A","1B","2A","2B","3A","3B"];
+mcpwm1.timeBase.$name                            = "drivers_mcpwm_v0_mcpwm_timeBase0";
+mcpwm1.timeBase.counterMode                      = "DL_MCPWM_COUNTER_MODE_UP";
+mcpwm1.timeBase.periodValue                      = 9999;
+mcpwm1.timeBase.emulationMode                    = "DL_MCPWM_EMULATION_FREE_RUN";
+mcpwm1.counterCompare.$name                      = "drivers_mcpwm_v0_mcpwm_counterCompare0";
+mcpwm1.counterCompare.PWM1_CMPA                  = 0;
+mcpwm1.counterCompare.PWM2_CMPA                  = 0;
+mcpwm1.counterCompare.PWM3_CMPA                  = 0;
+mcpwm1.actionQualifier.$name                     = "drivers_mcpwm_v0_mcpwm_actionQualifier0";
+mcpwm1.actionQualifier.PWM1A.$name               = "aq1a";
+mcpwm1.actionQualifier.PWM1A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM1A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM2A.$name               = "aq2a";
+mcpwm1.actionQualifier.PWM2A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM2A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM3A.$name               = "aq3a";
+mcpwm1.actionQualifier.PWM3A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM3A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM1B.$name               = "aq1b";
+mcpwm1.actionQualifier.PWM1B.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM1B.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM2B.$name               = "aq2b";
+mcpwm1.actionQualifier.PWM2B.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM2B.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM3B.$name               = "aq3b";
+mcpwm1.actionQualifier.PWM3B.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM3B.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.loadMode.$name                            = "drivers_mcpwm_v0_mcpwm_loadMode0";
+mcpwm1.eventTrigger.$name                        = "drivers_mcpwm_v0_mcpwm_eventTrigger0";
+mcpwm1.eventTrigger.SOCA_enable                  = true;
+mcpwm1.eventTrigger.SOCA_eventSource             = "DL_MCPWM_SOC_TBCTR_PERIOD";
+mcpwm1.peripheral["1A"].$assign                  = "PB3";
+mcpwm1.peripheral["1B"].$assign                  = "PA7";
+mcpwm1.peripheral["2A"].$assign                  = "PB1";
+mcpwm1.peripheral["2B"].$assign                  = "PA2";
+mcpwm1.peripheral["3A"].$assign                  = "PB2";
+mcpwm1.peripheral["3B"].$assign                  = "PA25";
+
+uart1.$name                            = "UART_0";
+uart1.enableFIFO                       = true;
+uart1.targetBaudRate                   = 115200;
+uart1.peripheral.$assign               = "UC4";
+uart1.peripheral.rxPin.$assign         = "PA1";
+uart1.peripheral.txPin.$assign         = "PA0";
+uart1.txPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig0";
+uart1.txPinConfig.direction            = scripting.forceWrite("OUTPUT");
+uart1.txPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.txPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.txPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+uart1.rxPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig1";
+uart1.rxPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.rxPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+
+sysctl.VREFSource         = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
+sysctl.peripheral.$assign = "SYSCTL";
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+mcpwm1.peripheral.$suggestSolution = "MCPWM4";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";
+adc1.SOC0.peripheral.$suggestSolution       = "ANALOG";
+adc1.SOC0.peripheral.AIN17.$suggestSolution = "PA17";
+adc1.SOC1.peripheral.$suggestSolution       = "ANALOG";
+adc1.SOC1.peripheral.AIN16.$suggestSolution = "PA16";

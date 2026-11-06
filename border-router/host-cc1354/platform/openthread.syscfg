@@ -1,0 +1,97 @@
+/*
+ * SysConfig for the border-router host on the LP-EM-CC1354P10-1.
+ *
+ * Derived from ot-ti's src/openthread.syscfg (TI's OpenThread port, release thread-v1.4-ti-2.1) with three
+ * changes: no RF core and no radio configuration (the radio is a CC2340R5 running TI's ot-rcp image), no NCP
+ * SPI peripheral, and a second UART for the spinel link to that radio on the pins wired in ../../WIRING.md.
+ */
+
+var AESECB   = scripting.addModule("/ti/drivers/AESECB");
+var DMA      = scripting.addModule("/ti/drivers/DMA");
+var Device   = scripting.addModule("/ti/devices/CCFG");
+var ECDH     = scripting.addModule("/ti/drivers/ECDH");
+var ECDSA    = scripting.addModule("/ti/drivers/ECDSA");
+var ECJPAKE  = scripting.addModule("/ti/drivers/ECJPAKE");
+var GPIO     = scripting.addModule("/ti/drivers/GPIO");
+var NVS      = scripting.addModule("/ti/drivers/NVS");
+var Power    = scripting.addModule("/ti/drivers/Power");
+var SHA2     = scripting.addModule("/ti/drivers/SHA2");
+var TRNG     = scripting.addModule("/ti/drivers/TRNG");
+var UART2    = scripting.addModule("/ti/drivers/UART2");
+var Watchdog = scripting.addModule("/ti/drivers/Watchdog");
+
+var AESECB1   = AESECB.addInstance();
+var ECDH1     = ECDH.addInstance();
+var ECDSA1    = ECDSA.addInstance();
+var ECJPAKE1  = ECJPAKE.addInstance();
+var GPIO1     = GPIO.addInstance();
+var GPIO2     = GPIO.addInstance();
+var GPIO3     = GPIO.addInstance();
+var GPIO4     = GPIO.addInstance();
+var NVS1      = NVS.addInstance();
+var NVSDGB    = NVS.addInstance();
+var SHA21     = SHA2.addInstance();
+var TRNG1     = TRNG.addInstance();
+var UART2CLI  = UART2.addInstance();
+var UART2RCP  = UART2.addInstance();
+var Watchdog1 = Watchdog.addInstance();
+
+/* A border router is mains powered and never sleeps: no standby, so UART DMA and the RCP link are never paused */
+Power.policyFunction = "PowerCC26XX_doWFI";
+/* No power policy at all while this is a bench image: the CPU never idles, so the debug port stays reachable after
+ * a power-on boot (every debugger connect that failed today followed the chip going idle). */
+Power.enablePolicy = false;
+
+const deviceId = system.deviceData.deviceId;
+
+/* CCFG as TI's low-power RF projects set it (boot from flash, no bootloader backdoor changes) */
+const ccfgSettings = system.getScript("/ti/common/lprf_ccfg_settings.js").ccfgSettings;
+for (var setting in ccfgSettings)
+{
+    Device[setting] = ccfgSettings[setting];
+}
+
+/* Console: the XDS110 debugger's UART (DIO13 TX, DIO12 RX on this board), the OpenThread CLI at 921600 */
+UART2CLI.$hardware = system.deviceData.board.components.XDS110UART;
+UART2CLI.$name     = "CONFIG_UART2_0";
+
+/* Radio link: UART1 on free BoosterPack pins to the CC2340R5 RCP, 921600 baud, spinel over HDLC.
+ * Host TX DIO23 (header pin 2) -> RCP RX DIO12 (pin 14); host RX DIO22 (pin 5) <- RCP TX DIO18 (pin 7). */
+UART2RCP.$name            = "CONFIG_UART2_RCP";
+UART2RCP.uart.$assign     = "UART1";
+UART2RCP.uart.txPin.$assign = "DIO23";
+UART2RCP.uart.rxPin.$assign = "DIO22";
+UART2RCP.rxRingBufferSize = 1024;
+UART2RCP.txRingBufferSize = 256;
+
+GPIO1.$hardware = system.deviceData.board.components["BTN-1"];
+GPIO1.$name     = "CONFIG_GPIO_BTN1";
+GPIO2.$hardware = system.deviceData.board.components["BTN-2"];
+GPIO2.$name     = "CONFIG_GPIO_BTN2";
+GPIO3.$hardware = system.deviceData.board.components.LED_GREEN;
+GPIO3.$name     = "CONFIG_GPIO_GLED";
+GPIO4.$hardware = system.deviceData.board.components.LED_RED;
+GPIO4.$name     = "CONFIG_GPIO_RLED";
+
+/* Non-volatile storage for OpenThread settings, where ot-ti puts it on the CC1354P10 (top of the 1 MB flash) */
+NVS1.$name   = "CONFIG_NVSINTERNAL";
+NVSDGB.$name = "CONFIG_NVS_DBG_INTERNAL";
+
+if (deviceId.match(/CC((13|26).4P10)/))
+{
+    NVS1.internalFlash.regionBase   = 0xFC000;
+    NVS1.internalFlash.regionSize   = 0x4000;
+    NVSDGB.internalFlash.regionBase = 0xFB800;
+    NVSDGB.internalFlash.regionSize = 0x800;
+}
+else
+{
+    throw new Error("This host build is for the CC1354P10; deviceId: " + deviceId);
+}
+
+Watchdog1.$name            = "CONFIG_WATCHDOG0";
+Watchdog1.period           = 1000;
+Watchdog1.watchdog.$assign = "WDT0";
+
+TRNG1.$name   = "CONFIG_TRNG_THREAD";
+AESECB1.$name = "CONFIG_AESECB_MBEDTLS";

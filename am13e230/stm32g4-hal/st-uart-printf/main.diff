@@ -1,0 +1,26 @@
+--- st-uart-printf/main_st.c	2026-10-09 23:20:44
++++ st-uart-printf/main.c	2026-10-09 23:20:57
+@@ -139,2 +139,4 @@
+ {
++  SYSCFG_DL_init(); /* TI: the clock comes from the .syscfg */
++#if 0 /* TI: ST RCC/PWR clock tree, no equivalent in the layer */
+   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+@@ -173,2 +175,3 @@
+   }
++#endif
+ }
+@@ -199,4 +202,6 @@
+   huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
++#if 0 /* TI: no prescaler or advanced-feature fields in the layer's handle */
+   huart2.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+   huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
++#endif
+   if (HAL_UART_Init(&huart2) != HAL_OK)
+@@ -205,2 +210,3 @@
+   }
++#if 0 /* TI: HAL_UARTEx_* (FIFO control) is not in the layer */
+   if (HAL_UARTEx_SetTxFifoThreshold(&huart2, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+@@ -217,2 +223,3 @@
+   }
++#endif
+   /* USER CODE BEGIN USART2_Init 2 */

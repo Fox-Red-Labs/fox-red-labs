@@ -1,0 +1,3900 @@
+{
+ "about": "The standard benchmark suite. Every board runs every test in the classes that apply to it. A test that cannot apply still gets a row (status not_supported or does_not_fit) so the gap shows. Method for each test: docs/methodology.md section 12 and the file in 'method'. Rows live in data/results/*.csv.",
+ "classes": {
+  "setup": "Every board: getting from box to a changed program",
+  "core": "Every MCU: CPU, memory and software stack",
+  "analog": "Every MCU with an ADC or UART",
+  "control": "Real-time control loop. Run on C2000, MSPM0 and the wireless parts so the purpose-built chip can be compared",
+  "ai": "The four room-occupancy models, on CPU, NPU or TMU, plus the vendor's own AI examples",
+  "radio": "Wireless boards",
+  "power": "Needs a meter (Nordic PPK2 at 3.0 V; TI EnergyTrace at 3.3 V where it runs)",
+  "agent": "A fresh AI agent doing one job, with and without this repo's docs",
+  "sweep": "Every vendor example for the board, built and run by script",
+  "hobby": "The hobby library pack: one driver per part (OLED, TM1637, IR, encoder, motor driver, distance sensors, WS2812) on every MCU board, smallest first",
+  "security": "Every MCU with 32 kB of RAM or more: post-quantum key exchange and signatures (ML-KEM-768, ML-DSA-44) and the classical operations they replace (ECDSA and ECDH P-256, SHA-256), timed with the CPU's cycle counter after known-answer tests pass. Boards below the RAM floor get does_not_fit rows",
+  "host": "Radio or sensor parts that have no CPU or too little of one, driven by an external host MCU. Fit (flash and RAM of the host side), then throughput, latency, CPU load and error rate per interface (SPI, UART, I2C), smallest host first. Plan: docs/research/host-scaling-plan-2026-10-09.md",
+  "radar": "mmWave radar sensors on the bench (IWRL6432BOOST and later radars): time to first frame, detection range and latency, false alarms, UART and SPI data rates, power per update rate. The host-side tests for a radar stream are the `host` class with variants named `radar-*`. Plan: docs/arrivals/iwrl6432boost.md",
+  "linux": "Linux-class boards (SK-TDA4VM and later): memory latency across the cache levels, scheduling jitter, boot breakdown, storage, cold start of a vision app, inter-core messaging, accelerator and DDR load during inference. Plan: docs/arrivals/tda4.md",
+  "motor": "One motor and one power stage, control methods compared at equal speed and load: six-step, sine, FOC; Hall, Hall-interpolated, sensorless. Variant <method>-<position>-<point>",
+  "motor-bringup": "Motor bring-up diagnostics on the bench (driver sense readings, PWM pad sampling, commissioning and six-step trials). Recorded so every bench reading has a row; not a benchmark, compared on no page, and no board is graded on it"
+ },
+ "tests": [
+  {
+   "id": "time_to_blink",
+   "class": "setup",
+   "name": "Box or plug-in to a changed blink",
+   "unit": "s",
+   "better": "lower",
+   "variants": "path: ccs-mcp, cli, zephyr, arduino, vendor-ide, micropython",
+   "method": "docs/methodology.md section 4"
+  },
+  {
+   "id": "blink_build",
+   "class": "setup",
+   "name": "Blink example build time",
+   "unit": "s",
+   "better": "lower",
+   "variants": "path"
+  },
+  {
+   "id": "blink_flash",
+   "class": "setup",
+   "name": "Blink flash time",
+   "unit": "s",
+   "better": "lower",
+   "variants": "tool: openocd, uniflash, ccs-mcp, west, esptool, uf2, dslite, stm32cubeprog, linkserver"
+  },
+  {
+   "id": "connect_step",
+   "class": "setup",
+   "name": "One step of frl's connect ladder reaches the chip on its own (frl identify --connect-step)",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "step, e.g. clock-100-khz, connect-under-reset",
+   "method": "docs/frl.md, \"When the board does not answer\""
+  },
+  {
+   "id": "message_flash_repeat",
+   "class": "setup",
+   "name": "Print-a-message write and serial check, three runs back to back",
+   "unit": "s",
+   "better": "lower",
+   "variants": "tool: frl; value is the median write time, value_hi the slowest; the note says how many of three write and serial checks passed and whether the restore matched"
+  },
+  {
+   "id": "check_rejects_wrong_ask",
+   "class": "setup",
+   "name": "frl's own check fails on the board when asked for something the program does not do",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "check kind and what was wrong, e.g. uart-other-message",
+   "method": "docs/frl.md"
+  },
+  {
+   "id": "frl_refuses_unsafe",
+   "class": "setup",
+   "name": "frl refuses an unsafe write or restore before anything is written",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "what was unsafe, e.g. layout-change, stale-bundle, old-backup, other-chip",
+   "method": "docs/frl.md"
+  },
+  {
+   "id": "message_flash",
+   "class": "setup",
+   "name": "Print-a-message write and serial check, one run",
+   "unit": "s",
+   "better": "lower",
+   "variants": "tool: frl; value is the write time; the note says whether the serial check passed",
+   "method": "docs/frl.md"
+  },
+  {
+   "id": "blink_flash_fallback",
+   "class": "setup",
+   "name": "Blink write and check through frl's second write path (TI's DSLite), once",
+   "unit": "s",
+   "better": "lower",
+   "variants": "path, e.g. dslite; value is the write time with DSLite's own verification; the note gives the erase setting, the LED check and whether the restore matched",
+   "method": "docs/frl.md"
+  },
+  {
+   "id": "blink_flash_repeat",
+   "class": "setup",
+   "name": "Blink write and check, three runs back to back",
+   "unit": "s",
+   "better": "lower",
+   "variants": "tool: frl; value is the median write time, value_hi the slowest; the note says how many of three write and LED checks passed and whether the restore matched"
+  },
+  {
+   "id": "probe_included",
+   "class": "setup",
+   "name": "Debug probe on the board",
+   "unit": "yes/no",
+   "better": "yes"
+  },
+  {
+   "id": "coremark",
+   "class": "core",
+   "name": "CoreMark",
+   "unit": "iter/s",
+   "better": "higher",
+   "variants": "toolchain-os-opt, e.g. ticlang-bare-O3, gcc-zephyr-O2unroll",
+   "method": "mspm0g3507/mcu-bench/baremetal/"
+  },
+  {
+   "id": "coremark_per_mhz",
+   "class": "core",
+   "name": "CoreMark per MHz",
+   "unit": "iter/s/MHz",
+   "better": "higher",
+   "variants": "as coremark"
+  },
+  {
+   "id": "dhrystone",
+   "class": "core",
+   "name": "Dhrystone 2.1",
+   "unit": "DMIPS/MHz",
+   "better": "higher"
+  },
+  {
+   "id": "embench_fit",
+   "class": "core",
+   "name": "Embench programs that fit and pass",
+   "unit": "of 19",
+   "better": "higher"
+  },
+  {
+   "id": "irq_latency",
+   "class": "core",
+   "name": "Interrupt pend to first line of handler",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "os: bare, zephyr, freertos"
+  },
+  {
+   "id": "gpio_toggle",
+   "class": "core",
+   "name": "GPIO toggle",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "api: register, driver, zephyr"
+  },
+  {
+   "id": "fft256",
+   "class": "core",
+   "name": "256-point complex FFT",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "q15, q31, f32"
+  },
+  {
+   "id": "math_sincos",
+   "class": "core",
+   "name": "sin plus cos",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "hw (accelerator, TMU) or sw"
+  },
+  {
+   "id": "math_divide",
+   "class": "core",
+   "name": "Divide",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "hw or sw"
+  },
+  {
+   "id": "aes_speedup",
+   "class": "core",
+   "name": "Hardware AES against software (ratio at one message size)",
+   "unit": "x",
+   "better": "higher",
+   "variants": "message size first, then mode and build, e.g. 1kb-ecb-ticlang-o2-driver-polling; older rows without a size are 1 kB (conditions says so)",
+   "method": "secondary: hardware over software cycles at the size in the variant. The figures of merit are aes_hw_cpb and aes_sw_cpb (docs/methodology.md section 13)"
+  },
+  {
+   "id": "crc_speedup",
+   "class": "core",
+   "name": "Hardware CRC against a table",
+   "unit": "x",
+   "better": "higher"
+  },
+  {
+   "id": "blink_flash_bytes",
+   "class": "core",
+   "name": "Blink image flash",
+   "unit": "B",
+   "better": "lower",
+   "variants": "os: bare, zephyr, freertos"
+  },
+  {
+   "id": "blink_ram_bytes",
+   "class": "core",
+   "name": "Blink image RAM",
+   "unit": "B",
+   "better": "lower",
+   "variants": "os"
+  },
+  {
+   "id": "zephyr_support",
+   "class": "core",
+   "name": "Zephyr upstream support",
+   "unit": "status",
+   "better": "yes",
+   "variants": "upstream, vendor-fork, ours"
+  },
+  {
+   "id": "rtos_task_switch",
+   "class": "core",
+   "name": "RTOS task switch round trip",
+   "unit": "us",
+   "better": "lower",
+   "variants": "os"
+  },
+  {
+   "id": "rtos_max_tasks",
+   "class": "core",
+   "name": "Minimal tasks that fit",
+   "unit": "tasks",
+   "better": "higher",
+   "variants": "os"
+  },
+  {
+   "id": "adc_max_rate",
+   "class": "analog",
+   "name": "Fastest ADC with DMA",
+   "unit": "Msps",
+   "better": "higher"
+  },
+  {
+   "id": "adc_dac_error",
+   "class": "analog",
+   "name": "DAC to ADC loop error",
+   "unit": "%",
+   "better": "lower"
+  },
+  {
+   "id": "uart_max_clean",
+   "class": "analog",
+   "name": "Fastest clean UART loopback",
+   "unit": "Mbaud",
+   "better": "higher"
+  },
+  {
+   "id": "isr_entry",
+   "class": "control",
+   "name": "PWM or timer trigger to first line of ISR",
+   "unit": "us",
+   "better": "lower",
+   "variants": "cycles also recorded in note"
+  },
+  {
+   "id": "control_loop",
+   "class": "control",
+   "name": "Trigger, ADC, control step, new PWM value (mean)",
+   "unit": "us",
+   "better": "lower",
+   "variants": "hw math or sw",
+   "method": "c2000-launchpad/bench/; value is the mean, value_hi the worst. Lead with control_loop_worst_pct and control_loop_jitter (docs/methodology.md section 13)"
+  },
+  {
+   "id": "foc_step",
+   "class": "control",
+   "name": "One field-oriented control step",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "hw math or sw"
+  },
+  {
+   "id": "ai_occ_latency",
+   "class": "ai",
+   "name": "Room-occupancy model, one inference",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "model-build, e.g. occ_cnn_8k-c-O3, occ_cnn_8k-nnc-cpu, occ_cnn_8k-npu",
+   "method": "mspm0g3507/mcu-bench/edgeai/"
+  },
+  {
+   "id": "ai_occ_fit",
+   "class": "ai",
+   "name": "Room-occupancy model fits and passes 20 of 20",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "model"
+  },
+  {
+   "id": "ai_model_flash",
+   "class": "ai",
+   "name": "Room-occupancy model: weights plus model code (plus the NNC runtime it links), from the linker map",
+   "unit": "B",
+   "better": "lower",
+   "variants": "same as ai_occ_latency (model-build). Test program, driverlib, C library, stack and the 20 test vectors are left out. The memory is flash unless the variant ends -ram (code and weights in RAM, C2000). conditions: weights_b, code_b, runtime_b",
+   "method": "tools/results/derive_model_sizes.py reads the map; the per-build split is in data/ai-model-sizes.csv"
+  },
+  {
+   "id": "ai_model_ram",
+   "class": "ai",
+   "name": "Room-occupancy model: scratch RAM (activation buffers), from the linker map",
+   "unit": "B",
+   "better": "lower",
+   "variants": "same as ai_occ_latency (model-build). Stack, test program and I/O buffers left out; weights and code placed in RAM are in ai_model_flash, not here",
+   "method": "tools/results/derive_model_sizes.py reads the map; the per-build split is in data/ai-model-sizes.csv"
+  },
+  {
+   "id": "ai_mnist_cycles",
+   "class": "ai",
+   "name": "BitNetMCU handwritten digit, one inference",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "model-build-clock, e.g. cnn_64-ticlang-O3-32mhz; the author's CH32V002 figures are in ports/bitnetmcu/README.md",
+   "method": "ports/bitnetmcu/"
+  },
+  {
+   "id": "ai_vendor_example",
+   "class": "ai",
+   "name": "Vendor AI example, one inference",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "example name"
+  },
+  {
+   "id": "radio_ram_left",
+   "class": "radio",
+   "name": "RAM left after linking a stack",
+   "unit": "B",
+   "better": "higher",
+   "variants": "stack-role; negative means short"
+  },
+  {
+   "id": "radio_flash_used",
+   "class": "radio",
+   "name": "Flash used by a stack and role, from the linker map",
+   "unit": "B",
+   "better": "lower",
+   "variants": "stack-role, as radio_ram_left; conditions column names SDK, compiler, build type"
+  },
+  {
+   "id": "radio_airtime",
+   "class": "radio",
+   "name": "Time on air for one packet",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "phy-payload, e.g. ble1m-31b, ieee154-250k-127b; computed and measured values are separate rows (conditions says which)"
+  },
+  {
+   "id": "radio_energy_event",
+   "class": "radio",
+   "name": "Charge per radio event at 3.0 V",
+   "unit": "uC",
+   "better": "lower",
+   "variants": "phy-txpower-payload; needs a meter"
+  },
+  {
+   "id": "radio_energy_avg_ua",
+   "class": "radio",
+   "name": "Average current at one event per 1000 ms, 3.0 V",
+   "unit": "uA",
+   "better": "lower",
+   "variants": "as radio_energy_event; needs a meter"
+  },
+  {
+   "id": "radio_throughput",
+   "class": "radio",
+   "name": "Payload throughput board to board",
+   "unit": "kbps",
+   "better": "higher",
+   "variants": "phy-payload, e.g. ble2m-244b; conditions: MTU, data length, interval, ack policy, peer"
+  },
+  {
+   "id": "radio_range",
+   "class": "radio",
+   "name": "Distance at which packet error rate stays under 1%",
+   "unit": "m",
+   "better": "higher",
+   "variants": "phy-txpower, e.g. ble1m-0dbm; conditions: height, environment, antenna, RSSI at the limit"
+  },
+  {
+   "id": "radio_join",
+   "class": "radio",
+   "name": "Boot to joined network",
+   "unit": "s",
+   "better": "lower",
+   "variants": "stack"
+  },
+  {
+   "id": "radio_cmd_latency",
+   "class": "radio",
+   "name": "Command to state change, median of 20",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "stack-path, e.g. zigbee-home-assistant"
+  },
+  {
+   "id": "radio_cmd_success",
+   "class": "radio",
+   "name": "Commands that landed",
+   "unit": "%",
+   "better": "higher",
+   "variants": "stack-path"
+  },
+  {
+   "id": "ble_on_air",
+   "class": "radio",
+   "name": "Flash to advertising",
+   "unit": "s",
+   "better": "lower"
+  },
+  {
+   "id": "findmy_on_air",
+   "class": "radio",
+   "name": "Flash to Find My beacon seen",
+   "unit": "s",
+   "better": "lower",
+   "note": "OpenHaystack-format advertisement matched byte for byte by a Mac scanner; Apple's side is a separate step"
+  },
+  {
+   "id": "ble_echo",
+   "class": "radio",
+   "name": "BLE echo round trip, 20 bytes",
+   "unit": "ms",
+   "better": "lower"
+  },
+  {
+   "id": "ble_write_rtt",
+   "class": "radio",
+   "name": "BLE write with response, round trip on the Mac clock (the board acts in its write callback before it answers)",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "service, e.g. nordic-lbs-led-1-byte",
+   "method": "ports/nordic-apps/host/nordic_test.py: 20 writes of one byte, median; the Mac's connection interval is inside the number"
+  },
+  {
+   "id": "ble_connect",
+   "class": "radio",
+   "name": "BLE connect and discover services",
+   "unit": "s",
+   "better": "lower"
+  },
+  {
+   "id": "radio_rssi",
+   "class": "radio",
+   "name": "Signal strength at the test spot",
+   "unit": "dBm",
+   "better": "higher",
+   "variants": "stack-peer; recorded so latency and loss rows can be read against it"
+  },
+  {
+   "id": "b2b_rtt",
+   "class": "radio",
+   "name": "Board to board round trip",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "stack, peer board"
+  },
+  {
+   "id": "ota_complete",
+   "class": "radio",
+   "name": "Over-the-air update completed",
+   "unit": "%",
+   "better": "higher",
+   "variants": "stack-server"
+  },
+  {
+   "id": "packet_loss_1h",
+   "class": "radio",
+   "name": "Packet loss over one hour",
+   "unit": "%",
+   "better": "lower",
+   "variants": "stack"
+  },
+  {
+   "id": "stack_support",
+   "class": "radio",
+   "name": "Stack offered and runs",
+   "unit": "status",
+   "better": "yes",
+   "variants": "stack: ble, zigbee, thread, matter, wifi, sub1ghz, dmm"
+  },
+  {
+   "id": "local_control_wan_down",
+   "class": "radio",
+   "name": "Setpoint or state change still works with the internet cable pulled",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "platform: apple-home, google-home, alexa, home-assistant",
+   "method": "cc35x1/matter/COMPATIBILITY.md, measurement 4"
+  },
+  {
+   "id": "multi_admin_count",
+   "class": "radio",
+   "name": "Controllers that hold one device at once and all still control it",
+   "unit": "controllers",
+   "better": "higher",
+   "method": "cc35x1/matter/COMPATIBILITY.md, measurement 5"
+  },
+  {
+   "id": "repair_after_reflash",
+   "class": "radio",
+   "name": "Setup again after a reflash and factory reset, per platform",
+   "unit": "s",
+   "better": "lower",
+   "variants": "platform: apple-home, google-home, alexa, home-assistant",
+   "method": "cc35x1/matter/COMPATIBILITY.md, measurement 6"
+  },
+  {
+   "id": "sleep_current",
+   "class": "power",
+   "name": "Deepest sleep with RAM kept (STANDBY-class)",
+   "unit": "uA",
+   "better": "lower",
+   "variants": "meter-voltage"
+  },
+  {
+   "id": "energy_ble_connection",
+   "class": "power",
+   "name": "Energy per BLE connection (BlueJoule job)",
+   "unit": "uJ",
+   "better": "lower",
+   "variants": "stack-meter"
+  },
+  {
+   "id": "energy_coremark",
+   "class": "power",
+   "name": "Energy per CoreMark iteration",
+   "unit": "uJ",
+   "better": "lower",
+   "variants": "meter"
+  },
+  {
+   "id": "energy_inference",
+   "class": "power",
+   "name": "Energy per occupancy inference",
+   "unit": "uJ",
+   "better": "lower",
+   "variants": "model-build-meter"
+  },
+  {
+   "id": "agent_pass",
+   "class": "agent",
+   "name": "Fresh agent finished, checked here",
+   "unit": "of runs",
+   "better": "higher",
+   "variants": "job-model-docs, docs = ours or none"
+  },
+  {
+   "id": "agent_minutes",
+   "class": "agent",
+   "name": "Fresh agent wall clock, median",
+   "unit": "min",
+   "better": "lower",
+   "variants": "job-model-docs"
+  },
+  {
+   "id": "agent_cost",
+   "class": "agent",
+   "name": "Fresh agent list-price cost, median",
+   "unit": "USD",
+   "better": "lower",
+   "variants": "job-model-docs"
+  },
+  {
+   "id": "agent_rule_breaks",
+   "class": "agent",
+   "name": "Rule breaks across runs",
+   "unit": "count",
+   "better": "lower",
+   "variants": "job-model-docs"
+  },
+  {
+   "id": "examples_built",
+   "class": "sweep",
+   "name": "Vendor examples that build from a terminal",
+   "unit": "%",
+   "better": "higher",
+   "variants": "sdk"
+  },
+  {
+   "id": "examples_ran_clean",
+   "class": "sweep",
+   "name": "Examples run with no crash",
+   "unit": "%",
+   "better": "higher",
+   "variants": "sdk"
+  },
+  {
+   "id": "port_build_rate",
+   "class": "sweep",
+   "name": "Examples that build after moving to another chip",
+   "unit": "%",
+   "better": "higher",
+   "variants": "from-to, method"
+  },
+  {
+   "id": "port_example_behavior",
+   "class": "sweep",
+   "name": "A TI driver example from another chip's SDK shows the behavior its source defines",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "from-to-example, e.g. mspm33-to-mspm0g3519-spi_controller_internal_loopback_poll",
+   "method": "portability/everywhere/PORTING.md section 7: configuration port, flash, then read the pins, registers and RAM variables the source example defines over the probe"
+  },
+  {
+   "id": "app_glue_lines",
+   "class": "sweep",
+   "name": "Glue lines the portable three-ways app needs on one board and software layer",
+   "unit": "lines",
+   "better": "lower",
+   "variants": "layer, e.g. driverlib, linux-sysfs",
+   "method": "code lines (no blanks, no comment-only lines) counted by portability/three-ways/count.py"
+  },
+  {
+   "id": "app_config_lines",
+   "class": "sweep",
+   "name": "Configuration lines the portable three-ways app needs on one board and software layer",
+   "unit": "lines",
+   "better": "lower",
+   "variants": "layer, e.g. driverlib, linux-sysfs",
+   "method": "code lines (no blanks, no comment-only lines) counted by portability/three-ways/count.py"
+  },
+  {
+   "id": "port_flash_bytes",
+   "class": "sweep",
+   "name": "Flash used by an outside project ported to the board, with its shim",
+   "unit": "B",
+   "better": "lower",
+   "variants": "project, e.g. minmea",
+   "method": "docs/ports.md"
+  },
+  {
+   "id": "port_ram_bytes",
+   "class": "sweep",
+   "name": "RAM used by an outside project ported to the board, with its shim",
+   "unit": "B",
+   "better": "lower",
+   "variants": "as port_flash_bytes",
+   "method": "docs/ports.md"
+  },
+  {
+   "id": "toolchain_gcc_examples_ran",
+   "class": "sweep",
+   "name": "SDK examples built with GCC that ran on the board with no fault",
+   "unit": "examples",
+   "better": "higher",
+   "variants": "compiler, e.g. gcc-12.2-zephyr-sdk",
+   "method": "portability/toolchains/gcc-mspm0/README.md, Run on silicon"
+  },
+  {
+   "id": "toolchain_gcc_faults",
+   "class": "sweep",
+   "name": "GCC-built SDK examples that faulted on the board",
+   "unit": "examples",
+   "better": "lower",
+   "variants": "compiler, e.g. gcc-12.2-zephyr-sdk",
+   "method": "portability/toolchains/gcc-mspm0/README.md, Run on silicon"
+  },
+  {
+   "id": "toolchain_gcc_behavior_verified",
+   "class": "sweep",
+   "name": "GCC-built SDK examples whose pin or serial behavior matched the ticlang build",
+   "unit": "examples",
+   "better": "higher",
+   "variants": "compiler, e.g. gcc-12.2-zephyr-sdk",
+   "method": "portability/toolchains/gcc-mspm0/README.md, Run on silicon"
+  },
+  {
+   "id": "display_full_frame",
+   "class": "display",
+   "name": "Full redraw of a 320x480 RGB565 SPI screen (ST7796S)",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "spi clock and method: spi8-cpu8, spi16-cpu16, spi40-dma16 ...",
+   "method": "mspm0g3507/display-test/README.md, Performance"
+  },
+  {
+   "id": "display_ready",
+   "class": "display",
+   "name": "Power-up to SPI screen initialized and on",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "init: usual, fast",
+   "method": "mspm0g3507/display-test/README.md, Start-up time"
+  },
+  {
+   "id": "gui_fps",
+   "class": "display",
+   "name": "LVGL demo screen refreshes per second",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "cpu and spi clock",
+   "method": "mspm0g3507/lvgl-g3507/README.md"
+  },
+  {
+   "id": "active_current_per_mhz",
+   "class": "power",
+   "name": "Active current per MHz running CoreMark (slope between two clocks)",
+   "unit": "uA/MHz",
+   "better": "lower",
+   "variants": "meter-voltage, e.g. energytrace-3.3v",
+   "method": "tools/energytrace/etcap.py on two CoreMark builds; the data sheet figure goes in conditions"
+  },
+  {
+   "id": "sleep_light_current",
+   "class": "power",
+   "name": "Lightest sleep, CPU off, clocks on (SLEEP)",
+   "unit": "uA",
+   "better": "lower",
+   "variants": "meter-voltage"
+  },
+  {
+   "id": "stop_current",
+   "class": "power",
+   "name": "STOP-class mode, low-speed clock kept",
+   "unit": "uA",
+   "better": "lower",
+   "variants": "meter-voltage"
+  },
+  {
+   "id": "shutdown_current",
+   "class": "power",
+   "name": "Deepest mode, RAM lost, pin wake",
+   "unit": "uA",
+   "better": "lower",
+   "variants": "meter-voltage"
+  },
+  {
+   "id": "idle_tick_current",
+   "class": "power",
+   "name": "Deepest sleep with a 1 s timer wake and nothing to do",
+   "unit": "uA",
+   "better": "lower",
+   "variants": "meter-voltage-os"
+  },
+  {
+   "id": "wakeup_time",
+   "class": "power",
+   "name": "Deepest sleep with RAM kept to first instruction",
+   "unit": "us",
+   "better": "lower",
+   "variants": "method: pin-toggle or trace"
+  },
+  {
+   "id": "energy_adc_sample",
+   "class": "power",
+   "name": "Energy per ADC sample at 1 ksps from sleep",
+   "unit": "uJ",
+   "better": "lower",
+   "variants": "meter-voltage"
+  },
+  {
+   "id": "energy_flash_write",
+   "class": "power",
+   "name": "Energy per 1 kB flash write",
+   "unit": "uJ",
+   "better": "lower",
+   "variants": "meter-voltage"
+  },
+  {
+   "id": "energy_radio_tx",
+   "class": "power",
+   "name": "Energy per radio transmit event (one advertisement or one packet)",
+   "unit": "uJ",
+   "better": "lower",
+   "variants": "stack-meter, e.g. ble-adv-energytrace"
+  },
+  {
+   "id": "battery_life_estimate",
+   "class": "power",
+   "name": "Days on a CR2032 (225 mAh) at the reference duty cycle: wake once a minute, 50 ms active at top clock, deepest sleep with RAM kept between",
+   "unit": "days",
+   "better": "higher",
+   "variants": "meter-voltage",
+   "method": "computed from the measured rows, never from the data sheet"
+  },
+  {
+   "id": "aes_sw_1kb",
+   "class": "core",
+   "name": "AES-128 CBC encrypt of 1 kB in software (tiny-AES-c)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "compiler-opt-memory, e.g. ticlang-o2-ram",
+   "method": "same tiny-AES-c source on every chip; FIPS-197 vectors must pass; key expansion outside the timing, the 1 kB memcpy inside. Per byte: aes_sw_cpb"
+  },
+  {
+   "id": "jpeg_decode_frame",
+   "class": "display",
+   "name": "Baseline JPEG decode of one 160 x 120 frame (picojpeg), one block row at a time",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "compiler-opt-memory",
+   "method": "same JPEG file and decoder on every chip; pixel checksum must match the native decode"
+  },
+  {
+   "id": "spi_tx_rate",
+   "class": "display",
+   "name": "SPI controller transmit at a stated clock, nothing attached",
+   "unit": "kB/s",
+   "better": "higher",
+   "variants": "frame width and clock, e.g. 16bit-12mhz; a clock above the data sheet's maximum for those pins ends in -over-spec",
+   "method": "64 kB from RAM through the FIFO (16 kB on a 4 kB-RAM chip); lead with the row at the data sheet's maximum clock; kB = 1,024 bytes; efficiency in spi_efficiency"
+  },
+  {
+   "id": "power_loop",
+   "class": "control",
+   "name": "Digital-power PID loop, trigger to duty write (mean)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "math: float, q15; memory",
+   "method": "same C on every chip; PWM period event triggers the ADC, the result interrupt runs the PID and writes the duty; value is the mean, value_hi the worst. Lead with power_loop_worst_pct and power_loop_jitter (docs/methodology.md section 13)"
+  },
+  {
+   "id": "video_fit",
+   "class": "display",
+   "name": "Smallest video decode that fits in RAM (arithmetic, not a run)",
+   "unit": "text",
+   "better": "",
+   "variants": "codec-resolution",
+   "method": "frame buffers plus decoder tables against the chip's RAM; docs/research/control-mcu-fit-2026-10-07.md"
+  },
+  {
+   "id": "hobby_flash_bytes",
+   "class": "hobby",
+   "name": "Flash used by a hobby part's driver plus its demo",
+   "unit": "B",
+   "better": "lower",
+   "variants": "part-layer, e.g. ssd1306-arduino, tm1637-c",
+   "method": "docs/arrivals/hobby-parts.md"
+  },
+  {
+   "id": "hobby_ram_bytes",
+   "class": "hobby",
+   "name": "RAM used by a hobby part's driver plus its demo",
+   "unit": "B",
+   "better": "lower",
+   "variants": "as hobby_flash_bytes",
+   "method": "docs/arrivals/hobby-parts.md"
+  },
+  {
+   "id": "hobby_works",
+   "class": "hobby",
+   "name": "The part works on this board from this repo's driver",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "part",
+   "method": "docs/arrivals/hobby-parts.md"
+  },
+  {
+   "id": "oled_frame_ms",
+   "class": "hobby",
+   "name": "SSD1306 OLED full-frame time (128x64, I2C)",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "i2c clock and mode: i2c400-page, i2c400-full",
+   "method": "docs/arrivals/hobby-parts.md"
+  },
+  {
+   "id": "power_loop_rate",
+   "class": "control",
+   "name": "Loop rate with 20 percent of the period free (computed, superseded)",
+   "unit": "kHz",
+   "better": "higher",
+   "variants": "math-memory, e.g. q15-flash",
+   "method": "0.8 x CPU clock / worst trigger-to-end cycles from the power_loop run. Not a measurement and it overstates the headroom (docs/research/figures-of-merit-2026-10-08.md, finding 1). Superseded on 2026-10-08 by power_loop_max_rate and power_loop_cpu_load; old rows stay, with status computed",
+   "superseded_by": "power_loop_max_rate power_loop_cpu_load"
+  },
+  {
+   "id": "control_loop_worst_pct",
+   "class": "control",
+   "name": "Control loop worst case, trigger to new PWM value, as a percent of a 100 kHz period",
+   "unit": "%",
+   "better": "lower",
+   "variants": "as control_loop",
+   "method": "worst trigger-to-new-value cycles / (CPU clock / 100,000) x 100, from the control_loop run; above 100 means the loop cannot update a 100 kHz PWM in time (docs/methodology.md section 13)"
+  },
+  {
+   "id": "control_loop_jitter",
+   "class": "control",
+   "name": "Control loop jitter, worst minus best trigger to new PWM value",
+   "unit": "us",
+   "better": "lower",
+   "variants": "as control_loop",
+   "method": "value_hi minus best of the control_loop run, 1,000 interrupts (docs/methodology.md section 13)"
+  },
+  {
+   "id": "control_loop_max_rate",
+   "class": "control",
+   "name": "Highest control-loop trigger rate with no missed period in 1,000",
+   "unit": "kHz",
+   "better": "higher",
+   "variants": "as control_loop",
+   "method": "rate sweep on the board (portability/fom/fom.h): a period is missed when its interrupt does not run, its new value lands after the period ends, or the ADC overwrites an unread result (docs/methodology.md section 13)"
+  },
+  {
+   "id": "control_loop_cpu_load",
+   "class": "control",
+   "name": "Control-loop CPU load, interrupt entry to exit, as a percent of a 100 kHz period",
+   "unit": "%",
+   "better": "lower",
+   "variants": "as control_loop",
+   "method": "CPU time taken from the main loop per interrupt (hardware entry, handler, return), our own checks subtracted, / (CPU clock / 100,000) x 100; measured at 100 kHz, or at control_loop_max_rate when lower; value_hi the worst with the checks left in (docs/methodology.md section 13)"
+  },
+  {
+   "id": "power_loop_worst_pct",
+   "class": "control",
+   "name": "Digital-power loop worst case, trigger to duty write, as a percent of a 100 kHz period",
+   "unit": "%",
+   "better": "lower",
+   "variants": "as power_loop",
+   "method": "worst trigger-to-duty-write cycles / (CPU clock / 100,000) x 100, from the power_loop run (docs/methodology.md section 13)"
+  },
+  {
+   "id": "power_loop_jitter",
+   "class": "control",
+   "name": "Digital-power loop jitter, worst minus best trigger to duty write",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as power_loop",
+   "method": "worst minus best trigger-to-duty-write of the power_loop run, 1,000 periods (docs/methodology.md section 13)"
+  },
+  {
+   "id": "power_loop_max_rate",
+   "class": "control",
+   "name": "Highest digital-power loop rate with no missed period in 1,000",
+   "unit": "kHz",
+   "better": "higher",
+   "variants": "math-memory, e.g. q15-flash",
+   "method": "rate sweep on the board, replaces power_loop_rate: doubling, then a binary search to one timer count, then two confirming runs (portability/fom/fom.h; docs/methodology.md section 13)"
+  },
+  {
+   "id": "power_loop_cpu_load",
+   "class": "control",
+   "name": "Digital-power loop CPU load, interrupt entry to exit, as a percent of a 100 kHz period",
+   "unit": "%",
+   "better": "lower",
+   "variants": "math-memory, e.g. q15-flash",
+   "method": "as control_loop_cpu_load: measured at 100 kHz, or at power_loop_max_rate when the chip cannot hold 100 kHz (docs/methodology.md section 13)"
+  },
+  {
+   "id": "aes_hw_cpb",
+   "class": "core",
+   "name": "AES-128 in hardware, cycles per byte",
+   "unit": "cycles/B",
+   "better": "lower",
+   "variants": "message size, mode, build and key setup, e.g. 16b-ecb-ticlang-o2-keyin, 1kb-cbc-ticlang-o2-keyin",
+   "method": "cycles for one driver call / bytes; keyin when the call loads the key, keyout when it does not (docs/methodology.md section 13)"
+  },
+  {
+   "id": "aes_sw_cpb",
+   "class": "core",
+   "name": "AES-128 in software (tiny-AES-c), cycles per byte",
+   "unit": "cycles/B",
+   "better": "lower",
+   "variants": "message size, mode, build and key setup, e.g. 16b-ecb-ticlang-o2-keyout, 1kb-cbc-ticlang-o2-keyout",
+   "method": "cycles / bytes, with the memcpy subtracted where the program timed it separately (the CC parts); elsewhere the note says the 1 kB memcpy is inside; keyout when the key schedule is outside the timing (docs/methodology.md section 13)"
+  },
+  {
+   "id": "spi_efficiency",
+   "class": "display",
+   "name": "SPI transmit as a percent of the wire rate",
+   "unit": "%",
+   "better": "higher",
+   "variants": "as spi_tx_rate",
+   "method": "measured kB/s / (bus clock / 8 / 1,024) x 100; 100 means no idle between frames (docs/methodology.md section 13)"
+  },
+  {
+   "id": "pqc_mlkem768_keygen",
+   "class": "security",
+   "name": "ML-KEM-768 key generation (FIPS 203)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "code, compiler, optimization and memory, e.g. ti-example-ticlang-o2-flash, mlkem-native-gcc-o3-flash",
+   "method": "one call to keygen from a 64-byte seed, cycles from DWT CYCCNT (M33), SysTick with wrap counter (M0+), esp_cpu_get_cycle_count (RISC-V) or the CPU timer (C28x); median of 3; the image first passes NIST ACVP ML-KEM keyGen test 26 for 768 (the vector TI's pqc_mlkem_768_keygen example carries) and refuses to time otherwise; random seed from the TRNG or a fixed seed, said in conditions"
+  },
+  {
+   "id": "pqc_mlkem768_encaps",
+   "class": "security",
+   "name": "ML-KEM-768 encapsulation",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as pqc_mlkem768_keygen",
+   "method": "one call to encaps with a 32-byte seed and a 1,184-byte encapsulation key in RAM; median of 3; known-answer test as keygen plus a cross check that another implementation (TI library, mlkem-native or OpenSSL on the Mac) decapsulates to the same 32-byte secret"
+  },
+  {
+   "id": "pqc_mlkem768_decaps",
+   "class": "security",
+   "name": "ML-KEM-768 decapsulation",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as pqc_mlkem768_keygen",
+   "method": "one call to decaps with a 2,400-byte decapsulation key and a 1,088-byte ciphertext; median of 3; must match the encapsulator's secret, and a ciphertext with one bit flipped must give a different secret (implicit rejection)"
+  },
+  {
+   "id": "pqc_mldsa44_keygen",
+   "class": "security",
+   "name": "ML-DSA-44 key generation (FIPS 204)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as pqc_mldsa44_sign",
+   "method": "one call to keygen from a 32-byte seed; median of 3; the image first passes a NIST ACVP ML-DSA-44 keyGen vector and refuses to time otherwise; seed from the TRNG or fixed, said in conditions"
+  },
+  {
+   "id": "pqc_mldsa44_sign",
+   "class": "security",
+   "name": "ML-DSA-44 sign (FIPS 204), mean over 100 messages",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "code (ti-example, mldsa-native, mldsa-native-lowram for MLD_CONFIG_REDUCE_RAM), compiler, optimization, memory; pure mode, empty context unless the variant says ctx",
+   "method": "100 signs of 100 different 32-byte messages with one key; value is the mean (TI quotes means of 16), value_hi the maximum, median and minimum in the note, because rejection sampling makes sign time vary run to run; deterministic signing (rnd = 0) for the known-answer test (NIST CAVP ML-DSA sign test 1, as in TI's pqc_mldsa_44_sign_ctx_pure), hedged signing for the timed runs, said in conditions"
+  },
+  {
+   "id": "pqc_mldsa44_verify",
+   "class": "security",
+   "name": "ML-DSA-44 verify",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as pqc_mldsa44_sign",
+   "method": "one verify of a 2,420-byte signature with a 1,312-byte public key; median of 3; must accept NIST CAVP ML-DSA verify test 6 (as in TI's pqc_mldsa_44_verify_ctx_pure) and reject the same signature with one bit flipped"
+  },
+  {
+   "id": "pqc_stack_peak",
+   "class": "security",
+   "name": "Peak stack of one post-quantum call, by painting",
+   "unit": "B",
+   "better": "lower",
+   "variants": "operation then code and build, e.g. mlkem768-decaps-mlkem-native-gcc-o3, mldsa44-sign-ti-example-ticlang-o2",
+   "method": "fill the stack area with a known pattern before the call, scan for the deepest overwritten word after it; excludes the key and message buffers, which the note lists; one row per operation; checked: by-us"
+  },
+  {
+   "id": "pqc_flash_bytes",
+   "class": "security",
+   "name": "Flash used by the post-quantum code in a linked image",
+   "unit": "B",
+   "better": "lower",
+   "variants": "algorithm then code and build, e.g. mlkem768-mlkem-native-gcc-os, mldsa44-ti-example-ticlang-o2",
+   "method": "from the linker map: the library or third-party objects only (KEM or DSA plus SHA-3), with the whole image in the note; checked: linker"
+  },
+  {
+   "id": "sha256_cpb",
+   "class": "security",
+   "name": "SHA-256 of 1 kB, cycles per byte",
+   "unit": "cycles/B",
+   "better": "lower",
+   "variants": "code and build, e.g. ti-cryptolib-sw-ticlang-o2, bcon-sw-ticlang-o2, hw-driver for a SHA block",
+   "method": "cycles for one-shot SHA-256 of 1,024 bytes in RAM / 1,024; FIPS 180-4 'abc' vector must pass; median of 3"
+  },
+  {
+   "id": "ecdsa_p256_sign",
+   "class": "security",
+   "name": "ECDSA P-256 sign of a 32-byte digest",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "code and engine, e.g. ti-example-sw-ticlang-o2 (MSPM0 software), ti-example-pka-ticlang-o2 (MSPM33 PKA), micro-ecc-asm-ticlang-o2, micro-ecc-c-ticlang-o2",
+   "method": "one sign, median of 3 (best of 3 in the older micro-ecc bench, said in the note); the signature must verify and a one-bit-flipped digest must be rejected; random k from the TRNG or a fixed-seed generator, said in conditions"
+  },
+  {
+   "id": "ecdsa_p256_verify",
+   "class": "security",
+   "name": "ECDSA P-256 verify",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as ecdsa_p256_sign",
+   "method": "one verify, median of 3; must accept a known-good signature (TI's ec_ecdsa_p256_sha256_verify vector where available) and reject a one-bit-flipped one"
+  },
+  {
+   "id": "ecdh_p256_shared",
+   "class": "security",
+   "name": "ECDH P-256 shared secret (the classical step ML-KEM replaces)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as ecdsa_p256_sign; x25519 as the code name for the X25519 equivalent",
+   "method": "one shared-secret computation from our private key and the peer's public key, median of 3; both parties' secrets must match; a full classical join is two of these plus two key generations, which the note adds up beside the ML-KEM-768 total"
+  },
+  {
+   "id": "host_fit",
+   "class": "host",
+   "name": "Host-side code for a radio or sensor: flash and RAM on this host",
+   "unit": "B",
+   "better": "lower",
+   "variants": "radio-interface-measure, e.g. cc1407p-spi-flash, cc1407p-spi-ram-nb24, cc1407p-spi-ram-nb4, openthread-ftd-spinel-uart-flash; RAM is .data plus .bss, stack not counted unless the note says so",
+   "method": "portability/cc1407p-host/build_fit.sh: TI's host driver unmodified, the repo's bare-metal HAL, a transmit app, linked with the board's core and the TI linker; vendor glue (SPI and GPIO calls) stubbed, so a real port adds a few hundred bytes. does_not_fit rows carry the shortfall as a negative number"
+  },
+  {
+   "id": "host_throughput",
+   "class": "host",
+   "name": "Payload rate through the host-to-radio link, per interface",
+   "unit": "kbps",
+   "better": "higher",
+   "variants": "radio-interface-spiclock, e.g. cc1407p-spi-4mhz; same payload and packet count on every interface",
+   "method": "docs/research/host-scaling-plan-2026-10-09.md"
+  },
+  {
+   "id": "host_latency",
+   "class": "host",
+   "name": "Command to radio response over the host link, per interface",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "as host_throughput",
+   "method": "docs/research/host-scaling-plan-2026-10-09.md"
+  },
+  {
+   "id": "host_cpu_load",
+   "class": "host",
+   "name": "Host CPU busy while the link runs at a set rate",
+   "unit": "%",
+   "better": "lower",
+   "variants": "as host_throughput",
+   "method": "docs/research/host-scaling-plan-2026-10-09.md"
+  },
+  {
+   "id": "host_error_rate",
+   "class": "host",
+   "name": "Frames lost or corrupted over the host link",
+   "unit": "%",
+   "better": "lower",
+   "variants": "as host_throughput; counts CRC and sequence errors over at least 100000 frames",
+   "method": "docs/research/host-scaling-plan-2026-10-09.md"
+  },
+  {
+   "id": "host_wire_match",
+   "class": "host",
+   "name": "The host driver's first SPI message equals the Arm reference byte for byte",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "radio-interface, e.g. cc1407p-first-message",
+   "method": "portability/cc1407p-host/c28x/README.md: same driver and fake radio on the board and on a PC; compare the logged transmit bytes"
+  },
+  {
+   "id": "radar_time_to_first_frame",
+   "class": "radar",
+   "name": "Box open to the first valid radar frame parsed on the Mac (TI image, a custom parser)",
+   "unit": "s",
+   "better": "lower",
+   "variants": "path: arprog, uniflash, ccs",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_detect_range",
+   "class": "radar",
+   "name": "Farthest boresight distance where a person is flagged in 20 of 20 passes",
+   "unit": "m",
+   "better": "higher",
+   "variants": "config: presence, motion, tracking; target: walking, seated, reflector",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_host_points_delivered",
+   "class": "radar",
+   "name": "Recorded radar points a third-party host program delivers, out of the points in the stream",
+   "unit": "%",
+   "better": "higher",
+   "variants": "project and condition, e.g. ti-mmwave-rospkg-frame-50ms",
+   "method": "docs/research/radar-software-survey-2026-11-03.md"
+  },
+  {
+   "id": "radar_detect_latency",
+   "class": "radar",
+   "name": "Motion start to presence flag",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "config; the frame period and the latency in frames go in conditions",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_clear_latency",
+   "class": "radar",
+   "name": "Person leaves to presence flag clears",
+   "unit": "s",
+   "better": "lower",
+   "variants": "config",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_false_alarm",
+   "class": "radar",
+   "name": "Presence flags in an empty room",
+   "unit": "per h",
+   "better": "lower",
+   "variants": "config; one hour",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_frame_rate",
+   "class": "radar",
+   "name": "Highest frame rate with 0 frames lost over 10 minutes",
+   "unit": "frames/s",
+   "better": "higher",
+   "variants": "baud: 115200, 1250000; tlv-set",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_uart_bandwidth",
+   "class": "radar",
+   "name": "Clean bytes per second the radar UART carries",
+   "unit": "kB/s",
+   "better": "higher",
+   "variants": "baud: 115200, 1250000; the packet bytes per TLV set go in conditions",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_power_avg",
+   "class": "radar",
+   "name": "Average power against update rate",
+   "unit": "mW",
+   "better": "lower",
+   "variants": "point: chip-rails, board-5v; update rate in conditions",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_power_deepsleep",
+   "class": "radar",
+   "name": "Deep-sleep power with memory retained",
+   "unit": "mW",
+   "better": "lower",
+   "variants": "retained kB in conditions",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_boot_to_first_frame",
+   "class": "radar",
+   "name": "Reset release to the first frame, application booting from flash",
+   "unit": "s",
+   "better": "lower",
+   "variants": "config",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_adc_stream",
+   "class": "radar",
+   "name": "Raw ADC samples streamed over SPI to a host, frames lost",
+   "unit": "kB/s",
+   "better": "higher",
+   "variants": "spi clock in conditions",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_hwa_fft_speedup",
+   "class": "radar",
+   "name": "Hardware accelerator FFT against the Cortex-M4F software FFT",
+   "unit": "x",
+   "better": "higher",
+   "variants": "size: 64, 256",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "radar_count_exact",
+   "class": "radar",
+   "name": "Share of frames with the right number of tracked people while people are in view, from a spoken-cue walk",
+   "unit": "%",
+   "better": "higher",
+   "variants": "config and walk script; the window runs from the first track to the leave cue",
+   "method": "iwrl6432boost/live/README.md"
+  },
+  {
+   "id": "radar_link_recovery",
+   "class": "radar",
+   "name": "Radar stops sending to frames flowing again with no hands (watchdog: probe reset and config)",
+   "unit": "s",
+   "better": "lower",
+   "variants": "how the stream was stopped",
+   "method": "iwrl6432boost/live/README.md"
+  },
+  {
+   "id": "radar_door_count",
+   "class": "radar",
+   "name": "Door entries and exits counted right against a spoken-cue script",
+   "unit": "%",
+   "better": "higher",
+   "variants": "room (walked setup or learned) and recording; the truth is the cue script",
+   "method": "iwrl6432boost/live/README.md"
+  },
+  {
+   "id": "radar_zone_overlap",
+   "class": "radar",
+   "name": "Share of a still person's seated time with a near box and a far box both lit",
+   "unit": "%",
+   "better": "lower",
+   "variants": "config, distance and which boxes (shipped boxes or our zones); a replay of recorded frames is measured with the source named in conditions",
+   "method": "iwrl6432boost/zones/README.md"
+  },
+  {
+   "id": "radar_zone_false_event",
+   "class": "radar",
+   "name": "Zone on-events in an empty room",
+   "unit": "per h",
+   "better": "lower",
+   "variants": "zone layout and config; the window length goes in conditions",
+   "method": "iwrl6432boost/zones/README.md"
+  },
+  {
+   "id": "radar_zone_latency",
+   "class": "radar",
+   "name": "Cue to a zone lighting (detect) or clearing (clear), from a timed walk-through",
+   "unit": "s",
+   "better": "lower",
+   "variants": "zone layout, config and detect or clear; the zone name goes in conditions",
+   "method": "iwrl6432boost/zones/README.md"
+  },
+  {
+   "id": "radar_ha_latency",
+   "class": "radar",
+   "name": "Radar frame to Home Assistant state change",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "route: mac-rest, mac-mqtt, zigbee, bthome, mqtt-cc35x1",
+   "method": "docs/arrivals/iwrl6432boost.md"
+  },
+  {
+   "id": "ai_presence_accuracy",
+   "class": "ai",
+   "name": "Presence model: windows classed right in a timed room protocol (empty, person still, person moving, empty; first 20 s of each phase not scored)",
+   "unit": "%",
+   "better": "higher",
+   "variants": "sensing route and phase, e.g. wifi-csi-empty, wifi-csi-still, wifi-csi-moving, wifi-csi-all; conditions: windows scored, mean P(presence)",
+   "method": "cc35x1/csi/csi_run.py"
+  },
+  {
+   "id": "ai_presence_first_result",
+   "class": "ai",
+   "name": "Presence model: host asks for the stream to the first result",
+   "unit": "s",
+   "better": "lower",
+   "variants": "sensing route, e.g. wifi-csi",
+   "method": "cc35x1/csi/csi_run.py"
+  },
+  {
+   "id": "linux_boot_time",
+   "class": "setup",
+   "name": "Power in to the Linux login prompt on the serial console",
+   "unit": "s",
+   "better": "lower",
+   "variants": "boot: first-boot (includes the root file system resize), warm",
+   "method": "docs/arrivals/tda4.md, first boot; timestamps on the console log, first bootloader byte to the login prompt"
+  },
+  {
+   "id": "dl_inference_ms",
+   "class": "ai",
+   "name": "Deep-learning model: one inference, median wall time",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "model-runtime-target, e.g. yolox-s-pose-640-onnxrt-tidl-c7x, yolox-s-pose-640-onnxrt-a72",
+   "method": "docs/arrivals/tda4.md run order step 13; 30 or 50 timed runs after one warm-up, random input, median"
+  },
+  {
+   "id": "gst_pipeline_fps",
+   "class": "ai",
+   "name": "Whole vision graph: decode, preprocess, inference, postprocess, sink",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "graph-model-sink, e.g. file-pose-encode",
+   "method": "TI edgeai-gst-apps -v framerate metric, steady state"
+  },
+  {
+   "id": "mem_bandwidth",
+   "class": "core",
+   "name": "Memory bandwidth, STREAM-style triad",
+   "unit": "MB/s",
+   "better": "higher",
+   "variants": "kernel-threads, e.g. triad-1t",
+   "method": "64 MB arrays, best of 5, wall clock"
+  },
+  {
+   "id": "xip_memcpy_tasks",
+   "class": "core",
+   "name": "TI OptiFlash benchmark: 16 tasks, no copy (the 0 B row), code where the variant says",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "memory layout: ocram, xip, xip-l2-8k, xip-l2-16k, xip-l2-32k, xip-l2-64k, xip-sp (TI smart placement); the flash clock goes in conditions",
+   "method": "am263p/bench/xip/ (TI's optiflash_benchmark ported to the LaunchPad) and am263p/tools/xip_run.sh"
+  },
+  {
+   "id": "video_decode_fps",
+   "class": "core",
+   "name": "Hardware video decode throughput",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "resolution-codec-streams, e.g. 1280x768-h264-1",
+   "method": "gst-launch to fakesink sync=false, frames divided by wall time"
+  },
+  {
+   "id": "video_encode_fps",
+   "class": "core",
+   "name": "Hardware video encode throughput",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "resolution-codec, e.g. 1080p-h264",
+   "method": "videotestsrc NV12 to the encoder, fakesink, frames divided by wall time"
+  },
+  {
+   "id": "openssl_speed_mbps",
+   "class": "security",
+   "name": "openssl speed, EVP, 8 KB blocks",
+   "unit": "MB/s",
+   "better": "higher",
+   "variants": "algorithm-engine, e.g. aes-128-cbc-cpu, aes-128-cbc-afalg",
+   "method": "openssl speed -elapsed -evp, the 8192-byte column"
+  },
+  {
+   "id": "thermal_steady_c",
+   "class": "power",
+   "name": "Hottest thermal zone after 10 minutes of sustained load",
+   "unit": "C",
+   "better": "lower",
+   "variants": "load, e.g. coremark2t-plus-tidl",
+   "method": "thermal_zone*/temp sampled every 10 s"
+  },
+  {
+   "id": "sensor_bridge_cpu",
+   "class": "core",
+   "name": "Holoscan Sensor Bridge device emulation: CPU cost of the packetizer process",
+   "unit": "%",
+   "better": "lower",
+   "variants": "resolution-format-fps, e.g. 720p-raw8-30fps",
+   "method": "NVIDIA HSB emulator (third-party/holoscan-sensor-bridge) in tda4/hsb/serve_frames; user plus system ticks of the process over 10 s after a host configured it; percent of one core"
+  },
+  {
+   "id": "sensor_bridge_frames_ok",
+   "class": "core",
+   "name": "Holoscan Sensor Bridge stream: frames received intact by the host-side check",
+   "unit": "%",
+   "better": "higher",
+   "variants": "resolution-format-fps-receiver, e.g. 720p-raw8-10fps-python",
+   "method": "tda4/hsb/hsb_host_check.py: frames whose CRC-32 matches a source frame, with sequence numbers in order"
+  },
+  {
+   "id": "video_sw_decode_fps",
+   "class": "core",
+   "name": "Software H.264 decode (baseline profile, no video hardware): frames per second",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "h264-<WxH>-ref1[-600k30]-<opt>; one reference frame, no B-frames, 30-frame stream; decoder calls only, RGB565 conversion apart. Linux boards: <opt> ffmpeg<major>-t<threads> is ffmpeg's software h264 decoder (MD5 of all frames equal to the Mac's ffmpeg), h264bsd-o3 the harness built on the board; -main- marks the main-profile stream (CABAC, B-frames)",
+   "method": "portability/h264 (h264bsd 42bcb5d); cycle counter around the decoder calls, CRC-32 of every frame equal to the Mac build; portability/h264/SOURCE.md"
+  },
+  {
+   "id": "video_sw_decode_ram",
+   "class": "core",
+   "name": "RAM the software H.264 decode needs: decoder heap peak plus input buffer plus RGB565 strip",
+   "unit": "B",
+   "better": "lower",
+   "variants": "same as video_sw_decode_fps; does_not_fit rows carry the shortfall",
+   "method": "portability/h264 allocator high-water mark; stack is reported in the row note"
+  },
+  {
+   "id": "gpu_gles_score",
+   "class": "core",
+   "name": "OpenGL ES on the GPU: kmscube or glmark2 frames per second",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "program, e.g. kmscube, glmark2-es2",
+   "method": "needs a display on the board"
+  },
+  {
+   "id": "mem_latency",
+   "class": "linux",
+   "name": "Memory load latency by pointer chase",
+   "unit": "ns",
+   "better": "lower",
+   "variants": "working set, e.g. l1-16k, l2-512k, ddr-64m",
+   "method": "tda4/bench/c3/memlat.c: random cyclic permutation, one dependent load per step, pinned to one core"
+  },
+  {
+   "id": "sched_jitter_us",
+   "class": "linux",
+   "name": "Timer wake-up latency (cyclictest), max over 60 s",
+   "unit": "us",
+   "better": "lower",
+   "variants": "idle, load-2cpu",
+   "method": "cyclictest -m -p 80 -i 1000 -l 60000 -t 1 -a 1; value is the max, note carries the average"
+  },
+  {
+   "id": "storage_read_mbps",
+   "class": "linux",
+   "name": "Boot medium sequential read",
+   "unit": "MB/s",
+   "better": "higher",
+   "variants": "medium and method, e.g. microsd-hdparm, microsd-fio-1m",
+   "method": "hdparm -t and fio direct reads of the block device"
+  },
+  {
+   "id": "storage_write_mbps",
+   "class": "linux",
+   "name": "Boot medium sequential write",
+   "unit": "MB/s",
+   "better": "higher",
+   "variants": "medium and method, e.g. microsd-dd-direct",
+   "method": "dd 256 MB with oflag=direct and fsync into the root file system"
+  },
+  {
+   "id": "storage_iops",
+   "class": "linux",
+   "name": "Boot medium 4 kB random read",
+   "unit": "IOPS",
+   "better": "higher",
+   "variants": "medium, e.g. microsd-fio-4k-qd8",
+   "method": "fio randread 4k direct, queue depth 8, 20 s"
+  },
+  {
+   "id": "cold_start_s",
+   "class": "linux",
+   "name": "Vision app launch to the first frame-rate line",
+   "unit": "s",
+   "better": "lower",
+   "variants": "app and model, e.g. edgeai-app-yolox-pose",
+   "method": "wall clock from process start to the first framerate metric the app prints"
+  },
+  {
+   "id": "ipc_roundtrip_us",
+   "class": "linux",
+   "name": "Linux to remote core message round trip (rpmsg echo)",
+   "unit": "us",
+   "better": "lower",
+   "variants": "remote core, e.g. mcu-r5f0-0, c7x",
+   "method": "rpmsg_char_simple with 2,000 echoes, minus the one-echo run, divided by 1,999"
+  },
+  {
+   "id": "ipc_throughput_kbps",
+   "class": "linux",
+   "name": "Linux to remote core message stream, payload rate (1 kB = 1,000 bytes)",
+   "unit": "kB/s",
+   "better": "higher",
+   "variants": "direction, payload size and wake mode, e.g. linux-to-zephyr-496b-irq",
+   "method": "20,000 messages back to back through the shared-memory rings, first send to last arrival (or the remote's final count), median of 3"
+  },
+  {
+   "id": "ipc_msgs_per_s",
+   "class": "linux",
+   "name": "Linux to remote core message stream, messages per second",
+   "unit": "msgs/s",
+   "better": "higher",
+   "variants": "direction, payload size and wake mode, e.g. linux-to-zephyr-64b-irq",
+   "method": "same run as ipc_throughput_kbps"
+  },
+  {
+   "id": "accel_load_pct",
+   "class": "linux",
+   "name": "Remote core load during a pipeline (TI perf_stats)",
+   "unit": "%",
+   "better": "",
+   "variants": "core and pipeline, e.g. c7x-yolox-zerocopy, c7x-pose-app",
+   "method": "TI's perf_stats tool beside a running pipeline, the printed TOTAL LOAD"
+  },
+  {
+   "id": "ddr_bw_mbps",
+   "class": "linux",
+   "name": "DDR bandwidth used during a pipeline (TI perf_stats)",
+   "unit": "MB/s",
+   "better": "",
+   "variants": "pipeline, e.g. yolox-zerocopy",
+   "method": "TI's perf_stats DDR read plus write"
+  },
+  {
+   "id": "eth_throughput_mbps",
+   "class": "linux",
+   "name": "Wired Ethernet TCP throughput (iperf3)",
+   "unit": "Mbit/s",
+   "better": "higher",
+   "variants": "direction and peer, e.g. tx-to-host, rx-from-host, bidir",
+   "method": "iperf3 -c <wired host> -t 10 (-R, --bidir), three runs, the receiver's figure"
+  },
+  {
+   "id": "eth_rtt_ms",
+   "class": "linux",
+   "name": "Wired Ethernet round trip to a host on the same switch",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "peer",
+   "method": "ping -c 100 -i 0.2, average"
+  },
+  {
+   "id": "display_scanout_fps",
+   "class": "core",
+   "name": "Parallel RGB scan-out from a frame buffer: frames per second with every frame's pixel sum checked against the buffer",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "engine-format-WxH-pixel clock, e.g. pru-rgb565-800x480-22mhz; a frame counts only if its sum matched",
+   "method": "am263p/bench/pru-display/ (gen_scan.py firmware, r5_main.c harness); frame counter against the R5F cycle counter over 5 s"
+  },
+  {
+   "id": "pru_read_bw",
+   "class": "core",
+   "name": "PRU read bandwidth into its registers, 64-byte blocks, data checked",
+   "unit": "MB/s",
+   "better": "higher",
+   "variants": "path-source, e.g. xfr2vbus-ocsram, lbbo64-ocsram, lbbo64-pru-dram",
+   "method": "am263p/bench/pru-display/bw.asm: 4,096 blocks timed with the PRU's own cycle counter at 200 MHz"
+  },
+  {
+   "id": "display_scanout_cpu_cost",
+   "class": "core",
+   "name": "What a display scan-out costs the CPU: change in a measured CPU workload's cycles with the scan-out running",
+   "unit": "%",
+   "better": "lower",
+   "variants": "engine-workload, e.g. pru-h264-320x240",
+   "method": "am263p/bench/pru-display/r5_main.c: the same H.264 decode, two passes each, before and while the PRU scans out"
+  },
+  {
+   "id": "ble_hid_action_latency",
+   "class": "radio",
+   "name": "Button press on a Bluetooth LE HID device to the host's action (a media key changing the player), median of 20",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "host-app, e.g. macos-music",
+   "method": "ports/ble-hid-remote/host/latency.py: the board's UART line for each press and Music's playerInfo notification, both stamped on the Mac clock; the UART leg (a few ms) is not subtracted"
+  },
+  {
+   "id": "ble_notify_latency",
+   "class": "radio",
+   "name": "Input change on the board to the notification on the central, on the central's clock",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "service and input, e.g. nordic-lbs-button-probe",
+   "method": "ports/nordic-apps/host/nordic_pack.py: the probe drives the button pin, the Mac stamps the end of the probe call and the Button notification; the probe call's own time is inside the number"
+  },
+  {
+   "id": "ble_hid_pair",
+   "class": "radio",
+   "name": "Bluetooth LE HID device paired and bonded by the host's own settings, no app: time from the host's pairing request to bonded",
+   "unit": "s",
+   "better": "lower",
+   "variants": "host-method, e.g. macos-just-works",
+   "method": "the host's Bluetooth log (macOS: log show for bluetoothd, Stack.SMP and Server.LE.Security lines)"
+  },
+  {
+   "id": "ai_wakeword_hits",
+   "class": "ai",
+   "name": "TI's wake-word model (\"OK Kilby\"): utterances detected, of the number said (20 unless the conditions say 10), one Mac voice at one level",
+   "unit": "hits",
+   "better": "higher",
+   "variants": "voice-input-level, e.g. samantha-replay-m20dbfs, samantha-live-mic-vol70",
+   "method": "mspm0g5187/wakeword/README.md: replay.py (speech sent to the serial port) or live.py (the Mac's speaker, the board's own microphone); a hit is a WAKE line from the board within the word and 1.5 s after it"
+  },
+  {
+   "id": "ai_wakeword_false_triggers",
+   "class": "ai",
+   "name": "TI's wake-word model: WAKE events in 10 minutes of silence or of other sentences spoken by the Mac",
+   "unit": "per 10 min",
+   "better": "lower",
+   "variants": "input-and-sound, e.g. replay-silence, replay-speech, live-silence, live-speech",
+   "method": "mspm0g5187/wakeword/replay_long.py and live.py; events 1 s or less apart count as one"
+  },
+  {
+   "id": "ai_wakeword_latency",
+   "class": "ai",
+   "name": "TI's wake-word model: end of the spoken phrase to the board's WAKE line, median",
+   "unit": "s",
+   "better": "lower",
+   "variants": "voice-input-level (negative: the board fired before the phrase ended)",
+   "method": "mspm0g5187/wakeword/replay.py: the audio clock of the clip against the Mac clock when the line arrives"
+  },
+  {
+   "id": "voice_turn_first_audio",
+   "class": "ai",
+   "name": "Voice assistant turn: end of the spoken question to the board's first reply audio, median",
+   "unit": "s",
+   "better": "lower",
+   "variants": "assistant server and language model",
+   "method": "ports/xiaozhi/target-cc35x1: the Mac speaks the question beside the board; the end of the Mac's speech against the serial line for the first reply audio, on the Mac clock"
+  },
+  {
+   "id": "ai_wakeword_image_bytes",
+   "class": "ai",
+   "name": "TI's wake-word example as built for the board's own microphone: flash and RAM (text plus data, bss) from the linker size report",
+   "unit": "B",
+   "better": "lower",
+   "variants": "flash-or-ram-input, e.g. flash-i2s-o2, ram-i2s-o2",
+   "method": "tiarmsize on the .out"
+  },
+  {
+   "id": "ai_wakeword_input_rate",
+   "class": "ai",
+   "name": "Samples a second the wake-word example's audio input really delivers (the model was trained at 8,000), counted by the board against the Mac clock",
+   "unit": "Hz",
+   "better": "higher",
+   "variants": "input, e.g. adc-shipped, i2s-microphone",
+   "method": "mspm0g5187/wakeword/stats.py on the serial log"
+  },
+  {
+   "id": "ai_wakeword_cpu_load",
+   "class": "ai",
+   "name": "Wake-word detector on the chip: share of the CPU the detector takes (front end and model, per 10 ms block), from the DWT cycle counter",
+   "unit": "%",
+   "better": "lower",
+   "variants": "model-kernels-clock, e.g. hey-sparky-cmsisnn-160mhz",
+   "method": "ports/microwakeword/target-mspm33c321a/README.md: stats line (busy_total_ms over blocks)"
+  },
+  {
+   "id": "bldc_rpm",
+   "class": "control",
+   "name": "Brushless motor speed at a duty, six-step from Hall sensors",
+   "unit": "rpm",
+   "better": "higher",
+   "variants": "<method>-<duty>pct-<fwd|rev> with the motor and bus voltage in conditions",
+   "method": "am13e230/bldc-drv8376/README.md: speed from the last six Hall edge intervals, printed once a second, read after the ramp settles"
+  },
+  {
+   "id": "hall_misalign_pct",
+   "class": "control",
+   "name": "Hall sensor misalignment: largest deviation of a sector's width from one sixth of an electrical turn",
+   "unit": "%",
+   "better": "lower",
+   "variants": "<method>-<duty>pct-<fwd|rev>; the six widths in note",
+   "method": "am13e230/bldc-drv8376/README.md: time in each Hall state over 50 electrical turns at steady speed, as percent of a turn"
+  },
+  {
+   "id": "motor_start_ms",
+   "class": "motor",
+   "name": "Time from standstill to one shaft turn",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_start_ok",
+   "class": "motor",
+   "name": "Starts that reached one shaft turn, of 20",
+   "unit": "of 20",
+   "better": "higher",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_start_load",
+   "class": "motor",
+   "name": "Largest load torque the motor starts against",
+   "unit": "mNm",
+   "better": "higher",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_speed_ripple",
+   "class": "motor",
+   "name": "Speed ripple at a set speed, peak to peak over mean",
+   "unit": "%",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_i_ripple",
+   "class": "motor",
+   "name": "Phase current ripple at a set speed",
+   "unit": "%",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_trq_ripple",
+   "class": "motor",
+   "name": "Torque ripple at a set speed",
+   "unit": "%",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_step_rise",
+   "class": "motor",
+   "name": "Speed step rise time, 10 to 90 percent",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_step_over",
+   "class": "motor",
+   "name": "Speed step overshoot",
+   "unit": "%",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_step_settle",
+   "class": "motor",
+   "name": "Speed step settling time to 2 percent",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_i_rise",
+   "class": "motor",
+   "name": "Current step rise time",
+   "unit": "us",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_i_bw",
+   "class": "motor",
+   "name": "Current-loop bandwidth",
+   "unit": "Hz",
+   "better": "higher",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_trq_per_amp",
+   "class": "motor",
+   "name": "Torque per ampere",
+   "unit": "mNm/A",
+   "better": "higher",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_noload_w",
+   "class": "motor",
+   "name": "No-load input power at a set speed",
+   "unit": "W",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_eff_sys",
+   "class": "motor",
+   "name": "Efficiency, electrical in to mechanical out, whole system",
+   "unit": "%",
+   "better": "higher",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_eff_drive",
+   "class": "motor",
+   "name": "Drive efficiency, bus in to motor terminals",
+   "unit": "%",
+   "better": "higher",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_noise_dba",
+   "class": "motor",
+   "name": "Sound level at a set speed, one position, one session",
+   "unit": "dBA",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_temp_rise",
+   "class": "motor",
+   "name": "Temperature rise after a timed run",
+   "unit": "C",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_stall_trip",
+   "class": "motor",
+   "name": "Time from stall to the driver's trip",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_stall_peak",
+   "class": "motor",
+   "name": "Peak current during a stall",
+   "unit": "A",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_hall_loss",
+   "class": "motor",
+   "name": "Time from a lost Hall line to a safe stop",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_reverse",
+   "class": "motor",
+   "name": "Time to reverse at a set speed",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_reverse_vbus",
+   "class": "motor",
+   "name": "Bus voltage rise during a reversal",
+   "unit": "V",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_sl_min_rpm",
+   "class": "motor",
+   "name": "Lowest speed a sensorless method holds",
+   "unit": "rpm",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_sl_angle_err",
+   "class": "motor",
+   "name": "Sensorless angle error against the Hall edges",
+   "unit": "deg",
+   "better": "lower",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_ol_follow",
+   "class": "motor",
+   "name": "Open-loop (no sensor) ramp the rotor followed to the target speed, of 10 tries",
+   "unit": "of 10",
+   "better": "higher",
+   "variants": "<method>-<position>-<point>, e.g. six-step-hall-1000rpm; conditions carry bus volts, PWM kHz, load",
+   "method": "docs/research/motor-programme/04-test-suite.md"
+  },
+  {
+   "id": "motor_mod_at_speed",
+   "class": "motor",
+   "name": "Modulation (duty or amplitude) the speed loop needs to hold a set speed, unloaded",
+   "unit": "%",
+   "better": "lower",
+   "variants": "<method>-<position>-<speed>rpm",
+   "method": "am13e230/bldc-drv8376/README.md: the speed loop's output after it settles, median of the status lines"
+  },
+  {
+   "id": "motor_diag_sense_mv",
+   "class": "motor-bringup",
+   "name": "Driver current-sense output, cached ADC sample (not a calibrated phase current)",
+   "unit": "mV",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_commission_pass",
+   "class": "motor-bringup",
+   "name": "Commissioning run completed its stages",
+   "unit": "pass 1 or 0",
+   "better": "higher",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_net_sectors",
+   "class": "motor-bringup",
+   "name": "Net signed Hall sector transitions in one trial (24 per shaft turn)",
+   "unit": "sectors",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_trial_us",
+   "class": "motor-bringup",
+   "name": "Duration of one six-step trial (cycle counter)",
+   "unit": "us",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_pwm_pad_permille",
+   "class": "motor-bringup",
+   "name": "PWM pin high, sampled at the MCU pad (not a scope measurement)",
+   "unit": "per mille",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_ordered_sectors",
+   "class": "motor-bringup",
+   "name": "Longest run of direction-consistent Hall transitions",
+   "unit": "sectors",
+   "better": "higher",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_aux_input_mv",
+   "class": "motor-bringup",
+   "name": "Auxiliary ADC input reading",
+   "unit": "mV",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_diag_logic",
+   "class": "motor-bringup",
+   "name": "Driver fault or logic line state, one observation",
+   "unit": "0 or 1",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_diag_cycles",
+   "class": "motor-bringup",
+   "name": "Polling cycles until fault or timeout",
+   "unit": "cycles",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_sense_idle_mv",
+   "class": "motor-bringup",
+   "name": "Current-sense output at rest",
+   "unit": "mV",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_pwm_high_cycles",
+   "class": "motor-bringup",
+   "name": "PWM pin high count by software sampling",
+   "unit": "samples",
+   "better": "none",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_learn_distinct_hall",
+   "class": "motor-bringup",
+   "name": "Distinct Hall states seen in a learning run",
+   "unit": "of 6",
+   "better": "higher",
+   "variants": "as the row's variant and conditions state",
+   "method": "am13e230/bldc-drv8376/BENCH.md"
+  },
+  {
+   "id": "motor_core_flash",
+   "class": "motor",
+   "name": "Flash added by a feature of the portable motor-control core, delta of two object builds (text with read-only data)",
+   "unit": "B",
+   "better": "lower",
+   "variants": "<feature>-<number format>-<trig backend>-<toolchain>, e.g. foc-sector-iq24-table-gcc; conditions carry the commit and flags",
+   "method": "portability/motor/tests/cost/EXPECTATIONS.md"
+  },
+  {
+   "id": "motor_core_ram",
+   "class": "motor",
+   "name": "RAM added by a feature of the portable motor-control core, delta of two object builds (data plus bss)",
+   "unit": "B",
+   "better": "lower",
+   "variants": "<feature>-<number format>-<trig backend>-<toolchain>, e.g. foc-sector-iq24-table-gcc; conditions carry the commit and flags",
+   "method": "portability/motor/tests/cost/EXPECTATIONS.md"
+  },
+  {
+   "id": "motor_phase_r",
+   "class": "motor",
+   "name": "Phase resistance from two DC current holds on the d axis (slope, so the constant drop cancels)",
+   "unit": "ohm",
+   "better": "none",
+   "variants": "<method>, e.g. two-dc-holds-0p3-0p6a",
+   "method": "am13e230/foc-drv8376/results/guard-revH5-20261019/expectations.md"
+  },
+  {
+   "id": "motor_ld",
+   "class": "motor",
+   "name": "d-axis inductance from a voltage step through the current capture, Ld = tau x R",
+   "unit": "mH",
+   "better": "none",
+   "variants": "<method>, e.g. d-axis-voltage-step",
+   "method": "am13e230/foc-drv8376/results/guard-revH5-20261019/expectations.md"
+  },
+  {
+   "id": "motor_cmp_trip",
+   "class": "motor",
+   "name": "Phase current at a comparator over-current trip, d-axis hold ramp at a fixed angle",
+   "unit": "A",
+   "better": "none",
+   "variants": "<comparators>-<level>, e.g. two-sided-u-w-1p0a",
+   "method": "am13e230/foc-drv8376/results/guard-revH5-20261019/expectations.md"
+  },
+  {
+   "id": "motor_drv_ilimit",
+   "class": "motor",
+   "name": "Phase current at the gate driver's own current-limit event",
+   "unit": "A",
+   "better": "none",
+   "variants": "<ILIMIT setting>, e.g. ilimit-test-1p70v",
+   "method": "am13e230/foc-drv8376/results/guard-revH5-20261019/expectations.md"
+  },
+  {
+   "id": "motor_inv_drop",
+   "class": "motor",
+   "name": "Inverter voltage drop at the d axis: the intercept of commanded d-axis voltage against measured d-axis current over two holds",
+   "unit": "V",
+   "better": "lower",
+   "variants": "<method>, e.g. commanded-vd-two-holds-dtc-off",
+   "method": "am13e230/foc-drv8376/results/guard-revH6-20261020/expectations.md"
+  },
+  {
+   "id": "motor_inertia",
+   "class": "motor",
+   "name": "Rotor inertia, unloaded: Kt times the steady q-axis current over the coast-down deceleration at the same speed (friction cancels)",
+   "unit": "kg m2",
+   "better": "none",
+   "variants": "<method>, e.g. steady-iq-over-coast-decel",
+   "method": "am13e230/foc-drv8376/results/mech-ident-20261020/expectations.md"
+  },
+  {
+   "id": "motor_friction_tc",
+   "class": "motor",
+   "name": "Coulomb friction torque, unloaded: intercept of Kt times the steady q-axis current against speed",
+   "unit": "N m",
+   "better": "none",
+   "variants": "<method>, e.g. steady-iq-line-20-60hz",
+   "method": "am13e230/foc-drv8376/results/mech-ident-20261020/expectations.md"
+  },
+  {
+   "id": "motor_friction_b",
+   "class": "motor",
+   "name": "Viscous friction, unloaded: slope of Kt times the steady q-axis current against mechanical speed",
+   "unit": "N m s/rad",
+   "better": "none",
+   "variants": "<method>, e.g. steady-iq-line-20-60hz",
+   "method": "am13e230/foc-drv8376/results/mech-ident-20261020/expectations.md"
+  },
+  {
+   "id": "uartdma_flash_bytes",
+   "class": "sweep",
+   "name": "Flash used by the ported UART DMA ring-buffer echo (MaJerle stm32-usart-uart-dma-rx-tx)",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build; toolchain and -O level in conditions",
+   "method": "ports/stm32-usart-dma-rx-tx/tools/check.py"
+  },
+  {
+   "id": "uartdma_ram_bytes",
+   "class": "sweep",
+   "name": "Static RAM (data + bss) of the ported UART DMA ring-buffer echo",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build; buffer sizes in conditions",
+   "method": "ports/stm32-usart-dma-rx-tx/tools/check.py"
+  },
+  {
+   "id": "uartdma_burst_pps",
+   "class": "sweep",
+   "name": "Packets per second answered for 500 back-to-back 5-byte packets, console UART",
+   "unit": "pps",
+   "better": "higher",
+   "variants": "baud: 115200, 921600",
+   "method": "ports/stm32-usart-dma-rx-tx/tools/check.py"
+  },
+  {
+   "id": "console_lines_read",
+   "class": "sweep",
+   "name": "Counting lines read on the host after the banner from TI's UART console example",
+   "unit": "count",
+   "better": "higher",
+   "variants": "example: uart_tx_console_multibyte_repeated_fifo_dma",
+   "method": "am62l-evm/tools/capture.py on the probe's USB serial port at 115200 8N1"
+  },
+  {
+   "id": "uartdma_burst_lost",
+   "class": "sweep",
+   "name": "Replies lost out of 500 back-to-back packets",
+   "unit": "count",
+   "better": "lower",
+   "variants": "baud: 115200, 921600",
+   "method": "ports/stm32-usart-dma-rx-tx/tools/check.py"
+  },
+  {
+   "id": "uartdma_rtt_ms",
+   "class": "sweep",
+   "name": "Median host-measured round trip of one packet to its 4-byte reply",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "baud: 115200, 921600",
+   "method": "ports/stm32-usart-dma-rx-tx/tools/check.py"
+  },
+  {
+   "id": "gamepad_flash_bytes",
+   "class": "sweep",
+   "name": "Flash used by the ported BLE gamepad report core (lemmingDev ESP32-BLE-Gamepad, generic mode) and its console glue",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build: arduino-nimble-full-library (the unmodified library on the C6), or core-only-<toolchain>; toolchain and -O level in conditions",
+   "method": "ports/esp32-ble-gamepad/README.md"
+  },
+  {
+   "id": "gamepad_ram_bytes",
+   "class": "sweep",
+   "name": "Static RAM used by the same image (bss plus data, stack not counted)",
+   "unit": "B",
+   "better": "lower",
+   "variants": "as gamepad_flash_bytes",
+   "method": "ports/esp32-ble-gamepad/README.md"
+  },
+  {
+   "id": "gamepad_desc_us",
+   "class": "sweep",
+   "name": "Average time to build the HID report descriptor, 200 builds, on the board's own timer",
+   "unit": "us",
+   "better": "lower",
+   "variants": "as gamepad_flash_bytes; what the timed region holds is in conditions",
+   "method": "ports/esp32-ble-gamepad/README.md"
+  },
+  {
+   "id": "gamepad_pack_us",
+   "class": "sweep",
+   "name": "Average time to pack one 19-byte input report, 1000 packs, on the board's own timer",
+   "unit": "us",
+   "better": "lower",
+   "variants": "as gamepad_flash_bytes",
+   "method": "ports/esp32-ble-gamepad/README.md"
+  },
+  {
+   "id": "gamepad_ble_adv_rate",
+   "class": "radio",
+   "name": "Advertisement callbacks per second a Mac scanner (bleak) reports for the gamepad, 30 s windows",
+   "unit": "1/s",
+   "better": "none",
+   "variants": "build",
+   "method": "ports/esp32-ble-gamepad/check/gp_ble.py"
+  },
+  {
+   "id": "gamepad_ble_connect_ms",
+   "class": "radio",
+   "name": "Time for the Mac (bleak) to connect to the gamepad, median of 4 connects",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "build",
+   "method": "ports/esp32-ble-gamepad/check/gp_ble.py"
+  },
+  {
+   "id": "bootloader_flash_bytes",
+   "class": "sweep",
+   "name": "Flash used by the ported UART bootloader (ferenc-nemeth/stm32-bootloader), text plus data",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build; toolchain and -O level in conditions",
+   "method": "ports/stm32-bootloader/tools/check.py"
+  },
+  {
+   "id": "bootloader_ram_bytes",
+   "class": "sweep",
+   "name": "Static RAM (data + bss, including the stack the linker reserves) of the ported UART bootloader",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build; stack size in conditions",
+   "method": "ports/stm32-bootloader/tools/check.py"
+  },
+  {
+   "id": "bootloader_checks_passed",
+   "class": "sweep",
+   "name": "Host checks passed out of 6 for the ported UART bootloader (prompt, update, flash content, reset jump, bad CRC retry, abort and recovery)",
+   "unit": "count",
+   "better": "higher",
+   "variants": "build",
+   "method": "ports/stm32-bootloader/tools/check.py"
+  },
+  {
+   "id": "bootloader_update_s",
+   "class": "sweep",
+   "name": "Seconds from the first Xmodem packet to the ACK of EOT, including the erase of the application area",
+   "unit": "s",
+   "better": "lower",
+   "variants": "packet size and image size",
+   "method": "ports/stm32-bootloader/tools/timing.py"
+  },
+  {
+   "id": "audio_app_flash_bytes",
+   "class": "hobby",
+   "name": "Flash used by the BOOSTXL-AUDIO app (DAC8311 and TPA301 drive, microphone capture)",
+   "unit": "B",
+   "better": "lower",
+   "variants": "optimization level, e.g. o2",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_app_ram_bytes",
+   "class": "hobby",
+   "name": "RAM used by the BOOSTXL-AUDIO app, including its capture buffer",
+   "unit": "B",
+   "better": "lower",
+   "variants": "as audio_app_flash_bytes",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_dac8311_tone",
+   "class": "hobby",
+   "name": "Dominant frequency the pack microphone hears from a DAC8311 test tone (1000 Hz expected; about 60 Hz is the silent mains floor)",
+   "unit": "Hz",
+   "better": "none",
+   "variants": "frame form, volume, amplifier-line state",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_dac8311_split8",
+   "class": "hobby",
+   "name": "Dominant frequency heard when the 16-bit DAC frame is sent as two 8-bit transfers with SYNC raised between them (E237; about 60 Hz means silent)",
+   "unit": "Hz",
+   "better": "none",
+   "variants": "amplifier-line state",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_dac_frame_rate",
+   "class": "hobby",
+   "name": "DAC8311 frames sent a second by the sample tick, counted by the firmware against the CPU cycle counter (8,000 expected)",
+   "unit": "frames/s",
+   "better": "none",
+   "variants": "app",
+   "method": "portability/boosterpacks/audio/halloween/README.md"
+  },
+  {
+   "id": "audio_dac_frames_bad",
+   "class": "hobby",
+   "name": "DAC8311 frames whose SYNC rose before the 16th clock edge, counted by a model of the DAC input stage fed by the same edges (0 expected)",
+   "unit": "frames",
+   "better": "lower",
+   "variants": "app, run length",
+   "method": "portability/boosterpacks/audio/halloween/README.md"
+  },
+  {
+   "id": "audio_isr_max_cycles",
+   "class": "hobby",
+   "name": "Longest sample interrupt in CPU cycles over a 10 s window (synth, effects and the bit-banged DAC frame)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "app, effect mode",
+   "method": "portability/boosterpacks/audio/halloween/README.md"
+  },
+  {
+   "id": "audio_show_run_seconds",
+   "class": "hobby",
+   "name": "Seconds the Halloween show ran on the board with no fault, every status line present",
+   "unit": "s",
+   "better": "higher",
+   "variants": "app",
+   "method": "portability/boosterpacks/audio/halloween/README.md"
+  },
+  {
+   "id": "audio_tune",
+   "class": "hobby",
+   "name": "Dominant frequency the microphone hears from the four-voice test tune",
+   "unit": "Hz",
+   "better": "none",
+   "variants": "tune, volume, amplifier-line state",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_mic_floor",
+   "class": "hobby",
+   "name": "Pack microphone RMS with the DAC silent",
+   "unit": "mV",
+   "better": "lower",
+   "variants": "amplifier-line state",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "dns_sinkhole_stage1_answer",
+   "class": "sweep",
+   "name": "DNS sinkhole answers a blocked name with the fixed address",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "answer form",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_blocked_latency_median_ms",
+   "class": "sweep",
+   "name": "Median DNS reply time for a blocked name, from a Mac on the same network",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "list size",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_blocked_latency_p95_ms",
+   "class": "sweep",
+   "name": "95th percentile DNS reply time for a blocked name",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "list size",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_allowed_latency_median_ms",
+   "class": "sweep",
+   "name": "Median DNS reply time for an allowed name (forwarded to the upstream resolver)",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "list size",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_allowed_latency_p95_ms",
+   "class": "sweep",
+   "name": "95th percentile DNS reply time for an allowed name",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "list size",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_hardware_random_id",
+   "class": "sweep",
+   "name": "DNS transaction IDs come from the chip hardware random generator",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "generator call",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_table_bytes_per_10k_domains",
+   "class": "sweep",
+   "name": "Flash taken by the blocklist table per 10,000 domains",
+   "unit": "B",
+   "better": "lower",
+   "variants": "hash width",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_blocker_static_ram_bytes",
+   "class": "sweep",
+   "name": "Static RAM of the DNS blocker code",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_image_flash_bytes",
+   "class": "sweep",
+   "name": "Flash of the whole image with the blocklist table",
+   "unit": "B",
+   "better": "lower",
+   "variants": "list size",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "dns_max_list_domains",
+   "class": "sweep",
+   "name": "Largest blocklist the application slot holds (link arithmetic)",
+   "unit": "count",
+   "better": "higher",
+   "variants": "slot",
+   "method": "docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md"
+  },
+  {
+   "id": "micropython_host_checks_passed",
+   "class": "sweep",
+   "name": "Expected console lines the MicroPython image printed in the Cortex-M0 emulator (host only)",
+   "unit": "count",
+   "better": "higher",
+   "variants": "build and emulator",
+   "method": "ports/micropython/README.md"
+  },
+  {
+   "id": "micropython_repl_boot",
+   "class": "sweep",
+   "name": "MicroPython REPL banner on the real UART",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "build",
+   "method": "ports/micropython/README.md"
+  },
+  {
+   "id": "micropython_gpio_toggle",
+   "class": "sweep",
+   "name": "machine.Pin toggle read back on the pin",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "build",
+   "method": "ports/micropython/README.md"
+  },
+  {
+   "id": "micropython_pystone",
+   "class": "sweep",
+   "name": "Pystone iterations per second at 80 MHz",
+   "unit": "iter/s",
+   "better": "higher",
+   "variants": "build",
+   "method": "ports/micropython/README.md"
+  },
+  {
+   "id": "npu_dsp_block_ms",
+   "class": "ai",
+   "name": "One block of a fixed-weight DSP graph on the TinyEngine NPU or the CPU (4 channels x 256 outputs unless the variant says)",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "graph and engine, e.g. fir64-nnc-npu",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_speedup_x",
+   "class": "ai",
+   "name": "NPU time against the same graph as NNC CPU code, or against hand-written C",
+   "unit": "x",
+   "better": "higher",
+   "variants": "graph and baseline",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_snr_db",
+   "class": "ai",
+   "name": "Signal to error ratio of the 8-bit graph against the float reference",
+   "unit": "dB",
+   "better": "higher",
+   "variants": "graph and channel",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_match",
+   "class": "ai",
+   "name": "Images whose output equals the reference",
+   "unit": "count",
+   "better": "higher",
+   "variants": "reference",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_image_bytes",
+   "class": "ai",
+   "name": "Flash text of the whole image with harness and NPU library",
+   "unit": "B",
+   "better": "lower",
+   "variants": "graph",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_energy_uj",
+   "class": "ai",
+   "name": "Energy per block on the NPU against the CPU",
+   "unit": "uJ",
+   "better": "lower",
+   "variants": "graph",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_streaming_overlap",
+   "class": "ai",
+   "name": "Streaming with the taps-1 overlap carried between blocks works",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "graph",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_cpu_free_fraction",
+   "class": "ai",
+   "name": "Share of CPU time left free while the NPU runs a block",
+   "unit": "%",
+   "better": "higher",
+   "variants": "graph",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_am13e230",
+   "class": "ai",
+   "name": "The same graph on the LP-AM13E230",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "graph",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "npu_dsp_repeat_flashes",
+   "class": "ai",
+   "name": "Repeat runs without a reflash",
+   "unit": "count",
+   "better": "higher",
+   "variants": "graph",
+   "method": "mspm0g5187/npu-dsp/README.md"
+  },
+  {
+   "id": "port_wad_sha1",
+   "class": "sweep",
+   "name": "The data file the port reads in place hashes to the expected SHA-1 at boot",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "data file",
+   "method": "ports/doom/target-cc35x1/README.md"
+  },
+  {
+   "id": "port_frame_crc_400",
+   "class": "sweep",
+   "name": "Checksum of the first 400 rendered frames equals the reference build",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "demo",
+   "method": "ports/doom/target-cc35x1/README.md"
+  },
+  {
+   "id": "port_frames_per_second",
+   "class": "sweep",
+   "name": "Frames per second of a ported engine running a timedemo, no screen output",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "demo",
+   "method": "ports/doom/target-cc35x1/README.md"
+  },
+  {
+   "id": "touch_2048_swipe_ms",
+   "class": "display",
+   "name": "2048: one swipe (slide, spawn, redraw changed tiles) on a touch panel",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "spi clock, cpu clock and sample (mean60, first10)",
+   "method": "ports/touch-games/README.md"
+  },
+  {
+   "id": "touch_mines_cell_ms",
+   "class": "display",
+   "name": "Minesweeper: one tap that redraws one cell",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "spi clock, cpu clock",
+   "method": "ports/touch-games/README.md"
+  },
+  {
+   "id": "touch_mines_first_dig_ms",
+   "class": "display",
+   "name": "Minesweeper: first tap of a board (places mines, may open a region)",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "spi clock, cpu clock",
+   "method": "ports/touch-games/README.md"
+  },
+  {
+   "id": "touch_mines_flag_ms",
+   "class": "display",
+   "name": "Minesweeper: long press that places a flag",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "spi clock, cpu clock",
+   "method": "ports/touch-games/README.md"
+  },
+  {
+   "id": "touch_read_us",
+   "class": "display",
+   "name": "One read of the touch chip registers",
+   "unit": "us",
+   "better": "lower",
+   "variants": "chip and bus method",
+   "method": "ports/touch-games/README.md"
+  },
+  {
+   "id": "touch_stack_bytes",
+   "class": "display",
+   "name": "Deepest stack use of the touch games after the scripted run",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build",
+   "method": "ports/touch-games/README.md"
+  },
+  {
+   "id": "touch_to_pixel_ms",
+   "class": "display",
+   "name": "Touch to changed pixel (computed from measured parts, or measured with a real finger)",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "estimate or real-finger",
+   "method": "ports/touch-games/README.md"
+  },
+  {
+   "id": "touch_games_screen_seen",
+   "class": "display",
+   "name": "A person looked at the games on the panel and touch worked",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "games",
+   "method": "ports/touch-games/README.md"
+  },
+  {
+   "id": "port_demo_select_rx",
+   "class": "sweep",
+   "name": "A byte sent over the serial port reaches the firmware (demo select)",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "port",
+   "method": "ports/doom/target-cc35x1/README.md"
+  },
+  {
+   "id": "audio_algo_code_bytes",
+   "class": "hobby",
+   "name": "Object code size of an audio algorithm",
+   "unit": "B",
+   "better": "lower",
+   "variants": "algorithm",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_algo_cycles",
+   "class": "hobby",
+   "name": "Cycles per frame of an audio algorithm on the chip (DWT counter)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "algorithm",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_algo_host_us",
+   "class": "hobby",
+   "name": "Compute time of an audio algorithm on a Mac (cc -O2); a host number, not a chip number",
+   "unit": "us",
+   "better": "lower",
+   "variants": "algorithm",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_algo_live",
+   "class": "hobby",
+   "name": "An audio algorithm runs live on the BoosterPack (heard or read back)",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "algorithm",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_algo_macs",
+   "class": "hobby",
+   "name": "Multiply-accumulates per frame of an audio algorithm",
+   "unit": "count",
+   "better": "lower",
+   "variants": "algorithm",
+   "method": "portability/boosterpacks/audio/host/test_algos.c"
+  },
+  {
+   "id": "audio_dtmf_fail_snr_db",
+   "class": "hobby",
+   "name": "DTMF decoder: lowest SNR at which it still decodes (1 percent digit errors)",
+   "unit": "dB",
+   "better": "lower",
+   "variants": "decision rule",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_echo_error_lsb",
+   "class": "hobby",
+   "name": "Echo effect error against the ideal delay line",
+   "unit": "LSB",
+   "better": "lower",
+   "variants": "test signal",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_gate_attenuation_db",
+   "class": "hobby",
+   "name": "Noise gate attenuation when closed",
+   "unit": "dB",
+   "better": "higher",
+   "variants": "gate state",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_gate_echo_dac_error_lsb",
+   "class": "hobby",
+   "name": "Gate then echo through a DAC8311 model: output error",
+   "unit": "LSB",
+   "better": "lower",
+   "variants": "chain",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_spectrum_error_px",
+   "class": "hobby",
+   "name": "Spectrum bar height error against a double-precision DFT",
+   "unit": "px",
+   "better": "lower",
+   "variants": "bar count",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_spectrum_peak_bar",
+   "class": "hobby",
+   "name": "Spectrum analyzer: frames whose peak lands in the right bar, or the bar index of a recorded tone",
+   "unit": "count",
+   "better": "none",
+   "variants": "test signal",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_tuner_error_cents",
+   "class": "hobby",
+   "name": "Guitar tuner (YIN) worst-case pitch error",
+   "unit": "cents",
+   "better": "lower",
+   "variants": "signal type and band",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "audio_tuner_latency_ms",
+   "class": "hobby",
+   "name": "Guitar tuner time from the first sample of a frame to its pitch",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "frame size",
+   "method": "portability/boosterpacks/audio/README.md"
+  },
+  {
+   "id": "blink_led_pin",
+   "class": "setup",
+   "name": "LED pin toggles under the Rust build (probe GPIO read, changes counted)",
+   "unit": "count",
+   "better": "higher",
+   "variants": "framework",
+   "method": "ports/rust-mspm0/README.md"
+  },
+  {
+   "id": "build_cache_size_mb",
+   "class": "sweep",
+   "name": "Disk used by downloaded crates and one release build",
+   "unit": "MB",
+   "better": "lower",
+   "variants": "framework",
+   "method": "ports/rust-mspm0/README.md"
+  },
+  {
+   "id": "llm_instr_per_token",
+   "class": "ai",
+   "name": "Instructions per generated token (emulator count)",
+   "unit": "instructions",
+   "better": "lower",
+   "variants": "model, quantization, optimization",
+   "method": "ports/llama2c/README.md"
+  },
+  {
+   "id": "llm_stack_bytes",
+   "class": "ai",
+   "name": "Deepest stack use while generating",
+   "unit": "B",
+   "better": "lower",
+   "variants": "model",
+   "method": "ports/llama2c/README.md"
+  },
+  {
+   "id": "llm_tokens_matching",
+   "class": "ai",
+   "name": "Generated token ids equal to a reference build (greedy, temperature 0)",
+   "unit": "count",
+   "better": "higher",
+   "variants": "reference",
+   "method": "ports/llama2c/README.md"
+  },
+  {
+   "id": "llm_tokens_per_s",
+   "class": "ai",
+   "name": "Tokens per second of a small language model",
+   "unit": "tokens/s",
+   "better": "higher",
+   "variants": "model, clock, measured or estimate",
+   "method": "ports/llama2c/README.md"
+  },
+  {
+   "id": "micropython_lcd_fill_ms",
+   "class": "hobby",
+   "name": "MicroPython: time to fill the whole display from Python",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "display",
+   "method": "ports/micropython/README.md"
+  },
+  {
+   "id": "micropython_touch_finger_track",
+   "class": "hobby",
+   "name": "MicroPython: a finger drag is tracked on screen (a person looked)",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "demo",
+   "method": "ports/micropython/README.md"
+  },
+  {
+   "id": "micropython_touch_read_us",
+   "class": "hobby",
+   "name": "MicroPython: time to read one touch report",
+   "unit": "us",
+   "better": "lower",
+   "variants": "bus",
+   "method": "ports/micropython/README.md"
+  },
+  {
+   "id": "port_demo_finishes",
+   "class": "sweep",
+   "name": "A recorded demo plays to its end on the board",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "demo",
+   "method": "ports/doom/target-cc35x1-whx/README.md"
+  },
+  {
+   "id": "port_frame_crc_end",
+   "class": "sweep",
+   "name": "CRC chain over all frames of a run equals the emulator run",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "port",
+   "method": "ports/doom/target-cc35x1-whx/README.md"
+  },
+  {
+   "id": "rust_install_size_mb",
+   "class": "sweep",
+   "name": "Disk used by the Rust toolchain for the target",
+   "unit": "MB",
+   "better": "lower",
+   "variants": "toolchain profile",
+   "method": "ports/rust-mspm0/README.md"
+  },
+  {
+   "id": "uart_hello_console",
+   "class": "setup",
+   "name": "Serial console shows the program banner and a running count",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "framework",
+   "method": "ports/rust-mspm0/README.md"
+  },
+  {
+   "id": "wasm_slowdown_fib20",
+   "class": "sweep",
+   "name": "WebAssembly interpreter slowdown against the same C (fib 20, instruction counts)",
+   "unit": "x",
+   "better": "lower",
+   "variants": "interpreter",
+   "method": "ports/wasm3/README.md"
+  },
+  {
+   "id": "wasm_slowdown_loop20k",
+   "class": "sweep",
+   "name": "WebAssembly interpreter slowdown against the same C (20k-iteration loop, instruction counts)",
+   "unit": "x",
+   "better": "lower",
+   "variants": "interpreter",
+   "method": "ports/wasm3/README.md"
+  },
+  {
+   "id": "llm_screen_story_cadence_s",
+   "class": "ai",
+   "name": "Seconds between stories when the model writes to the screen unattended",
+   "unit": "s",
+   "better": "none",
+   "variants": "model",
+   "method": "ports/llama2c/README.md"
+  },
+  {
+   "id": "llm_screen_s2_new_story",
+   "class": "ai",
+   "name": "The S2 button starts a new story on the screen",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "model",
+   "method": "ports/llama2c/README.md"
+  },
+  {
+   "id": "emu_instr_per_frame",
+   "class": "display",
+   "name": "Instructions per drawn frame of an emulator port, counted in an Arm emulator",
+   "unit": "instructions",
+   "better": "lower",
+   "variants": "build step",
+   "method": "ports/peanut-gb/README.md"
+  },
+  {
+   "id": "emu_late_frames",
+   "class": "display",
+   "name": "Emulator frames that finished after their due time, paced to the console clock",
+   "unit": "count",
+   "better": "lower",
+   "variants": "image",
+   "method": "ports/peanut-gb/README.md"
+  },
+  {
+   "id": "persist_survives_reset",
+   "class": "sweep",
+   "name": "Stored count survives a software reset storm",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "port",
+   "method": "ports/msp430-to-mspm0/README.md"
+  },
+  {
+   "id": "persist_survives_reload",
+   "class": "sweep",
+   "name": "Stored count survives a program load that leaves the data sector alone",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "port",
+   "method": "ports/msp430-to-mspm0/README.md"
+  },
+  {
+   "id": "persist_survives_power_off",
+   "class": "sweep",
+   "name": "Stored count survives power removed",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "port",
+   "method": "ports/msp430-to-mspm0/README.md"
+  },
+  {
+   "id": "persist_word_write_us",
+   "class": "sweep",
+   "name": "Time to store one word in non-volatile memory",
+   "unit": "us",
+   "better": "lower",
+   "variants": "port",
+   "method": "ports/msp430-to-mspm0/README.md"
+  },
+  {
+   "id": "persist_sector_erase_us",
+   "class": "sweep",
+   "name": "Time to erase the flash sector that holds the stored data",
+   "unit": "us",
+   "better": "lower",
+   "variants": "port",
+   "method": "ports/msp430-to-mspm0/README.md"
+  },
+  {
+   "id": "deep_sleep_cpu_ticks",
+   "class": "power",
+   "name": "CPU clock ticks counted across one sleep (a stopped clock counts only the wake)",
+   "unit": "ticks",
+   "better": "none",
+   "variants": "sleep mode",
+   "method": "ports/msp430-to-mspm0/README.md"
+  },
+  {
+   "id": "deep_sleep_wake_period_ms",
+   "class": "power",
+   "name": "Period between wakes from deep sleep, read by the host clock",
+   "unit": "ms",
+   "better": "none",
+   "variants": "port",
+   "method": "ports/msp430-to-mspm0/README.md"
+  },
+  {
+   "id": "uart_echo_burst_bytes_ok",
+   "class": "sweep",
+   "name": "Bytes of a burst echoed correctly while the chip sleeps between bytes",
+   "unit": "bytes",
+   "better": "higher",
+   "variants": "clock source",
+   "method": "ports/msp430-to-mspm0/README.md"
+  },
+  {
+   "id": "load_cycles_per_word",
+   "class": "core",
+   "name": "CPU cycles per single word load from each memory (unrolled independent loads)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "memory",
+   "method": "ports/doom/target-cc35x1-whx/README.md"
+  },
+  {
+   "id": "dcache_counters",
+   "class": "core",
+   "name": "Data-cache hit and miss counters readable from the application",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "counter",
+   "method": "ports/doom/target-cc35x1-whx/README.md"
+  },
+  {
+   "id": "flash_clock_change",
+   "class": "core",
+   "name": "External flash read mode or clock changeable from the application",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "setting",
+   "method": "ports/doom/target-cc35x1-whx/README.md"
+  },
+  {
+   "id": "qspi_flash_bytes",
+   "class": "core",
+   "name": "Size of the on-board QSPI NOR flash",
+   "unit": "B",
+   "better": "none",
+   "variants": "device",
+   "method": "docs/experiments/2026-10-21-mspm33c321a-qspi-dump-doom-data.md"
+  },
+  {
+   "id": "qspi_read_us_per_256b",
+   "class": "core",
+   "name": "Time to read 256 bytes from the on-board QSPI flash",
+   "unit": "us",
+   "better": "lower",
+   "variants": "mode-clock-driver",
+   "method": "docs/experiments/2026-10-21-mspm33c321a-qspi-dump-doom-data.md"
+  },
+  {
+   "id": "cycles_per_instruction",
+   "class": "core",
+   "name": "CPU cycles per instruction of a whole program, from its time and an emulator instruction count",
+   "unit": "cycles/instr",
+   "better": "lower",
+   "variants": "image",
+   "method": "ports/doom/m33-whx/E27-qspi-dump-and-load.md"
+  },
+  {
+   "id": "emu_instr_per_s",
+   "class": "display",
+   "name": "Instructions per second of an interpreter port with no screen and the display wait off",
+   "unit": "instructions/s",
+   "better": "higher",
+   "variants": "ROM",
+   "method": "ports/chip8/README.md"
+  },
+  {
+   "id": "emu_headroom",
+   "class": "display",
+   "name": "Interpreter speed divided by the pace a typical program needs",
+   "unit": "x",
+   "better": "higher",
+   "variants": "pace",
+   "method": "ports/chip8/README.md"
+  },
+  {
+   "id": "gui_full_redraw_us",
+   "class": "display",
+   "name": "Time to redraw the whole emulated screen to the panel",
+   "unit": "us",
+   "better": "lower",
+   "variants": "scale",
+   "method": "ports/chip8/README.md"
+  },
+  {
+   "id": "conformance",
+   "class": "sweep",
+   "name": "Test programs or checks whose output on the board equals the host reference",
+   "unit": "count",
+   "better": "higher",
+   "variants": "suite",
+   "method": "ports/chip8/README.md"
+  },
+  {
+   "id": "touch_pad_response",
+   "class": "display",
+   "name": "A finger on the panel pad reaches the program as a key press",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "pad",
+   "method": "ports/chip8/README.md"
+  },
+  {
+   "id": "touch_keyboard_response",
+   "class": "display",
+   "name": "A finger on the touch keyboard reaches the program as a typed character",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "keyboard",
+   "method": "ports/zx-spectrum/README.md"
+  },
+  {
+   "id": "emu_speed_pct_x10",
+   "class": "display",
+   "name": "Emulated machine speed as per mille of the real machine, 159 meaning 15.9 percent",
+   "unit": "per mille",
+   "better": "higher",
+   "variants": "build step",
+   "method": "ports/zx-spectrum/README.md"
+  },
+  {
+   "id": "mp3_decode_rtf",
+   "class": "hobby",
+   "name": "MP3 decode time divided by the clip length (real-time factor, below 1 is faster than real time)",
+   "unit": "x real time",
+   "better": "lower",
+   "variants": "clip and build",
+   "method": "ports/minimp3/README.md"
+  },
+  {
+   "id": "mp3_decode_cycles",
+   "class": "hobby",
+   "name": "CPU cycles to decode a whole MP3 clip",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "clip and build",
+   "method": "ports/minimp3/README.md"
+  },
+  {
+   "id": "mp3_decode_cycles_per_frame",
+   "class": "hobby",
+   "name": "CPU cycles per MP3 frame (value is the mean, value_hi the worst frame)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "clip and build",
+   "method": "ports/minimp3/README.md"
+  },
+  {
+   "id": "mp3_max_sample_error",
+   "class": "hobby",
+   "name": "Largest sample difference between the board and the host decode of the same clip",
+   "unit": "LSB",
+   "better": "lower",
+   "variants": "clip",
+   "method": "ports/minimp3/README.md"
+  },
+  {
+   "id": "mp3_playback",
+   "class": "hobby",
+   "name": "The decoded clip plays out of a DAC or speaker",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "path",
+   "method": "ports/minimp3/README.md"
+  },
+  {
+   "id": "lisp_tak_18_12_6_s",
+   "class": "core",
+   "name": "Time for the Lisp Tak benchmark (tak 18 12 6)",
+   "unit": "s",
+   "better": "lower",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lisp_fib23_s",
+   "class": "core",
+   "name": "Time for the Lisp (fib 23) benchmark",
+   "unit": "s",
+   "better": "lower",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lisp_fib20_s",
+   "class": "core",
+   "name": "Time for the Lisp (fib 20) benchmark",
+   "unit": "s",
+   "better": "lower",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lisp_q2_7_8_s",
+   "class": "core",
+   "name": "Time for the Lisp queens benchmark (q2 7 8)",
+   "unit": "s",
+   "better": "lower",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lisp_gc_us",
+   "class": "core",
+   "name": "Time of one garbage collection in the Lisp interpreter",
+   "unit": "us",
+   "better": "lower",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lisp_free_objects",
+   "class": "core",
+   "name": "Free objects in the Lisp workspace after boot and a collection",
+   "unit": "count",
+   "better": "higher",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "port_repl_checks",
+   "class": "sweep",
+   "name": "Interactive interpreter checks that pass on the board",
+   "unit": "count",
+   "better": "higher",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "port_stack_guard",
+   "class": "sweep",
+   "name": "Endless recursion ends in an error message and the next line still runs",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "led_toggle_blink_check",
+   "class": "sweep",
+   "name": "LED pin changes seen by a pin read while a program blinks it",
+   "unit": "count",
+   "better": "higher",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lisp_analogread",
+   "class": "core",
+   "name": "The Lisp interpreter reads an ADC channel",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lisp_save_image",
+   "class": "core",
+   "name": "The Lisp interpreter saves its workspace to flash and restores it",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lisp_serial_paste_burst",
+   "class": "core",
+   "name": "A long program pasted in one burst while another runs loses no characters",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "image",
+   "method": "ports/ulisp/README.md"
+  },
+  {
+   "id": "lc3_encode_cycles",
+   "class": "hobby",
+   "name": "Mean CPU cycles to encode one 10 ms LC3 frame (value is the mean; the note holds the worst frame)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "configuration, build and flags (16k-32kbps-o2-hard-strict)",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "lc3_decode_cycles",
+   "class": "hobby",
+   "name": "Mean CPU cycles to decode one 10 ms LC3 frame",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as lc3_encode_cycles",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "lc3_encode_pct_rt",
+   "class": "hobby",
+   "name": "LC3 encode time as a percent of the 10 ms frame at the stated clock",
+   "unit": "% of real time",
+   "better": "lower",
+   "variants": "as lc3_encode_cycles",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "lc3_decode_pct_rt",
+   "class": "hobby",
+   "name": "LC3 decode time as a percent of the 10 ms frame at the stated clock",
+   "unit": "% of real time",
+   "better": "lower",
+   "variants": "as lc3_encode_cycles",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "lc3_frames_differ",
+   "class": "hobby",
+   "name": "Frames of 100 whose encoded bytes or decoded samples differ from the host build (0 is bit-exact)",
+   "unit": "frames",
+   "better": "lower",
+   "variants": "as lc3_encode_cycles",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "lc3_max_sample_error",
+   "class": "hobby",
+   "name": "Largest sample difference between the board and the host decode of the same stream",
+   "unit": "LSB",
+   "better": "lower",
+   "variants": "configuration",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "lc3_flash_bytes",
+   "class": "hobby",
+   "name": "Flash used by the LC3 codec build, code plus tables",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build and feature set",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "lc3_stack_peak_bytes",
+   "class": "hobby",
+   "name": "Peak stack used by one LC3 encode or decode call",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build and feature set",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "plaits_cycles_per_block",
+   "class": "hobby",
+   "name": "Mean CPU cycles to render one 12-sample block of a Plaits engine at 48 kHz (blocks 2 to 256; the first block is kept apart)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "engine, build and flags (va_vcf-o2-hard-strict)",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_pct_rt",
+   "class": "hobby",
+   "name": "Plaits render time as a percent of the 250 us a 12-sample block lasts at 48 kHz, at the stated clock",
+   "unit": "% of real time",
+   "better": "lower",
+   "variants": "as plaits_cycles_per_block",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_worst_block_cycles",
+   "class": "hobby",
+   "name": "Cycles of the slowest block after the first",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as plaits_cycles_per_block",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_first_block_cycles",
+   "class": "hobby",
+   "name": "Cycles of the first block after an engine is selected (engine reset and user-data load)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as plaits_cycles_per_block",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_blocks_differ",
+   "class": "hobby",
+   "name": "Blocks of 256 whose CRC-32 differs from the Mac build (0 is bit-exact)",
+   "unit": "blocks",
+   "better": "lower",
+   "variants": "as plaits_cycles_per_block",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_engines_bitexact",
+   "class": "hobby",
+   "name": "Engines of 24 whose CRC-32 over all 256 blocks equals the Mac build",
+   "unit": "engines",
+   "better": "higher",
+   "variants": "build and flags",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_engines_realtime",
+   "class": "hobby",
+   "name": "Engines of 24 whose slowest block after the first stays under 100 percent of real time",
+   "unit": "engines",
+   "better": "higher",
+   "variants": "build and flags",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_pct_rt_median",
+   "class": "hobby",
+   "name": "Median over the 24 engines of the mean percent of real time (value_hi is the largest engine)",
+   "unit": "% of real time",
+   "better": "lower",
+   "variants": "build and flags",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_pcm_samples_differ",
+   "class": "hobby",
+   "name": "Rendered 16-bit samples that differ from the Mac build (speech engine)",
+   "unit": "samples",
+   "better": "lower",
+   "variants": "engine and build",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_flash_bytes",
+   "class": "hobby",
+   "name": "Flash used by the Plaits test image, code plus constant tables",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build and flags",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_ram_bytes",
+   "class": "hobby",
+   "name": "Static RAM of the Plaits test image, stack reserve included",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build and flags",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "plaits_stack_peak_bytes",
+   "class": "hobby",
+   "name": "Peak stack used while rendering",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build and flags",
+   "method": "ports/plaits/README.md"
+  },
+  {
+   "id": "opus_encode_cycles",
+   "class": "hobby",
+   "name": "Mean CPU cycles to encode one Opus frame (the note holds the worst frame)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "build, mode, frame length, bit rate and complexity (fixed-o2-silk-16k-20ms-32kbps-c0)",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "opus_decode_cycles",
+   "class": "hobby",
+   "name": "Mean CPU cycles to decode one Opus frame",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as opus_encode_cycles",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "opus_encode_pct_rt",
+   "class": "hobby",
+   "name": "Opus encode time as a percent of the frame length at the stated clock",
+   "unit": "% of real time",
+   "better": "lower",
+   "variants": "as opus_encode_cycles",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "opus_decode_pct_rt",
+   "class": "hobby",
+   "name": "Opus decode time as a percent of the frame length at the stated clock",
+   "unit": "% of real time",
+   "better": "lower",
+   "variants": "as opus_encode_cycles",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "opus_frames_differ",
+   "class": "hobby",
+   "name": "Frames whose decoded PCM CRC-32 differs from the Mac build with the same multiply macros (0 is bit-exact)",
+   "unit": "frames",
+   "better": "lower",
+   "variants": "as opus_encode_cycles",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "opus_flash_bytes",
+   "class": "hobby",
+   "name": "Flash used by the Opus test image",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build and flags",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "opus_stack_peak_bytes",
+   "class": "hobby",
+   "name": "Peak stack used by an Opus encode or decode call",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build and flags",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "opus_encoder_state_bytes",
+   "class": "hobby",
+   "name": "State the application supplies for one Opus encoder",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "opus_decoder_state_bytes",
+   "class": "hobby",
+   "name": "State the application supplies for one Opus decoder",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build",
+   "method": "ports/opus/README.md"
+  },
+  {
+   "id": "lc3_decode_lost_cycles",
+   "class": "hobby",
+   "name": "Mean CPU cycles to conceal one lost LC3 frame",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "as lc3_encode_cycles",
+   "method": "ports/lc3/README.md"
+  },
+  {
+   "id": "port_panel_up",
+   "class": "hobby",
+   "name": "Whether a ported display driver brought the panel up (yes or no)",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "project and panel",
+   "method": "docs/ports.md"
+  },
+  {
+   "id": "sensor_read",
+   "class": "hobby",
+   "name": "A sensor reading taken on the board (value is the mean over the run; the note holds the range)",
+   "unit": "as the variant says (C, lux, mV)",
+   "better": "none",
+   "variants": "sensor and unit, e.g. hdc2080-temperature-c",
+   "method": "portability/boosterpacks/bassensorsmkii/README.md"
+  },
+  {
+   "id": "backup_restore",
+   "class": "sweep",
+   "name": "Restoring a board's saved flash image after a test (done, or waiting with the reason)",
+   "unit": "yes/no",
+   "better": "yes",
+   "variants": "image name",
+   "method": "data/README.md"
+  },
+  {
+   "id": "rail_power_mw",
+   "class": "linux",
+   "name": "Board rail power from the on-board current monitors (sum of the monitored rails, 30 s mean)",
+   "unit": "mW",
+   "better": "lower",
+   "variants": "state, e.g. total-linux-idle, vdd-core-linux-idle, total-linux-1core-busy",
+   "method": "am62l-evm/README.md: INA228 registers read over I2C, shunt values from the user guide"
+  },
+  {
+   "id": "linux_app_ram_mb",
+   "class": "linux",
+   "name": "Memory a container app uses on a Linux board (docker stats, and whole-system RAM in use from /proc/meminfo)",
+   "unit": "MB",
+   "better": "lower",
+   "variants": "app and view, e.g. nodered-container, nodered-system-used, baseline-system-used",
+   "method": "am62l-evm/linux-apps/README.md: docker stats --no-stream and sample.py (MemTotal minus MemAvailable) 30 s after the app is ready"
+  },
+  {
+   "id": "linux_app_idle_pct",
+   "class": "linux",
+   "name": "CPU idle share with a container app running, both cores, 30 s",
+   "unit": "%",
+   "better": "higher",
+   "variants": "app, e.g. baseline, nodered, ha-alone",
+   "method": "am62l-evm/linux-apps/sample.py: /proc/stat idle plus iowait over 30 s, app idle after it is ready"
+  },
+  {
+   "id": "linux_app_ready_s",
+   "class": "linux",
+   "name": "Seconds from docker run to the app's first useful answer",
+   "unit": "s",
+   "better": "lower",
+   "variants": "app and answer, e.g. nodered-ui, pihole-dns, ha-onboarding-api",
+   "method": "am62l-evm/linux-apps/README.md: the answer is named in the variant; timed with date +%s.%N on the board"
+  },
+  {
+   "id": "linux_app_pull_s",
+   "class": "linux",
+   "name": "Seconds to pull the container image over Ethernet to the board's SD card",
+   "unit": "s",
+   "better": "lower",
+   "variants": "app, e.g. nodered, ha",
+   "method": "am62l-evm/linux-apps/README.md: docker pull, wall clock"
+  },
+  {
+   "id": "linux_app_image_mb",
+   "class": "linux",
+   "name": "Container image size on the board's disk (docker images)",
+   "unit": "MB",
+   "better": "lower",
+   "variants": "app, e.g. nodered, ha",
+   "method": "am62l-evm/linux-apps/README.md: docker images SIZE column"
+  },
+  {
+   "id": "linux_asr_rtf",
+   "class": "linux",
+   "name": "Speech to text on the CPU, processing time divided by audio length (whisper.cpp, 11.0 s clip)",
+   "unit": "x real time",
+   "better": "lower",
+   "variants": "model and threads, e.g. tiny.en-t2, base.en-t2",
+   "method": "whisper-cli total time, jfk.wav, median of 3 runs; below 1.0 is faster than real time"
+  },
+  {
+   "id": "linux_llm_tok_s",
+   "class": "linux",
+   "name": "Small language model on the CPU (llama.cpp llama-bench)",
+   "unit": "tokens/s",
+   "better": "higher",
+   "variants": "model, phase and threads, e.g. qwen2.5-0.5b-q4_0-gen-t2, qwen2.5-0.5b-q4_0-prompt-t2",
+   "method": "llama-bench -p 128 -n 32 -r 3; value is the mean of 3"
+  },
+  {
+   "id": "linux_infer_ms",
+   "class": "linux",
+   "name": "One model inference on the CPU, median latency",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "model, runtime and threads, e.g. yamnet-litert-t2, silero-en_v5-ort-t2",
+   "method": "3 sets of N timed runs after 2 warm-ups; median of the set medians"
+  },
+  {
+   "id": "voice_fe_frame_ms",
+   "class": "hobby",
+   "name": "Voice front end (4-mic delay-and-sum beamformer, SpeexDSP echo canceller and noise suppressor, 16 kHz): mean CPU time per 10 ms frame",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "build: compiler, flags, code memory and echo tail, e.g. ticlang-o2-flash-tail200, ticlang-o2-cram-tail200",
+   "method": "portability/voice-fe/README.md"
+  },
+  {
+   "id": "voice_fe_frame_worst_ms",
+   "class": "hobby",
+   "name": "Voice front end: worst CPU time for one 10 ms frame over the run",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "build: compiler, flags, code memory and echo tail, e.g. ticlang-o2-flash-tail200, ticlang-o2-cram-tail200",
+   "method": "portability/voice-fe/README.md"
+  },
+  {
+   "id": "voice_fe_cpu_load",
+   "class": "hobby",
+   "name": "Voice front end: core load, mean ms per 10 ms frame as a percent",
+   "unit": "%",
+   "better": "lower",
+   "variants": "build: compiler, flags, code memory and echo tail, e.g. ticlang-o2-flash-tail200, ticlang-o2-cram-tail200",
+   "method": "portability/voice-fe/README.md"
+  },
+  {
+   "id": "voice_fe_ram_bytes",
+   "class": "hobby",
+   "name": "Voice front end RAM: SpeexDSP heap high-water plus the beamformer and frame buffers plus measured stack",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build: compiler, flags, code memory and echo tail, e.g. ticlang-o2-flash-tail200, ticlang-o2-cram-tail200",
+   "method": "portability/voice-fe/README.md"
+  },
+  {
+   "id": "voice_fe_flash_bytes",
+   "class": "hobby",
+   "name": "Voice front end code and constants from the linker map (SpeexDSP, beamformer, allocator; test signal and harness excluded)",
+   "unit": "B",
+   "better": "lower",
+   "variants": "build: compiler, flags, code memory and echo tail, e.g. ticlang-o2-flash-tail200, ticlang-o2-cram-tail200",
+   "method": "portability/voice-fe/README.md"
+  },
+  {
+   "id": "voice_fe_erle_db",
+   "class": "hobby",
+   "name": "Voice front end echo return loss enhancement on the generated test signal, passes 2 to 8, echo canceller output",
+   "unit": "dB",
+   "better": "higher",
+   "variants": "build: compiler, flags, code memory and echo tail, e.g. ticlang-o2-flash-tail200, ticlang-o2-cram-tail200",
+   "method": "portability/voice-fe/README.md"
+  },
+  {
+   "id": "byom_latency",
+   "class": "ai",
+   "name": "Model from the training tool's own file, one inference, plain C from tools/byom",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "model-build, e.g. occ_float_8k-c-O3 (float32 CNN), dtree-c-O3, forest-c-O3, xgb-c-O3",
+   "method": "tools/byom/README.md"
+  },
+  {
+   "id": "byom_agreement",
+   "class": "ai",
+   "name": "Vectors whose class matches the training tool, model through tools/byom",
+   "unit": "of 20",
+   "better": "higher",
+   "variants": "model-build; note holds the largest output difference and the match with the true label",
+   "method": "tools/byom/README.md"
+  },
+  {
+   "id": "ai_ic_latency",
+   "class": "ai",
+   "name": "MLPerf Tiny image classification (ResNet-8, CIFAR-10), one 32x32 image",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "model-quantizer-compiler-engine, e.g. resnet8-ti-qat-nnc-npu",
+   "method": "am13e230/bench/resnet-nnc/main.c"
+  },
+  {
+   "id": "ai_ic_agreement",
+   "class": "ai",
+   "name": "MLPerf Tiny ResNet-8: board images whose class matches the host run of the same int8 file",
+   "unit": "of 20",
+   "better": "higher",
+   "variants": "same as ai_ic_latency; note holds the match with the true label",
+   "method": "am13e230/bench/resnet-nnc/main.c"
+  },
+  {
+   "id": "emu_fps",
+   "class": "linux",
+   "name": "Frames per second an emulator core delivers to the HDMI connector, locked to vblank (free-run rows: no vblank wait)",
+   "unit": "fps",
+   "better": "higher",
+   "variants": "core-content-WxH-options, e.g. snes9x2005-mode7-1920x1080-sync",
+   "method": "am62l-evm/lean/lean_fe.c, median of 3 runs of 10 s after 2 s warm-up"
+  },
+  {
+   "id": "emu_core_ms",
+   "class": "linux",
+   "name": "Time the emulator core spends in one retro_run frame, video callback excluded",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "same as emu_fps",
+   "method": "am62l-evm/lean/lean_fe.c, monotonic clock around retro_run, mean of a 10 s run, median of 3"
+  },
+  {
+   "id": "emu_input_ms",
+   "class": "linux",
+   "name": "Time from a gamepad button event (kernel timestamp) to the vblank at which the frame drawn after it is flipped onto the connector",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "core-content-WxH, e.g. snes9x2005-breakout-1920x1080",
+   "method": "am62l-evm/lean/lean_fe.c -L, evdev timestamps on CLOCK_MONOTONIC against the flip event; display and TV lag not included"
+  },
+  {
+   "id": "simplefoc_loop_cycles",
+   "class": "motor",
+   "name": "SimpleFOC loopFOC() plus move(), one pass, in CPU cycles (value is the mean, value_hi the worst pass)",
+   "unit": "cycles",
+   "better": "lower",
+   "variants": "mode-condition, e.g. openloop-nosupply",
+   "method": "ports/simplefoc/README.md; DWT counter around the two calls, many passes in one run"
+  },
+  {
+   "id": "simplefoc_glue_lines",
+   "class": "motor",
+   "name": "Lines of port code written to run SimpleFOC on a chip (non-blank), beside the unchanged library",
+   "unit": "lines",
+   "better": "lower",
+   "variants": "layer, e.g. hal-shim-pins, sketch",
+   "method": "ports/simplefoc/README.md"
+  },
+  {
+   "id": "motor_phase_peak",
+   "class": "motor",
+   "name": "Peak phase current in a steady-speed window, from the driver's sense outputs at the assumed gain",
+   "unit": "A",
+   "better": "lower",
+   "variants": "<method>-<point>, e.g. simplefoc-hall-velocity-20hz",
+   "method": "ports/simplefoc/tools/run_simplefoc.py; 5 ms windows of the largest of three phases"
+  },
+  {
+   "id": "kws_latency",
+   "class": "ai",
+   "name": "MLPerf Tiny keyword spotting (DS-CNN), one inference",
+   "unit": "ms",
+   "better": "lower",
+   "variants": "model-quantizer-compiler-engine, e.g. ds-cnn-ti-ptq-nnc-npu",
+   "method": "mspm0g5187/mlperf-tiny/README.md"
+  },
+  {
+   "id": "kws_accuracy",
+   "class": "ai",
+   "name": "MLPerf Tiny keyword spotting top-1 accuracy on the board",
+   "unit": "percent",
+   "better": "higher",
+   "variants": "model-quantizer-compiler-engine-clips, e.g. ds-cnn-ti-ptq-nnc-npu-4890",
+   "method": "mspm0g5187/mlperf-tiny/README.md"
+  },
+  {
+   "id": "kws_fit",
+   "class": "ai",
+   "name": "MLPerf Tiny keyword-spotting image size, or why it does not fit",
+   "unit": "kB",
+   "better": "lower",
+   "variants": "model-compiler-engine-image",
+   "method": "mspm0g5187/mlperf-tiny/README.md"
+  },
+  {
+   "id": "ic_fit",
+   "class": "ai",
+   "name": "MLPerf Tiny ResNet-8 image classification size, or why it does not fit",
+   "unit": "kB",
+   "better": "lower",
+   "variants": "model-quantizer-compiler-engine",
+   "method": "mspm0g5187/mlperf-tiny/README.md"
+  }
+ ]
+}

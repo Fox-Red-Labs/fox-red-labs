@@ -1,0 +1,10 @@
+{
+  "service": "Bench Probe",
+  "uuid": "9ac30001-90a8-40e0-a398-f2fec9172b0f",
+  "characteristics": [
+    {"name": "Command", "uuid": "9ac30002-90a8-40e0-a398-f2fec9172b0f", "properties": ["write", "write-no-response"], "length": 4, "description": "Command word"},
+    {"name": "Reading", "uuid": "9ac30003-90a8-40e0-a398-f2fec9172b0f", "properties": ["read", "notify", "indicate"], "length": 20, "description": "Latest reading"},
+    {"name": "Alarm", "uuid": "9ac30004-90a8-40e0-a398-f2fec9172b0f", "properties": ["indicate"], "length": 2},
+    {"name": "Status", "uuid": "9ac30005-90a8-40e0-a398-f2fec9172b0f", "properties": ["read"], "length": 1}
+  ]
+}

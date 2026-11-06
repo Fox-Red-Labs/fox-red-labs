@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="A radar board sends 60 gigahertz chirps into a room; a seated person lights one floor zone">
+<style>
+  .arc { animation: arc 1.8s infinite; opacity:.15; } .a2 { animation-delay:.3s } .a3 { animation-delay:.6s }
+  @keyframes arc { 0%{opacity:.1} 40%{opacity:1} 100%{opacity:.1} }
+  .pulse { animation: pl 4s infinite; }
+  @keyframes pl { 0%,30%{fill-opacity:0} 40%,80%{fill-opacity:.35} 90%,100%{fill-opacity:0} }
+  @media (prefers-reduced-motion: reduce) { .arc,.pulse,.tw,.mv { animation: none; opacity: 1; } }
+</style>
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="40" y="100" width="40" height="80" rx="4" fill="#161312"/><text x="60" y="140" font-size="11" font-weight="700" text-anchor="middle" fill="#F4EFE9" transform="rotate(-90 60 140)">60 GHz</text>
+<g fill="none" stroke="#B42418" stroke-width="5" stroke-linecap="round"><path class="arc a1" d="M100 120 a30 30 0 0 1 0 40"/><path class="arc a2" d="M118 108 a50 50 0 0 1 0 64"/><path class="arc a3" d="M136 96 a70 70 0 0 1 0 88"/></g>
+<rect x="230" y="60" width="150" height="160" fill="#F7F3EC" stroke="#6B625B" stroke-dasharray="4 4"/><rect x="380" y="60" width="150" height="160" fill="#F7F3EC" stroke="#6B625B" stroke-dasharray="4 4"/>
+<rect class="pulse" x="380" y="60" width="150" height="160" fill="#B42418" stroke="#B42418" stroke-width="2"/>
+<circle cx="455" cy="130" r="14" fill="#161312"/><rect x="437" y="146" width="36" height="30" rx="6" fill="#161312"/>
+<text x="305" y="48" font-size="13" fill="#6B625B" text-anchor="middle">near zone</text><text x="455" y="48" font-size="13" fill="#6B625B" text-anchor="middle">far zone</text>
+</svg>

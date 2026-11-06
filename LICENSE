@@ -1,0 +1,74 @@
+Fox Red Labs: code under BSD-3-Clause, written content under CC BY 4.0, brand all rights reserved.
+
+1. CODE (every source file, script, configuration and data file not covered by 2, 3 or 5)
+
+BSD 3-Clause License
+
+Copyright (c) 2026, Fox Red Labs
+Portions copyright (c) Texas Instruments Incorporated and other third parties (see NOTICE)
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+2. WRITTEN CONTENT (README files, docs/, the site's text, logs and guides written by Fox Red Labs)
+
+Licensed under the Creative Commons Attribution 4.0 International License (CC BY 4.0),
+https://creativecommons.org/licenses/by/4.0/. Attribute as "Fox Red Labs" with a link to
+the source page. Measured numbers are facts and carry no license; the write-up around them
+does.
+
+3. BRAND
+
+The Fox Red Labs name, the fox mark and the logo files under brand/ are not licensed. All
+rights reserved. Do not use them to suggest endorsement.
+
+4. THIRD-PARTY FILES
+
+Files from other projects keep their own licenses, listed in NOTICE and in the LICENSE file
+inside each of those folders. Where a third-party license is stricter than BSD-3-Clause, that
+folder's license governs that folder (see the exceptions below).
+
+5. EXCEPTIONS: FAMILIES WHOSE LICENSE DIFFERS FROM BSD-3-CLAUSE
+
+These are not covered by section 1. Each folder holds its own license text.
+
+- ports/doom/: GPL-2.0 (the Doom port; ports/doom/LICENSE).
+- ports/bitnetmcu/ and third-party/bitnetmcu/: GPL-3.0.
+- ports/openocd-cc23xx/: GPL-2.0-or-later (the OpenOCD flash driver).
+- am62l-evm/linux/cpu1_start/ and am62l-evm/rpmsg/: the Linux kernel module sources are GPL-2.0.
+- ports/esphome-ti/: GPLv3 for the ESPHome runtime the shim sources compile into; see
+  ports/esphome-ti/LICENSE.
+- third-party/arduino/ArduinoCore-API: LGPL-2.1.
+- Four files under the TI Limited License, for use only with TI devices, not BSD-3-Clause:
+  cc35x1/matter/thermostat/csi/ti/feature_extract.c and feature_extract.h,
+  cc2340r5/zigbee/onoff_light/dmm/rcl_stub_dmm.c and cc2340r5/zigbee-alarm/dmm/rcl_stub_dmm.c
+  (LICENSE-TI-LIMITED.txt in each folder).
+- ports/microwakeword/models/hey_sparky.tflite and hey_sparky.json: non-commercial, personal use
+  only (ports/microwakeword/models/LICENSE). A firmware image that embeds the model carries
+  the same limit.
+
+Hardware safety: this repository contains programs that erase and rewrite a microcontroller's
+flash memory and scripts that drive debug probes. They are provided as is, for development
+boards, with no warranty; read each folder's README before running anything on a board.

@@ -1,0 +1,8 @@
+{
+  "service": "Blinky",
+  "uuid": "de8a5aac-a99b-c315-0c80-60d4cbb51224",
+  "characteristics": [
+    {"name": "LED", "uuid": "5b026510-4088-c297-46d8-be6c736a087a", "properties": ["read", "write"], "length": 1},
+    {"name": "Button", "uuid": "61a885a4-41c3-60d0-9a53-6d652a70d29c", "properties": ["read", "notify"], "length": 1}
+  ]
+}

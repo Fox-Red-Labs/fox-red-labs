@@ -1,0 +1,6 @@
+/* Three ways: ADC0 channel 9 (PA15, the onboard thermistor). The LED is the board's led0 (PA0, LED1). */
+/ {
+	zephyr,user {
+		adc-channel = <9>;
+	};
+};

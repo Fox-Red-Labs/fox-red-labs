@@ -1,0 +1,40 @@
+/* Zephyr in MAIN on-chip SRAM only: 0x70800000 to 0x70814000 (80 KB). The 16 KB above it (0x70814000 to 0x70818000)
+ * is the TIFS mailbox and debug buffer area in TI's SRAM map (Linux SDK, "SRAM memory layout during initial
+ * bootloader stage"); left alone so a later TF-A can coexist. The 64 KB WKUP SRAM below 0x70800000 holds ROM data
+ * while the ROM is active and is not used here. The firmware nodes (SCMI, PSCI) stay in the tree, disabled, because every UART names the SCMI clock by label. */
+/ {
+	sram_main: memory@70800000 {
+		compatible = "mmio-sram";
+		reg = <0x70800000 0x14000>;
+	};
+	chosen {
+		zephyr,sram = &sram_main;
+		/delete-property/ zephyr,flash;
+		/delete-property/ zephyr,flash-controller;
+	};
+	cpus {
+		cpu@1 { status = "disabled"; };
+	};
+	firmware {
+		psci { status = "disabled"; };
+		scmi { status = "disabled"; };
+	};
+};
+&oc_sram { status = "disabled"; };
+&main_uart0 {
+	/delete-property/ clocks;
+	/delete-property/ power-domains;
+};
+&main_adc0 { status = "disabled"; };
+&main_i2c0 { status = "disabled"; };
+&main_i2c1 { status = "disabled"; };
+&main_sdhci0 { status = "disabled"; };
+&main_sdhci1 { status = "disabled"; };
+&main_sdhci2 { status = "disabled"; };
+&main_epwm0 { status = "disabled"; };
+&main_ecap0 { status = "disabled"; };
+&main_rti0 { status = "disabled"; };
+&wkup_rtc0 { status = "disabled"; };
+&counter_rtc0 { status = "disabled"; };
+&main_ospi0 { status = "disabled"; };
+&main_gpio0_3 { status = "disabled"; };

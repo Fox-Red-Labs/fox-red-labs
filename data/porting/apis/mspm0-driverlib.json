@@ -1,0 +1,52 @@
+{
+ "api": "mspm0-driverlib",
+ "vendor": "TI",
+ "detect": "\\bDL_\\w+|SYSCFG_DL_\\w+",
+ "symbol_re": "\\b(?:DL_[A-Za-z0-9_]+|SYSCFG_DL_[A-Za-z_]+|delay_cycles)\\b",
+ "calls_only": true,
+ "note": "Source side for MSPM0 projects moved to another TI family. Seeded only with the calls the shims and the AM13 header handle.",
+ "entries": [
+  {
+   "match": "SYSCFG_DL_init",
+   "idiom": "system.init",
+   "note": "",
+   "from": "portability/shim"
+  },
+  {
+   "match": "DL_Common_delayCycles|delay_cycles",
+   "idiom": "time.delay_cycles",
+   "note": "",
+   "from": "portability/shim"
+  },
+  {
+   "match": "DL_GPIO_(setPins|clearPins)",
+   "idiom": "gpio.write",
+   "note": "clearPins is LED on on the active-low LaunchPad LEDs",
+   "from": "portability/shim"
+  },
+  {
+   "match": "DL_GPIO_togglePins",
+   "idiom": "gpio.toggle",
+   "note": "",
+   "from": "portability/shim"
+  },
+  {
+   "match": "DL_GPIO_readPins",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "portability/shim"
+  },
+  {
+   "match": "DL_UART_Main_(transmitData|transmitDataBlocking|isBusy)",
+   "idiom": "uart.tx_byte_blocking",
+   "note": "",
+   "from": "portability/shim"
+  },
+  {
+   "match": "DL_UART_Main_receiveDataBlocking",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "portability/shim"
+  }
+ ]
+}

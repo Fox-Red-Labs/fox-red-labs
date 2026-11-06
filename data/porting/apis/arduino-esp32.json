@@ -1,0 +1,93 @@
+{
+ "api": "arduino-esp32",
+ "vendor": "Arduino",
+ "detect": "#include\\s*<Arduino\\.h>|\\bSerial\\.begin\\b",
+ "symbol_re": "\\b(?:pinMode|digitalWrite|digitalRead|analogRead|analogWrite|delay|delayMicroseconds|millis|micros|attachInterrupt|tone|noInterrupts|interrupts|ledcSetup|ledcAttachPin|ledcWrite|Serial\\d?\\.[A-Za-z]+)\\b",
+ "calls_only": true,
+ "entries": [
+  {
+   "match": "pinMode",
+   "idiom": "gpio.config_pin",
+   "note": "",
+   "from": "port esp32-ble-gamepad source and portability/arduino"
+  },
+  {
+   "match": "digitalWrite",
+   "idiom": "gpio.write",
+   "note": "",
+   "from": "portability/arduino"
+  },
+  {
+   "match": "digitalRead",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "portability/arduino"
+  },
+  {
+   "match": "analogRead",
+   "idiom": "adc.start_conversion",
+   "note": "",
+   "from": "Arduino reference"
+  },
+  {
+   "match": "analogWrite|ledcWrite|ledcSetup|ledcAttachPin",
+   "idiom": "pwm.config_channel",
+   "note": "",
+   "from": "Arduino-ESP32 reference"
+  },
+  {
+   "match": "attachInterrupt",
+   "idiom": "gpio.input_irq_edge",
+   "note": "",
+   "from": "portability/arduino"
+  },
+  {
+   "match": "noInterrupts|interrupts",
+   "idiom": "irq.global_disable",
+   "note": "",
+   "from": "Arduino reference"
+  },
+  {
+   "match": "delay",
+   "idiom": "time.delay_ms",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "delayMicroseconds",
+   "idiom": "time.delay_us",
+   "note": "",
+   "from": "portability/arduino"
+  },
+  {
+   "match": "millis",
+   "idiom": "time.tick_ms",
+   "note": "",
+   "from": "portability/arduino"
+  },
+  {
+   "match": "micros",
+   "idiom": "time.tick_us",
+   "note": "",
+   "from": "portability/arduino"
+  },
+  {
+   "match": "Serial\\d?\\.begin",
+   "idiom": "uart.init_8n1",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "Serial\\d?\\.(print|println|printf|write|flush)",
+   "idiom": "console.print",
+   "note": "",
+   "from": "port esp32-ble-gamepad source"
+  },
+  {
+   "match": "Serial\\d?\\.(read|available)",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "portability/arduino"
+  }
+ ]
+}

@@ -1,0 +1,18 @@
+[Unit]
+Description=Fox Red Labs lean game picker on HDMI (SNES, PS1, GB through libretro cores)
+After=systemd-user-sessions.service sound.target
+Conflicts=ti-lvgl-demo.service
+
+[Service]
+Type=simple
+WorkingDirectory=/root/frl/lean
+ExecStart=/root/frl/lean/lean_fe -M /root/games
+Restart=always
+RestartSec=2
+StandardOutput=journal
+StandardError=journal
+# real-time-ish: the picker and games own two A53 cores
+Nice=-5
+
+[Install]
+WantedBy=multi-user.target

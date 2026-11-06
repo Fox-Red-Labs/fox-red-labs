@@ -1,0 +1,77 @@
+{
+ "name": "LP-EM-CC2340R5 LaunchPad development kit",
+ "sources": "CC2340R family data sheet SWRS272F (features list; read 2026-10-07); LP-EM-CC2340R5 quick start guide SWRU588A (board overview, BoosterPack pinout, box contents; read 2026-10-07); SimpleLink Low Power F3 SDK 9.21 board file LP_EM_CC2340R5.syscfg.json (LEDs, buttons, header pins)",
+ "columns": [
+  {
+   "head": "The chip: CC2340R5",
+   "items": [
+    [
+     "Processor: Arm Cortex-M0+",
+     "Runs the program, up to 48 million steps a second (48 MHz)"
+    ],
+    [
+     "Chip: 2.4 GHz radio",
+     "Bluetooth Low Energy, Zigbee and Thread, up to +8 dBm. This is what the chip is for"
+    ],
+    [
+     "Flash: 512 kB",
+     "Holds the program and the radio stack. Kept when the power is off"
+    ],
+    [
+     "RAM: 36 kB",
+     "Working memory. The Bluetooth stack takes most of it, so a sensor app gets what is left"
+    ],
+    [
+     "Power: 1.71 to 3.8 V",
+     "3.3 V from the debug probe on this board, so 5 V parts need care"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "GPIO: up to 26 pads",
+     "Plain on/off pins (TI calls them DIO). 22 of them reach the board's headers"
+    ],
+    [
+     "UART: 1 / SPI: 1 / I2C: 1",
+     "Serial text / fast bus for displays and memory / two-wire bus for sensors. Only one of each"
+    ],
+    [
+     "ADC: 12-bit",
+     "Measures a voltage in 4,096 steps, up to 12 inputs"
+    ],
+    [
+     "Timers: 3 x 16-bit, 1 x 24-bit",
+     "PWM, timing a pulse, counting a knob (quadrature decode), making an IR carrier"
+    ],
+    [
+     "Chip: AES and random numbers in hardware",
+     "Hardware for encryption, which the radio stacks use"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "Red LED (DIO14), green LED (DIO15), two buttons (DIO10, DIO9), 1 MB SPI flash, chip antenna"
+    ],
+    [
+     "Headers",
+     "40-pin BoosterPack layout (J1 to J4); several positions are not connected"
+    ],
+    [
+     "Debug probe: none on the board",
+     "Needs an LP-XDS110ET or LP-XDS110 probe on its edge connector, sold separately. The probe also powers it"
+    ],
+    [
+     "Watch out",
+     "Only one I2C bus: every Qwiic sensor shares DIO24 (SCL) and DIO0 (SDA). No pull-up resistors found on the board"
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,301 @@
+{
+ "target": "TI MSPM0: ports of MSP430 idioms (reported from vendor documents, with tested traps from runs on the board)",
+ "impl": [
+  {
+   "idiom": "memory.persistent_variable",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "redesign",
+   "replace": "No FRAM, so no variable keeps its value by being declared persistent. Reserve one flash erase sector outside the linker's FLASH region (cut it from the FLASH length in the linker file) and read it through a const pointer. Write through DL_FlashCTL: 64-bit words with generated ECC, one program per word until the sector is erased. For a handful of bytes that must survive SHUTDOWN but not a power loss, the SHUTDOWN storage bytes (DL_SYSCTL_setShutdownStorageByte) need no flash write.",
+   "trap": "Rewriting one flash word on every event does not work: a word takes one program after an erase. Flash is rated 100k cycles in the lower 32 KB and 10k above; FRAM is rated 10^15 (SLAAE74B Tables 3-6 and 3-7). Use the append-log idiom below. Code must not execute from the sector being erased, and interrupts stay off during the command.",
+   "degrades": "a write is a flash program, tens of microseconds, and an erase is milliseconds, where an FRAM store is one memory write",
+   "check": "a counter read after a software reset and after a USB power cycle equals the last value written",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Tables 3-6 and 3-7; MSPM0 SDK 2.11.00.07 examples/nortos/LP_MSPM0L1306/driverlib/flashctl_multiple_size_write and sysctl_shutdown",
+   "status": "proven",
+   "id": "mspm0:memory.persistent_variable/from-msp430",
+   "proof": [
+    {
+     "port": "msp430-to-mspm0",
+     "board": "mspm0l1306",
+     "level": "measured",
+     "what": "count kept across 17 software resets, a program load and a 5 s power-off",
+     "path": "ports/msp430-to-mspm0/fram-persist/results/l1306-storm.log",
+     "results": "mspm0l1306:persist_survives_reset"
+    },
+    {
+     "port": "msp430-to-mspm0",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "count 15 before and after a 5 s power-off",
+     "path": "ports/msp430-to-mspm0/fram-persist/results/l1306-powercycle-after.log",
+     "results": "mspm0l1306:persist_survives_power_off"
+    }
+   ]
+  },
+  {
+   "idiom": "storage.append_log_counter",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "A counter as an append-only log: 128 slots of 8 bytes in one 1 kB sector, each slot (count, ~count) programmed once with DL_FlashCTL_programMemoryFromRAM64WithECCGenerated; at boot the newest valid slot is the count; when all slots are used, erase the sector and start again at slot 0. One erase per 128 counts.",
+   "trap": "A power loss between the erase and the first program of a full log loses the count; FRAM has no such window. Two sectors used alternately close it. A slot half-programmed by a power loss reads as invalid and is skipped.",
+   "degrades": "endurance is 100k erases times 128 counts per erase, about 12.8 million counts in the lower 32 KB, against 10^15 for FRAM",
+   "check": "count after N resets is N more; the log wraps once without losing the count; erases equal N divided by 128",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-7 (program mode a single 64-bit flash word); EEPROM emulation Type A and Type B application notes listed in SLAAE70B, Rev. B",
+   "status": "proven",
+   "id": "mspm0:storage.append_log_counter/from-msp430",
+   "proof": [
+    {
+     "port": "msp430-to-mspm0",
+     "board": "mspm0l1306",
+     "level": "measured",
+     "what": "300 counts, 2 erases, word write 56 us, sector erase 1.99 ms",
+     "path": "ports/msp430-to-mspm0/fram-persist/results/l1306-burst.log",
+     "results": "mspm0l1306:persist_word_write_us"
+    }
+   ]
+  },
+  {
+   "idiom": "memory.nvm_write_unprotect",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "Open the sector before each command: DL_FlashCTL_unprotectSector(FLASHCTL, addr, DL_FLASHCTL_REGION_SELECT_MAIN) after DL_FlashCTL_executeClearStatus. Protection is per sector and the unprotect lasts for one command; there is no global write-enable bit like SYSCFG0.",
+   "trap": "Forgetting the unprotect call makes the command fail with a status, not a fault. Check the returned DL_FLASHCTL_COMMAND_STATUS.",
+   "check": "a program call without the unprotect fails; with it the data reads back",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-6 (protection supported on both); MSPM0 SDK 2.11.00.07 examples/nortos/LP_MSPM0L1306/driverlib/flashctl_multiple_size_write",
+   "status": "reported",
+   "id": "mspm0:memory.nvm_write_unprotect/from-msp430"
+  },
+  {
+   "idiom": "memory.nvm_wait_states",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "direct",
+   "replace": "Nothing to port: the SysConfig clock tree sets the flash wait states for the chosen clock (the L1306 uses one wait state above 24 MHz). Delete FRAMCtl_configureWaitStateControl.",
+   "trap": "The MSP430 limit is 8 MHz FRAM access with wait states needed above it; the MSPM0 flash limit is a different number per device. Read the data sheet for the part, not the MSP430 value.",
+   "check": "the program runs at the chosen clock with no fault",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Section 3.4.2",
+   "status": "reported",
+   "id": "mspm0:memory.nvm_wait_states/from-msp430"
+  },
+  {
+   "idiom": "power.deep_sleep_timer_wake",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "STANDBY0 with WWDT0 in interval mode from LFCLK: DL_SYSCTL_setPowerPolicySTANDBY0(), then __WFI() in a loop that checks a tick counter. WWDT0 in interval mode (clock divider 1, 15-bit period) gives 1 s from the 32 kHz clock, the same period as WDT_ADLY_1000. TIMG0 on LFCLK also runs in STANDBY.",
+   "trap": "While a debugger holds the debug power request the chip stays out of STOP and STANDBY and runs as in SLEEP; clear CDBGPWRUPREQ (OpenOCD: dap dpreg 0x04 0x00000000) or disconnect the probe before judging a power state. Bench 2026-10-21 on the LP-MSPM0L1306: with the request set, the CPU-clock counter across a 1 s sleep read 15.1 million; cleared, 33.8 thousand. LFOSC is an internal 32 kHz oscillator, not the crystal of the MSP430 example; the interval ran 0.2 percent short over 29 ticks.",
+   "check": "SysTick counted across the sleep is under 0.3 percent of the sleep time in STANDBY0 and about 1 s of CPU clock in SLEEP",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-5 (LPM3 to STANDBY); MSPM0 SDK 2.11.00.07 examples/nortos/LP_MSPM0L1306/driverlib/wwdt_interval_timer_lfosc_standby and timx_timer_mode_periodic_standby",
+   "status": "proven",
+   "id": "mspm0:power.deep_sleep_timer_wake/from-msp430",
+   "proof": [
+    {
+     "port": "msp430-to-mspm0",
+     "board": "mspm0l1306",
+     "level": "measured",
+     "what": "STANDBY0 SysTick 33.8 thousand a second against 15.2 million in SLEEP",
+     "path": "ports/msp430-to-mspm0/lpm3-wake/results/l1306-run1.log",
+     "results": "mspm0l1306:deep_sleep_cpu_ticks"
+    }
+   ]
+  },
+  {
+   "idiom": "power.shutdown_pin_wake",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "LPM4.5 becomes SHUTDOWN: configure a wake pin (DL_GPIO_initDigitalInputFeatures with DL_GPIO_WAKEUP_ON_0), DL_SYSCTL_setPowerPolicySHUTDOWN(), __WFI(). On wake the chip resets; DL_SYSCTL_getResetCause() returns DL_SYSCTL_RESET_CAUSE_BOR_WAKE_FROM_SHUTDOWN, replacing SYSRSTIV_LPM5WU. Call DL_SYSCTL_releaseShutdownIO() after the pins are configured. Four bytes survive in SYSCTL SHUTDNSTORE.",
+   "trap": "An image that enters SHUTDOWN right after boot cannot be reached by a debugger; wait several seconds awake before sleeping so a probe can attach after every reset, or the board needs the S1 plus reset recovery of mspm0l1306/AGENTS.md.",
+   "check": "reset cause reads wake from shutdown; RAM is cleared; the flash counter is kept",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-5 (LPM4.5 to SHUTDOWN); MSPM0 SDK 2.11.00.07 examples/nortos/LP_MSPM0L1306/driverlib/sysctl_shutdown",
+   "status": "reported",
+   "id": "mspm0:power.shutdown_pin_wake/from-msp430"
+  },
+  {
+   "idiom": "gpio.release_after_lowpower_reset",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "After SHUTDOWN wake call SYSCFG_DL_GPIO_init() and then DL_SYSCTL_releaseShutdownIO(); after a normal reset nothing is held, so the PM5CTL0 LOCKLPM5 clear is deleted.",
+   "trap": "Release the pins only after they are configured, or they glitch to the reset default.",
+   "check": "pin state after wake equals the state set before sleep",
+   "cite": "MSPM0 SDK 2.11.00.07 examples/nortos/LP_MSPM0L1306/driverlib/sysctl_shutdown",
+   "status": "reported",
+   "id": "mspm0:gpio.release_after_lowpower_reset/from-msp430"
+  },
+  {
+   "idiom": "gpio.unused_pins_safe",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "direct",
+   "replace": "SysConfig Board.configureUnused = true drives every unused pin low as an output, which is what the MSP430 examples do by hand with PxDIR = 0xFF and PxOUT = 0.",
+   "trap": "A pin that carries a BoosterPack or the debug probe must not be listed as unused: leave stacked-pack pins untouched.",
+   "check": "unused pins read back low",
+   "cite": "MSPM0 SDK 2.11.00.07 examples/nortos/LP_MSPM0L1306/driverlib/timx_timer_mode_periodic_standby (generated ti_msp_dl_config.c)",
+   "status": "reported",
+   "id": "mspm0:gpio.unused_pins_safe/from-msp430"
+  },
+  {
+   "idiom": "clock.low_freq_aclk",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "ACLK is a fixed 32 kHz clock on MSPM0 (LFCLK, from the internal LFOSC or an external LFXT crystal). Peripherals pick LFCLK in SysConfig (timer clock source, UART clock source). Delete the XT1 pin setup and the oscillator fault loop.",
+   "trap": "LFOSC is not a crystal: the MSP430 example's accuracy comes from XT1. Add the LFXT crystal if the period must be exact.",
+   "check": "an interval timer on LFCLK measured against a wall clock over 30 s",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Tables 3-2 and 3-4",
+   "status": "proven",
+   "id": "mspm0:clock.low_freq_aclk/from-msp430",
+   "proof": [
+    {
+     "port": "msp430-to-mspm0",
+     "board": "mspm0l1306",
+     "level": "measured",
+     "what": "the same period test with the timer on the 32 kHz oscillator",
+     "path": "ports/msp430-to-mspm0/lpm3-wake/results/l1306-run1.log",
+     "results": "mspm0l1306:deep_sleep_wake_period_ms"
+    }
+   ]
+  },
+  {
+   "idiom": "clock.fll_dco_trim",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "none",
+   "replace": "SYSOSC is factory-trimmed to 32 MHz (or 4 MHz); there is no DCO and no trim loop. Delete Software_Trim().",
+   "trap": "Do not port the trim routine: it writes CSCTL registers that do not exist.",
+   "instead": "select the SYSOSC frequency in the SysConfig SYSCTL block",
+   "check": "measured clock against the target",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-2 and 3-3",
+   "status": "reported",
+   "id": "mspm0:clock.fll_dco_trim/from-msp430"
+  },
+  {
+   "idiom": "timer.interval_watchdog_as_timer",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "WWDT0 in interval mode from LFCLK (SysConfig WWDT module, mode INTERVAL, clock divider 1, period 15 bits for 1 s). The interrupt is in interrupt group 0: handle DL_INTERRUPT_GROUP0_IIDX_WWDT0 and read DL_WWDT_getPendingInterrupt(WWDT0).",
+   "trap": "SysConfig's default is divider 4 and 12 bits (0.5 s); set both. WWDT0 runs in STANDBY0.",
+   "check": "one interrupt per second for 30 s, no reset",
+   "cite": "MSPM0 SDK 2.11.00.07 examples/nortos/LP_MSPM0L1306/driverlib/wwdt_interval_timer_lfosc_standby",
+   "status": "proven",
+   "id": "mspm0:timer.interval_watchdog_as_timer/from-msp430",
+   "proof": [
+    {
+     "port": "msp430-to-mspm0",
+     "board": "mspm0l1306",
+     "level": "measured",
+     "what": "29 ticks, mean period 0.9974 s",
+     "path": "ports/msp430-to-mspm0/lpm3-wake/results/l1306-run1.log",
+     "results": "mspm0l1306:deep_sleep_wake_period_ms"
+    }
+   ]
+  },
+  {
+   "idiom": "uart.rx_wake_deep_sleep",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "redesign",
+   "replace": "Two modes. UART0 on the bus clock at 16x oversampling works in STANDBY0 and echoes bursts. UART0 on LFCLK (SysConfig uartClkSrc LFCLK, oversampling 3x) is the only mode that keeps receiving in STANDBY1. Enable the receive FIFO with a one-entry threshold and drain it in the handler.",
+   "trap": "Tested 2026-10-21: the LFCLK UART echoed single typed bytes but lost most of a 20 to 40 byte burst, keeping only the first byte and the last four (the FIFO depth); the same handler on the bus clock echoed 190 bytes intact. With the default FIFO threshold of half full the handler does not run for the first byte.",
+   "check": "a 190 byte burst at 9600 baud echoes unchanged; a byte every 0.3 s echoes from deep sleep",
+   "cite": "MSPM0 SDK 2.11.00.07 examples/nortos/LP_MSPM0L1306/driverlib/uart_echo_interrupts_standby",
+   "status": "proven",
+   "id": "mspm0:uart.rx_wake_deep_sleep/from-msp430",
+   "proof": [
+    {
+     "port": "msp430-to-mspm0",
+     "board": "mspm0l1306",
+     "level": "measured",
+     "what": "190 of 190 bytes echoed on the bus clock from STANDBY0; 5 of 38 on the 32 kHz clock",
+     "path": "ports/msp430-to-mspm0/uart-echo-lpm3/results/l1306-default-bus-standby0.log",
+     "results": "mspm0l1306:uart_echo_burst_bytes_ok"
+    }
+   ]
+  },
+  {
+   "idiom": "timer.capture_compare_pwm",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "Timer_A channels map to a TIMG or TIMA instance (SysConfig TIMER module: PWM, capture or compare mode). CCRn counts N+1 on the MSP430 and the load value is N on MSPM0 timers; Timer_A up/down mode becomes center-aligned PWM.",
+   "trap": "Count conventions differ by one; verify period and duty on a logic analyzer, not by reading code.",
+   "check": "frequency and duty on a logic analyzer against the source",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-1 (timer row)",
+   "status": "reported",
+   "id": "mspm0:timer.capture_compare_pwm/from-msp430"
+  },
+  {
+   "idiom": "spi.controller_init",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "eUSCI_A or eUSCI_B in SPI mode becomes a SysConfig SPI instance (mode, bit order, clock divider). MSPM0L SPI runs to 16 MHz against 8 MHz on the MSP430.",
+   "trap": "The MSP430 mode bits (UCCKPH, UCCKPL, UCMSB) are inverted in sense from SysConfig's polarity and phase names: check with a loopback.",
+   "check": "a MOSI to MISO loopback returns the bytes sent",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-1 (SPI row)",
+   "status": "reported",
+   "id": "mspm0:spi.controller_init/from-msp430"
+  },
+  {
+   "idiom": "i2c.controller_init",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "eUSCI_B in I2C mode becomes a SysConfig I2C controller instance. MSPM0 supports standard, fast and fast-plus (to 1 MHz) with an 8-byte FIFO; the MSP430 table lists 100 kHz.",
+   "trap": "I2C addresses are 7-bit on both; the target send routines take the 7-bit address, not the shifted byte.",
+   "check": "a device ID reads back",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-1 (I2C row) and Section 3.8",
+   "status": "reported",
+   "id": "mspm0:i2c.controller_init/from-msp430"
+  },
+  {
+   "idiom": "vendor.no_equivalent",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "none",
+   "replace": "RTC code has no tested replacement here. SLAAE74B Table 3-1 lists an RTC as supported on MSPM0C, MSPM0L and MSPM0G, while this repo's board profile lists RTC missing for the LP-MSPM0L1306; which is right is not settled. Read the part's data sheet first.",
+   "trap": "Do not stub RTC registers.",
+   "instead": "a timer from LFCLK for elapsed time",
+   "check": "behavior that the call served is checked by name",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-1 (RTC row)",
+   "status": "reported",
+   "id": "mspm0:vendor.no_equivalent/from-msp430"
+  }
+ ]
+}

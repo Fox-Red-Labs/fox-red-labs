@@ -1,0 +1,1484 @@
+# Fox Red Labs: mspm0l1306
+
+Every reader page concatenated, for AI assistants. 8 files. Each starts with a line giving its path and heading. Links inside keep the paths they have in the repo.
+
+==============================================================================
+FILE: mspm0l1306/README.md | TI LP-MSPM0L1306 LaunchPad: what runs in 4 kB of RAM
+==============================================================================
+
+# TI LP-MSPM0L1306 LaunchPad: what runs in 4 kB of RAM
+
+> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+
+**Short answer.** From a Mac terminal TI's blink example for the LP-MSPM0L1306 built in 3.3 seconds and flashed in 0.6, and the chip ran CoreMark at 78.27 per second at 32 MHz: per MHz, the same core speed as the MSPM0G3507. RAM is the limit on everything else: CoreMark fits with 144 bytes to spare, Zephyr's hello_world uses 94% of RAM (a trimmed Zephyr shell still fits, with 48 bytes left), 5 of 19 Embench benchmarks and the largest of four small neural nets do not fit.
+
+Terms: [docs/vocab.md](../docs/vocab.md). Every problem found, with its cause and fix: [FAQ](FAQ.md). 1 kB = 1,024 bytes. **SysConfig** is TI's tool that writes a chip's setup code; **DriverLib** is TI's low-level C library for its peripherals; a **flash wait state** is an extra clock cycle the core waits for each read from flash at high clock speeds; **NONMAIN** is the chip's boot configuration area, which a bad write can lock for good; the **heap** is RAM handed out at run time by `malloc`; **MessagePack** is a compact binary form of JSON.
+
+**First blink:** `./start.sh mspm0l1306 blink` from the top of a clone, once the four tools are installed ([One-command build](#one-command-build), [the tools](#where-these-facts-come-from)). Then: [what each part of the board is for](img/board-tour.png), the CoreMark and timing sources in `bench/coremark/` and `bench/timing/`, and [notes to copy into your own project for your AI assistant](AGENTS.md).
+
+## What is in this folder
+
+<!-- folder-contents -->
+**In this folder:** this README; `AGENTS.md` (notes for an AI assistant, every line from a run); `FAQ.md` (every error hit, with its exact text and the fix). Folders: `bench/coremark/` and `bench/timing/` the CoreMark and timing sources, `color-player/` the color player, `freertos/` FreeRTOS builds, `img/` pictures, `third-party/` third-party benchmark code, `tools/` helper scripts for this board, `zephyr/` Zephyr builds. Results are rows in `data/results/mspm0l1306.csv` at the top of the repository, not in this folder.
+
+**Not in this folder:** TI's SDK, CCStudio, SysConfig and the compilers (you install them; the versions are under "Where these facts come from"); built images (`.out`, `.hex`, `.bin`, `.elf`), which are not cleared for redistribution, so you build them with the command below.
+
+**Taking this folder alone:** the one-command build runs from the top of a clone and the by-hand steps from inside this folder; both call `tools/` and `data/`, and the benchmarks also borrow sources from folders that several boards share. A sparse clone fetches only those, about 10 to 60 MB, instead of the whole repository (about 500 MB):
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git
+cd fox-red-labs
+git sparse-checkout add mspm0l1306 tools data mspm0g3507/mcu-bench third-party/coremark
+```
+
+`docs/` is left out on purpose (236 MB, mostly pictures). Read a page a link points to there with `git show HEAD:docs/<file>`, for example `git show HEAD:docs/vocab.md`.
+
+
+## The board
+
+| Part | Fact | Read from |
+|---|---|---|
+| Chip | MSPM0L1306: Arm Cortex-M0+ at up to 32 MHz from an internal oscillator (no PLL, no crystal needed) | Data sheet |
+| Memory | 64 kB flash, 4 kB RAM, reported by the chip itself; device ID `0x1BB8202F` | Read from the chip |
+| On the chip | One 12-bit ADC, two op-amps, a general-purpose amplifier, a comparator with an 8-bit DAC, hardware CRC, 3 DMA channels, four 16-bit timers, two UARTs, two I2C, one SPI | Data sheet |
+| Not on the chip | No FPU, no divide instruction, no math accelerator, no AES, no random number generator | Data sheet |
+| LEDs and buttons | An RGB LED, a red LED, two buttons | `AGENTS.md` |
+| Sensors | A light sensor (photodiode into op-amp 0) and a thermistor | `AGENTS.md` |
+| Debugger | Onboard XDS110, probe serial <probe serial>, firmware 3.0.0.43; two serial ports, no driver to install | this page, Where these facts come from |
+
+![The LP-MSPM0L1306 with each part numbered: USB and debugger, J101, buttons S1 to S3, header pins, light sensor, thermistor, J16 and J17, the chip and the LEDs](img/board-tour.png)
+
+MSPM0L1306: Arm Cortex-M0+ at up to 32 MHz from an internal oscillator (no PLL, no crystal needed), 64 kB flash, 4 kB RAM, one 12-bit ADC, two op-amps, a general-purpose amplifier, a comparator with an 8-bit DAC, hardware CRC, 3 DMA channels, four 16-bit timers, two UARTs, two I2C, one SPI. No FPU, no divide instruction, no math accelerator, no AES, no random number generator. The LaunchPad adds an RGB LED, a red LED, two buttons, a light sensor (photodiode into op-amp 0) and a thermistor. Read from the chip: device ID `0x1BB8202F`, 64 kB flash and 4 kB RAM reported by the chip itself.
+
+It came with TI's out-of-box demo in flash. It is silent until asked: send it a MessagePack command and it streams the light sensor (339 to 343 counts on this bench) or the thermistor (22.8 °C). How: [FAQ](FAQ.md#the-out-of-box-demo-is-silent-on-the-serial-port-is-it-broken). The original image was saved first and put back at the end: all 64 kB of flash read back identical, and the demo answered over serial.
+
+## Ten-minute path
+
+Quickest: `./start.sh mspm0l1306 blink` from the top of the clone does all of this in one command ([One-command build](#one-command-build)). The steps below do it by hand (measured: build 3.3 s, flash 0.6 s).
+
+1. **Plug in the board (bench).** It shows up as an XDS110 probe with two serial ports; no driver to install. Find its serial from the top of the clone with `python3 tools/frl/frl.py detect`.
+2. **Copy TI's example (terminal).** These steps run from inside this folder. With the tools in Where these facts come from installed (`/Applications/ti/` is where TI's installer puts SDK 2.11.00.07 by default; some installs use `~/ti/`, so change the path if yours differs):
+
+   ```bash
+   cd mspm0l1306
+   cp -R /Applications/ti/mspm0_sdk_2_11_00_07/examples/nortos/LP_MSPM0L1306/driverlib/gpio_toggle_output .
+   ```
+3. **Build it (terminal, 3.3 s).**
+
+   ```bash
+   ../mspm0g3507/mcu-bench/sdk-common/sdkmake.sh gpio_toggle_output/ticlang
+   ```
+4. **Flash it with OpenOCD (terminal, 0.6 s).** `tools/ocd.sh` uses only the probe you name and refuses to run without one. Put your serial from step 1 in place of `<serial>`:
+
+   ```bash
+   PROBE=<serial> tools/ocd.sh "reset halt" "program gpio_toggle_output/ticlang/gpio_toggle_output.out verify" "reset run"
+   ```
+5. **Look at the board (bench).** The RGB LED cycles. OpenOCD prints `Error: checksum mismatch - attempting binary compare` before `** Verified OK **`; that is normal ([FAQ](FAQ.md#openocd-prints-error-checksum-mismatch---attempting-binary-compare-did-the-flash-fail)). TI's UniFlash command line also works, in 15.0 s, with a connection file for your probe serial.
+
+## One-command build
+
+From the top of the clone:
+
+```bash
+./start.sh mspm0l1306 blink
+```
+
+It backs up the board, builds TI's blink, flashes it and checks the LED pattern through the debugger, with no assistant (`docs/frl.md`). It took 1 min 15 s from the command to a confirmed blink once the tools were installed (`data/results/mspm0l1306.csv`, test `time_to_blink`, variant `oneline-terminal-start-sh`). If tools are missing it lists them with their sizes and stops. With several probes plugged in it stops with FRL-E002 and lists their serials; add `--probe <serial>`. It does not run the benchmarks does.
+
+## What was measured
+
+One LP-MSPM0L1306, run from a Mac terminal on 2026-10-06. Rows cite a test name in `data/results/mspm0l1306.csv` or a file.
+
+| What | Number | Conditions | Level | Source |
+|---|---|---|---|---|
+| Chip | 32 MHz, 64 kB flash, 4 kB RAM, 1.68 Msps ADC | Data sheet values | claim | Data sheet |
+| Flash and RAM size, device ID | 64 kB, 4 kB, `0x1BB8202F` | Reported by the chip itself | measured | Read from the chip, 2026-10-06 |
+| Build of TI's blink | 3.3 s | 32 MHz host build, 1 run | measured | `data/results/mspm0l1306.csv`, test `blink_build` |
+| Flash with OpenOCD | 0.6 s | 1 run | measured | `data/results/mspm0l1306.csv`, test `blink_flash` (openocd) |
+| Flash with UniFlash command line | 15.0 s | 1 run, `MSPM0L1306_ML130001.ccxml` | measured | `data/results/mspm0l1306.csv`, test `blink_flash` (uniflash) |
+| Command to confirmed blink, `start.sh` | 75 s | Pin read through the debugger | measured | `data/results/mspm0l1306.csv`, test `time_to_blink` (oneline-terminal-start-sh) |
+| Out-of-box image restored | all 64 kB of flash read back identical; demo answered over serial | Original image saved before the first flash | measured | Readback compare, 2026-10-06 |
+| CoreMark, TI Arm Clang -O3, no operating system | 78.27 per second, 2.446 per MHz (-Os 47.35, -Oz 41.63) | Bare metal, 32 MHz | measured | `data/results/mspm0l1306.csv`, test `coremark` (ticlang-bare-o3, -os, -oz) |
+| CoreMark at 4 MHz (no flash wait state) | 2.631 per MHz; the one wait state at 32 MHz costs 7% | Bare metal, -O3 | measured | `data/results/mspm0l1306.csv`, test `coremark_per_mhz` (ticlang-bare-o3-4mhz) |
+| CoreMark under Zephyr, GCC -O2 with unrolling | 59.70 per second, 1.87 per MHz | Zephyr 4.4.2, 32 MHz | measured | `data/results/mspm0l1306.csv`, test `coremark` (gcc-zephyr-o2unroll); `zephyr/README.md` |
+| Interrupt latency, pend to handler | 25 to 28 cycles bare metal; 119 to 137 through Zephyr | Pend a spare interrupt line | measured | `data/results/mspm0l1306.csv`, test `irq_latency` (bare, zephyr) |
+| GPIO, one register write | 1 cycle | Not checked on a scope | measured | `data/results/mspm0l1306.csv`, test `gpio_toggle` (register) |
+| Internal oscillator | 32.16 MHz, 0.5% fast (data sheet ±1.2%) | Measured on this bench | measured | Measured 2026-10-06 |
+| ADC top rate, TI's example with DMA | 1.45 million samples per second | TI's 8-cycle window | measured | `data/results/mspm0l1306.csv`, test `adc_max_rate` |
+| Room-occupancy neural nets | 500, 2k and 8k parameter models: 20 of 20 test vectors each; the 8k model in 84 to 100 ms | -O3 and -Os builds | measured | `data/results/mspm0l1306.csv`, tests `ai_occ_latency`, `ai_occ_fit` (occ_cnn_8k) |
+| P-256 signature (micro-ecc, assembly) | sign 0.50 s, verify 0.57 s | 32 MHz | measured | `third-party/README.md` |
+| Dhrystone 2.1, rules followed | 0.73 DMIPS/MHz (23.4 DMIPS); 0.88 at 4 MHz | 32 MHz | measured | `data/results/mspm0l1306.csv`, test `dhrystone` |
+| FFT, 256 points, q15, TI's CMSIS-DSP | 2.25 ms; 512 points 5.2 ms | 32 MHz | measured | `data/results/mspm0l1306.csv`, test `fft256` (q15) |
+| FreeRTOS (TI's V11.2.0, no TI example for this chip) | runs; task switch 12 to 16 µs; 11 small tasks fit | Static allocation | measured | `data/results/mspm0l1306.csv`, tests `rtos_task_switch`, `rtos_max_tasks`; `freertos/README.md` |
+| ADC speed against accuracy | 1.99 Msps possible, but a sensor reads 10% low at that speed; TI's default window reads 1.7% low | Thermistor, window of 2 cycles against 8 | measured | Measured 2026-10-06 |
+| UART loop, one jumper wire | every byte right to 4.5 Mbaud and from 6.4 to 10.67 Mbaud; 5 to 6 Mbaud fails, the same dead band as the MSPM0G3507 | Bytes compared after the loop | measured | `data/results/mspm0l1306.csv`, test `uart_max_clean` |
+| Hardware CRC-32 against a lookup table | 10.9 times faster | 1 kB buffer | measured | `data/results/mspm0l1306.csv`, test `crc_speedup`; `third-party/README.md` |
+| TI's SDK examples | 156 of 170 build from a terminal; all 148 that do not write the boot configuration were flashed and run by a script, low-power ones included: none crashed, the debugger never lost the board | MSPM0 SDK 2.11.00.07 | measured | `data/results/mspm0l1306.csv`, tests `examples_built`, `examples_ran_clean` |
+| G3507 and C1104 examples retargeted to this chip | 133 built and ran, none crashed; 17 of the G3507 ones toggled an LED | Device changed in SysConfig | measured | `data/results/mspm0l1306.csv`, test `port_build_rate` |
+
+No current or energy figures were taken in this README's run: TI's EnergyTrace software has no macOS version, and no other meter was on the bench for it. The later EnergyTrace rows are in the CSV.
+
+
+## What fits in 4 kB and what does not
+
+| Program | RAM it needs | Fits? |
+|---|--:|---|
+| TI's blink example | 256 B | yes |
+| Every TI SDK example that builds | up to 3.2 kB | yes |
+| CoreMark (standard 2 kB data), bare metal | 3.9 kB | yes, 144 B spare; the stack reached 2.9 kB |
+| Room-occupancy model, 8k parameters | 2.2 kB plus 548 B of stack | yes |
+| Room-occupancy model, 30k parameters | over 4 kB for its buffers alone | no |
+| FreeRTOS, one-task blink (static allocation) | 1.0 kB | yes, 3.0 kB spare |
+| FreeRTOS with TI's own settings file for this board | 5.4 kB | no |
+| Zephyr hello_world | 3.7 kB | yes, 264 B spare |
+| Zephyr CoreMark (2 kB data) | 4.0 kB | yes, after turning off the C library heap |
+| Zephyr synchronization, logger, shell, philosophers, as shipped | 6.1 to 17.0 kB | no |
+| Zephyr shell (minimal), logger, synchronization, Thread-Metric, trimmed | up to 4.0 kB | yes, all ran; the shell has 48 B left |
+| Embench: 14 of 19 fit and run, 13 pass | | yes |
+| Embench: heatshrink, huffbench, matmult-int, qrduino, sglib-combined | 6.9 to 8.5 kB | no |
+| Embench: wikisort | 4.1 kB of stack in one function | no: it links, then faults at run time |
+
+Flash was never the limit; the largest image, the Zephyr benchmark at its O3 setting, used 54.9 kB of 64 kB (`zephyr/README.md`).
+
+## Compared with the other TI boards on this bench
+
+Measured means run on this board; data sheet means read, not run.
+
+| LP-MSPM0G3507 | LP-EM-CC2340R5 | LP-CC1354P10-1 | LP-MSPM0L1306 |
+|---|---|---|---|---|
+| Core, clock | Cortex-M0+, 80 MHz | Cortex-M0+, 48 MHz | Cortex-M33 with FPU, 48 MHz (data sheet) | Cortex-M0+, 32 MHz |
+| Flash, RAM | 128 kB, 32 kB | 512 kB, 36 kB | 1 MB, 256 kB (data sheet) | 64 kB, 4 kB |
+| Extra hardware | math accelerator, AES, CRC, random numbers | AES (data sheet) | AES, random numbers (data sheet) | CRC, op-amps, comparator |
+| Radio | none | Bluetooth LE, Zigbee; Thread only as a radio co-processor | Sub-1 GHz and 2.4 GHz | none |
+| CoreMark, TI Clang -O3, bare metal | 183.61 (2.30 per MHz; 2.46 at 32 MHz) | 111.09 (2.31) | not measured | 78.27 (2.446) |
+| CoreMark, Zephyr GCC -O2 with unrolling | 139.88 (1.75) | 84.07 (1.75) | no Zephyr support | 59.70 (1.87) |
+| Interrupt latency, bare metal | 29 to 36 cycles | 28 to 29 | not measured | 25 to 28 |
+| Hardware CRC-32 against a table | 13.5 times | not measured | not measured | 10.9 times |
+| Zephyr board in upstream 4.4.2 | yes | yes, no radio | no | no; chip yes, the board file in this repo works |
+| TI SDK examples | 270 (13 Edge AI, TI Drivers, FreeRTOS) | F3 SDK, TI Drivers, FreeRTOS | F2 SDK, not installed here | 170, DriverLib only; FreeRTOS runs with this repo's settings |
+
+The three Cortex-M0+ parts have the same core speed per MHz with the same compiler. The L1306 even needs fewer cycles than the G3507 for the same code (CoreMark 1.87 against 1.75 per MHz under Zephyr; Embench 0.93 times the G3507's cycles), because at 32 MHz its flash adds one wait state and the G3507's adds two at 80 MHz. What separates them is clock, RAM and the extra hardware. The L1306 is the cheapest by far and the one where every program has to be sized for RAM first. Sources: the other boards' rows in `data/results/`, the CC1354P10 page `../cc1354p10/README.md`, and ti.com for prices.
+
+## Moving code to and from it
+
+- **Plain C moves.** CoreMark, Embench, micro-ecc, jsmn and the occupancy models built and ran with board code only (clock, UART pins, stack size). The prebuilt model libraries made for the G3507 ran unchanged and gave the same answers on all 20 test vectors; the Zephyr benchmark's neural-net checksums match the G3507's and the CC2340R5's.
+- **TI's own examples move up easily and down badly.** Changing only the device in SysConfig: 101 of 170 L1306 examples build for the G3507, but only 22 of 270 G3507 examples build for the L1306. The single biggest blocker is one G-series SysConfig setting (`SYSCTL.forceDefaultClkConfig`) that the L1306 does not have; SysConfig's command line stops on it. Dropping every line SysConfig rejects gets 96 of 270 to build, and 13 of those silently lose a real setting, such as the ADC's DMA trigger. All 133 ported images that built ran on the board with no crash, but running is not the same as working. A C1104 blink moved this way still toggles the C1104 kit's LED pin, PA22, which on this board is wired to the light sensor; and dropped settings change behavior.
+- **One TI example ported by hand.** The G3507's internal temperature example needs four SysConfig lines changed and no C changes. SysConfig picks the software IQmath library by itself.
+- **Interrupt lines are a trap.** This chip's interrupt controller implements only the 13 lines that have a peripheral; pending any other line does nothing, silently. Code that borrows an unused line on the G3507 (the test used line 28) breaks here.
+
+## Problems found
+
+Each one is in the [FAQ](FAQ.md) with the fix.
+
+- The internal temperature sensor reads -165 °C with this chip's factory calibration. **Tag: Unknown (suspected: wrong factory trim).** A TI forum answer says early samples carry a wrong trim.
+- CCStudio 21.0.1's notes for AI agents (`ai/boards/LP-MSPM0L1306/AGENTS.md`) list the package as LQFP-32, the BoosterPack header pins as differing from the LaunchPad user guide's figure, and ADC channels 7 and 8 on PA19 and PA18. The user guide (SLAU869E) and data sheet (SLASEX0D) give VQFN-32 (RHB) and PA18 and PA16. Take pin and channel numbers from the user guide's BoosterPack figure.
+- The out-of-box demo's GUI needs a request to TI sales; the demo's serial protocol is only in its source. **Tag: Tool or docs.**
+- Zephyr: the GPIO driver does not compile for this chip (`'IOMUX_PINCM38' undeclared`) and there is no pin-mux file. **Tag: Third-party behavior.**
+- Zephyr: every program that filled RAM stopped at `***** HARD FAULT *****` during boot, because the C library heap defaults to all RAM left over. **Tag: Third-party behavior.**
+- The 30k-parameter model fails to link on RAM (`program will not fit into available memory`). **Tag: Unknown (suspected: Chip limit).**
+- 14 of 170 SDK examples do not build from a terminal: no makefile, a TI build-server path, or `symbol "interruptVectors" redefined`. **Tag: Tool or docs.**
+- Embench `st` fails its own check, as on the G3507. **Tag: Third-party behavior.**
+- A SysConfig clock line is ignored without a warning when the clock tree is on. **Tag: Tool or docs.**
+
+## If you see this
+
+- If you see `wrong # args: should be "error message ?stacktrace?"` after `mspm0_mass_erase`, ignore it and load an image with DSLite or OpenOCD: the script's reset helper throws after the erase has happened.
+- If you see `DAP Connection Error. This could be caused by the device having gone to low power mode.`, the image entered SHUTDOWN right after boot. Hold S1 (PA18), press and release S3, keep S1 held 2 more seconds, then flash a non-sleeping image at once and replug USB.
+- If you see `error: 'IOMUX_PINCM38' undeclared here (not in a function)` building Zephyr, build with the out-of-tree board in `zephyr/` (`-DBOARD_ROOT`): Zephyr 4.4.2's GPIO driver has the 80-pin MSPM0L222x pin table.
+
+The rest, each with cause and fix, are in [FAQ.md](FAQ.md).
+
+## Where these facts come from
+
+Checked 2026-10-06 on an Intel Mac, macOS 15.7.9: MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS (from CCStudio 21.0.1), SysConfig 1.26.3, xPack OpenOCD 0.12.0+dev, UniFlash 9.6.0, Zephyr 4.4.2 with GCC 12.2.0. One LP-MSPM0L1306, onboard XDS110 probe serial <probe serial>, firmware 3.0.0.43, powered and flashed over its USB cable. No jumper or wire was changed, except the one jumper wire of the UART loop test.
+
+Files: `data/results/mspm0l1306.csv`, `AGENTS.md`, `FAQ.md`.
+
+==============================================================================
+FILE: mspm0l1306/FAQ.md | TI LP-MSPM0L1306 LaunchPad on a Mac: errors and fixes
+==============================================================================
+
+# TI LP-MSPM0L1306 LaunchPad on a Mac: errors and fixes
+
+Every problem hit bringing up the TI LP-MSPM0L1306 LaunchPad (MSPM0L1306 chip: Arm Cortex-M0+, 32 MHz, 64 kB flash, 4 kB RAM; onboard XDS110 probe) from a Mac terminal on 2026-10-06 and 2026-10-07. Each answer starts with the fix, names what caused it, and quotes the exact error text so a search finds it. Versions: Intel Mac, macOS 15.7.9, MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, SysConfig 1.26.3, UniFlash 9.6.0, xPack OpenOCD 0.12.0+dev, Zephyr 4.4.2 with GCC 12.2.0.
+
+**What caused it**, one tag per answer:
+
+| Tag | Meaning |
+|---|---|
+| Our mistake | A mistake in this repo's runs. Listed so you do not repeat it |
+| Setup or handling | How the hardware was plugged in or set up |
+| TI example default | A TI example's default works on TI's bench but not for this job |
+| Tool or docs | A TI tool bug, a missing tool, or a missing or wrong instruction |
+| Chip limit | The silicon cannot do it, usually RAM |
+| Third-party behavior | Upstream Zephyr, OpenOCD, macOS or open-source code, not TI |
+| Unknown | Not found |
+
+Contents: [Setting up CCStudio and the AI on a Mac](#setting-up-ccstudio-and-the-ai-on-a-mac), [Connecting and flashing](#connecting-and-flashing), [Memory](#memory), [Analog and sensors](#analog-and-sensors), [Zephyr](#zephyr), [Building and moving code](#building-and-moving-code), [DriverLib, TI Drivers and Zephyr](#driverlib-ti-drivers-and-zephyr).
+
+Words used below (more in [docs/vocab.md](../docs/vocab.md)): the **probe** is the XDS110 debugger built into the LaunchPad; it shows up on the Mac as two serial ports, `/dev/cu.usbmodem<serial>1` (the board's UART) and `...4`. **OpenOCD** is an open-source flashing and debug tool. **NONMAIN** is the chip's boot configuration area at 0x41C00000. 1 kB = 1,024 bytes.
+
+## The one-command route (`./start.sh` and `tools/frl`)
+
+Checked on 2026-10-14 on an Intel Mac with this board, MSPM0 SDK 2.11.00.07, SysConfig 1.26.3, TI Arm Clang 5.1.1.LTS and xPack OpenOCD 0.12.0-7. The route itself is in [docs/frl.md](../docs/frl.md); every code is in [docs/frl-errors.md](../docs/frl-errors.md).
+
+### Do I need an AI account or CCStudio to blink a pattern on the LP-MSPM0L1306?
+
+No. `./start.sh mspm0l1306 blink --probe <serial> --pattern 150,150,150,900` builds, flashes and checks it with TI's SDK, SysConfig, compiler and xPack OpenOCD, no assistant and no CCStudio window; about 13 s of machine time on this bench. An assistant is optional (`--assistant claude` or `codex`). **Tag: Setup or handling.**
+
+### `./start.sh` says "FRL-E001 REFUSED: no XDS110 debug probe found on USB". The board's light is on. Why?
+
+The cable is most likely charge-only, or it is in the wrong connector. Use a USB data cable in the connector on the top half of the board (the XDS110 debugger), straight into the computer. **Tag: Setup or handling.**
+
+### It says "FRL-E002 REFUSED: 2 probes on USB". Which one is my board?
+
+Run `python3 tools/frl/frl.py detect`, unplug the other board, run it again: the serial that stays is this board. Pass it with `--probe`. The tool never picks one by order. **Tag: Setup or handling.**
+
+### It says "FRL-E004 ... could not be opened; another program (CCStudio, UniFlash or another OpenOCD) may hold it". What do I close?
+
+CCStudio's or UniFlash's debug connection on this board, or another terminal still running OpenOCD. If the message names another frl run instead ("in use by ... run ..."), wait for it to finish. The tool never stops them itself. **Tag: Setup or handling.**
+
+### It says "FRL-E006 FAILED: OpenOCD could not attach to the board" with "DAP Connection Error. This could be caused by the device having gone to low power mode." What now?
+
+The program on the chip sleeps right after starting. Hold S1 (PA18), press and release S3 (reset), keep S1 held 2 more seconds, then at once run `./start.sh` again, which flashes the blink program; unplug and replug USB afterwards. If there is no low-power line, check all nine J101 jumpers are on. **Tag: Setup or handling.**
+
+### It says "FRL-E021 REFUSED: sysconfig 1.28.0 installed; this route was validated with 1.26.3". Must I install another SysConfig?
+
+Either install 1.26.3, or keep yours and name it: `export FRL_SYSCONFIG=/Applications/ti/sysconfig_1.28.0`. The run is then recorded as unvalidated. The same code with "has no target/ti_mspm0.cfg" means the OpenOCD found is too old (Homebrew's 0.12.0): install xPack OpenOCD 0.12.0-7. **Tag: Tool or docs.**
+
+### It says "FRL-E070 REFUSED: the project folder ... has a space in its path". Why can't it build there?
+
+TI's example makefile passes generated option files unquoted, so a space splits the path (`tiarmclang: error: no such file or directory: '@é/ticlang/device.opt'` for a folder named `my blink é`). Set `FRL_PROJECTS` to a folder with no spaces. The same code also refuses a pattern outside the limits: each time 50 to 5,000 ms, at most 8 on/off pairs, one cycle at most 6 s. **Tag: Tool or docs.**
+
+### It says "FRL-E040 FAILED: LED2 red (PA26) does not follow the asked pattern". The build and flash passed. What is on the board?
+
+Suspected: another program than the one just built, for example because the flash step did not run or a different board was flashed. The message says what the LED did. Run the same `./start.sh` command again; it rebuilds, flashes and checks. TI's unchanged blink shows "on 498, off 497" here. **Tag: Unknown.**
+
+### `./start.sh mspm0l1306 print-a-message` says "FRL-E040 FAILED: nothing arrived on /dev/cu.usbmodem...1". Why is the port silent?
+
+J16 and J17 are probably on BP (left), which sends the UART to the header pins instead of the USB port. Move both to XDS (right, as shipped) and run the command again. Another program holding the serial port (a terminal, CCStudio's serial view) can also take the bytes first. **Tag: Setup or handling.**
+
+### Can Codex, the ChatGPT app or Claude Code flash my LP-MSPM0L1306 for me?
+
+Yes, from the computer the board is plugged into, through the same local tool. The Codex command-line tool that comes inside the ChatGPT app backed up, built, flashed and checked the board in 56 s; Claude Code did the same through `./start.sh --assistant claude` in 92 s, and the check passed both times. Nobody has done it from an app's own chat window; docs/frl-desktop-apps.md has the setup. **Tag: Setup or handling.**
+
+### Does the route work on Linux?
+
+Building does: in an Ubuntu 24.04 x86_64 container, emulated on an Apple Silicon Mac, with TI's Linux installers for TI Arm Clang 5.1.1.LTS and SysConfig 1.28.1 (no login) and the MSPM0 SDK copied from a Mac (its download needs a myTI login), `frl build` made the image in 3.9 s, and that image passed the check on this board. SysConfig 1.28.1 is not the tested 1.26.3, so set `FRL_SYSCONFIG` and the run is recorded as unvalidated. Flashing from Linux is untested (no board on that computer). **Tag: Tool or docs.**
+
+### Do I have to pass `--probe` with only one board plugged in?
+
+No: with exactly one XDS110 on USB the tool uses it. With two or more it stops (`FRL-E002`) until you name one. The single-board case passed this repo's tests with simulated hardware; every run on the real bench had several boards and named the probe. **Tag: Setup or handling.**
+
+### `print-a-message` refuses my text with "FRL-E070 REFUSED: use plain letters, digits, spaces and punctuation, without quotes or backslashes". What may the message contain?
+
+1 to 40 plain characters: letters, digits, spaces and punctuation, but no quotes or backslashes, because the text goes into a C string in TI's example. **Tag: Tool or docs.**
+
+### On Windows, `print-a-message` ends "not verified". Did it work?
+
+Maybe: the tool does not look for the serial port on Windows (`FRL-E042 ... could not find the serial port ... on this OS (untested here)`). Open the board's first USB serial port at 115200 baud in a terminal program and look for your message. **Tag: Tool or docs.**
+
+### How do I share what went wrong without sharing my computer's details?
+
+Run `python3 tools/frl/frl.py status --report`. It prints the last run's summary with your home folder, user and computer name and IP addresses removed, and the probe serial shortened to its last two characters. Read it before you paste it anywhere; the tool sends nothing. **Tag: Setup or handling.**
+
+### A desktop app's `frl_verify` or `frl_flash` call fails asking for `probe`. Why, with one board plugged in?
+
+The tools that read or write a board through an app (`frl_backup`, `frl_verify`, `frl_verify_image`, `frl_flash`, `frl_restore`) always need the probe serial named, so an app never picks a board on its own. Call `frl_detect` first and pass the serial it lists. **Tag: Tool or docs.**
+
+### How do I put TI's out-of-box demo back after using `./start.sh`?
+
+`python3 tools/frl/frl.py restore "<first backup folder>" --probe <serial>`. The first backup holds the demo the board shipped with; later runs back up whatever was on the board then. Restore writes main flash, reads it back and compares; it ran five times on this bench, each with a match. **Tag: Setup or handling.**
+
+### Does the route work on an Apple Silicon Mac?
+
+Building does: on an Apple Silicon Mac (macOS 26.3) with TI Arm Clang 5.1.1.LTS for arm64, SysConfig 1.28.1 (it runs under Rosetta) and xPack OpenOCD for arm64, `frl build` made the image in 14.7 s, and that image passed the check on this board. Flashing from an Apple Silicon Mac is untested, and SysConfig 1.28.1 is not the tested 1.26.3, so set `FRL_SYSCONFIG` and the run is recorded as unvalidated. **Tag: Tool or docs.**
+
+### Codex says "MCP tool call requires approval, but approval policy is never". Is the tool broken?
+
+No. Codex refuses tools that write the board when it cannot ask you. Run it interactively, or approve the one tool for that run (`-c 'mcp_servers.frl.tools.frl_flash.approval_mode="approve"'`). If Codex sits at "Reading additional input from stdin...", start it with `< /dev/null`. Details: docs/frl-desktop-apps.md. **Tag: Setup or handling.**
+
+### A desktop app's `frl_host` reports a Linux VM or 0 probes. Can it reach the board?
+
+No: that app runs the tool somewhere without your USB devices (a cloud run or a VM). Run `./start.sh` in a terminal on the computer with the board, and use the app to read and explain. **Tag: Setup or handling.**
+
+### It says "FRL-E020 REFUSED: ... missing: mspm0_sdk not found; sysconfig not found; ...". What do I install?
+
+Run `python3 tools/frl/frl.py doctor --board mspm0l1306`: it lists every missing tool with its download link and size (MSPM0 SDK 2.11.00.07, SysConfig 1.26.3, TI Arm Clang 5.1.1.LTS, xPack OpenOCD 0.12.0-7). Install them, or point to copies elsewhere with `FRL_MSPM0_SDK`, `FRL_SYSCONFIG`, `FRL_TICLANG` or `FRL_OPENOCD`. Have about 12 GB free if the compiler comes with CCStudio. **Tag: Setup or handling.**
+
+### macOS refuses to open the xPack OpenOCD because it was downloaded from the internet. How do I run it?
+
+Clear the download flag once: `xattr -dr com.apple.quarantine ~/xpack-openocd-0.12.0-7`. The exact wording of macOS's warning differs between versions; it did not appear on the Mac used here, where OpenOCD came with the Zephyr toolchain. **Tag: Setup or handling.**
+
+### Claude Desktop cannot connect to the Fox Red Labs extension; its log says "Couldn't start for Cowork and Code sessions. Error: Connection closed". What do I do?
+
+Open the extension's log, `~/Library/Logs/Claude/mcp-server-Fox Red Labs host check.log` on a Mac (on Windows: not run): the lines under that error say why the server stopped. Check that `python3 --version` prints 3.9 or later, then remove the extension and install the newest `.mcpb` (`python3 tools/frl/cowork/build_mcpb.py <folder>` builds it). **Tag: Unknown.** The current build asks for no folder and should start. If it still fails this way, include the log's last lines in a report. Details: docs/frl-desktop-apps.md.
+
+### `make` or `python3` is not found on my Mac. What do I install?
+
+Apple's command line tools: `xcode-select --install`. They bring `make` and Python 3.9, which the route needs. **Tag: Setup or handling.**
+
+### A desktop app lists no frl tools. What is wrong?
+
+The app cannot start the server. Its log says why: on a Mac, `~/Library/Logs/Claude/mcp-server-<extension name>.log` for Claude Desktop. Check `python3 --version` prints 3.9 or later, and reinstall the newest extension; the current ones carry the tool and ask no questions. **Tag: Setup or handling.**
+
+### The assistant says it is done, but the check failed. Which do I believe?
+
+The check. It read the board; the assistant's words did not. The message says what the LED did, and `python3 tools/frl/frl.py status --handoff` gives a summary to continue from. **Tag: Setup or handling.**
+
+### Can Claude's Cowork reach my board?
+
+Anthropic's Cowork architecture page says local MCP servers do not run in cloud runs. Install the read-only `frl-hostcheck.mcpb` first (`python3 tools/frl/cowork/build_mcpb.py <folder>` builds it) and ask a new Cowork run to call `frl_host`; if it reports this computer and your probe count, the board tools can work there. **Tag: Setup or handling.**
+
+## Connecting and flashing
+
+### OpenOCD says "Could not find MEM-AP to control the core" and DSLite says "Peripheral mis-configuration (e.g improper watchdog or clock)". The chip resets itself in a loop. How do I get back in?
+
+Mass-erase it through the debug mailbox, which works while the core is unreachable. **Tag: Setup or handling.** Cause: a window-watchdog example that refreshed the watchdog inside the closed window, and the chip reset every few milliseconds from the first boot. The command that recovered it, with xPack OpenOCD 0.12.0-7: `openocd -f interface/xds110.cfg -c "adapter serial ML130001" -f target/ti_mspm0.cfg -c "mspm0x.cpu configure -defer-examine" -c init -c mspm0_mass_erase -c shutdown`. The script then throws `wrong # args: should be "error message ?stacktrace?"` from its reset helper; the erase has already happened and the next DSLite load works. Without a terminal: hold S1 while pressing S3 to enter the bootloader. The port that hit it is `ports/cms32/README.md`.
+
+### Will a low-power example knock the LP-MSPM0L1306 off the debugger, as it did the MSPM0G3507?
+
+Not in the runs made here. **Tag: Unknown.** All 13 of TI's low-power, watchdog and flash-protection examples for this board (12 STOP, STANDBY, SHUTDOWN and watchdog examples plus `flashctl_dynamic_memory_protection`), and 9 more whose SysConfig selects STOP or STANDBY, were flashed and run by a script, and the debugger reconnected every time. On the LP-MSPM0G3507 the same script lost the board twice and needed a USB replug. Each run started with a system reset that keeps the debugger attached, which may stop the chip from fully entering the deep modes; no meter was available to check. If you lose the board, unplug and replug its USB cable.
+
+### What is the quickest way to flash the LP-MSPM0L1306 from a Mac terminal?
+
+OpenOCD with its MSPM0 script, choosing the probe by serial number: a 440-byte blink took 0.6 seconds to program and verify. **Tag: Tool or docs.** No TI command-line tool writes the connection file its own flasher needs. TI's own command-line flasher (UniFlash's `dslite.sh`) also works but took 15.0 seconds for the same image, and it needs a connection file (`.ccxml`) that no TI command-line tool writes; the file used here is the G3507 file with two names changed (`MSPM0L1306_ML130001.ccxml`). The OpenOCD wrapper is `tools/ocd.sh`.
+
+### OpenOCD prints "Error: checksum mismatch - attempting binary compare". Did the flash fail?
+
+No. The next line, `** Verified OK **`, is the real result. **Tag: Third-party behavior.** OpenOCD's quick checksum check fails on every MSPM0 image flashed here, on this board and the LP-MSPM0G3507, and it falls back to reading the image back, which passes.
+
+### OpenOCD says "Unable to reset target", then every connection fails with "Could not find MEM-AP to control the core". Is the chip dead?
+
+No. With main flash blank, the chip's boot ROM keeps the debugger off the CPU after a reset. Connect, run TI's `mspm0_mass_erase` (it halts the CPU), then `flash write_image erase <file> 0x0 bin` with no reset, then `mspm0_board_reset`. **Tag: Our mistake.** Cause: on an MSPM0G3507, all of main flash was erased before OpenOCD's `program`, which resets first; `program` erases what it needs on its own. `mspm0_mass_erase` erases main flash only, not the boot configuration.
+
+### Why does my program restart every time I connect the debugger?
+
+OpenOCD's `init` resets the MSPM0 target, so each new connection starts the program again; the serial port shows the boot text twice. **Tag: Third-party behavior.** Read results in the same OpenOCD connection that started the program, or leave the program alone and use the serial port.
+
+### The board came with a program on it. What is it, and can I get it back?
+
+It is TI's out-of-box demo (`examples/nortos/LP_MSPM0L1306/demos/out_of_box`), built with an older toolchain than today's SDK: 9.5 kB, against 9.6 kB from SDK 2.11. **Tag: Setup or handling.** Save it before you flash anything: `tools/ocd.sh "dump_image flash-as-received.bin 0x0 0x10000"`. The copy from this board is in `data/out-of-box-as-received.bin` and restores with `tools/ocd.sh "reset halt" "program data/out-of-box-as-received.bin 0x0 verify" "reset run"`.
+
+### The out-of-box demo is silent on the serial port. Is it broken?
+
+No. It answers commands and sends nothing until asked. Send a MessagePack map ending in a newline, at 115200 baud, for example the bytes `81 AB 6C 69 67 68 74 45 6E 61 62 6C 65 C3 0A` (`{"lightEnable": true}`). It then streams `lsADC` light readings; `{"thermEnable": true}` streams `thADC`, the board temperature in degrees Celsius times 32. **Tag: Tool or docs.** The README points to a GUI and says "Please contact your local sales representative or TI support team to request access to the GUI." The message format is only in the source (`MSP_GUI/GUI_mpack.c`). Without the newline the demo ignores the message.
+
+## Memory
+
+### Why does my program print garbage at the end, or fault, on a 4 kB chip?
+
+Check the stack size. TI's examples for this chip reserve 256 bytes of stack, and `printf("%f")` alone needs more than 400. **Tag: TI example default.** The CoreMark build passed its own checks while its final `printf` ran 148 bytes past a 2.8 kB stack and overwrote the end of the result text, with no fault. The chip has no memory protection unit, so nothing stops an overflow. Fill RAM with a pattern before running and look for the lowest overwritten word (`tools/paintrun.sh`), and set the stack in the linker file (`--stack_size`).
+
+### Embench's wikisort builds for this chip and then never finishes. Why?
+
+Its main function reserves 4.1 kB of stack in one instruction, more than the chip's 4 kB of RAM. **Tag: Chip limit.** That is the benchmark as written, at -O2 and -Os. The stack pointer lands below RAM (0x1FFFFEE0) and the first write faults into the default handler. The linker cannot see this; only a run does. `third-party/README.md`.
+
+### Which of the room-occupancy neural nets fit?
+
+The 500, 2k and 8k parameter models run, 20 of 20 test vectors each, the 8k one in 84 to 100 ms at 32 MHz. The 30k model does not link: `program will not fit into available memory` for `.bss`. **Tag: Unknown (suspected: Chip limit).** Its buffers alone need more than 4 kB as generated; reusing buffers between layers was not run.
+
+## Analog and sensors
+
+### Why does the internal temperature sensor read about -165 °C?
+
+The factory calibration word on the chip tested (`TEMP_SENSE0` at 0x41C4003C, 369) does not match its sensor. With the typical value from TI's manual instead, the same reading gives about 21.7 °C, and the board's thermistor read 22.8 °C. **Tag: Unknown (suspected: wrong factory trim).** A public TI forum thread (E2E 1311550) reports the same impossible result on LP-MSPM0L1306 boards, and TI's answer there is that early samples carry a wrong temperature trim. Whether this chip is an early sample is not confirmed. Use the onboard thermistor (PA15, ADC channel 9) or calibrate against a known temperature.
+
+### Is there an internal temperature sensor example for the L1306?
+
+No. Only the G-series has one (`adc12_internal_temp_sensor_mathacl`), and it uses the G-series math accelerator. **Tag: Tool or docs.** It ports with four SysConfig changes and no C changes: device and package lines, board line, `genLibIQVersion` from `MATHACL` to `RTS`, and remove `SYSCTL.forceDefaultClkConfig`.
+
+### Why does TI's "max frequency" ADC example reach 1.45 million samples per second when the data sheet says 1.68?
+
+Its 8-cycle sample window sets the rate. With 4 cycles it does 1.77 million and with 2 cycles 1.99 million, but on the board's thermistor every shorter window reads lower: 1.7% low at TI's 8 cycles, 5.3% at 4, 9.9% at 2, against a 64-cycle reading. **Tag: Unknown (suspected: Chip limit).** The input must settle onto the sampling capacitor; the sensor's source impedance was not measured and no buffered input was tried. Use a longer window for sensors, or buffer the input with an op-amp..
+
+### I changed the clock in SysConfig and nothing changed. Why?
+
+If the file has `SYSCTL.clockTreeEn = true`, the clock tree setting wins: `system.clockTree["SYSOSC"].frequencySelect = 4` sets 4 MHz, and `SYSCTL.SYSOSC_Freq = 4000000` alone is ignored with no warning. **Tag: Tool or docs.** After any clock change, read `CPUCLK_FREQ` in the generated `ti_msp_dl_config.h`.
+
+### Why does my UART return garbage at 5 to 6 Mbaud on the LP-MSPM0L1306?
+
+The UART fails between 5 and 6 Mbaud at 32 MHz with TI's DriverLib baud setup and works on both sides of that band; other clocks were not tested. In a loop test (PA8 wired to PA9, 2 kB of random bytes per speed, 2026-10-06) every byte came back right from 9,600 baud to 4.5 Mbaud and from 6.4 to 10.67 Mbaud; 5 Mbaud got 38 right, 5.33 Mbaud 1 to 5, 5.5 Mbaud 178, 6 Mbaud 94%, with framing, break and overrun flags (`RXDATA` bits `0x100`, `0x400`, `0x800`). The LP-MSPM0G3507 gives nearly the same counts. At 12 Mbaud DriverLib sets a divisor of 0 and nothing is sent, with no error. **Tag: Unknown (suspected: Tool or docs).** Neither chip's errata (SLAZ742H, SLAZ741D) lists it, and the UART block was not separated from DriverLib's setup. Stay at or below 4.5 Mbaud, or test your exact speed first. Detail: `data/results/mspm0l1306.csv`.
+
+### I wired PA8 to PA9 for the UART loop and nothing comes back. Why?
+
+Move jumpers J16 and J17 to the BP side (left) first, then wire J1 pin 4 (PA8) to J1 pin 3 (PA9). **Tag: Tool or docs.** Out of the box those two jumpers route the chip's UART to the debugger's USB serial port, so a wire on the header connects to nothing; TI's loopback example README does not mention them. Move them back to XDS (right) afterwards or the board's serial window stays silent.
+
+## Zephyr
+
+### Does Zephyr support the LP-MSPM0L1306?
+
+Zephyr 4.4.2 has the chip but no board for this LaunchPad. The out-of-tree board in this repo (`zephyr/boards/ti/lp_mspm0l1306/`) runs hello_world and blinky. **Tag: Third-party behavior.** Zephyr's own GPIO driver does not compile for this chip and there is no pin-mux file for the MSPM0L130x family; both are worked around in the board folder. `zephyr/README.md`.
+
+### Zephyr's blinky fails with "error: 'IOMUX_PINCM38' undeclared here (not in a function)". Why?
+
+Zephyr 4.4.2's MSPM0 GPIO driver has the pin table of the 80-pin MSPM0L222x, and this 32-pin chip has no `IOMUX_PINCM38` to `PINCM74`. **Tag: Third-party behavior.** Use the corrected copy of the driver in this repo's board folder (`zephyr/boards/ti/lp_mspm0l1306/`), which keeps only the pins this chip has.
+
+### Every Zephyr program that fills RAM stops at boot with "***** HARD FAULT *****". Why?
+
+Set `CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=0` if the program does not call `malloc`. **Tag: Third-party behavior.** Zephyr's C library heap defaults to all RAM left after the program. With 8 to 16 bytes left, setting up the heap writes past the end of RAM: the fault address was in `sys_heap_init`, called from `malloc_prepare`. Nothing warns at build time.
+
+### My interrupt test works on the MSPM0G3507 but the handler never runs on the L1306. Why?
+
+Use an interrupt line that has a peripheral on this chip. **Tag: Chip limit.** The L1306 implements only lines 0, 1, 2, 4, 9, 13, 15, 16, 18, 20, 24, 25 and 31 (the enable register reads back `0x8315a217` after writing all ones). Pending any other line does nothing, and neither CMSIS nor Zephyr's `IRQ_CONNECT` complains. The test had borrowed line 28, which is AES on the G3507; line 25 (I2C1, unused) works.
+
+### Why does a Zephyr "-O3" build run at -O2?
+
+Put the optimisation flag on the file itself with a per-file compile option. **Tag: Third-party behavior.** Zephyr adds its own `-O2` after the application's flags, and GCC uses the last one, so a project-wide `-O3` is overridden (and loop unrolling stays on). `zephyr/README.md` shows the per-file option.
+
+### Why does a Zephyr sample fail with "region `RAM' overflowed"?
+
+As shipped, most do: synchronization needs 6.1 kB, logger 8 kB, shell_module 12.5 kB and philosophers 17 kB, mostly in stacks (Zephyr's interrupt stack alone defaults to 2 kB). **Tag: Third-party behavior.** That is Zephyr's sample defaults, not the chip: with stacks and buffers cut, the shell (minimal setting, 48 bytes left), the logger in both modes, synchronization and all eight Thread-Metric tests ran on the board. philosophers was not run. The exact settings are in `zephyr/extra/README.md`.
+
+## Building and moving code
+
+### Do Cmsemicon's CMS32F04x example programs run on the LP-MSPM0L1306?
+
+34 of the 53 variants in Cmsemicon's Keil pack build and ran on this board on 2026-10-07, 29 with their `main.c` unchanged, through a glue layer of 845 lines of C that implements Cmsemicon's function names on DriverLib. Of the 19 not built, 7 need CAN, a segment LCD, USB fast charge or a clock monitor the L1306 does not have. **Tag: Chip limit.** The other 12 are I2C and SPI examples that need a second device on the bench. **Tag: Setup or handling.** Two more things to know: the temperature-sensor example prints a wrong temperature because the glue's trim constants are placeholders, and the flash example's 512-byte pages land on the L1306's 1 kB sectors, so two of its erases wipe a neighbour it just wrote (both **Tag: Setup or handling**, detail on the port page). Detail and the per-example record: `ports/cms32/README.md`.
+
+### My ported example's LED never blinks, but the same code blinks at -O0. Why?
+
+The example polls a plain global (`extern uint32_t g_ticks`) that an interrupt decrements, without `volatile`, so at -O2 the compiler turns the wait into an endless branch. **Tag: Third-party behavior.** Cmsemicon's Keil projects build at optimization level 0, which hides it. Build that file at -O0, or add `volatile`. Seen with TI Arm Clang 5.1.1 on 2026-10-07, `ports/cms32/README.md`.
+
+### Some SDK examples for the L1306 will not build from the terminal. Which, and why?
+
+14 of 170. **Tag: Tool or docs.** 9 have no makefile (CCStudio project only), 2 have a path from TI's build server in their makefile (`/home/developer/.cache/bazel/...`: `dali_led_demo`, `drv8329aevm_gui_firmware`), and the three `bsl_software_invoke_app_demo_*` stop at link with `symbol "interruptVectors" redefined`. None fails to compile.
+
+### I moved an MSPM0C1104 example to the L1306 by changing the device in SysConfig. It runs, but the LED does not blink. Why?
+
+It is blinking a pin with no LED. Unlock the pin assignments, or set the LED pin by hand (PA0 red, PA26, PA13 and PA27 for the RGB LED). **Tag: Tool or docs.** Changing the device keeps the old board's pins: the ported `gpio_toggle_output` toggled PA22 and PA2, the C1104 kit's LED and test pins, and on this board PA22 is the light sensor's amplifier output. SysConfig gives no warning. With the assignments removed it picked PA0, the red LED.
+
+### Does FreeRTOS run on the LP-MSPM0L1306? TI's settings file will not link
+
+Yes, with static allocation and smaller stacks: a one-task blink uses 1 kB of RAM, 11 small tasks fit, and a task switch takes 12 to 16 microseconds. **Tag: TI example default.** TI ships no FreeRTOS example for this chip, and its `kernel/freertos/builds/LP_MSPM0L1306/release/FreeRTOSConfig.h` sets a 3 kB heap and 512-byte task stacks, which needs 5.4 kB of zero-filled RAM on a 4 kB chip. Settings and build: `freertos/README.md`.
+
+### Why is there no Trace or EnergyTrace item in CCStudio 21 on my Mac? Can I measure current on the LP-MSPM0L1306 from a Mac?
+
+Not in CCStudio 21.0.1 as installed. Two functions in the IDE's own code return "not supported" on macOS (the comment says "not supported on Mac OS, only windows and linux"), so the Run, Trace menu is hidden. **Tag: Tool or docs.** Behind that switch, TI's Mac trace server library fails to load with `Library not loaded: @rpath/libti_logger.dylib` (it ships with a build-server path and a Linux-style search path) and the capture library, loaded on its own, with `Library not loaded: @rpath/libxdsfast3.dylib`. **Unknown (suspected: Tool or docs).** It cannot see the probe driver folder by itself; the debugger may load it differently. With the switch removed and three library paths corrected in copies placed in a mirror of the install tree (the install itself was not changed), the three libraries tested (`libCloudTrace`, `libenergytraceccs`, `libTraceFactory`) load; the other 72 in that folder were not tested. The IDE path then dies anyway: the Mac DSLite answers `Unknown sub module: "trace"`. **Tag: Tool or docs.** So the capture runs without the IDE: `tools/energytrace/etcap.py` talks to the probe through CCStudio's XDS110 driver library and gives the numbers in `data/results/mspm0l1306.csv`. Apple silicon was not tested (the files checked are Intel builds). TI's command-line capture tool `stune` is documented for Windows only and is not in the Mac install. Two more libraries in `ccs_base/common/bin` carry the same Linux-style search path, and the five files checked (the three patched libraries, DSLite and the app) are not code-signed, so the patch is expected not to trip macOS library validation. TI's answer on E2E is CCStudio 12.8, whose last supported macOS is Ventura (TI staff, E2E thread 1579854), and TI's tracker entry EXT_EP-12168 (open since 2025-01) gives "Use CCS 12.x" as the workaround. To measure today: `python3 tools/energytrace/etcap.py --serial ML130001 --seconds 20 --csv out.csv`, or a meter across the J101 3V3 jumper (user's guide section 2.6). Detail and the patch: `docs/experiments/2026-10-06-mac-energytrace-ccstudio.md`.
+
+### My sleep-current reading never drops below about 2.6 mA, whatever power mode I set. Why?
+
+A debugger has been attached since the last power-on reset. The debug subsystem stays enabled until a power-on reset, and while it is enabled the chip stays in SLEEP0 whatever policy the code sets. **Tag: Setup or handling.** Make the program check the reset cause on boot and trigger one software power-on reset (the deep-sleep test image does), or unplug and replug the board. After that OpenOCD cannot reach the sleeping chip ("Debug AP not available"); DSLite can: `DSLite flash -c mspm0l1306/MSPM0L1306_ML130001.ccxml -f -v <file.out>`. Numbers:
+
+### After flashing a SHUTDOWN test, nothing can connect: "DAP Connection Error. This could be caused by the device having gone to low power mode." Is the board bricked?
+
+No, but it is locked out. A program that enters SHUTDOWN right after boot runs back into it on every reset, before any debugger can attach. **Tag: Our mistake.** OpenOCD's mailbox mass erase did not reach it either (OpenOCD exits as soon as the debug port fails to answer). What worked: hold S1 (the bootloader button, PA18) while pressing and releasing S3 (reset), keep S1 held two more seconds; the chip sits in TI's bootloader with its debug port alive, and OpenOCD attaches within a second. After that rescue the chip kept starting in the ROM bootloader at every debugger reset until a plain USB power cycle (seen on a later use of the board); unplug and replug once the new image is on. Flash any non-sleeping image at once. Prevention: every deep-sleep image waits 3 s at boot.
+
+### EnergyTrace reads 1.5 mA with the chip in SHUTDOWN, where the data sheet says 61 nA. Is the tool wrong?
+
+No. A pin is. The test image drives PA1 low, and the LaunchPad pulls PA1 up to 3.3 V through 2,200 Ω when jumper J10 is in, so the pin sinks 1.31 mA whatever the chip is doing. The user guide SLAU869E says it in the jumper table: "J10: OFF if pin initialized as output low or input with pullup or pulldown" (the same for J9 and PA0). **Tag: Our mistake.** With PA1 high the same STANDBY0 image reads 0.198 mA, which is the thermistor divider and the light-sensor circuit, not the chip. Before any power run on this board: read table 2-1 of the user guide, pull J9 and J10 or keep PA0 and PA1 high, and expect about 0.2 mA of board circuits on top of the chip. The tool's scale was never in doubt: CoreMark at 32 MHz and 4 MHz differ by 72.9 µA per MHz against the data sheet's 71, and SLEEP0 minus SHUTDOWN is 940 µA against 978. Numbers:
+
+### Does TI's CMSIS-DSP library run on the L1306, and what fits?
+
+Yes. The SDK's prebuilt Cortex-M0 library ran FFTs, FIR and biquad filters with the same errors as the C code on a Mac: a 256-point q15 FFT takes 2.25 ms at 32 MHz, a 512-point one 5.2 ms. **Tag: Chip limit.** The largest transforms that fit 4 kB of RAM are 512 points in q15 and 256 in q31; a 512-point q31 FFT's buffer alone is 4 kB. A 256-point FFT in 32-bit float also runs, in software because the chip has no FPU: 25.7 ms, 11 times the q15 time.
+
+### Why does the L1306 score 0.73 DMIPS per MHz when tables often say about 1?
+
+Those tables usually let the compiler inline across Dhrystone's procedures, which the benchmark's rules forbid; with that on, this chip reads 1.04. And at 32 MHz the flash adds a wait state, which costs Dhrystone 17% (0.88 DMIPS per MHz at 4 MHz). **Tag: Setup or handling.** The number depends on the rules and clock you pick.
+
+### Embench's st benchmark reports FAIL. Is the chip's maths wrong?
+
+No. **Tag: Third-party behavior.** It fails its own check at both optimization levels on this chip and on the MSPM0G3507; on the G3507 the difference was traced to one or two steps of the last bit of a double, finer than Embench's 1e-13 tolerance. Not re-traced on the L1306.
+
+### Can I take code written for the MSPM0G3507 and run it on the L1306?
+
+Plain C, and code that only uses DriverLib calls both chips have, moves with SysConfig changes only: CoreMark, the occupancy models and TI's temperature example all did. **Tag: Chip limit.** What does not move is anything that needs a block the L1306 lacks (math accelerator, AES, TRNG, 12-bit DAC, CAN, port B pins) or more than 4 kB of RAM. Counts for TI's own examples:
+
+## DriverLib, TI Drivers and Zephyr
+
+These come from building one small app (ADC reading, serial line, LED) three ways on this board and the LP-MSPM0G3507: `portability/three-ways/README.md`. MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, Zephyr 4.4.2.
+
+### My TI Drivers program on the L1306 sends binary at 115200 instead of text. Why?
+
+Not found; use DriverLib or Zephyr for serial output on this chip until it is. **Tag: Unknown (suspected: Our mistake).** The image runs and keeps sending: runs of zero bytes and a repeating 32-bit word 0x0000136f at 115200, and nothing readable at six other rates from 9600 to 460800 (observed, not saved). The suspect is the hand-ported configuration, since TI ships no TI Drivers example for this chip. Ruled out: 1-byte against 32-byte UART ring buffers (no change), a missing `UART_init()` (this SDK has no such function), and the clock (a 32 MHz bus clock, confirmed by the working DriverLib build).
+
+### TI Drivers on FreeRTOS will not link on the L1306: "run placement with alignment fails for section ".bss" size 0x1458". Why?
+
+TI's FreeRTOS settings file for this board does not fit its 4 kB of RAM. **Tag: TI example default.** The linker needs 0x1458 (5.1 kB) of `.bss` against 0x1000 (4 kB) of RAM, mostly the 3 kB heap that TI's `FreeRTOSConfig.h` for the LP-MSPM0L1306 asks for. FreeRTOS alone fits with static allocation (`freertos/README.md`); that was not run with TI Drivers.
+
+### Does Zephyr have an ADC driver for the MSPM0?
+
+Not in Zephyr 4.4.2: its `drivers/adc` folder has no MSPM0 file. **Tag: Third-party behavior.** Call DriverLib from your Zephyr app for the ADC and add `dl_adc12.c` and `dl_vref.c` to `CMakeLists.txt` yourself, because Zephyr's MSPM0 Kconfig only switches on the GPIO, UART, timer and CAN parts of DriverLib. That glue is the part you rewrite for another vendor's chip.
+
+### Zephyr's DriverLib headers differ from the MSPM0 SDK's. Does that matter?
+
+Not for this app, as far as is known. **Tag: Third-party behavior.** In Zephyr's copy of TI's DriverLib, `dl_adc12.h` and `dl_vref.h` differ from MSPM0 SDK 2.11.00.07 by 143 diff lines (93 and 50, counted as the lines `diff` marks on either side); the `dl_adc12.c` and `dl_vref.c` files are identical. Inference, not checked: the differences are version drift.
+
+### Why is MSPM0 TI Drivers configuration hand-written C?
+
+Because MSPM0 TI Drivers have no SysConfig module: write the configuration tables in C, starting from a TI example's `ti_drivers_config.c`. **Tag: Tool or docs.** No MSPM0 TI Drivers example has a `.syscfg` file; checked by listing the 40 TI Drivers example folders in SDK 2.11.00.07 (`examples/rtos/<board>/drivers/`, 10 examples on each of four LaunchPad kits). For the same small app the configuration is 136 lines of C against 35 lines of SysConfig for DriverLib on the LP-MSPM0G3507, and 130 against 34 on this board. `portability/three-ways/README.md`, problem 3.
+
+### Is there a TI Drivers example for the LP-MSPM0L1306?
+
+No. **Tag: Tool or docs.** SDK 2.11.00.07 ships the driver library for this chip (`drivers_mspm0l11xx_l13xx.a`), the no-RTOS driver porting layer and a FreeRTOS settings file, but no example and no board configuration that uses them. The C configuration tables were ported from TI's G3507 `adc_singlechannel` and `uart_echo` examples (130 code lines), and the startup and linker files come from the SDK's device folder.
+
+### A TI Drivers GPIO table entry without a pin-mux index sets up PA0. Is that expected?
+
+Give every entry its pin-mux index, or mark it `GPIO_DO_NOT_CONFIG`. **Tag: Unknown (suspected: TI example default).** Read from the source, not run: `GPIO_init` takes the pin-mux index from each entry's low byte (`pincm = pinConfig & 0xFF`), and 0 is PA0's pin control register, which drives LED1 on this board. TI's G3507 `adc_singlechannel` table has four entries without one.
+
+### TI Drivers' ADC driver does not turn on the internal reference. Do I have to?
+
+Yes, as far as the source shows: turn the reference on with DriverLib in your configuration. **Tag: Unknown (suspected: Tool or docs).** `ADCMSPM0.c` sets the reference choice in the ADC but never touches the VREF block. Not checked on a board, because no TI Drivers image here has printed a reading.
+
+### The CC1407P host build prints its banner and the first SPI frame on the LP-MSPM0L1306, then nothing. Is the board hung?
+
+With no radio on SPI0 (PA6, PA5, PA4, PA3, PA7, PA2) that is the expected stop: the driver waits for the radio in the SPI-complete handler (halted in `hb_delay_us`, 3 s after reset). **Tag: Setup or handling.** Wire the BP-CC1407P-9-FE as in `mspm0l1306/radio-host/README.md`; the first frame `00 04 11 00 02 32 00 00 e9 71` is the same ten bytes the LP-MSPM0G5187 sent in its recorded link. Build with the pool cut to 4 buffers (`NBUF=4`, the default there): TI's 24 need 5,244 B of the chip's 4,096 B. Run 2026-10-24, no radio attached, so the link itself is untested here.
+
+## Setting up CCStudio and the AI on a Mac
+
+These come from setting up CCStudio 21.0.1, the MSPM0 SDK 2.11.00.07 and Claude Code inside CCStudio on the same Intel Mac (macOS 15.7.9) on 2026-10-04, before the board was plugged in. They are the setup steps of the [Blink project's Start here box](../site/project-blink.html#start).
+
+### How much free disk do I need for CCStudio and the MSPM0 SDK?
+
+Have 12 GB free before you start, and delete each installer file once it has finished. **Tag: Setup or handling.** The full CCStudio install with every chip family is 8.1 GB, more than the 6.0 GB TI's page recommends, and the SDK adds 2.2 GB; together 10.3 GB once installed, more while an installer file sits beside its install. A Mac that started with 13 GB free dropped to 2.5 GB after CCStudio with its installer still on disk. Measured sizes: `mac-setup/README.md`, "Disk space you need".
+
+### I clicked the MSPM0 SDK download and nothing happened in CCStudio. Where is it?
+
+Look in your browser's downloads folder. The SDK file (`mspm0_sdk_2_11_00_07.app.zip`, 0.4 GB) downloads in the browser from ti.com/tool/MSPM0-SDK, not inside CCStudio; unzip it and run the installer. **Tag: Tool or docs.** CCStudio's first screen gives no hint that an SDK is needed, so it is easy to look for the download inside CCStudio. The padlock beside each file on TI's page marks a short export approval form, about a minute.
+
+### CCStudio lists no SDK after I installed the MSPM0 SDK and turned on the AI. What do I do?
+
+Quit CCStudio and open it again. **Tag: Tool or docs.** On CCStudio 21.0.1 it listed no SDK until it was restarted; after the restart it listed all six installed SDKs, the MSPM0 SDK among them. Observed 2026-10-04.
+
+### Should I pick Global or Workspace for Scope in CCStudio's AI panel?
+
+Pick Workspace. **Tag: Tool or docs.** CCStudio's AI panel opens on Global, and the panel itself does not say which file each choice changes. Global writes into `~/.claude/settings.json`, the settings file every other Claude Code run on the Mac uses; Workspace keeps the change inside the CCStudio workspace folder.
+
+### Several Claude Code chat panels opened in CCStudio. Is something wrong?
+
+No. Close the extras; one chat is enough. **Tag: Unknown.** Extra panels can open during setup; the cause was not found. The chat answered, and CCStudio's four tool servers for the AI (project, debug, SysConfig, serial) all responded afterwards.
+
+### Does the LP-MSPM0L1306 come with a USB cable, and will it fit my Mac?
+
+TI's user guide lists one micro-USB cable in the box (SLAU869E, section 1.3.1); the plug type on the computer end is not stated. **Tag: Setup or handling.** If it does not fit a USB-C-only Mac, use a USB-C to micro-B cable or an adapter. An LP-MSPM0G3507 came with a cable that had a USB-A plug on the computer end.
+
+### Does this work on an Apple Silicon Mac?
+
+Not tested. **Tag: Unknown.** Every time and size on this page and in the Blink Start here box comes from one Intel MacBook (Core i7-8750H) on macOS 15.7.9. TI's download page offers CCStudio and the MSPM0 SDK for macOS; neither was run on an Apple Silicon Mac.
+
+## Benchmark programs
+
+### Why does the PID power loop on the LP-MSPM0L1306 miss periods at 100 kHz in Q15 when it is clean at 10 kHz?
+
+Run the Q15 loop at 92 kHz or below: a rate sweep on the board found 92.75 kHz the highest rate with no missed period in 1,000, and at 50 kHz about 57 percent of the CPU is left for other work. **Tag: Unknown (suspected: Chip limit).** Only code in flash at -O2 was tried. The lead: each interrupt takes 273.5 cycles of CPU with entry and return, and the ADC takes about 65 cycles from trigger to interrupt, about 338 together, close to the 345-count period the sweep found. At 32 MHz, the chip's top clock, a 100 kHz period is 320 cycles, and the loop's worst time from trigger to the end of the interrupt was 313. In the 100 kHz pass 6 of 1,000 interrupts ran past the end of their period, and one ADC result was overwritten before it was read. Interrupt entry took up to 152 cycles in that pass against at most 59 in the 10 kHz pass, which suggests some interrupts started late; why was not found. The 10 kHz pass had no such period and the same 228-cycle mean. MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1 -O2, code in flash; rows in `data/results/mspm0l1306.csv`.
+
+### How fast can the LP-MSPM0L1306 run the C2000's FOC motor-control loop?
+
+1.83 kHz in software float and 16.94 kHz with TI's IQmath fixed-point library, each the highest rate with no missed period in 1,000, found by a rate sweep on the board. **Tag: Unknown (suspected: Chip limit).** The Cortex-M0+ has no floating-point unit and this chip has no math accelerator, so every sine and cosine is software; a sine lookup table was not run. The float run at a 50 kHz trigger stopped at the program's time limit after 80 of 1,000 interrupts, so its worst case, 13k cycles from trigger to PWM value (4,131.2 percent of a 100 kHz period), rests on those 80, where the angle stayed under 0.8 radians. The older 1,000-interrupt run at 1 kHz, same `foc.c`, reached 17k cycles (5,399.7 percent). For scale, the LAUNCHXL-F2800137 holds the same loop at 301.5 kHz from flash. TI Arm Clang 5.1.1 -O2, 32 MHz, code in flash; rows in `data/results/mspm0l1306.csv`.
+
+### Should I run my control loop from RAM on the LP-MSPM0L1306 to skip the flash wait state?
+
+Only if every routine the loop calls fits in RAM with it. The FOC step in TI's IQmath ran 2.6% faster from RAM (1,744.9 cycles against 1,700.2), but the float step ran 6.3% slower (12,701.1 against 13,497.3), because its library routines do not all fit the 4 kB SRAM (the map shows it 3.9 kB full, with the double-precision helpers left in flash) and each call between SRAM and flash goes through a trampoline of about 12 cycles. **Tag: Unknown (suspected: Chip limit).** Only one stack size was built; a smaller stack might fit the helpers too. With the flash prefetch and cache on (the reset setting), code in flash costs only about 3% here. TI Arm Clang 5.1.1 -O2, 32 MHz, measured 2026-10-08.
+
+### SYSCTL MCLKCFG on the LP-MSPM0L1306 reads FLASHWAIT 2 at 32 MHz. Does it run with two flash wait states?
+
+No, it runs with one: ignore the `FLASHWAIT` field on this chip. **Tag: Tool or docs.** The field only applies when the main clock comes from HSCLK, which the MSPM0L130x does not have; with the clock from SYSOSC the hardware picks the wait state itself, and the data sheet gives 0 up to 24 MHz and 1 up to 32 MHz. The register reads 0x00000200 after TI's SysConfig clock code; driverlib's `dl_sysctl_mspm0l11xx_l13xx.h` says "Flash wait states are managed automatically by SYSCTL when MCLK is running from SYSOSC or LFCLK". MSPM0 SDK 2.11.00.07.
+
+### Is GCC as fast as TI Arm Clang on the LP-MSPM0L1306?
+
+No: CoreMark at -O3 and 32 MHz scores 78.27 with TI Arm Clang 5.1.1 and 54.62 with GCC 12.2.0 (the Zephyr SDK's), bare metal, the same source files, both validated. **Tag: Setup or handling.** The compiler and C library you pick move this score by 43% (TI Arm Clang with its own library against GCC with newlib-nano; the compiler alone was not separated); with `-funroll-loops` GCC reaches 58.65. The SDK's GCC startup file and linker script build it with no changes. Measured 2026-10-08; rows in `data/results/mspm0l1306.csv`.
+
+### I read my benchmark's results from the LP-MSPM0L1306 with a second OpenOCD call after the run, and got all zeros. Did the run fail?
+
+Probably not: read the results from the SRAM dump taken in the same OpenOCD connection as the run, not with a new connection. **Tag: Setup or handling.** A second OpenOCD call restarts the chip as it connects, and the start-up code zeroes the results array (`fom`, at 0x20000800), so the read gives zeros. The same connection's dump (`sram.bin`) holds the finished array; read results from the dump. xPack OpenOCD 0.12.0+dev.
+
+### The SPI speed test on the LP-MSPM0L1306 stops after its first two passes and never sets its done marker. Is the SPI broken?
+
+No: the two CPU-fed passes at 16 MHz, the chip's maximum, completed and give 1,644 kB/s with 8-bit frames and 1,785 kB/s with 16-bit frames. **Tag: Unknown (suspected: the DMA setup for this chip's SPI0).** The next pass is the first DMA-fed one; it and every later pass (the 8 MHz passes and the loopback check) read zero, and the done marker stayed 0 (`spi: magic 0x0 (NOT DONE)`). The same code runs to the end on the MSPM0G3507.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+How it locks up:
+
+- An image enters SHUTDOWN right after boot: DAP Connection Error, low power mode (`mspm0l1306/FAQ.md`)
+- A window-watchdog example resets the chip every few milliseconds: Could not find MEM-AP (`mspm0l1306/FAQ.md`, `ports/cms32/README.md`)
+- A deep-sleep port with only the watchdog timer as wake source (ran, woke every 0.997 s) (`ports/msp430-to-mspm0/lpm3-wake/PORT.md`, 2026-10-21)
+
+Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
+
+| Method | Remote or hands | Status | Evidence |
+|---|---|---|---|
+| Hold S1 (PA18), press and release S3 (reset), keep S1 held 2 s, then flash a non-sleeping image at once; replug USB afterwards (for the SHUTDOWN lockup; the chip then starts in the ROM bootloader until a plain power cycle) | hands | proven | `mspm0l1306/FAQ.md`, `mspm0l1306/AGENTS.md`, date not recorded |
+| OpenOCD mailbox mass erase (mspm0_mass_erase) (for the watchdog reset loop) | remote | proven | `mspm0l1306/FAQ.md`, date not recorded |
+| OpenOCD mailbox mass erase (for the SHUTDOWN lockup: OpenOCD exits when the debug port fails to answer) | remote | failed | `mspm0l1306/FAQ.md`, date not recorded |
+| uhubctl power-off of the probe port (the tick counter restarted; the hub location is not recorded) | remote | proven | 2026-10-21 |
+
+USB hub ports recorded for this board:
+
+- The probe's hub port does not cut power, 2026-10-27. SRAM marker test: a word written at 0x20000FF0 through the DAP (no CPU connect, no reset) survived a 15 s `uhubctl -a off`; the chip and the XDS110 kept power. The port does drop the data link: the probe leaves USB within 1 s and is back 1.0 s after `on` on every port of this hub (nine ports tried), and the first debugger connect after a cut answers Error -261, the second works.
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: mspm0l1306/AGENTS.md | AI assistant notes for the TI LP-MSPM0L1306 LaunchPad development kit
+==============================================================================
+
+# AI assistant notes for the TI LP-MSPM0L1306 LaunchPad development kit
+
+The 4 kB of RAM runs out long before anything else, and that a few silent traps (stack size, Zephyr's heap, missing interrupt lines, one ignored SysConfig line) cost hours if nobody warns it. This file is the short list, each item comes from runs on one board unless it says otherwise.
+
+Terms: [docs/vocab.md](../docs/vocab.md) and the [LP-MSPM0L1306 FAQ](FAQ.md) in the Fox Red Labs repo. In short: **SysConfig** is TI's tool that writes a chip's pin and clock setup code; **DriverLib** is TI's C library for the chip's parts; **NONMAIN** is the flash area that holds the chip's boot settings; **CoreMark** is a standard CPU speed test; **MessagePack** is a compact binary format for structured data; **MEM-AP** is the debug port the debugger uses to reach the CPU; **static allocation** means RAM is reserved when the program is built, not requested while it runs. 1 kB = 1,024 bytes. Checked 2026-10-06 on an Intel Mac, macOS 15.7.9, with MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, SysConfig 1.26.3, xPack OpenOCD 0.12.0+dev and Zephyr 4.4.2, on one LP-MSPM0L1306.
+
+**How to use it.** Copy this file into the top folder of your own project as `AGENTS.md`. Most coding assistants read that name; for one that reads `CLAUDE.md`, copy it under that name or add the line `@AGENTS.md` to your `CLAUDE.md`. Paths below in backticks starting `mspm0l1306/` or `data/` are in the Fox Red Labs repo; they are not in your copy, and links in this file only work inside that repo.
+
+## The board
+
+| Part | Fact |
+|---|---|
+| Chip | MSPM0L1306: Arm Cortex-M0+, 32 MHz from the internal oscillator, one flash wait state above 24 MHz (`mspm0l1306/README.md`) |
+| Memory | 64 kB flash, 4 kB RAM. Flash was never the limit; RAM always was (`mspm0l1306/README.md`) |
+| Not on the chip | No FPU, no divide instruction, no math accelerator, no AES, no random-number generator, no radio, no general-purpose DAC (only the comparator's 8-bit reference DAC). Hardware CRC is there (`data/results/mspm0l1306.csv`) |
+| Interrupt lines | Only 0, 1, 2, 4, 9, 13, 15, 16, 18, 20, 24, 25 and 31 exist (`mspm0l1306/FAQ.md`) |
+| LEDs | LED1 red on PA0 (on when the pin is low); LED2 color on PA26 red, PA13 green, PA27 blue (`mspm0l1306/zephyr/README.md`) |
+| Buttons | S1 on PA18 (held at reset, starts TI's serial bootloader), S2 on PA14, S3 reset (`mspm0l1306/FAQ.md`) |
+| Sensors | Light sensor (photodiode into op-amp 0, PA22, PA24, PA25); thermistor on PA15 (`data/results/mspm0l1306.csv`) |
+| Serial | UART0 on PA8 (TX) and PA9 (RX). Jumpers J16 and J17 on XDS (right, as shipped) send it to the USB serial port; on BP (left) to the header pins (`mspm0l1306/FAQ.md`) |
+| Debugger | XDS110 on the board, USB, two serial ports, no driver needed on a Mac (`mspm0l1306/README.md`) |
+
+A labeled picture of every part: `mspm0l1306/img/board-tour.png`.
+
+## Start here
+
+| Step | This board |
+|---|---|
+| Whole route | `./start.sh mspm0l1306 blink --probe <serial>` does the rows below in order with no assistant (`docs/frl.md`); stops with FRL-E002 if several probes are plugged in and none is named |
+| Tools | MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS (from CCStudio 21.0.1), SysConfig 1.26.3, xPack OpenOCD 0.12.0-7 (the first with `ti_mspm0.cfg`; `tools/frl` runs later versions only when named, as unvalidated), UniFlash 9.6.0 (`mspm0l1306/README.md`) |
+| Probe serial | `python3 tools/frl/frl.py detect`, or `xdsdfu -e` from CCStudio's `ccs_base/common/uscif/xds110/` folder |
+| Back up | `python3 tools/benchmark/backup.py save mspm0l1306 --probe <serial>` (tested recipe: main flash and NONMAIN read twice and compared; NONMAIN is never written back) |
+| Build TI's blink | `cp -R <SDK>/examples/nortos/LP_MSPM0L1306/driverlib/gpio_toggle_output .` then `make -C gpio_toggle_output/ticlang MSPM0_SDK_INSTALL_DIR=<SDK> SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh TICLANG_ARMCOMPILER=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS GCC_ARMCOMPILER=` (3.3 s) |
+| Flash | `openocd -f interface/xds110.cfg -c "adapter serial <serial>" -c "adapter speed 2500" -f target/ti_mspm0.cfg -c init -c "reset halt" -c "program gpio_toggle_output/ticlang/gpio_toggle_output.out verify" -c "reset run" -c shutdown` (0.6 s) |
+| Check | `python3 tools/check/blink.py --board mspm0l1306 --probe <serial>` |
+| Restore | `python3 tools/benchmark/backup.py restore <backup folder> --probe <serial>` |
+
+The pattern is the delay in `gpio_toggle_output.c`. TI's example drives the red channel of LED2 (PA26); LED1 on PA0 is not an output in it, so a person should watch LED2. A pin read through the probe on 2026-10-13 showed PA26 toggling and PA0 not enabled.
+
+## If you see this
+
+| What you see | Cause | Do this | Check |
+|---|---|---|---|
+| `wrong # args: should be "error message ?stacktrace?"` after `mspm0_mass_erase` | The script's reset helper throws after the erase has happened | Ignore it and load an image with DSLite or OpenOCD | The next load works |
+| `DAP Connection Error. This could be caused by the device having gone to low power mode.` | The image enters SHUTDOWN right after boot, so no debugger can attach | Hold S1 (PA18), press and release S3, keep S1 held 2 more seconds, then flash a non-sleeping image at once. Unplug and replug USB afterwards | OpenOCD attaches within a second |
+| `error: 'IOMUX_PINCM38' undeclared here (not in a function)` | Zephyr 4.4.2's GPIO driver has the 80-pin MSPM0L222x pin table | Build with the out-of-tree board in `mspm0l1306/zephyr/` (`-DBOARD_ROOT`) | Blinky builds |
+| ``region `RAM' overflowed`` (Zephyr sample) | Sample defaults need 6.1 to 17 kB of RAM | Cut stacks and buffers as in `mspm0l1306/zephyr/extra/README.md` | Image links |
+| `run placement with alignment fails for section ".bss" size 0x1458` | TI's `FreeRTOSConfig.h` for this board asks for a 3 kB heap | Use static allocation and small task stacks (`mspm0l1306/freertos/README.md`) | Image links |
+| `symbol "interruptVectors" redefined` (the three `bsl_software_invoke_app_demo_*` examples) | The examples clash at link | Skip them. 14 of 170 SDK examples do not build from a terminal | The other 156 build |
+| Serial shows the boot text twice | Each new OpenOCD connection resets and restarts the program | Read results in the OpenOCD connection that started it, or use the serial port | One boot line |
+| Sleep current stays near 2.6 mA in any power mode, or a SysTick count does not stop in STANDBY0 | A debugger attached since the last power-on reset keeps the chip in SLEEP0; OpenOCD leaves the debug power request set | Unplug and replug USB, or clear the request in OpenOCD with `mspm0x.dap dpreg 0x04 0x00000000` (this resets the chip once more), then measure | Current drops; the CPU clock stops in STANDBY0 (33.8 thousand ticks a second against 15.2 million in SLEEP) |
+| Serial port silent on the shipped demo | The out-of-box demo sends nothing until asked | Send `81 AB 6C 69 67 68 74 45 6E 61 62 6C 65 C3 0A` at 115200 baud | Light readings stream |
+| Wire from PA8 to PA9 returns nothing | J16 and J17 on XDS route the UART to the USB port | Move both to BP (left), wire J1 pin 4 to J1 pin 3 | Bytes come back |
+| Ported example blinks at -O0 but not at -O2 | A global polled without `volatile` | Add `volatile` | LED blinks at -O2 |
+
+Traps shared with other boards: TRAPS.md.
+
+## Rules for the assistant
+
+1. **After any clock change in SysConfig, read `CPUCLK_FREQ`** in the generated `ti_msp_dl_config.h`. With the clock tree on, `system.clockTree["SYSOSC"].frequencySelect` wins and `SYSCTL.SYSOSC_Freq` is ignored without a warning (`mspm0l1306/FAQ.md`).
+2. **For sensors, keep the ADC sample window long.** TI's 8-cycle window reads the thermistor 1.7% low against a 64-cycle reading; 2 cycles reaches 1.99 million samples a second but reads 9.9% low (`mspm0l1306/FAQ.md`).
+3. **Do not trust the internal temperature sensor.** It read about -165 °C with this chip's factory calibration. Use the thermistor on PA15 (`mspm0l1306/FAQ.md`).
+4. **UART:** every byte was right up to 4.5 Mbaud and from 6.4 to 10.67 Mbaud; 5 to 6 Mbaud fails. At 12 Mbaud `DL_UART_configBaudRate` sets a divisor of 0 and nothing is sent, with no error (`mspm0l1306/FAQ.md`).
+5. **FreeRTOS:** TI's settings file for this board needs 5.4 kB of RAM. Use static allocation and size each task's stack from stack analysis (44 words worst case for a task that sleeps; 48 words, 192 bytes, ran with 11 tasks; TI's setting is 128): a one-task blink then uses 0.98 kB (`mspm0l1306/freertos/README.md`).
+
+## What fits in 4 kB of RAM
+
+| Program | RAM | Fits? |
+|---|--:|---|
+| TI blink example | 256 B | yes |
+| CoreMark, standard 2 kB data, bare metal | 3.9 kB | yes, 144 B spare |
+| 8k-parameter room-occupancy neural net | 2.2 kB plus 548 B stack | yes, 84 to 100 ms per answer |
+| 30k-parameter neural net | over 4 kB | no |
+| FreeRTOS one-task blink, static | 0.98 kB | yes |
+| Zephyr hello_world | 3.7 kB | yes, 264 B spare |
+| Zephyr shell, logger, synchronization, as shipped | 6.1 to 17.0 kB | no; trimmed versions fit (the shell has 48 B left) |
+
+Sources: `mspm0l1306/README.md`, `mspm0l1306/zephyr/README.md`, `mspm0l1306/freertos/README.md`.
+
+## Measured speeds, for sanity checks
+
+CoreMark 78.27 per second at 32 MHz with TI Arm Clang -O3 (2.446 per MHz). CoreMark's own printout says `Iterations/Sec : 83` here, because float printing is off to save RAM; compute the score from the tick count instead. Under Zephyr with GCC: 59.70. Interrupt entry: 25 to 28 cycles bare metal, 119 to 137 under Zephyr. A 256-point q15 FFT with TI's CMSIS-DSP: 2.25 ms (`mspm0l1306/README.md`, `mspm0l1306/FAQ.md`, `mspm0l1306/zephyr/README.md`, `data/results/mspm0l1306.csv`).
+
+## Next
+
+Start at `mspm0l1306/README.md` for the full bring-up, and `mspm0l1306/FAQ.md` for each problem with its exact error and fix. If you find something this file gets wrong on your board, the FAQ is where it should be corrected first.
+
+## Check a blink without looking
+
+After a flash, prove the LED pin is toggling through the debugger: `python3 tools/check/blink.py --board mspm0l1306 --probe <your probe serial>` from the repository root (xPack OpenOCD; it reads the GPIO registers for 3 s and never writes). PASS means an LED pin enabled as an output changed state; it passed on this board on 2026-10-13. This is the check to paste into a report.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+How it locks up:
+
+- An image enters SHUTDOWN right after boot: DAP Connection Error, low power mode (`mspm0l1306/FAQ.md`)
+- A window-watchdog example resets the chip every few milliseconds: Could not find MEM-AP (`mspm0l1306/FAQ.md`, `ports/cms32/README.md`)
+- A deep-sleep port with only the watchdog timer as wake source (ran, woke every 0.997 s) (`ports/msp430-to-mspm0/lpm3-wake/PORT.md`, 2026-10-21)
+
+Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
+
+| Method | Remote or hands | Status | Evidence |
+|---|---|---|---|
+| Hold S1 (PA18), press and release S3 (reset), keep S1 held 2 s, then flash a non-sleeping image at once; replug USB afterwards (for the SHUTDOWN lockup; the chip then starts in the ROM bootloader until a plain power cycle) | hands | proven | `mspm0l1306/FAQ.md`, `mspm0l1306/AGENTS.md`, date not recorded |
+| OpenOCD mailbox mass erase (mspm0_mass_erase) (for the watchdog reset loop) | remote | proven | `mspm0l1306/FAQ.md`, date not recorded |
+| OpenOCD mailbox mass erase (for the SHUTDOWN lockup: OpenOCD exits when the debug port fails to answer) | remote | failed | `mspm0l1306/FAQ.md`, date not recorded |
+| uhubctl power-off of the probe port (the tick counter restarted; the hub location is not recorded) | remote | proven | 2026-10-21 |
+
+USB hub ports recorded for this board:
+
+- The probe's hub port does not cut power, 2026-10-27. SRAM marker test: a word written at 0x20000FF0 through the DAP (no CPU connect, no reset) survived a 15 s `uhubctl -a off`; the chip and the XDS110 kept power. The port does drop the data link: the probe leaves USB within 1 s and is back 1.0 s after `on` on every port of this hub (nine ports tried), and the first debugger connect after a cut answers Error -261, the second works.
+
+<!-- recovery:end -->
+
+<!-- ports:start (tools/render_ports.py) -->
+## Ports that ran here
+
+Code written for other chips and tools, brought to this board. The files to copy, the command and what you see for each are in `docs/ports.md`; the method and a prompt to port your own are there too. Works ran and did what it should; Could work ran in part.
+
+| Port | Status | Result | Evidence |
+|---|---|---|---|
+| BitNetMCU handwriting AI on MSPM0 | Works | BitNetMCU handwriting models read all 10 test digits right on the LP-MSPM0G3507 and LP-MSPM0L1306, the same answers as on a Mac. | `ports/bitnetmcu/README.md` |
+| Cmsemicon CMS32 examples on the LP-MSPM0L1306 | Works | Cmsemicon CMS32 examples run on the LP-MSPM0L1306 through one glue layer: 34 of 34 ran; 21 checked, 13 show nothing a probe can see. | `ports/cms32/README.md` |
+| FreeRTOS in 4 kB of RAM on the LP-MSPM0L1306 | Works | FreeRTOS runs on the LP-MSPM0L1306 in 4 kB of RAM: the blink uses 1 kB. | `docs/experiments/2026-10-06-mspm0l1306-freertos-4kb.md` |
+| MSP430FR2433 code examples on the LP-MSPM0L1306 | Works | Three MSP430FR2433 FRAM examples ran on the LP-MSPM0L1306: a persistent counter, a watchdog wake from LPM3 and a UART echo in LPM3. | `ports/msp430-to-mspm0/README.md` |
+| MSPM0 examples moved up and down the family | Works | MSPM0 examples move between family members with only the SysConfig device changed (SysConfig is TI's pin and peripheral setup tool): all 133 images that built and write nothing outside main flash and SRAM ran on the LP-MSPM0L1306. | `portability/README.md` |
+| Rust (embassy-mspm0) on the LP-MSPM0L1306 | Works | A Rust blinky and a serial hello run on the LP-MSPM0L1306 with embassy-mspm0. | `ports/rust-mspm0/README.md` |
+| STM32 UART DMA receive with idle-line interrupt (MaJerle stm32-usart-uart-dma-rx-tx) on TI boards | Works | MaJerle's STM32 UART DMA example answers every test packet at 115200 baud on the LP-MSPM0G3519, G5187, L1306, C1104 and MSPM33C321A. | `docs/experiments/2026-10-19-stm32-usart-dma-port-matrix.md` |
+| TI's MSPM0 DriverLib examples built and run with GCC | Works | TI's MSPM0 DriverLib examples build and run with GCC from a terminal: all 224 no-RTOS examples with a GCC makefile built unchanged. | `portability/toolchains/gcc-mspm0/README.md` |
+| Zephyr in 4 kB of RAM on the LP-MSPM0L1306 | Works | Zephyr runs on the LP-MSPM0L1306 in 4 kB of RAM: hello_world, blinky and CoreMark. | `docs/experiments/2026-10-06-mspm0l1306-zephyr-4kb.md` |
+| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
+| One app, three ways: DriverLib, TI Drivers and Zephyr | Could work | The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings. | `portability/three-ways/README.md` |
+<!-- ports:end -->
+
+==============================================================================
+FILE: mspm0l1306/freertos/README.md | FreeRTOS on the TI MSPM0L1306: what fits in 4 kB of RAM and what it costs
+==============================================================================
+
+# FreeRTOS on the TI MSPM0L1306: what fits in 4 kB of RAM and what it costs
+
+**Short answer.** Yes. The FreeRTOS kernel that ships in TI's MSPM0 SDK (V11.2.0) runs on the MSPM0L1306 with static allocation: a one-task blink uses 3,784 bytes (3.7 kB) of flash and 1,008 bytes (1.0 kB) of RAM, 11 minimal tasks fit (192-byte stacks), and on the board a task switch round trip takes 397 to 499 cycles (12 to 16 microseconds at 32 MHz), an interrupt wakes a waiting task in 511 to 645 cycles. TI ships no FreeRTOS example for this chip, and TI's own FreeRTOS settings file for this board asks for 5,540 bytes (5.4 kB) of RAM, more than the chip has.
+
+Terms: [docs/vocab.md](../../docs/vocab.md) (RTOS, stack, heap, SysTick, linker). Errors and fixes for this board: [FAQ](../FAQ.md). 1 kB = 1,024 bytes.
+
+Built 2026-10-06 on an Intel Mac, macOS 15.7.9: MSPM0 SDK 2.11.00.07 (FreeRTOS Kernel V11.2.0 inside it, `kernel/freertos/Source`, read only), TI Arm Clang 5.1.1.LTS from CCStudio 21.0.1, -O2. Clock setup is the SysConfig output already in `../bench/coremark/syscfg32/` (TI's `gpio_toggle_output` example: SYSOSC 32 MHz).
+
+Contents: [Words used](#words-used-below), [Sizes](#sizes), [Where the RAM goes](#where-the-ram-goes), [How many tasks fit](#how-many-tasks-fit), [Timing](#timing), [What was changed](#what-was-changed-from-tis-setup), [Build](#build), [Check on the board](#check-on-the-board), [Notes](#notes).
+
+## Words used below
+
+- **Task:** one function the RTOS runs as if it had the CPU to itself. Each task has its own stack and a 64-byte task block (FreeRTOS calls it the TCB).
+- **Idle task:** the task FreeRTOS creates itself; it runs when nothing else can.
+- **Tick:** the RTOS's regular timer interrupt, here SysTick at 1,000 per second. `vTaskDelay(500)` sleeps 500 ticks.
+- **Context switch:** saving one task's registers and loading another's.
+- **Semaphore, queue, task notification:** ways for one task (or an interrupt) to wake another. A queue also carries data. A notification is the lightest: no separate object.
+- **Static allocation:** every task block, stack and queue is a fixed array the linker places. The alternative is a heap: one big array the RTOS hands out at run time.
+- **High-water mark:** how much of a task's stack was never touched. FreeRTOS fills each stack with a pattern and counts what is left.
+- **Interrupt stack:** the stack in the linker's `.stack` section. Before the scheduler starts, `main()` runs on it; after, interrupts do.
+
+## Sizes
+
+From the linker map of each image.
+
+| Image | What it runs | Flash, bytes | RAM used, bytes | RAM left, bytes |
+|---|---|--:|--:|--:|
+| `blink` | 1 task + idle | 3,784 | 1,008 | 3,088 |
+| `bench` | 3 tasks + idle, a semaphore, 2 queues, 1 interrupt | 13,016 | 2,178 | 1,918 |
+| `bench-lean` | the same, no `configASSERT`, no stack overflow check | 12,088 | 2,178 | 1,918 |
+| `edge-static` | 11 minimal tasks + checker + idle, all static | 4,504 | 3,956 | 140 |
+| `edge-heap` | the largest heap that links, 3,424 bytes (3.3 kB); tasks made at run time | 4,712 | 4,092 | 4 |
+| `ti-config` | `blink` with TI's own L1306 FreeRTOS settings file, unchanged | does not link | 5,540 (`.bss`) + 256 (stack) | none |
+
+The kernel and port alone: 2,718 bytes (2.7 kB) of flash in `blink` (tasks and delays), 5,726 in `bench` (adds queues, semaphores, notifications and the interrupt calls), 4,872 in `bench-lean`. The asserts and the overflow check cost 928 bytes of flash in the whole `bench` image and no RAM. Flash is never the limit: the largest image uses 20% of it.
+
+For scale: TI's bare-metal blink example on this chip is 440 bytes of flash and 256 bytes of RAM, all of it stack ([`../README.md`](../README.md)). FreeRTOS adds 3,344 bytes (3.3 kB) of flash and 752 bytes of RAM to a blink: 456 for the kernel and its idle task, 256 for the blink task, 40 for this page's result and fault records.
+
+## Where the RAM goes
+
+From the linker maps of `blink` and `bench` (every RAM symbol with its size).
+
+| Item | Bytes | Notes |
+|---|--:|---|
+| Kernel lists and counters | 200 | 3 priority levels at 20 bytes each, 4 more lists, 15 pointers and counters |
+| Idle task | 256 | 64-byte task block + 48-word (192-byte) stack |
+| Each task you add | 64 + its stack | a minimal task here: 64 + 192 = 256 |
+| Each task from the heap instead | 64 + stack + 16 | heap_4 puts an 8-byte header on the block and on the stack |
+| Each semaphore or queue | 72 | plus the queue's item storage |
+| Interrupt stack (`.stack`) | 256 | TI's value in its FreeRTOS examples; bare-metal examples use the same |
+
+Part of the interrupt stack is never given back. The Cortex-M0+ port in the SDK does not reset the main stack pointer when the scheduler starts (its comment: the vector table offset register is optional on the M0+), so the frames `main()` used to start the scheduler stay on it: 100 to 132 bytes in these images, from the stack analysis (`stackdepth.py`). **Tag: Third-party behavior.** It is FreeRTOS's port design, documented in `portasm.c`.
+
+## How many tasks fit
+
+A minimal task here writes a flag and sleeps one tick, forever (`edge.c`). Its stack is 48 words (192 bytes). The compiler's stack-usage files and the call graph (`stackdepth.py`) put its worst case at 44 words: an 88-byte call chain (`vTaskDelay` > `xTaskResumeAll` > `xTaskIncrementTick`), 72 bytes for one saved context, and the 16 bytes the overflow check needs untouched. The idle task needs 22 words but gets the same 48, because FreeRTOS sizes it from the same setting.
+
+| Memory | Minimal tasks | RAM per task | How it was found | Status |
+|---|--:|--:|---|---|
+| Static, 48-word stacks | **11** (13 tasks with checker and idle) | 257 bytes (block, stack, 1 flag byte) | 11 links; 12 gives `program will not fit into available memory` | ran on the board: 11 made, 11 alive, no fault |
+| Heap (heap_4 at 3,424 bytes (3.3 kB)), 48-word stacks | **10 expected** | 272 bytes from the heap | arithmetic from heap_4's rules: 3,416 usable, idle 272, checker 368, then 10 × 272 leaves 56 | ran on the board: 10 made, the 11th failed for lack of heap, 56 bytes free, as predicted |
+| Static, TI's 128-word stacks (`MIN_STACK=128`) | **4** (6 tasks with checker and idle) | 577 bytes | 4 links; 5 does not | linked, not run |
+
+Static allocation fits one more task than the heap here, mostly because heap_4 adds 16 bytes per task (two 8-byte headers). The heap image also keeps a 96-byte table of task handles, which static tasks do not need: a static task's handle is its block's address. Static also moves the failure to build time: the linker refuses a design that does not fit, where `xTaskCreate` would fail on the board.
+
+## Timing
+
+FreeRTOS uses SysTick for its tick, so the cycle counter is TIMG0, a 16-bit timer clocked from the 32 MHz bus clock, divide 1: one count is one CPU cycle (31.25 ns), and a reading wraps after 2.048 ms, far above any test here. Before the scheduler starts, `bench` times one delay with both TIMG0 and SysTick to prove TIMG0 runs at the CPU clock. Each test: 8 warm-up passes, then 1,000 measured; best, worst, worst with no tick interrupt inside, and average. Values are raw and each includes one TIMG0 read, measured as `timer_read`.
+
+| Test (cycles at 32 MHz) | `bench` best / worst / average | `bench-lean` best / worst / average |
+|---|---|---|
+| Task switch round trip: `taskYIELD` to an equal-priority task that yields straight back (2 switches) | 499 / 640 / 502.9 | 397 / 537 / 400.6 |
+| `xSemaphoreGive` to the first line of the higher-priority task waiting on it | 615 / 755 / 618.8 | 527 / 652 / 529.5 |
+| `xTaskNotifyGive` to the first line of the higher-priority task waiting on it | 556 / 697 / 557.8 | 469 / 609 / 471.1 |
+| Queue round trip: send to a higher-priority task, it sends back, receive returns | 2,380 / 2,650 / 2,396.9 | 2,155 / 2,424 / 2,171.4 |
+| Interrupt entry: pend I2C1 (line 25) to the handler's first line | 38 / 39 / 39.0 | 39 / 39 / 39.0 |
+| Interrupt to task: pend to the first line of the task woken by `xSemaphoreGiveFromISR` | 645 / 789 / 651.2 | 559 / 685 / 564.2 |
+| Interrupt to task: pend to the first line of the task woken by `vTaskNotifyGiveFromISR` | 583 / 724 / 585.7 | 511 / 646 / 513.3 |
+
+Measured 2026-10-06 on the board (probe <probe serial>), 1k samples per test, every pass checked: zero errors, no fault, every stack kept bytes unused (`check.py` prints ALL OK for all five images). The worst cases include a tick interrupt landing inside the measurement; the "worst, no tick" column in `check.py`'s output leaves those out and is within 6 cycles of the best. For comparison: interrupt entry here (38 to 39 cycles, with a 3-cycle timer read) matches bare metal (25 to 28 with a SysTick read pair); a Zephyr thread yield round trip on this chip is 431 to 491 cycles, against FreeRTOS's 397 to 499 ([`../zephyr/README.md`](../zephyr/README.md)). The two use different timers and builds, so this is not a one-change comparison.
+
+## What was changed from TI's setup
+
+Nothing in the SDK was changed, and the FreeRTOS kernel and port are TI's files compiled as they are: `tasks.c`, `list.c`, `queue.c`, `portable/TI_ARM_CLANG/ARM_CM0/port.c` and `portasm.c`, plus `portable/MemMang/heap_4.c` for the heap image. TI ships a FreeRTOS settings file for this board (`kernel/freertos/builds/LP_MSPM0L1306/release/FreeRTOSConfig.h`) but no example that uses it; the closest examples are for the L1117 and L2228, whose files are the same apart from writing the heap as 3 × 1,024 instead of 6 × 512 (3,072 bytes (3.0 kB) either way). This folder's `FreeRTOSConfig.h` starts from TI's file and changes:
+
+| Setting | TI's file | Here | Why |
+|---|---|---|---|
+| Allocation | static and heap, 3,072-byte heap | static only, no heap (`edge-heap`: heap only) | the heap is 75% of RAM before any task; static lets the linker count every byte |
+| `configMINIMAL_STACK_SIZE` | 128 words (512 bytes) | 48 words (192 bytes) | stack analysis: 44 words worst case for a task that sleeps |
+| `configMAX_PRIORITIES` | 10 | 3 | 20 bytes of RAM per level |
+| `configMAX_TASK_NAME_LEN` | 16 | 4 | 12 bytes per task block |
+| Mutexes, trace facility, task tags, thread-local pointers | on | off | none is needed here; with the name length, the task block drops from 104 to 64 bytes |
+| Software timers, event groups, stream buffers | on | off | timers add a timer task and its queue |
+| Tickless idle | on | off | keeps the tick regular for timing; costs sleep power, not measured |
+| High-water mark and idle handle calls | off | on | needed for the stack reports |
+| Idle task memory | TI's `dpl/StaticAllocs_freertos.c` supplies it | `configKERNEL_PROVIDED_STATIC_MEMORY` | the kernel supplies it; no TI DPL code needed |
+| `configASSERT`, stack overflow check method 2 | on | on (`bench-lean`: off) | a failure leaves a code in `fr_fault` instead of a silent loop |
+
+Kept from TI's file: 32 MHz, 1,000 Hz tick, preemption on, time slicing off, kernel interrupts at the lowest priority. Task block and queue object sizes: 104 and 80 bytes with TI's file, 64 and 72 here.
+
+TI's FreeRTOS example makefiles link a kernel library from a CCStudio workspace and point at a kernel makefile that does not exist ([`../../portability/README.md`](../../portability/README.md)). This folder does not use them: `build.sh` compiles the five kernel files straight into each image.
+
+**TI's own settings file for this board does not fit this board.** `./build.sh ti-config` builds the same blink with TI's `LP_MSPM0L1306/release/FreeRTOSConfig.h` unchanged, plus the files TI's kernel project compiles for it (`timers.c`, `heap_4.c`, TI's `dpl/StaticAllocs_freertos.c`). The blink skips its stack report there, because TI's file turns those calls off. The link stops:
+
+```text
+"./device_linker.cmd", line 62: error: program will not fit into available
+   memory, or the section contains a call site that requires a trampoline that
+   can't be generated for this section, or the section contains padded
+   functions. run placement with alignment fails for section ".bss" size
+   0x15a4.  Available memory ranges:
+   SRAM         size: 0x1000       unused: 0xeab        max hole: 0xeab
+```
+
+0x15a4 is 5,540 bytes (5.4 kB) of zero-filled RAM on a chip with 4,096, before the 256-byte interrupt stack. The largest items, from the object files: the 3,072-byte heap, the idle and timer tasks' 512-byte stacks (static arrays in TI's `StaticAllocs_freertos.c`), the blink task's 512-byte stack, three 104-byte task blocks and 200 bytes of ready lists for 10 priorities. Without the blink task it would still need about 4,900 bytes (4.8 kB) (arithmetic from the same list). **Tag: TI example default.** No L1306 example uses the file, so nothing in the SDK exercises it. This folder's `FreeRTOSConfig.h` is one way to make it fit.
+
+## Build
+
+From this folder (`mspm0l1306/freertos`), one command per image:
+
+```bash
+./build.sh blink
+```
+
+```bash
+./build.sh bench
+```
+
+```bash
+./build.sh bench-lean
+```
+
+```bash
+./build.sh edge-static
+```
+
+```bash
+./build.sh edge-heap
+```
+
+`./build.sh all` builds the five. `./build.sh ti-config` repeats the link with TI's settings file (it is meant to fail; the log is written to `build-ti-config/link.log`). Each writes `build-<name>/<name>.out` and `.map`, `sizes.txt`, `ram-symbols.txt` and `stack.txt`, and stops if any part of the image falls outside main flash (0x0 to 0x10000) or SRAM (0x20000000 to 0x20001000); nothing is written to the boot configuration area. `MIN_STACK=<words>` changes the minimal stack and builds into a folder with `-stack<words>` on its name. The kernel is compiled once per setting into `build-kernel/`. On a lightly loaded Mac each image takes under a minute.
+
+## Check on the board
+
+Each command flashes the image, fills RAM with 0xA5 before any code runs, lets it run, then reads the results and dumps all of RAM to `build-<name>/sram.bin` ([`../tools/paintrun.sh`](../tools/paintrun.sh)). `check.py` then decodes the dump and checks every value. Run from this folder:
+
+```bash
+../tools/paintrun.sh build-blink/blink.out build-blink/blink.map fr_blink 6 5000
+```
+
+```bash
+python3 check.py build-blink
+```
+
+| Image | `paintrun.sh` arguments after the map | Run | Result symbol (words) | Fault record | Must see |
+|---|---|--:|---|---|---|
+| `blink` | `fr_blink 6 5000` | 5 s | `fr_blink` 0x2000023c (6) | `fr_fault` 0x200002a4 | LED1 (red) on 0.5 s, off 0.5 s. `magic` 0xB1E00001, `ticks` = 500 × (`toggles` − 1) |
+| `bench` | `fr_bench 43 3000` | 3 s | `fr_bench` 0x20000400 (43) | `fr_fault` 0x20000710 | `magic` 0xBE4C0001, `samples` 1,000, `timg_counts` within 4 of `systick_cycles`, `errors` 0 |
+| `bench-lean` | `fr_bench 43 3000` | 3 s | `fr_bench` 0x20000400 (43) | `fr_fault` 0x20000710 | as `bench` |
+| `edge-static` | `fr_edge 12 5000` | 5 s | `fr_edge` 0x20000d9c (12) | `fr_fault` 0x20000e1c | `magic` 0xED6E0001, `made` 11, `alive` 11 |
+| `edge-heap` | `fr_edge 12 5000` | 5 s | `fr_edge` 0x20000dfc (12) | `fr_fault` 0x20000e94 | `magic` 0xED6E0001, `alive` = `made` (10 expected), `ran_out` 1, `heap_free` 56 expected |
+
+In every image: `fr_fault.code` 0 (0xDEAD0001 is a stack overflow with the task name, 0xDEAD0002 a failed assert with its kernel line, 0xDEAD0003 a hard fault with its address), and every high-water mark above 4 words. `paintrun.sh` also prints how deep the interrupt stack went; the stack analysis says at most 184 bytes (`blink`), 224 (`bench`: 116 held by `main()`, 36 for the interrupt frame, 72 for the I2C1 handler; 300 if an interrupt could nest on the tick, which this program never causes), 208 (`bench-lean`), 208 (`edge-static`) and 176 (`edge-heap`), all under the 256 reserved. The bench finishes its tests in well under a second (an estimate; `ticks_end` gives the real time in milliseconds). Addresses come from `build-*/ram-symbols.txt`; they change if an image is rebuilt with other settings, and `paintrun.sh` and `check.py` look them up by name.
+
+## Notes
+
+- **No FreeRTOS example for this chip.** TI ships FreeRTOS examples for the G3507, G3519, L1117 and L2228, and a kernel settings file for the L1306, but no L1306 example. **Tag: TI example default.**
+- **Stack sizes come from analysis, then the board.** `stackdepth.py` assumes an interrupt can land at the deepest point of every call chain, which overstates: the deepest kernel paths run with interrupts off. The high-water marks from the board are the measured answer.
+- **The bench interrupt is I2C1, line 25.** This chip's interrupt controller has only the 13 lines that have a peripheral; pending any other line does nothing ([`../README.md`](../README.md)).
+- **No UART.** Results stay in RAM, as in the rest of the bench, so printing costs nothing in RAM or timing.
+
+## Files
+
+`FreeRTOSConfig.h` (the settings), `fr_common.c` and `.h` (LED1 setup, fault records), `blink.c`, `bench.c`, `edge.c`, `build.sh`, `mapsize.py` (flash and RAM from a map), `stackdepth.py` (worst-case stack per task), `check.py` (decode and check the board results), `build-*/` (images, maps, reports).
+
+==============================================================================
+FILE: mspm0l1306/radio-host/README.md | CC1407P host driver on an LP-MSPM0L1306
+==============================================================================
+
+# CC1407P host driver on an LP-MSPM0L1306
+
+TI's CC1407P host driver (plain C, from its Zephyr fork) with this repo's bare-metal layer, linked and flashed on the LP-MSPM0L1306. The same layer ran with a radio on the LP-MSPM0G5187 (`mspm0g5187/radio/README.md`). Run 2026-10-24 with no BP-CC1407P-9-FE attached, so the radio link itself is untested here.
+
+Terms: [docs/vocab.md](../../docs/vocab.md). 1 kB = 1,024 bytes.
+
+## Result
+
+| What | Value |
+|---|---|
+| Image with the driver, HAL, UART and 2-GFSK 50 kbps settings | 14,400 B (14.1 kB) flash, 2,277 B (2.2 kB) RAM (4 buffers of 156 B), 256 B stack: 2.5 kB of the 4 kB |
+| Same with the SPI trace on | 15,672 B (15.3 kB) flash |
+| With TI's 24 buffers | does not fit (5,244 B (5.1 kB) needed against 4,096 B (4.0 kB), `portability/cc1407p-host/README.md`) |
+| First SPI frame after reset, with trace on | `00 04 11 00 02 32 00 00 e9 71`, byte for byte the frame the LP-MSPM0G5187 sent to the radio in its recorded link |
+| Reply with no radio | all `ff` (the POCI line reads high); the G5187 with no radio read all `00` |
+| After that frame | stops inside the driver's wait for the radio (halted in `hb_delay_us` in the SPI-complete handler, 3 s after reset) |
+
+## Pins
+
+| Signal | Pin |
+|---|---|
+| SCLK | PA6 (SPI0) |
+| PICO | PA5 |
+| POCI | PA4 |
+| CS_N | PA3 |
+| RESET_N | PA7 |
+| SPI_INT | PA2 |
+| Trace UART0 | PA8 TX, PA9 RX, 115200 (jumpers J16 and J17 on XDS) |
+
+These are SPI0's default pins in TI's SPI example for this board. Wire to a BP-CC1407P-9-FE as in the G5187 README (radio pins 7, 15, 14, 18, 36, 23, plus 3V3 and GND); not wired for this run.
+
+## Build and run
+
+```text
+FRL_SYSCONFIG=<sysconfig_cli.sh> mspm0l1306/radio-host/build.sh -DHB_TRACE
+PROBE=<serial> mspm0l1306/tools/flash_and_capture.py mspm0l1306/radio-host/out/radio_host.out trace.log Ct 8
+```
+
+`build.sh` copies TI's `spi_controller_echo_interrupts` for this board, replaces its `.c` with `mspm0g5187/radio/radio_host.c` and its `.syscfg` with `radio.syscfg`, and links the driver (buffer pool cut to 4 by `NBUF`), `portability/cc1407p-host/hal_bare.c` and `hooks_mspm0l1306.c`. The banner still says LP-MSPM0G5187 because the application file is shared.
+
+==============================================================================
+FILE: mspm0l1306/third-party/README.md | Open-source C libraries and benchmarks on the TI LP-MSPM0L1306: what fits and how fast
+==============================================================================
+
+# Open-source C libraries and benchmarks on the TI LP-MSPM0L1306: what fits and how fast
+
+**Short answer.** 40 of 42 images ran: 14 of 19 Embench-IoT benchmarks (13 pass their own check), micro-ecc P-256 (sign in 0.50 s with its assembly), jsmn, SHA-256, two printf libraries and hardware CRC (10.9 times faster than a table). Five Embench benchmarks and heatshrink do not fit in 4 kB of RAM.
+
+Terms: [docs/vocab.md](../../docs/vocab.md) (Embench, stack, linker). Errors and fixes: [LP-MSPM0L1306 FAQ](../FAQ.md). 1 kB = 1,024 bytes.
+
+Contents: short version, results on the board, what changed from the G3507 suite, images in run order, what does not fit, hardware CRC, run order, commands.
+
+The MSPM0G3507 suite, rebuilt for the LP-MSPM0L1306: Cortex-M0+, 32 MHz from SYSOSC, 64 kB flash, 4 kB SRAM, hardware CRC only. Built with TI Arm Clang 5.1.1 against SDK 2.11.00.07. `build.sh` does not touch the board; `run_bench_l1306.py` flashes each image and reads its results (below).
+
+## Short version
+
+- **42 images built** (all with `-O2`; Embench and printf also with `-Os`). 15 Embench benchmarks, CRC-32, jsmn, micro-ecc (two variants), and the 4 printf variants.
+- **5 benchmarks do not fit, all for RAM** (9 images, because Embench was tried at two optimization levels): heatshrink (7,076 bytes (6.9 kB) of static RAM), Embench huffbench (8,752), matmult-int (8,052), qrduino (8,280), sglib-combined (8,736). The chip has 4,096. Flash was never the limit: the biggest image is 42 kB of 64 kB. Numbers are in the table below.
+- **Dropped on purpose:** the hardware AES test and the whole tiny-AES-c image (no AES on this chip; the software-only half is not built either, because the point of that image was software against hardware), and the hardware TRNG test plus the `rand()` comparison that went with it.
+- **Kept:** hardware CRC. The L130x CRC block has the 32-bit polynomial (`CRC_SYS_CRC32_ENABLE` is 1 in `mspm0l130x.h`), so the same IEEE CRC-32 test runs unchanged. It also has CRC-16; this suite only tests CRC-32.
+- No benchmark data size was changed. No benchmark was shrunk to fit.
+- **Stack:** the depth of 40 of the 42 images is unknown (not measured), so each gets all RAM left after its static data. The two micro-ecc images get 2,048 bytes (2.0 kB), because the G3507 run measured at most 1,704 bytes (1.7 kB) for them.
+
+## Results on the board
+
+Run with `python3 run_bench_l1306.py` on probe <probe serial>, then the five images whose serial output was unreadable rerun with `python3 run_bench_l1306.py <list> 30`.
+
+- **40 of 42 images ran and finished.** 39 passed every check. `embench/st` failed its own check at both levels, as it did on the G3507, where it was traced to Embench's 1e-13 tolerance being finer than one step of a double; not re-traced here.
+- **Embench `wikisort` does not fit, though it links.** Its `benchmark_body` reserves 4,188 bytes (4.1 kB) of stack in one instruction (`ldr r7, =0xffffefa4; add sp, r7`), more than the chip's whole RAM. The stack pointer lands at 0x1FFFFEE0, below SRAM, and the first write faults into the default handler. The linker cannot see this; only running it shows it. Counted with the four Embench benchmarks above (heatshrink is not part of Embench): **5 of 19 Embench benchmarks do not fit in 4 kB.**
+- **Serial capture.** Three images (the two eyalroz printf images and, on the first pass only, two Embench `-Os` images) printed a few garbled bytes before their result line; the eyalroz ones do it every time. The result lines were intact and are used below.
+
+### Embench-IoT, cycles for one run (CPU_MHZ=1)
+
+The L1306 needs fewer cycles than the G3507 for the same code at -O2 (median 0.93 times): one flash wait state at 32 MHz against two at 80 MHz. The -Os column swings both ways (0.63 to 1.47); each L1306 benchmark is its own image, so code placement differs from the G3507's packed images, and -Os timing is sensitive to it.
+
+| Benchmark | L1306 -O2 | G3507 -O2 | L1306 / G3507 | L1306 -Os | G3507 -Os | L1306 / G3507 |
+|---|--:|--:|--:|--:|--:|--:|
+| aha-mont64 | 10,374,714 | 10,629,850 | 0.98 | 12,061,204 | 10,827,868 | 1.11 |
+| crc32 | 6,499,531 | 9,470,466 | 0.69 | 7,492,653 | 6,887,860 | 1.09 |
+| cubic | 10,021,552 | 10,878,777 | 0.92 | 10,080,200 | 7,171,362 | 1.41 |
+| edn | 6,862,307 | 6,947,750 | 0.99 | 7,178,547 | 5,629,854 | 1.28 |
+| minver | 8,679,738 | 8,931,530 | 0.97 | 8,644,763 | 9,868,500 | 0.88 |
+| nbody | 6,429,041 | 6,985,891 | 0.92 | 6,423,742 | 7,643,319 | 0.84 |
+| nettle-aes | 8,572,900 | 10,016,449 | 0.86 | 7,784,014 | 9,757,578 | 0.80 |
+| nettle-sha256 | 7,028,059 | 7,213,314 | 0.97 | 7,499,854 | 11,156,598 | 0.67 |
+| nsichneu | 4,495,705 | 4,773,930 | 0.94 | 4,519,088 | 7,120,385 | 0.63 |
+| picojpeg | 5,660,711 | 6,085,085 | 0.93 | 6,731,035 | 6,897,295 | 0.98 |
+| slre | 5,801,146 | 6,789,472 | 0.85 | 6,268,883 | 4,422,191 | 1.42 |
+| st | 9,529,950, check fails | 10,318,553 | 0.92 | 9,669,088, check fails | 6,572,947 | 1.47 |
+| statemate | 5,448,453 | 6,419,329 | 0.85 | 5,787,999 | 7,121,891 | 0.81 |
+| ud | 12,504,702 | 13,042,249 | 0.96 | 6,912,697 | 6,035,250 | 1.15 |
+| wikisort | does not fit (stack) | 3,689,596 | | does not fit (stack) | 8,972,786 | |
+| huffbench, matmult-int, qrduino, sglib-combined | do not link (RAM) | | | | | |
+
+### Libraries
+
+| Library | Job | L1306 cycles | Time at 32 MHz | G3507 cycles (80 MHz) | Notes |
+|---|---|--:|--:|--:|---|
+| micro-ecc, Thumb assembly | P-256 key pair / sign / verify | 15.1 M / 16.0 M / 18.3 M | 0.47 / 0.50 / 0.57 s | 15.8 M / 16.7 M / 19.1 M | Stack 1,584 to 1,608 B (1.6 kB) of 2,048. Verify rejects a flipped bit. |
+| micro-ecc, plain C | same | 35.2 M / 36.2 M / 41.0 M | 1.10 / 1.13 / 1.28 s | 37.3 M / 38.4 M / 43.4 M | Stack 1,640 to 1,704 B (1.7 kB). |
+| B-Con SHA-256 | hash 1 kB | 153,793 to 156,668 | 4.8 ms | 160,704 | FIPS 180-4 "abc" vector passes |
+| jsmn | parse 300 bytes of JSON, 51 tokens | 14,774 | 0.46 ms | 17,292 | |
+| TI libc `snprintf` | one line with ints, hex, a float | 30,098 (-O2), 30,262 (-Os) | 0.94 ms | 31,062 | |
+| eyalroz/printf | same line | 37,097 (-O2), 37,157 (-Os) | 1.16 ms | 34,177 | |
+| eyalroz/printf, no float | same line without the float | 9,037 (-O2), 8,734 (-Os) | 0.28 ms | 9,059 | |
+
+### Hardware CRC against software (CRC-32, 1 kB)
+
+| Method | Cycles | Against the table |
+|---|--:|--:|
+| Software, bitwise | 77,877 | 6.4 times slower |
+| Software, 256-entry table in flash | 12,211 | 1 |
+| Hardware, byte feeds | 4,303 | 2.8 times faster |
+| Hardware, 32-bit word feeds | 1,121 | **10.9 times faster** |
+| Hardware, `DL_CRC_calculateBlock32` | 1,790 | 6.8 times faster |
+
+All five give the same CRC, and the check value for "123456789" matches. On the G3507 the word-feed hardware CRC was 13.5 times faster than the table.
+
+## What changed from the G3507 suite
+
+| Item | G3507 | L1306 |
+|---|---|---|
+| Clock | 80 MHz from SYSPLL | 32 MHz from SYSOSC, default clock tree (flash gets 1 wait state at 32 MHz, set by SYSCTL automatically) |
+| UART0 | PA10 TX, PA11 RX, 40 MHz bus clock | PA8 TX, PA9 RX, 32 MHz, divisors 17 and 23 at 115200 (SysConfig output in `syscfg/`) |
+| Startup file | `startup_mspm0g350x_ticlang.c` | `startup_mspm0l130x_ticlang.c` |
+| SRAM | 32 kB at `0x20200000` | 4 kB at `0x20000000` |
+| Harness | `common/tb.c`, `tb.h` | Same files, read from the original folder. `tb.c` is built from a `sed` copy that only changes one include path (it pointed at `bench_timer.h` by a path that only works in the old tree). `TB_MAX_RESULTS` is set per image to the number of result lines (the original reserves 40 entries, which is 1.1 kB of the 4 kB). |
+| Embench | 3 images, 19 benchmarks | one image per benchmark, 19 benchmarks, 2 optimization levels |
+| tiny-AES-c, hardware AES | `aes` image | dropped |
+| `crc_trng` | CRC-32 plus TRNG | `crc`: same CRC-32 test, TRNG part removed (`crc/main.c`) |
+| `text` | heatshrink and jsmn in one image | split into `heatshrink` and `jsmn` (`text_hs/main.c`, `text_jsmn/main.c`; the code is the original with the other half deleted) |
+| micro-ecc, printf, Embench harness | | original sources and `main.c` files, by path, unedited |
+
+The output format, the `BENCH START`, `R,...` and `BENCH DONE` lines, the RAM copy in `tb_res` with magic `0x7141E002`, and every correctness check are the same as the original.
+
+Embench speed ratio changes at 32 MHz: `baseline_ms / (cycles / 32000 x 16)` (the G3507 README used 80000).
+
+## Images, in run order
+
+Sizes are from the linker output. Flash is text plus initialized data. Static RAM is `.data` plus `.bss`, not counting the stack. The image does not fit if static RAM plus a 256 byte stack is more than 4,096 bytes (4.0 kB), or flash is over the 65,528 byte linker region.
+
+| Image | Flash (of 64 kB) | Static RAM (of 4 kB) | Stack set | Stack basis |
+|---|--:|--:|--:|---|
+| crc_O2 | 11,368 (17.3%) | 1,272 | 2,824 | all remaining RAM, depth unknown |
+| printf_none_O2 | 2,432 (3.7%) | 48 | 4,048 | all remaining RAM, depth unknown |
+| printf_ti_O2 | 13,388 (20.4%) | 52 | 4,040 | all remaining RAM, depth unknown |
+| printf_eyalroz_O2 | 15,456 (23.6%) | 48 | 4,048 | all remaining RAM, depth unknown |
+| printf_eyalroz_nofloat_O2 | 9,168 (14.0%) | 48 | 4,048 | all remaining RAM, depth unknown |
+| printf_none_Os | 1,888 (2.9%) | 48 | 4,048 | all remaining RAM, depth unknown |
+| printf_ti_Os | 9,836 (15.0%) | 52 | 4,040 | all remaining RAM, depth unknown |
+| printf_eyalroz_Os | 9,992 (15.2%) | 48 | 4,048 | all remaining RAM, depth unknown |
+| printf_eyalroz_nofloat_Os | 4,744 (7.2%) | 48 | 4,048 | all remaining RAM, depth unknown |
+| jsmn_O2 | 4,640 (7.1%) | 1,072 | 3,024 | all remaining RAM, depth unknown |
+| uecc_asm_O2 | 33,400 (51.0%) | 1,248 | 2,048 | measured on G3507 (1,704 max) plus margin |
+| uecc_c_O2 | 42,136 (64.3%) | 1,248 | 2,048 | measured on G3507 (1,704 max) plus margin |
+| embench_aha_mont64_O2 | 6,344 (9.7%) | 65 | 4,024 | all remaining RAM, depth unknown |
+| embench_crc32_O2 | 4,340 (6.6%) | 52 | 4,040 | all remaining RAM, depth unknown |
+| embench_cubic_O2 | 14,572 (22.2%) | 92 | 4,000 | all remaining RAM, depth unknown |
+| embench_edn_O2 | 7,080 (10.8%) | 1,658 | 2,432 | all remaining RAM, depth unknown |
+| embench_minver_O2 | 9,464 (14.4%) | 160 | 3,936 | all remaining RAM, depth unknown |
+| embench_nbody_O2 | 8,380 (12.8%) | 372 | 3,720 | all remaining RAM, depth unknown |
+| embench_nettle_aes_O2 | 17,312 (26.4%) | 1,592 | 2,504 | all remaining RAM, depth unknown |
+| embench_nettle_sha256_O2 | 8,000 (12.2%) | 168 | 3,928 | all remaining RAM, depth unknown |
+| embench_nsichneu_O2 | 13,644 (20.8%) | 116 | 3,976 | all remaining RAM, depth unknown |
+| embench_picojpeg_O2 | 27,012 (41.2%) | 2,445 | 1,648 | all remaining RAM, depth unknown |
+| embench_slre_O2 | 7,904 (12.1%) | 112 | 3,984 | all remaining RAM, depth unknown |
+| embench_st_O2 | 8,532 (13.0%) | 1,680 | 2,416 | all remaining RAM, depth unknown |
+| embench_statemate_O2 | 8,128 (12.4%) | 275 | 3,816 | all remaining RAM, depth unknown |
+| embench_ud_O2 | 7,544 (11.5%) | 1,812 | 2,280 | all remaining RAM, depth unknown |
+| embench_wikisort_O2 | 10,864 (16.6%) | 3,256 | 840 | all remaining RAM, depth unknown |
+| embench_aha_mont64_Os | 3,848 (5.9%) | 65 | 4,024 | all remaining RAM, depth unknown |
+| embench_crc32_Os | 3,452 (5.3%) | 52 | 4,040 | all remaining RAM, depth unknown |
+| embench_cubic_Os | 13,668 (20.9%) | 92 | 4,000 | all remaining RAM, depth unknown |
+| embench_edn_Os | 4,752 (7.3%) | 1,658 | 2,432 | all remaining RAM, depth unknown |
+| embench_minver_Os | 4,864 (7.4%) | 160 | 3,936 | all remaining RAM, depth unknown |
+| embench_nbody_Os | 5,612 (8.6%) | 372 | 3,720 | all remaining RAM, depth unknown |
+| embench_nettle_aes_Os | 15,112 (23.1%) | 1,592 | 2,504 | all remaining RAM, depth unknown |
+| embench_nettle_sha256_Os | 6,848 (10.4%) | 168 | 3,928 | all remaining RAM, depth unknown |
+| embench_nsichneu_Os | 13,028 (19.9%) | 116 | 3,976 | all remaining RAM, depth unknown |
+| embench_picojpeg_Os | 10,676 (16.3%) | 2,445 | 1,648 | all remaining RAM, depth unknown |
+| embench_slre_Os | 5,064 (7.7%) | 112 | 3,984 | all remaining RAM, depth unknown |
+| embench_st_Os | 4,844 (7.4%) | 1,680 | 2,416 | all remaining RAM, depth unknown |
+| embench_statemate_Os | 6,544 (10.0%) | 275 | 3,816 | all remaining RAM, depth unknown |
+| embench_ud_Os | 2,784 (4.2%) | 1,812 | 2,280 | all remaining RAM, depth unknown |
+| embench_wikisort_Os | 11,824 (18.0%) | 3,256 | 840 | all remaining RAM, depth unknown |
+
+Where the stack basis says "all remaining RAM", the depth was not measured, so the stack was set to everything the static data leaves free (rounded down to 8 bytes, so a few bytes of slack show). If an image is wrong or hard-faults on the board, suspect stack depth first. `tb_stack_paint()` and `tb_stack_used()` are in the harness if you want to measure. Two with the least stack are `embench_wikisort` (840 bytes) and `embench_picojpeg` (1,648 bytes (1.6 kB)). A finished image has `tb_res.magic == 0x7141E002`.
+
+## Do not fit
+
+Linker numbers, from a relink into an oversized memory map. All are RAM overruns. The static data is arrays inside the benchmark itself, so they cannot shrink without changing the benchmark.
+
+| Image | Flash | Static RAM | Why |
+|---|--:|--:|---|
+| heatshrink_O2 | 9,136 | 7,076 | RAM over by 3,236 bytes (3.2 kB) with a 256 byte stack (2,980 over with no stack at all). Flash is fine. |
+| embench_huffbench_O2 | 6,596 | 8,752 | RAM over by 4,912 bytes (4.8 kB) with a 256 byte stack (4,656 over with no stack at all). Flash is fine. |
+| embench_matmult_int_O2 | 6,080 | 8,052 | RAM over by 4,212 bytes (4.1 kB) with a 256 byte stack (3,956 over with no stack at all). Flash is fine. |
+| embench_qrduino_O2 | 16,244 | 8,280 | RAM over by 4,440 bytes (4.3 kB) with a 256 byte stack (4,184 over with no stack at all). Flash is fine. |
+| embench_sglib_combined_O2 | 8,964 | 8,736 | RAM over by 4,896 bytes (4.8 kB) with a 256 byte stack (4,640 over with no stack at all). Flash is fine. |
+| embench_huffbench_Os | 4,036 | 8,752 | RAM over by 4,912 bytes (4.8 kB) with a 256 byte stack (4,656 over with no stack at all). Flash is fine. |
+| embench_matmult_int_Os | 4,120 | 8,052 | RAM over by 4,212 bytes (4.1 kB) with a 256 byte stack (3,956 over with no stack at all). Flash is fine. |
+| embench_qrduino_Os | 10,532 | 8,280 | RAM over by 4,440 bytes (4.3 kB) with a 256 byte stack (4,184 over with no stack at all). Flash is fine. |
+| embench_sglib_combined_Os | 5,420 | 8,736 | RAM over by 4,896 bytes (4.8 kB) with a 256 byte stack (4,640 over with no stack at all). Flash is fine. |
+
+heatshrink keeps a 2,048 byte output buffer (`decomp`) and a 3,080 byte compressed buffer (`comp`) in RAM, plus encoder and decoder state; the 2 kB text input is in flash. A rewrite that streams and compares instead of buffering would fit, but that is a different test, so it was not done. Embench has no smaller documented size setting.
+
+## Hardware CRC on the L130x
+
+`DL_CRC_init` takes `DL_CRC_16_POLYNOMIAL` or `DL_CRC_32_POLYNOMIAL` (DriverLib `dl_crc.h`; the 32-bit one exists because `CRC_SYS_CRC32_ENABLE` is 1). The polynomial is fixed in silicon (CRC-16 0x1021, CRC-32 0x04C11DB7), so there is no custom polynomial. The test uses CRC-32 with bit reversal on, seed `0xFFFFFFFF` and a software final XOR, the same as on the G3507. If the check value `0xCBF43926` fails, `hw_check` tries the eight combinations and names the one that works. The L130x DriverLib has the same CRC calls (`feedData8`, `feedData32`, `calculateBlock32`) as the G3507.
+
+## Run order
+
+`build.sh` writes `images.txt`, the 42 `.out` files with absolute paths, in this order: `crc`, the 8 printf images, `jsmn`, `uecc_asm`, `uecc_c`, then the 15 Embench benchmarks at `-O2`, then at `-Os`. Shortest first. Expect about 5 to 10 seconds per image for flash and run, and `uecc_c` is the slowest (about 40 s at 32 MHz). A run of all 42 should take under 10 minutes.
+
+## Commands
+
+    cd mspm0l1306/third-party
+    ./build.sh                       # all images, about 10 minutes (the original suite's vendor/ is reused by path)
+    ./build.sh crc embench_st        # only images whose name contains a word
+    python3 run_bench_l1306.py       # flashes and collects: needs the board, probe <probe serial>, tty /dev/cu.usbmodemML1300011
+
+`run_bench_l1306.py [images.txt] [timeout_s]` is a copy of the original runner. It overrides the probe (`ML130001`), the serial port, the OpenOCD config (`openocd_l1306.cfg`, same lines as `../tools/ocd.sh`) and the safe memory map (flash `0x0` to `0x10000`, SRAM `0x20000000` to `0x20001000`; NONMAIN is refused). It writes `results/<image>.txt` and `results/runs.jsonl`.
+
+Files: `build.sh`, `syscfg/` (SysConfig output and `bench32.syscfg`), `crc/`, `text_hs/`, `text_jsmn/` (copied mains), `out/` (images, maps, `sizes.txt`, `nofit.txt`).
+
+==============================================================================
+FILE: mspm0l1306/zephyr/README.md | Zephyr on the TI LP-MSPM0L1306 LaunchPad: board file and what fits in 4 kB of RAM
+==============================================================================
+
+# Zephyr on the TI LP-MSPM0L1306 LaunchPad: board file and what fits in 4 kB of RAM
+
+Zephyr 4.4.2 has the MSPM0L1306 chip but no board for this LaunchPad kit, so this folder adds one out of tree. hello_world and blinky link with about 200 to 260 bytes of RAM to spare. The project's benchmark needs 12,824 bytes (12.5 kB) of RAM as written, and it fits in 4,096 only after four changes: smaller stacks, the test buffers moved onto the stack, a 512-byte copy test instead of 1,024, and CoreMark's data cut from 2,000 to 1,200 bytes (1.2 kB). That last change means the CoreMark score cannot be compared with standard scores. A second build runs CoreMark alone at the standard 2,000 bytes (2.0 kB) and links with 16 bytes of RAM to spare. On the board it scores 59.70 per second (1.87 per MHz).
+
+Terms: [docs/vocab.md](../../docs/vocab.md). 1 kB = 1,024 bytes. Checked 2026-10-06 on an Intel Mac (macOS 15), Zephyr 4.4.2, GCC 12.2.0 from Zephyr SDK 0.17.4 (`ZEPHYR_TOOLCHAIN_VARIANT=cross-compile`), MSPM0 SDK 2.11.00.07 for pin data. Everything here was built, then flashed and run on an LP-MSPM0L1306 (probe <probe serial>) the same day.
+
+## Short version
+
+- **On the board (2026-10-06):** hello_world, blinky and every benchmark image ran. Standard CoreMark under Zephyr: **59.70 per second, 1.87 per MHz** (GCC at -O2 plus loop unrolling; the build named O3), against 2.446 per MHz with TI Arm Clang and no operating system. Interrupt latency through Zephyr: 119 to 137 cycles. Two fixes were needed first: `CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=0`, after every benchmark image stopped at `***** HARD FAULT *****` during boot (**Third-party behavior**, point 8), and interrupt line 25 instead of 28 for the latency test (**Chip limit**, point 9).
+
+- **Board:** `boards/ti/lp_mspm0l1306/`. Use it with `-DBOARD_ROOT=<this folder>`. Console on UART0 (PA8 TX, PA9 RX) at 115200. Four LEDs and two buttons in the devicetree.
+- **Two upstream gaps, both worked around in the board folder.** Zephyr's GPIO driver does not compile for this chip, and there is no pin-mux file for the MSPM0L130x family. Details under "Failures".
+- **4 kB is tight.** Zephyr's default interrupt stack is 2,048 bytes (2.0 kB), half the chip. hello_world already uses 93.6 percent of RAM.
+- **Benchmark:** `mcu-bench-l1306/` is the project's CoreMark and timing benchmark, copied and fitted to this chip.
+- **Build anything:** `./build.sh <target>`. Set `OUT` to the folder for build output.
+
+Contents: Results on the board. Sizes. Hex files. What each one prints. The files. Commands. Failures and how they were passed. Other traps. Zephyr's clock setup on this chip.
+
+## Results on the board
+
+Run 2026-10-06 on probe <probe serial>, flashed with OpenOCD, read from the serial port (`../tools/flash_and_capture.py`). Every run passed CoreMark's own check ("Correct operation validated") and every stack line printed a value above 0, so no stack ran out.
+
+CoreMark, standard 2,000-byte data, GCC 12.2.0, at 32 MHz:
+
+| Build | Iterations | Seconds | CoreMark/s | Per MHz | Main stack left | MSPM0G3507, same build, per MHz |
+|---|--:|--:|--:|--:|--:|--:|
+| `coremark2k-Os` | 3,000 | 71.45 | 41.99 | 1.31 | 176 B | 1.19 |
+| `coremark2k-O2` | 3,000 | 55.83 | 53.73 | 1.68 | 128 B | 1.63 |
+| `coremark2k-O3` (really -O2 with loop unrolling, point 7) | 3,000 | 50.25 | **59.70** | **1.87** | 128 B | 1.75 |
+| `coremark2k-trueO3` (-O3 -funroll-loops applied) | 3,000 | 52.87 | 56.74 | 1.77 | 104 B | 1.71 |
+
+Seconds come from Zephyr's uptime counter, which runs from the 32 MHz system clock; the measured clock is 32.16 MHz, so the true rates are 0.5% higher. Per MHz assumes 32 MHz exactly. The L1306 needs fewer cycles per iteration than the G3507 because its flash adds one wait state at 32 MHz and the G3507's adds two at 80 MHz. Real -O3 is slower than -O2 with unrolling on this chip, and on the G3507 (136.70 against 139.88) and the CC2340R5 (79.54 against 84.07) too, measured the same day: suspected, the bigger code costs more in flash waits than it saves. TI Arm Clang on the same chip, no operating system, scores 2.446 per MHz.
+
+The fitted benchmark (`bench-Os`, `-O2`, `-O3`; CoreMark at 1,200 bytes (1.2 kB), so its CoreMark is not comparable), CPU cycles, best of five:
+
+| Test | -Os | -O2 | -O2 plus unrolling (O3 build) | true -O3 | What it is |
+|---|--:|--:|--:|--:|---|
+| timer_read | 102.09 | 81.07 | 78.32 | 77.32 | one `k_cycle_get_32()`; every timed row includes about one |
+| empty_loop | 5.00 | 5.00 | 1.63 | 1.63 | loop overhead |
+| udiv32_software | 253.25 | 246.24 | 242.24 | 242.24 | the core has no divide instruction |
+| float_mul_add_software | 253.04 | 251.03 | 248.79 | 248.54 | no FPU |
+| sinf_cosf_software | 9,066.76 | 8,712.27 | 8,708.61 | 8,719.33 | |
+| memcpy_512_bytes | 5,157.45 | 873.38 | 869.50 | 897.49 | |
+| gpio_toggle_zephyr_api | 42.04 | 32.04 | 26.04 | 27.79 | `gpio_pin_toggle_dt` |
+| gpio_toggle_register | 6.04 | 10.03 | 2.04 | 2.04 | DriverLib toggle of PA0 |
+| irq_latency, best and worst of 200 | 137 / 137 | 121 / 121 | 119 / 122 | 120 / 121 | pend to the handler's first line through Zephyr's wrapper, including one timer read |
+| thread_yield_round_trip | 491.08 | 434.07 | 430.69 | 437.69 | two context switches |
+| nn_mlp_64_32_16_4 | 42,333 | 48,469 | 24,981 | 25,215 | one inference, 2,624 multiply-adds |
+| nn_cnn_1d_128 | 466,202 | 400,313 | 243,130 | 198,005 | one inference, 20,608 multiply-adds |
+
+The true -O3 column is a fifth build (`bench-trueO3`); its CoreMark at 1,200 bytes (1.2 kB) was 209.75 against 218.80 for the unrolled -O2 build, the same direction as the standard CoreMark above. The neural-net checksums match the G3507's and the CC2340R5's runs (`-22287500` and `-7929100`), so the same code gives the same answers on all three chips.
+
+## Sizes
+
+Flash total is 65,536 B (64.0 kB). RAM total is 4,096 B (4.0 kB). "Links" means the linker accepted it; it does not mean it ran (see "Results on the board" for what ran). Benchmark sizes are after the heap fix in Failures, point 8.
+
+| Build | What it is | Flash used | RAM used | Links? | RAM left |
+|---|---|--:|--:|---|--:|
+| hello_world | `samples/hello_world` | 9,424 | 3,832 | yes | 264 |
+| blinky | `samples/basic/blinky`, LED1 red on PA0 | 11,364 | 3,888 | yes | 208 |
+| blinky-rgb-red | same, red channel of the RGB LED on PA26 | 11,372 | 3,888 | yes | 208 |
+| blinky-upstream-gpio | blinky with Zephyr's own GPIO driver forced on | | | no: compile error | |
+| bench-orig-Os, -O2, -O3 | the G3507 benchmark, unchanged | | | no: compile errors | |
+| bench-port-Os, -O2, -O3 | copy with the chip differences fixed, G3507 memory settings | | needs 12,824 | no: overflow by 8,728 | |
+| bench-Os | copy fitted to 4 kB, CoreMark at 1,200 bytes (1.2 kB) | 41,940 | 4,064 | yes | 32 |
+| bench-O2 | same, speed build | 47,692 | 4,064 | yes | 32 |
+| bench-O3 | same, "-O3" (really -O2 plus unrolling, see Failures, point 7) | 56,192 | 4,064 | yes | 32 |
+| bench-trueO3 | same, app really at -O3 -funroll-loops | 58,332 | 4,064 | yes | 32 |
+| coremark2k-Os | CoreMark alone at the standard 2,000 bytes (2.0 kB) | 25,480 | 4,080 | yes | 16 |
+| coremark2k-O2 | same, speed build | 30,400 | 4,080 | yes | 16 |
+| coremark2k-O3 | same, "-O3" | 35,760 | 4,080 | yes | 16 |
+| coremark2k-trueO3 | same, app really at -O3 -funroll-loops | 37,100 | 4,080 | yes | 16 |
+| synchronization | `samples/synchronization` | | needs 6,296 | no: overflow by 2,200 | |
+| synchronization, trimmed | same with interrupt and main stacks at 512 | | needs 4,248 | no: overflow by 152 | |
+| philosophers | `samples/philosophers` | | needs 17,400 | no: overflow by 13,304 | |
+| shell_module | `samples/subsys/shell/shell_module` | | needs 12,776 | no: overflow by 8,680 | |
+| logger | `samples/subsys/logging/logger` | | needs 8,192 | no: overflow by 4,096 | |
+
+"Needs" is 4,096 plus the overflow the linker printed.
+
+Where the RAM goes in the samples that do not fit (from their map files):
+
+| Sample | Biggest pieces |
+|---|---|
+| synchronization | interrupt stack 2,048; two sample threads 1,024 each, fixed in the sample's source; main stack 1,024 |
+| philosophers | six philosopher stacks of 2,048 (12,288); interrupt stack 2,048; main stack 1,024 |
+| shell_module | shell thread stack 2,048; interrupt stack 2,048; work queue stack 1,024; main stack 1,024; log buffer 1,024; log thread stack 768 |
+| logger | interrupt stack 2,048; log buffer 2,048; sample thread 1,024; main stack 1,024; log thread stack 768 |
+
+**Tag: Third-party behavior.** These are Zephyr's sample defaults; trimmed further (stacks hard-coded in the samples changed by a build-time copy, minimal shell, smaller log buffer), synchronization, logger, shell_module and all eight Thread-Metric tests ran on the board: `extra/README.md`.
+
+## Hex files
+
+All in `<OUT>/<target>/zephyr/zephyr.hex`. Every image covers main flash only (highest address 0x0000DC70, in bench-O3). Nothing writes NONMAIN, the boot configuration area.
+
+## What each one prints on the serial port (115200, 8N1)
+
+All of these were seen on the board, 2026-10-06.
+
+- **hello_world:** `*** Booting Zephyr OS build v4.4.2 ***`, then `Hello World! lp_mspm0l1306/mspm0l1306`.
+- **blinky and blinky-rgb-red:** the boot banner, then `LED state: OFF`, `LED state: ON`, alternating once a second. LED1 needs jumper J2 on and J10 on 2:3 (3.3 V pull-up). The RGB red needs J12.
+- **bench-Os, -O2, -O3:** `BENCH START`, `I,` lines (board `lp_mspm0l1306`, timer 32000000 Hz, `I,coremark_total_data_size,1200,not comparable with standard 2000-byte CoreMark scores`, `I,mathacl,not on this chip`), one `R,` line per test, `I,peer_stack_unused`, `COREMARK START`, CoreMark's report with `Profile generation run parameters for coremark.` and, if it passes its own check, `Correct operation validated.`, then the stack lines (`main_stack_unused_after_coremark`, `isr_stack_unused`, `idle_stack_unused`) and `BENCH DONE`. The copy test row is now `memcpy_512_bytes`.
+- **coremark2k-Os, -O2, -O3:** `BENCH START`, the `I,` lines with `I,coremark_only,1`, `COREMARK START`, `2K performance run parameters for coremark.`, the report, the stack lines, `BENCH DONE`. CoreMark needs at least 10 seconds of run time to count; 3k iterations at 32 MHz run 50 to 71 seconds.
+
+The stack lines are the check that matters on this chip. It has no memory protection unit, so a stack overflow does not stop the program. It overwrites the next stack down. If any `_unused` value prints as 0, the run is not valid.
+
+## The files
+
+| Path | What it is |
+|---|---|
+| `boards/ti/lp_mspm0l1306/board.yml`, `Kconfig.lp_mspm0l1306`, `board.cmake`, `lp_mspm0l1306_defconfig`, `lp_mspm0l1306.yaml`, `support/openocd.cfg` | Board files, same shape as Zephyr's `lp_mspm0l2228`. OpenOCD config is the l2228 one: XDS110 probe, `target/ti_mspm0.cfg`. |
+| `boards/ti/lp_mspm0l1306/lp_mspm0l1306.dts` | Devicetree: UART0 console, LEDs `led0` (LED1, PA0, active low, open drain), `led1` red PA26, `led2` green PA13, `led3` blue PA27 (active high), buttons `sw0` S1 on PA18 (active high, external pull-down) and `sw1` S2 on PA14 (active low, internal pull-up). |
+| `boards/ti/lp_mspm0l1306/gpio_mspm0_l1306.c`, `Kconfig`, `Kconfig.defconfig`, `CMakeLists.txt` | Board-local copy of Zephyr's GPIO driver with a 28-pin table, and the switch that builds it instead of the upstream one. |
+| `overlays/blinky-rgb-red.overlay` | Points `led0` at the RGB red LED. |
+| `build.sh` | Builds every target in this README. |
+| `mcu-bench-l1306/` | The benchmark copy. Changed: `src/main.c`, `CMakeLists.txt`, `prj.conf`. New: `prj-g3507.conf` (the original `prj.conf`), `coremark2k.conf`. Unchanged: `speed.conf`, `src/coremark/`, `src/nn_weights.h`. |
+| `tools/stackdepth.py` | Worst-case stack depth from GCC call-graph files. |
+| `tools/ramsum.py` | Where the RAM went, from a linker map file. Works on failed links. |
+
+Pin sources: `mspm0l130x.h` in MSPM0 SDK 2.11 (UART0 TX is PINCM9 function 2, RX is PINCM10 function 2, and PA*n* is PINCM *n*+1 for all 28 pins), and the LP_MSPM0L1306 example READMEs in the same SDK (LED jumpers, S1 on PA18 with external pull-down and J11, S2 on PA14 to ground with no pull resistor). The SDK's own board file `LP_MSPM0L1306.syscfg.json` lists the header pins but not the buttons.
+
+## Commands
+
+Build one target, or all of them. The script sets up the environment from `~/zephyrproject/.venv` and `~/zephyr-toolchain`.
+
+```bash
+cd mspm0l1306/zephyr
+./build.sh blinky
+```
+
+```bash
+./build.sh all
+```
+
+Targets: `hello_world`, `blinky`, `blinky-rgb-red`, `bench-Os`, `bench-O2`, `bench-O3`, `coremark2k-Os`, `coremark2k-O2`, `coremark2k-O3`, `bench-port-Os` (and O2, O3), `bench-orig-Os` (and O2, O3), `synchronization`, `philosophers`, `shell_module`, `logger`, or `custom <name> <app folder> [cmake options]`.
+
+What the script runs, for one sample:
+
+```bash
+source ~/zephyrproject/.venv/bin/activate
+export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile CROSS_COMPILE=~/zephyr-toolchain/arm-zephyr-eabi/bin/arm-zephyr-eabi-
+cd ~/zephyrproject/zephyr
+west build -p always -b lp_mspm0l1306 samples/basic/blinky -d <OUT>/blinky -- -DBOARD_ROOT=<path to this folder>
+```
+
+The runs above flashed with `../tools/flash_and_capture.py`; `west flash` was not run on this board. The pattern that worked on the G3507, with this board's probe serial number, from `~/zephyrproject/zephyr` with the environment above:
+
+```bash
+west flash -d <OUT>/blinky --openocd ~/zephyr-toolchain/xpack-openocd-0.12.0-7/bin/openocd --openocd-search ~/zephyr-toolchain/xpack-openocd-0.12.0-7/openocd/scripts --cmd-pre-init "adapter serial ML130001"
+```
+
+```bash
+../tools/ocd.sh "mspm0_board_reset"
+```
+
+The second command is the board-level reset. On the G3507 a debugger soft reset left the chip in Zephyr's NMI handler (`../../mspm0g3507/zephyr/README.md`).
+
+## Failures and how they were passed
+
+1. **blinky did not compile.** `drivers/gpio/gpio_mspm0.c:57:9: error: 'IOMUX_PINCM38' undeclared here (not in a function); did you mean 'IOMUX_PINCM28'?` and the same for PINCM39 to PINCM74. **Tag: Third-party behavior.** Zephyr 4.4.2's GPIO driver has one pin table for the whole MSPM0L series, and it is the 80-pin MSPM0L222x layout. The device headers for MSPM0L110x, L130x and L134x stop at PINCM28. Of Zephyr's four MSPM0 boards, the one with 4 kB of RAM (`pocketbeagle_2/mspm0l1105`) lists pinctrl as supported, not GPIO. Fix: the board folder builds its own copy of the driver with the right table (PA*n* is PINCM *n*+1), and its `Kconfig.defconfig` turns the upstream driver off. If you set `CONFIG_GPIO_MSPM0=y` yourself, the error comes back: `./build.sh custom blinky-upstream-gpio samples/basic/blinky -DCONFIG_GPIO_MSPM0=y -DCONFIG_BOARD_LP_MSPM0L1306_GPIO=n` reproduces it. CMake then prints `No SOURCES given to Zephyr library: drivers__gpio`. That warning is expected and harmless.
+2. **No pin-mux file for this chip.** Zephyr's TI module ships `mspm0l110x-pinctrl.dtsi` and `mspm0l222x-pinctrl.dtsi`, nothing for L130x. **Tag: Third-party behavior.** Fix: the two UART pin nodes are written in the board's devicetree from the SDK header.
+3. **The benchmark did not compile.** `error: unknown type name 'DL_MathACL_operationConfig'`, `error: 'MATHACL' undeclared`, `error: 'GPIOB' undeclared (first use in this function); did you mean 'GPIOA'?` **Tag: Chip limit.** The benchmark was written for the G3507, which has a math accelerator and a second GPIO port. The L1306 has neither (`mspm0l130x.h` has no `MATHACL_BASE` and no `GPIOB_BASE`). Fix in the copy: accelerator tests only on the MSPM0G series, register toggle on PA0, board name from the chip.
+4. **Then it did not link.** `section 'noinit' will not fit in region 'RAM'` and `region 'RAM' overflowed by 8728 bytes`, the same at -Os, -O2 and -O3. **Tag: Chip limit.** The G3507 settings ask for 12,824 bytes (12.5 kB): main stack 6,144, interrupt stack 2,048, second thread 512, idle 256, copy buffers 2,048, neural-net buffers 1,080, and 736 bytes of everything else.
+5. **Fitting it.** Changes in the copy, each needed:
+   - Main stack 6,144 to 2,304. Interrupt stack 2,048 to 512. Second thread 512 to 256. Idle stays 256.
+   - Copy and neural-net buffers moved from fixed RAM onto the stack, inside two functions that return before CoreMark starts. The same bytes serve CoreMark later.
+   - The copy test is 512 bytes, not 1,024. Two 1,024-byte buffers on the stack would make that test the deepest point, deeper than CoreMark.
+   - CoreMark data 2,000 to 1,200 bytes (1.2 kB). This is CoreMark's own "profile run" size: the seeds change to 8, 8, 8 and CoreMark still checks its results against known answers. The score is not comparable with any 2,000-byte score. Why it had to go: in the fitted build everything except the main stack takes 1,776 bytes (1.7 kB), which leaves 2,320 for the main stack. CoreMark at 2,000 bytes (2.0 kB) needs at least 2,640 there (next point).
+   - Logging was already off. The accelerator code is gone (point 3).
+   - The bench now prints how much of every stack was used.
+6. **How the stack sizes were chosen.** From GCC's call graph (`-fcallgraph-info=su`, then `tools/stackdepth.py`). Worst direct-call path from `main`: 1,896 bytes (1.9 kB) at -Os and 1,944 at -O2 and -O3 for the fitted bench; 2,640 and 2,680 for CoreMark alone at 2,000 bytes (2.0 kB). The analysis cannot follow calls through function pointers (printf's path to the UART) or count interrupt frames. For scale: the same analysis on the copy with G3507 settings gives 2,784 bytes (2.7 kB) at -Os, and the G3507 build of the same benchmark measured 2,880 bytes (2.8 kB) on hardware. The fitted bench has a 2,304-byte main stack. The CoreMark-alone build has 2,912 and a 320-byte interrupt stack; boot needs 132 to 144 bytes there and the timer interrupt 104 to 120. Measured on the board afterwards: every stack line printed above 0 (smallest margin 104 bytes, the main stack of `coremark2k-trueO3`), so the sizes held.
+7. **"-O3" is not -O3.** The benchmark's CMakeLists adds `-O3 -funroll-loops` to the app, but Zephyr's own `-O2` comes later on the compile line, and GCC uses the last `-O`. Seen in the build's `compile_commands.json`, here and on the G3507: `-O3 ... -O2`. So every "-O3" result in this project, on the G3507 too, is -O2 with loop unrolling. **Tag: Third-party behavior.** The copy keeps the same behavior so its numbers line up with the G3507's. To get a real -O3 in the copy, add `-DBENCH_TRUE_O3=1` to `-DBENCH_O3=1` (`./build.sh coremark2k-trueO3`): it appends `-O3 -funroll-loops` as a source-file property, so the app and CoreMark lines end `-O3 -funroll-loops -O2 -O3 -funroll-loops` and the kernel stays at `-O2`. It links in 4 kB; its static worst stack path is 2,704 bytes (2.6 kB) of the 2,912-byte main stack. `CONFIG_COMPILER_OPT="-O3 -funroll-loops"` does not work: it never reaches the app lines (they still end `-O2`) and moves the kernel and C library to -O3 instead.
+8. **Every benchmark image hard-faulted at boot.** The serial port showed `***** HARD FAULT *****` and `Faulting instruction address (r15/pc): 0x00004f10`, which is `sys_heap_init`, called from `malloc_prepare`. **Tag: Third-party behavior.** Zephyr's C library heap defaults to "all RAM left after the program" (`CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=-1`). These images leave 8 to 16 bytes, and setting up a heap that small writes its bookkeeping past the end of RAM. No warning at build time. Fix: `CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=0` in `prj.conf` (nothing here calls `malloc`).
+9. **Interrupt latency read 17.7 million cycles**. The test pended interrupt line 28, which the G3507 uses for AES. **Tag: Chip limit.** On the L1306 the interrupt controller implements only lines 0, 1, 2, 4, 9, 13, 15, 16, 18, 20, 24, 25 and 31 (writing all ones to the enable register reads back `0x8315a217`), so pending line 28 does nothing, and `IRQ_CONNECT` accepts it without a word. Fix: line 25 (I2C1, unused here).
+
+## Other traps for a beginner or an AI agent
+
+- **S1 is also the bootloader pin.** PA18. Holding S1 through a reset starts TI's ROM bootloader instead of your program.
+- **LED1 is open drain.** PA0 can only pull low. It needs the J10 pull-up jumper, and J2 to reach the LED. The devicetree marks it `GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN`.
+- **`led0` is LED1.** Zephyr counts from 0, the board's silk screen from 1.
+- **Nodes for hardware the chip does not have.** The shared MSPM0 devicetree files define `gpiob`, `gpioc` and `rtc`. The L1306 header has no `GPIOB_BASE` and no RTC. They are disabled; do not enable them.
+- **No `clock-frequency` on `cpu0`** in the L-series devicetree. The benchmark reads it. The board sets 32 MHz there; that is a description, not a register setting.
+- **The upstream l2228 board puts the app at 0x8000** (MCUboot slot partitions sized for 256 kB). Not copied here; this board links at 0.
+- **Every build compiles the C library from source:** 1,099 steps, about 2 minutes per build on this Mac when nothing else runs.
+- **`dtc` is not installed** (`Could NOT find Dtc`). Zephyr builds without it, but the extra devicetree checks dtc does were not run.
+- **No Kconfig or devicetree warnings** in any build.
+
+## Zephyr's clock setup on this chip
+
+Read from the source, not measured here:
+
+- Devicetree (`dts/arm/ti/mspm0/mspm0.dtsi`; the L-series and L1306 files and this board change nothing): SYSOSC 32 MHz, MCLK from SYSOSC at 32 MHz, ULPCLK 32 MHz with no divider, LFCLK from the internal 32,768 Hz oscillator. HFXT, LFXT, HFCLK, MFPCLK and CANCLK are disabled. There is no PLL node on the L series.
+- `drivers/clock_control/clock_control_mspm0.c` at boot calls `DL_SYSCTL_setSYSOSCFreq(DL_SYSCTL_SYSOSC_FREQ_BASE)` and nothing else for this devicetree. MCLK stays on SYSOSC, where reset leaves it.
+- `soc/ti/mspm0/common/soc.c` sets the brown-out level to 0.
+- Kconfig takes the system clock, 32,000,000 Hz, from the MCLK node. The system timer is the Cortex-M SysTick, 10,000 ticks a second.
+- TI's own `empty_non_sysconfig` example for this board does the same three things: SYSOSC base frequency, MCLK divider off, brown-out level 0.
+- Neither sets flash wait states. The data sheet says the hardware manages them.
+
+==============================================================================
+FILE: mspm0l1306/zephyr/extra/README.md | More Zephyr 4.4.2 on the TI LP-MSPM0L1306 LaunchPad: what else fits in 4 kB of RAM
+==============================================================================
+
+# More Zephyr 4.4.2 on the TI LP-MSPM0L1306 LaunchPad: what else fits in 4 kB of RAM
+
+Terms: [docs/vocab.md](../../../docs/vocab.md). 1 kB = 1,024 bytes. Built 2026-10-06 with Zephyr 4.4.2, GCC 12.2.0 from Zephyr SDK 0.17.4, on the out-of-tree board in `../boards/` (see [../README.md](../README.md)). Built and, unless a row says otherwise, run on the board 2026-10-06. The "What you should see" section is from Zephyr's source; where a table above it shows something different, the table wins.
+
+## Short answer
+
+Run on the board 2026-10-06 (probe <probe serial>), not just linked:
+
+- **A Zephyr shell runs in 4 kB.** With TI's 32-pin chip and the board file, `shell_module` in its minimal setting answers `demo ping` with `pong`, with 48 bytes of RAM left.
+- **All eight Thread-Metric tests run**, with stacks and data cut to fit (so their counts are not comparable with other chips' published Thread-Metric scores). Three 30-second periods each agreed within 0.05%.
+- **Logging works in both modes**, and the synchronization sample runs. Deferred logging first crashed 4 ms after boot (`ZEPHYR FATAL ERROR 0: CPU exception`, in `log_output_flush`); a 768-byte log thread stack fixed it. **Tag: Setup or handling.** A log thread stack of 512 bytes is too small; use 768.
+- **latency_measure crashes after its first result.** It reports a `k_yield` context switch at 307 cycles (9.6 µs), then faults in `z_setup_new_thread` and reboots in a loop. **Tag: Unknown (suspected: Chip limit).** Its test stacks were cut to 256 bytes to link; not traced further.
+- Zephyr's minimal C library saves 24 bytes of RAM against picolibc and costs 140 bytes of flash.
+
+## What was built
+
+Every image needs `CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=0` (without it the C library heap takes all leftover RAM and the image hard-faults at boot, see [../README.md](../README.md), point 8). Every image also sets `CONFIG_ISR_STACK_SIZE=512`, because Zephyr's default interrupt stack is 2,048 bytes (2.0 kB), half the chip. Those two are not repeated in the Changes column.
+
+| Build | Fits | Flash (bytes) | RAM (bytes) | RAM left (bytes) | Changes |
+|---|---|--:|--:|--:|---|
+| Thread-Metric basic | yes, ran | 13,520 | 3,712 | 384 | Main stack 768. Reads a 256-entry array instead of 1,024 (the 1,024 array alone is all 4,096 bytes (4.0 kB)), so the count is not comparable with other chips |
+| Thread-Metric cooperative | yes, ran | 14,124 | 3,984 | 112 | Five test stacks of 256 instead of 1,024; main stack 768 |
+| Thread-Metric preemptive | yes, ran | 13,972 | 3,984 | 112 | Same as cooperative |
+| Thread-Metric interrupt | yes, ran | 22,748 | 2,880 | 1,216 | Test stack 512. `CONFIG_TEST=y` (needed for `irq_offload`) |
+| Thread-Metric interrupt preemption | yes, ran | 22,796 | 3,536 | 560 | Same as interrupt |
+| Thread-Metric memory allocation | yes, ran | 14,080 | 2,976 | 1,120 | Test stack 512; one slab of two 128-byte blocks instead of four slabs of eight |
+| Thread-Metric message | yes, ran | 14,340 | 2,888 | 1,208 | Test stack 512; one queue instead of four |
+| Thread-Metric synchronization | yes, ran | 14,032 | 2,704 | 1,392 | Test stack 512 |
+| latency_measure | links; crashes after the first result | 32,212 | 3,884 | 212 | Test stacks 256 (`CONFIG_TEST_EXTRA_STACK_SIZE=-768`), main stack 512, kernel heap 256 (was 2,048) |
+| logger, deferred mode | links; crashed at boot (log thread stack 512) | 22,780 | 3,656 | 440 | Log buffer 256 (was 2,048), log thread stack 512, demo thread stack 512, main stack 512 |
+| logger, immediate mode | yes, ran | 17,684 | 3,640 | 456 | Demo thread and main stack keep the sample's 1,024 bytes (1.0 kB); no log buffer, no log thread |
+| logger, deferred mode, log thread stack 768 | yes, ran | | 3,912 | 184 | As the deferred row, log thread stack 768 (`-DCONFIG_LOG_PROCESS_THREAD_STACK_SIZE=768`) |
+| logger, minimal mode | no | | | | The sample's own code uses `CONFIG_LOG_BUFFER_SIZE`, which does not exist in minimal mode: compile error |
+| shell_module | yes, ran: `demo ping` gives `pong` | 22,048 | 4,048 | **48** | `prj_minimal.conf` (`CONFIG_SHELL_MINIMAL`), shell stack 640 (was 2,048), system work queue stack 512 (was 1,024), main stack 512, no history, 32-byte command line, no tab completion, no dynamic or foreground demo commands (a 660-byte table), no logging |
+| synchronization | yes, ran | 10,852 | 3,136 | 960 | Both thread stacks 512 (the sample hard-codes 1,024, so a copy of its `main.c` is built with that number changed), main stack 512 |
+| hello_world, Zephyr minimal libc | yes, ran | 9,564 | 3,808 | 288 | `CONFIG_MINIMAL_LIBC=y` |
+| hello_world, picolibc (baseline from [../README.md](../README.md)) | yes | 9,424 | 3,832 | 264 | none |
+
+"Left" is 4,096 minus RAM used. Thread-Metric tests have to share one build folder to be quick (the tests differ only in app code), which is why `extra/thread_metric/build_all.sh` exists.
+
+Two places needed more than a config line, and both are in this folder, not in Zephyr: the Thread-Metric porting layer (`thread_metric/src/tm_porting_layer_l1306.c`) replaces Zephyr's, which reserves ten 1,024-byte stacks plus buffers (14 kB); and the synchronization and logger folders each build a copy of the sample's `main.c` with one hard-coded stack number changed. Zephyr's own test sources are read in place and are not edited.
+
+**Tag: Third-party behavior.** Zephyr's defaults assume more RAM; everything that fits does so by giving up Zephyr's default stack sizes. Stack overflow is silent on this chip (no memory protection unit): it corrupts the next stack down and the run still looks fine.
+
+## Thread-Metric results
+
+Counts per 30-second period, as Thread-Metric prints them (`Time Period Total`), three periods each, Zephyr 4.4.2, GCC, 32 MHz. Higher is better. Because stacks, the basic test's array, the slab and the queue were cut to fit 4 kB (table above), compare these only with each other or with the same builds on another board, not with published Thread-Metric tables.
+
+| Test | Period 1 | Period 2 | Period 3 |
+|---|--:|--:|--:|
+| Basic processing (256-entry array) | 208,142 | 208,103 | 208,103 |
+| Cooperative context switching | 3,326,961 | 3,326,410 | 3,326,362 |
+| Preemptive context switching | 2,287,188 | 2,287,411 | 2,287,411 |
+| Interrupt processing | 883,305 | 883,158 | 883,159 |
+| Interrupt preemption | 627,140 | 627,164 | 627,164 |
+| Memory allocation | 6,531,728 | 6,530,683 | 6,530,684 |
+| Message processing | 1,799,745 | 1,799,452 | 1,799,453 |
+| Synchronization | 7,935,244 | 7,933,778 | 7,933,778 |
+
+## Images within 64 bytes of full RAM
+
+shell_module: 48 bytes left. It has no way to print its own stack use. `CONFIG_INIT_STACKS=y` is on (the minimal shell has no `kernel stacks` command), so the stacks are painted with 0xAA and can be read with a debugger, which this project has not done. Treat a shell that hangs or prints garbage after typing a long line as a possible stack overflow, not as a driver fault.
+
+Three more are close (112 bytes): Thread-Metric cooperative and preemptive. They print their own stack use every period (see below), so check those lines.
+
+## Commands
+
+Run from `mspm0l1306/zephyr/`. Set `OUT` to choose where builds go. Nothing here touches hardware.
+
+```bash
+export OUT=/some/folder
+E=$PWD/extra
+
+# Thread-Metric, all eight tests, one build folder, hex files at $OUT/tm-<test>.hex
+extra/thread_metric/build_all.sh
+extra/thread_metric/build_all.sh cooperative      # one test
+TM_DURATION=10 extra/thread_metric/build_all.sh   # 10-second period instead of 30
+
+# latency_measure
+./build.sh custom latency tests/benchmarks/latency_measure -DEXTRA_CONF_FILE=$E/latency_measure/l1306.conf
+
+# logger
+./build.sh custom logger-deferred  $E/logger -DCONF_FILE="$E/logger/common.conf;$E/logger/deferred.conf"
+./build.sh custom logger-immediate $E/logger -DLOG_STACK=1024 -DCONF_FILE="$E/logger/common.conf;$E/logger/immediate.conf"
+
+# shell
+./build.sh custom shell samples/subsys/shell/shell_module -DCONF_FILE=prj_minimal.conf -DEXTRA_CONF_FILE=$E/shell_module/l1306.conf
+
+# synchronization
+./build.sh custom sync $E/synchronization -DCONF_FILE=$E/synchronization/prj.conf
+
+# hello_world with the minimal C library
+./build.sh custom hello-minlibc samples/hello_world -DEXTRA_CONF_FILE=$E/hello_minimal/minimal_libc.conf
+```
+
+Hex files: `$OUT/<name>/zephyr/zephyr.hex` for `build.sh` builds, `$OUT/tm-<test>.hex` for Thread-Metric. `TM_DURATION` is a plain compile option (`-DTM_DURATION`), not Kconfig. Changing it rebuilds only the app.
+
+## What you should see on UART0 (115200 8N1)
+
+Every image starts with `*** Booting Zephyr OS build v4.4.2 ***` (shell_module turns the banner off).
+
+**Thread-Metric (all eight).** Nothing prints for the first 30 seconds. Then each period prints, in this order: `S,` stack lines (`S,test_thread_N_unused_of_<size>,<bytes>`, `S,main_unused_of_768,...`, `S,isr_unused_of_512,...`, `S,idle_unused_of_...`), then `**** Thread-Metric <name> Test **** Relative Time: 30`, then `Time Period Total:  <count>`. Next period is at 60, then 90. Let it run three periods (90 seconds); the first period can include start-up. Cooperative also prints five per-thread counters; they should differ by at most 1. A line starting `ERROR:` means the test failed. Any `S,` value of 0 means a stack ran out and that run is not valid. The count is events per period: the larger, the faster. The basic test count is only for this chip (smaller array). Compare these counts only with the same builds on another board.
+
+**latency_measure.** It prints the first result (`Context switch via k_yield : 307 cycles , 9620 ns`) and then faults in `z_setup_new_thread` and reboots in a loop.
+
+**logger (deferred and immediate).** The sample prints these headings with `printk`, in order: `Module logging showcase.`, `Instance level logging showcase.`, `Severity levels showcase.`, `String logging showcase.`, `Logging performance showcase.` (ends with `Estimated logging capabilities: N messages/second`), `Logs from external logging system showcase.`. Between them are log lines like `[00:00:00.123,000] <inf> sample_module: ...`. In deferred mode the 256-byte buffer holds only a few messages, so expect `--- N messages dropped ---` lines; immediate mode drops nothing. If the output stops or the board resets partway, suspect a stack.
+
+**shell_module.** The prompt `uart:~$`. Type `help`, `version` (prints `Zephyr version 4.4.2`), `demo ping` (`pong`), `demo board` (`lp_mspm0l1306`), `demo params 1 2 3`. The shell ran with interrupt-driven UART: `demo ping` returned `pong`.
+
+**synchronization.** Two lines alternating about every 0.6 seconds: `thread_a_entry_point: Hello World from cpu 0 on lp_mspm0l1306!` then `thread_b_entry_point: ...` (thread names are off in this build, so the function name prints).
+
+**hello_world (minimal libc).** `Hello World! lp_mspm0l1306/mspm0l1306`, same as the picolibc build.
+
+## Where the change lives
+
+`extra/thread_metric/` (CMakeLists, `prj.conf`, `irq.conf`, porting layer, `build_all.sh`), `extra/latency_measure/l1306.conf`, `extra/logger/` (CMakeLists, Kconfig, `common.conf`, `deferred.conf`, `immediate.conf`, `minimal.conf` which does not build), `extra/shell_module/l1306.conf`, `extra/synchronization/`, `extra/hello_minimal/minimal_libc.conf`.

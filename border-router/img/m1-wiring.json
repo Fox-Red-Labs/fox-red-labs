@@ -1,0 +1,303 @@
+{
+ "title": "Thread border router test: host board to radio board, 3 wires",
+ "warning": "Unplug both USB cables before wiring. 3.3 V boards, no level shifter.",
+ "credit": "Board drawings: TI SPRUIZ8 (CC1354P10) and SWRU588 (CC2340R5) quick start guides",
+ "boards": [
+  {
+   "name": "LP-CC1354P10-1",
+   "role": "HOST  (OpenThread border router)",
+   "pins": {
+    "1": "3V3",
+    "2": "DIO23",
+    "3": "DIO12",
+    "4": "DIO13",
+    "5": "DIO22",
+    "6": "DIO24",
+    "7": "DIO10",
+    "8": "DIO21",
+    "9": "DIO4",
+    "10": "DIO5",
+    "21": "5V",
+    "22": "GND",
+    "23": "DIO25",
+    "24": "DIO26",
+    "25": "DIO27",
+    "26": "DIO28",
+    "27": "DIO29",
+    "28": "DIO30",
+    "29": "DIO43",
+    "30": "DIO44",
+    "40": "DIO47",
+    "39": "DIO46",
+    "38": "DIO20",
+    "37": "DIO45",
+    "36": "DIO18",
+    "35": "BPRST",
+    "34": "TMS",
+    "33": "TCK",
+    "32": "DIO16",
+    "31": "DIO17",
+    "20": "GND",
+    "19": "DIO19",
+    "18": "DIO11",
+    "17": "DIO14",
+    "16": "LPRST",
+    "15": "DIO9",
+    "14": "DIO8",
+    "13": "DIO42",
+    "12": "DIO41",
+    "11": "DIO15"
+   },
+   "columns": [
+    [
+     1,
+     10
+    ],
+    [
+     21,
+     30
+    ],
+    null,
+    [
+     40,
+     31
+    ],
+    [
+     20,
+     11
+    ]
+   ],
+   "image": "border-router/img/src/source-lp-em-cc1354p10-1-spruiz8.png",
+   "scale": 0.75,
+   "pins_px": {
+    "x": [
+     110,
+     155,
+     null,
+     865,
+     908
+    ],
+    "y0": 408,
+    "pitch": 44.3
+   }
+  },
+  {
+   "name": "LP-EM-CC2340R5",
+   "role": "RADIO  (TI ot-rcp)",
+   "pins": {
+    "1": "3V3",
+    "2": "NC",
+    "3": "DIO22",
+    "4": "DIO20",
+    "5": "NC",
+    "6": "NC",
+    "7": "DIO18",
+    "8": "NC",
+    "9": "DIO24",
+    "10": "DIO0",
+    "11": "NC",
+    "12": "DIO9",
+    "13": "DIO10",
+    "14": "DIO12",
+    "15": "DIO13",
+    "16": "LPRST",
+    "17": "DIO19",
+    "18": "DIO11",
+    "19": "NC",
+    "20": "GND",
+    "21": "5V",
+    "22": "GND",
+    "23": "DIO23",
+    "24": "DIO25",
+    "25": "DIO1",
+    "26": "DIO2",
+    "27": "DIO5",
+    "28": "DIO7",
+    "29": "NC",
+    "30": "NC",
+    "31": "NC",
+    "32": "NC",
+    "33": "SWDCK",
+    "34": "SWDIO",
+    "35": "BPRST",
+    "36": "DIO8",
+    "37": "DIO21",
+    "38": "DIO6",
+    "39": "DIO14",
+    "40": "DIO15"
+   },
+   "columns": [
+    [
+     1,
+     10
+    ],
+    [
+     21,
+     30
+    ],
+    null,
+    [
+     40,
+     31
+    ],
+    [
+     20,
+     11
+    ]
+   ],
+   "image": "border-router/img/src/source-lp-em-cc2340r5-swru588.png",
+   "scale": 0.75,
+   "pins_px": {
+    "x": [
+     100,
+     147,
+     null,
+     850,
+     895
+    ],
+    "y0": 395,
+    "pitch": 44.0
+   }
+  }
+ ],
+ "wires": [
+  {
+   "from": [
+    0,
+    2
+   ],
+   "to": [
+    1,
+    14
+   ],
+   "color": [
+    250,
+    210,
+    0
+   ],
+   "label": "yellow: host TX to radio RX",
+   "label_y": 1360,
+   "tag_from": "TX DIO23",
+   "tag_to": "RX DIO12"
+  },
+  {
+   "from": [
+    1,
+    7
+   ],
+   "to": [
+    0,
+    5
+   ],
+   "color": [
+    40,
+    100,
+    235
+   ],
+   "label": "blue: radio TX to host RX",
+   "label_y": 1430,
+   "tag_from": "TX DIO18",
+   "tag_to": "RX DIO22"
+  },
+  {
+   "from": [
+    0,
+    20
+   ],
+   "to": [
+    1,
+    22
+   ],
+   "color": [
+    25,
+    25,
+    25
+   ],
+   "label": "black: GND to GND",
+   "arrow": false,
+   "label_y": 1500,
+   "tag_from": "GND",
+   "tag_to": "GND"
+  }
+ ],
+ "callouts": [
+  {
+   "side": "left",
+   "y": 380,
+   "lines": [
+    "Host side: 2 signals, 1 ground",
+    "pin 2  (DIO23) UART1 TX  yellow",
+    "pin 5  (DIO22) UART1 RX  blue",
+    "pin 20 (GND)  black",
+    "Pins 3, 4 stay empty: the",
+    "debugger's own UART."
+   ]
+  },
+  {
+   "side": "right",
+   "y": 1150,
+   "lines": [
+    "Radio side: 2 signals, 1 ground",
+    "pin 14 (DIO12) UART0 RX  yellow",
+    "pin 7  (DIO18) UART0 TX  blue",
+    "pin 22 (GND)  black",
+    "Pins 3, 4 stay empty here too.",
+    "ot-rcp is built for DIO18/DIO12."
+   ]
+  },
+  {
+   "side": "left",
+   "y": 840,
+   "lines": [
+    "Finding pin 1",
+    "Outer-left pin nearest the USB end.",
+    "1 to 10 down the outer left column,",
+    "21 to 30 down the inner left column;",
+    "right side: 40 to 31 inner,",
+    "20 to 11 outer. Match the DIO name",
+    "on the silkscreen."
+   ]
+  }
+ ],
+ "steps": {
+  "head": "Test steps, in order (M1)",
+  "items": [
+   [
+    "1",
+    "Photo both boards wired, before power."
+   ],
+   [
+    "2",
+    "Plug in the radio board only. Flash ot-rcp with the DIO18/DIO12 pins."
+   ],
+   [
+    "3",
+    "Plug in the host board. Load the host image (CCStudio scripting, no power cycle)."
+   ],
+   [
+    "4",
+    "On the host console: `rcp version` must answer with TI's OPENTHREAD/1.4 string."
+   ],
+   [
+    "5",
+    "`dataset init new`, `dataset commit active`, `ifconfig up`, `thread start`."
+   ],
+   [
+    "6",
+    "`state` reads leader in 16 s fresh, 37 to 39 s after a restart. Record PAN, channel, time."
+   ],
+   [
+    "7",
+    "Pull the yellow wire: `state` must stop answering. Replace it: it recovers."
+   ],
+   [
+    "8",
+    "Put each board back on what it ran before; the host README has the restore commands."
+   ]
+  ]
+ },
+ "width": 3000,
+ "height": 2230,
+ "left_x": 760,
+ "gap": 480
+}

@@ -1,0 +1,43 @@
+From b5b317ee17b96de9c5f2f716934784d93101b3d3 Mon Sep 17 00:00:00 2001
+From: Contributor Name <contributor@example.invalid>
+Date: Sun, 25 Oct 2026 10:10:08 -0400
+Subject: [PATCH 2/4] tests: drivers: flash: common: add lp_mspm0g3519 overlay
+
+The common flash test needs storage_partition. The LP-MSPM0G3519 board
+file has no partitions, so add one: the last 4 kB of flash0 (bank 0,
+256 kB), away from the image at the start of the bank.
+
+Assisted-by: Claude:claude-sonnet-5-5
+---
+ .../flash/common/boards/lp_mspm0g3519.overlay | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+ create mode 100644 tests/drivers/flash/common/boards/lp_mspm0g3519.overlay
+
+diff --git a/tests/drivers/flash/common/boards/lp_mspm0g3519.overlay b/tests/drivers/flash/common/boards/lp_mspm0g3519.overlay
+new file mode 100644
+index 000000000..97c2d8a73
+--- /dev/null
++++ b/tests/drivers/flash/common/boards/lp_mspm0g3519.overlay
+@@ -0,0 +1,22 @@
++/*
++ * Copyright (c) 2026 Texas Instruments
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/* The common flash test works on storage_partition. Use the last 4 kB sector group of
++ * flash0 (bank 0, 256 kB); the image sits at the start of the same bank.
++ */
++&flash0 {
++	partitions {
++		ranges;
++		#address-cells = <1>;
++		#size-cells = <1>;
++
++		storage_partition: partition@3f000 {
++			compatible = "zephyr,mapped-partition";
++			label = "storage";
++			reg = <0x3f000 DT_SIZE_K(4)>;
++		};
++	};
++};

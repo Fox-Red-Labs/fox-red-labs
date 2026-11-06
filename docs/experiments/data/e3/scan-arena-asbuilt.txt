@@ -1,0 +1,2 @@
+18:58:28 9C868C99-A4CE-1076-FC20-2B068A79739D 'FRL Temp' rssi=-35 raw=4000010901 {'version': 2, 'encrypted': False, 'trigger': False, 'packet_id': 1, 'count': 1}
+1 distinct packets

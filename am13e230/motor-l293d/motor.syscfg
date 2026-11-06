@@ -1,0 +1,51 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+// Kit DC motor through an L293D: MCPWM4 output 1A (PB3, J4 pin 40) and 2A (PB1, J4 pin 38) are the two
+// H-bridge inputs. Up-count, 10,000 clocks a period at the 200 MHz time-base clock = 20 kHz (above hearing).
+// LED4 (PA5, active low) shows when the motor is driven. Clock block copied from TI's mcpwm examples.
+const gpio   = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1  = gpio.addInstance();
+const mcpwm  = scripting.addModule("/drivers/mcpwm", {}, false);
+const mcpwm1 = mcpwm.addInstance();
+const sysctl = scripting.addModule("/drivers/sysctl");
+
+gpio1.$name                         = "GPIO_LED";
+gpio1.associatedPins[0].$name       = "LED4";
+gpio1.associatedPins[0].initialValue = "SET";
+gpio1.associatedPins[0].pin.$assign = "PA5";
+
+mcpwm1.$name                                     = "MOTOR_PWM";
+mcpwm1.mcpwmBase                                 = "MCPWM4";
+mcpwm1.pinList                                   = ["1A","2A"];
+mcpwm1.enablePWM1B                               = false;
+mcpwm1.enablePWM2B                               = false;
+mcpwm1.enablePWM3A                               = false;
+mcpwm1.enablePWM3B                               = false;
+mcpwm1.timeBase.$name                            = "drivers_mcpwm_v0_mcpwm_timeBase0";
+mcpwm1.timeBase.counterMode                      = "DL_MCPWM_COUNTER_MODE_UP";
+mcpwm1.timeBase.periodValue                      = 9999;
+mcpwm1.timeBase.emulationMode                    = "DL_MCPWM_EMULATION_FREE_RUN";
+mcpwm1.counterCompare.$name                      = "drivers_mcpwm_v0_mcpwm_counterCompare0";
+mcpwm1.counterCompare.PWM1_CMPA                  = 0;
+mcpwm1.counterCompare.PWM2_CMPA                  = 0;
+mcpwm1.actionQualifier.$name                     = "drivers_mcpwm_v0_mcpwm_actionQualifier0";
+mcpwm1.actionQualifier.PWM1A.$name               = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents0";
+mcpwm1.actionQualifier.PWM1A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM1A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM2A.$name               = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents2";
+mcpwm1.actionQualifier.PWM2A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM2A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.loadMode.$name                            = "drivers_mcpwm_v0_mcpwm_loadMode0";
+mcpwm1.peripheral["1A"].$assign                  = "PB3";
+mcpwm1.peripheral["2A"].$assign                  = "PB1";
+
+sysctl.VREFSource         = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
+sysctl.peripheral.$assign = "SYSCTL";
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+mcpwm1.peripheral.$suggestSolution = "MCPWM4";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";

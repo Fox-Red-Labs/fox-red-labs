@@ -1,0 +1,1139 @@
+# Fox Red Labs: cc1354p10
+
+Every reader page concatenated, for AI assistants. 10 files. Each starts with a line giving its path and heading. Links inside keep the paths they have in the repo.
+
+==============================================================================
+FILE: cc1354p10/README.md | What is on a TI LP-CC1354P10-1 LaunchPad development kit, and how do you get it running from a Mac terminal?
+==============================================================================
+
+# What is on a TI LP-CC1354P10-1 LaunchPad development kit, and how do you get it running from a Mac terminal?
+
+> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+
+This kit arrived with TI's Project Zero Bluetooth LE demo in flash that had never run, because its config area (CCFG) was almost blank. Building a correct CCFG from TI's own `ccfg.c` and flashing it with the original image made it advertise Project Zero on 2026-10-06; it was then renamed to "Fox Red 1354" without the source. Measured here since: CoreMark 199.92 at -O3 (4.17 per MHz), Thread and Zigbee links to a CC2340R5, and a Zigbee plus Bluetooth LE example that stays joined to Home Assistant.
+
+Terms: [docs/vocab.md](../docs/vocab.md) and [FAQ.md](FAQ.md). In short: **CCFG** is the chip's boot configuration area; **cJTAG** is the 2-wire debug link; **DSLite** is UniFlash's command-line flasher; **DMM** is TI's scheduler that shares one radio between two stacks. 1 kB = 1,024 bytes.
+
+## What is in this folder, and what is not
+
+<!-- folder-contents -->
+**In this folder:** this README; `AGENTS.md` (notes for an AI assistant, every line from a run); `FAQ.md` (every error hit, with its exact text and the fix). Folders: `baremetal/` bare-metal builds, `dmm-zigbee-ble/` Zigbee plus Bluetooth at once, `pqc-join/` post-quantum join demo, `radio-rx/` radio receive demo, `thread/` Thread demos, `tools/` helper scripts for this board, `zigbee-coordinator/` a Zigbee coordinator, `zigbee-sleepy-sensor/` a sleepy Zigbee sensor. Results are rows in `data/results/cc1354p10.csv` at the top of the repository, not in this folder.
+
+**Not in this folder:** TI's SDK, CCStudio, SysConfig and the compilers (you install them; the versions are under "Where these facts come from"); built images (`.out`, `.hex`, `.bin`, `.elf`), which are not cleared for redistribution, so you build them with the command below; raw run logs and benchmark capture folders, which are lab records and not something to run or flash.
+
+**Taking this folder alone:** the commands in this README run from the top of a clone and call `tools/` and `data/`. A sparse clone fetches only those, about 10 to 60 MB, instead of the whole repository (about 500 MB):
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git
+cd fox-red-labs
+git sparse-checkout add cc1354p10 tools data cc2340r5 board-to-board
+```
+
+`docs/` is left out on purpose (236 MB, mostly pictures). Read a page a link points to there with `git show HEAD:docs/<file>`, for example `git show HEAD:docs/vocab.md`.
+
+
+## The board
+
+| Part | Fact |
+|---|---|
+| Kit | LP-CC1354P10-1, first plugged in 2026-10-06 |
+| Chip | CC1354P10: Cortex-M33 (CPUID `0x410FD214`), Sub-1 GHz and 2.4 GHz radios (Bluetooth LE, Zigbee, Thread, TI 15.4) |
+| Memory | 1 MB flash |
+| Debugger | Onboard XDS110 probe, serial LS45013A, firmware 03.00.00.22 (current tools want 03.00.00.43) |
+| Serial | Backchannel UART at `/dev/cu.usbmodemLS45013A1` |
+| Not supported | Zephyr 4.4.2 has no CC13x4 or CC26x4 support; OpenOCD 0.12 has no CC13x4 target |
+
+Sources: a read-only look at the board on 2026-10-06; [FAQ.md](FAQ.md); [AGENTS.md](AGENTS.md).
+
+### What is on it
+
+Read without changing anything (2026-10-06):
+
+- CPUID `0x410FD214`: Arm Cortex-M33.
+- FCFG1 `ICEPICK_DEVICE_ID` `0x1BB7802F`, `USER_ID` `0x1287F000`.
+- Flash: a program in the first 212 kB (0x0 to 0x34FFF), rest blank. Strings in it: `project_zero.c`, LED service messages, BLE5-Stack paths from TI's build server. It is TI's **Project Zero** Bluetooth LE demo, built by TI.
+- The backchannel UART (`/dev/cu.usbmodemLS45013A1`) was silent for 4 s after plug-in.
+- **The program had never been running.** The config area (CCFG at 0x50000000) was almost blank: `IMAGE_VALID_CONF` = `0xFFFFFFFF`, so the boot ROM skipped the program and sat in TI's serial bootloader (`BL_CONFIG` `0xC5FFFFFF`). Silent UART, all-zero RAM and no Bluetooth all came from that.
+
+## Ten-minute path (not timed)
+
+The steps ran on 2026-10-06; no time was recorded for them. Step 1 is plugging in, the rest is in a terminal.
+
+1. Plug the board's USB cable into the Mac. The probe is on the board; nothing clips on.
+2. In the terminal: check the connection with the connection file below (explained under "Connecting from a terminal").
+
+```bash
+DSLite memory -c cc1354p10/CC1354P10.ccxml -r 0xE000ED00,1 -o cpuid.bin
+```
+
+3. Back up all 1 MB of flash and the CCFG (outside the repo).
+4. Build a correct CCFG by compiling TI's own `source/ti/devices/cc13x4_cc26x4/startup_files/ccfg.c` (F2 SDK 8.33) with its defaults, keeping the board's `BL_CONFIG` so the ROM bootloader stays as a recovery route. Flashed it with the original image: after a power cycle the Mac saw **Project Zero** advertising TI's LED service.
+5. Rename it without the source (`tools/rename_ble.py`, `tools/ti_cinit.py`). Both names sit in the linker's compressed startup data (copy-table record 0, 1.3 kB packed, 4.1 kB unpacked into RAM at 0x20000650). The tool unpacks it with a line-for-line port of TI's `copy_decompress_lzss.c`, edits the names, stores it as literal-only LZSS in blank flash at 0x35000, and repoints the copy table. TI's own decompressor reads it unchanged.
+6. Result: advertises as **Fox Red 1354** (the advertising array holds 12 characters of name beside the BLE flags); GATT device name **Fox Red Lab CC1354** (21-byte slot). From the Mac: found at -39 dBm, connected, both LED characteristics written and read back 1, 0, 1 correctly.
+
+Gotchas: a program flashed through DSLite does not start advertising until a real power cycle (a probe reset with `xds110reset` is not enough). While the demo runs, the debugger often fails with "A router subpath could not be accessed" (error -242) until the board is power-cycled. macOS hides the GAP service, so the GATT device name can only be read from a phone.
+
+Services seen: Device Information (0x180A), LED (F0001110: LED0 1111, LED1 1112), Button (F0001120: 1121, 1122 notify), Data (F0001130).
+
+### Connecting from a terminal
+
+`cc1354p10/CC1354P10.ccxml` works with UniFlash's DSLite (command in step 2).
+
+It is built from TI's template `ccs_base/arm/cc13xx_cc26xx_2pin_cJTAG_XDS110.ccxml`. Two things a hand-written file gets wrong: it needs the ICEPick router driver (`tixds510icepick_c.xml`), or DSLite says "An invalid processor ID has been found" without touching the chip; and it needs 2-pin cJTAG. OpenOCD 0.12 has no CC13x4 target, and plain 4-wire JTAG reads all zeroes. DSLite's memory length is in 32-bit words.
+
+## One-command build
+
+No single command builds the board's examples: TI ships no makefile for any of the 42 Zigbee or 11 DMM examples, only a CCStudio project and an IAR project. Bluetooth, TI 15.4, Wi-SUN, proprietary RF and driver examples do have makefiles. These steps build only; they do not flash. A clean rebuild of the DMM example took 30.5 s with `-j4`.
+
+1. **CCStudio's headless command line**, every time:
+
+       ccs-server-cli.sh -noSplash -workspace <dir> -application projectImport -ccs.location <example>.projectspec
+       ccs-server-cli.sh -noSplash -workspace <dir> -application projectBuild -ccs.projects <name> -ccs.configuration <config>
+
+2. **Import once, then plain make.** The first headless build writes a full makefile into the workspace's configuration folder. After that, `gmake` rebuilds without CCStudio: a clean rebuild of the DMM example took 30.5 s with `-j4` and produced the identical image. Use CCStudio's own `/Applications/ti/ccs2101/ccs/utils/bin/gmake` (GNU Make 4.4.1); macOS's built-in make 3.81 stops at the link step on `-Onone`.
+
+Traps found on the way:
+
+- The headless build summary says "0 out of 1 projects have errors" even when SysConfig failed and nothing was built. Check that the `.out` file exists.
+- Configuration names differ between examples: the DMM project uses `Release`, the Zigbee coordinator `default`. A wrong name fails with "Build-configuration ... does not exist".
+- A second import of the same project is refused, even with `-ccs.overwrite full`. Use a fresh workspace or copy changed files in.
+- App sources are linked into the SDK, not copied. To change one, copy it into the repo and point the `.projectspec` at the copy, or the edit lands in TI's SDK.
+- TI's Zigbee coordinator project for this board names its device CC2674R10 (a sibling chip); the board define `EM_CC1354P10_1_LP` is still correct.
+- The DMM project asks for TI Arm Clang 3.2.2; CCStudio substituted 4.0.4.LTS without asking.
+- Renaming `ble.deviceName` in the DMM example also needs TI's explicit `scanRes1.completeLocalName` line removed, or SysConfig stops.
+
+### Software
+
+- SDK: SimpleLink Low Power F2 SDK (was "CC13xx CC26xx SDK"), not installed. Public on GitHub: `TexasInstruments/simplelink-lowpower-f2-sdk`, newest tag seen `lpf2-8.33.00.16`, about 1.7 GB.
+- Zephyr 4.4.2: no CC13x4 or CC26x4 support (`soc/ti/simplelink` has cc13x2_cc26x2, cc13x2x7_cc26x2x7, cc23x0).
+- Portability: third TI SDK with TI Drivers (after MSPM0 and F3). Next test in `portability/`.
+
+## What was measured
+
+| What | Number | Conditions | Level | Source |
+|---|---|---|---|---|
+| CoreMark | 199.92 per second (4.17 per MHz) at -O3; 94.70 at -Oz (1.97 per MHz) | 48 MHz, TI Arm Clang, bare metal, median of 3 | measured | `coremark`, `coremark_per_mhz` in `data/results/cc1354p10.csv` |
+| Interrupt latency | 23 to 24 cycles | 48 MHz, bare metal | measured | `irq_latency` (bare) |
+| GPIO toggle by register write | 1.51 cycles at -O3; 8.01 at -Oz | 48 MHz, bare metal | measured | `gpio_toggle` (register-bare-o3, register-bare-oz) |
+| Thread ping to the CC2340R5 | Median 42 to 44 ms each way, 20 of 20, RSSI -30 | This board as leader, the CC2340R5 as TI's RCP joined as router | measured | `board-to-board/thread-two-radios-2026-10-06/` |
+| Zigbee join, CC2340R5 router to this coordinator | 6.2 s | PAN 0xe99d | measured | `board-to-board/zigbee-cc1354-cc2340/` |
+| BLE round trip from the CC2340R5 central | 195 ms average, 20 of 20 LED writes acked | Central found "Fox Red 1354" | measured | `board-to-board/ble-cc2340r5-central/` |
+| DMM example: Zigbee plus BLE | Joined Home Assistant's Zigbee network in about 6 s; a Mac switched the light over BLE 4 of 4 while it stayed joined | `dmm_zr_light_remote_display_app` | measured | `dmm-zigbee-ble/README.md` |
+| DMM example size | 459 kB flash, 33.8 kB RAM | Linker figures | computed | `dmm-zigbee-ble/README.md` |
+| Sizes | Project Zero 212 kB flash; Zigbee coordinator 225 kB flash, 59 kB RAM; Zigbee+BLE DMM 470 kB flash, 44.6 kB RAM | Build outputs | computed | `data/results/cc1354p10.csv` |
+| Headless rebuild of the DMM example | 30.5 s, identical image | `gmake -j4` with CCStudio's own gmake | measured | `cc1354p10/README.md` |
+
+Sleep current is not measured.
+
+## If you see this
+
+- If you see `IcePick_C: Error connecting to the target: (Error -242) A router subpath could not be accessed`, start a loop of loads, then unplug and replug the USB cable: one load gets in during the few seconds the chip stays awake at boot. On 2026-10-07 the load went in on the 21st try, about 10 s after the replug.
+- If you see `Compiler version 'TICLANG_3.2.2' is not currently installed - defaulting to 'TICLANG_4.0.4.LTS'` in a headless CCStudio build, it still builds, with the compiler you have.
+- If you see `CCS headless build complete - 0 out of 1 projects have errors` and there is no `.out` file, nothing was built: SysConfig stopped. Check that the `.out` exists after every headless build.
+
+The rest of the errors, with causes: [FAQ.md](FAQ.md).
+
+## What ran on this board
+
+Status uses Works and Could work. The last column names what did not run or what blocks it.
+
+| Test | Status | Detail |
+|---|---|---|
+| BLE: Project Zero from a phone (TI SimpleLink Connect app): find it, toggle LEDs, read the button | Works | LEDs over BLE from a Mac; the phone app and the button did not run |
+| Rename the BLE device without the example source | Works | "Fox Red 1354" advertised, "Fox Red Lab CC1354" as device name |
+| BLE board to board with the CC2340R5 | Works | CC2340R5 central found "Fox Red 1354", 20 of 20 LED writes acked, 195 ms average round trip (`board-to-board/ble-cc2340r5-central/`) |
+| Thread (OpenThread, `ot-ti`) | **Works, two radios** | Leader on this board; the CC2340R5 (as TI's RCP with a Mac host) joined over the air and became a router. Ping median 42 to 44 ms each way, 20 of 20, RSSI -30 (`board-to-board/thread-two-radios-2026-10-06/`) |
+| Matter over Thread (`TexasInstruments/matter`) | Could work | Its family (cc13x4_26x4) is in TI's Matter v1.5 lighting example, but the part is not on TI's supported list; Linux build, about 25 GB; needs a Thread border router. |
+| Zigbee: board to board, and into Home Assistant | Works | **Board to board**: CC1354P10 coordinator formed PAN 0xe99d, CC2340R5 router joined in 6.2 s (`board-to-board/zigbee-cc1354-cc2340/`). The Home Assistant join is in the next row |
+| Coexistence: BLE plus Zigbee or 15.4 at once (DMM) | Works | **Runs, both sides.** TI's `dmm_zr_light_remote_display_app` (459 kB flash, 33.8 kB RAM by the linker) joined Home Assistant's Zigbee network in about 6 s and a Mac switched the light over BLE 4 of 4 while it stayed joined; a toggle from Home Assistant did not run (`dmm-zigbee-ble/README.md`) |
+| Limits and speed: CoreMark, flash and RAM per stack, sleep current | Works | **CoreMark 199.92 at -O3 (4.17 per MHz), 94.70 at -Oz**, median of 3; IRQ latency 23 to 24 cycles (`baremetal/README.md`). Sizes: Project Zero 212 kB flash; Zigbee coordinator 225 kB flash, 59 kB RAM; Zigbee+BLE DMM 470 kB flash, 44.6 kB RAM. Sleep current is not measured |
+
+## Where these facts come from
+
+Checked 2026-10-06 and 2026-10-07. Tools: SimpleLink Low Power F2 SDK 8.33.00.16, CCStudio 21.0.1, TI Arm Clang 5.1.1.LTS (4.0.4.LTS for the Zigbee and DMM projects), SysConfig 1.26.3, UniFlash 9.6.0 with DSLite, CCStudio's gmake (GNU Make 4.4.1), Zephyr 4.4.2 (no support), OpenOCD 0.12 (no target). The Mac model and macOS version were not recorded. Files: `data/results/cc1354p10.csv`, `cc1354p10/AGENTS.md`, `cc1354p10/FAQ.md`.
+
+==============================================================================
+FILE: cc1354p10/FAQ.md | What goes wrong with the TI LP-CC1354P10-1 LaunchPad development kit on a Mac, and how do you fix it?
+==============================================================================
+
+# What goes wrong with the TI LP-CC1354P10-1 LaunchPad development kit on a Mac, and how do you fix it?
+
+Every problem seen on the TI LP-CC1354P10-1 LaunchPad development kit (CC1354P10 chip: Arm Cortex-M33, 48 MHz, 1 MB flash, 296 kB RAM in TI's count (the linker gives programs 256 kB of SRAM), Bluetooth LE, Zigbee, Thread and sub-1 GHz radios; onboard XDS110 probe) from a Mac. Each answer starts with the fix, then why. Measured on an Intel Mac, macOS 15.7, the F2 SDK (SimpleLink CC13xx CC26xx SDK 8.33.00.16), TI Arm Clang 4.0.4 (the sleepy sensor) and 5.1.1 (the border-router host), Home Assistant with ZHA on a separate host.
+
+Terms: [docs/vocab.md](../docs/vocab.md) (ZHA, sleepy end device, poll, border router, standby, node descriptor, trust center, factory new). 1 kB = 1,024 bytes. For the benchmark answers: the DWT cycle counter is a counter in the Arm core's debug block that adds one every CPU cycle; a probe pin reset (`xds110reset`) is the debug probe pulsing the chip's reset line; the FPU is the floating-point unit; a FIFO is the ADC's small queue of results; ksps is thousands of samples a second.
+
+Contents: [Joining Home Assistant over Zigbee](#joining-home-assistant-over-zigbee), [Building and loading](#building-and-loading), [Thread border router host](#thread-border-router-host), [Bluetooth](#bluetooth), [Benchmarks](#benchmarks).
+
+## Joining Home Assistant over Zigbee
+
+### Why does a sleepy Zigbee sensor associate but not get the network key, and have to try again?
+
+Open joining on the router nearest the board (`zha.permit` with that router's `ieee`, here a smart plug), not only on the coordinator, and keep the board within a few metres of it for the first join. **Tag: Unknown (suspected: Radio environment).** In 4 of 6 associations the board's association was accepted but the network key arrived after the board had stopped waiting; the coordinator was out of direct range and every join went through a router. Why the key was late was not found. The clean join took 6.0 s from boot (1 run). Details in `cc1354p10/zigbee-sleepy-sensor/README.md`, trap 5.
+
+### TI's `zed_temperaturesensor` does not join by itself and shows 17 °C. Is it broken?
+
+No: as shipped it joins only from the left button (BTN-1) or its serial menu, and its temperature is a fixed 17.00 °C that moves only from the menu. **Tag: TI example default.** At boot the example resumes a saved network and nothing else, and it never reads the chip's temperature sensor. The patch in this repo starts joining 1 s after boot when there is no saved network, retries every 15 s, and reads the chip temperature every 10 s with TI's Temperature driver. F2 SDK 8.33.00.16. `cc1354p10/zigbee-sleepy-sensor/README.md`, traps 1 and 2, changes 1 and 4.
+
+### Can you make a TI Zigbee end device wait longer than 3 s for the network key?
+
+Only by editing the stack header in a copy of the SDK. **Tag: TI example default.** Z-Stack waits 3 s (`BDB_DEFAULT_DEVICE_UNAUTH_TIMEOUT 3000` in `bdb_interface.h`), and it is a plain `#define`, not a SysConfig setting.
+
+### The sensor joined, but Home Assistant took almost three minutes to show an entity. Is it stuck?
+
+Wait. The entity appears about 160 s after the join (162 s measured, one run); nothing is wrong on the board. **Tag: Unknown (suspected: Radio environment).** About half of ZHA's first setup requests to the sleeping board got no answer; zigpy sent each again about 28 s later and every resend was answered within one 3 s poll period. The cause of the lost first tries was not found.
+
+### Home Assistant shows the board as "unk_manufacturer unk_model". Did the join fail?
+
+No. The join worked; Home Assistant could not read the names, because TI's example answers every attribute read with `0xC1` (`SOFTWARE_FAILURE`). **Tag: Tool or docs.** ZHA reads the manufacturer and model attributes during setup; when the read fails it shows `unk_manufacturer unk_model`. The fix is the read callback in the next entry. With reads working, TI's example would show the manufacturer "TexasInstruments" and no model (it has no Model Identifier attribute); the patch in `cc1354p10/zigbee-sleepy-sensor/` sets "Fox Red Labs" and "Temp Sensor". `cc1354p10/zigbee-sleepy-sensor/README.md`, traps 2 and 3.
+
+### After a re-pair, the entity is still called `sensor.unk_manufacturer_unk_model`. Why?
+
+Rename the entity in Home Assistant. **Tag: Third-party behavior.** After removing and re-adding the device, Home Assistant reused the old entity id while the device name became "Fox Red Labs Temp Sensor". That is Home Assistant's doing, not TI's. Trap 13 in `cc1354p10/zigbee-sleepy-sensor/README.md`.
+
+### Every attribute read from Home Assistant returns `0xC1` (`SOFTWARE_FAILURE`). Why?
+
+Register a read callback in the example: one line, `zcl_registerReadWriteCB(...)`, as TI's light example does. **Tag: Tool or docs.** In this Z-Stack, `zclProcessInReadCmd` sends every read through the endpoint's read callback, and `zcl_registerReadWriteCB`'s comment says one is needed only when an attribute's data pointer is NULL; `zed_temperaturesensor` registers none. Home Assistant's log says `failure: [{0: <Status.SOFTWARE_FAILURE: 193>}]`. After the patch, 20 of 20 reads succeeded. Patch and logs in `cc1354p10/zigbee-sleepy-sensor/`.
+
+### The first temperature report took 15 minutes. Is the sensor broken?
+
+No. Home Assistant sets the report interval, not the device. **Tag: Third-party behavior.** ZHA set min 30 s, max 900 s and change 0.50 °C, replacing the device's defaults, so at a steady temperature the first report came 899.9 s after ZHA set it up. Trap 4 in `cc1354p10/zigbee-sleepy-sensor/README.md`.
+
+### Why did the board join someone else's network on channel 11 or 20?
+
+List only your network's channel in the `.syscfg` (`zstack.rf.primaryChannels`). **Tag: Radio environment.** TI's stack joins the first open network it finds. Searching all 16 channels, the board also associated with PAN 0xe99d on channel 11 (suspected to be kept by another board nearby) and PAN 0xdc20 on channel 20 (owner not known); each cost a 3 s key wait. Trap 9 in `cc1354p10/zigbee-sleepy-sensor/README.md`.
+
+### The device was removed in Home Assistant, and the board still says "In the network". Why?
+
+Also use the serial menu's RESET TO FN (reset to factory new) on the board. **Tag: Unknown.** The coordinator logged `DEVICE_LEFT` from the board's parent 2 s after the removal, but the board's screen still said "In the network". Why the leave did not reach the board was not found. Trap 10 in `cc1354p10/zigbee-sleepy-sensor/README.md`.
+
+### After RESET TO FN the board stays silent and does not rejoin. How do you get it back?
+
+Load the image again with `cc1354p10/tools/ccs_load_run.py`; it comes back factory new. **Tag: Unknown.** On this board a program loaded by the debugger does not come back when it restarts itself, and the reset is a restart. Not checked: whether a USB replug alone brings it back. Trap 7 in `cc1354p10/zigbee-sleepy-sensor/README.md`.
+
+### TI's DMM light joined Home Assistant and no light appears; `zha.issue_zigbee_cluster_command` answers `HTTP Error 400: Bad Request`. Why?
+
+Remove the old device for this board in Home Assistant, then commission again from the board's menu. **Tag: Unknown.** Home Assistant's Zigbee integration is suspected of not reading a known address's endpoints again when it rejoins (not checked). The board had joined before as a temperature sensor; after `dmm_zr_light_remote_display_app` joined, Home Assistant still showed the "Temp Sensor" record with no light, and a toggle to endpoint 8 failed with that error. `cc1354p10/dmm-zigbee-ble/README.md`.
+
+### Does the serial menu stop the sleepy sensor from reaching its lowest current?
+
+Possibly; it was not measured. **Tag: Unknown (suspected: TI example default).** TI's UART driver keeps the chip out of standby while it listens (`UART2_rxEnable` in `source/ti/drivers/UART2.c`), and the menu always listens. TI's Zigbee power page says to define `CUI_DISABLE` and remove `BOARD_DISPLAY_USE_UART` for low power. Not checked: current with and without `CUI_DISABLE`; no meter was on the bench. Trap 8 in `cc1354p10/zigbee-sleepy-sensor/README.md`.
+
+## Building and loading
+
+### The debugger will not connect to the board once a program is running. How do you get back in?
+
+Start a loop of loads first, then unplug and replug the USB cable: one load gets in during the few seconds the chip stays awake at boot. **Tag: Unknown (suspected: Chip limit).** While the image sleeps between polls, every connect failed, including with `IcePick_C: Error connecting to the target: (Error -242) A router subpath could not be accessed`. On 2026-10-07 the load went in on the 21st try of a loop, about 10 s after the replug; a replug with no loop running missed the window twice. The loop command is in `cc1354p10/zigbee-sleepy-sensor/README.md`, "Before you load it".
+
+### The headless CCStudio build says "Compiler version 'TICLANG_3.2.2' is not currently installed". Does the build fail?
+
+No: it builds with the compiler you have. **Tag: Tool or docs.** The Zigbee project asks for TI Arm Clang 3.2.2; CCStudio 21.0.1's headless import says `Compiler version 'TICLANG_3.2.2' is not currently installed - defaulting to 'TICLANG_4.0.4.LTS'` and builds with that. The build then has one warning, from TI's own linker file (`redefinition of macro 'NVOCMP_NVPAGES'`). Trap 12 in `cc1354p10/zigbee-sleepy-sensor/README.md`.
+
+### TI's README for `zed_temperaturesensor` lists other LaunchPad development kits, not the LP-CC1354P10-1. Does the example work on it?
+
+Yes: the example is in the SDK's `LP_EM_CC1354P10_1` folder, and it built and joined on this board. **Tag: Tool or docs.** The README names the CC26x2R1, CC1352P, CC1352R1, CC2652RB and CC2652RSIP boards only. Trap 11 in `cc1354p10/zigbee-sleepy-sensor/README.md`.
+
+### Can you power-cycle the LP-CC1354P10-1 from the Mac so loads work without a replug?
+
+Yes, if the board sits on a USB port `uhubctl` can switch: switch it off for 6 s, on again, and start the load at once. **Tag: Setup or handling.** The debugger connects only in the first seconds after power-on, and a reset-line pulse does not reopen that window. Install with `brew install uhubctl` (2.6.0 here) and run `uhubctl` alone to list hubs: a hub marked `ppps` (per-port power switching) can switch its ports. Here that was the USB-A port of Apple's USB-C Digital AV Multiport Adapter (hub `20-4`, port `1`). A 3 s off time did not reopen the window (observed 2026-10-08; not saved), and switching power while a load is connected left the probe answering `IcePick_C: Error connecting to the target: (Error -261 @ 0x0) Invalid response was received from the XDS110.` until the next off and on. The bench runner does it all with `UHUB=20-4:1 ./run-all.sh`:.
+
+### The headless CCStudio build says `0 out of 1 projects have errors` but there is no `.out` file. Did it build?
+
+No. Check that the `.out` exists after every headless build. **Tag: Tool or docs.** The summary line `CCS headless build complete - 0 out of 1 projects have errors` is printed even when SysConfig stopped and nothing was compiled. Seen with the Zigbee and DMM projects of SDK 8.33.00.16 on CCStudio 21. `cc1354p10/README.md`, "Building Zigbee and DMM examples from a terminal".
+
+## Thread border router host
+
+### The OpenThread host on the CC1354P10 goes silent within a second of `ifconfig up` or `thread start`. Is the board dead?
+
+Build the host with standby off (the SysConfig power policy), power-cycle the board, and it runs: network formed and leader in 16 s from a fresh dataset, 37 to 39 s after a restart. **Tag: Unknown (suspected: Tool or docs).** With standby allowed, the console stopped echoing within a second of the first radio commands and the capture ended with one flushed byte; whether the radio link to the CC2340R5 or the console dropped first is not known. The build and the hang log are in `border-router/host-cc1354/README.md`.
+
+### Connecting with CCStudio resets the board, and after a BLE demo it needed a power cycle (error -242). Why?
+
+Unplug and replug the board; the debugger has no post-mortem on this chip, so a connect always resets it. **Tag: Tool or docs.** It can happen after a Bluetooth demo has been running; a USB hub with per-port power switching makes the power cycle a command.
+
+## Bluetooth
+
+### Why does a BTHome or custom-service UUID arrive byte-swapped from SysConfig?
+
+Type the UUID byte-reversed in the `.syscfg`, then check the bytes in the generated `ti_ble_config.c`. **Tag: Tool or docs.** With the CC13xx CC26xx SDK 8.33.00.16, SysConfig writes a 128-bit UUID in the scan-response UUID list most significant byte first; Bluetooth sends UUIDs least significant byte first. The F3 SDK does the same to a 16-bit service-data UUID: for BTHome's 0xFCD2 you type `UUID016SD = 0xD2FC`. The worked 128-bit line is in `ports/phone-app-demos/blinky-cc1354p10/project_zero.patch`.
+
+### macOS lists the board under an old Bluetooth name
+
+Find it by the name it advertises or by its service, not by the name in a list. **Tag: Third-party behavior.** macOS remembers a device's name by its address. After `dmm_zr_light_remote_display_app` was loaded (advertising "Fox Red DMM"), the Mac still showed "Fox Red Lab CC1354" from an earlier image.
+
+## Benchmarks
+
+### Why does `DWT->CYCCNT` read 0 on a CC1354P10 after a probe pin reset, even with `TRCENA` and `CYCCNTENA` set?
+
+Load and start the program from the debugger, or time with SysTick instead. **Tag: Unknown (suspected: Tool or docs).** On the LP-CC1354P10-1 the Cortex-M33 cycle counter stayed at 0 after a probe pin reset (`R,rtos,timer_rate,0,FAIL,counter 0 systick 45015`) and counted normally when CCStudio had loaded and started the same image (`counter 45014 systick 45017`). A power-on boot with no debugger and the reset button were not run. No TI document found says why; Arm's [ARMv8-M processor debug guide](https://developer.arm.com/documentation/100734/0100/Debug-for-ARMv8-M/Other-debug-functionality/DWT) says the DWT counters stop when non-invasive debug is not enabled. To time code without it, use SysTick with a wrap counter. F2 SDK 8.33.00.16, 2026-10-08.
+
+### Why does a CC1354P10 ADC interrupt (`INT_AUX_ADC_IRQ`) fire for ever and stop the program?
+
+Flush the ADC FIFO in your handler on an overflow, an underflow or a sample left after the read, as TI's ADCBuf driver does, and stop the interrupt line once you have the interrupts you need. **Tag: Unknown (suspected: Our mistake).** The power-loop and control-loop bench images printed nothing at first. With four changes (that flush, the handler stopping its own line after 1,000 interrupts, the slow passes first, and a timeout counted on SysTick) all 30 of 30 runs reported, in about 20 s each. Which change cured it is not known: the flush never fired in the -O2 runs. The CC13x4's ADC interrupt event includes the FIFO's overflow and underflow flags, and both stay set until the FIFO is flushed. F2 SDK 8.33.00.16, 2026-10-08.
+
+### How fast can the CC1354P10 run a digital-power PID loop or an FOC control loop, and how much CPU does it take?
+
+With no missed period in 1,000, the PID loop holds 117.1 kHz in float and 120.6 kHz in Q15, and the FOC loop 46.2 kHz (-O2, code in flash, 48 MHz). **Tag: Unknown (suspected: the AUX ADC's sample and conversion time).** At 100 kHz each PID interrupt takes 48.5 percent (float) or 42.9 percent (Q15) of the CPU; CPU time alone would allow about 206 and 233 kHz, so the AUX ADC's 2.7 µs sample and its conversion before the interrupt are the suspected limit, not tested by changing them. Each FOC interrupt takes 180.4 percent of a 100 kHz period.
+
+### What does a CPU load of 180 percent mean for the CC1354P10's FOC loop, and why does it still hold 46 kHz?
+
+Each interrupt takes 866 cycles of CPU, 1.8 times a 100 kHz period of 480 cycles, so the loop cannot run at 100 kHz; at 46.2 kHz (1k cycles a period) it fits. **Tag: Unknown (suspected: Chip limit).** The estimate was 38 to 42 kHz, from the worst case seen at 50 kHz, where every loop ran past its period; at the sweep's limit no new value was written late. The float power loop, 117.1 kHz against an estimate of 120 to 135, missed for the same reason: one rare slow interrupt per pass that the sweep's trials did not meet is suspected.
+
+### Why does a rate sweep on the CC1354P10 fail its first trial with an ADC overflow and report 10 kHz?
+
+Read the AUX ADC event flags back after clearing them, before you clear the interrupt's pending bit, and let any conversion in flight finish before you flush the FIFO. **Tag: Our mistake.** The first sweep cleared the flag and then the pending bit at once; after a run that ended with the loop overrunning, the interrupt pended again on an empty FIFO, the read underflowed and the trial counted an overflow. The fixed image stops the trigger, waits 10 µs, flushes, clears the flags, reads them back, then clears the pending bit. F2 SDK 8.33.00.16, 2026-10-08.
+
+### Why does each CC1354P10 control-loop interrupt take about 100 cycles more CPU time than its loop work?
+
+Hardware entry and return, the handler saving and restoring 8 registers, its setup before the first timestamp, and the FPU's register save are all CPU time too. **Tag: Our mistake.** The estimate counted only the loop work and came out 26 to 146 cycles short, depending on the loop; the disassembly of the handler shows each of these parts.
+
+### Why is the CC1354P10's AES hardware only 2.5 to 3.4 times faster than software for one block, when the results say 51 times?
+
+The 51 times is for 1 kB; for one 16-byte block most of the hardware time is the driver call. **Tag: Setup or handling.** One block takes 1.5k cycles through TI's AESECB driver, which loads the key on every call, against 3.7k for tiny-AES-c with its key expanded beforehand and 5k with the key expansion timed. A Bluetooth or Zigbee packet is closer to one block than to 1 kB. TI Arm Clang 5.1.1 -O2, F2 SDK 8.33.00.16.
+
+### Why does `cosf` take 447 cycles on the CC1354P10 when `sinf` takes 75?
+
+TI Arm Clang's `cosf` does one step in `double`, which this FPU cannot do, so that step runs in software. **Tag: Unknown (suspected: Tool or docs).** The disassembly of the linked `cosf` (TI Arm Clang 5.1.1, `s_cosf.c.obj`) converts its quadrant number with `__floatsidf` and adds -0.5 with `__aeabi_dadd`, both software double routines; `sinf` calls nothing. The library source was not read and no other `cosf` was tried. As arithmetic only, a `cosf` as fast as `sinf` would take about 370 cycles off a motor-control (FOC) step of 671.
+
+### A control loop takes longer than its PWM period but drops no triggers. Is the count wrong?
+
+Probably not: the ADC can sample the next period while the CPU finishes this one. **Tag: Unknown.** At a 50 kHz trigger (960 cycles) the loop took 1k cycles from trigger to new PWM value, and every one of 3,000 triggers was dated one period after the last from the cycle counter. About 280 of those cycles are the AUX ADC's 2.7 µs sample and conversion, done in hardware; the CPU part is 747 cycles. So the loop keeps up, but each PWM value lands about 1.4 µs into the next period. Why the timer event reached the ADC while the interrupt still ran was not found.
+
+### Does `double` math use the CC1354P10's FPU?
+
+No. The FPU does single-precision `float` only, so `double` add, multiply and divide are library calls. **Tag: Chip limit.** In the bench, `double`-heavy Embench programs ran only 1.5 to 1.8 times faster per cycle than on the Cortex-M0+ CC2340R5, against 12.3 times for the `float` program `minver`..
+
+### The CC1354P10 ADC (`ADCBufCC26X2`) asked for 250 ksps gives only 125 ksps. Why?
+
+TI's default synchronous mode (the ADC samples when a trigger arrives) takes 2.7 µs of sampling plus the conversion, so at 250 ksps every second trigger is missed. **Tag: Setup or handling.** In the ADCBuf driver's asynchronous mode (the ADC samples continuously and the trigger only takes the result) the same pin held 250, 300 and 400 ksps (500 fell back to 249.8); the data sheet (SWRS267B section 8.19.1.1) gives 200 ksps. The pin was floating, so these are rates only, not accuracy.
+
+### The FreeRTOS heap bench prints `I,heap,total 32768` but the map shows a bigger heap. Which is right?
+
+The map: the heap that links is 242.6 kB (`.bss.ucHeap`). **Tag: Our mistake.** The report line prints TI's default from a file compiled without this repo's heap setting. That heap held 388 tasks with 512-byte stacks, 5 fewer than the arithmetic predicts; where the other 3.0 kB went was not found.
+
+### Why does `memcpy` take 8 cycles a byte in a TI Arm Clang build?
+
+Pass your `-O` flag to the link step too. **Tag: Our mistake.** Linked without one, TI Arm Clang 5.1.1 pulls in `TI_memcpy_small`, a byte loop, for `__aeabi_memcpy8`; linked with `-O3` it uses the word-copy `memcpy`. The linker map names which one you got.
+
+### A bench reports `stack_used 4096 of 4096`. Did the stack overflow?
+
+Possibly; give that image a bigger stack. **Tag: Our mistake.** `stack_used` counts painted stack words that were overwritten, so 4096 of 4096 means every word was used and the stack may have gone past its end. In the `embench_b` image the linker map shows about 231 kB of unused RAM below the stack, so nothing is suspected to have been overwritten, and all five programs passed their own checks.
+
+### Does the CC1354P10 have a CRC accelerator?
+
+No. **Tag: Chip limit.** The F2 SDK's `cc13x4_cc26x4` memory map lists no CRC block and its driverlib has no CRC module; the CRYPTO block does AES, SHA-2 and public-key math. Use a table-driven CRC in software.
+
+## Post-quantum key exchange and signatures
+
+### Does ML-KEM-768 (post-quantum key exchange, formerly Kyber) run on the LP-CC1354P10-1, and how fast?
+
+Yes: 20.8 ms to make a key pair, 24.0 ms to encapsulate and 29.1 ms to decapsulate at 48 MHz, with mlkem-native 2.0.0 in plain C at `-O3`, and its five known-answer checks pass (NIST's three vectors plus the rejection and key checks). The full exchange with a Mac over USB serial completes on the board: key pair from the chip's random-number generator, key check matching on both sides, and one AES-128-GCM line decrypted. **Tag: Chip limit.** Not reached: it uses 14.7 to 20.0 kB of stack and 80.5 kB of flash at `-O3` (9.4 kB at `-Os`, built, not run), well inside the chip's RAM and 1 MB of flash. SimpleLink CC13xx/CC26xx SDK 8.33.00.16, TI Arm Clang 5.1.1.LTS, 2026-10-08. `cc1354p10/pqc-join/README.md`,.
+
+### The ML-KEM demo stops after `join: making an ML-KEM-768 key pair` and the Mac says `timed out waiting for @PK from the board`. Why?
+
+The image never called `TRNG_init()`. **Tag: Our mistake.** `Board_init()` sets up only the power and GPIO drivers; without `TRNG_init()`, `TRNG_open()` returns NULL, and the first `TRNG_getRandomBytes()` call with that NULL handle faults (the debugger shows the CPU in an exception handler). If you see this, call `TRNG_init()` before `TRNG_open()` and check that the handle is not NULL; TI's `TRNG.h` says the same. With the fix, 64 random bytes take 20 ms and the exchange completes. F2 SDK 8.33.00.16, 2026-10-08. `cc1354p10/pqc-join/README.md`.
+
+### Does ML-DSA-44 (post-quantum signatures, formerly Dilithium) run on the LP-CC1354P10-1, and how fast?
+
+Yes: 49.5 ms to make a key pair, 50.5 ms to verify, and 154 ms on average to sign (77 to 361 ms over 16 messages, because signing retries a varying number of times) at 48 MHz, with mldsa-native 2.0.0 in plain C at `-O3`. NIST's known-answer vectors pass on the board first. **Tag: Chip limit.** RAM is the constraint to watch: signing needs 50 kB of stack, so the image sets a 64 kB stack; the chip has 256 kB. Code size 106.7 kB at `-O3`, 13.3 kB at `-Os` (built, not run). 2026-10-08. `cc1354p10/pqc-join/README.md`.
+
+### Can you try the ML-KEM-768 exchange without a board?
+
+Yes: `portability/pqc-join/test/run.sh` compiles the board's code for the Mac and runs the whole exchange against OpenSSL's ML-KEM through a pipe; it prints `pqc-join host test: OK`. **Tag: Tool or docs.** It needs a C compiler, Python with the `cryptography` package and OpenSSL 3.5 or later; the board run needs a power-switchable USB port (`uhubctl`), because this board's debugger connects only just after power-on.
+
+### How long does ML-KEM-768 take over a 115,200-baud serial link, against X25519?
+
+About 420 ms of wire time for 2.2 kB of key material, written as hex (4,864 characters in all), against 34 ms for X25519's 32 bytes each way. **Tag: Setup or handling.** The slow part is the 115,200-baud serial link chosen here, not the chip: on the board run of 2026-10-08 the board's own work was 73 ms (random bytes 20 ms, key pair 21 ms, decapsulate and derive the key 30 ms, decrypt 2.5 ms), and the Mac measured 346 ms from receiving the key to the board's answer. Wire times are computed from the byte counts, not measured.
+
+### Is the ML-KEM demo safe for real keys?
+
+No. **Tag: Tool or docs.** Neither mlkem-native, mldsa-native nor this demo claims protection against power or fault attacks, and the demo prints a key check; it shows the math and its cost, not a hardened product.
+
+## Sub-1 GHz receiver for the CC1407P weather station
+
+### TI's GitHub copy of the F2 SDK will not link `rfPacketRx`: `drivers_cc13x4.a`, `driverlib.lib` and `nortos_cc13x4.a` are missing. Why?
+
+The GitHub repository (`TexasInstruments/simplelink-lowpower-f2-sdk`, tag `lpf2-8.33.00.16`) carries those libraries as source only; TI's installer ships them built. `python3 cc1354p10/radio-rx/build_f2_libs.py <sdk>` builds them with TI Arm Clang 5.1.1 from the SDK's own CMake source lists in a few minutes: 43 of 43 driverlib files, 14 of 14 no-RTOS files, 83 of 90 driver files (CAN, SD card and PDM fail and the receiver does not use them). **Tag: Tool or docs.** TI packaging, 2026-10-10. Details: [radio-rx README](radio-rx/README.md).
+
+### DSLite says `Error -242 @ 0x0 A router subpath could not be accessed` when flashing the receiver. What now?
+
+A program was already running and its one debug connection had been used (here by a flash backup read). Unplug the kit's USB for 3 seconds and flash again; `xds110reset` alone did not clear it. **Tag: Unknown (suspected: Tool or docs).** 2026-10-10.
+
+### The receiver flashed fine but its serial port prints nothing. Is it broken?
+
+The image does not start on its own after DSLite. Run `xds110reset -s <probe serial>` (in CCStudio's `ccs_base/common/uscif/xds110/`); the banner `rfrx: CC1354P10 listening at 915 MHz` appears within a second. **Tag: Tool or docs.** 2026-10-10.
+
+### The receiver's printout skips packets, but `count ok=` says none were lost. Which is right?
+
+The count. It comes from the radio core's own counters. The XDS110 serial bridge drops lines while no program on the Mac has the port open, so a printout started late, or read by two programs at once, has gaps, and the first line after opening can be a stale replay. From 2026-10-10 23:46 to 2026-10-11 06:00:48 the count matched the sender: 21,658 of 21,658. **Tag: Setup or handling.** 2026-10-11.
+
+### The `sensor.frl_radio_*` entities vanished from Home Assistant. Did the bridge stop?
+
+Probably Home Assistant restarted. `ha_bridge.py` creates the four sensors through the REST API's states endpoint, not through an integration, so Home Assistant does not keep them across a restart; they come back on the bridge's next post, within 10 s, if the bridge is still running. **Tag: Setup or handling.** If they do not come back, check the bridge's output for an HTTP error, usually an expired token.
+
+### Wi-SUN packets from the CC1407P arrive, but every byte reads backwards. Is the data corrupt?
+
+No. **Tag: Setup or handling.** With TI's 802.15.4g settings and `CMD_PROP_RX_ADV`, this radio stores each payload byte bit-reversed: 0x62 is 0x46, an `F`. The two-byte header comes low byte first, so `08 40` is length 64 with the whitening bit set. The radio checks the checksum either way; 260 of 260 sent arrived with a good checksum in each of Wi-SUN modes 2b and 4b ([rx-check.txt](radio-rx/rx-check.txt)). Reverse the bits of each byte in your code.
+
+### The CC1407P sends SUN O-QPSK, and this board's SUN O-QPSK setting sees every packet with a bad checksum. Why?
+
+Not known for sure. **Tag: Unknown (suspected: Tool or docs).** With SysConfig's `qpsk50kbpsrm3` setting at 915 MHz, 260 packets sent from the CC1407P gave only bad-checksum receptions ([rx-check.txt](radio-rx/rx-check.txt)). The receive command SysConfig generates for that setting expects TI's proprietary frame (sync word 0x930B51DE, a 1-byte length), while the CC1407P's driver names its header for 802.15.4 SUN O-QPSK. A frame mismatch is the suspected cause; no sniffer checked it. To test the CC1407P's O-QPSK, receive it on a second CC1407P.
+
+### The CC1354P10 receives no packets with `maxPktLen` set above 255. Why?
+
+`maxPktLen` is an 8-bit field in `CMD_PROP_RX` (`rf_prop_cmd.h`). **Tag: Unknown (suspected: Tool or docs).** The suspected cause is that a larger value keeps only its low byte, so longer packets are dropped; not checked in a register dump. With 259 the receiver counted no packets; with 255 it did (observed 2026-10-11, log not saved). Keep it at 255 or less there; `CMD_PROP_RX_ADV`, used for TI's Wi-SUN settings, has a 16-bit field.
+
+### The CC1354P10 receives one packet, then nothing. Why?
+
+The receive command ends after one packet unless it is told to repeat. **Tag: Our mistake.** Set `pktConf.bRepeatOk` and `bRepeatNok` before posting it, as `partner.c` does; the first build lost those two lines to a bad edit.
+
+### With an external LP-XDS110 probe, CCStudio `loadProgram` on a CC1354P10 stops at `OnPreFileLoaded(): Connect failed`. How do I flash?
+
+The load's second connect misses the few seconds after power-on in which this board accepts a debugger. **Tag: Unknown (suspected: Tool or docs).** Do this: power-cycle the probe's USB port while a CCStudio scripting connection retries `target.connect()`, then `target.halt()` and `memory.loadBinaryProgram(<image flash bytes from address 0>, 0x0)`; it loaded 12 of 12 images, where `loadProgram` and `DSLite flash` failed on every attempt in a run of 14. The image is the `.out` segment at address 0, leaving the board's CCFG alone. Read it back to confirm. 2026-10-24, probe LS5600RE.
+
+### How do I back up, change and check this board from a terminal?
+
+Run `frl run --board cc1354p10 --pattern 150,150,150,900 --probe <serial>`: it backs up main flash and the CCFG (the boot configuration), builds the pattern project, writes main flash and times the red LED. **Tag: Tool or docs.** It needs CCStudio (its Python scripting runs every debug step), the SimpleLink CC13xx CC26xx SDK (`export FRL_F2_SDK=<the SDK folder>`), SysConfig and TI Arm Clang. If you see `FRL-E006 ... connect refused` (CCStudio may also show `Error -242`), unplug the probe's USB cable for 6 s, plug it back in and run the same command at once; on a hub that `uhubctl` (a command-line tool that switches power on USB hub ports) switches, `FRL_POWER_CYCLE=<hub>:<port>` does it for you. Put the board back with `frl restore <backup folder>`. 3 of 3 runs on 2026-10-25, probe LS5600RE; `docs/frl.md`; more ways back are in "When the board stops answering" below.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-25. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+How it locks up:
+
+- The debugger connects only in the first seconds after power-on (cause unknown, suspected chip limit); a sleeping image misses it: Error -242, A router subpath could not be accessed (`cc1354p10/FAQ.md`, `cc1354p10/AGENTS.md`, 2026-10-07)
+- A flash backup read, or a connect after a BLE demo, uses the one debug session: Error -242 on the next load (`cc1354p10/FAQ.md`, 2026-10-10)
+- External LP-XDS110 probe: loadProgram and DSLite flash fail at the second connect (Error -242, OnPreFileLoaded(): Connect failed) (`cc1354p10/FAQ.md`, 2026-10-24)
+- Loading a whole .out rewrites the CCFG at 0x50000000 with the SDK default, which differed from the board's original (`cc1354p10/AGENTS.md`, 2026-10-24)
+
+Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
+
+| Method | Remote or hands | Status | Evidence |
+|---|---|---|---|
+| frl's ccs13 route: one CCStudio Python scripting session per step, connect retried after a 6 s power cycle of the probe port when FRL_POWER_CYCLE names it, write with loadBinaryProgram from 0 (CCFG left alone) (three full cycles and four restores on the external LP-XDS110 probe, no connect refused, so the power-cycle branch did not run) | remote | proven | `docs/frl.md`, `tools/frl/ccs13.py`, 2026-10-25 |
+| xds110reset -s <serial> (does not reopen the post-power-on window and did not clear -242 after a flash read; it does start a DSLite-flashed image) | remote | failed | `cc1354p10/FAQ.md`, 2026-10-10 |
+| uhubctl off 6 s on the probe's port of a USB-C adapter, then load at once (3 s off failed; never switch while a load is connected (Error -261)) | remote | proven | `cc1354p10/FAQ.md`, 2026-10-08 |
+| Power-cycle the probe port during a retrying connect(), then halt() and loadBinaryProgram(<flash bytes from 0>, 0x0) (12 of 12 images on the external probe; leaves the CCFG alone) | remote | proven | `cc1354p10/FAQ.md`, 2026-10-24 |
+| Start a loop of loads, then unplug and replug USB (in on the 21st try; a replug with no loop missed the window twice) | hands | proven | `cc1354p10/FAQ.md`, 2026-10-07 |
+| Unplug USB for 3 s, flash again (for -242 after a flash read) | hands | proven | `cc1354p10/FAQ.md`, 2026-10-10 |
+
+USB hub ports recorded for this board:
+
+- The probe's hub port power cut not checked, 2026-10-25. The external LP-XDS110 probe leaves USB within 1 s of `uhubctl -a off` and is back about 1 s after `on`, and a CCStudio connect works at once after each cycle; whether the chip itself lost power was not measured, because every connect resets this chip and clears what would show it (SRAM, reset source).
+- The probe's hub port power cut not checked, date not recorded. The hands-free load route in the blink README; no separate before-and-after check.
+- The probe's hub port cuts power, 2026-10-08. 6 s off, then load at once, reopened the debugger window every time; 3 s did not. Never switch it while a load is connected: the probe then answers Error -261 until the next off and on.
+
+Restore: CCStudio scripting loadBinaryProgram. Regions: 1 MB main flash and 2 kB CCFG at 0x50000000: back up both, restore both. (`cc1354p10/AGENTS.md`)
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: cc1354p10/AGENTS.md | What should an AI coding assistant know before working on a TI LP-CC1354P10-1 LaunchPad development kit?
+==============================================================================
+
+# What should an AI coding assistant know before working on a TI LP-CC1354P10-1 LaunchPad development kit?
+
+Short answer: the debugger on this board only connects in the first few seconds after power-on (cause unknown, suspected chip limit), so a program that sleeps locks you out until the USB cable is replugged, and that TI ships no makefile for its Zigbee and DMM examples. This file is the short list of what was learned. Each item is from runs on one board unless it says otherwise.
+
+Terms: [docs/vocab.md](../docs/vocab.md) and the [LP-CC1354P10-1 FAQ](FAQ.md) in the Fox Red Labs repo. In short: **ZHA** is Home Assistant's built-in Zigbee integration; **DMM** is TI's scheduler that shares one radio between two stacks; a **sleepy end device** is a battery Zigbee node that wakes to poll its parent; a **border router** links a Thread network to the home network; **CCFG** is the chip's boot configuration area. 1 kB = 1,024 bytes. Checked 2026-10-06 to 2026-10-11 on an Intel Mac, macOS 15.7, with the SimpleLink Low Power F2 SDK 8.33.00.16, CCStudio 21.0.1, TI Arm Clang 4.0.4 and 5.1.1, SysConfig 1.28.1 and Zephyr 4.4.2, on one LP-CC1354P10-1 with Home Assistant ZHA.
+
+**How to use it.** Copy this file into the top folder of your own project as `AGENTS.md`. Most coding assistants read that name; for one that reads `CLAUDE.md`, copy it under that name or add the line `@AGENTS.md` to your `CLAUDE.md`. Paths below in backticks starting `cc1354p10/` are in the Fox Red Labs repo, where the evidence for each line lives; they are not in your copy, and links in this file only work inside that repo.
+
+## The board
+
+| Part | Fact |
+|---|---|
+| Chip | CC1354P10: Arm Cortex-M33 (CPUID `0x410FD214`) at 48 MHz, Sub-1 GHz and 2.4 GHz radios: Bluetooth LE, Zigbee, Thread, TI 15.4 (`cc1354p10/README.md`, `cc1354p10/FAQ.md`) |
+| Memory | 1 MB flash. 296 kB RAM in TI's count; the linker gives programs 256 kB of SRAM (`cc1354p10/FAQ.md`) |
+| Debug probe | XDS110 on the board, USB. Probe firmware on the board used was 03.00.00.22 when current tools wanted 03.00.00.43 (`cc1354p10/README.md`) |
+| Serial | Backchannel UART at `/dev/cu.usbmodem<probe serial>1` (`cc1354p10/README.md`) |
+| Unprogrammed state | The board arrived with TI's Project Zero but a nearly blank CCFG (`IMAGE_VALID_CONF` = `0xFFFFFFFF`), so the boot ROM skipped the program and sat in TI's serial bootloader. The CCFG was built from TI's own `ccfg.c` with the board's `BL_CONFIG` kept, so the bootloader stays as a recovery route (`cc1354p10/README.md`) |
+| Not supported | Zephyr 4.4.2 has no CC13x4 or CC26x4 support. OpenOCD 0.12 has no CC13x4 target (`cc1354p10/README.md`) |
+
+## Start here
+
+Tools it was built with: SimpleLink Low Power F2 SDK 8.33.00.16 (`<SDK>`, folder `simplelink_cc13xx_cc26xx_sdk_8_33_00_16`), reinstalled 2026-10-22 from TI's GitHub (tag `lpf2-8.33.00.16`, sparse checkout, 149 MB, no `examples/` folder) on a drive with room (recipe: `cc1354p10/radio-rx/README.md`, then `cc1354p10/radio-rx/build_f2_libs.py <SDK>`; add `/kernel/.meta/` to the sparse list for SysConfig; blink: `cc1354p10/blink/README.md`), CCStudio 21.0.1, TI Arm Clang 5.1.1.LTS (4.0.4 for the Zigbee and DMM projects), SysConfig 1.26.3, UniFlash 9.6.0.
+
+Probe: XDS110 on the board, plug the USB cable in; nothing to clip on. Connection file `cc1354p10/CC1354P10.ccxml` (ICEPick router driver, 2-pin cJTAG); put your probe serial in it (`xdsdfu -e`). The debugger connects only in the first seconds after power-on (Error -242 otherwise, TRAPS.md). Hands-free: switch the probe's hub port off 6 s (3 s failed), on with `uhubctl`, on, load at once.
+
+Backup: use frl (`docs/frl.md`): it reads the 1 MB main flash and the 2 kB CCFG at 0x50000000 twice and compares them (tested 2026-10-24 and 2026-10-25, probe LS5600RE; rows `backup_restore` in `data/results/cc1354p10.csv`). Back up both regions before any write. The board arrived with TI's Project Zero and a nearly blank CCFG (`IMAGE_VALID_CONF` = `0xFFFFFFFF`), so it sat in the serial bootloader until a CCFG was written. A read-only check that needs no backup is the CPU ID (the length counts 32-bit words):
+
+```text
+DSLite memory -c cc1354p10/CC1354P10.ccxml -r 0xE000ED00,1 -o cpuid.bin
+```
+
+Do not write the CCFG at 0x50000000, and keep the board's `BL_CONFIG` so the ROM bootloader stays as a recovery route. A flash read leaves a running program holding the only debug connection: unplug USB for 3 s before the next load.
+
+Build: no LED blink has been built on this board. The simplest build recorded is the bare-metal benchmark, from `cc1354p10/baremetal/` (makefile copied from TI's `drivers/empty` for this board):
+
+```bash
+mkdir -p build-O3 && make -C build-O3 -f ../makefile OPT="-O3" SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR=<SDK> SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh TICLANG_ARMCOMPILER=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
+```
+
+Flash: load with CCStudio scripting, which starts the program without a power cycle. A DSLite flash does not start a new program until `xds110reset -s <probe serial>` (a Bluetooth program needs a real power cycle):
+
+```bash
+/Applications/ti/ccs2101/ccs/scripting/python/run.sh cc1354p10/tools/ccs_load_run.py build-O3/bench.out
+```
+
+Check: the board prints a report on `/dev/cu.usbmodem<probe serial>1` at 115200 ending in `BENCH DONE`. `cc1354p10/baremetal/run.sh O3` builds, loads and reads it, and prints `WRONG IMAGE` if the flags printed differ from the ones built.
+
+Restore: tested. frl writes the backup back with CCStudio scripting `loadBinaryProgram` from 0 and reads main flash and CCFG back identical to the backup (2026-10-24 and 2026-10-25; see "When the board stops answering").
+
+## If you see this
+
+| What you see | Cause | Do this | Check |
+|---|---|---|---|
+| `IcePick_C: Error connecting to the target: (Error -261 @ 0x0) Invalid response was received from the XDS110.` | A leftover DSLite still holds the probe | Wait for it to exit, then load again | Load connects |
+| `CCS headless build complete - 0 out of 1 projects have errors`, but no `.out` | SysConfig stopped and nothing compiled | Look for the `.out` after every headless build | The file exists |
+| `Build-configuration ... does not exist` | DMM uses `Release`, the Zigbee coordinator `default` | Use the project's own configuration name | Build runs |
+| `Compiler version 'TICLANG_3.2.2' is not currently installed - defaulting to 'TICLANG_4.0.4.LTS'` | A project asks for an older compiler | Ignore it | It builds |
+| `unk_manufacturer unk_model` in Home Assistant, or every read returns `0xC1` (`SOFTWARE_FAILURE`) | The example answers every attribute read with `0xC1` | Register a read callback with `zcl_registerReadWriteCB(...)` | Manufacturer and model show |
+| `HTTP Error 400: Bad Request` from `zha.issue_zigbee_cluster_command` for the DMM light | Suspected, not checked: Home Assistant keeps the old "Temp Sensor" record for this address | Remove the device in Home Assistant, commission again from the board's menu | A light entity appears |
+| `R,rtos,timer_rate,0,FAIL,counter 0 systick 45015` | `DWT->CYCCNT` reads 0 after a probe pin reset | Load from the debugger, or time with SysTick | Counter counts |
+| `timed out waiting for @PK from the board` after `join: making an ML-KEM-768 key pair` | `TRNG_init()` was never called, so `TRNG_open()` returns NULL | Call `TRNG_init()` before `TRNG_open()` and check the handle | Exchange completes |
+| `rfPacketRx` fails to link: `drivers_cc13x4.a`, `driverlib.lib`, `nortos_cc13x4.a` missing | TI's GitHub copy of the F2 SDK carries those libraries as source only | `python3 cc1354p10/radio-rx/build_f2_libs.py <SDK>` | Link passes |
+| Receiver flashed but its serial port is silent | DSLite does not start the image | `xds110reset -s <probe serial>` | `rfrx: CC1354P10 listening at 915 MHz` |
+
+Traps shared with other boards: TRAPS.md.
+
+## Radios and stacks
+
+| Stack | Result | Source |
+|---|---|---|
+| Bluetooth LE, TI Project Zero | Advertised, LED service written and read back from a Mac; renamed without source | `cc1354p10/README.md` |
+| Zigbee sleepy sensor into Home Assistant | Joined; entity appeared about 160 s later (one run) | `cc1354p10/FAQ.md`, `cc1354p10/zigbee-sleepy-sensor/` |
+| Zigbee coordinator, board to board | Formed a PAN; a CC2340R5 router joined in 6.2 s | `cc1354p10/README.md` |
+| DMM Zigbee light plus Bluetooth LE | 459 kB flash, 33.8 kB RAM; joined Home Assistant in about 6 s; a Mac switched the light over Bluetooth 4 of 4. Home Assistant switching it not tested | `cc1354p10/dmm-zigbee-ble/README.md` |
+| Thread (`ot-ti`) | Leader here; a CC2340R5 as RCP joined as router; ping median 42 to 44 ms, 20 of 20 | `cc1354p10/README.md`, `cc1354p10/thread/README.md` |
+| Thread images | `ot-cli-ftd` 427 kB flash 94 kB RAM; `ot-cli-mtd` 363 and 88; `ot-rcp` 108 and 67 | `cc1354p10/thread/README.md` |
+| Matter | Not built; not on TI's supported list for this part | `cc1354p10/README.md` |
+| Sub-1 GHz receiver | Counted 21,658 of 21,658 packets over about 6 hours | `cc1354p10/FAQ.md` |
+
+## What ran here
+
+| Project | Result | Source |
+|---|---|---|
+| CoreMark, bare metal | 199.92 at -O3 (4.17 per MHz); 94.70 at -Oz; IRQ latency 23 to 24 cycles | `cc1354p10/baremetal/README.md` |
+| Dhrystone and FFT | 1.199 DMIPS/MHz; 256-point q15 FFT 0.340 ms | `data/results/cc1354p10.csv` |
+| Control loops | PID 117.1 kHz float, 120.6 kHz Q15; FOC 46.2 kHz | `data/results/cc1354p10.csv` |
+| ML-KEM-768 | 20.8 ms key pair, 24.0 ms encapsulate, 29.1 ms decapsulate | `cc1354p10/pqc-join/` |
+| ML-DSA-44 | 49.5 ms key pair, 154 ms average sign | `cc1354p10/FAQ.md` |
+
+<!-- ports:start (tools/render_ports.py) -->
+## Ports that ran here
+
+Code written for other chips and tools, brought to this board. The files to copy, the command and what you see for each are in `docs/ports.md`; the method and a prompt to port your own are there too. Works ran and did what it should; Could work ran in part.
+
+| Port | Status | Result | Evidence |
+|---|---|---|---|
+| Post-quantum key exchange and signatures on the LP-CC1354P10-1 | Works | ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on the LP-CC1354P10-1. | `cc1354p10/pqc-join/README.md` |
+| Sub-1 GHz CC1407P radio on an LP-MSPM0G5187, heard by an LP-CC1354P10-1 | Works | TI's CC1407P sub-1 GHz radio driver runs unchanged on the LP-MSPM0G5187, and an LP-CC1354P10-1 receives its packets: 21,658 of 21,658. | `mspm0g5187/radio/README.md` |
+| MSPM0 code on the CC2340R5 and CC1354P10 radio chips | Could work | MSPM0 driver examples build for the CC2340R5 with a 47-line shim, the first 5 ran with the same pin states as TI's own build, and 4 of 4 ran on the CC1354P10. | `portability/README.md` |
+<!-- ports:end -->
+
+## Where the evidence lives
+
+Start at `cc1354p10/README.md`, then `cc1354p10/FAQ.md` for each problem with its exact error and fix. Rows are in `data/results/cc1354p10.csv`. If this file is wrong about your board, correct the FAQ first.
+
+External LP-XDS110 probe, flashing (2026-10-24): CCStudio `loadProgram` and `DSLite flash` fail at the second connect (Error -242, `OnPreFileLoaded(): Connect failed`). Power-cycle the probe port during a retrying `connect()`, `halt()`, then `loadBinaryProgram(<flash bytes from 0>, 0x0)`; this loaded 12 of 12 images. Loading a full `.out` also rewrites the CCFG with the SDK default, which differed from the board's original CCFG; back up 1 MB flash plus 2 kB at 0x50000000 and restore both.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-25. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+How it locks up:
+
+- The debugger connects only in the first seconds after power-on (cause unknown, suspected chip limit); a sleeping image misses it: Error -242, A router subpath could not be accessed (`cc1354p10/FAQ.md`, `cc1354p10/AGENTS.md`, 2026-10-07)
+- A flash backup read, or a connect after a BLE demo, uses the one debug session: Error -242 on the next load (`cc1354p10/FAQ.md`, 2026-10-10)
+- External LP-XDS110 probe: loadProgram and DSLite flash fail at the second connect (Error -242, OnPreFileLoaded(): Connect failed) (`cc1354p10/FAQ.md`, 2026-10-24)
+- Loading a whole .out rewrites the CCFG at 0x50000000 with the SDK default, which differed from the board's original (`cc1354p10/AGENTS.md`, 2026-10-24)
+
+Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
+
+| Method | Remote or hands | Status | Evidence |
+|---|---|---|---|
+| frl's ccs13 route: one CCStudio Python scripting session per step, connect retried after a 6 s power cycle of the probe port when FRL_POWER_CYCLE names it, write with loadBinaryProgram from 0 (CCFG left alone) (three full cycles and four restores on the external LP-XDS110 probe, no connect refused, so the power-cycle branch did not run) | remote | proven | `docs/frl.md`, `tools/frl/ccs13.py`, 2026-10-25 |
+| xds110reset -s <serial> (does not reopen the post-power-on window and did not clear -242 after a flash read; it does start a DSLite-flashed image) | remote | failed | `cc1354p10/FAQ.md`, 2026-10-10 |
+| uhubctl off 6 s on the probe's port of a USB-C adapter, then load at once (3 s off failed; never switch while a load is connected (Error -261)) | remote | proven | `cc1354p10/FAQ.md`, 2026-10-08 |
+| Power-cycle the probe port during a retrying connect(), then halt() and loadBinaryProgram(<flash bytes from 0>, 0x0) (12 of 12 images on the external probe; leaves the CCFG alone) | remote | proven | `cc1354p10/FAQ.md`, 2026-10-24 |
+| Start a loop of loads, then unplug and replug USB (in on the 21st try; a replug with no loop missed the window twice) | hands | proven | `cc1354p10/FAQ.md`, 2026-10-07 |
+| Unplug USB for 3 s, flash again (for -242 after a flash read) | hands | proven | `cc1354p10/FAQ.md`, 2026-10-10 |
+
+USB hub ports recorded for this board:
+
+- The probe's hub port power cut not checked, 2026-10-25. The external LP-XDS110 probe leaves USB within 1 s of `uhubctl -a off` and is back about 1 s after `on`, and a CCStudio connect works at once after each cycle; whether the chip itself lost power was not measured, because every connect resets this chip and clears what would show it (SRAM, reset source).
+- The probe's hub port power cut not checked, date not recorded. The hands-free load route in the blink README; no separate before-and-after check.
+- The probe's hub port cuts power, 2026-10-08. 6 s off, then load at once, reopened the debugger window every time; 3 s did not. Never switch it while a load is connected: the probe then answers Error -261 until the next off and on.
+
+Restore: CCStudio scripting loadBinaryProgram. Regions: 1 MB main flash and 2 kB CCFG at 0x50000000: back up both, restore both. (`cc1354p10/AGENTS.md`)
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: cc1354p10/baremetal/README.md | How fast is the LP-CC1354P10-1 (Cortex-M33) on bare metal with TI Arm Clang?
+==============================================================================
+
+# How fast is the LP-CC1354P10-1 (Cortex-M33) on bare metal with TI Arm Clang?
+
+EEMBC CoreMark scores **199.92 at -O3 (4.17 per MHz at 48 MHz)** and 94.70 at -Oz, with TI Arm Clang 5.1.1 and no operating system, measured on the board on 2026-10-06, three runs each. Interrupt latency from pend to handler is 23 to 24 CPU cycles at -O3. A GPIO register toggle takes 1.51 cycles per loop pass.
+
+Terms: [docs/vocab.md](../../docs/vocab.md). 1 kB = 1,024 bytes. Built and run from an Intel Mac (macOS 15.7.9) with SimpleLink Low Power F2 SDK 8.33.00.16 and SysConfig 1.26.3, loaded with CCStudio 21.0.1 scripting (this board does not start a DSLite-flashed program until a power cycle).
+
+## Results, measured 2026-10-06
+
+| | -O3 | -Oz |
+|---|--:|--:|
+| CoreMark, iterations per second (median of 3) | **199.92** | 94.70 |
+| CoreMark per MHz | **4.17** | 1.97 |
+| GPIO toggle, TI driver call, cycles | 15.08 | 19.01 |
+| GPIO toggle, register write in a loop, cycles | 1.51 | 8.01 |
+| Interrupt latency, pend to handler, direct vector, cycles (includes one SysTick read) | 23 to 24 | 25 to 29 |
+| Flash used (whole benchmark image) | 43.3 kB | 30.8 kB |
+
+The three -O3 runs gave 199.9208 to 199.9210; the three -Oz runs 94.7041 to 94.7063. Every run passed CoreMark's own check ("Correct operation validated", crcfinal 0x4983). Clock read back as 48 MHz (`ClockP_getCpuFreq`). Cache on (VIMS CTL 0x20000005). Mac load average about 2.5 on 12 cores during the runs.
+
+How it compares, same method and compiler:
+
+- **Against Arm's figure**: Arm publishes 4.02 CoreMark per MHz for the Cortex-M33. 4.17 here is slightly above it.
+- **Against the CC2340R5** (Cortex-M0+, also 48 MHz): 111.09 at -O3, 2.31 per MHz (`cc2340r5/baremetal/README.md`). The M33 does 1.8 times the work per clock.
+- **Against the MSPM0G3507** (Cortex-M0+, 80 MHz): 183.61 (`mspm0g3507` rows in `data/results/mspm0g3507.csv`). The CC1354P10 beats it at 60% of the clock.
+
+## Run it
+
+    ./run.sh O3      # or Oz: builds, loads with CCStudio scripting, prints the serial report
+
+`run.sh` checks that the board printed the flags that were built and stops with "WRONG IMAGE" otherwise: on 2026-10-06 one "-Oz" run was really the previous -O3 image still running after a load that did not take, and its numbers looked valid.
+
+## The port from the CC2340R5 bench
+
+Same `bench.c`, `bench_timer.h` and unmodified EEMBC CoreMark files as `cc2340r5/baremetal/`, with:
+
+- `PowerCC26XX.h` and `PowerCC26XX_DISALLOW_STANDBY`/`_IDLE` instead of the CC23 power names.
+- `cmsis/cc26x4.h` plus `cmsis/core/core_cm33.h`: the F2 SDK's device header does not pull in the Arm core header (the F3 SDK's does).
+- Spare interrupt for the latency test: I2S (unused here) instead of the CC23's LRFD IRQ0.
+- Cache report: VIMS CTL instead of the CC23's wait-state and cache registers.
+- Makefile and SysConfig from TI's `examples/nortos/LP_EM_CC1354P10_1/drivers/empty` plus the UART2 lines from `uart2echo`; no CCFG CRC step (F2 parts have none).
+
+==============================================================================
+FILE: cc1354p10/blink/README.md | How do you blink the LED on a TI LP-CC1354P10-1 from a Mac terminal?
+==============================================================================
+
+# How do you blink the LED on a TI LP-CC1354P10-1 from a Mac terminal?
+
+Works (2026-10-22): the red LED (DIO6) blink image builds in 6 s and runs on the board 29 s after the clock starts (build, power-cycle the probe, load, run, first counter read). `blink_count` read 8, 18, 27, 31, 35, 38, 42, 46 over 3.8 s: about 9.8 toggles a second, a 0.2 s blink period.
+
+Setup: LP-CC1354P10-1, with its USB hub port switched by `uhubctl` (the debugger connects only in the first seconds after power-on). SimpleLink Low Power F2 SDK 8.33.00.16 from TI's GitHub (tag `lpf2-8.33.00.16`, sparse checkout, 149 MB), its three missing libraries built with `cc1354p10/radio-rx/build_f2_libs.py`, TI Arm Clang 5.1.1.LTS, SysConfig 1.28.0.
+
+What differs from the SDK's own `drivers/empty`: TI's GitHub copy of the SDK carries no `examples/` folder, so this blink is `drivers/empty`'s shape written out here (the same SysConfig board, LED and no-RTOS main; the makefile adapted from the one `cc1354p10/baremetal` already uses). The toggle is 0.1 s and a counter makes it readable by the debugger.
+
+Files: `blink.c`, `blink.syscfg`, `makefile`, `main_nortos.c`, `cc13x4_cc26x4_nortos.cmd`, `load_and_read.py`. Build: `mkdir build && make -C build -f ../makefile SYSCONFIG_TOOL=<sysconfig_cli.sh> TICLANG_ARMCOMPILER=<ti-cgt-armllvm_5.1.1.LTS> GCC_ARMCOMPILER= IAR_ARMCOMPILER=`. Load and read: `ccs/scripting/python/run.sh load_and_read.py build/blink.out <blink_count address from the linker map>`. Terms: [docs/vocab.md](../../docs/vocab.md); **CCFG** is the chip's boot configuration area. 1 MB = 1,024 kB.
+
+Next: [bare-metal benchmark](../baremetal/README.md), [FAQ](../FAQ.md).
+
+Limits: the LED level was not read (the GPIO output register cannot be read while the program runs), so the proof is the counter, not the pin. One run. The image's CCFG is the SysConfig default; it differs from the board's own in two words (0x4 and 0x28); debug and bootloader fields are the same.
+
+Backup and restore: main flash (1 MB) and the CCFG read twice identical before the run; the board's own image and CCFG were flashed back and read back identical.
+
+==============================================================================
+FILE: cc1354p10/dmm-zigbee-ble/README.md | Can the TI LP-CC1354P10-1 run a Zigbee light and a Bluetooth light at the same time?
+==============================================================================
+
+# Can the TI LP-CC1354P10-1 run a Zigbee light and a Bluetooth light at the same time?
+
+Partly shown. TI's `dmm_zr_light_remote_display_app` joined a Home Assistant Zigbee network about 5 to 6 seconds after the join command, and while it stayed on that network a Mac switched the light over Bluetooth LE 4 times out of 4 (about 60 ms per write and read-back). Home Assistant switching the light was not tested: it still held an old record for this chip (see "What did not work").
+
+Terms: [vocab](../../docs/vocab.md) (DMM, ZHA, GATT). Errors and fixes, including the three on this page: [CC1354P10 FAQ](../FAQ.md). 1 kB = 1,024 bytes.
+
+Checked 2026-10-08 on an Intel Mac, macOS 15.7, with SimpleLink CC13xx/CC26xx SDK 8.33.00.16, CCStudio 21.0.1 (headless), SysConfig 1.28.1 and TI Arm Clang 4.0.4.LTS. One board, one run.
+
+## What it is
+
+DMM (Dynamic Multi-protocol Manager) is TI's scheduler that shares one radio between two stacks. This example runs a Zigbee light and a Bluetooth LE peripheral with a "light" service in one image. A phone, or a Mac, can switch the light over Bluetooth while the Zigbee network can switch it too. On Zigbee the light is a router: a mains-powered device that also passes messages on for other devices. Words used below: a PAN ID is the number that names one Zigbee network; an endpoint is a numbered slot on a device that holds one function, and TI's light uses endpoint 8.
+
+## Size
+
+From the linker's memory summary of this build:
+
+| | Used | Of | Left |
+|---|---|---|---|
+| Flash | 459 kB | 1,014 kB (excluding 10 kB kept for settings) | 555 kB |
+| RAM | 33.8 kB | 256 kB | 222 kB |
+
+`tiarmsize` reports 43.6 kB of `.bss`, about 10 kB more than the linker's RAM total. The extra 10 kB is not identified. Use the linker figure.
+
+## Build it from a terminal
+
+TI ships no makefile for the DMM examples, only a CCStudio project. CCStudio's headless command line builds it. The copy of the project in this folder changes two things in SysConfig: the Bluetooth name ("Fox Red DMM") and the Zigbee channel list (all 16 channels instead of 11 only), so it can join a home network on any channel.
+
+```bash
+/Applications/ti/ccs2101/ccs/ccs-server.app/Contents/MacOS/ccs-server-cli.sh -noSplash -workspace ~/dmm-ws -application projectImport -ccs.location tirtos7/ticlang/dmm_zr_light_remote_display_app_LP_EM_CC1354P10_1_tirtos7_ticlang.projectspec
+```
+
+```bash
+/Applications/ti/ccs2101/ccs/ccs-server.app/Contents/MacOS/ccs-server-cli.sh -noSplash -workspace ~/dmm-ws -application projectBuild -ccs.projects dmm_zr_light_remote_display_app_LP_EM_CC1354P10_1_tirtos7_ticlang -ccs.configuration Release
+```
+
+Run both from this folder. Import and build took 35 s here and the workspace used 21 MB of disk. Then check that `Release/*.out` exists. **Tool or docs.** The last line, `CCS headless build complete - 0 out of 1 projects have errors`, is the same when SysConfig fails and nothing is built ([../README.md](../README.md), "Building Zigbee and DMM examples from a terminal"; the FAQ has the entry).
+
+## Load it
+
+Load the `.out` with CCStudio or UniFlash. This board's debugger connects only in the first seconds after power is applied, so unplug and replug the USB cable, then start the load at once (to do it hands-free, switch the probe's USB hub port off for 6 s with `uhubctl`, on, then load at once).
+
+## Join the Zigbee network
+
+The image does not join on its own. Use the menu on the board's serial port (TI's CUI, the Common User Interface):
+
+1. In Home Assistant, open joining: **Settings**, **Devices & services**, **Zigbee Home Automation**, **Add device**.
+2. Open the first serial port of the board (`/dev/cu.usbmodem<serial>1`) at 115200 baud in a terminal program.
+3. Press Esc, right arrow (the menu shows `TI Sample Light`), Enter, right arrow (`<   COMMISSION   >`), Enter.
+
+Success looks like `[State] In the network` on the "ZDO Info" line and a real PAN ID and channel on "NWK Info". The board showed `[PAN ID] 0xde8d [Channel] 20`.
+
+To leave the network later: Esc, right arrow, Enter, left arrow twice (`<  RESET TO FN   >`), Enter.
+
+## Switch it over Bluetooth
+
+The board advertises "Fox Red DMM" (TI's default name is "DMM Zigbee Light RD"). Any Bluetooth LE app works: connect, open the service `F00011A0-0451-4000-B000-000000000000`, and write `01` or `00` to the characteristic `F00011A1-...`. The "APP Info" line on the serial port changes to `[Light State] On` or `Off`. The Mac run wrote 1, 0, 1, 0; each read back the same value in 57 to 61 ms, and the board's line went Off, On, Off, On, Off.
+
+## What did not work
+
+- **Home Assistant did not get a light entity.** **Unknown (suspected: Third-party behavior).** This chip had joined the same Home Assistant before with another image (a temperature sensor). After the new join, Home Assistant still showed the old record for this address ("Temp Sensor", no light). Suspected: it did not read the device's endpoints again on a rejoin; not checked. A toggle sent through `zha.issue_zigbee_cluster_command` to endpoint 8 failed with `HTTP Error 400: Bad Request`. If you see this, remove the old device in Home Assistant, then commission again so Home Assistant reads the new endpoints. The old record was not removed, so a toggle from Home Assistant is not tested.
+- **macOS showed an old name.** **Third-party behavior.** The Mac listed the board as "Fox Red Lab CC1354", the name an earlier image used. macOS remembers names by address. Search by the advertised name or by the service, not by the name in a list.
+
+## What to do next
+
+Not done: toggle the light from Home Assistant with a fresh device record, and time 20 toggles from each side, then both at once. Next: [CC1354P10 FAQ](../FAQ.md).
+
+==============================================================================
+FILE: cc1354p10/pqc-join/README.md | Can the LP-CC1354P10-1 run post-quantum key exchange (ML-KEM-768) and signatures (ML-DSA-44), and how fast?
+==============================================================================
+
+# Can the LP-CC1354P10-1 run post-quantum key exchange (ML-KEM-768) and signatures (ML-DSA-44), and how fast?
+
+Yes, both, in plain C with no hardware help. On the LP-CC1354P10-1 (CC1354P10, Cortex-M33 at 48 MHz), ML-KEM-768 takes 21 to 29 ms per step and ML-DSA-44 takes 50 ms to verify and 154 ms on average to sign. The full exchange with a Mac over USB serial works end to end: the board makes its key pair from its hardware random-number generator, agrees a key with the Mac, and decrypts the Mac's encrypted line. Every step passes NIST's known-answer vectors, plus a few checks added in this repo, on the board first.
+
+| Step | Time at 48 MHz | Stack |
+|---|--:|--:|
+| ML-KEM-768: make a key pair | 20.8 ms | 14.7 kB |
+| ML-KEM-768: encapsulate | 24.0 ms | 20.0 kB |
+| ML-KEM-768: decapsulate | 29.1 ms | 18.7 kB |
+| ML-DSA-44: make a key pair | 49.5 ms | 32.0 kB |
+| ML-DSA-44: sign (mean of 16 messages; 77 to 361 ms) | 154 ms | 50.1 kB (one fixed message) |
+| ML-DSA-44: verify | 50.5 ms | 30.2 kB |
+
+Code size in flash: ML-KEM-768 80.5 kB and ML-DSA-44 106.7 kB built for speed (`-O3`, the timed build); 9.4 kB and 13.3 kB built for size (`-Os`, built, not run). Libraries: mlkem-native 2.0.0 and mldsa-native 2.0.0, unmodified.
+
+**In plain words.** A key exchange is how two devices agree a secret key over a wire anyone can read. A signature proves a message or a firmware image came from the holder of a private key. Post-quantum (also called quantum-safe) means a future quantum computer cannot break it. ML-KEM is NIST's post-quantum key exchange standard (FIPS 203, formerly Kyber); 768 is its middle security level. One side makes a key pair and sends the public half; the other side *encapsulates*: it makes a random secret, locks it with that public key and sends the result (the ciphertext); the first side *decapsulates* it with its private key. Both now hold the same 32-byte secret. ML-DSA is NIST's post-quantum signature standard (FIPS 204, formerly Dilithium); 44 is its smallest level. A known-answer test (KAT) runs the code on NIST's fixed inputs and checks the outputs byte for byte. The TRNG is the chip's hardware true random-number generator. A *load* is one flash of the image onto the board followed by one run. The *stack* is the RAM a function uses for its local variables while it runs. NoRTOS means the program runs without an operating system.
+
+Other terms: [docs/vocab.md](../../docs/vocab.md). Board FAQ: [cc1354p10/FAQ.md](../FAQ.md). 1 kB = 1.0 kB. Measured 2026-10-08 on macOS 15.7 (Intel), CCStudio 21.0.1, TI Arm Clang 5.1.1.LTS, SimpleLink CC13xx/CC26xx SDK 8.33.00.16 (NoRTOS), OpenSSL 3.6.4.
+
+Contents: [ML-KEM-768 numbers](#how-were-the-lp-cc1354p10-1-ml-kem-768-numbers-measured) · [ML-DSA-44 numbers](#how-were-the-lp-cc1354p10-1-ml-dsa-44-numbers-measured) · [the exchange](#what-does-the-post-quantum-exchange-between-the-lp-cc1354p10-1-and-a-mac-look-like) · [the TRNG hang](#why-did-the-exchange-stop-at-join-making-an-ml-kem-768-key-pair-on-the-lp-cc1354p10-1) · [how to run it](#how-do-i-run-the-post-quantum-tests-on-the-lp-cc1354p10-1) · [files](#which-files-make-up-the-lp-cc1354p10-1-post-quantum-tests)
+
+## How were the LP-CC1354P10-1 ML-KEM-768 numbers measured?
+
+| Step | Cycles (median of the 3 load medians) | Time at 48 MHz | Stack | Basis |
+|---|--:|--:|--:|---|
+| Key generation | 996,527 | 20.8 ms | 14.7 kB | three loads |
+| Encapsulation | 1,152,209 | 24.0 ms | 20.0 kB | three loads |
+| Decapsulation | 1,398,195 | 29.1 ms | 18.7 kB | three loads |
+
+The board was loaded three times and each load ran every step three times. The three load medians agree within 0.01 percent (key generation 996,518 to 996,612). A fourth load, with the TRNG fix and ML-DSA-44 added, read 996,625, 1,152,311 and 1,398,035. Clock: the CPU's own cycle counter (SysTick, the Arm core's built-in timer, on the CPU clock). As a check, SysTick and the Cortex-M33's DWT cycle counter (a counter in the core's debug block) read the same count over a test loop on each load: 180,024 to 180,029. The fixed NIST seed was used, so the same keys come out each time. Stack is measured by filling it with a pattern before each call and finding the deepest overwritten word after, net of the calling functions; the key buffers are static and not counted. Flash is from the linker maps (not kept in the repo; the byte counts are in the CSV rows): `mlkem_native.o` (ML-KEM-768 and its SHA-3) is 80.5 kB at `-O3` and 9.4 kB at `-Os`. Rows: `data/results/cc1354p10.csv`, tests `pqc_mlkem768_*`, `pqc_stack_peak`, `pqc_flash_bytes`.
+
+For scale: TI's MSP Crypto Library publishes 27, 31 and 36 ms for the same three steps on the 80 MHz Cortex-M0+ MSPM0G3519 (TI's figures, not measured here). On cycles, this build used 15 to 21 percent fewer than TI's published figures for the MSPM33C321A (a Cortex-M33) at 80 MHz, which are 1.26, 1.43 and 1.65 million; the two differ in library, compiler and flash wait states, so read it as the same class, not a ranking.
+
+## How were the LP-CC1354P10-1 ML-DSA-44 numbers measured?
+
+| Step | Cycles | Time at 48 MHz | Stack | How |
+|---|--:|--:|--:|---|
+| Key generation | 2,374,548 | 49.5 ms | 32.0 kB | median of 3 calls, fixed NIST seed |
+| Sign, one fixed message | 4,964,477 | 103.4 ms | 50.1 kB | median of 3 calls |
+| Sign, 16 different messages | mean 7,406,767; median 6,233,336 | mean 154 ms; 77 to 361 ms | | one call each |
+| Verify | 2,421,949 | 50.5 ms | 30.2 kB | median of 3 calls |
+
+One load, the same clock, stack painting and build as ML-KEM. Before timing, the board passed six checks: NIST's ACVP key generation vector (test 1), one hedged and one deterministic signing vector (tests 194 and 7, signature byte for byte), one signature NIST marks valid (test 11, accepted) and one it marks invalid (test 9, rejected), and this repo's own round trip (its signature verifies, a flipped message bit does not). The vectors and where they come from: [portability/pqc-join/kat/SOURCE.md](../../portability/pqc-join/kat/SOURCE.md).
+
+**Why signing time varies.** ML-DSA signing makes a candidate signature and throws it away if a check fails (rejection sampling), so the number of tries depends on the message. Over 16 messages the fastest sign took 3.7 million cycles and the slowest 17.3 million. Verify always takes the same time. The timed signs use deterministic signing (the random input set to zero, which FIPS 204 allows), so a rerun gives the same times; a product would use hedged signing with fresh random bytes, which costs the same.
+
+**Stack.** Signing needs 50 kB of stack at once, so this image sets a 64 kB stack. mldsa-native keeps its working buffers on the stack by default; its own header lists 43.7 kB of buffers for signing. Its `MLD_CONFIG_REDUCE_RAM` option trades speed for RAM; build sizes and the run left for the bench are under [ML-DSA-44 with MLD_CONFIG_REDUCE_RAM](#ml-dsa-44-with-mld_config_reduce_ram-expectation-build-sizes-and-the-run-left-for-the-bench).
+
+Flash: `mldsa_native.o` (ML-DSA-44 with its own copy of SHA-3) is 106.7 kB at `-O3` and 13.3 kB at `-Os`. The whole `-O3` image with both algorithms and the test vectors is 266.6 kB; the `-Os` image is 84.7 kB (built, not run).
+
+For scale: TI publishes 22, 133 and 23 ms for ML-DSA-44 key generation, sign (mean of 16) and verify on the 160 MHz MSPM33C321A, and 84, 423 and 98 ms on the 80 MHz MSPM0G3519 (TI's figures, not measured here). Neither TI part is measured here.
+
+## What does the post-quantum exchange between the LP-CC1354P10-1 and a Mac look like?
+
+The board offers its public key, the Mac encapsulates with OpenSSL and sends the ciphertext, both sides show a key check (the first 4 bytes of the SHA-256 of the derived AES key), and the Mac sends one encrypted line that the board decrypts and prints. From the run on 2026-10-08:
+
+```text
+key check  Mac d01a2f61  board d01a2f61  MATCH
+board> DECRYPTED (76 bytes, tag ok): Hello from the Mac: this line was encrypted with a key agreed by ML-KEM-768.
+```
+
+Each step, timed on the board (cycle counter) and on the Mac (wall clock):
+
+| Step | Where | Time | Bytes on the wire |
+|---|---|--:|--:|
+| 64 random bytes from the TRNG | board | 20.2 ms | |
+| ML-KEM-768 key pair from them | board | 20.9 ms | |
+| Board sends its 1,184-byte public key | wire | 207 ms (computed) | 2,389 |
+| Mac encapsulates (OpenSSL command line, includes starting it) | Mac | 58.6 ms | |
+| Mac sends the 1,088-byte ciphertext | wire | 191 ms (computed) | 2,197 |
+| Board decapsulates, derives the AES key, sends the key check | board | 29.8 ms | 27 |
+| Mac sends one encrypted line (104 bytes) | wire | 20 ms (computed) | 229 |
+| Board decrypts it (AES-128-GCM in software) and answers | board | 2.5 ms | 22 |
+
+On the Mac's clock, from receiving the public key to the board's answer took 346 ms. In total 4,864 characters crossed the wire for 2.3 kB of payload: the framing writes every byte as two hex characters. Wire times are computed at 115,200 baud, not measured. The UART, not the chip, is the slow part: the board's own work is about 73 ms, the wire about 420 ms. For comparison, the same exchange with X25519 (the classical key exchange in common use today, run on the Mac alone) sends 32 bytes each way, 168 bytes of payload in all.
+
+The key derivation is HKDF-SHA256 (a standard way to turn a shared secret into a key) on the 32-byte shared secret, giving a 16-byte AES-128 key. The line is encrypted with AES-128-GCM, which also detects tampering. The shared secret itself is never printed. Neither library nor this code claims protection against power or fault attacks; this is a demonstration of the math and its cost, not a hardened product. Do not use it for real keys.
+
+## Why did the exchange stop at "join: making an ML-KEM-768 key pair" on the LP-CC1354P10-1?
+
+**Our mistake.** The image never called `TRNG_init()`. Adding it fixed the hang on the next load. Why it hung, from reading the SDK source (not traced on the board): in TI's SDK, `Board_init()` initializes only the power and GPIO drivers; every other driver's `_init()` is the application's job (TI's `aesKeyAgreement` example calls `TRNG_init()` itself). Without it, `TRNG_open()` returns NULL, and the code did not check. The first `TRNG_getRandomBytes()` call then used the NULL handle, so the driver read its state pointer from address 0 (the start of the vector table, which holds the initial stack address `0x20040000`, the first byte past the end of RAM), wrote there, and faulted. Everything before it worked because the known-answer tests and timing use fixed inputs and never touch the TRNG.
+
+If you see a program stop at its first TRNG call on a CC13xx or CC26xx board, with the CPU in an exception handler (here the debugger showed PC `0x100006f4` and LR `0xfffffff9`; observed 2026-10-08, output not saved), do this: call `TRNG_init()` before `TRNG_open()`, and stop with a message if `TRNG_open()` returns NULL. That is the whole fix in `pqc_board.c`. With it, the 64 random bytes take 20 ms (polling mode) and the exchange completes.
+
+## How do I run the post-quantum tests on the LP-CC1354P10-1?
+
+The host test needs no board (a C compiler, Python with the `cryptography` package and OpenSSL 3.5 or later). It builds the board code for the Mac, runs both sets of known-answer tests and the whole exchange against `mac_side.py`, and prints `pqc-join host test: OK`:
+
+```bash
+portability/pqc-join/test/run.sh
+```
+
+Build the board image (touches no hardware; 19.5 s on 2026-10-08 with the SysConfig output already generated, longer the first time):
+
+```bash
+cc1354p10/pqc-join/build.sh -O3
+```
+
+Loading and running it needs the board on a USB port the Mac can power-switch with `uhubctl` (a command-line tool that turns USB hub ports off and on), because this board's debugger connects only just after power-on; see the board FAQ, [the debugger will not connect](../FAQ.md#the-debugger-will-not-connect-to-the-board-once-a-program-is-running-how-do-you-get-back-in) and [power-cycling from the Mac](../FAQ.md#can-you-power-cycle-the-lp-cc1354p10-1-from-the-mac-so-loads-work-without-a-replug). `run.sh` power-cycles the port, backs up flash and the CCFG page (the chip's boot settings) to a folder outside the repo, loads the image, runs `mac_side.py` against the UART, then loads the image you name to leave running and reads flash back against the backup. Replace `20-4:1` with your hub and port from `uhubctl`, and the path with the `.out` file you want left on the board:
+
+```text
+UHUB=20-4:1 RESTORE_IMG=<path to the .out to leave running> cc1354p10/pqc-join/run.sh -O3
+```
+
+The run on 2026-10-08 took 2 minutes 22 seconds: 22 s to back up 1 MB of flash, 18 s on the board, then the restore and read-back. The loader leaves the 8 kB flash sector at `0xFC000` (an application's saved settings) different from the backup after loading a large image; `run.sh` rewrites that sector from the backup and compares the whole 1 MB again. It prints `READBACK MATCHES BACKUP` when the board is back as it was.
+
+## Which files make up the LP-CC1354P10-1 post-quantum tests?
+
+`pqc_board.c` (UART, timer, TRNG, stack painting), `pqc.syscfg`, `build.sh`, `run.sh`, `ccs_pqc_session.py` (backup, load, restore, read-back). Shared code: [portability/pqc-join/](../../portability/pqc-join/README.md) (`core/pqc_join.c` for ML-KEM and the exchange, `core/pqc_sign.c` for ML-DSA). Libraries: [third-party/mlkem-native/](../../third-party/mlkem-native/SOURCE.md) and [third-party/mldsa-native/](../../third-party/mldsa-native/SOURCE.md).
+
+## ML-DSA-44 with MLD_CONFIG_REDUCE_RAM: expectation, build sizes and the run left for the bench
+
+**Expectation, written 2026-10-20 before any lowram build.** mldsa-native's own header (`mldsa_native.h`, `MLD_TOTAL_ALLOC_44_*`) lists the working buffers a call allocates. The option is expected to cut them like this (bytes, default to `MLD_CONFIG_REDUCE_RAM`): key generation without the pairwise test 26,912 to 11,584; key generation with it 48,480 to 16,896; sign 44,704 to 13,120; verify 24,448 to 9,120. The painted stack peaks measured at the default build exceed those figures by 5.9 to 6.6 kB (keygen 32,792 against 26,912; sign 51,320 against 44,704; verify 30,904 against 24,448), so the lowram painted peaks are expected near 17.5 kB, 19.7 kB and 15.6 kB. That is a prediction for the board run, not a result. Expected cost: more cycles, because the matrix and vectors are recomputed instead of kept; the size of the slowdown is not predicted. Expected flash: a few kB more or less than the default, since the code path is the same library. Expected fit: ML-DSA-44 in the 32 kB single bank of the LP-MSPM0G5187 only if the harness's static buffers (16.7 kB of key and test buffers) shrink as well, so signing fits the stack but the harness as written probably still does not; the 128 kB-class parts (G3519, MSPM33C321A, CC1354P10) fit either way.
+
+Build and link only (nothing touched a probe or a board): `portability/pqc-join/lowram_build.sh`, which builds the shared core with `-DMLD_CONFIG_REDUCE_RAM` through the existing board build scripts. The CC1354P10 image in this folder could not be rebuilt on 2026-10-20 because the SimpleLink F2 SDK 8.33 and SysConfig 1.26.3 were not installed on the build machine that day; its lowram build waits on that install.
+
+**Build result, 2026-10-20 (build and link only, TI Arm Clang 5.1.1.LTS, nothing flashed).** The default and the lowram build were both rebuilt the same day, so the pairs compare like with like. The default `mldsa_native.o` sizes match the recorded rows exactly. Flash is the `mldsa_native.o` contribution; "image" is the whole linked harness. Static RAM is the linker map's `.bss` and `.data` without the reserved stack.
+
+| Board | Opt | ML-DSA-44 flash, default | lowram | Image, default | lowram | Static RAM | Stack reserved by the harness |
+|---|---|--:|--:|--:|--:|--:|--:|
+| LP-MSPM0G3519 (128 kB RAM) | -O3 | 196,764 | 118,584 | 255,656 | 197,640 | 28,680 | 61,440 |
+| LP-MSPM0G3519 | -Os | 16,620 | 15,482 | 68,544 | 67,784 | 28,680 | 61,440 |
+| LP-MSPM33C321A (256 kB RAM) | -O3 | 109,252 | 90,246 | 243,552 | 224,544 | 27,372 | 65,536 |
+| LP-MSPM33C321A | -Os | 13,592 | 12,972 | 67,696 | 67,072 | 27,372 | 65,536 |
+| LP-MSPM0G5187 (32 kB RAM, 128 kB flash) | -Os | 16,620 | 15,482 | 68,256 | 67,504 | 19,204 | 13,564 at most (see below) |
+| LP-MSPM0G5187 | -O3 | 196,764 | 118,584 | does not link | does not link | | |
+
+**Does ML-DSA-44 fit?** On the G3519 and the MSPM33C321A yes, as before: the harness already reserves 60.0 and 64.0 kB of stack, above the 50.1 kB the default build was measured to use, and lowram only lowers the need (the header's allocation for signing falls from 43.7 kB to 12.8 kB). The saving there is flash (-O3 drops 19 to 40 percent of the ML-DSA code) rather than RAM headroom, and the stack the lowram build needs is not known until it is painted on the board. On the LP-MSPM0G5187, with the ML-DSA files in and the harness's static buffers unchanged (18.8 kB including the 3 kB log), the 32 kB bank leaves at most 13.2 kB for the stack; the largest stack that links was not searched beyond that figure because it is the map's whole free RAM. The header's allocation for lowram signing alone is 12.8 kB, which leaves 444 B for every call frame around it, so signing does not fit this chip with this harness; key generation with the pairwise test (16.5 kB) does not either. Key generation without it (11.3 kB) and verify (8.9 kB) are inside 13.2 kB on the header's figures only, which are floors and not peaks. The -O3 image does not link on the G5187: its code needs 157.3 kB against 128.0 kB of flash, so use -Os. The CC1354P10 image was not rebuilt (its SDK is not installed); its harness reserves a 64 kB stack in 256 kB of RAM, the same situation as the G3519. Rows: `data/results/<board>.csv`, variants `mldsa-native-lowram-ticlang-o3` and `-os` for the sizes, `waiting` for timing and painted stack on all four boards.
+
+**What is left for the bench.** One load on the LP-CC1354P10-1 with the SDK installed, then the numbers for the other boards on their own scripts. Build, then run, with `LOWRAM=1`:
+
+```text
+LOWRAM=1 cc1354p10/pqc-join/build.sh -O3
+LOWRAM=1 UHUB=20-4:1 RESTORE_IMG=<path to the .out to leave running> cc1354p10/pqc-join/run.sh -O3
+```
+
+`build.sh` reads `LOWRAM=1` and writes `out/pqc-join-O3-lowram/`; `run.sh` loads that folder when `LOWRAM=1` is set (both edited 2026-10-20, syntax-checked, not run). Add the rows with variant `mldsa-native-lowram-ticlang-o3-flash` and replace the `waiting` rows. For the MSP boards: `portability/pqc-join/lowram_build.sh g3519|m33 -O3` builds the images and `portability/boards/mspm0g3519/run_pqc.sh` runs the G3519 image.
+
+==============================================================================
+FILE: cc1354p10/radio-rx/README.md | Can the LP-CC1354P10-1 (CC1354P10) hear the CC1407P weather station with TI's own receive example?
+==============================================================================
+
+# Can the LP-CC1354P10-1 (CC1354P10) hear the CC1407P weather station with TI's own receive example?
+
+Terms: [docs/vocab.md](../../docs/vocab.md). 1 kB = 1,024 bytes.
+
+**Short answer.** Yes. `rfPacketRx`, TI's proprietary-radio receive example for the LP-CC1354P10-1, with two files changed hears the LP-MSPM0G5187 and its BP-CC1407P-9-FE radio: 21,658 of 21,658 packets over about 6 h 15 min, ending 2026-10-11 06:00, no checksum errors, at -14 dBm on the same desk. Its default 50 kbps 2-GFSK settings match TI's CC1407P settings in every field compared, and the checksum agreed in practice, so only the channel changes, from 868 to 915 MHz. A bridge on the Mac posts the readings to Home Assistant. Run 2026-10-10 and 11; the sender is in [mspm0g5187/radio](../../mspm0g5187/radio/README.md).
+
+Checked on an Intel Mac, macOS 15.7.9, with TI Arm Clang 5.1.1.LTS (from CCStudio 21.0.1), SysConfig 1.28.0 (the sender's MSPM0 project used 1.26.3), UniFlash 9.6.0, F2 SDK 8.33.00.16 from GitHub and TI's prop_rf examples tag `lpf2-lpf3-8.33.00.16-9.21.00.36_LTS-prop_rf`.
+
+The link in one line: sender LP-MSPM0G5187 plus BP-CC1407P-9-FE, receiver this board, 915 MHz, 50 kbps, text packets of 37 to 39 bytes every 1.04 s.
+
+## Packet format: the two radios agree
+
+Compared from the two settings files, TI's generated `ti_radio_config.c` for this board and TI's `rcl_settings_2gfsk50kbps.h` for the CC1407P: 50 kbps symbol rate, 25 kHz deviation, 4-byte preamble, 32-bit sync word 0x930B51DE, a 1-byte length field, no whitening. The checksum was not compared on paper; in practice it agreed, with 0 checksum errors in 21,658 packets.
+
+## What changed from TI's example
+
+- `rfrx.syscfg`: `phyInst.carrierFrequency = 915`, and a serial port (UART2) on the XDS110 debugger's backchannel.
+- `rfrx.c`, in place of `rfPacketRx.c`: it keeps packets that fail the checksum, so a format mismatch shows instead of silence; it appends RSSI (received signal strength); and it prints every packet plus, about every 14 s, the radio core's own counters of good and bad packets: `count ok=350 crc_bad=0`. The counters are 16-bit, so they wrap after 65,535 packets, about 19 hours at this rate.
+- `main_nortos.c`, `RFQueue.c`, `RFQueue.h`: TI's, unchanged.
+
+Each packet prints as hex; the payload is plain text:
+
+```text
+pkt 2 len=38 rssi=-14 status=0x00 data=46524c206e3d32393220743d32352e3231432072683d33362e3025206c75783d3230382e3438
+```
+
+`46524c20...` reads `FRL n=292 t=25.21C rh=36.0% lux=208.48`. `status=0x00` means the checksum passed.
+
+## Build
+
+The F2 SDK 8.33.00.16 on GitHub (`TexasInstruments/simplelink-lowpower-f2-sdk`, tag `lpf2-8.33.00.16`) has no prebuilt driverlib, TI Drivers or no-RTOS libraries; TI's installer has them. **Tag: Tool or docs.** The example lives in `TexasInstruments/simplelink-prop_rf-examples`. About 5 minutes and 110 MB:
+
+```bash
+git clone --filter=blob:none --no-checkout --depth 1 --branch lpf2-8.33.00.16 https://github.com/TexasInstruments/simplelink-lowpower-f2-sdk.git f2sdk
+cd f2sdk && git sparse-checkout init --no-cone
+printf '/*\n!/*/\n/.metadata/product.json\n/source/ti/devices/\n/source/ti/drivers/\n/source/ti/boards/\n/source/ti/display/\n/source/ti/log/\n/source/ti/common/\n/source/ti/posix/\n/source/ti/utils/\n/source/ti/dpl/\n/source/ti/prop_rf/\n/source/ti/*.js\n/source/ti/.meta/\n/source/third_party/CMSIS/\n/source/cmake/\n/kernel/nortos/\n' > .git/info/sparse-checkout
+git checkout HEAD && cd ..
+python3 cc1354p10/radio-rx/build_f2_libs.py f2sdk
+```
+
+The library builder compiles 43 of 43 driverlib files, 14 of 14 no-RTOS files and 83 of 90 driver files from the SDK's own CMake source lists; CAN, SD card and PDM microphone drivers fail and the receiver does not use them. Then clone the prop_rf examples tag, copy `examples/nortos/LP_EM_CC1354P10_1/prop_rf/rfPacketRx`, put `rfrx.c` and `rfrx.syscfg` in as `rfPacketRx.c` and `rfPacketRx.syscfg`, and in its `ticlang/` folder:
+
+```bash
+make SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR=<path>/f2sdk SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.28.0/sysconfig_cli.sh TICLANG_ARMCOMPILER=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS GCC_ARMCOMPILER= IAR_ARMCOMPILER=
+```
+
+Flash `rfPacketRx.hex` with UniFlash's DSLite and `cc1354p10/CC1354P10.ccxml` (your probe serial in it), then start it with `xds110reset -s <probe serial>` from CCStudio's `ccs_base/common/uscif/xds110/`. The image is 29.2 kB of flash.
+
+## Into Home Assistant
+
+`ha_bridge.py` reads the receiver's serial port and posts four sensors through Home Assistant's REST API every 10 seconds: `sensor.frl_radio_temperature`, `sensor.frl_radio_humidity`, `sensor.frl_radio_light` and `sensor.frl_radio_signal`, with units and device classes so they graph.
+
+```bash
+python3 cc1354p10/radio-rx/ha_bridge.py --port /dev/cu.usbmodem<probe serial>1
+```
+
+Give it your Home Assistant address and a long-lived access token in the environment variables `HA_URL` and `HA_TOKEN` (or `--url` and `--token`, but a token on the command line shows in the process list). Plain `http://` is accepted only for a local-network or private VPN address such as `http://homeassistant.local:8123`; anything else needs `https://`, and redirects are refused so the token never goes to another host. A token is made in Home Assistant under your profile, Security, Long-lived access tokens. `--follow <log file>` reads a log another program is writing instead, for when that program holds the port. The entities come from the REST API, not an integration, so after a Home Assistant restart they are missing until the next post, at most 10 s later. One run on 2026-10-11 made 253 posts from 06:03.
+
+`loss_run.py <seconds> <folder>` logs the sender's and receiver's serial ports at once with timestamps and compares the receiver's counters with the sender's count, skipping the lines the serial bridge replays in the first 3 s. One hour on 2026-10-11: 3,508 of 3,508, 0 checksum errors.
+
+## Other protocols from the same radio
+
+The CC1407P has 23 protocol settings ([sender README](../../mspm0g5187/radio/README.md#every-protocol-the-radio-has)). This board's radio has SysConfig settings for four of its families, so those were checked over the air on 2026-10-11, 75 s each, with the sender looping 20 numbered 60-byte packets per protocol:
+
+| CC1407P protocol | Receiver setting in SysConfig | Result |
+|---|---|---|
+| 2-GFSK 50 kbps: high performance, general purpose and low power | the default 50 kbps 2-GFSK | 10 of 10 of each at 20 bytes in the 23-profile run; high performance also 80 of 80 in the SPI sweep and the six-hour run above |
+| Wi-SUN FSK mode 2b, 100 kbps | `2gfsk100kbps50dev915wsun2b` | 260 of 260 sent, 13 complete batches, 0 checksum errors |
+| Wi-SUN FSK mode 4b, 200 kbps | `2gfsk200kbps100dev915wsun4b` | 260 of 260 sent, 13 complete batches, 0 checksum errors |
+| SUN O-QPSK rate mode 3 | `qpsk50kbpsrm3`, which SysConfig labels "Release Candidate" | 260 sent; every reception had a bad checksum (220 by the last count line) |
+
+The two Wi-SUN settings receive with TI's `CMD_PROP_RX_ADV`, which reads the 802.15.4g two-byte header. Build `rfrx.c` with `#define RX_ADV` and `#define MAX_LENGTH 255` at its top, and add to `rfrx.syscfg`:
+
+```text
+phyInst.phyType868 = "2gfsk100kbps50dev915wsun2b";
+phyInst.carrierFrequency = 915;
+phyInst.codeExportConfig.cmdList_prop = ["cmdPropRadioDivSetupPa", "cmdFs", "cmdPropTxAdv", "cmdPropRxAdv"];
+```
+
+The sent count comes from the sender's own batch lines. The receiver's count line lags its printout; at its last print it read 220 and 200.
+
+Why O-QPSK fails is suspected, not proven. The receive command SysConfig generates for that setting expects TI's proprietary frame (sync word 0x930B51DE, a 1-byte length), and the CC1407P's driver names its O-QPSK header for 802.15.4 SUN O-QPSK; no sniffer checked what is on the air. No matching setting was found in this board's SysConfig list (F2 SDK 8.33 radio settings, read 2026-10-11) for the 38.4 and 9.6 kbps GFSK, OFDM, OFDM-LR and XLR protocols; the one 9.6 kbps setting is a narrowband 868 MHz one. OFDM, OFDM-LR and XLR need a second CC1407P to receive; the two GFSK rates might work with a custom setting, not run.
+
+## As a test partner for the CC1407P
+
+`partner.c` grows the same TI example into a radio that receives, sends, answers pings and starts them, driven by text commands on its serial port (list at the top of the file). Build it like `rfrx.c`, with the protocol chosen by `phyType868` in the SysConfig file; for the Wi-SUN settings add `#define RX_ADV` and the command list shown above. With it, the CC1407P on the LP-MSPM0G5187 and this board exchanged packets in both directions on 2-GFSK 50 kbps and all eight Wi-SUN FSK modes: 20 of 20 each way in seven of them, with losses toward the CC1407P in modes 4a and 5, and pings partial in four modes. The table is in the [sender README](../../mspm0g5187/radio/README.md#two-radios-the-cc1407p-against-a-cc1354p10).
+
+Three details made it work, all in `partner.c`. With TI's 802.15.4g settings, this radio sends and stores each payload byte bit-reversed against the CC1407P, so `partner.c` reverses bytes both ways. The receive command's `maxPktLen` is an 8-bit field in `CMD_PROP_RX`, so 255 is the most it takes. And the Wi-SUN transmit header carries the length plus the 4-byte checksum, low byte first, with the whitening bit set as the CC1407P sends it.
+
+## If you see this
+
+- **DSLite fails with `Error -242 @ 0x0 A router subpath could not be accessed`.** **Tag: Unknown.** Suspected Tool or docs: a program was already running and its one debug connection had been used, here by a flash backup read. Unplug the board's USB for 3 seconds and flash again.
+- **Nothing on the serial port after flashing.** **Tag: Tool or docs.** Run `xds110reset -s <probe serial>`; the image does not start on its own after DSLite.
+- **Lines missing from the printout.** **Tag: Setup or handling.** The serial bridge drops lines while no program reads the port, and replays old ones when it is opened. The `count ok=` line is the radio core's own count; the first line after opening can be a stale one.
+- **Wi-SUN packets arrive with every byte backwards** (0x62 where the text has 0x46, `F`). **Tag: Setup or handling.** With TI's 802.15.4g settings the radio stores each byte bit-reversed, and the two-byte header low byte first (`08 40` is length 64). Reverse the bits of each payload byte. The checksum is checked by the radio either way.
+
+All four are in the [CC1354P10 FAQ](../FAQ.md), with the GitHub SDK libraries, and so is the O-QPSK result.
+
+==============================================================================
+FILE: cc1354p10/thread/README.md | Thread (OpenThread) on the LP-CC1354P10-1
+==============================================================================
+
+# Thread (OpenThread) on the LP-CC1354P10-1
+
+Terms: [docs/vocab.md](../../docs/vocab.md) and the [CC1354P10 FAQ](../FAQ.md). 1 kB = 1,024 bytes. FTD is a full Thread device, MTD a minimal one, RCP a radio co-processor.
+
+**Runs: one board formed its own Thread network and became leader** (2026-10-06, about 6 to 10 s after `thread start`; PAN 0xf561, channel 13, network name OpenThread-f561, mesh-local and link-local IPv6 addresses up). Built as below. TI's OpenThread port (`TexasInstruments/ot-ti`, release `thread-v1.4-ti-2.1`, commit `eaac0de`) built every CC1354P10 image on 2026-10-06 in 4 minutes with no failures, against the installed **F2 SDK 8.33**, although `ot-ti` pins F2 SDK 7.40 as its submodule. The CLI runs at **921600 baud** (`ot-ti/src/uart.c`), not 115200: at 115200 it answers in garbage, which is also what the CC2340R5 Thread test saw. macOS termios stops at 230400, so `tools/ot_cli.py` sets the speed with the `IOSSIOSPEED` ioctl.
+
+| Image | Flash | RAM (including reserved heap and stacks) |
+|---|--:|--:|
+| `ot-cli-ftd` (full Thread device, command line) | 397.9 kB | 92.7 kB |
+| `ot-cli-mtd` (minimal Thread device) | 335.4 kB | 86.7 kB |
+| `ot-rcp` (radio co-processor for a border-router host) | 86.6 kB | 65.9 kB |
+| `ot-cli-radio` (radio test) | 75.4 kB | 64.6 kB |
+
+Flash is the end of the last flash section in each ELF file; the 18 kB of non-volatile storage is not counted. RAM is the stack end minus the RAM base. All fit the CC1354P10's 1 MB of flash and 256 kB of RAM. The figures are rows in `data/results/cc1354p10.csv`. On the CC2340R5 (36 kB RAM) every node build fails to link (`cc2340r5/thread/`). The images carry a valid CCFG (`IMAGE_VALID_CONF` = 0), so they will boot.
+
+## How it was built
+
+Toolchain from the CC2340R5 Thread work (`cc2340r5/thread/README.md`: GCC 12.2 from the Zephyr SDK, CMake below 4, SysConfig 1.26.3), then:
+
+    cmake -GNinja -DTI_SIMPLELINK_BOARD=LP_EM_CC1354P10_1 -DOT_PLATFORM=external \
+      -DCMAKE_TOOLCHAIN_FILE=src/arm-none-eabi-m33.cmake -DTI_SIMPLELINK_SDK_DIR=<sdk path> ~/ot-ti -B <build dir>
+    cmake --build <build dir>
+
+No edits to `ot-ti` and no SDK download. One trap: `ot-ti`'s CMake reads `<SDK>/../../../src/nvocmp.c`, which only exists when the SDK is the submodule inside `ot-ti`. CMake resolves that path as text, so pointing `TI_SIMPLELINK_SDK_DIR` at a symlink three levels down (`<dir>/a/b/sdk` -> the installed SDK, plus `<dir>/src` -> `~/ot-ti/src`) satisfies it.
+
+## Run it
+
+`run_thread_leader.sh <ot-cli-ftd.out>` loads the image with CCStudio scripting (no power cycle), forms a new network alone with the OpenThread CLI (`tools/ot_cli.py`) and reads back state, PAN ID, channel and addresses. A two-node test with a CC2340R5 as the second device passed: see [two TI radios on one Thread network](../../board-to-board/thread-two-radios-2026-10-06/README.md). The RCP needs a border-router host: see [the CC1354P10 as a border-router host](../../border-router/host-cc1354/README.md).
+
+## Thread border router: what works, and what does not exist on TI (checked 2026-10-06)
+
+**Measured: the CC1354P10 works as the radio of a border router.** TI's `ot-rcp` image (radio co-processor, built above) was loaded on the board, and OpenThread's host program (`ot-cli`, POSIX build of the same OpenThread commit, built on this Intel Mac in 15 s) drove it over the backchannel UART: `spinel+hdlc+uart:///dev/cu.usbmodemLS45013A1?uart-baudrate=921600`. The host reported the RCP as `OPENTHREAD/1.4.0.0; CC13XX_CC26XX thread-v1.4-ti-1.0-ea-1.0`, formed a new network (PAN 0xb00d, channel 24) and became leader.
+
+That is the radio half of every Linux Thread border router: OpenThread's `ot-br-posix` (the border-router software, Linux only) talks to an RCP exactly this way. TI documents the same split: `ot-ti` pins an `ot-br-posix` commit, and its "border router setup guide" (`docs/thread-users-guide/ti-openthread-borderrotuer-setup-guide.md`, filename misspelled) links to a TI SimpleLink Academy lab built on a Raspberry Pi and a TI RCP, from the 2023 SDK. The CC1354P10 is not in `ot-ti`'s device table (its sibling CC2674P10 is), and every TI Thread role is marked "Evaluation Only".
+
+**Not measured:** a full border router with this board as its radio. Needs `ot-br-posix` on a Linux host (a Raspberry Pi, or a container on another computer) with this board as its RCP, then route a Thread device's IPv6 traffic to the home network.
+
+**Single-chip border router:** NXP's RW612 puts Wi-Fi 6, Bluetooth LE and an 802.15.4 radio on one chip and runs OpenThread's border routing on it without Linux (NXP's description; not checked here). TI has no chip with both Wi-Fi and 802.15.4: the CC35xx has Wi-Fi 6 and Bluetooth LE only, and the CC13xx/CC26xx/CC27xx have 802.15.4 and no Wi-Fi. A TI border router is therefore always two chips. The embedded (no Linux) version would be a TI Wi-Fi part running OpenThread's border-routing code as the host, with a CC27xx or CC13xx RCP over UART or SPI; that is the shape of Espressif's two-chip Thread border router (ESP32-S3 host plus ESP32-H2 RCP, `esp-thread-br`; not checked here). No TI port of that host side was found.
+
+==============================================================================
+FILE: cc1354p10/zigbee-sleepy-sensor/README.md | How do I get a TI LP-CC1354P10-1 into Home Assistant as a sleepy Zigbee temperature sensor?
+==============================================================================
+
+# How do I get a TI LP-CC1354P10-1 into Home Assistant as a sleepy Zigbee temperature sensor?
+
+Build TI's `zed_temperaturesensor` example with [one patch](sleepy_sensor.patch) and `./build.sh`, load it, and open joining in Home Assistant's Zigbee integration (ZHA): on 2026-10-07 (1 run) the board joined the house network 6.0 s after boot and Home Assistant showed "Fox Red Labs Temp Sensor" with the chip temperature (22 °C, shown as 71.6 °F) 162 s after boot. As TI ships it, the example joins only from a button or its serial menu, reports a made-up temperature, and answers every attribute read from Home Assistant with an error, so the hub shows `unk_manufacturer unk_model` and no value for up to 15 minutes.
+
+Terms: ZHA, ZBT-2, coordinator, router, end device, poll interval, node descriptor, trust center, NV, factory new, SysConfig and CCStudio are in [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [../FAQ.md](../FAQ.md). Board notes: [../README.md](../README.md). A **sleepy end device** turns its receiver off between polls; its parent router holds messages for it until it asks. The **network key** is the secret the network's trust center (the device that hands out keys, here the coordinator) sends a new device after it associates. 1 kB = 1,024 bytes.
+
+Time to repeat, once the tools in [mac-setup/README.md](../../mac-setup/README.md) are installed: about 21 s to build, 15 s to load, 6 s to join and about 3 minutes until Home Assistant shows the entity.
+
+Checked 2026-10-07 on an Intel MacBook (Core i7-8750H), macOS 15.7.9: the F2 SDK (SimpleLink CC13xx CC26xx SDK 8.33.00.16, with Z-Stack and TI-RTOS 7), CCStudio 21.0.1 headless with its SysConfig 1.28.1 and TI Arm Clang 4.0.4.LTS, Home Assistant 2026.9.2 with ZHA and a Nabu Casa Home Assistant Connect ZBT-2 coordinator on a separate host.
+
+Contents: [expected and measured](#what-was-expected-and-what-was-measured), [what the patch changes](#what-the-patch-changes), [build, load, join](#build-load-and-join), [getting the debugger back in](#before-you-load-it-getting-the-debugger-back-in), [traps](#traps), [what was not confirmed](#what-was-not-confirmed), [files](#files).
+
+## What was expected, and what was measured
+
+The expectations were written before the first build, from the CC2340R5 Zigbee run in [../../cc2340r5/zigbee/README.md](../../cc2340r5/zigbee/README.md).
+
+| Step | Expected | Measured |
+|---|---|---|
+| Build from the terminal | under a minute | 21 s for `./build.sh` (copy, patch, CCStudio import and build), first try |
+| Flash and RAM | about 200 kB flash, 45 to 55 kB RAM | 179.4 kB flash, 45.5 kB RAM of 256 kB of SRAM (the linker's RAM region); TI quotes 296 kB of RAM for the whole chip. TI's example as shipped, same build: 178.9 kB and 45.4 kB. The patch costs 508 B of flash and 152 B of RAM. A further 10 kB of flash is reserved for the stack's non-volatile storage (NV). |
+| Boot to joined | within 60 s, most likely 10 to 40 s | **6.0 s** on the clean run (1 run). The board's serial clock shows "In the network" 5.6 s after boot, the coordinator logged the join 5.9 s after boot, and the results file rounds to 6.0 s (row `radio_join` in `data/results/cc1354p10.csv`). Earlier tries were rougher: 4 of 6 associations lost the network key ([trap 5](#traps)). |
+| Boot to entity in Home Assistant | not estimated | 162 s. ZHA's setup questions to the sleeping board took 156 s ([trap 6](#traps)). |
+| What Home Assistant shows | "Fox Red Labs" "Temp Sensor", end device, one temperature entity, identify button | Same: `EndDevice`, power source "Battery or Unknown", node descriptor MAC capability `0x80`: bit 3, "receiver on when idle", is clear, so the receiver is off between polls, temperature in °F because the house is set to °F, identify button. |
+| Temperature value | chip temperature in whole degrees, a few above room | 22 °C on the serial line; Home Assistant read `2200` (22.00 °C) and shows 71.6 °F. Room temperature was not measured. |
+| Report interval | ZHA replaces this repo's 30 s default with min 30 s, max 900 s, change about 0.5 °C | **Confirmed.** ZHA set min 30, max 900, change 50 (0.50 °C). At a steady 22 °C the first report arrived 899.9 s after ZHA set it. |
+| Poll interval | 3,000 ms, TI's SysConfig default | On the final run the stack reported 3,000 ms in 78 of the 82 status lines (2 at 0 ms before joining, 1 at 440 ms just after joining, 1 at 100 ms while the hub was talking to it). From outside: 20 of 20 reads from Home Assistant, median 1,574 ms, spread 171 to 2,799 ms, which is what a 3 s poll predicts. |
+| Sleep current | not measurable here | Not measured: no current meter was used. See [trap 8](#traps). |
+
+## What the patch changes
+
+[`sleepy_sensor.patch`](sleepy_sensor.patch) is a diff against TI's example folder plus the three app files it links from the SDK (`source/ti/zstack/apps/temperaturesensor/`). Everything else is TI's code as shipped.
+
+In `tirtos7/zed_temperaturesensor.syscfg`, edited as text:
+
+```text
+var Temperature = scripting.addModule("/ti/drivers/Temperature");
+```
+
+```text
+zstack.rf.primaryChannels = [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26];
+```
+
+The first adds TI's Temperature driver. The second searches all 16 channels; TI's default is channel 11 only, and this house network is on channel 20. You can list just your network's channel instead ([trap 9](#traps) says why that is better). The poll period stays at TI's SysConfig default, 3,000 ms.
+
+In the C files:
+
+1. **Real temperature.** `Temperature_init()` at start, then `Temperature_getTemperature()` every 10 s, times 100 into the Measured Value attribute (the Zigbee cluster counts in hundredths of a degree). A change goes to the reporting engine with `Zstackapi_bdbRepChangedAttrValueReq`. TI's value started at a fixed 17.00 °C and changed only from the serial menu. The attribute's min and max are now -40.00 and 125.00 °C (TI: 17 and 27).
+2. **Names.** Manufacturer "Fox Red Labs" (TI: "TexasInstruments") and a new Model Identifier attribute, "Temp Sensor" (TI's example has none). SysConfig does not expose these for this example; they are in `zcl_sampletemperaturesensor_data.c`.
+3. **Attribute reads work.** One line registers a read callback, `zcl_registerReadWriteCB(...)`, the same way TI's light example does ([trap 3](#traps)).
+4. **Join without a button.** If there is no saved network at boot, start joining after 1 s, and retry every 15 s after a failure. TI's code resumes a saved network only and waits for the left button (BTN-1) or the serial menu.
+5. **Report defaults.** Max interval 30 s (TI: 10) and change 1 °C (TI: 3 °C). ZHA replaces both when it sets up reporting.
+6. **Status line.** The serial screen's "APP Info" line shows the temperature, a sample count, the join retries and the poll period the stack reports.
+
+## Build, load, and join
+
+You need: the board, a Mac with the tools in [mac-setup/README.md](../../mac-setup/README.md) (CCStudio 21.0.1 and the F2 SDK), and a Zigbee network in Home Assistant with the board in range of the coordinator or of a Zigbee router. Here the coordinator was out of the board's range, and every join went through a router (a smart plug).
+
+Run these from the repo root. The paths are where TI's installers put the tools on this Mac.
+
+```bash
+cc1354p10/zigbee-sleepy-sensor/build.sh
+```
+
+It copies TI's example and the three app files out of the SDK, applies the patch, imports the project with CCStudio's headless command line into a fresh workspace and builds it, then copies the image to `out/frl_sleepy_sensor.out` and the map beside it. TI ships no makefile for Zigbee examples on this board ([../README.md](../README.md), "Building Zigbee and DMM examples from a terminal").
+
+### Before you load it: getting the debugger back in
+
+Read this first. On this board the debugger connects only in the first seconds after a power-on boot, whatever image runs (a never-sleeping image locked it out the same way later that day), so once this image is loaded the debugger cannot attach to the CC1354P10. **Unknown (suspected: Chip limit).** Nothing from software reached it once it was in that state: the serial menu's reset, hundreds of connects, BTN-1 held through a reset. What worked, on 2026-10-07: start a loop of `ccs_load_run.py` loads first, then unplug and replug the USB cable. The loop below tries up to 60 times and stops at the first load that gets in; put the image you want back on the board in place of the sleepy sensor's:
+
+```text
+for i in $(seq 1 60); do /Applications/ti/ccs2101/ccs/scripting/python/run.sh cc1354p10/tools/ccs_load_run.py cc1354p10/zigbee-sleepy-sensor/out/frl_sleepy_sensor.out && break; done
+```
+
+The load went in on the 21st attempt, about 10 s after the replug, in the seconds the chip stays awake at boot before its first sleep. A replug with no loop already running missed that window twice. Keep this recipe, or a non-sleeping image and its backup, before leaving this image on a board you share.
+
+### Join
+
+Open joining in Home Assistant first. In the web page: **Settings**, **Devices & services**, **Zigbee Home Automation**, **Add device**. Joining stays open for about 4 minutes. (Or **Developer tools**, **Actions**, `zha.permit` with `duration: 254`.) If the board is out of the coordinator's range, open joining on the router it can reach: `zha.permit` with `duration: 254` and that router's `ieee` address ([trap 5](#traps)).
+
+Then load the image and start it:
+
+```bash
+/Applications/ti/ccs2101/ccs/scripting/python/run.sh cc1354p10/tools/ccs_load_run.py cc1354p10/zigbee-sleepy-sensor/out/frl_sleepy_sensor.out
+```
+
+`run.sh` is CCStudio's own scripting Python; if CCStudio is not installed at `/Applications/ti/ccs2101`, change that part of the path. [`cc1354p10/tools/ccs_load_run.py`](../tools/ccs_load_run.py) is a short script in this repo that connects to the board, loads the program and starts it. This board needs a CCStudio scripting connection to start a freshly loaded program; a plain UniFlash flash does not start until you unplug and replug the USB cable ([../README.md](../README.md)). The load took about 15 s.
+
+Watch the serial screen at 115200 baud. Replace `LS45013A1` with your probe's serial: `ls /dev/cu.usbmodem*` lists two ports for the probe, and the board's UART is the one ending in 1.
+
+```text
+screen /dev/cu.usbmodemLS45013A1 115200
+```
+
+Or log it with timestamps:
+
+```bash
+python3 cc1354p10/zigbee-sleepy-sensor/cui_log.py capture /dev/cu.usbmodemLS45013A1 serial.raw 300
+```
+
+```bash
+python3 cc1354p10/zigbee-sleepy-sensor/cui_log.py decode serial.raw
+```
+
+Success looks like `[State] In the network` on the "ZDO Info" line and `[PAN ID] 0x.... [Channel] 20` on "NWK Info". The device then appears in Home Assistant a few minutes later as "Fox Red Labs Temp Sensor". Prove it from Home Assistant's device list, not from the board's screen.
+
+To start over: remove the device in Home Assistant and wait until it is gone, then use the serial menu's **RESET TO FN** (reset to factory new, which forgets the saved network; right arrow to it, Enter) and load the image again ([trap 7](#traps)).
+
+## Traps
+
+1. **TI's example joins only from a button or the serial menu.** **TI example default.** At boot it resumes a saved network and nothing else. Fixed by change 4.
+2. **The temperature is made up, and the names are TI's.** **TI example default.** The value starts at 17.00 °C and moves 1 °C per menu key press. Manufacturer "TexasInstruments", no model. Fixed by changes 1 and 2.
+3. **Every attribute read answers `0xC1` (`SOFTWARE_FAILURE`).** **Tool or docs.** In this Z-Stack, `zclProcessInReadCmd` in `source/ti/zstack/stack/zcl/zcl.c` sends every read through the endpoint's read callback, and `zclReadAttrDataUsingCB` returns `ZCL_STATUS_SOFTWARE_FAILURE` when none is registered. The comment on `zcl_registerReadWriteCB` says the callback is needed only when an attribute's data pointer is NULL. TI's light example registers one; the temperature sensor does not. What Home Assistant does with it: the device is named `unk_manufacturer unk_model`, and the temperature stays `unknown` until the first report, which at a steady temperature is 15 minutes later. Home Assistant's log shows `failure: [{0: <Status.SOFTWARE_FAILURE: 193>}]`. Fixed by change 3. The cause was read from the source; after the patch, reads succeeded (20 of 20). The one-line change was not tested on its own: the same build also changed the names and the temperature.
+4. **Home Assistant decides the report interval, not the device.** **Third-party behavior.** ZHA binds the temperature cluster and sets min 30 s, max 900 s, change 0.50 °C, replacing the device's own defaults. A sensor at a steady temperature reports every 15 minutes. Measured: 899.9 s from setup to the first report.
+5. **The network key arrived too late in 4 of 6 associations.** **Unknown (suspected: Radio environment).** The board can only reach the house network through a router (a smart plug); with joining open on the coordinator alone it could not join the house network in 3 minutes (it found only another network, trap 9). Each time, the coordinator's log shows the join and its key answer (`trustCenterJoinHandler ... USE_PRECONFIGURED_KEY`). The two successes got the key in 0.2 and 0.7 s. Why the key was late in the other four was not found; a weak radio link through the router is suspected. Not checked: whether the key reached the plug and waited there, and how another parent would behave. How to avoid it: if the board is out of the coordinator's range, open joining on the router it can reach (`zha.permit` with that router's `ieee`), and keep the board near that router for the first join.
+   - **The 3 s wait is TI's setting.** **TI example default.** TI's stack waits 3 s for the key (`BDB_DEFAULT_DEVICE_UNAUTH_TIMEOUT 3000` in `bdb_interface.h`, a plain `#define` that a project cannot override), then gives up and tries again.
+6. **Home Assistant took 156 s to finish setting the device up.** **Unknown (suspected: Radio environment).** About half of ZHA's first requests to the sleeping board got no answer; zigpy sent each again about 28 s later, and every resend was answered in 1.8 to 3.0 s, within one poll period. The cause of the lost first tries was not found.
+7. **A reset from the serial menu leaves the board silent.** **Unknown.** After **RESET TO FN** (reset to factory new) the board stopped printing and did not rejoin; loading the image again with `ccs_load_run.py` brought it back, factory new. The same happens on this board whenever a program loaded by the debugger restarts itself (for example, a Thread script's `factoryreset` rebooted the chip and the loaded program did not come back). Not checked: whether a USB replug alone would bring it back.
+8. **The serial menu may keep the chip out of its deepest sleep.** **Unknown (suspected: TI example default).** The radio sleeps between polls (the node descriptor says so), but TI's UART driver sets a standby constraint while it listens (`UART2_rxEnable` in `source/ti/drivers/UART2.c`), and the menu always listens. TI's Zigbee power page says to define `CUI_DISABLE` and remove `BOARD_DISPLAY_USE_UART` for low power. Not checked: the current with and without `CUI_DISABLE`. That build would have no serial log; it was not made or measured here.
+9. **Other open networks nearby get tried first.** **Radio environment.** Searching all 16 channels, the board also associated with two other networks: PAN `0xe99d` on channel 11 (the network this board formed as a coordinator on 2026-10-06; suspected: still kept by the CC2340R5 that joined it then, since the parent address seen here, `0xc8dd`, was that board's address in it) and PAN `0xdc20` on channel 20 (owner not known). Each costs a 3 s key wait. TI's stack joins the first open network it finds. List only your network's channel to avoid most of this.
+10. **Removing the device in Home Assistant did not reach the board.** **Unknown.** The coordinator logged `DEVICE_LEFT` from the parent 2 s after the removal, but the board's screen still said "In the network". Use **RESET TO FN** as well.
+11. **TI's README for this example lists other LaunchPad development kits.** **Tool or docs.** It names the CC26x2R1, CC1352P, CC1352R1, CC2652RB and CC2652RSIP boards, not this one. The example itself is in the SDK's `LP_EM_CC1354P10_1` folder and works.
+12. **CCStudio swaps the compiler.** **Tool or docs.** The project asks for TI Arm Clang 3.2.2; the headless import says `Compiler version 'TICLANG_3.2.2' is not currently installed - defaulting to 'TICLANG_4.0.4.LTS'` and builds with that. The build has one warning, from TI's own linker file (`redefinition of macro 'NVOCMP_NVPAGES'`).
+13. **The entity keeps its old name after a re-pair.** **Third-party behavior.** After removing and re-adding the device, Home Assistant reused the entity id `sensor.unk_manufacturer_unk_model` while the device name became "Fox Red Labs Temp Sensor". Rename the entity in Home Assistant if it matters.
+
+## What was not confirmed
+
+- Current and battery life: no current meter was used, and no `CUI_DISABLE` build was made.
+- Join time is one clean run. Three runs are needed before quoting a median.
+- That the temperature tracks the room: only 22 °C was seen; the chip was not warmed or cooled, and no thermometer was beside it.
+- A report on the final build. The first build's report came 899.9 s after ZHA set reporting. On the final build, Home Assistant's whole Zigbee integration went down for a reason outside this run (its radio disappeared from the hub's USB) before the next report; the next report was due about 6 minutes after the outage began. Every Zigbee entity in the house, this one included, turned `unavailable`. The board itself stayed "In the network", polling every 3 s.
+- Packet loss over an hour, the board's own signal strength to its parent (ZHA shows only the last hop into the coordinator), and range.
+- Over-the-air update of this image.
+
+What to do next: a `CUI_DISABLE` build for a current measurement with a meter, and two more clean joins for a median.
+
+## Files
+
+- [`sleepy_sensor.patch`](sleepy_sensor.patch): all changes against TI's example. [`build.sh`](build.sh): rebuilds from the SDK. [`cui_log.py`](cui_log.py): capture and decode the serial screen.
+- Results: rows `radio_join`, `radio_cmd_latency`, `radio_cmd_success`, `radio_flash_used`, `radio_ram_left` and `stack_support` in [../../data/results/cc1354p10.csv](../../data/results/cc1354p10.csv).
+- Build output (`out/`) is not committed; `build.sh` makes it.

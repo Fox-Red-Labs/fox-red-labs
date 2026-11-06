@@ -1,0 +1,245 @@
+{
+ "note": "written by tools/edge_ai_check.py; independent recomputation of the digit comparison from the raw rows, the maps and boards.csv",
+ "pass": true,
+ "engine_sha": "cc9fd92f98c9e1d4",
+ "cases": [
+  {
+   "id": "digit-cc1354p10",
+   "expected_ms": 23.452,
+   "page_ms": 23.5,
+   "cycles": 1125694.0,
+   "pass": true
+  },
+  {
+   "id": "digit-cc2340r5",
+   "expected_ms": 57.403,
+   "page_ms": 57.4,
+   "cycles": 2755346.0,
+   "pass": true
+  },
+  {
+   "id": "digit-cc2755p10",
+   "expected_ms": 11.3787,
+   "page_ms": 11.4,
+   "cycles": 1092354.0,
+   "pass": true
+  },
+  {
+   "id": "digit-f2800137",
+   "expected_ms": 24.1465,
+   "page_ms": 24.1,
+   "cycles": 2897585.0,
+   "pass": true
+  },
+  {
+   "id": "digit-frdm-mcxa153",
+   "expected_ms": 13.5574,
+   "page_ms": 13.6,
+   "cycles": 1301510.0,
+   "pass": true
+  },
+  {
+   "id": "digit-mspm0g3507",
+   "expected_ms": 34.3859,
+   "page_ms": 34.4,
+   "cycles": 2750868.0,
+   "pass": true
+  },
+  {
+   "id": "digit-mspm0g3519",
+   "expected_ms": 34.3859,
+   "page_ms": 34.4,
+   "cycles": 2750868.0,
+   "pass": true
+  },
+  {
+   "id": "digit-mspm0g5187",
+   "expected_ms": 34.3859,
+   "page_ms": 34.4,
+   "cycles": 2750868.0,
+   "pass": true
+  },
+  {
+   "id": "digit-mspm0l1306",
+   "expected_ms": 82.7874,
+   "page_ms": 82.8,
+   "cycles": 2649196.0,
+   "pass": true
+  },
+  {
+   "id": "digit-mspm33c321a",
+   "expected_ms": 9.3707,
+   "page_ms": 9.37,
+   "cycles": 1499307.0,
+   "pass": true
+  },
+  {
+   "id": "digit-pico2",
+   "expected_ms": 9.6069,
+   "page_ms": 9.61,
+   "cycles": 1441038.0,
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3507-cnn64-80-cnn64-ticlang-o3-80mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3507-cnn_64-O3-80/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3507-cnn64-32-cnn64-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3507-cnn_64-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3507-cnn16-32-cnn16-small-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3507-cnn_16small-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3507-12k-32-12k-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3507-12k-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3507-1k-32-1k-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3507-1k-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0l1306-cnn64-32-cnn64-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-l1306-cnn_64-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-cc1354p10-cnn64-48-cnn64-ticlang-o3-48mhz",
+   "map": "cc1354p10/bench/out/bitnet-cnn_64-O3/image.map",
+   "pass": true
+  },
+  {
+   "id": "size-cc1354p10-1k-48-1k-ticlang-o3-48mhz",
+   "map": "cc1354p10/bench/out/bitnet-1k-O3/image.map",
+   "pass": true
+  },
+  {
+   "id": "size-cc2340r5-cnn64-48-cnn64-ticlang-o3-48mhz",
+   "map": "cc2340r5/bench/out/bitnet-cnn_64-O3/image.map",
+   "pass": true
+  },
+  {
+   "id": "size-cc2340r5-1k-48-1k-ticlang-o3-48mhz",
+   "map": "cc2340r5/bench/out/bitnet-1k-O3/image.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3519-cnn64-32-cnn64-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3519-cnn_64-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3519-cnn64-80-cnn64-ticlang-o3-80mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3519-cnn_64-O3-80/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3519-cnn16-32-cnn16-small-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3519-cnn_16small-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3519-12k-32-12k-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3519-12k-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm0g3519-1k-32-1k-ticlang-o3-32mhz",
+   "map": "ports/bitnetmcu/mspm0/build-g3519-1k-O3-32/bitnet.map",
+   "pass": true
+  },
+  {
+   "id": "size-cc2755p10-cnn64-96-cnn64-ticlang-o3-96mhz",
+   "map": "cc2755p10/bench/out/bitnet-cnn_64-O3/image.map",
+   "pass": true
+  },
+  {
+   "id": "size-cc2755p10-1k-96-1k-ticlang-o3-96mhz",
+   "map": "cc2755p10/bench/out/bitnet-1k-O3/image.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm33c321a-cnn64-160-cnn64-ticlang-o3-160mhz",
+   "map": "mspm33c321a/bench/out/bitnet-cnn_64-O3-160/bench.map",
+   "pass": true
+  },
+  {
+   "id": "size-mspm33c321a-1k-160-1k-ticlang-o3-160mhz",
+   "map": "mspm33c321a/bench/out/bitnet-1k-O3-160/bench.map",
+   "pass": true
+  },
+  {
+   "id": "size-pico2-cnn64-150-cnn64-gcc-o3-150mhz-m33",
+   "map": "pico2/bench/out/bitnet-m33/bitnet_cnn_64.elf.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-pico2-1k-150-1k-gcc-o3-150mhz-m33",
+   "map": "pico2/bench/out/bitnet-m33/bitnet_1k.elf.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-pico2-cnn64-150-cnn64-gcc-o3-150mhz-riscv",
+   "map": "pico2/bench/out/bitnet-riscv/bitnet_cnn_64.elf.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-pico2-1k-150-1k-gcc-o3-150mhz-riscv",
+   "map": "pico2/bench/out/bitnet-riscv/bitnet_1k.elf.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-frdm-mcxa153-cnn64-96-cnn64-gcc12-o3-96mhz",
+   "map": "frdm-mcxa153/bench/out/bitnet_cnn_64_O3.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-frdm-mcxa153-cnn16-96-cnn-16small-gcc12-o3-96mhz",
+   "map": "frdm-mcxa153/bench/out/bitnet_cnn_16small_O3.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-frdm-mcxa153-12k-96-12k-gcc12-o3-96mhz",
+   "map": "frdm-mcxa153/bench/out/bitnet_12k_O3.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-frdm-mcxa153-1k-96-1k-gcc12-o3-96mhz",
+   "map": "frdm-mcxa153/bench/out/bitnet_1k_O3.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-nucleo-u083rc-cnn64-48-cnn64-gcc14-o3-48mhz",
+   "map": "nucleo-u083rc/bench/bitnet/out/bitnet-cnn_64.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "size-nucleo-u083rc-1k-48-1k-gcc14-o3-48mhz",
+   "map": "nucleo-u083rc/bench/bitnet/out/bitnet-1k.map",
+   "pass": true,
+   "not_reread": "GCC map, no used-size table"
+  },
+  {
+   "id": "npu-gain-character-recognition",
+   "gain": 9.073,
+   "pass": true
+  }
+ ],
+ "tolerance": "0.6 % of the time, set before the run"
+}

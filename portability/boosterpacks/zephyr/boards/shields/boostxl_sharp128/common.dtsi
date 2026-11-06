@@ -1,0 +1,40 @@
+/*
+ * BOOSTXL-SHARP128: Sharp LS013B7DH03, 128 x 128, one bit per pixel.
+ * Pins as shipped (SLAU786 Tables 1 to 3): 2 panel supply (R7), 5 DISP,
+ * 6 panel select (active high, R14), 7 clock, 15 data in. EXTCOMIN is not
+ * wired to the header (pin 19 stays free), so the driver sends the VCOM
+ * flip as a bit in the serial data. The SD card pins (8, 14, 17) are unused.
+ * Clock: 1 MHz typical, 1.1 MHz maximum (panel specification).
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	chosen {
+		zephyr,display = &sharp128_panel;
+	};
+
+	sharp128_supply: panel_supply {
+		compatible = "regulator-fixed";
+		regulator-name = "sharp128_supply";
+		enable-gpios = <&boosterpack_header 2 GPIO_ACTIVE_HIGH>;
+		regulator-boot-on;
+	};
+};
+
+&boosterpack_spi {
+	cs-gpios = <&boosterpack_header 6 GPIO_ACTIVE_HIGH>;
+
+	sharp128_panel: ls0xx@0 {
+		compatible = "sharp,ls0xx";
+		reg = <0>;
+		spi-max-frequency = <1000000>;
+		width = <128>;
+		height = <128>;
+		disp-en-gpios = <&boosterpack_header 5 GPIO_ACTIVE_HIGH>;
+		serial-vcom-inversion;
+		serial-vcom-interval = <1000>;
+	};
+};

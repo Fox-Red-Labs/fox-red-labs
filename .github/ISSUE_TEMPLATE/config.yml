@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Show and tell
+    url: https://github.com/Fox-Red-Labs/fox-red-labs/discussions/categories/show-and-tell
+    about: "Post what you built with its four parts: what you built or ported, what it runs on, a photo or a clip, and anything that did not work."
+  - name: Q&A
+    url: https://github.com/Fox-Red-Labs/fox-red-labs/discussions/categories/q-a
+    about: "Questions and ideas. The forms below are for results and failures."

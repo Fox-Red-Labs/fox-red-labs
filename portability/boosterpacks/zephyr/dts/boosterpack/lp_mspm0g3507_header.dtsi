@@ -1,0 +1,58 @@
+/*
+ * BoosterPack header of the LP-MSPM0G3507, pins 1 to 40.
+ * Pin map: LP-MSPM0G3507 user guide SLAU873 (BoosterPack header table).
+ * Pin 3 is PB23 with J14 at 1-2 (PA9 at 2-3). Pin 29 is PA16 with J15 at 1-2.
+ * Pins 33 and 34 are the XDS110 backchannel UART until J21 and J22 move.
+ * Pin 12 and pin 19 both read PB12 in the CCStudio board note; both are mapped
+ * to PB12 and the schematic should settle it before a flash.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	boosterpack_header: connector {
+		compatible = "ti,boosterpack-header";
+		#gpio-cells = <2>;
+		gpio-map-mask = <0xffffffff 0xffffffc0>;
+		gpio-map-pass-thru = <0 0x3f>;
+		gpio-map = <2 0 &gpioa 25 0>,
+			   <3 0 &gpiob 23 0>,
+			   <4 0 &gpioa 8 0>,
+			   <5 0 &gpioa 26 0>,
+			   <6 0 &gpiob 24 0>,
+			   <7 0 &gpiob 9 0>,
+			   <8 0 &gpioa 27 0>,
+			   <9 0 &gpiob 2 0>,
+			   <10 0 &gpiob 3 0>,
+			   <11 0 &gpiob 16 0>,
+			   <12 0 &gpiob 12 0>,
+			   <13 0 &gpiob 6 0>,
+			   <14 0 &gpiob 7 0>,
+			   <15 0 &gpiob 8 0>,
+			   <17 0 &gpiob 15 0>,
+			   <18 0 &gpiob 17 0>,
+			   <19 0 &gpiob 12 0>,
+			   <23 0 &gpiob 19 0>,
+			   <24 0 &gpioa 22 0>,
+			   <25 0 &gpiob 18 0>,
+			   <26 0 &gpioa 18 0>,
+			   <27 0 &gpioa 17 0>,
+			   <29 0 &gpioa 16 0>,
+			   <30 0 &gpioa 15 0>,
+			   <31 0 &gpioa 13 0>,
+			   <32 0 &gpioa 12 0>,
+			   <33 0 &gpioa 11 0>,
+			   <34 0 &gpioa 10 0>,
+			   <35 0 &gpiob 13 0>,
+			   <36 0 &gpiob 20 0>,
+			   <37 0 &gpioa 31 0>,
+			   <38 0 &gpioa 28 0>,
+			   <39 0 &gpiob 1 0>,
+			   <40 0 &gpiob 4 0>;
+	};
+};
+
+&gpioa { status = "okay"; };
+&gpiob { status = "okay"; };

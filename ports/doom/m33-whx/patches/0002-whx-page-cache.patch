@@ -1,0 +1,1274 @@
+diff -ruN a/src/doom/d_main.c b/src/doom/d_main.c
+--- a/src/doom/d_main.c
++++ b/src/doom/d_main.c
+@@ -1154,7 +1154,7 @@
+                 if (W_CheckNumForName(demolumpname) > 0)
+                 {
+                     demolump = W_CacheLumpName(demolumpname, PU_STATIC);
+-                    demoversion = demolump[0];
++                    demoversion = FW_U8(demolump);
+                     W_ReleaseLumpName(demolumpname);
+                     status = true;
+                     switch (demoversion)
+@@ -1582,7 +1582,7 @@
+ #if !DOOM_TINY
+     W_CheckCorrectIWAD(doom);
+ #else
+-    gamemission = IdentifyIWADByName(whdheader->name);
++    { char iwname[16]; FW_COPY(iwname, whdheader->name, 14); iwname[14] = 0; gamemission = IdentifyIWADByName(iwname); }
+ #endif
+ 
+     // Now that we've loaded the IWAD, we can figure out what gamemission
+diff -ruN a/src/doom/g_game.c b/src/doom/g_game.c
+--- a/src/doom/g_game.c
++++ b/src/doom/g_game.c
+@@ -2485,7 +2485,7 @@
+ #endif
+     demo_p = (byte *)demobuffer;
+ 
+-    demoversion = *demo_p++;
++    demoversion = FW_U8(demo_p++);
+ 
+     longtics = false;
+ 
+@@ -2511,17 +2511,17 @@
+                          DemoVersionDescription(demoversion));
+     }
+ 
+-    skill = *demo_p++; 
+-    episode = *demo_p++; 
+-    map = *demo_p++; 
+-    deathmatch = *demo_p++;
+-    respawnparm = *demo_p++;
+-    fastparm = *demo_p++;
+-    nomonsters = *demo_p++;
+-    consoleplayer = *demo_p++;
++    skill = FW_U8(demo_p++); 
++    episode = FW_U8(demo_p++); 
++    map = FW_U8(demo_p++); 
++    deathmatch = FW_U8(demo_p++);
++    respawnparm = FW_U8(demo_p++);
++    fastparm = FW_U8(demo_p++);
++    nomonsters = FW_U8(demo_p++);
++    consoleplayer = FW_U8(demo_p++);
+ 
+     for (i=0 ; i<MAXPLAYERS ; i++)
+-	playeringame[i] = *demo_p++;
++	playeringame[i] = FW_U8(demo_p++);
+ 
+ #if !NO_USE_NET
+     if (playeringame[1] || M_CheckParm("-solo-net") > 0
+@@ -2536,7 +2536,7 @@
+     precache = false;
+     G_InitNew (skill, episode, map); 
+ #if USE_WHD
+-    uint8_t decode_words = *demo_p++;
++    uint8_t decode_words = FW_U8(demo_p++);
+     memset(&demo_decode, 0, sizeof(demo_decode));
+     th_bit_input_init(&demo_decode.bi, demo_p);
+     demo_decode.decoders = Z_Malloc(decode_words * 2, PU_LEVEL, 0);
+diff -ruN a/src/doom/p_maputl.c b/src/doom/p_maputl.c
+--- a/src/doom/p_maputl.c	2026-10-21 00:51:32
++++ b/src/doom/p_maputl.c	2026-10-21 00:59:45
+@@ -651,13 +651,13 @@
+     uint row_header_offset = y * (2 + (bmapwidth + 7) / 8);
+     uint bmx = x / 8;
+ 
+-    if (blockmap_whd[row_header_offset + 2 + bmx] & (1u << (x & 7))) {
+-        uint data_offset = blockmap_whd[row_header_offset] | (blockmap_whd[row_header_offset + 1] << 8u);
+-        uint cell_metadata_index = popcount8(blockmap_whd[row_header_offset + 2 + bmx] & ((1u << (x & 7)) - 1));
++    if (FW_U8(blockmap_whd + (row_header_offset + 2 + bmx)) & (1u << (x & 7))) {
++        uint data_offset = FW_U8(blockmap_whd + (row_header_offset)) | (FW_U8(blockmap_whd + (row_header_offset + 1)) << 8u);
++        uint cell_metadata_index = popcount8(FW_U8(blockmap_whd + (row_header_offset + 2 + bmx)) & ((1u << (x & 7)) - 1));
+         for(int xx = 0; xx < bmx; xx++) {
+-            cell_metadata_index += popcount8(blockmap_whd[row_header_offset + 2 + xx]);
++            cell_metadata_index += popcount8(FW_U8(blockmap_whd + (row_header_offset + 2 + xx)));
+         }
+-        uint cell_metadata = blockmap_whd[data_offset + cell_metadata_index * 2] | (blockmap_whd[data_offset + cell_metadata_index * 2 + 1] << 8u);
++        uint cell_metadata = FW_U8(blockmap_whd + (data_offset + cell_metadata_index * 2)) | (FW_U8(blockmap_whd + (data_offset + cell_metadata_index * 2 + 1)) << 8u);
+         if ((cell_metadata & 0xf000) == 0xf000) {
+             const line_t *line = &lines[cell_metadata & 0xfffu];
+             if (!line_validcount_update_check(line, validcount) && !func(line)) return false;
+@@ -666,9 +666,9 @@
+             uint element_offset = data_offset + (cell_metadata & 0x3ff);
+             uint last = 0;
+             while (count--) {
+-                uint b = blockmap_whd[element_offset++];
++                uint b = FW_U8(blockmap_whd + (element_offset++));
+                 if (b & 0x80) {
+-                    b = ((b & 0x7f) << 8) + blockmap_whd[element_offset++];
++                    b = ((b & 0x7f) << 8) + FW_U8(blockmap_whd + (element_offset++));
+                 }
+                 last += b + 1;
+                 const line_t *line = &lines[last];
+diff -ruN a/src/doom/p_mobj.c b/src/doom/p_mobj.c
+--- a/src/doom/p_mobj.c
++++ b/src/doom/p_mobj.c
+@@ -844,7 +844,8 @@
+     fixed_t		y;
+     fixed_t		z;
+ 
+-    const mapthing_t *mthing = &spawnpoint_mapthing(spawnpoint);
++    mapthing_t mthing_copy; FW_COPY(&mthing_copy, &spawnpoint_mapthing(spawnpoint), sizeof mthing_copy);
++    const mapthing_t *mthing = &mthing_copy;
+     // count deathmatch start positions
+     if (mthing->type == 11)
+     {
+diff -ruN a/src/doom/p_saveg.c b/src/doom/p_saveg.c
+--- a/src/doom/p_saveg.c
++++ b/src/doom/p_saveg.c
+@@ -1888,7 +1888,7 @@
+ static uint32_t calc_wad_hash() {
+     uint32_t hash = LOAD_SAVE_VERSION;
+ #if USE_WHD
+-    hash = hash * 31u + whdheader->hash;
++    hash = hash * 31u + FW_U32(&whdheader->hash);
+ #endif
+     return hash;
+ }
+@@ -2661,7 +2661,7 @@
+ void P_SaveGameGetExistingFlashSlotAddresses(flash_slot_info_t *slots, int count) {
+     const uint8_t *index = get_end_of_flash() - 4;
+     int i;
+-    const uint8_t *limit = whd_map_base + whdheader->size;
++    const uint8_t *limit = whd_map_base + FW_U32(&whdheader->size);
+     for(i=0;i<count;i++) {
+         bool ok = false;
+         if (index[0] == 0x53 && index[1] >= i && index[1] < count) {
+@@ -2757,7 +2757,7 @@
+             last_slot = i;
+         }
+     }
+-    const uint8_t *limit = whd_map_base + whdheader->size;
++    const uint8_t *limit = whd_map_base + FW_U32(&whdheader->size);
+     int freespace = (get_end_of_flash() - limit) - used;
+ //    printf("SPACE %d, required %d\n", freespace, size + SLOT_OVERHEAD);
+     if (freespace < size + SLOT_OVERHEAD) {
+diff -ruN a/src/doom/p_setup.c b/src/doom/p_setup.c
+--- a/src/doom/p_setup.c	2026-10-21 00:51:32
++++ b/src/doom/p_setup.c	2026-10-21 01:00:26
+@@ -397,13 +397,14 @@
+     ss = sectors;
+     for (i=0 ; i<numsectors ; i++, ss++, whss++)
+     {
+-        sector_set_floorheight(ss, SHORT(whss->floorheight)<<FRACBITS);
+-        sector_set_ceilingheight(ss, SHORT(whss->ceilingheight)<<FRACBITS);
+-        ss->floorpic = whss->floorpic;
+-        ss->ceilingpic = whss->ceilingpic;
+-	ss->lightlevel = whss->lightlevel;
+-	ss->special = whss->special;
+-	ss->tag = whss->tag;
++        whdsector_t ws; FW_COPY(&ws, whss, sizeof ws);
++        sector_set_floorheight(ss, SHORT(ws.floorheight)<<FRACBITS);
++        sector_set_ceilingheight(ss, SHORT(ws.ceilingheight)<<FRACBITS);
++        ss->floorpic = ws.floorpic;
++        ss->ceilingpic = ws.ceilingpic;
++	ss->lightlevel = ws.lightlevel;
++	ss->special = ws.special;
++	ss->tag = ws.tag;
+ 	ss->thinglist = 0;
+     }
+ #endif
+@@ -486,7 +487,7 @@
+ 	// Do not spawn cool, new monsters if !commercial
+ 	if (gamemode != commercial)
+ 	{
+-	    switch (SHORT(mt->type))
++	    switch (SHORT(FW_S16(&mt->type)))
+ 	    {
+ 	      case 68:	// Arachnotron
+ 	      case 64:	// Archvile
+@@ -564,9 +565,9 @@
+     lines = (line_t *) data;
+     unsigned int bitmap_size = (numlines + 31) / 8;
+ #else
+-    numlines = ((uint16_t *)data)[0];
+-    whd_sidemul = ((uint16_t *)data)[1];
+-    whd_vmul = ((uint16_t *)data)[2];
++    numlines = FW_U16((uint16_t *)data);
++    whd_sidemul = FW_U16((uint16_t *)data + 1);
++    whd_vmul = FW_U16((uint16_t *)data + 2);
+     lines = (line_t *) (data + 6);
+     numlines5 = line_bitmap_index(W_LumpLength(lump) - 6);
+ #if PRINT_LEVEL_SIZE
+@@ -741,10 +742,10 @@
+ 
+     // Read the header
+ 
+-    bmaporgx = blockmaplump[0]<<FRACBITS;
+-    bmaporgy = blockmaplump[1]<<FRACBITS;
+-    bmapwidth = blockmaplump[2];
+-    bmapheight = blockmaplump[3];
++    bmaporgx = FW_S16(&blockmaplump[0])<<FRACBITS;
++    bmaporgy = FW_S16(&blockmaplump[1])<<FRACBITS;
++    bmapwidth = FW_S16(&blockmaplump[2]);
++    bmapheight = FW_S16(&blockmaplump[3]);
+ 
+ #if PRINT_LEVEL_SIZE
+ #if !USE_WHD
+diff -ruN a/src/doom/p_sight.c b/src/doom/p_sight.c
+--- a/src/doom/p_sight.c	2026-10-21 00:51:32
++++ b/src/doom/p_sight.c	2026-10-21 00:59:45
+@@ -327,7 +327,7 @@
+     bitnum = 1 << (pnum&7);
+ 
+     // Check in REJECT table.
+-    if (rejectmatrix[bytenum]&bitnum)
++    if (FW_U8(rejectmatrix + bytenum)&bitnum)
+     {
+ 	sightcounts[0]++;
+ 
+diff -ruN a/src/doom/r_bsp.c b/src/doom/r_bsp.c
+--- a/src/doom/r_bsp.c
++++ b/src/doom/r_bsp.c
+@@ -535,6 +535,7 @@
+ #endif
+ {
+     node_t *bsp;
++    node_t bsp_copy;
+     int side;
+ 
+     // todo graham we should loop not recurse perhaps?
+@@ -561,6 +562,9 @@
+ 
+     // Decide which side the view point is on.
+     side = R_PointOnSide(viewx, viewy, bsp);
++#ifdef FOX_WHX_CACHE
++    FW_COPY((void *)&bsp_copy, bsp, sizeof bsp_copy); bsp = &bsp_copy;   /* the node is used again after the recursive call */
++#endif
+ //    printf("NODE %d v %d,%d p %d,%d dir %d,%d\n", bspnum, viewx, viewy, bsp->x, bsp->y, bsp->dx, bsp->dy);
+ 
+     // Recursively divide front space.
+diff -ruN a/src/doom/r_data.h b/src/doom/r_data.h
+--- a/src/doom/r_data.h	2026-10-21 00:51:32
++++ b/src/doom/r_data.h	2026-10-21 00:55:59
+@@ -82,8 +82,8 @@
+     assert(fd->real_id >= 0);
+     // had seen this in the past with bug related to certain maps (hopefully now fixed everywhere)
+     // todo ^ happens in tnt for now due to anim issue
+-    assert( whd_textures[fd->real_id].width != 0); // texture is missing
+-    col &= (whd_textures[fd->real_id].width - 1);
++    assert( whd_tex(fd->real_id).width != 0); // texture is missing
++    col &= (whd_tex(fd->real_id).width - 1);
+     return make_drawcolumn(fd, col);
+ }
+ 
+@@ -123,7 +123,7 @@
+ #define R_FlatNumForName(x) (x)
+ extern const uint16_t *whd_vpatch_numbers;
+ //#define check_vpatch_handle(handle) ({assert((handle)<NUM_VPATCHES); whd_vpatch_numbers[handle]; })
+-#define check_vpatch_handle(handle) whd_vpatch_numbers[handle]
++#define check_vpatch_handle(handle) FW_U16(&whd_vpatch_numbers[handle])
+ #define resolve_vpatch_handle(handle) ((const patch_t *)W_CacheLumpNum(check_vpatch_handle(handle), PU_STATIC))
+ #endif
+ 
+diff -ruN a/src/doom/r_data_whd.c b/src/doom/r_data_whd.c
+--- a/src/doom/r_data_whd.c	2026-10-21 00:51:32
++++ b/src/doom/r_data_whd.c	2026-10-21 01:45:58
+@@ -136,13 +136,14 @@
+     num_framedrawables = 0;
+     translated_fds[0] = translated_fds[1] = translated_fds[2] = 0xff;
+     skytexture_fd = lookup_texture(skytexture);
+-    if (!whd_textures[skytexture].patch_count) {
++    whdtexture_t skt = whd_tex(skytexture);
++    if (!skt.patch_count) {
+         // this is a single covering opaque patch at 0, 0
+-        skytexture_patch = whd_textures[skytexture].patch0;
++        skytexture_patch = skt.patch0;
+     } else {
+-        assert(whd_textures[skytexture].patch_count == 1);
+-        uint8_t *patch_table = &((uint8_t *)whd_textures)[whd_textures[skytexture].metdata_offset];
+-        skytexture_patch = patch_table[0] + (patch_table[1] << 8);
++        assert(skt.patch_count == 1);
++        uint8_t *patch_table = &((uint8_t *)whd_textures)[skt.metdata_offset];
++        skytexture_patch = FW_U16(patch_table);
+     }
+ }
+ 
+@@ -175,9 +176,10 @@
+ }
+ 
+ framedrawable_t *lookup_masked_texture(int texturenum) {
+-    if (!whd_textures[texturenum].patch_count) {
++    whdtexture_t mtx = whd_tex(texturenum);
++    if (!mtx.patch_count) {
+         // this is currently a single patch at 0,0
+-        return lookup_texture(-whd_textures[texturenum].patch0);
++        return lookup_texture(-mtx.patch0);
+     } else {
+         // turns out this does happen e.g. in E4M3 in ultimate doom
+         return lookup_texture(texturenum);
+@@ -192,7 +194,7 @@
+ {
+     lumpindex_t lump  = W_CheckNumForName("TEXTURE1");
+     const uint8_t *data = W_CacheLumpNum(lump, PU_STATIC);
+-    numtextures = data[0] | (data[1] << 8);
++    numtextures = FW_U16(data);
+     whd_textures = (const whdtexture_t *)(data + 2);
+     assert(numtextures >= NUM_SPECIAL_TEXTURES);
+ 
+@@ -254,7 +256,16 @@
+     // Load in the light tables,
+     //  256 byte align tables.
+     lump = W_GetNumForName(DEH_String("COLORMAP"));
++#ifdef FOX_WHX_CACHE
++    {   /* the light tables are read once per drawn pixel: they live in RAM (8.7 kB), not behind the page cache */
++        static uint8_t colormaps_ram[34 * 256] __attribute__((aligned(256)));
++        assert(W_LumpLength(lump) <= (int)sizeof(colormaps_ram));
++        FW_COPY(colormaps_ram, W_CacheLumpNum(lump, PU_STATIC), W_LumpLength(lump));
++        colormaps = colormaps_ram;
++    }
++#else
+     colormaps = W_CacheLumpNum(lump, PU_STATIC);
++#endif
+ #if PRINT_COLORMAPS
+     int size = W_LumpLength(lump);
+     assert(!(size & 0xff));
+diff -ruN a/src/doom/r_main.c b/src/doom/r_main.c
+--- a/src/doom/r_main.c
++++ b/src/doom/r_main.c
+@@ -460,6 +460,8 @@
+     fixed_t dy;
+     fixed_t left;
+     fixed_t right;
++    node_t node_tmp;
++    node = (node_t *)FW_VIEW(node, sizeof(node_t), &node_tmp);
+ 
+     if (!node->dx) {
+         if (x <= node_coord_to_fixed(node->x))
+@@ -1274,10 +1276,10 @@
+     }
+ #else
+     int rc = 0;
+-    if ((line[1] & (ML_HAS_SPECIAL >> 8)) != 0) {
++    if ((FW_U8(line + 1) & (ML_HAS_SPECIAL >> 8)) != 0) {
+         const static uint8_t special_pos[8] = { 5, 6, 6, 7, 6, 7, 7, 8 };
+-        uint pos = special_pos[line[1]&7];
+-        rc = line[pos];
++        uint pos = special_pos[FW_U8(line + 1)&7];
++        rc = FW_U8(line + pos);
+         uint index = line_bitmap_index(line - lines);
+         assert(index < numlines5);
+     }
+@@ -1299,10 +1301,10 @@
+     }
+ #else
+     int rc = 0;
+-    if ((line[1] & (ML_HAS_SPECIAL >> 8)) != 0) {
++    if ((FW_U8(line + 1) & (ML_HAS_SPECIAL >> 8)) != 0) {
+         const static uint8_t special_pos[8] = { 5, 6, 6, 7, 6, 7, 7, 8 };
+-        uint pos = special_pos[line[1]&7];
+-        rc = line[pos];
++        uint pos = special_pos[FW_U8(line + 1)&7];
++        rc = FW_U8(line + pos);
+         uint index = line_bitmap_index(line - lines);
+         assert(index < numlines5);
+         uint bit = 1u << (index & 31);
+diff -ruN a/src/doom/r_segs.c b/src/doom/r_segs.c
+--- a/src/doom/r_segs.c
++++ b/src/doom/r_segs.c
+@@ -478,7 +478,7 @@
+                 // graham: added drawing here
+                 // draw the texture
+ #if USE_WHD
+-                maskedcolumn_t col = R_GetMaskedColumn(maskedtexture, texturecolumn & (whd_textures[maskedtexture_tex].width -1));
++                maskedcolumn_t col = R_GetMaskedColumn(maskedtexture, texturecolumn & (whd_tex(maskedtexture_tex).width -1));
+ #else
+                 maskedcolumn_t col = R_GetMaskedColumn(maskedtexture, texturecolumn);
+ #endif
+@@ -928,28 +928,28 @@
+ #if PD_COLUMNS && USE_WHD
+ void pd_add_column2(pd_column_type type) {
+     assert(dc_source.real_id >= 0);
+-    int pc = whd_textures[dc_source.real_id].patch_count;
++    whdtexture_t wtx = whd_tex(dc_source.real_id); int pc = wtx.patch_count;
+     if (!pc) {
+-        dc_source = make_drawcolumn(lookup_patch(whd_textures[dc_source.real_id].patch0-firstspritelump), dc_source.col);
++        dc_source = make_drawcolumn(lookup_patch(wtx.patch0-firstspritelump), dc_source.col);
+     } else {
+-        uint8_t *patch_table = &((uint8_t *)whd_textures)[whd_textures[dc_source.real_id].metdata_offset];
++        uint8_t *patch_table = &((uint8_t *)whd_textures)[wtx.metdata_offset];
+         uint8_t *metadata = patch_table + pc * 2;
+ 
+         int xx = 0;
+         do {
+-            uint b=metadata[0];
++            uint b=FW_U8(metadata);
+             if (xx + 1 + (b&0x7f) > dc_source.col) break;
+             xx = xx + 1 + (b&0x7f);
+             metadata += 1 + 2 * (b>>7u);
+         } while (true);
+-        if (metadata[0] & 0x80) {
+-            int pn = metadata[1];
++        if (FW_U8(metadata) & 0x80) {
++            int pn = FW_U8(metadata + 1);
+             if (pn != 0xff) { // todo this was here before zero patch columns, but i can't see why (it used to fall thru to regular add column type)
+               // single patch column
+                 assert(pn < pc);
+-                uint pnum = patch_table[pn*2] | (patch_table[pn*2+1] << 8);
++                uint pnum = FW_U16(patch_table + pn*2);
+                 // note as pre R_GenerateLookup, a single patch column ignores the patch offsety
+-                dc_source = make_drawcolumn(lookup_patch(pnum-firstspritelump), (uint8_t)(dc_source.col - metadata[2]));
++                dc_source = make_drawcolumn(lookup_patch(pnum-firstspritelump), (uint8_t)(dc_source.col - FW_U8(metadata + 2)));
+             } else {
+ #warning untested no patch column
+                 return;
+diff -ruN a/src/doom/r_state.h b/src/doom/r_state.h
+--- a/src/doom/r_state.h	2026-10-21 00:51:32
++++ b/src/doom/r_state.h	2026-10-21 01:03:41
+@@ -69,9 +69,14 @@
+ #else
+ extern cardinal_t numtextures;
+ extern const whdtexture_t *whd_textures;
+-#define texture_width(t) whd_textures[t].width
+-#define texture_height(t) (whd_textures[t].height << FRACBITS)
++#ifdef FOX_WHX_CACHE
++static inline whdtexture_t whd_tex(int t) { whdtexture_t x; fox_whx_copy(&x, &whd_textures[t], sizeof x); return x; }
++#else
++#define whd_tex(t) whd_textures[t]
+ #endif
++#define texture_width(t) whd_tex(t).width
++#define texture_height(t) (whd_tex(t).height << FRACBITS)
++#endif
+ 
+ // Sprite....
+ #if !USE_WHD
+@@ -98,17 +103,17 @@
+ #else
+ extern const int32_t *whd_sprite_meta;
+ extern const uint16_t *whd_sprite_frame_meta;
+-#define sprite_width(s) ((whd_sprite_meta[s]&0x3ff) << FRACBITS)
+-#define sprite_offset(s) ((whd_sprite_meta[s]>>21) << FRACBITS)
+-#define sprite_topoffset(s) (((whd_sprite_meta[s]<<11)>>21) << FRACBITS)
+-#define sprite_numframes(s) (whd_sprite_frame_meta[(s)+1] - whd_sprite_frame_meta[s])
+-#define sprite_sprdef(s) whd_sprite_frame_meta[s]
+-#define sprite_frame(s,n) whd_sprite_frame_meta[sprite_sprdef(s)+(n)]
++#define sprite_width(s) ((FW_S32(&whd_sprite_meta[s])&0x3ff) << FRACBITS)
++#define sprite_offset(s) ((FW_S32(&whd_sprite_meta[s])>>21) << FRACBITS)
++#define sprite_topoffset(s) (((FW_S32(&whd_sprite_meta[s])<<11)>>21) << FRACBITS)
++#define sprite_numframes(s) (FW_U16(&whd_sprite_frame_meta[(s)+1]) - FW_U16(&whd_sprite_frame_meta[s]))
++#define sprite_sprdef(s) FW_U16(&whd_sprite_frame_meta[s])
++#define sprite_frame(s,n) FW_U16(&whd_sprite_frame_meta[sprite_sprdef(s)+(n)])
+ #define spriteframe_rotates(f) (((f)&32768) != 0)
+ #define spriteframe_unrotated_pic(f) ((f)&0x7fff)
+ #define spriteframe_unrotated_flipped(f) 0
+-#define spriteframe_rotated_flipped(f, n) ((whd_sprite_frame_meta[((f)&0x7fff) + (n)] & 32768) != 0)
+-#define spriteframe_rotated_pic(f, n) (whd_sprite_frame_meta[((f)&0x7fff) + (n)] & 0x7fff)
++#define spriteframe_rotated_flipped(f, n) ((FW_U16(&whd_sprite_frame_meta[((f)&0x7fff) + (n)]) & 32768) != 0)
++#define spriteframe_rotated_pic(f, n) (FW_U16(&whd_sprite_frame_meta[((f)&0x7fff) + (n)]) & 0x7fff)
+ #endif
+ extern lumpindex_t 		firstspritelump;
+ extern lumpindex_t 		lastspritelump;
+@@ -150,7 +155,7 @@
+ #else
+ static inline int bsp_child(int n, int w) {
+     // w is 0 R, 1 L
+-    uint coded = nodes[n].coded_children;
++    uint coded = FW_U16(&nodes[n].coded_children);
+     // code is 11ll llll lrrr rrrr  : l/r are 7 bit signed values; left leaf = 0x8000 + n - l; right leaf = 0x8000 + n - r
+     //         10ll llll l--- ----  : right node is n- 1, left leaf via l as above
+     //         01-- ---- -rrr rrrr  : left node is n - 1, right leaf via r is as above,
+@@ -238,10 +243,10 @@
+ #endif
+ 
+ #if USE_RAW_MAPVERTEX
+-#define vertex_x(v) (((v)->x) << FRACBITS)
+-#define vertex_y(v) (((v)->y) << FRACBITS)
+-#define vertex_x_raw(v) ((v)->x)
+-#define vertex_y_raw(v) ((v)->y)
++#define vertex_x(v) (FW_S16(&(v)->x) << FRACBITS)
++#define vertex_y(v) (FW_S16(&(v)->y) << FRACBITS)
++#define vertex_x_raw(v) FW_S16(&(v)->x)
++#define vertex_y_raw(v) FW_S16(&(v)->y)
+ #define vertex_raw_to_fixed(p) (((fixed_t)(p)) << FRACBITS)
+ #else
+ #define vertex_x(v) ((v)->x)
+@@ -262,38 +267,38 @@
+ #if WHD_SUPER_TINY
+ #define sidenum_to_side(sidenum) (sides_z + (sidenum))
+ static inline uint side_sectornum(side_t *side) {
+-    return side[1];
++    return FW_U8(side + (1));
+ }
+ #define side_sector(side) (sectors + side_sectornum(side))
+ 
+ static inline int side_toptexture(side_t *side) {
+-    if ((side[0] & 0xf) < 5) return 0;
+-    return side[2] <= LAST_SWITCH_TEXTURE ? check_switch_texture(side, CST_TOP, side[2]) : side[2];
++    if ((FW_U8(side + (0)) & 0xf) < 5) return 0;
++    return FW_U8(side + (2)) <= LAST_SWITCH_TEXTURE ? check_switch_texture(side, CST_TOP, FW_U8(side + (2))) : FW_U8(side + (2));
+ }
+ 
+ static inline int side_midtexture(side_t *side) {
+     static uint8_t posM[26] = { 0, 0, 2, 2, 2, 0, 0, 0, 2, 2, 2, 2, 3, 3, 3, 3};
+-    uint enc = side[0] & 0xf;
++    uint enc = FW_U8(side + (0)) & 0xf;
+     if (!posM[enc]) return 0;
+-    return side[posM[enc]] <= LAST_SWITCH_TEXTURE ? check_switch_texture(side, CST_MID, side[posM[enc]]) : side[posM[enc]];
++    return FW_U8(side + posM[enc]) <= LAST_SWITCH_TEXTURE ? check_switch_texture(side, CST_MID, FW_U8(side + posM[enc])) : FW_U8(side + posM[enc]);
+ }
+ 
+ static inline int side_bottomtexture(side_t *side) {
+     static uint8_t posB[26] = { 0, 2, 0, 2, 3, 0, 2, 3, 0, 2, 3, 4, 0, 2, 3, 4};
+-    uint enc = side[0] & 0xf;
++    uint enc = FW_U8(side + (0)) & 0xf;
+     if (!posB[enc]) return 0;
+-    return side[posB[enc]] <= LAST_SWITCH_TEXTURE ? check_switch_texture(side, CST_BOTTOM, side[posB[enc]]) : side[posB[enc]];
++    return FW_U8(side + posB[enc]) <= LAST_SWITCH_TEXTURE ? check_switch_texture(side, CST_BOTTOM, FW_U8(side + posB[enc])) : FW_U8(side + posB[enc]);
+ }
+ 
+ static inline int side_textureoffset16(side_t *side) {
+     int16_t toff = 0;
+-    if (side[0] & 48) {
++    if (FW_U8(side + (0)) & 48) {
+         static uint8_t offset_offset[16] = {2, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 4, 4, 4, 4, 5};
+-        uint enc = side[0] & 0xf;
+-        if (side[0] & 32) {
+-            toff = (side[offset_offset[enc]] << 8) + side[1 + offset_offset[enc]];
++        uint enc = FW_U8(side + (0)) & 0xf;
++        if (FW_U8(side + (0)) & 32) {
++            toff = (FW_U8(side + offset_offset[enc]) << 8) + FW_U8(side + (1 + offset_offset[enc]));
+         } else {
+-            toff = side[offset_offset[enc]] << 1;
++            toff = FW_U8(side + offset_offset[enc]) << 1;
+         }
+     }
+     return toff;
+@@ -303,12 +308,12 @@
+     // todo is this shared with the other?
+     static uint8_t offset_offset[16] = {2, 3, 3, 3, 4, 3, 3, 4, 3, 3, 4, 4, 4, 4, 4, 5};
+     int16_t rowoff = 0;
+-    if (side[0] & 64) {
+-        uint enc = side[0] & 0xf;
+-        uint pos = offset_offset[enc] + ((sides_z[0] >> 4)&3);
+-        rowoff = side[pos];
++    if (FW_U8(side + (0)) & 64) {
++        uint enc = FW_U8(side + (0)) & 0xf;
++        uint pos = offset_offset[enc] + ((FW_U8(sides_z + (0)) >> 4)&3);
++        rowoff = FW_U8(side + (pos));
+         if (rowoff & 128) {
+-            rowoff = ((rowoff << 8) | sides_z[pos + 1])<<1;
++            rowoff = ((rowoff << 8) | FW_U8(sides_z + (pos + 1)))<<1;
+             rowoff /= 2;
+         } else {
+             rowoff <<= 1;
+@@ -374,13 +379,13 @@
+ #define line_next_step(l) 1
+ #else
+ 
+-#define line_onesided(l) ((l[1] & (ML_SIDE_MASK >> 8)) == 0)
+-#define line_predict_side(l) ((l[1] & (ML_NO_PREDICT_SIDE >> 8)) == 0)
+-#define line_predict_v1(l) ((l[1] & (ML_NO_PREDICT_V1 >> 8)) == 0)
+-#define line_predict_v2(l) ((l[1] & (ML_NO_PREDICT_V2 >> 8)) == 0)
++#define line_onesided(l) ((FW_U8(l + (1)) & (ML_SIDE_MASK >> 8)) == 0)
++#define line_predict_side(l) ((FW_U8(l + (1)) & (ML_NO_PREDICT_SIDE >> 8)) == 0)
++#define line_predict_v1(l) ((FW_U8(l + (1)) & (ML_NO_PREDICT_V1 >> 8)) == 0)
++#define line_predict_v2(l) ((FW_U8(l + (1)) & (ML_NO_PREDICT_V2 >> 8)) == 0)
+ 
+ static inline short line_flags(const line_t *l) {
+-    return l[0];// + (l[1] << 8); // todo mask off top 7?
++    return FW_U8(l + (0));// + (FW_U8(l + (1)) << 8); // todo mask off top 7?
+ }
+ 
+ extern uint16_t whd_sidemul;
+@@ -389,12 +394,12 @@
+     int s;
+     if (line_predict_side(l)) {
+         s = ((l - lines) * whd_sidemul) >> 16;
+-        s += (int8_t)l[2];
++        s += (int8_t)FW_U8(l + (2));
+     } else {
+-        s = l[2] + (l[3] << 8);
++        s = FW_U8(l + (2)) + (FW_U8(l + (3)) << 8);
+     }
+     if (side) {
+-        s += l[1] >> 5;
++        s += FW_U8(l + (1)) >> 5;
+     }
+     return s;
+ }
+@@ -402,35 +407,35 @@
+ extern uint16_t whd_vmul;
+ static inline vertex_t *line_v1(const line_t *l) {
+     int v;
+-    uint pos = 3 + (l[1]&1);
++    uint pos = 3 + (FW_U8(l + (1))&1);
+     if (line_predict_v1(l)) {
+         v = ((l - lines) * whd_vmul) >> 16;
+-        v += (int8_t)l[pos];
++        v += (int8_t)FW_U8(l + (pos));
+     } else {
+-        v = l[pos] + (l[pos+1] << 8);
++        v = FW_U8(l + (pos)) + (FW_U8(l + (pos+1)) << 8);
+     }
+     return vertexes + v;
+ }
+ 
+ static inline vertex_t *line_v2(const line_t *l) {
+     const static uint8_t v2pos[4] = { 4, 5, 5, 6 };
+-    uint pos = v2pos[l[1]&3];
++    uint pos = v2pos[FW_U8(l + (1))&3];
+     int v;
+     if (line_predict_v2(l)) {
+         v = ((l - lines) * whd_vmul) >> 16;
+-        v += (int8_t)l[pos];
++        v += (int8_t)FW_U8(l + (pos));
+     } else {
+-        v = l[pos] + (l[pos+1] << 8);
++        v = FW_U8(l + (pos)) + (FW_U8(l + (pos+1)) << 8);
+     }
+     return vertexes + v;
+ }
+ 
+ static inline int line_tag(const line_t *l) {
+     int tag = 0;
+-    if ((l[1] & (ML_HAS_TAG >> 8)) != 0) {
++    if ((FW_U8(l + (1)) & (ML_HAS_TAG >> 8)) != 0) {
+         const static uint8_t special_pos[8] = { 5, 6, 6, 7, 6, 7, 7, 8 };
+-        uint pos = special_pos[l[1]&7] + ((l[1] & (ML_HAS_SPECIAL >> 8)) != 0);
+-        tag = l[pos];
++        uint pos = special_pos[FW_U8(l + (1))&7] + ((FW_U8(l + (1)) & (ML_HAS_SPECIAL >> 8)) != 0);
++        tag = FW_U8(l + (pos));
+     }
+     return tag;
+ }
+@@ -447,7 +452,7 @@
+     else
+         return side_sector(sidenum_to_side(line_sidenum(l, 1)));
+ }
+-#define line_next_step(l) (5 + popcount8((l)[1]&0x1f))
++#define line_next_step(l) (5 + popcount8(FW_U8((l) + 1)&0x1f))
+ 
+ #endif
+ #define line_is_horiz(l) (vertex_y_raw(line_v1(l)) == vertex_y_raw(line_v2(l)))
+@@ -539,25 +544,25 @@
+ #define seg_offset(s) (((s)->offset) << FRACBITS)
+ #define seg_next_step(s) 1
+ #else
+-#define seg_linedef(s) (&lines[(s)[3] + ((s)[4] << 8)])
+-#define seg_side(s) ((s)[0] >> 7)
+-#define seg_v1(s) (&vertexes[((s)[1] | (((s)[0]&0x07)<<8))])
+-#define seg_v2(s) (&vertexes[((s)[2] | (((s)[0]&0x38)<<5))])
++#define seg_linedef(s) (&lines[FW_U8((s) + 3) + (FW_U8((s) + 4) << 8)])
++#define seg_side(s) (FW_U8((s) + 0) >> 7)
++#define seg_v1(s) (&vertexes[(FW_U8((s) + 1) | ((FW_U8((s) + 0)&0x07)<<8))])
++#define seg_v2(s) (&vertexes[(FW_U8((s) + 2) | ((FW_U8((s) + 0)&0x38)<<5))])
+ static inline fixed_t seg_offset(const seg_t *s) {
+-    if (!(s[0] & 64)) {
++    if (!(FW_U8(s + (0)) & 64)) {
+         return 0;
+     }
+-    if (s[5] < 128) {
+-        return (s[5] * 4) << FRACBITS;
++    if (FW_U8(s + (5)) < 128) {
++        return (FW_U8(s + (5)) * 4) << FRACBITS;
+     } else {
+-        return (((s[5]<<23)|(s[6]<<17)))/2;
++        return (((FW_U8(s + (5))<<23)|(FW_U8(s + (6))<<17)))/2;
+     }
+ }
+ 
+ static inline int seg_next_step(const seg_t *s) {
+     int size = 5;
+-    if (s[0]&64) {
+-        size += s[5]&128 ? 2 : 1;
++    if (FW_U8(s + (0))&64) {
++        size += FW_U8(s + (5))&128 ? 2 : 1;
+     }
+     return size;
+ }
+@@ -586,9 +591,9 @@
+ #endif
+ 
+ #if USE_WHD
+-#define subsector_firstline(ss) &segs[*(ss)]
++#define subsector_firstline(ss) &segs[FW_U16(ss)]
+ #define subsector_sector(ss) side_sector(seg_sidedef(subsector_firstline(ss)))
+-#define subsector_linelimit(ss) &segs[(ss)[1]]
++#define subsector_linelimit(ss) &segs[FW_U16((ss) + 1)]
+ #else
+ #define subsector_firstline(ss) &segs[(ss)->firstline]
+ #define subsector_sector(ss) ((ss)->sector)
+diff -ruN a/src/doom/r_things.c b/src/doom/r_things.c
+--- a/src/doom/r_things.c	2026-10-21 00:51:32
++++ b/src/doom/r_things.c	2026-10-21 01:03:01
+@@ -470,9 +470,9 @@
+             int last = -1;
+             th_backwards_bit_input rbi;
+             uint data_index = 3 + patch_has_extra(patch);
+-            data_index += ((uint8_t*)patch)[data_index*2]; // skip over decoder metadata
++            data_index += FW_U8((uint8_t*)patch + data_index*2); // skip over decoder metadata
+             uint16_t *col_offsets = &((uint16_t*)patch)[data_index];
+-            uint16_t col_offset = col_offsets[column.col];
++            uint16_t col_offset = FW_U16(&col_offsets[column.col]);
+             uint next_column;
+             if (0xff == (col_offset >> 8)) {
+                 next_column = (col_offset & 0xff);
+@@ -481,11 +481,11 @@
+             } else {
+                 next_column = column.col + 1;
+             }
+-            col_offset = col_offsets[next_column]; // we work backwards from the next column
++            col_offset = FW_U16(&col_offsets[next_column]); // we work backwards from the next column
+             // we have to skip over any columns which aren't stored
+             while (0xff == (col_offset >> 8)) {
+                 assert(next_column < patch_width(patch)); // note < and ++ afterwards; we are allowed to read one beyond width which is the "end" marker column
+-                col_offset = col_offsets[++next_column];
++                col_offset = FW_U16(&col_offsets[++next_column]);
+             }
+             data_index = (data_index + patch_width(patch)) * 2 + 2; // + 2 because we have one extra col_data offset
+             if (patch_byte_addressed(patch)) {
+diff -ruN a/src/doomtype.h b/src/doomtype.h
+--- a/src/doomtype.h	2026-10-21 00:51:33
++++ b/src/doomtype.h	2026-10-21 00:52:22
+@@ -132,6 +132,7 @@
+ typedef uint8_t isb_uint8_t;
+ #endif
+ #include <limits.h>
++#include "fox_whx.h"
+ 
+ #ifdef _WIN32
+ 
+diff -ruN a/src/pd_render.cpp b/src/pd_render.cpp
+--- a/src/pd_render.cpp
++++ b/src/pd_render.cpp
+@@ -1206,8 +1206,8 @@
+ }
+ 
+ static int translate_picnum(int picnum) {
+-    if (whd_flattospecial[picnum] != 0xff) {
+-        picnum = whd_specialtoflat[whd_flattranslation[whd_flattospecial[picnum]]];
++    if (FW_U8(whd_flattospecial + picnum) != 0xff) {
++        picnum = FW_U8(whd_specialtoflat + whd_flattranslation[FW_U8(whd_flattospecial + picnum)]);
+     }
+     return picnum;
+ }
+@@ -1645,7 +1645,7 @@
+     int offset_or_inverse_slot = patch_offset_or_inverse_slot(patch_num);
+     uint data_index = 3 + patch_has_extra(pdi.patch);
+     if (!simple_path && offset_or_inverse_slot >= 0) {
+-        data_index += ((uint8_t *) pdi.patch)[data_index * 2]; // skip over decoder metadata
++        data_index += FW_U8((uint8_t *) pdi.patch + data_index * 2); // skip over decoder metadata
+         patch_hash_entry_header *header = (patch_hash_entry_header *)(patch_decoder_circular_buf + offset_or_inverse_slot);
+         assert(header->patch_num == patch_num);
+         pdi.decoder = patch_decoder_circular_buf + offset_or_inverse_slot + PATCH_HASH_ENTRY_HEADER_HWORDS;
+@@ -1713,7 +1713,7 @@
+         pos += PATCH_HASH_ENTRY_HEADER_HWORDS;
+         pdi.decoder = pos;
+         const uint8_t *sourcez = pdi.patch + data_index * 2 + 1;
+-        data_index += ((uint8_t *) pdi.patch)[data_index * 2]; // skip over decoder metadata
++        data_index += FW_U8((uint8_t *) pdi.patch + data_index * 2); // skip over decoder metadata
+         th_bit_input bi;
+         th_bit_input_init(&bi, (const uint8_t *) sourcez);
+         header->encoding = th_read_bits(&bi, 1);
+@@ -1864,10 +1864,10 @@
+             restart_song_state &= ~1;
+         }
+         if (i != -1) {
+-            uint16_t col_offset = col_offsets[col];
++            uint16_t col_offset = FW_U16(&col_offsets[col]);
+             if (0xff == (col_offset >> 8)) {
+                 assert((col_offset&0xff)<pdi.w);
+-                col_offset = col_offsets[col_offset & 0xff];
++                col_offset = FW_U16(&col_offsets[col_offset & 0xff]);
+             }
+             uint8_t pixels[257];
+             th_bit_input bi;
+@@ -1998,14 +1998,14 @@
+ #if DEBUG_COMPOSITE
+     printf("Texture %d h=%d, %d->%d\n", texture_num, texture_height(texture_num)>>FRACBITS, min, max);
+ #endif
+-    int pc = whd_textures[texture_num].patch_count;
++    whdtexture_t wtx = whd_tex(texture_num); int pc = wtx.patch_count;
+     assert(pc);
+-    uint8_t *patch_table = &((uint8_t *)whd_textures)[whd_textures[texture_num].metdata_offset];
++    uint8_t *patch_table = &((uint8_t *)whd_textures)[wtx.metdata_offset];
+     uint8_t *metadata = patch_table + pc * 2;
+     // skip over the non composite column metadata (always pretty small)
+     uint xx=0;
+     while (xx < w) {
+-        uint b = *metadata++;
++        uint b = FW_U8(metadata++);
+         xx += (b&0x7f)+1;
+         if (b&0x80) metadata+=2;
+     }
+@@ -2022,12 +2022,12 @@
+         //      [2] originx
+         //      [3] originy
+         // }
+-        uint limit = base + *metadata++ + 1;
++        uint limit = base + FW_U8(metadata++) + 1;
+         assert(limit <= w);
+         uint col;
+         // if the first localpatch is 0xff, this is a run of single patches (which
+         // don't come to this function)
+-        if (metadata[0] != 0xff) {
++        if (FW_U8(metadata + 0) != 0xff) {
+ #if DEBUG_COMPOSITE
+             printf("composites, limit %d\n", limit);
+ #endif
+@@ -2050,10 +2050,10 @@
+                 int y = 0;
+                 uint used_this_time = 0;
+                 do {
+-                    int local_patch = metadata[0];
+-                    int m1 = metadata[1];
++                    int local_patch = FW_U8(metadata + 0);
++                    int m1 = FW_U8(metadata + 1);
+                     if (local_patch & WHD_COL_SEG_EXPLICIT_Y) {
+-                        y = metadata[2];
++                        y = FW_U8(metadata + 2);
+                         metadata++;
+                     }
+                     int length = 1 + (m1 & 0x7f);
+@@ -2064,7 +2064,7 @@
+                             runs[run_count].pdi_index = local_patch & WHD_COL_SEG_MEMCPY_IS_BACKWARDS ? 0xff : 0xfe;
+                             // todo we could clip more, but barely seems worth it
+                             runs[run_count].y = y;
+-                            runs[run_count].src_offset = metadata[2];
++                            runs[run_count].src_offset = FW_U8(metadata + 2);
+                             runs[run_count].count = std::min(1 + max - y, length);
+ #if DEBUG_COMPOSITE
+                             printf("  memcpy %d <- %d + %d\n", y, runs[run_count].src_offset, length);
+@@ -2082,9 +2082,9 @@
+                             // 1111 1111 single columns (ignore) _ eqqivalent to memcpy from 0x7f which would be silly
+                             // todo local_patch_mapping? probably unnecessary as we don't often have the same patch in a column
+                             local_patch &= 0xf;
+-                            int patch_num = patch_table[local_patch * 2] | (patch_table[local_patch * 2 + 1] << 8);
++                            int patch_num = FW_U16(patch_table + local_patch * 2);
+     #if DEBUG_DECODER
+-                            printf("  looking for local patch %d (%d) offset %d,%d\n", local_patch, patch_num, (int8_t)metadata[2], (int8_t)metadata[3]);
++                            printf("  looking for local patch %d (%d) offset %d,%d\n", local_patch, patch_num, (int8_t)FW_U8(metadata + 2), (int8_t)FW_U8(metadata + 3));
+     #endif
+                             uint p;
+                             for (p = 0; p < count_of(pdis); p++) {
+@@ -2113,8 +2113,8 @@
+                             runs[run_count].pdi_index = p;
+                             // todo we could clip more, but barely seems worth it
+                             runs[run_count].y = y;
+-                            runs[run_count].col = metadata[2] - base;
+-                            runs[run_count].src_offset = metadata[3];
++                            runs[run_count].col = FW_U8(metadata + 2) - base;
++                            runs[run_count].src_offset = FW_U8(metadata + 3);
+                             runs[run_count].count = std::min(1 + max - y, length);
+ #if DEBUG_COMPOSITE
+                             printf("  patch %d, %d + %d\n", patch_num, y, length);
+@@ -2166,10 +2166,10 @@
+                                 const uint8_t *patch_decoder_table = decoder_tables[run.pdi_index];
+                                 uint8_t pcol = col + run.col;
+                                 assert(pcol < patch_width(pdi.patch));
+-                                uint16_t col_offset = col_offsets[pcol];
++                                uint16_t col_offset = FW_U16(&col_offsets[pcol]);
+                                 if (0xff == (col_offset >> 8)) {
+                                     assert((col_offset & 0xff) < w);
+-                                    col_offset = col_offsets[col_offset & 0xff];
++                                    col_offset = FW_U16(&col_offsets[col_offset & 0xff]);
+                                 }
+                                 th_bit_input bi;
+                                 if (patch_byte_addressed(pdi.patch)) {
+@@ -2288,9 +2288,9 @@
+ #endif
+                 int last;
+                 do {
+-                    last = metadata[1] & 0x80;
+-                    bool has_y = metadata[0] & WHD_COL_SEG_EXPLICIT_Y;
+-                    if (metadata[0] & 0x80) {
++                    last = FW_U8(metadata + 1) & 0x80;
++                    bool has_y = FW_U8(metadata + 0) & WHD_COL_SEG_EXPLICIT_Y;
++                    if (FW_U8(metadata + 0) & 0x80) {
+                         metadata += 3 + has_y;
+                     } else {
+                         metadata += 4 + has_y;
+@@ -2409,10 +2409,10 @@
+         stride = 1;
+     }
+     for (; col < w; col++) {
+-        uint16_t col_offset = col_offsets[col];
++        uint16_t col_offset = FW_U16(&col_offsets[col]);
+         if (0xff == (col_offset >> 8)) {
+             assert((col_offset & 0xff) < pdi.w);
+-            col_offset = col_offsets[col_offset & 0xff];
++            col_offset = FW_U16(&col_offsets[col_offset & 0xff]);
+         }
+         th_bit_input bi;
+         if (patch_byte_addressed(pdi.patch)) {
+diff -ruN a/src/tiny_huff.h b/src/tiny_huff.h
+--- a/src/tiny_huff.h	2026-10-21 00:51:33
++++ b/src/tiny_huff.h	2026-10-21 00:52:22
+@@ -7,6 +7,11 @@
+ typedef unsigned int uint;
+ 
+ #pragma once
++#if !IS_WHD_GEN
++#include "fox_whx.h"
++#else
++#define FW_U8(p) (*(const uint8_t *)(p))
++#endif
+ 
+ #define TH_IDX_CEILING 0
+ #define TH_IDX_OFFSET 1
+@@ -77,7 +82,7 @@
+ #endif
+ #if TH_USE_ACCUM
+     bi->bits = 8 - (bit_offset & 7);
+-    bi->accum = *bi->cur++ >> (bit_offset & 7);
++    bi->accum = FW_U8(bi->cur++) >> (bit_offset & 7);
+ #else
+     bi->bit = 0;
+ #endif
+@@ -90,7 +95,7 @@
+ #endif
+ #if TH_USE_ACCUM
+     bi->bits = 8 - (bit_offset & 7);
+-    bi->accum = *bi->cur++ >> (bit_offset & 7);
++    bi->accum = FW_U8(bi->cur++) >> (bit_offset & 7);
+ #else
+     bi->bit = 0;
+ #endif
+@@ -105,7 +110,7 @@
+ static inline void th_backwards_bit_input_init_bit_offset(th_backwards_bit_input *bi, const uint8_t *data, uint bit_offset) {
+     bi->cur = data + bit_offset / 8;
+     bi->bits = bit_offset & 7u;
+-    bi->accum = *bi->cur & ((1u << bi->bits)-1); // if we start on a non byte boundary, then the bits are in the wrong place
++    bi->accum = FW_U8(bi->cur) & ((1u << bi->bits)-1); // if we start on a non byte boundary, then the bits are in the wrong place
+ }
+ 
+ void th_bit_overrun(th_bit_input *bi); // global and user provided
+@@ -116,7 +121,7 @@
+ #ifndef NDEBUG
+         if (bi->cur == bi->end) th_bit_overrun(bi);
+ #endif
+-        bi->accum = *bi->cur++;
++        bi->accum = FW_U8(bi->cur++);
+         bi->bits = 8;
+     }
+     bi->bits--;
+@@ -143,7 +148,7 @@
+ #ifndef NDEBUG
+         if (bi->cur == bi->end) th_bit_overrun(bi);
+ #endif
+-        bi->accum |= *bi->cur++ << bi->bits;
++        bi->accum |= FW_U8(bi->cur++) << bi->bits;
+         bi->bits += 8;
+ //    }
+ }
+@@ -190,7 +195,7 @@
+     assert(n<=32);
+     bi->bits -= n;
+     while (bi->bits > 32) { // really negative
+-        bi->accum = (bi->accum << 8) | *--bi->cur;
++        bi->accum = (bi->accum << 8) | FW_U8(--bi->cur);
+         bi->bits += 8;
+     }
+     uint tmp = bi->accum >> bi->bits;
+diff -ruN a/src/v_patch.h b/src/v_patch.h
+--- a/src/v_patch.h	2026-10-21 00:51:33
++++ b/src/v_patch.h	2026-10-21 00:55:39
+@@ -54,26 +54,26 @@
+ typedef const uint8_t patch_t;
+ #define patch_topoffset(p) 0//crud//(p)->topoffset
+ #define patch_leftoffset(p) 0//crud//(p)->leftoffset
+-#define patch_width(p) ((p)[1] | ((((p)[2]&1) << 8)))
+-#define patch_decoder_size_needed(p) ((((p)[2]>>1)<<2)+3)
+-#define patch_is_wide(p) (((p)[2])&1)
+-#define patch_height(p) ((p)[3])
++#define patch_width(p) (FW_U8((p)+1) | (((FW_U8((p)+2)&1) << 8)))
++#define patch_decoder_size_needed(p) (((FW_U8((p)+2)>>1)<<2)+3)
++#define patch_is_wide(p) ((FW_U8((p)+2))&1)
++#define patch_height(p) (FW_U8((p)+3))
+ #define patch_columnofs(p, col) 0//crud//(p)->columnofs[col]
+-#define patch_byte_addressed(p) (((p)[0] & 4)!=0)
+-#define patch_fully_opaque(p) (((p)[0] & 2)!=0)
+-#define patch_has_extra(p) (((p)[0] & 1)!=0)
++#define patch_byte_addressed(p) ((FW_U8((p)+0) & 4)!=0)
++#define patch_fully_opaque(p) ((FW_U8((p)+0) & 2)!=0)
++#define patch_has_extra(p) ((FW_U8((p)+0) & 1)!=0)
+ 
+ // vpatch style patches are stored differently
+-#define vpatch_width(p) ((p)[0] | (((p)[3]&0x2)<<7u))
+-#define vpatch_height(p) ((p)[1])
+-#define vpatch_colorcount(p) ((p)[2])
+-#define vpatch_type(p) ((p)[3]>>2)
+-#define vpatch_topoffset(p) ((int8_t)(p)[4])
+-#define vpatch_leftoffset(p) ((int8_t)(p)[5])
++#define vpatch_width(p) (FW_U8((p)+0) | ((FW_U8((p)+3)&0x2)<<7u))
++#define vpatch_height(p) (FW_U8((p)+1))
++#define vpatch_colorcount(p) (FW_U8((p)+2))
++#define vpatch_type(p) (FW_U8((p)+3)>>2)
++#define vpatch_topoffset(p) ((int8_t)FW_U8((p)+4))
++#define vpatch_leftoffset(p) ((int8_t)FW_U8((p)+5))
+ #define vpatch_palette(p) ((p)+6)
+-#define vpatch_has_shared_palette(p) ((p)[3]&1)
+-#define vpatch_shared_palette(p) ((vpatch_palette(p) + vpatch_colorcount(p))[0])
+-#define vpatch_data(p) (vpatch_palette(p) + vpatch_colorcount(p) + ((p)[3]&1))
++#define vpatch_has_shared_palette(p) (FW_U8((p)+3)&1)
++#define vpatch_shared_palette(p) (FW_U8(vpatch_palette(p) + vpatch_colorcount(p)))
++#define vpatch_data(p) (vpatch_palette(p) + vpatch_colorcount(p) + (FW_U8((p)+3)&1))
+ #define NUM_SHARED_PALETTES 3
+ extern const uint8_t vpatch_for_shared_palette[NUM_SHARED_PALETTES];
+ #endif
+diff -ruN a/src/v_video.c b/src/v_video.c
+--- a/src/v_video.c
++++ b/src/v_video.c
+@@ -70,6 +70,7 @@
+ #if USE_WHD
+ const uint8_t vpatch_for_shared_palette[NUM_SHARED_PALETTES] = {VPATCH_STBAR, VPATCH_STCFN033, VPATCH_WIBP1};
+ static const uint8_t *shared_palette8[NUM_SHARED_PALETTES];
++static uint8_t shared_palette_n[NUM_SHARED_PALETTES];   /* colours in each shared palette */
+ #endif
+ // villsa [STRIFE] Blending table used for Strife
+ byte *xlatab = NULL;
+@@ -186,19 +187,21 @@
+             assert(patch);
+             assert(vpatch_has_shared_palette(patch));
+             assert(vpatch_colorcount(patch));
+-            shared_palette8[i] = vpatch_palette(patch);
++            shared_palette8[i] = vpatch_palette(patch); shared_palette_n[i] = vpatch_colorcount(patch);
+         }
+     }
+     for (int l = 1; l < patchlist[0].header.size; l++) {
+         uint8_t *orig = dest_screen + (patchlist[l].entry.y) * SCREENWIDTH + patchlist[l].entry.x;
+         const patch_t *patch = resolve_vpatch_handle(patchlist[l].entry.patch_handle);
+         const uint8_t *pal;
++        uint8_t palbuf[256];   /* the palette is copied out of the data file once per patch */
+         if (!vpatch_has_shared_palette(patch)) {
+-            pal = vpatch_palette(patch);
++            FW_COPY(palbuf, vpatch_palette(patch), vpatch_colorcount(patch));
+         } else {
+             assert(vpatch_shared_palette(patch) < NUM_SHARED_PALETTES);
+-            pal = shared_palette8[vpatch_shared_palette(patch)];
++            FW_COPY(palbuf, shared_palette8[vpatch_shared_palette(patch)], shared_palette_n[vpatch_shared_palette(patch)]);
+         }
++        pal = palbuf;
+         int repeat = patchlist[l].entry.repeat;
+         int w = vpatch_width(patch);
+         int h0 = vpatch_height(patch);
+@@ -226,9 +229,9 @@
+                 for(;skip_top--; desttop += SCREENWIDTH) {
+                     uint8_t gap;
+                     int p = 0;
+-                    while (0xff != (gap = *data++)) {
++                    while (0xff != (gap = FW_U8(data++))) {
+                         p += gap;
+-                        int len = *data++;
++                        int len = FW_U8(data++);
+                         for (int i = 1; i < len; i += 2) {
+                             p += 2;
+                             data++;
+@@ -247,16 +250,16 @@
+                     uint8_t *p = desttop;
+                     uint8_t *pend = desttop + w;
+                     uint8_t gap;
+-                    while (0xff != (gap = *data++)) {
++                    while (0xff != (gap = FW_U8(data++))) {
+                         p += gap;
+-                        int len = *data++;
++                        int len = FW_U8(data++);
+                         for (int i = 1; i < len; i += 2) {
+-                            uint v = *data++;
++                            uint v = FW_U8(data++);
+                             *p++ = pal[v & 0xf];
+                             *p++ = pal[v >> 4];
+                         }
+                         if (len & 1) {
+-                            *p++ = pal[(*data++) & 0xf];
++                            *p++ = pal[(FW_U8(data++)) & 0xf];
+                         }
+                         assert(p <= pend);
+                         if (p == pend) break;
+@@ -271,13 +274,13 @@
+                 for (; h > 0; h--, desttop += SCREENWIDTH) {
+                     uint8_t *p = desttop;
+                     for (int i = 0; i < w / 2; i++) {
+-                        uint v = *data++;
++                        uint v = FW_U8(data++);
+                         if (v & 0xf) p[0] = pal[v & 0xf];
+                         if (v >> 4) p[1] = pal[v >> 4];
+                         p += 2;
+                     }
+                     if (w & 1) {
+-                        uint v = *data++;
++                        uint v = FW_U8(data++);
+                         if (v & 0xf) p[0] = pal[v & 0xf];
+                     }
+                 }
+@@ -286,13 +289,13 @@
+                 for (; h > 0; h--, desttop += SCREENWIDTH) {
+                     uint8_t *p = desttop;
+                     for (int i = 0; i < w / 2; i++) {
+-                        uint v = *data++;
++                        uint v = FW_U8(data++);
+                         p[0] = pal[v & 0xf];
+                         p[1] = pal[v >> 4];
+                         p += 2;
+                     }
+                     if (w & 1) {
+-                        uint v = *data++;
++                        uint v = FW_U8(data++);
+                         p[0] = pal[v & 0xf];
+                     }
+                 }
+@@ -305,13 +308,13 @@
+                     uint8_t *p = desttop;
+                     uint8_t *pend = desttop + w;
+                     uint8_t gap;
+-                    while (0xff != (gap = *data++)) {
++                    while (0xff != (gap = FW_U8(data++))) {
+                         p += gap;
+-                        int len = *data++;
++                        int len = FW_U8(data++);
+                         for (int i = 3; i < len; i += 4) {
+-                            uint v = *data++;
+-                            v |= (*data++) << 8;
+-                            v |= (*data++) << 16;
++                            uint v = FW_U8(data++);
++                            v |= (FW_U8(data++)) << 8;
++                            v |= (FW_U8(data++)) << 16;
+                             *p++ = pal[v & 0x3f];
+                             *p++ = pal[(v >> 6) & 0x3f];
+                             *p++ = pal[(v >> 12) & 0x3f];
+@@ -319,15 +322,15 @@
+                         }
+                         len &= 3;
+                         if (len--) {
+-                            uint v = *data++;
++                            uint v = FW_U8(data++);
+                             *p++ = pal[v & 0x3f];
+                             if (len--) {
+                                 v >>= 6;
+-                                v |= (*data++) << 2;
++                                v |= (FW_U8(data++)) << 2;
+                                 *p++ = pal[v & 0x3f];
+                                 if (len--) {
+                                     v >>= 6;
+-                                    v |= (*data++) << 4;
++                                    v |= (FW_U8(data++)) << 4;
+                                     *p++ = pal[v & 0x3f];
+                                     assert(!len);
+                                 }
+@@ -343,11 +346,11 @@
+                     uint8_t *p = desttop;
+                     uint8_t *pend = desttop + w;
+                     uint8_t gap;
+-                    while (0xff != (gap = *data++)) {
++                    while (0xff != (gap = FW_U8(data++))) {
+                         p += gap;
+-                        int len = *data++;
++                        int len = FW_U8(data++);
+                         for (int i = 0; i < len; i++) {
+-                            *p++ = pal[*data++];
++                            *p++ = pal[FW_U8(data++)];
+                         }
+                         assert(p <= pend);
+                         if (p == pend) break;
+@@ -359,9 +362,9 @@
+                 // fall thru
+             case vp_border: {
+                 for (; h > 0; h--, desttop += SCREENWIDTH) {
+-                    desttop[0] = data[0];
+-                    for (int i = 1; i < w - 1; i++) desttop[i] = data[1];
+-                    desttop[w - 1] = data[2];
++                    desttop[0] = FW_U8(data);
++                    for (int i = 1; i < w - 1; i++) desttop[i] = FW_U8(data + 1);
++                    desttop[w - 1] = FW_U8(data + 2);
+                     data += 3;
+                 }
+                 break;
+diff -ruN a/src/w_file_memory.c b/src/w_file_memory.c
+--- a/src/w_file_memory.c
++++ b/src/w_file_memory.c
+@@ -26,6 +26,7 @@
+ #include "w_file.h"
+ #include "z_zone.h"
+ #include "w_wad.h"
++#include "fox_whx.h"
+ #if PICO_BUILD
+ #include "pico.h"
+ #include "pico/binary_info.h"
+@@ -73,7 +74,7 @@
+         panic("NO WAD");
+ #else
+ #if WHD_SUPER_TINY
+-    if (fileo.mapped[0] != 'I' || fileo.mapped[1] != 'W' || fileo.mapped[2] != 'H' || fileo.mapped[3] != 'X') {
++    if (FW_U8(fileo.mapped + 0) != 'I' || FW_U8(fileo.mapped + 1) != 'W' || FW_U8(fileo.mapped + 2) != 'H' || FW_U8(fileo.mapped + 3) != 'X') {
+ #if PICO_ON_DEVICE
+         panic("No WXD at %p\n", TINY_WAD_ADDR);
+ #else
+@@ -103,7 +104,7 @@
+ size_t W_Memory_Read(wad_file_t *wad, unsigned int offset,
+                    void *buffer, size_t buffer_len)
+ {
+-    memcpy(buffer, wad->mapped + offset, buffer_len);
++    FW_COPY(buffer, wad->mapped + offset, buffer_len);
+     return buffer_len;
+ }
+ 
+diff -ruN a/src/w_wad.c b/src/w_wad.c
+--- a/src/w_wad.c
++++ b/src/w_wad.c
+@@ -172,8 +172,8 @@
+     numlumps = memory_wad_numlumps;
+     lumphash = memory_wad_lumphash;
+ #else
+-    numlumps = ((wadinfo_t *)whd_map_base)->numlumps;
+-    lump_offsets = (const uint32_t *)(whd_map_base + ((wadinfo_t *)whd_map_base)->infotableofs);
++    numlumps = FW_U32(&((wadinfo_t *)whd_map_base)->numlumps);
++    lump_offsets = (const uint32_t *)(whd_map_base + FW_U32(&((wadinfo_t *)whd_map_base)->infotableofs));
+     whdheader = (const whdheader_t*)(whd_map_base + sizeof(wadinfo_t));
+     lump_names = (lump_name_info_t *)(whd_map_base + sizeof(wadinfo_t) + sizeof(whdheader_t) + (numlumps + 1) * 4);
+ #endif
+@@ -347,12 +347,13 @@
+     }
+ #else
+     int left = 0;
+-    int right = whdheader->num_named_lumps;
++    int right = FW_U16(&whdheader->num_named_lumps);
+     do {
+         int center = (left + right) / 2;
+-        int diff = strcasecmp(name, lump_names[center].name);
++        char lname[10]; FW_COPY(lname, lump_names[center].name, 10);
++        int diff = strcasecmp(name, lname);
+         if (!diff) {
+-            return (lumpindex_t )lump_names[center].num;
++            return (lumpindex_t )FW_U16(&lump_names[center].num);
+         } else if (diff < 0) {
+             right = center;
+         } else {
+@@ -391,7 +392,7 @@
+ #if !USE_WHD
+     return lump->size;
+ #else
+-    return ((lump[1] - lump[0])&0xffffffu) - (lump[0]>>30); // just the address of the next minus this one (argh i guess we mauy have alignment issues)
++    return ((FW_U32(lump + 1) - FW_U32(lump))&0xffffffu) - (FW_U32(lump)>>30); // just the address of the next minus this one (argh i guess we mauy have alignment issues)
+ #endif
+ }
+ 
+@@ -439,7 +440,7 @@
+     }
+     #else
+     printf("WARNING: W_ReadLump size %d\n", lump_size(l));
+-    memcpy(dest, lump_data(l), lump_size(l));
++    FW_COPY(dest, lump_data(l), lump_size(l));
+     #endif
+ }
+ 
+diff -ruN a/src/w_wad.h b/src/w_wad.h
+--- a/src/w_wad.h
++++ b/src/w_wad.h
+@@ -25,6 +25,7 @@
+ 
+ #include "doomtype.h"
+ #include "w_file.h"
++#include "fox_whx.h"
+ 
+ 
+ //
+@@ -96,7 +97,7 @@
+ #if !USE_WHD
+     return (const uint8_t *)lump->mem;
+ #else
+-    return whd_map_base + ((*lump)&0xffffffu);
++    return whd_map_base + (FW_U32(lump)&0xffffffu);
+ #endif
+ }
+ #endif

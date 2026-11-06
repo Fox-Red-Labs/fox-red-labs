@@ -1,0 +1,8 @@
+{
+  "service": "Led Button",
+  "uuid": "00001523-1212-efde-1523-785feabcd123",
+  "characteristics": [
+    {"name": "Button", "uuid": "00001524-1212-efde-1523-785feabcd123", "properties": ["read", "notify"], "length": 1},
+    {"name": "Led", "uuid": "00001525-1212-efde-1523-785feabcd123", "properties": ["read", "write"], "length": 1}
+  ]
+}

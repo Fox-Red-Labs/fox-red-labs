@@ -1,0 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
+
+config SHIELD_BOOSTXL_EDUMKII
+	def_bool $(shields_list_contains,boostxl_edumkii)

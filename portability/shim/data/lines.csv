@@ -1,0 +1,11 @@
+cell,m0_lines,f3_lines,identical,m0_only,f3_only,a_shim,a_overlay,a_flags,b_shim
+adc_singlechannel / adcsinglechannel,148,142,96,52,46,1,4,1,0
+gpio_interrupt / gpiointerrupt,52,63,36,16,27,0,0,4,2
+i2c_controller / i2ccontroller,210,204,155,55,49,1,0,1,2
+i2c_target / i2ctarget,374,317,234,140,83,2,3,2,3
+i2c_tmp / i2ctmp,180,190,138,42,52,2,0,2,1
+spi_controller / spicontroller,208,214,153,55,61,2,0,3,3
+spi_peripheral / spiperipheral,232,246,171,61,75,2,0,3,3
+uart_callback / uart2callback,107,88,34,73,54,15,0,0,14
+uart_echo / uart2echo,55,63,23,32,40,12,0,0,13
+empty_freertos / empty,32,36,21,11,15,1,0,1,1

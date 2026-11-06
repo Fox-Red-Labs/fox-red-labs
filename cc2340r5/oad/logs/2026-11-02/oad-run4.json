@@ -1,0 +1,16 @@
+{
+ "image": "cc2340r5/oad/images/frl_oad_v2.bin",
+ "version": "2.0.0+0",
+ "send_bytes": 241664,
+ "name": "FRL OAD 1",
+ "address": "0E69F562-4083-27CB-865E-2A09510C3889",
+ "scan_s": 4.25,
+ "connect_s": 0.85,
+ "att_mtu": 251,
+ "running_version": "1.0.0",
+ "block_size": 240,
+ "blocks": 1024,
+ "transfer_s": 31.27,
+ "kbit_s": 61.8,
+ "enable_status": "SUCCESS"
+}

@@ -1,0 +1,26 @@
+// @cliArgs --board /ti/boards/LP_EM_CC1354P10_1 --rtos nortos
+// Post-quantum join image for the LP-CC1354P10-1: the bench's base configuration (LED, backchannel UART, custom power
+// policy tbBusyPolicy) with a 4 kB receive ring buffer on the UART (a ciphertext is 2,197 characters) and the TRNG.
+
+var Power = scripting.addModule("/ti/drivers/Power");
+
+system.getScript("kernel_config_release.syscfg.js");
+
+var GPIO = scripting.addModule("/ti/drivers/GPIO");
+var gpio = GPIO.addInstance();
+gpio.$hardware = system.deviceData.board.components.LED0;
+gpio.$name = "CONFIG_GPIO_LED_0";
+
+var UART2 = scripting.addModule("/ti/drivers/UART2");
+var uart2 = UART2.addInstance();
+uart2.$hardware = system.deviceData.board.components.XDS110UART;
+uart2.$name = "CONFIG_UART2_0";
+uart2.rxRingBufferSize = 4096;
+
+var TRNG = scripting.addModule("/ti/drivers/TRNG");
+var trng = TRNG.addInstance();
+trng.$name = "CONFIG_TRNG_0";
+
+Power.enablePolicy = false;
+Power.policyFunction = "Custom";
+Power.policyCustomFunction = "tbBusyPolicy";

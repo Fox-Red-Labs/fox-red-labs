@@ -1,0 +1,16 @@
+identifier: lp_mspm0l1306
+name: TI MSPM0L1306 LaunchPad (out of tree)
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+  - gnuarmemb
+  - xtools
+  - cross-compile
+ram: 4
+flash: 64
+supported:
+  - gpio
+  - pinctrl
+  - uart
+vendor: ti

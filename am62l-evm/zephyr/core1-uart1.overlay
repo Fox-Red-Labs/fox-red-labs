@@ -1,0 +1,16 @@
+/* Image A: console on SoC UART1 (0x02810000), FT4232 port B on J7, 115200. UART0 stays off so Linux's console (UART0) is untouched.
+ * Clock and power-domain properties deleted like uart0 in sram-all.overlay: no SCMI. Linux must have left UART1 clocked and pin-muxed
+ * (see the arrival plan, E242 step 3); if not, this image is silent and image B is the path. Apply after sram-all.overlay. */
+/ {
+	chosen {
+		zephyr,console = &main_uart1;
+		zephyr,shell-uart = &main_uart1;
+	};
+};
+&main_uart0 { status = "disabled"; };
+&main_uart1 {
+	/delete-property/ clocks;
+	/delete-property/ power-domains;
+	current-speed = <115200>;
+	status = "okay";
+};

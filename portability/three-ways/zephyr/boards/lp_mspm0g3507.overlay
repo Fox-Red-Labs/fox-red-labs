@@ -1,0 +1,6 @@
+/* Three ways: ADC0 channel 2 (PA25). The LED is the board's led0 (PB22, blue). */
+/ {
+	zephyr,user {
+		adc-channel = <2>;
+	};
+};

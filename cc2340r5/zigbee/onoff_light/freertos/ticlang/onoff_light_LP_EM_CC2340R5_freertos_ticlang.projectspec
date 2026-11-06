@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectSpec>
+    <applicability>
+        <when>
+            <context
+                deviceFamily="ARM"
+                deviceId="Cortex M.CC2340R5"
+            />
+        </when>
+    </applicability>
+
+    <project
+        title="On Off Light Example"
+        name="onoff_light_LP_EM_CC2340R5_freertos_ticlang"
+        configurations="Debug"
+        toolChain="TICLANG"
+        cgtVersion="TICLANG_4.0.4.LTS"
+        connection="TIXDS110_Connection.xml"
+        device="Cortex M.CC2340R5"
+        ignoreDefaultDeviceSettings="true"
+        ignoreDefaultCCSSettings="true"
+        products="com.ti.SIMPLELINK_LOWPOWER_F3_SDK;sysconfig"
+        compilerBuildOptions="
+            -I${PROJECT_ROOT}
+            -I${PROJECT_ROOT}/${ConfigName}
+            -DSYNC_WRITE
+            -DZB_TI_F3_ZBOSS
+            -Wno-gnu-folding-constant
+            -Wno-unaligned-access
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source/ti/zigbee/osif/include
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source/ti/zigbee/include
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source/ti/common/cc26xx/flash_interface/
+            -DZB_DEFAULT_VENDOR
+            -Oz
+            -flto
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/kernel/freertos
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source/ti/posix/ticlang
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source/third_party/freertos/include
+            -I${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source/third_party/freertos/portable/GCC/ARM_CM0
+            -mcpu=cortex-m0plus
+            -march=thumbv6m
+            -mfloat-abi=soft
+            -mthumb
+            -Wall
+        "
+        linkerBuildOptions="
+            -Wl,--reread_libs 
+            -L${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/source
+            -L${PROJECT_BUILD_DIR}/syscfg
+            -lti_utils_build_linker.cmd.genlibs
+            -Wl,--rom_model
+            -Wl,--warn_sections
+            -L${CG_TOOL_ROOT}/lib
+            -llibc.a
+        "
+        postBuildStep="
+            ${COM_TI_SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR}/tools/common/crc_tool/crc_tool patch-image --elf ${BuildDirectory}/${BuildArtifactFileBaseName}.out --symbol-prefix ti_utils_build_GenMap_sym_CRC --output ${BuildDirectory}/${BuildArtifactFileBaseName}.out;
+            ${CG_TOOL_ROOT}/bin/tiarmobjcopy -O ihex ${BuildDirectory}/${BuildArtifactFileBaseName}.out ${BuildDirectory}/${BuildArtifactFileBaseName}.hex
+        "
+        sysConfigBuildOptions="
+            --compiler ticlang
+        "
+        description="On Off Light Example">
+        <property name="buildProfile" value="release"/>
+        <property name="isHybrid" value="true"/>
+        <file path="../../on_off_light.c" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../../on_off_light.syscfg" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../../README.md" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+        <file path="../../osif/ti_f3_main.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="osif">
+        </file>
+        <file path="../../osif/ti_f3_led_buttons.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="osif">
+        </file>
+        <file path="../../dmm/rcl_stub_dmm.c" openOnCreation="false" excludeFromBuild="false" action="copy" targetDirectory="dmm">
+        </file>
+        <file path="../../freertos/ticlang/lpf3_zigbee_freertos.cmd" openOnCreation="false" excludeFromBuild="false" action="copy">
+        </file>
+    </project>
+</projectSpec>

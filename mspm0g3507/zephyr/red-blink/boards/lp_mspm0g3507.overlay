@@ -1,0 +1,5 @@
+/* Point led0 at the red channel of the RGB LED (PB26) instead of blue (PB22). */
+&led0 {
+	gpios = <&gpiob 26 GPIO_ACTIVE_HIGH>;
+	label = "Red LED";
+};

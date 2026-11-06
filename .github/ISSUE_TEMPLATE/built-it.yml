@@ -1,0 +1,53 @@
+name: Share a project
+description: You followed a recipe on your own board. Give the board, the versions, one proof and what did not work.
+title: "<board> <project>: built it"
+labels: ["report", "built"]
+body:
+  - type: markdown
+    attributes:
+      value: "Thank you. Your report becomes a row on that project's page, in your words and marked as yours (data/community/README.md has the format). Your GitHub handle is the credit; say so in the last field if you would rather stay anonymous."
+  - type: input
+    id: board
+    attributes:
+      label: Board
+      description: "What it runs on: the board id (the folder name; board-mspm0g3507.html gives mspm0g3507), then the kit name and the revision printed on the board if you can see one."
+      placeholder: mspm0g3507 (LP-MSPM0G3507, rev E3)
+    validations:
+      required: true
+  - type: input
+    id: project
+    attributes:
+      label: Project
+      description: The short name from the project page's address (project-blink.html gives blink), or the project's title.
+      placeholder: blink
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Your machine
+      placeholder: macOS 15.7 on Apple Silicon, or Windows 11, or Ubuntu 24.04
+    validations:
+      required: true
+  - type: input
+    id: tools
+    attributes:
+      label: Tool versions
+      description: "What it runs on: the SDK or tool version you used, as you had it."
+      placeholder: MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS
+    validations:
+      required: true
+  - type: textarea
+    id: proof
+    attributes:
+      label: Photo, log or measurement
+      description: "A photo, a clip or a log that shows it ran. Drag in a photo, paste the last lines of the log, or give a number with its unit and how long it took (for example 2 min 40 s to the first blink)."
+    validations:
+      required: true
+  - type: textarea
+    id: text
+    attributes:
+      label: Anything that did not work
+      description: Where you slowed down or had to change something. Write "nothing" if all of it worked.
+    validations:
+      required: true

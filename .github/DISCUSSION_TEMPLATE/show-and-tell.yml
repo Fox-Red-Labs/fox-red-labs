@@ -1,0 +1,37 @@
+title: "<board>: <what you built>"
+labels: ["show-and-tell"]
+body:
+  - type: markdown
+    attributes:
+      value: "A post should have its four parts: what you built or ported, what it runs on, a photo or a clip, and anything that did not work. A post with all four parts can be repeated by the next person. If a step failed and you want it fixed on the page, use the [Report a problem](https://github.com/Fox-Red-Labs/fox-red-labs/issues/new?template=broke-here.yml) form instead."
+  - type: textarea
+    id: what
+    attributes:
+      label: What you built or ported
+      description: "One or two lines, and the project it started from."
+      placeholder: The LED-switching Zigbee light from docs/builds/zigbee-light.md, joined to my own Home Assistant.
+    validations:
+      required: true
+  - type: input
+    id: runs_on
+    attributes:
+      label: What it runs on
+      description: "The board id and the SDK or tool version."
+      placeholder: cc2340r5 (LP-EM-CC2340R5), SimpleLink Low Power F3 SDK 9.21.00.36
+    validations:
+      required: true
+  - type: textarea
+    id: proof
+    attributes:
+      label: A photo, a clip or a log
+      description: "A photo, a log or a measurement with its unit."
+      placeholder: Drag a photo into this box, or paste the last lines of the log.
+    validations:
+      required: true
+  - type: textarea
+    id: not_worked
+    attributes:
+      label: Anything that did not work
+      description: "Or “nothing” if all of it worked."
+    validations:
+      required: true

@@ -1,0 +1,291 @@
+{
+ "lp_mspm0g3507": {
+  "counts": {
+   "built": 21,
+   "filtered": 185,
+   "error": 1
+  },
+  "filtered_by_reason": {
+   "runtime filter": 32,
+   "No hardware support for {'pwm'}": 6,
+   "Not in testsuite platform allow list": 78,
+   "Not in testsuite arch allow list": 1,
+   "No hardware support for {'adc'}": 6,
+   "No hardware support for {'arduino_spi'}": 1,
+   "No hardware support for {'charger'}": 1,
+   "No hardware support for {'counter'}": 2,
+   "No hardware support for {'crc'}": 1,
+   "No hardware support for {'dac'}": 1,
+   "No hardware support for {'arduino_spi', 'arduino_i2c', 'arduino_gpio'}": 1,
+   "No hardware support for {'espi'}": 1,
+   "No hardware support for {'spi'}": 13,
+   "No hardware support for {'i2c'}": 6,
+   "No hardware support for {'arduino_i2c'}": 4,
+   "No hardware support for {'lora'}": 8,
+   "No hardware support for {'mspi'}": 3,
+   "No hardware support for {'opamp'}": 1,
+   "No hardware support for {'psi5'}": 1,
+   "No hardware support for {'rtc'}": 1,
+   "No hardware support for {'sent'}": 1,
+   "No hardware support for {'serial gpio'}": 1,
+   "No hardware support for {'gpio input'}": 1,
+   "No hardware support for {'dma'}": 1,
+   "No hardware support for {'video'}": 2,
+   "No hardware support for {'video', 'netif'}": 1,
+   "No hardware support for {'arduino_serial'}": 1,
+   "No hardware support for {'w1'}": 1,
+   "No hardware support for {'watchdog'}": 8
+  },
+  "failed": [
+   {
+    "scenario": "sample.drivers.crypto.mbedtls",
+    "path": "samples/drivers/crypto",
+    "first_error": "error: Aborting due to Kconfig warnings"
+   }
+  ],
+  "sizes": {
+   "samples/hello_world": {
+    "flash_used": 9884,
+    "flash_size": 131072,
+    "ram_used": 3880,
+    "ram_size": 32768
+   },
+   "samples/basic/blinky": {
+    "flash_used": 11932,
+    "flash_size": 131072,
+    "ram_used": 3976,
+    "ram_size": 32768
+   }
+  },
+  "total_scenarios": 207
+ },
+ "lp_mspm0g3519": {
+  "counts": {
+   "built": 23,
+   "filtered": 183,
+   "error": 1
+  },
+  "filtered_by_reason": {
+   "runtime filter": 30,
+   "No hardware support for {'pwm'}": 6,
+   "Not in testsuite platform allow list": 78,
+   "Not in testsuite arch allow list": 1,
+   "No hardware support for {'adc'}": 6,
+   "No hardware support for {'arduino_spi'}": 1,
+   "No hardware support for {'charger'}": 1,
+   "No hardware support for {'counter'}": 2,
+   "No hardware support for {'crc'}": 1,
+   "No hardware support for {'dac'}": 1,
+   "No hardware support for {'arduino_gpio', 'arduino_spi', 'arduino_i2c'}": 1,
+   "No hardware support for {'espi'}": 1,
+   "No hardware support for {'spi'}": 13,
+   "No hardware support for {'i2c'}": 6,
+   "No hardware support for {'arduino_i2c'}": 4,
+   "No hardware support for {'lora'}": 8,
+   "No hardware support for {'mspi'}": 3,
+   "No hardware support for {'opamp'}": 1,
+   "No hardware support for {'psi5'}": 1,
+   "No hardware support for {'rtc'}": 1,
+   "No hardware support for {'sent'}": 1,
+   "No hardware support for {'serial gpio'}": 1,
+   "No hardware support for {'gpio input'}": 1,
+   "No hardware support for {'dma'}": 1,
+   "No hardware support for {'video'}": 2,
+   "No hardware support for {'video', 'netif'}": 1,
+   "No hardware support for {'arduino_serial'}": 1,
+   "No hardware support for {'w1'}": 1,
+   "No hardware support for {'watchdog'}": 8
+  },
+  "failed": [
+   {
+    "scenario": "sample.drivers.crypto.mbedtls",
+    "path": "samples/drivers/crypto",
+    "first_error": "error: Aborting due to Kconfig warnings"
+   }
+  ],
+  "sizes": {
+   "samples/hello_world": {
+    "flash_used": 10004,
+    "flash_size": 262144,
+    "ram_used": 3960,
+    "ram_size": 65536
+   },
+   "samples/basic/blinky": {
+    "flash_used": 12052,
+    "flash_size": 262144,
+    "ram_used": 4048,
+    "ram_size": 65536
+   }
+  },
+  "total_scenarios": 207
+ },
+ "lp_mspm0l2228": {
+  "counts": {
+   "built": 20,
+   "filtered": 186,
+   "error": 1
+  },
+  "filtered_by_reason": {
+   "runtime filter": 31,
+   "No hardware support for {'pwm'}": 6,
+   "Not in testsuite platform allow list": 78,
+   "Not in testsuite arch allow list": 1,
+   "No hardware support for {'adc'}": 6,
+   "No hardware support for {'arduino_spi'}": 1,
+   "No hardware support for {'can'}": 2,
+   "No hardware support for {'charger'}": 1,
+   "No hardware support for {'counter'}": 2,
+   "No hardware support for {'crc'}": 1,
+   "No hardware support for {'dac'}": 1,
+   "No hardware support for {'arduino_i2c', 'arduino_gpio', 'arduino_spi'}": 1,
+   "No hardware support for {'espi'}": 1,
+   "No hardware support for {'spi'}": 13,
+   "No hardware support for {'i2c'}": 6,
+   "No hardware support for {'arduino_i2c'}": 4,
+   "No hardware support for {'lora'}": 8,
+   "No hardware support for {'mspi'}": 3,
+   "No hardware support for {'opamp'}": 1,
+   "No hardware support for {'psi5'}": 1,
+   "No hardware support for {'rtc'}": 1,
+   "No hardware support for {'sent'}": 1,
+   "No hardware support for {'serial gpio'}": 1,
+   "No hardware support for {'gpio input'}": 1,
+   "No hardware support for {'dma'}": 1,
+   "No hardware support for {'video'}": 2,
+   "No hardware support for {'netif', 'video'}": 1,
+   "No hardware support for {'arduino_serial'}": 1,
+   "No hardware support for {'w1'}": 1,
+   "No hardware support for {'watchdog'}": 8
+  },
+  "failed": [
+   {
+    "scenario": "sample.drivers.crypto.mbedtls",
+    "path": "samples/drivers/crypto",
+    "first_error": "error: Aborting due to Kconfig warnings"
+   }
+  ],
+  "sizes": {
+   "samples/hello_world": {
+    "flash_used": 9424,
+    "flash_size": 262144,
+    "ram_used": 3832,
+    "ram_size": 32768
+   },
+   "samples/basic/blinky": {
+    "flash_used": 11376,
+    "flash_size": 262144,
+    "ram_used": 3888,
+    "ram_size": 32768
+   }
+  },
+  "total_scenarios": 207
+ },
+ "lp_em_cc2340r5": {
+  "counts": {
+   "built": 24,
+   "filtered": 181,
+   "error": 1,
+   "skipped": 1
+  },
+  "filtered_by_reason": {
+   "runtime filter": 26,
+   "No hardware support for {'pwm'}": 6,
+   "Not in testsuite platform allow list": 78,
+   "Not in testsuite arch allow list": 1,
+   "No hardware support for {'adc'}": 6,
+   "No hardware support for {'arduino_spi'}": 1,
+   "No hardware support for {'can'}": 2,
+   "No hardware support for {'charger'}": 1,
+   "No hardware support for {'counter'}": 2,
+   "No hardware support for {'crc'}": 1,
+   "No hardware support for {'dac'}": 1,
+   "No hardware support for {'arduino_gpio', 'arduino_i2c', 'arduino_spi'}": 1,
+   "No hardware support for {'espi'}": 1,
+   "No hardware support for {'spi'}": 13,
+   "No hardware support for {'i2c'}": 6,
+   "No hardware support for {'arduino_i2c'}": 4,
+   "No hardware support for {'lora'}": 8,
+   "No hardware support for {'mspi'}": 3,
+   "No hardware support for {'opamp'}": 1,
+   "No hardware support for {'psi5'}": 1,
+   "No hardware support for {'rtc'}": 1,
+   "No hardware support for {'sent'}": 1,
+   "No hardware support for {'serial gpio'}": 1,
+   "No hardware support for {'gpio input'}": 1,
+   "No hardware support for {'dma'}": 1,
+   "No hardware support for {'video'}": 2,
+   "No hardware support for {'video', 'netif'}": 1,
+   "No hardware support for {'arduino_serial'}": 1,
+   "No hardware support for {'w1'}": 1,
+   "No hardware support for {'watchdog'}": 8
+  },
+  "failed": [
+   {
+    "scenario": "sample.drivers.crypto.mbedtls",
+    "path": "samples/drivers/crypto",
+    "first_error": "error: Aborting due to Kconfig warnings"
+   }
+  ],
+  "sizes": {
+   "samples/hello_world": {
+    "flash_used": 9600,
+    "flash_size": 524288,
+    "ram_used": 4112,
+    "ram_size": 36864
+   },
+   "samples/basic/blinky": {
+    "flash_used": 10108,
+    "flash_size": 524288,
+    "ram_used": 4112,
+    "ram_size": 36864
+   }
+  },
+  "total_scenarios": 207
+ },
+ "lp_mspm0l1306": {
+  "counts": {
+   "built": 1,
+   "filtered": 206
+  },
+  "filtered_by_reason": {
+   "Not enough RAM": 130,
+   "No hardware support for {'pwm'}": 6,
+   "No hardware support for {'adc'}": 6,
+   "No hardware support for {'arduino_spi'}": 1,
+   "No hardware support for {'can'}": 2,
+   "No hardware support for {'charger'}": 1,
+   "No hardware support for {'counter'}": 2,
+   "No hardware support for {'crc'}": 1,
+   "No hardware support for {'dac'}": 1,
+   "No hardware support for {'arduino_i2c', 'arduino_spi', 'arduino_gpio'}": 1,
+   "No hardware support for {'espi'}": 1,
+   "No hardware support for {'spi'}": 13,
+   "No hardware support for {'i2c'}": 6,
+   "No hardware support for {'arduino_i2c'}": 4,
+   "No hardware support for {'lora'}": 8,
+   "No hardware support for {'mspi'}": 3,
+   "No hardware support for {'opamp'}": 1,
+   "No hardware support for {'psi5'}": 1,
+   "No hardware support for {'rtc'}": 1,
+   "No hardware support for {'sent'}": 1,
+   "No hardware support for {'serial gpio'}": 1,
+   "No hardware support for {'gpio input'}": 1,
+   "No hardware support for {'dma'}": 1,
+   "No hardware support for {'video'}": 2,
+   "No hardware support for {'netif', 'video'}": 1,
+   "No hardware support for {'arduino_serial'}": 1,
+   "No hardware support for {'w1'}": 1,
+   "No hardware support for {'watchdog'}": 8
+  },
+  "failed": [],
+  "sizes": {
+   "samples/hello_world": {
+    "flash_used": 9424,
+    "flash_size": 65536,
+    "ram_used": 3832,
+    "ram_size": 4096
+   }
+  },
+  "total_scenarios": 207
+ }
+}

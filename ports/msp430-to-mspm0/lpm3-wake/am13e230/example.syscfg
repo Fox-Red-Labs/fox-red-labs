@@ -1,0 +1,36 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+// Port of msp430fr243x_LPM3_01: a 1 s interval timer from the low-frequency clock wakes the chip from deep sleep and toggles an LED.
+// WWDT in interval mode (power domain 0, LFOSC) is the AM13 part closest to the MSP430 watchdog in interval mode.
+const gpio  = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1 = gpio.addInstance();
+const uart  = scripting.addModule("/drivers/uart", {}, false);
+const uart1 = uart.addInstance();
+const wwdt  = scripting.addModule("/drivers/wwdt", {}, false);
+const wwdt1 = wwdt.addInstance();
+const sysctl = scripting.addModule("/drivers/sysctl", {}, false);
+
+gpio1.$name                         = "GPIO_LEDS";
+gpio1.associatedPins[0].$name       = "USER_LED_1";
+gpio1.associatedPins[0].direction   = "OUTPUT";
+gpio1.associatedPins[0].pin.$assign = "PA5";
+
+uart1.$name                    = "APP_UART_0";
+uart1.targetBaudRate           = 115200;
+uart1.peripheral.rxPin.$assign = "PA1";
+uart1.peripheral.txPin.$assign = "PA0";
+uart1.txPinConfig.$name        = "drivers_gpio_v0_gpioPinConfig0";
+uart1.rxPinConfig.$name        = "drivers_gpio_v0_gpioPinConfig1";
+
+wwdt1.$name             = "APP_WWDT_0";
+wwdt1.wwdtMode          = "INTERVAL";
+wwdt1.sleepMode         = true;
+wwdt1.enabledInterrupts = true;
+wwdt1.registerInterrupt = true;
+wwdt1.periodCount       = "DL_WWDT_TIMER_PERIOD_15_BITS";
+wwdt1.clockDivider      = "DL_WWDT_CLOCK_DIVIDE_1";
+
+sysctl.peripheral.$suggestSolution = "SYSCTL";
+uart1.peripheral.$suggestSolution  = "UC1";

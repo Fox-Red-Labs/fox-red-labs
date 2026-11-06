@@ -1,0 +1,67 @@
+/*
+ * LP-MSPM0G3519, BoosterPack site 1.
+ * Joystick X (pin 2) is PA14 = ADC0 channel 12, joystick Y (pin 26) is
+ * PB25 = ADC0 channel 4.
+ * S1 (pin 33) is PA11 and S2 (pin 32) is PA12. PA11 is also the backchannel
+ * UART RX until J13 moves to 1-2.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <boosterpack/lp_mspm0g3519.dtsi>
+#include <zephyr/dt-bindings/clock/mspm0_clock.h>
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+&adc0 {
+	clocks = <&ckm MSPM0_CLOCK_ULPCLK>;
+	ti,clk-divider = <1>;
+	ti,clk-range = <6>;
+	max-result-reg = <12>;
+	pinctrl-0 = <&analog_pa14 &analog_pb25>;
+	pinctrl-names = "default";
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@c {
+		reg = <12>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+
+	channel@4 {
+		reg = <4>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+};
+
+/ {
+	/* One ADC, channels in increasing order: Y (pin 26) first, then X (pin 2). */
+	edumkii_joystick {
+		compatible = "analog-axis";
+
+		axis_y {
+			io-channels = <&adc0 4>;
+			in-min = <0>;
+			in-max = <4095>;
+			in-deadzone = <300>;
+			zephyr,axis = <INPUT_ABS_Y>;
+		};
+
+		axis_x {
+			io-channels = <&adc0 12>;
+			in-min = <0>;
+			in-max = <4095>;
+			in-deadzone = <300>;
+			zephyr,axis = <INPUT_ABS_X>;
+		};
+	};
+};
+
+#include "../common.dtsi"

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Desk display: Bluetooth setup page</title>
+<style>
+body{font-family:Barlow,system-ui,sans-serif;background:#f4efe6;color:#161312;max-width:760px;margin:24px auto;padding:0 16px}
+h1{font-size:28px}button{font:inherit;padding:10px 16px;border:2px solid #161312;background:#fff;border-radius:6px;cursor:pointer}
+button.go{background:#b42418;color:#fff;border-color:#b42418}input{font:inherit;padding:8px;width:100%;box-sizing:border-box;border:2px solid #6b625b;border-radius:6px}
+.card{background:#fff;border:1px solid #6b625b;border-radius:8px;padding:14px;margin:14px 0}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stat{font-size:22px;font-weight:600}.dim{color:#6b625b}pre{background:#161312;color:#f4efe6;padding:10px;border-radius:6px;min-height:90px;overflow:auto;font-size:15px}
+#oled{background:#000;color:#8cf;font-family:monospace;padding:10px;width:21ch;line-height:1.25;white-space:pre;border-radius:4px}
+</style></head><body>
+<h1>Desk display</h1>
+<p class="dim">Chrome or Edge. Serve this folder with <code>python3 -m http.server 8000</code> and open <code>http://localhost:8000/</code>.</p>
+<div class="card row"><button class="go" id="conn">Connect to "FRL Desk"</button><button id="disc" disabled>Disconnect</button>
+<span class="stat" id="link">Not connected</span></div>
+<div class="card"><div class="row"><div>Signal<br><span class="stat" id="rssi">n/a</span></div>
+<div>Last echo<br><span class="stat" id="rtt">n/a</span></div><div>Echoes ok<br><span class="stat" id="okc">0</span></div></div>
+<p class="dim">Signal comes from the browser's advertisement watch and may stay n/a on some browsers. The echo time is the round trip to the board and back.</p></div>
+<div class="card"><label>Line (1 to 8)
+<div class="row"><input id="ln" type="number" min="1" max="8" value="3" style="width:80px"><input id="txt" maxlength="21" placeholder="up to 21 characters" style="flex:1"><button class="go" id="send" disabled>Send</button></div></label>
+<div class="row" style="margin-top:10px"><button id="time" disabled>Send time now</button><button id="cls" disabled>Clear</button></div></div>
+<div class="card"><b>What the board draws</b><div id="oled"></div><pre id="log"></pre></div>
+<script>
+const NUS='6e400001-b5a3-f393-e0a9-e50e24dcca9e',RX='6e400002-b5a3-f393-e0a9-e50e24dcca9e',TX='6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+let dev,rx,t0,okc=0,buf='';const $=id=>document.getElementById(id);const lines=Array(8).fill('');
+const log=s=>{$('log').textContent=(s+'\n'+$('log').textContent).slice(0,2000)};
+function draw(){$('oled').textContent=lines.map(l=>l.padEnd(21).slice(0,21)).join('\n')}draw();
+function ui(on){['disc','send','time','cls'].forEach(i=>$(i).disabled=!on);$('conn').disabled=on;$('link').textContent=on?'Linked':'Not connected'}
+async function send(s){t0=performance.now();await rx.writeValueWithoutResponse(new TextEncoder().encode(s+'\n'));
+ const m=/^(\d):(.*)$/.exec(s);if(m)lines[m[1]-1]=m[2];else if(s==='cls')lines.fill('');draw()}
+$('conn').onclick=async()=>{try{
+ dev=await navigator.bluetooth.requestDevice({filters:[{name:'FRL Desk'}],optionalServices:[NUS]});
+ dev.addEventListener('gattserverdisconnected',()=>{ui(false);log('link lost')});
+ if(dev.watchAdvertisements){dev.addEventListener('advertisementreceived',e=>$('rssi').textContent=e.rssi+' dBm');try{await dev.watchAdvertisements()}catch(e){}}
+ const s=await(await dev.gatt.connect()).getPrimaryService(NUS);rx=await s.getCharacteristic(RX);const tx=await s.getCharacteristic(TX);
+ await tx.startNotifications();tx.addEventListener('characteristicvaluechanged',e=>{buf+=new TextDecoder().decode(e.target.value);
+  while(buf.includes('\n')){const l=buf.slice(0,buf.indexOf('\n'));buf=buf.slice(buf.indexOf('\n')+1);$('rtt').textContent=(performance.now()-t0).toFixed(0)+' ms';$('okc').textContent=++okc;log('echo: '+l)}});
+ ui(true);log('connected')}catch(e){log('error: '+e.message)}};
+$('disc').onclick=()=>dev&&dev.gatt.disconnect();
+$('send').onclick=()=>send($('ln').value+':'+$('txt').value);
+$('time').onclick=()=>send('2:'+new Date().toTimeString().slice(0,8));
+$('cls').onclick=()=>send('cls');
+</script></body></html>

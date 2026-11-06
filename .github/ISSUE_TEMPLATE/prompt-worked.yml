@@ -1,0 +1,48 @@
+name: A prompt that worked
+description: The words you typed to your AI assistant and what came out. It becomes a row in the community reports.
+title: "<board>: a prompt that worked"
+labels: ["report", "prompt"]
+body:
+  - type: markdown
+    attributes:
+      value: "Your prompt is stored as typed, credited if you like. Take out anything private before posting: file paths with your name, keys, addresses."
+  - type: input
+    id: board
+    attributes:
+      label: Board
+      description: Start with the short id from the board page's address (board-mspm0l1306.html gives mspm0l1306), then the kit name.
+      placeholder: mspm0l1306 (LP-MSPM0L1306)
+    validations:
+      required: true
+  - type: input
+    id: project
+    attributes:
+      label: Project
+      description: The short name from the project page's address, if the prompt belongs to one project.
+      placeholder: build-from-terminal
+  - type: input
+    id: tools
+    attributes:
+      label: Assistant and versions
+      placeholder: Claude Code 2.1.278 in VS Code, CCStudio 21.0.1 with its MCP servers on
+    validations:
+      required: true
+  - type: textarea
+    id: text
+    attributes:
+      label: The prompt
+      description: Exactly as you typed it.
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: What it produced
+      description: What happened, and how you checked it (the LED, the serial line, the number).
+    validations:
+      required: true
+  - type: input
+    id: credit
+    attributes:
+      label: Credit
+      description: Your GitHub handle if you want the entry to carry it.

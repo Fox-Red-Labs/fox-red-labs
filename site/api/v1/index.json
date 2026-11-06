@@ -1,0 +1,43 @@
+{
+ "schema_version": "1.0",
+ "generated": "2026-11-03",
+ "files": {
+  "boards.json": {
+   "rows": 23,
+   "source": "data/boards.csv",
+   "sha256": "9472e4b267cb65fc8b8dd0ae031426771fffc8a0a627b909da779cb4907a6135"
+  },
+  "results.json": {
+   "rows": 7368,
+   "source": "data/results/*.csv",
+   "sha256": "5259101c563250cecb4a2354fbdeccc8d125d704a3801aed3553e5890e6bfb44"
+  },
+  "parts.json": {
+   "rows": 66,
+   "source": "data/parts.json",
+   "sha256": "0a99d68771eaf51624897c00e263d804f66a4ddee61f5400625f3e557005915a"
+  },
+  "ports.json": {
+   "rows": 72,
+   "source": "site/data/ports.json",
+   "sha256": "c795b46efeca2ed48de718c9a23e077f7b524b237a44e29c9bf36f74a5659c6d"
+  },
+  "milestones.json": {
+   "rows": 107,
+   "source": "data/milestones.json",
+   "sha256": "f60b343a57dbbc2d29141abcc7139b118155a3245cb186f7b4040618dc3a167b"
+  },
+  "support-matrix.json": {
+   "rows": 6,
+   "source": "data/support-matrix.json",
+   "sha256": "ca649c4951aed5cca2723d729bc4eeccc75bc423c6b1274e188f7f7cb7e51d59"
+  },
+  "questions.json": {
+   "rows": 10,
+   "source": "data/questions.json",
+   "sha256": "72bee792fe6661c438e1a537768c6289e9caa84ddc38932d569af14cc1a11106"
+  }
+ },
+ "doc": "docs/api-v1.md",
+ "note": "Static snapshots of the data the site is drawn from. Versioned: a schema change bumps schema_version and is listed in docs/api-v1.md. Read, never written by hand."
+}

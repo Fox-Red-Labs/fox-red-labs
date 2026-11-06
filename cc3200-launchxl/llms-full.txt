@@ -1,0 +1,234 @@
+# Fox Red Labs: cc3200-launchxl
+
+Every reader page concatenated, for AI assistants. 4 files. Each starts with a line giving its path and heading. Links inside keep the paths they have in the repo.
+
+==============================================================================
+FILE: cc3200-launchxl/README.md | Why does the used TI CC3200-LAUNCHXL LaunchPad development kit not answer its debugger?
+==============================================================================
+
+# Why does the used TI CC3200-LAUNCHXL LaunchPad development kit not answer its debugger?
+
+> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+
+**The debugger opens, the chip does not answer, so the board is parked and nothing has been built, flashed or run on it.** A used CC3200 LaunchPad development kit, plugged in 2026-10-06: a Wi-Fi MCU (Cortex-M4 application core plus a network processor). Parked until the cause is known.
+
+Terms: [docs/vocab.md](../docs/vocab.md). Problems and fixes: [FAQ](FAQ.md). **JTAG** and **SWD** are two debug wiring schemes; **SOP** is the three-pin header that sets the boot mode.
+
+## What is in this folder, and what is not
+
+<!-- folder-contents -->
+**In this folder:** this README; `AGENTS.md` (notes for an AI assistant, every line from a run); `FAQ.md` (every error hit, with its exact text and the fix); `RESULTS-cc3200.md` (what was expected, and that nothing has run). Results are rows in `data/results/cc3200.csv` at the top of the repository, not in this folder.
+
+**Not in this folder:** TI's SDK, CCStudio, SysConfig and the compilers; there is nothing to build, because CCStudio 21.0.1 has no CC3200 target and the chip does not answer the debugger.
+
+**Taking this folder alone:** the commands in this README run from the top of a clone and call `tools/` and `data/`; the benchmarks also borrow sources from folders that several boards share. A sparse clone fetches only those, about 10 to 60 MB, instead of the whole repository (about 500 MB):
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git
+cd fox-red-labs
+git sparse-checkout add cc3200-launchxl tools data
+```
+
+`docs/` is left out on purpose (236 MB, mostly pictures). Read a page a link points to there with `git show HEAD:docs/<file>`, for example `git show HEAD:docs/vocab.md`.
+
+## The board
+
+- Silkscreen: CC3200-LAUNCHXL Rev 3.2.
+- Chip marking: `XCC3200HZ`, `447`. The leading X marks a pre-production part; 447 reads as 2014, week 47.
+- Onboard debugger: FTDI FT2232D. USB vendor and product 0451:c32a, manufacturer "FTDI", serial number `cc3200`.
+- As received: a green jumper wire ran from the left header row to the boot-mode header (SOP), and a blue jumper sat on the SOP header. Both removed for these tests. All four JTAG jumpers (J8 to J11: TCK, TMS, TDI, TDO) are on.
+- It runs a previous owner's program: LEDs D5 to D7 toggle at power-up.
+
+## Ten-minute path
+
+Nothing runs: the debugger opens but the chip does not answer, so there is no path to a changed blink. What was tried is under "What was tried" below.
+
+## One-command build
+
+Nothing runs: CCStudio 21.0.1 has no CC3200 entry (CC3220 variants only), so there is no build target, and no image could be loaded because the chip does not answer the debugger.
+
+## What was measured
+
+Nothing measured. Every test that needs the chip is a row in `data/results/cc3200.csv` marked failed or not run, each with its reason; the first run to answer will be UART flashing with SOP 100.
+
+## What was tried (2026-10-06)
+
+| Try | Tool | Result |
+|---|---|---|
+| First plug-in | USB | Nothing enumerated, no LEDs. A different USB port fixed it. |
+| JTAG, as received | OpenOCD 0.12 (xPack), `board/ti_cc3200_launchxl.cfg` | Debugger opens; scan chain reads all ones |
+| SWD, as received | same, `TRANSPORT swd` | "cannot read IDR" |
+| JTAG and SWD, held in reset, 500 kHz | same | same |
+| Wire and SOP jumper removed (SOP 000, 4-wire JTAG) | same | same |
+| TI's debug engine | UniFlash 9.6 DSLite, hand-written ccxml (Stellaris ICDI connection, CC3200 device) | "No device driver was specified for IcePick_C": no driver in UniFlash 9.6 for this debugger with the CC3200's JTAG router |
+| CCStudio 21.0.1 | device list | No CC3200 entry (CC3220 variants only) |
+
+All ones on JTAG means nothing is driving TDO back. With the jumpers in place, the likely causes are the chip itself (pre-production silicon, or damage from the earlier rewiring) or the SOP pins, which look bent over in the crop.
+
+## On a Mac
+
+- No serial console appears: macOS's built-in FTDI driver only matches FTDI's own vendor ID, and this board uses TI's. Reading it needs a user-space USB library (pyftdi or libftdi) told about 0451:c32a.
+- Every CC3200 LaunchPad reports the serial `cc3200`, so two of them cannot be told apart on one computer.
+
+## If you see this
+
+- If you see `scan chain all ones` (JTAG) or `cannot read IDR` (SWD) from OpenOCD, nothing is driving the chip's debug lines back: check that no two SOP pins touch and straighten them ([FAQ](FAQ.md#openocd-opens-the-debugger-but-the-jtag-scan-chain-reads-all-ones-and-swd-says-cannot-read-idr-is-the-chip-dead)).
+- If you see `No device driver was specified for IcePick_C` from UniFlash 9.6, there is no driver in UniFlash 9.6 for this debugger with the CC3200's JTAG router ([FAQ](FAQ.md#uniflash-says-no-device-driver-was-specified-for-icepick_c-what-driver-do-i-need)).
+- If you see nothing enumerate on first plug-in, no LEDs, try a different USB port ([FAQ](FAQ.md#nothing-enumerates-on-usb-and-no-leds-light-when-you-plug-the-cc3200-launchxl-in-what-now)).
+
+The rest: [FAQ](FAQ.md).
+
+## Limits
+
+JTAG does not reach this board. If you see that, check that no two SOP pins touch, then try UART flashing (SOP 100) with UniFlash's `cc32xx` mode, which talks to the ROM bootloader instead of JTAG.
+
+## Where these facts come from
+
+Checked 2026-10-06 on a Mac with xPack OpenOCD 0.12 (`board/ti_cc3200_launchxl.cfg`), UniFlash 9.6 (DSLite) and CCStudio 21.0.1, on one used CC3200-LAUNCHXL. Files: `data/results/cc3200.csv`, `cc3200-launchxl/RESULTS-cc3200.md`, `cc3200-launchxl/AGENTS.md`, `cc3200-launchxl/FAQ.md`.
+
+==============================================================================
+FILE: cc3200-launchxl/FAQ.md | What goes wrong with the used TI CC3200-LAUNCHXL LaunchPad development kit on a Mac, and how do you fix it?
+==============================================================================
+
+# What goes wrong with the used TI CC3200-LAUNCHXL LaunchPad development kit on a Mac, and how do you fix it?
+
+Problems hit with a used CC3200-LAUNCHXL Rev 3.2 (CC3200 chip: Arm Cortex-M4 application core plus a network processor) from a Mac on 2026-10-06. Terms: [docs/vocab.md](../docs/vocab.md). Versions: xPack OpenOCD 0.12, UniFlash 9.6 (DSLite), CCStudio 21.0.1.
+
+**What caused it**, one tag per answer:
+
+| Tag | Meaning |
+|---|---|
+| Setup or handling | How the hardware was plugged in or set up |
+| Tool or docs | A TI tool bug, a missing tool, or a missing or wrong instruction |
+| Third-party behavior | macOS or open-source code, not TI |
+| Unknown | Not found |
+
+## Connecting
+
+### Nothing enumerates on USB and no LEDs light when you plug the CC3200-LAUNCHXL in. What now?
+
+Plug it into a different USB port. **Tag: Setup or handling.** On the first plug-in nothing enumerated and no LEDs lit; a different port fixed it. Source: `cc3200-launchxl/README.md`.
+
+### OpenOCD opens the debugger but the JTAG scan chain reads all ones and SWD says "cannot read IDR". Is the chip dead?
+
+Not known. **Tag: Unknown.** Suspected: the chip itself (pre-production silicon, marked `XCC3200HZ`, or damage from earlier rewiring) or the SOP pins, which look bent over in a close-up photo. All ones on JTAG means nothing is driving TDO back. The same result came with JTAG and SWD as received, held in reset at 500 kHz, and with the wire and SOP jumper removed (SOP 000, 4-wire JTAG, jumpers J8 to J11 on). Next to try: check that no two SOP pins touch and straighten them, then UART flashing with SOP 100 in UniFlash's `cc32xx` mode, which talks to the ROM bootloader instead of JTAG. Source: `cc3200-launchxl/README.md`.
+
+### UniFlash says "No device driver was specified for IcePick_C". What driver do I need?
+
+None. UniFlash 9.6 has no driver for this debugger with the CC3200's JTAG router. **Tag: Tool or docs.** Tried with a hand-written ccxml using the Stellaris ICDI connection and the CC3200 device. Source: `cc3200-launchxl/README.md`.
+
+### CCStudio 21.0.1 has no CC3200 in its device list. How do I build for it?
+
+It cannot be built in CCStudio 21.0.1 as installed. **Tag: Tool or docs.** The device list has CC3220 variants only. Source: `cc3200-launchxl/README.md`.
+
+## Serial
+
+### No serial port appears on the Mac for the CC3200-LAUNCHXL. Where is the console?
+
+macOS's built-in FTDI driver matches only FTDI's own vendor ID, and this board uses TI's (0451:c32a), so no console appears. **Tag: Third-party behavior.** Reading it needs a user-space USB library (pyftdi or libftdi) told about 0451:c32a. That was not run. Source: `cc3200-launchxl/README.md`.
+
+### Two CC3200 LaunchPad development kits are plugged in and you cannot tell which is which. Why?
+
+Because every CC3200 LaunchPad reports the serial `cc3200`, so two of them cannot be told apart on one computer. **Tag: Setup or handling.** Source: `cc3200-launchxl/README.md`.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+No lockup is recorded for this board.
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: cc3200-launchxl/AGENTS.md | What should an AI coding assistant know before working on a used TI CC3200-LAUNCHXL LaunchPad development kit?
+==============================================================================
+
+# What should an AI coding assistant know before working on a used TI CC3200-LAUNCHXL LaunchPad development kit?
+
+That on the used board the debugger opens but the chip never answered, so nothing has been built, flashed or run on it. This file is the short list of what was tried and what is not run. Each item comes from runs on one board.
+
+Terms: [docs/vocab.md](../docs/vocab.md) in the Fox Red Labs repo. In short: **JTAG** and **SWD** are two debug wiring schemes; **SOP** is the three-pin header that sets the boot mode; **OpenOCD** is an open-source debug tool; **UniFlash** is TI's flashing tool. Checked 2026-10-06 on a Mac with xPack OpenOCD 0.12, UniFlash 9.6 (DSLite) and CCStudio 21.0.1, on one used CC3200-LAUNCHXL (`cc3200-launchxl/README.md`).
+
+**How to use it.** Copy this file into the top folder of your own project as `AGENTS.md`. Most coding assistants read that name; for one that reads `CLAUDE.md`, copy it under that name or add the line `@AGENTS.md` to your `CLAUDE.md`. Paths below in backticks starting `cc3200-launchxl/` are in the Fox Red Labs repo, where the evidence for each line lives; they are not in your copy, and links in this file only work inside that repo.
+
+## The board
+
+| Part | Fact |
+|---|---|
+| Kit | CC3200-LAUNCHXL Rev 3.2 silkscreen, bought used (`cc3200-launchxl/README.md`) |
+| Chip | Marked `XCC3200HZ`, `447`. The leading X marks a pre-production part; 447 reads as 2014, week 47 |
+| Debugger | Onboard FTDI FT2232D, USB 0451:c32a, manufacturer "FTDI", serial `cc3200` for every board of this kind |
+| JTAG jumpers | J8 to J11 (TCK, TMS, TDI, TDO) all on |
+| As received | A jumper wire ran from the left header row to the SOP header and a jumper sat on SOP; both were removed. A previous owner's program toggled LEDs D5 to D7 at power-up |
+
+## Start here
+
+Nothing works on this board. The debugger opens, the chip never answered, so nothing was built, flashed or run. Tools tried: xPack OpenOCD 0.12, UniFlash 9.6 (DSLite), CCStudio 21.0.1. Probe: the onboard FTDI debugger over USB, nothing to add; JTAG jumpers J8 to J11 on.
+
+- Backup: No tested backup command. Nothing can be read while the chip does not answer.
+- Build: not possible. CCStudio 21.0.1 lists CC3220 variants only, no CC3200.
+- Flash and check: not run. The debugger opens with `board/ti_cc3200_launchxl.cfg`; the JTAG scan chain reads all ones.
+- Restore: not tested.
+
+## If you see this
+
+| What you see | Cause | Do this | Check |
+|---|---|---|---|
+| Nothing enumerates, no LEDs | Unknown; a different USB port fixed it | Try another port | The FTDI device appears on USB |
+| Scan chain reads all ones (JTAG) | Nothing drives TDO back; chip or SOP pins suspected, not confirmed | Check that no two SOP pins touch; the README lists the rest | Scan chain shows an ID |
+| `cannot read IDR` (SWD) | Same as above | Same as above | OpenOCD names the chip |
+| `No device driver was specified for IcePick_C` | UniFlash 9.6 has no driver for this debugger with the CC3200's JTAG router | None found | None |
+| No serial console on a Mac | The built-in FTDI driver matches only FTDI's vendor ID; this board uses TI's | Use pyftdi or libftdi told about 0451:c32a (not done here) | A serial port appears |
+
+Traps shared with other boards: TRAPS.md.
+
+## How to reach it
+
+A different USB port was needed before the board enumerated at all. No serial console appears on a Mac: the built-in FTDI driver matches only FTDI's own vendor ID and this board uses TI's. Reading the console needs a user-space USB library (pyftdi or libftdi) told about 0451:c32a (`cc3200-launchxl/README.md`, "On a Mac"). This was not done.
+
+The debugger opens in OpenOCD with the config the xPack package ships:
+
+```text
+board/ti_cc3200_launchxl.cfg
+```
+
+## What ran here
+
+- Nothing built, flashed or measured. Blink build: not run, because CCStudio 21.0.1 has no CC3200 entry (CC3220 variants only) (`data/results/cc3200.csv`, row `blink_build`).
+- Time to blink: failed. JTAG scan chain reads all ones; SWD reports "cannot read IDR" (`data/results/cc3200.csv`, row `time_to_blink`).
+- The radio rows (airtime, energy, throughput, range, flash use) are all not run (`data/results/cc3200.csv`).
+
+## Not run
+
+From the README, in order: check that no two SOP pins touch; try UART flashing (SOP 100) with UniFlash's `cc32xx` mode, which talks to the ROM bootloader instead of JTAG (needs the serial console first); if the ROM answers, the chip is alive and the JTAG path is the problem.
+
+## Where the evidence lives
+
+`cc3200-launchxl/README.md` and `data/results/cc3200.csv`. The board is parked until the cause is known.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+No lockup is recorded for this board.
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: cc3200-launchxl/RESULTS-cc3200.md | What has the used TI CC3200-LAUNCHXL LaunchPad development kit measured?
+==============================================================================
+
+# What has the used TI CC3200-LAUNCHXL LaunchPad development kit measured?
+
+**Nothing: the chip does not answer the debugger, so every test is failed or not run.** The rows and their reasons are in `data/results/cc3200.csv`; the story is in the [README](README.md) and [FAQ](FAQ.md). Terms: [docs/vocab.md](../docs/vocab.md).
+
+Speed run, 2026-10-17. Goal: show the same bench and AI tools reach an older TI Wi-Fi part (FTDI debugger, old SDK) the way they reach the CC35X1.
+
+## Expectations, written before any measurement
+
+- Console: the FT2232D's second interface is the CC3200 UART; pyftdi opens it at 921600 baud (FT2232D divisor gives 923077, 0.16% off).
+- ROM bootloader with SOP 100: answers the break condition with ack 00 CC; version packet returns a CC3200 chip id; storage list shows serial flash. Likelihood it answers: 70% (JTAG silence points at the debug path or SOP pins, not necessarily a dead chip).
+- Serial flash backup: SFLASH raw read, two passes, identical hashes.
+- Blink: the SDK blinky is about 3.2 kB of code, loaded to SRAM at 0x20004000 from /sys/mcuimg.bin; flash over UART in under 30 s.

@@ -1,0 +1,23 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+const gpio  = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1 = gpio.addInstance();
+gpio1.$name = "GPIO_LEDS";
+gpio1.associatedPins.create(4);
+gpio1.associatedPins[0].$name       = "USER_LED_1";
+gpio1.associatedPins[0].pin.$assign = "PA5";
+gpio1.associatedPins[1].$name       = "USER_LED_2";
+gpio1.associatedPins[1].pin.$assign = "PA6";
+gpio1.associatedPins[2].$name       = "USER_LED_3";
+gpio1.associatedPins[2].pin.$assign = "PA7";
+gpio1.associatedPins[3].$name       = "USER_TEST";
+gpio1.associatedPins[3].pin.$assign = "PA8";
+const sysctl = scripting.addModule("/drivers/sysctl", {}, false);
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+sysctl.peripheral.$suggestSolution       = "SYSCTL";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";

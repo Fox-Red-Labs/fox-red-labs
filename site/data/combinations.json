@@ -1,0 +1,53 @@
+{
+  "note": "Combinations of two things on one chip, each named by result variants so tools/composition.py can add up the single builds and set the sum beside the real combined link where one exists. No numbers here. schedule: concurrent (both run at once, so each keeps its own stacks, heap and buffers) or sequential (one after the other, so working memory can be reused; only where the code really does that). Design: docs/superpowers/specs/2026-10-11-evidence-product-design.md, Phase 4.",
+  "combinations": [
+    {
+      "id": "cc1354p10-zigbee-ble",
+      "board": "cc1354p10",
+      "title": "Zigbee router and Bluetooth at once, with TI's dual-mode manager",
+      "combined": "zigbee-ble-dmm-zr-light",
+      "parts": [
+        "zigbee-router",
+        "ble-simple-peripheral"
+      ],
+      "schedule": "concurrent",
+      "source": "cc1354p10/dmm-zigbee-ble/README.md"
+    },
+    {
+      "id": "cc2755p10-ble-154",
+      "board": "cc2755p10",
+      "title": "Bluetooth and a TI 15.4 sensor at once, with TI's dual-mode manager",
+      "combined": "dmm-ble-ti154",
+      "parts": [
+        "ble-basic-ble",
+        "ti154-sensor"
+      ],
+      "schedule": "concurrent",
+      "source": "data/results/cc2755p10.csv"
+    },
+    {
+      "id": "cc2340r5-ble-154",
+      "board": "cc2340r5",
+      "title": "Bluetooth and a TI 15.4 sensor at once, with TI's dual-mode manager",
+      "combined": "dmm-ble-ti154",
+      "parts": [
+        "ble-basic-ble",
+        "ti154-sensor"
+      ],
+      "schedule": "concurrent",
+      "source": "data/results/cc2340r5.csv"
+    },
+    {
+      "id": "cc2340r5-ble-occupancy",
+      "board": "cc2340r5",
+      "title": "Bluetooth and the 8k room-occupancy model in one program",
+      "combined": "ble-basic-ble-occ-8k",
+      "parts": [
+        "ble-basic-ble"
+      ],
+      "model": "occ_cnn_8k-c-os",
+      "schedule": "concurrent",
+      "source": "cc2340r5/matrix/ble_occ_8k.run.md"
+    }
+  ]
+}

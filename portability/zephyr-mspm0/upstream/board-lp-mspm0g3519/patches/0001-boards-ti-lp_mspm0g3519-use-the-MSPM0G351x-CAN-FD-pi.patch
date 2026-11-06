@@ -1,0 +1,46 @@
+From 745ecd06b5d29f812102e13c7c3d2b15ad627435 Mon Sep 17 00:00:00 2001
+From: Contributor Name <contributor@example.invalid>
+Date: Sun, 25 Oct 2026 07:27:47 -0400
+Subject: [PATCH 1/3] boards: ti: lp_mspm0g3519: use the MSPM0G351x CAN-FD pin
+ function
+
+The board file includes the shared MSPM0G1x0x/G3x0x pinctrl file. On the
+MSPM0G351x some pin functions differ from it, and the CAN-FD groups the
+board uses are among them: PA12 function 5 is TIMA0.CCP3 and PA13
+function 6 is RTC_OUT, CAN-FD is function 12 on both pins. Redefine the
+two groups in the board file with function 12.
+
+A comparison of all 443 pin functions in the shared file against the
+SysConfig 1.28.0 MSPM0G351X device data finds 136 mismatches. The
+other groups this board uses (uart0, spi0, spi1, i2c1) match. The
+shared file itself should be corrected for the G351x; this commit only
+fixes the pins this board's devicetree uses.
+
+Assisted-by: Claude:claude-sonnet-5-5
+---
+ boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts b/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
+index b77a9bc4c..d1fe55d8e 100644
+--- a/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
++++ b/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
+@@ -91,6 +91,18 @@
+ 
+ &pinctrl {
+ 	status = "okay";
++
++	/* The shared MSPM0G1x0x/G3x0x pin file has the wrong CAN-FD function for these pins on the
++	 * MSPM0G351x (5 and 6 are TIMA0.CCP3 and RTC_OUT there); CAN-FD is function 12.
++	 */
++	canfd0_cantx_pa12: canfd0_cantx_pa12 {
++		pinmux = <MSP_PINMUX(34, MSPM0_PIN_FUNCTION_12)>;
++	};
++
++	canfd0_canrx_pa13: canfd0_canrx_pa13 {
++		pinmux = <MSP_PINMUX(35, MSPM0_PIN_FUNCTION_12)>;
++		input-enable;
++	};
+ };
+ 
+ &gpioa {

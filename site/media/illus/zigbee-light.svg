@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="The setup for Switch a board&#x27;s LED from Home Assistant over Zigbee: LP-EM-CC2340R5, then Zigbee, then Home Assistant">
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="20" y="86" width="140" height="88" rx="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="90" y="110" text-anchor="middle" font-size="16" font-weight="600" fill="#161312">Home Assistant</text>
+<rect x="62" y="126" width="56" height="26" rx="13" fill="#B42418"/><circle cx="105" cy="139" r="10" fill="#F7F3EC"/>
+<text x="90" y="196" text-anchor="middle" font-size="15" fill="#6B625B">switch on or off</text>
+<line x1="164" y1="130" x2="200" y2="130" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M194 124 L204 130 L194 136" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="210" y="96" width="108" height="68" rx="8" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="264.0" y="126.0" text-anchor="middle" font-size="16" font-weight="600" fill="#161312">ZBT-2</text>
+<text x="264.0" y="146.0" text-anchor="middle" font-size="16" font-weight="400" fill="#161312">radio</text>
+<text x="264.0" y="186" text-anchor="middle" font-size="15" fill="#6B625B">Zigbee coordinator</text>
+<path d="M354 126 A12 12 0 0 1 378 126" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="1.0"/>
+<path d="M342 114 A24 24 0 0 1 390 114" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+<path d="M330 102 A36 36 0 0 1 402 102" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+<circle cx="366" cy="135" r="3" fill="#161312"/>
+<text x="366" y="166" text-anchor="middle" font-size="15" fill="#6B625B">Zigbee</text>
+<rect x="414" y="86" width="166" height="88" rx="10" fill="#B42418"/>
+<text x="497" y="114" text-anchor="middle" font-size="18" font-weight="600" fill="#F7F3EC">LP-EM-CC2340R5</text>
+<circle cx="497" cy="144" r="9" fill="#F7F3EC"/>
+<line x1="511.0" y1="144.0" x2="516.0" y2="144.0" stroke="#F7F3EC" stroke-width="2" stroke-linecap="round"/>
+<line x1="506.9" y1="153.9" x2="510.4" y2="157.4" stroke="#F7F3EC" stroke-width="2" stroke-linecap="round"/>
+<line x1="497.0" y1="158.0" x2="497.0" y2="163.0" stroke="#F7F3EC" stroke-width="2" stroke-linecap="round"/>
+<line x1="487.1" y1="153.9" x2="483.6" y2="157.4" stroke="#F7F3EC" stroke-width="2" stroke-linecap="round"/>
+<line x1="483.0" y1="144.0" x2="478.0" y2="144.0" stroke="#F7F3EC" stroke-width="2" stroke-linecap="round"/>
+<line x1="487.1" y1="134.1" x2="483.6" y2="130.6" stroke="#F7F3EC" stroke-width="2" stroke-linecap="round"/>
+<line x1="497.0" y1="130.0" x2="497.0" y2="125.0" stroke="#F7F3EC" stroke-width="2" stroke-linecap="round"/>
+<line x1="506.9" y1="134.1" x2="510.4" y2="130.6" stroke="#F7F3EC" stroke-width="2" stroke-linecap="round"/>
+<text x="497" y="196" text-anchor="middle" font-size="15" fill="#6B625B">its LED follows the switch</text>
+<text x="588" y="250" text-anchor="end" font-size="12" fill="#6B625B">drawing</text></svg>

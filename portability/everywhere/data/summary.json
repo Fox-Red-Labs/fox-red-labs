@@ -1,0 +1,7933 @@
+{
+ "cells": 52466,
+ "examples": 3411,
+ "targets": [
+  "mspm0c1104",
+  "mspm0l1306",
+  "mspm0g3507",
+  "mspm0g3519",
+  "mspm0g5187",
+  "mspm33c321a",
+  "cc2340r5",
+  "cc2755p10",
+  "cc1354p10",
+  "cc35x1",
+  "am13e230",
+  "am263p",
+  "f2800137",
+  "f28p65x",
+  "tda4",
+  "iwrl6432"
+ ],
+ "caps": {
+  "mspm0c1104": [
+   "ADC",
+   "CRC",
+   "DMA",
+   "GPIO",
+   "I2C",
+   "LIN",
+   "PWM",
+   "QEI",
+   "SPI",
+   "TIMER",
+   "UART",
+   "VREF",
+   "WDT"
+  ],
+  "mspm0l1306": [
+   "ADC",
+   "COMP",
+   "CRC",
+   "DMA",
+   "GPIO",
+   "I2C",
+   "LIN",
+   "OPA",
+   "PWM",
+   "SPI",
+   "TIMER",
+   "UART",
+   "VREF",
+   "WDT"
+  ],
+  "mspm0g3507": [
+   "ADC",
+   "AES",
+   "CAN",
+   "COMP",
+   "CRC",
+   "DAC",
+   "DMA",
+   "GPIO",
+   "I2C",
+   "LIN",
+   "MATHACL",
+   "OPA",
+   "PWM",
+   "QEI",
+   "RTC",
+   "SPI",
+   "TIMER",
+   "TRNG",
+   "UART",
+   "VREF",
+   "WDT"
+  ],
+  "mspm0g3519": [
+   "ADC",
+   "AES",
+   "CAN",
+   "COMP",
+   "CRC",
+   "DAC",
+   "DMA",
+   "GPIO",
+   "I2C",
+   "LIN",
+   "MATHACL",
+   "PWM",
+   "QEI",
+   "SPI",
+   "TIMER",
+   "TRNG",
+   "UART",
+   "VREF",
+   "WDT"
+  ],
+  "mspm0g5187": [
+   "ADC",
+   "AES",
+   "COMP",
+   "CRC",
+   "DMA",
+   "GPIO",
+   "I2C",
+   "I2S",
+   "LIN",
+   "NPU",
+   "PWM",
+   "SPI",
+   "TIMER",
+   "UART",
+   "USB",
+   "VREF",
+   "WDT"
+  ],
+  "mspm33c321a": [
+   "ADC",
+   "AES",
+   "CAN",
+   "COMP",
+   "CRC",
+   "DMA",
+   "GPIO",
+   "GSC",
+   "I2C",
+   "I2S",
+   "LIN",
+   "PKA",
+   "PWM",
+   "QEI",
+   "QSPI",
+   "RTC",
+   "SHA",
+   "SPI",
+   "TAMPER",
+   "TIMER",
+   "TRNG",
+   "UART",
+   "VREF",
+   "WDT"
+  ],
+  "cc2340r5": [
+   "ADC",
+   "AES",
+   "COMP",
+   "GPIO",
+   "I2C",
+   "I2C_TARGET",
+   "KEYSTORE",
+   "PWM",
+   "RADIO_BLE",
+   "RADIO_RF",
+   "RADIO_THREAD",
+   "RADIO_ZIGBEE",
+   "SD",
+   "SHA",
+   "SPI",
+   "TRNG",
+   "UART",
+   "WDT"
+  ],
+  "cc2755p10": [
+   "ADC",
+   "AES",
+   "COMP",
+   "DMA",
+   "GPIO",
+   "HSM",
+   "I2C",
+   "I2C_TARGET",
+   "I2S",
+   "KEYSTORE",
+   "PKA",
+   "PWM",
+   "RADIO_BLE",
+   "RADIO_RF",
+   "RADIO_THREAD",
+   "RADIO_ZIGBEE",
+   "SD",
+   "SHA",
+   "SPI",
+   "TRNG",
+   "UART",
+   "WDT"
+  ],
+  "cc1354p10": [
+   "ADC",
+   "AES",
+   "COMP",
+   "DMA",
+   "GPIO",
+   "I2C",
+   "I2S",
+   "KEYSTORE",
+   "NVS",
+   "PKA",
+   "PWM",
+   "RADIO_BLE",
+   "RADIO_RF",
+   "RADIO_THREAD",
+   "RADIO_ZIGBEE",
+   "SD",
+   "SHA",
+   "SPI",
+   "TIMER",
+   "TRNG",
+   "UART",
+   "WDT"
+  ],
+  "cc35x1": [
+   "ADC",
+   "CAN",
+   "DMA",
+   "GPIO",
+   "I2C",
+   "I2S",
+   "KEYSTORE",
+   "PWM",
+   "QSPI",
+   "RADIO_BLE",
+   "SHA",
+   "SPI",
+   "UART",
+   "WDT",
+   "WIFI"
+  ],
+  "am13e230": [
+   "ADC",
+   "AES",
+   "CAN",
+   "COMP",
+   "CRC",
+   "DMA",
+   "GPIO",
+   "GSC",
+   "I2C",
+   "NPU",
+   "OPA",
+   "PWM",
+   "QEI",
+   "SPI",
+   "TIMER",
+   "TMU",
+   "UART",
+   "WDT",
+   "XBAR"
+  ],
+  "am263p": [
+   "ADC",
+   "CAN",
+   "COMP",
+   "DAC",
+   "DMA",
+   "GPIO",
+   "HSM",
+   "I2C",
+   "LIN",
+   "MULTICORE",
+   "PRU",
+   "PWM",
+   "QEI",
+   "QSPI",
+   "RTC",
+   "SDFM",
+   "SPI",
+   "TIMER",
+   "UART",
+   "WDT",
+   "XBAR"
+  ],
+  "f2800137": [
+   "CMPSS",
+   "GPIO"
+  ],
+  "f28p65x": [
+   "ADC",
+   "AES",
+   "CAN",
+   "COMP",
+   "DAC",
+   "DMA",
+   "ETHERNET",
+   "GPIO",
+   "I2C",
+   "MULTICORE",
+   "PWM",
+   "QEI",
+   "SDFM",
+   "SPI",
+   "TIMER",
+   "UART",
+   "XBAR"
+  ],
+  "tda4": [
+   "AES",
+   "DISPLAY",
+   "ETHERNET",
+   "GPIO",
+   "I2C",
+   "MULTICORE",
+   "NPU",
+   "SHA",
+   "SPI",
+   "TRNG",
+   "UART",
+   "USB"
+  ],
+  "iwrl6432": [
+   "CAN",
+   "CRC",
+   "DMA",
+   "ESM",
+   "GPIO",
+   "I2C",
+   "LIN",
+   "PWM",
+   "QSPI",
+   "RADAR",
+   "RADAR_HWA",
+   "SPI",
+   "TIMER",
+   "UART",
+   "WDT"
+  ]
+ },
+ "matrix": {
+  "LP_MSPM0C1104->mspm0l1306": {
+   "Should work": 89,
+   "Could work": 2
+  },
+  "LP_MSPM0C1104->mspm0g3507": {
+   "Should work": 91
+  },
+  "LP_MSPM0C1104->mspm0g3519": {
+   "Should work": 91
+  },
+  "LP_MSPM0C1104->mspm0g5187": {
+   "Should work": 89,
+   "Could work": 2
+  },
+  "LP_MSPM0C1104->mspm33c321a": {
+   "Could work": 35,
+   "Should work": 56
+  },
+  "LP_MSPM0C1104->cc2340r5": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1104->cc2755p10": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1104->cc1354p10": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1104->cc35x1": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1104->am13e230": {
+   "Should work": 87,
+   "Could work": 4
+  },
+  "LP_MSPM0C1104->am263p": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1104->f2800137": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1104->f28p65x": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1104->tda4": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1104->iwrl6432": {
+   "Does not exist": 91
+  },
+  "LP_MSPM0C1106->mspm0c1104": {
+   "Should work": 122
+  },
+  "LP_MSPM0C1106->mspm0l1306": {
+   "Should work": 122
+  },
+  "LP_MSPM0C1106->mspm0g3507": {
+   "Should work": 122
+  },
+  "LP_MSPM0C1106->mspm0g3519": {
+   "Should work": 122
+  },
+  "LP_MSPM0C1106->mspm0g5187": {
+   "Should work": 122
+  },
+  "LP_MSPM0C1106->mspm33c321a": {
+   "Could work": 51,
+   "Should work": 71
+  },
+  "LP_MSPM0C1106->cc2340r5": {
+   "Does not exist": 120,
+   "Could work": 2
+  },
+  "LP_MSPM0C1106->cc2755p10": {
+   "Does not exist": 120,
+   "Should work": 2
+  },
+  "LP_MSPM0C1106->cc1354p10": {
+   "Does not exist": 120,
+   "Should work": 2
+  },
+  "LP_MSPM0C1106->cc35x1": {
+   "Does not exist": 120,
+   "Should work": 2
+  },
+  "LP_MSPM0C1106->am13e230": {
+   "Should work": 116,
+   "Could work": 6
+  },
+  "LP_MSPM0C1106->am263p": {
+   "Does not exist": 120,
+   "Should work": 2
+  },
+  "LP_MSPM0C1106->f2800137": {
+   "Does not exist": 120,
+   "Could work": 2
+  },
+  "LP_MSPM0C1106->f28p65x": {
+   "Does not exist": 120,
+   "Should work": 2
+  },
+  "LP_MSPM0C1106->tda4": {
+   "Does not exist": 120,
+   "Could work": 2
+  },
+  "LP_MSPM0C1106->iwrl6432": {
+   "Does not exist": 120,
+   "Should work": 2
+  },
+  "LP_MSPM0G3218->mspm0c1104": {
+   "Could work": 22,
+   "Should work": 125
+  },
+  "LP_MSPM0G3218->mspm0l1306": {
+   "Could work": 17,
+   "Should work": 130
+  },
+  "LP_MSPM0G3218->mspm0g3507": {
+   "Should work": 147
+  },
+  "LP_MSPM0G3218->mspm0g3519": {
+   "Should work": 147
+  },
+  "LP_MSPM0G3218->mspm0g5187": {
+   "Should work": 136,
+   "Could work": 11
+  },
+  "LP_MSPM0G3218->mspm33c321a": {
+   "Does not exist": 1,
+   "Should work": 88,
+   "Could work": 58
+  },
+  "LP_MSPM0G3218->cc2340r5": {
+   "Should work": 1,
+   "Does not exist": 144,
+   "Could work": 2
+  },
+  "LP_MSPM0G3218->cc2755p10": {
+   "Should work": 3,
+   "Does not exist": 144
+  },
+  "LP_MSPM0G3218->cc1354p10": {
+   "Should work": 3,
+   "Does not exist": 144
+  },
+  "LP_MSPM0G3218->cc35x1": {
+   "Could work": 1,
+   "Does not exist": 144,
+   "Should work": 2
+  },
+  "LP_MSPM0G3218->am13e230": {
+   "Does not exist": 1,
+   "Should work": 129,
+   "Could work": 17
+  },
+  "LP_MSPM0G3218->am263p": {
+   "Does not exist": 145,
+   "Should work": 2
+  },
+  "LP_MSPM0G3218->f2800137": {
+   "Does not exist": 145,
+   "Could work": 2
+  },
+  "LP_MSPM0G3218->f28p65x": {
+   "Does not exist": 145,
+   "Should work": 2
+  },
+  "LP_MSPM0G3218->tda4": {
+   "Does not exist": 145,
+   "Could work": 2
+  },
+  "LP_MSPM0G3218->iwrl6432": {
+   "Does not exist": 145,
+   "Should work": 2
+  },
+  "LP_MSPM0G3507->mspm0c1104": {
+   "Could work": 87,
+   "Should work": 193,
+   "Does not make sense": 2
+  },
+  "LP_MSPM0G3507->mspm0l1306": {
+   "Could work": 69,
+   "Should work": 211,
+   "Does not make sense": 2
+  },
+  "LP_MSPM0G3507->mspm0g3519": {
+   "Should work": 262,
+   "Does not make sense": 2,
+   "Could work": 18
+  },
+  "LP_MSPM0G3507->mspm0g5187": {
+   "Could work": 64,
+   "Should work": 216,
+   "Does not make sense": 2
+  },
+  "LP_MSPM0G3507->mspm33c321a": {
+   "Could work": 151,
+   "Should work": 117,
+   "Does not exist": 12,
+   "Does not make sense": 2
+  },
+  "LP_MSPM0G3507->cc2340r5": {
+   "Does not exist": 266,
+   "Should work": 12,
+   "Does not make sense": 2,
+   "Could work": 2
+  },
+  "LP_MSPM0G3507->cc2755p10": {
+   "Does not exist": 266,
+   "Should work": 14,
+   "Does not make sense": 2
+  },
+  "LP_MSPM0G3507->cc1354p10": {
+   "Does not exist": 266,
+   "Should work": 14,
+   "Does not make sense": 2
+  },
+  "LP_MSPM0G3507->cc35x1": {
+   "Does not exist": 266,
+   "Should work": 12,
+   "Does not make sense": 2,
+   "Could work": 2
+  },
+  "LP_MSPM0G3507->am13e230": {
+   "Could work": 63,
+   "Should work": 205,
+   "Does not exist": 12,
+   "Does not make sense": 2
+  },
+  "LP_MSPM0G3507->am263p": {
+   "Does not exist": 278,
+   "Does not make sense": 2,
+   "Could work": 2
+  },
+  "LP_MSPM0G3507->f2800137": {
+   "Does not exist": 278,
+   "Does not make sense": 2,
+   "Could work": 2
+  },
+  "LP_MSPM0G3507->f28p65x": {
+   "Does not exist": 278,
+   "Does not make sense": 2,
+   "Should work": 2
+  },
+  "LP_MSPM0G3507->tda4": {
+   "Does not exist": 280,
+   "Could work": 2
+  },
+  "LP_MSPM0G3507->iwrl6432": {
+   "Does not exist": 278,
+   "Does not make sense": 2,
+   "Could work": 2
+  },
+  "LP_MSPM0G3519->mspm0c1104": {
+   "Could work": 126,
+   "Should work": 144
+  },
+  "LP_MSPM0G3519->mspm0l1306": {
+   "Could work": 106,
+   "Should work": 164
+  },
+  "LP_MSPM0G3519->mspm0g3507": {
+   "Should work": 221,
+   "Could work": 49
+  },
+  "LP_MSPM0G3519->mspm0g5187": {
+   "Should work": 189,
+   "Could work": 81
+  },
+  "LP_MSPM0G3519->mspm33c321a": {
+   "Does not exist": 12,
+   "Should work": 161,
+   "Could work": 97
+  },
+  "LP_MSPM0G3519->cc2340r5": {
+   "Should work": 12,
+   "Does not exist": 256,
+   "Could work": 2
+  },
+  "LP_MSPM0G3519->cc2755p10": {
+   "Should work": 14,
+   "Does not exist": 256
+  },
+  "LP_MSPM0G3519->cc1354p10": {
+   "Should work": 14,
+   "Does not exist": 256
+  },
+  "LP_MSPM0G3519->cc35x1": {
+   "Could work": 1,
+   "Does not exist": 256,
+   "Should work": 13
+  },
+  "LP_MSPM0G3519->am13e230": {
+   "Does not exist": 12,
+   "Should work": 224,
+   "Could work": 34
+  },
+  "LP_MSPM0G3519->am263p": {
+   "Does not exist": 268,
+   "Should work": 2
+  },
+  "LP_MSPM0G3519->f2800137": {
+   "Does not exist": 268,
+   "Could work": 2
+  },
+  "LP_MSPM0G3519->f28p65x": {
+   "Does not exist": 268,
+   "Should work": 2
+  },
+  "LP_MSPM0G3519->tda4": {
+   "Does not exist": 268,
+   "Could work": 2
+  },
+  "LP_MSPM0G3519->iwrl6432": {
+   "Does not exist": 268,
+   "Should work": 2
+  },
+  "LP_MSPM0G5187->mspm0c1104": {
+   "Could work": 16,
+   "Should work": 190,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0G5187->mspm0l1306": {
+   "Could work": 9,
+   "Should work": 197,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0G5187->mspm0g3507": {
+   "Should work": 204,
+   "Does not make sense": 1,
+   "Could work": 2
+  },
+  "LP_MSPM0G5187->mspm0g3519": {
+   "Should work": 204,
+   "Does not make sense": 1,
+   "Could work": 2
+  },
+  "LP_MSPM0G5187->mspm33c321a": {
+   "Does not exist": 1,
+   "Should work": 128,
+   "Does not make sense": 1,
+   "Could work": 77
+  },
+  "LP_MSPM0G5187->cc2340r5": {
+   "Should work": 1,
+   "Does not exist": 203,
+   "Does not make sense": 1,
+   "Could work": 2
+  },
+  "LP_MSPM0G5187->cc2755p10": {
+   "Should work": 3,
+   "Does not exist": 203,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0G5187->cc1354p10": {
+   "Should work": 3,
+   "Does not exist": 203,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0G5187->cc35x1": {
+   "Could work": 1,
+   "Does not exist": 203,
+   "Does not make sense": 1,
+   "Should work": 2
+  },
+  "LP_MSPM0G5187->am13e230": {
+   "Does not exist": 1,
+   "Should work": 181,
+   "Does not make sense": 1,
+   "Could work": 24
+  },
+  "LP_MSPM0G5187->am263p": {
+   "Does not exist": 204,
+   "Does not make sense": 1,
+   "Should work": 2
+  },
+  "LP_MSPM0G5187->f2800137": {
+   "Does not exist": 204,
+   "Does not make sense": 1,
+   "Could work": 2
+  },
+  "LP_MSPM0G5187->f28p65x": {
+   "Does not exist": 204,
+   "Does not make sense": 1,
+   "Should work": 2
+  },
+  "LP_MSPM0G5187->tda4": {
+   "Does not exist": 205,
+   "Could work": 2
+  },
+  "LP_MSPM0G5187->iwrl6432": {
+   "Does not exist": 204,
+   "Does not make sense": 1,
+   "Should work": 2
+  },
+  "LP_MSPM0H3216->mspm0c1104": {
+   "Should work": 120
+  },
+  "LP_MSPM0H3216->mspm0l1306": {
+   "Should work": 120
+  },
+  "LP_MSPM0H3216->mspm0g3507": {
+   "Should work": 120
+  },
+  "LP_MSPM0H3216->mspm0g3519": {
+   "Should work": 120
+  },
+  "LP_MSPM0H3216->mspm0g5187": {
+   "Should work": 120
+  },
+  "LP_MSPM0H3216->mspm33c321a": {
+   "Could work": 48,
+   "Should work": 72
+  },
+  "LP_MSPM0H3216->cc2340r5": {
+   "Does not exist": 118,
+   "Could work": 2
+  },
+  "LP_MSPM0H3216->cc2755p10": {
+   "Does not exist": 118,
+   "Should work": 2
+  },
+  "LP_MSPM0H3216->cc1354p10": {
+   "Does not exist": 118,
+   "Should work": 2
+  },
+  "LP_MSPM0H3216->cc35x1": {
+   "Does not exist": 118,
+   "Should work": 2
+  },
+  "LP_MSPM0H3216->am13e230": {
+   "Should work": 115,
+   "Could work": 5
+  },
+  "LP_MSPM0H3216->am263p": {
+   "Does not exist": 118,
+   "Should work": 2
+  },
+  "LP_MSPM0H3216->f2800137": {
+   "Does not exist": 118,
+   "Could work": 2
+  },
+  "LP_MSPM0H3216->f28p65x": {
+   "Does not exist": 118,
+   "Should work": 2
+  },
+  "LP_MSPM0H3216->tda4": {
+   "Does not exist": 118,
+   "Could work": 2
+  },
+  "LP_MSPM0H3216->iwrl6432": {
+   "Does not exist": 118,
+   "Should work": 2
+  },
+  "LP_MSPM0L1117->mspm0c1104": {
+   "Could work": 17,
+   "Should work": 125
+  },
+  "LP_MSPM0L1117->mspm0l1306": {
+   "Could work": 16,
+   "Should work": 126
+  },
+  "LP_MSPM0L1117->mspm0g3507": {
+   "Should work": 142
+  },
+  "LP_MSPM0L1117->mspm0g3519": {
+   "Should work": 142
+  },
+  "LP_MSPM0L1117->mspm0g5187": {
+   "Should work": 142
+  },
+  "LP_MSPM0L1117->mspm33c321a": {
+   "Does not exist": 12,
+   "Should work": 98,
+   "Could work": 32
+  },
+  "LP_MSPM0L1117->cc2340r5": {
+   "Should work": 12,
+   "Does not exist": 128,
+   "Could work": 2
+  },
+  "LP_MSPM0L1117->cc2755p10": {
+   "Should work": 14,
+   "Does not exist": 128
+  },
+  "LP_MSPM0L1117->cc1354p10": {
+   "Should work": 14,
+   "Does not exist": 128
+  },
+  "LP_MSPM0L1117->cc35x1": {
+   "Could work": 1,
+   "Does not exist": 128,
+   "Should work": 13
+  },
+  "LP_MSPM0L1117->am13e230": {
+   "Does not exist": 12,
+   "Should work": 124,
+   "Could work": 6
+  },
+  "LP_MSPM0L1117->am263p": {
+   "Does not exist": 140,
+   "Should work": 2
+  },
+  "LP_MSPM0L1117->f2800137": {
+   "Does not exist": 140,
+   "Could work": 2
+  },
+  "LP_MSPM0L1117->f28p65x": {
+   "Does not exist": 140,
+   "Should work": 2
+  },
+  "LP_MSPM0L1117->tda4": {
+   "Does not exist": 140,
+   "Could work": 2
+  },
+  "LP_MSPM0L1117->iwrl6432": {
+   "Does not exist": 140,
+   "Should work": 2
+  },
+  "LP_MSPM0L1306->mspm0c1104": {
+   "Should work": 144,
+   "Could work": 25,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->mspm0g3507": {
+   "Should work": 169,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->mspm0g3519": {
+   "Should work": 150,
+   "Could work": 19,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->mspm0g5187": {
+   "Should work": 150,
+   "Could work": 19,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->mspm33c321a": {
+   "Should work": 86,
+   "Could work": 82,
+   "Does not exist": 1,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->cc2340r5": {
+   "Does not exist": 166,
+   "Should work": 1,
+   "Does not make sense": 1,
+   "Could work": 2
+  },
+  "LP_MSPM0L1306->cc2755p10": {
+   "Does not exist": 166,
+   "Should work": 3,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->cc1354p10": {
+   "Does not exist": 166,
+   "Should work": 3,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->cc35x1": {
+   "Does not exist": 166,
+   "Should work": 3,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->am13e230": {
+   "Should work": 150,
+   "Could work": 18,
+   "Does not exist": 1,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L1306->am263p": {
+   "Does not exist": 167,
+   "Does not make sense": 1,
+   "Should work": 2
+  },
+  "LP_MSPM0L1306->f2800137": {
+   "Does not exist": 167,
+   "Does not make sense": 1,
+   "Could work": 2
+  },
+  "LP_MSPM0L1306->f28p65x": {
+   "Does not exist": 167,
+   "Does not make sense": 1,
+   "Should work": 2
+  },
+  "LP_MSPM0L1306->tda4": {
+   "Does not exist": 168,
+   "Could work": 2
+  },
+  "LP_MSPM0L1306->iwrl6432": {
+   "Does not exist": 167,
+   "Does not make sense": 1,
+   "Should work": 2
+  },
+  "LP_MSPM0L2117->mspm0c1104": {
+   "Should work": 118,
+   "Could work": 3,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->mspm0l1306": {
+   "Should work": 118,
+   "Could work": 3,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->mspm0g3507": {
+   "Should work": 121,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->mspm0g3519": {
+   "Should work": 121,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->mspm0g5187": {
+   "Should work": 121,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->mspm33c321a": {
+   "Should work": 80,
+   "Could work": 41,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->cc2340r5": {
+   "Does not exist": 119,
+   "Could work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->cc2755p10": {
+   "Does not exist": 119,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->cc1354p10": {
+   "Does not exist": 119,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->cc35x1": {
+   "Does not exist": 119,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->am13e230": {
+   "Should work": 117,
+   "Could work": 4,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->am263p": {
+   "Does not exist": 119,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->f2800137": {
+   "Does not exist": 119,
+   "Could work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->f28p65x": {
+   "Does not exist": 119,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2117->tda4": {
+   "Does not exist": 120,
+   "Could work": 2
+  },
+  "LP_MSPM0L2117->iwrl6432": {
+   "Does not exist": 119,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->mspm0c1104": {
+   "Could work": 28,
+   "Should work": 154,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->mspm0l1306": {
+   "Could work": 24,
+   "Should work": 158,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->mspm0g3507": {
+   "Should work": 179,
+   "Does not make sense": 1,
+   "Could work": 3
+  },
+  "LP_MSPM0L2228->mspm0g3519": {
+   "Should work": 179,
+   "Does not make sense": 1,
+   "Could work": 3
+  },
+  "LP_MSPM0L2228->mspm0g5187": {
+   "Should work": 177,
+   "Could work": 5,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->mspm33c321a": {
+   "Does not exist": 12,
+   "Should work": 121,
+   "Could work": 49,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->cc2340r5": {
+   "Should work": 12,
+   "Does not exist": 168,
+   "Could work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->cc2755p10": {
+   "Should work": 14,
+   "Does not exist": 168,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->cc1354p10": {
+   "Should work": 14,
+   "Does not exist": 168,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->cc35x1": {
+   "Could work": 1,
+   "Does not exist": 168,
+   "Should work": 13,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->am13e230": {
+   "Does not exist": 12,
+   "Should work": 158,
+   "Could work": 12,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->am263p": {
+   "Does not exist": 180,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->f2800137": {
+   "Does not exist": 180,
+   "Could work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->f28p65x": {
+   "Does not exist": 180,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM0L2228->tda4": {
+   "Does not exist": 181,
+   "Could work": 2
+  },
+  "LP_MSPM0L2228->iwrl6432": {
+   "Does not exist": 180,
+   "Should work": 2,
+   "Does not make sense": 1
+  },
+  "LP_MSPM33C321A->mspm0c1104": {
+   "Does not exist": 1,
+   "Should work": 108,
+   "Could work": 150,
+   "Does not make sense": 1
+  },
+  "LP_MSPM33C321A->mspm0l1306": {
+   "Does not exist": 1,
+   "Should work": 113,
+   "Could work": 145,
+   "Does not make sense": 1
+  },
+  "LP_MSPM33C321A->mspm0g3507": {
+   "Does not exist": 1,
+   "Should work": 132,
+   "Could work": 126,
+   "Does not make sense": 1
+  },
+  "LP_MSPM33C321A->mspm0g3519": {
+   "Does not exist": 1,
+   "Should work": 132,
+   "Could work": 126,
+   "Does not make sense": 1
+  },
+  "LP_MSPM33C321A->mspm0g5187": {
+   "Does not exist": 1,
+   "Should work": 121,
+   "Could work": 137,
+   "Does not make sense": 1
+  },
+  "LP_MSPM33C321A->cc2340r5": {
+   "Does not exist": 258,
+   "Does not make sense": 1,
+   "Should work": 1
+  },
+  "LP_MSPM33C321A->cc2755p10": {
+   "Does not exist": 258,
+   "Does not make sense": 1,
+   "Should work": 1
+  },
+  "LP_MSPM33C321A->cc1354p10": {
+   "Does not exist": 258,
+   "Does not make sense": 1,
+   "Should work": 1
+  },
+  "LP_MSPM33C321A->cc35x1": {
+   "Does not exist": 258,
+   "Does not make sense": 1,
+   "Should work": 1
+  },
+  "LP_MSPM33C321A->am13e230": {
+   "Does not exist": 1,
+   "Should work": 78,
+   "Could work": 180,
+   "Does not make sense": 1
+  },
+  "LP_MSPM33C321A->am263p": {
+   "Does not exist": 258,
+   "Does not make sense": 1,
+   "Should work": 1
+  },
+  "LP_MSPM33C321A->f2800137": {
+   "Does not exist": 258,
+   "Does not make sense": 1,
+   "Should work": 1
+  },
+  "LP_MSPM33C321A->f28p65x": {
+   "Does not exist": 258,
+   "Does not make sense": 1,
+   "Should work": 1
+  },
+  "LP_MSPM33C321A->tda4": {
+   "Does not exist": 259,
+   "Should work": 1
+  },
+  "LP_MSPM33C321A->iwrl6432": {
+   "Does not exist": 258,
+   "Does not make sense": 1,
+   "Should work": 1
+  },
+  "LP_EM_CC2340R5->mspm0c1104": {
+   "Could work": 66,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->mspm0l1306": {
+   "Could work": 49,
+   "Should work": 17,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->mspm0g3507": {
+   "Could work": 20,
+   "Should work": 46,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->mspm0g3519": {
+   "Could work": 20,
+   "Should work": 46,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->mspm0g5187": {
+   "Could work": 21,
+   "Should work": 45,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->mspm33c321a": {
+   "Does not exist": 66,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->cc2755p10": {
+   "Should work": 108,
+   "Could work": 1
+  },
+  "LP_EM_CC2340R5->cc1354p10": {
+   "Should work": 106,
+   "Could work": 3
+  },
+  "LP_EM_CC2340R5->cc35x1": {
+   "Could work": 22,
+   "Should work": 45,
+   "Does not make sense": 42
+  },
+  "LP_EM_CC2340R5->am13e230": {
+   "Does not exist": 66,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->am263p": {
+   "Does not exist": 66,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->f2800137": {
+   "Does not exist": 66,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->f28p65x": {
+   "Does not exist": 66,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->tda4": {
+   "Does not exist": 66,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R5->iwrl6432": {
+   "Does not exist": 66,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R53->mspm0c1104": {
+   "Could work": 66,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->mspm0l1306": {
+   "Could work": 49,
+   "Should work": 17,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->mspm0g3507": {
+   "Could work": 20,
+   "Should work": 46,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->mspm0g3519": {
+   "Could work": 20,
+   "Should work": 46,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->mspm0g5187": {
+   "Could work": 21,
+   "Should work": 45,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->mspm33c321a": {
+   "Does not exist": 66,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->cc2340r5": {
+   "Should work": 109,
+   "Could work": 1
+  },
+  "LP_EM_CC2340R53->cc2755p10": {
+   "Should work": 109,
+   "Could work": 1
+  },
+  "LP_EM_CC2340R53->cc1354p10": {
+   "Should work": 107,
+   "Could work": 3
+  },
+  "LP_EM_CC2340R53->cc35x1": {
+   "Could work": 22,
+   "Should work": 45,
+   "Does not make sense": 43
+  },
+  "LP_EM_CC2340R53->am13e230": {
+   "Does not exist": 66,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->am263p": {
+   "Does not exist": 66,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->f2800137": {
+   "Does not exist": 66,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->f28p65x": {
+   "Does not exist": 66,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->tda4": {
+   "Does not exist": 66,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2340R53->iwrl6432": {
+   "Does not exist": 66,
+   "Does not make sense": 44
+  },
+  "LP_EM_CC2745R10_Q1->mspm0c1104": {
+   "Could work": 91,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->mspm0l1306": {
+   "Could work": 67,
+   "Should work": 24,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->mspm0g3507": {
+   "Could work": 34,
+   "Should work": 57,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->mspm0g3519": {
+   "Could work": 34,
+   "Should work": 57,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->mspm0g5187": {
+   "Could work": 36,
+   "Should work": 55,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->mspm33c321a": {
+   "Does not exist": 91,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->cc2340r5": {
+   "Should work": 97,
+   "Could work": 6
+  },
+  "LP_EM_CC2745R10_Q1->cc2755p10": {
+   "Should work": 100,
+   "Could work": 3
+  },
+  "LP_EM_CC2745R10_Q1->cc1354p10": {
+   "Should work": 98,
+   "Could work": 5
+  },
+  "LP_EM_CC2745R10_Q1->cc35x1": {
+   "Could work": 22,
+   "Should work": 70,
+   "Does not make sense": 11
+  },
+  "LP_EM_CC2745R10_Q1->am13e230": {
+   "Does not exist": 91,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->am263p": {
+   "Does not exist": 91,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->f2800137": {
+   "Does not exist": 91,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->f28p65x": {
+   "Does not exist": 91,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->tda4": {
+   "Does not exist": 91,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2745R10_Q1->iwrl6432": {
+   "Does not exist": 91,
+   "Does not make sense": 12
+  },
+  "LP_EM_CC2755P10->mspm0c1104": {
+   "Could work": 82,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->mspm0l1306": {
+   "Could work": 59,
+   "Should work": 23,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->mspm0g3507": {
+   "Could work": 30,
+   "Should work": 52,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->mspm0g3519": {
+   "Could work": 30,
+   "Should work": 52,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->mspm0g5187": {
+   "Could work": 29,
+   "Should work": 53,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->mspm33c321a": {
+   "Does not exist": 82,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->cc2340r5": {
+   "Should work": 102,
+   "Could work": 5
+  },
+  "LP_EM_CC2755P10->cc1354p10": {
+   "Should work": 105,
+   "Could work": 2
+  },
+  "LP_EM_CC2755P10->cc35x1": {
+   "Could work": 20,
+   "Should work": 63,
+   "Does not make sense": 24
+  },
+  "LP_EM_CC2755P10->am13e230": {
+   "Does not exist": 82,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->am263p": {
+   "Does not exist": 82,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->f2800137": {
+   "Does not exist": 82,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->f28p65x": {
+   "Does not exist": 82,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->tda4": {
+   "Does not exist": 82,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P10->iwrl6432": {
+   "Does not exist": 82,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->mspm0c1104": {
+   "Could work": 86,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->mspm0l1306": {
+   "Could work": 62,
+   "Should work": 24,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->mspm0g3507": {
+   "Could work": 32,
+   "Should work": 54,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->mspm0g3519": {
+   "Could work": 32,
+   "Should work": 54,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->mspm0g5187": {
+   "Could work": 31,
+   "Should work": 55,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->mspm33c321a": {
+   "Does not exist": 86,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->cc2340r5": {
+   "Should work": 106,
+   "Could work": 5
+  },
+  "LP_EM_CC2755P20->cc2755p10": {
+   "Should work": 111
+  },
+  "LP_EM_CC2755P20->cc1354p10": {
+   "Should work": 109,
+   "Could work": 2
+  },
+  "LP_EM_CC2755P20->cc35x1": {
+   "Could work": 20,
+   "Should work": 67,
+   "Does not make sense": 24
+  },
+  "LP_EM_CC2755P20->am13e230": {
+   "Does not exist": 86,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->am263p": {
+   "Does not exist": 86,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->f2800137": {
+   "Does not exist": 86,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->f28p65x": {
+   "Does not exist": 86,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->tda4": {
+   "Does not exist": 86,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755P20->iwrl6432": {
+   "Does not exist": 86,
+   "Does not make sense": 25
+  },
+  "LP_EM_CC2755R10_BG->mspm0c1104": {
+   "Could work": 82,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->mspm0l1306": {
+   "Could work": 59,
+   "Should work": 23,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->mspm0g3507": {
+   "Could work": 30,
+   "Should work": 52,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->mspm0g3519": {
+   "Could work": 30,
+   "Should work": 52,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->mspm0g5187": {
+   "Could work": 29,
+   "Should work": 53,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->mspm33c321a": {
+   "Does not exist": 82,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->cc2340r5": {
+   "Should work": 102,
+   "Could work": 3
+  },
+  "LP_EM_CC2755R10_BG->cc2755p10": {
+   "Should work": 105
+  },
+  "LP_EM_CC2755R10_BG->cc1354p10": {
+   "Should work": 103,
+   "Could work": 2
+  },
+  "LP_EM_CC2755R10_BG->cc35x1": {
+   "Could work": 20,
+   "Should work": 63,
+   "Does not make sense": 22
+  },
+  "LP_EM_CC2755R10_BG->am13e230": {
+   "Does not exist": 82,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->am263p": {
+   "Does not exist": 82,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->f2800137": {
+   "Does not exist": 82,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->f28p65x": {
+   "Does not exist": 82,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->tda4": {
+   "Does not exist": 82,
+   "Does not make sense": 23
+  },
+  "LP_EM_CC2755R10_BG->iwrl6432": {
+   "Does not exist": 82,
+   "Does not make sense": 23
+  },
+  "CC2745R10_CS_EVM->mspm0c1104": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->mspm0l1306": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->mspm0g3507": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->mspm0g3519": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->mspm0g5187": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->mspm33c321a": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->cc2340r5": {
+   "Should work": 4
+  },
+  "CC2745R10_CS_EVM->cc2755p10": {
+   "Should work": 4
+  },
+  "CC2745R10_CS_EVM->cc1354p10": {
+   "Should work": 4
+  },
+  "CC2745R10_CS_EVM->cc35x1": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->am13e230": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->am263p": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->f2800137": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->f28p65x": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->tda4": {
+   "Does not make sense": 4
+  },
+  "CC2745R10_CS_EVM->iwrl6432": {
+   "Does not make sense": 4
+  },
+  "LP_EM_CC35X1->mspm0c1104": {
+   "Could work": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1->mspm0l1306": {
+   "Should work": 1,
+   "Does not make sense": 9,
+   "Could work": 22
+  },
+  "LP_EM_CC35X1->mspm0g3507": {
+   "Should work": 16,
+   "Does not make sense": 9,
+   "Could work": 7
+  },
+  "LP_EM_CC35X1->mspm0g3519": {
+   "Should work": 16,
+   "Does not make sense": 9,
+   "Could work": 7
+  },
+  "LP_EM_CC35X1->mspm0g5187": {
+   "Should work": 14,
+   "Does not make sense": 9,
+   "Could work": 9
+  },
+  "LP_EM_CC35X1->mspm33c321a": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1->cc2340r5": {
+   "Should work": 19,
+   "Does not make sense": 9,
+   "Could work": 4
+  },
+  "LP_EM_CC35X1->cc2755p10": {
+   "Should work": 20,
+   "Does not make sense": 9,
+   "Could work": 3
+  },
+  "LP_EM_CC35X1->cc1354p10": {
+   "Should work": 20,
+   "Does not make sense": 9,
+   "Could work": 3
+  },
+  "LP_EM_CC35X1->am13e230": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1->am263p": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1->f2800137": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1->f28p65x": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1->tda4": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1->iwrl6432": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1ET->mspm0c1104": {
+   "Could work": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1ET->mspm0l1306": {
+   "Should work": 1,
+   "Does not make sense": 9,
+   "Could work": 22
+  },
+  "LP_EM_CC35X1ET->mspm0g3507": {
+   "Should work": 16,
+   "Does not make sense": 9,
+   "Could work": 7
+  },
+  "LP_EM_CC35X1ET->mspm0g3519": {
+   "Should work": 16,
+   "Does not make sense": 9,
+   "Could work": 7
+  },
+  "LP_EM_CC35X1ET->mspm0g5187": {
+   "Should work": 14,
+   "Does not make sense": 9,
+   "Could work": 9
+  },
+  "LP_EM_CC35X1ET->mspm33c321a": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1ET->cc2340r5": {
+   "Should work": 19,
+   "Does not make sense": 9,
+   "Could work": 4
+  },
+  "LP_EM_CC35X1ET->cc2755p10": {
+   "Should work": 20,
+   "Does not make sense": 9,
+   "Could work": 3
+  },
+  "LP_EM_CC35X1ET->cc1354p10": {
+   "Should work": 20,
+   "Does not make sense": 9,
+   "Could work": 3
+  },
+  "LP_EM_CC35X1ET->cc35x1": {
+   "Should work": 32
+  },
+  "LP_EM_CC35X1ET->am13e230": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1ET->am263p": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1ET->f2800137": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1ET->f28p65x": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1ET->tda4": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_EM_CC35X1ET->iwrl6432": {
+   "Does not exist": 23,
+   "Does not make sense": 9
+  },
+  "LP_AM13E230->mspm0c1104": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->mspm0l1306": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->mspm0g3507": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->mspm0g3519": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->mspm0g5187": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->mspm33c321a": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->cc2340r5": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->cc2755p10": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->cc1354p10": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->cc35x1": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->am263p": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->f2800137": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->f28p65x": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->tda4": {
+   "Does not exist": 96
+  },
+  "LP_AM13E230->iwrl6432": {
+   "Does not exist": 96
+  },
+  "LP_AM263P->mspm0c1104": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->mspm0l1306": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->mspm0g3507": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->mspm0g3519": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->mspm0g5187": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->mspm33c321a": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->cc2340r5": {
+   "Does not exist": 216,
+   "Does not make sense": 46
+  },
+  "LP_AM263P->cc2755p10": {
+   "Does not exist": 216,
+   "Does not make sense": 46
+  },
+  "LP_AM263P->cc1354p10": {
+   "Does not exist": 216,
+   "Does not make sense": 46
+  },
+  "LP_AM263P->cc35x1": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->am13e230": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->f2800137": {
+   "Does not exist": 215,
+   "Does not make sense": 47
+  },
+  "LP_AM263P->f28p65x": {
+   "Does not exist": 259,
+   "Does not make sense": 3
+  },
+  "LP_AM263P->tda4": {
+   "Does not exist": 240,
+   "Does not make sense": 22
+  },
+  "LP_AM263P->iwrl6432": {
+   "Should work": 155,
+   "Does not make sense": 47,
+   "Could work": 60
+  },
+  "LAUNCHXL_F2800137->mspm0c1104": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->mspm0l1306": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->mspm0g3507": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->mspm0g3519": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->mspm0g5187": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->mspm33c321a": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->cc2340r5": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->cc2755p10": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->cc1354p10": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->cc35x1": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->am13e230": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->am263p": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->f28p65x": {
+   "Should work": 115
+  },
+  "LAUNCHXL_F2800137->tda4": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "LAUNCHXL_F2800137->iwrl6432": {
+   "Does not exist": 108,
+   "Should work": 7
+  },
+  "IWRL6432BOOST->mspm0c1104": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->mspm0l1306": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->mspm0g3507": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->mspm0g3519": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->mspm0g5187": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->mspm33c321a": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->cc2340r5": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->cc2755p10": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->cc1354p10": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->cc35x1": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->am13e230": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->am263p": {
+   "Does not make sense": 33,
+   "Should work": 68,
+   "Could work": 8
+  },
+  "IWRL6432BOOST->f2800137": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->f28p65x": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  },
+  "IWRL6432BOOST->tda4": {
+   "Does not make sense": 33,
+   "Does not exist": 76
+  }
+ },
+ "blockers": [
+  {
+   "target": "tda4",
+   "blocker": "driverlib_msp is not on the SK-TDA4VM and no shim bridges MSPM0 to TDA4",
+   "n": 1785
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "driverlib_msp is not on the LP-EM-CC2340R5 and no shim bridges MSPM0 to F3",
+   "n": 1779
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "driverlib_msp is not on the LP-EM-CC2755P10 and no shim bridges MSPM0 to F3",
+   "n": 1779
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "driverlib_msp is not on the LP-CC1354P10-1 and no shim bridges MSPM0 to F2",
+   "n": 1779
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "driverlib_msp is not on the LP-EM-CC35X1 and no shim bridges MSPM0 to WIFI",
+   "n": 1779
+  },
+  {
+   "target": "am263p",
+   "blocker": "driverlib_msp is not on the LP-AM263P and no shim bridges MSPM0 to AM263P",
+   "n": 1779
+  },
+  {
+   "target": "f2800137",
+   "blocker": "driverlib_msp is not on the LAUNCHXL-F2800137 and no shim bridges MSPM0 to C2000",
+   "n": 1779
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "driverlib_msp is not on the LAUNCHXL-F28P65X and no shim bridges MSPM0 to C2000",
+   "n": 1779
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "driverlib_msp is not on the IWRL6432BOOST and no shim bridges MSPM0 to MMWAVE",
+   "n": 1779
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "TI Drivers images do not fit 1 KB of RAM",
+   "n": 570
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "tidrivers is not on the LP-MSPM33C321A and no shim bridges F3 to MSPM33",
+   "n": 473
+  },
+  {
+   "target": "am13e230",
+   "blocker": "tidrivers is not on the LP-AM13E230 and no shim bridges F3 to AM13",
+   "n": 473
+  },
+  {
+   "target": "am263p",
+   "blocker": "tidrivers is not on the LP-AM263P and no shim bridges F3 to AM263P",
+   "n": 473
+  },
+  {
+   "target": "f2800137",
+   "blocker": "tidrivers is not on the LAUNCHXL-F2800137 and no shim bridges F3 to C2000",
+   "n": 473
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "tidrivers is not on the LAUNCHXL-F28P65X and no shim bridges F3 to C2000",
+   "n": 473
+  },
+  {
+   "target": "tda4",
+   "blocker": "tidrivers is not on the SK-TDA4VM and no shim bridges F3 to TDA4",
+   "n": 473
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "tidrivers is not on the IWRL6432BOOST and no shim bridges F3 to MMWAVE",
+   "n": 473
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "FreeRTOS fits only on paper in 1 KB of RAM",
+   "n": 371
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "FreeRTOS fits only on paper in 4 KB of RAM",
+   "n": 371
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "ADC has a different API on the LP-MSPM33C321A",
+   "n": 264
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "mcuplus_drivers is not on the LAUNCHXL-F28P65X and no shim bridges AM263P to C2000",
+   "n": 259
+  },
+  {
+   "target": "tda4",
+   "blocker": "driverlib_msp is not on the SK-TDA4VM and no shim bridges MSPM33 to TDA4",
+   "n": 258
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "driverlib_msp is not on the LP-EM-CC2340R5 and no shim bridges MSPM33 to F3",
+   "n": 257
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "driverlib_msp is not on the LP-EM-CC2755P10 and no shim bridges MSPM33 to F3",
+   "n": 257
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "driverlib_msp is not on the LP-CC1354P10-1 and no shim bridges MSPM33 to F2",
+   "n": 257
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "driverlib_msp is not on the LP-EM-CC35X1 and no shim bridges MSPM33 to WIFI",
+   "n": 257
+  },
+  {
+   "target": "am263p",
+   "blocker": "driverlib_msp is not on the LP-AM263P and no shim bridges MSPM33 to AM263P",
+   "n": 257
+  },
+  {
+   "target": "f2800137",
+   "blocker": "driverlib_msp is not on the LAUNCHXL-F2800137 and no shim bridges MSPM33 to C2000",
+   "n": 257
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "driverlib_msp is not on the LAUNCHXL-F28P65X and no shim bridges MSPM33 to C2000",
+   "n": 257
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "driverlib_msp is not on the IWRL6432BOOST and no shim bridges MSPM33 to MMWAVE",
+   "n": 257
+  },
+  {
+   "target": "tda4",
+   "blocker": "mcuplus_drivers is not on the SK-TDA4VM and no shim bridges AM263P to TDA4",
+   "n": 240
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "mcuplus_drivers is not on the LP-EM-CC2340R5 and no shim bridges AM263P to F3",
+   "n": 216
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "mcuplus_drivers is not on the LP-EM-CC2755P10 and no shim bridges AM263P to F3",
+   "n": 216
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "mcuplus_drivers is not on the LP-CC1354P10-1 and no shim bridges AM263P to F2",
+   "n": 216
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0C1104 and no shim bridges AM263P to MSPM0",
+   "n": 215
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0L1306 and no shim bridges AM263P to MSPM0",
+   "n": 215
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0G3507 and no shim bridges AM263P to MSPM0",
+   "n": 215
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0G3519 and no shim bridges AM263P to MSPM0",
+   "n": 215
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0G5187 and no shim bridges AM263P to MSPM0",
+   "n": 215
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM33C321A and no shim bridges AM263P to MSPM33",
+   "n": 215
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "mcuplus_drivers is not on the LP-EM-CC35X1 and no shim bridges AM263P to WIFI",
+   "n": 215
+  },
+  {
+   "target": "am13e230",
+   "blocker": "mcuplus_drivers is not on the LP-AM13E230 and no shim bridges AM263P to AM13",
+   "n": 215
+  },
+  {
+   "target": "f2800137",
+   "blocker": "mcuplus_drivers is not on the LAUNCHXL-F2800137 and no shim bridges AM263P to C2000",
+   "n": 215
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "SPI has a different API on the LP-MSPM33C321A",
+   "n": 207
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "I2C has a different API on the LP-MSPM33C321A",
+   "n": 194
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no VREF",
+   "n": 137
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no KEYSTORE",
+   "n": 126
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no KEYSTORE",
+   "n": 126
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no KEYSTORE",
+   "n": 126
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no KEYSTORE",
+   "n": 126
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no KEYSTORE",
+   "n": 126
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no AES",
+   "n": 110
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no AES",
+   "n": 110
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "c2000_driverlib is not on the LP-MSPM0C1104 and no shim bridges C2000 to MSPM0",
+   "n": 108
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "c2000_driverlib is not on the LP-MSPM0L1306 and no shim bridges C2000 to MSPM0",
+   "n": 108
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "c2000_driverlib is not on the LP-MSPM0G3507 and no shim bridges C2000 to MSPM0",
+   "n": 108
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "c2000_driverlib is not on the LP-MSPM0G3519 and no shim bridges C2000 to MSPM0",
+   "n": 108
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "c2000_driverlib is not on the LP-MSPM0G5187 and no shim bridges C2000 to MSPM0",
+   "n": 108
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "c2000_driverlib is not on the LP-MSPM33C321A and no shim bridges C2000 to MSPM33",
+   "n": 108
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "c2000_driverlib is not on the LP-EM-CC2340R5 and no shim bridges C2000 to F3",
+   "n": 108
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "c2000_driverlib is not on the LP-EM-CC2755P10 and no shim bridges C2000 to F3",
+   "n": 108
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "c2000_driverlib is not on the LP-CC1354P10-1 and no shim bridges C2000 to F2",
+   "n": 108
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "c2000_driverlib is not on the LP-EM-CC35X1 and no shim bridges C2000 to WIFI",
+   "n": 108
+  },
+  {
+   "target": "am13e230",
+   "blocker": "c2000_driverlib is not on the LP-AM13E230 and no shim bridges C2000 to AM13",
+   "n": 108
+  },
+  {
+   "target": "am263p",
+   "blocker": "c2000_driverlib is not on the LP-AM263P and no shim bridges C2000 to AM263P",
+   "n": 108
+  },
+  {
+   "target": "tda4",
+   "blocker": "c2000_driverlib is not on the SK-TDA4VM and no shim bridges C2000 to TDA4",
+   "n": 108
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "c2000_driverlib is not on the IWRL6432BOOST and no shim bridges C2000 to MMWAVE",
+   "n": 108
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no RADIO_RF",
+   "n": 103
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "am13_driverlib is not on the LP-MSPM0C1104 and no shim bridges AM13 to MSPM0",
+   "n": 96
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "am13_driverlib is not on the LP-MSPM0L1306 and no shim bridges AM13 to MSPM0",
+   "n": 96
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "am13_driverlib is not on the LP-MSPM0G3507 and no shim bridges AM13 to MSPM0",
+   "n": 96
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "am13_driverlib is not on the LP-MSPM0G3519 and no shim bridges AM13 to MSPM0",
+   "n": 96
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "am13_driverlib is not on the LP-MSPM0G5187 and no shim bridges AM13 to MSPM0",
+   "n": 96
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "am13_driverlib is not on the LP-MSPM33C321A and no shim bridges AM13 to MSPM33",
+   "n": 96
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "am13_driverlib is not on the LP-EM-CC2340R5 and no shim bridges AM13 to F3",
+   "n": 96
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "am13_driverlib is not on the LP-EM-CC2755P10 and no shim bridges AM13 to F3",
+   "n": 96
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "am13_driverlib is not on the LP-CC1354P10-1 and no shim bridges AM13 to F2",
+   "n": 96
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "am13_driverlib is not on the LP-EM-CC35X1 and no shim bridges AM13 to WIFI",
+   "n": 96
+  },
+  {
+   "target": "am263p",
+   "blocker": "am13_driverlib is not on the LP-AM263P and no shim bridges AM13 to AM263P",
+   "n": 96
+  },
+  {
+   "target": "f2800137",
+   "blocker": "am13_driverlib is not on the LAUNCHXL-F2800137 and no shim bridges AM13 to C2000",
+   "n": 96
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "am13_driverlib is not on the LAUNCHXL-F28P65X and no shim bridges AM13 to C2000",
+   "n": 96
+  },
+  {
+   "target": "tda4",
+   "blocker": "am13_driverlib is not on the SK-TDA4VM and no shim bridges AM13 to TDA4",
+   "n": 96
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "am13_driverlib is not on the IWRL6432BOOST and no shim bridges AM13 to MMWAVE",
+   "n": 96
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no RADIO_BLE",
+   "n": 91
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0C1104 and no shim bridges MMWAVE to MSPM0",
+   "n": 76
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0L1306 and no shim bridges MMWAVE to MSPM0",
+   "n": 76
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0G3507 and no shim bridges MMWAVE to MSPM0",
+   "n": 76
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0G3519 and no shim bridges MMWAVE to MSPM0",
+   "n": 76
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM0G5187 and no shim bridges MMWAVE to MSPM0",
+   "n": 76
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "mcuplus_drivers is not on the LP-MSPM33C321A and no shim bridges MMWAVE to MSPM33",
+   "n": 76
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "mcuplus_drivers is not on the LP-EM-CC2340R5 and no shim bridges MMWAVE to F3",
+   "n": 76
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "mcuplus_drivers is not on the LP-EM-CC2755P10 and no shim bridges MMWAVE to F3",
+   "n": 76
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "mcuplus_drivers is not on the LP-CC1354P10-1 and no shim bridges MMWAVE to F2",
+   "n": 76
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "mcuplus_drivers is not on the LP-EM-CC35X1 and no shim bridges MMWAVE to WIFI",
+   "n": 76
+  },
+  {
+   "target": "am13e230",
+   "blocker": "mcuplus_drivers is not on the LP-AM13E230 and no shim bridges MMWAVE to AM13",
+   "n": 76
+  },
+  {
+   "target": "f2800137",
+   "blocker": "mcuplus_drivers is not on the LAUNCHXL-F2800137 and no shim bridges MMWAVE to C2000",
+   "n": 76
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "mcuplus_drivers is not on the LAUNCHXL-F28P65X and no shim bridges MMWAVE to C2000",
+   "n": 76
+  },
+  {
+   "target": "tda4",
+   "blocker": "mcuplus_drivers is not on the SK-TDA4VM and no shim bridges MMWAVE to TDA4",
+   "n": 76
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no AES",
+   "n": 71
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no RADIO_ZIGBEE",
+   "n": 71
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "DMA has a different API on the LP-MSPM33C321A",
+   "n": 68
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no COMP",
+   "n": 61
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "tidrivers is not on the LP-MSPM33C321A and no shim bridges MSPM0 to MSPM33",
+   "n": 51
+  },
+  {
+   "target": "am13e230",
+   "blocker": "tidrivers is not on the LP-AM13E230 and no shim bridges MSPM0 to AM13",
+   "n": 51
+  },
+  {
+   "target": "am263p",
+   "blocker": "tidrivers is not on the LP-AM263P and no shim bridges MSPM0 to AM263P",
+   "n": 51
+  },
+  {
+   "target": "f2800137",
+   "blocker": "tidrivers is not on the LAUNCHXL-F2800137 and no shim bridges MSPM0 to C2000",
+   "n": 51
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "tidrivers is not on the LAUNCHXL-F28P65X and no shim bridges MSPM0 to C2000",
+   "n": 51
+  },
+  {
+   "target": "tda4",
+   "blocker": "tidrivers is not on the SK-TDA4VM and no shim bridges MSPM0 to TDA4",
+   "n": 51
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "tidrivers is not on the IWRL6432BOOST and no shim bridges MSPM0 to MMWAVE",
+   "n": 51
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no PKA",
+   "n": 47
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no PKA",
+   "n": 47
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no PKA",
+   "n": 47
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no PKA",
+   "n": 47
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no PKA",
+   "n": 47
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "tidrivers is not on the LP-MSPM33C321A and no shim bridges WIFI to MSPM33",
+   "n": 46
+  },
+  {
+   "target": "am13e230",
+   "blocker": "tidrivers is not on the LP-AM13E230 and no shim bridges WIFI to AM13",
+   "n": 46
+  },
+  {
+   "target": "am263p",
+   "blocker": "tidrivers is not on the LP-AM263P and no shim bridges WIFI to AM263P",
+   "n": 46
+  },
+  {
+   "target": "f2800137",
+   "blocker": "tidrivers is not on the LAUNCHXL-F2800137 and no shim bridges WIFI to C2000",
+   "n": 46
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "tidrivers is not on the LAUNCHXL-F28P65X and no shim bridges WIFI to C2000",
+   "n": 46
+  },
+  {
+   "target": "tda4",
+   "blocker": "tidrivers is not on the SK-TDA4VM and no shim bridges WIFI to TDA4",
+   "n": 46
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "tidrivers is not on the IWRL6432BOOST and no shim bridges WIFI to MMWAVE",
+   "n": 46
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no CAN",
+   "n": 44
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no CAN",
+   "n": 44
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no CAN",
+   "n": 44
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "no MATHACL: IQmath falls back to the RTS library",
+   "n": 43
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "no MATHACL: IQmath falls back to the RTS library",
+   "n": 43
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "no MATHACL: IQmath falls back to the RTS library",
+   "n": 43
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "no MATHACL: IQmath falls back to the RTS library",
+   "n": 43
+  },
+  {
+   "target": "am13e230",
+   "blocker": "no MATHACL: IQmath falls back to the RTS library",
+   "n": 43
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no PKA",
+   "n": 39
+  },
+  {
+   "target": "am13e230",
+   "blocker": "DMA has a different API on the LP-AM13E230",
+   "n": 36
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no OPA",
+   "n": 33
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no OPA",
+   "n": 33
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no OPA",
+   "n": 33
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no OPA",
+   "n": 33
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no XBAR",
+   "n": 33
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no RADAR_HWA",
+   "n": 32
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no DAC",
+   "n": 31
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no DAC",
+   "n": 31
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no DAC",
+   "n": 31
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no DAC",
+   "n": 31
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no DAC",
+   "n": 31
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no SHA",
+   "n": 31
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no SHA",
+   "n": 31
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no SHA",
+   "n": 31
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no SHA",
+   "n": 31
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no SHA",
+   "n": 31
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no SD",
+   "n": 30
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no SD",
+   "n": 30
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no SD",
+   "n": 30
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no SD",
+   "n": 30
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no SD",
+   "n": 30
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no SD",
+   "n": 30
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "CAN has a different API on the LP-MSPM33C321A",
+   "n": 29
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "ADC has a different API on the LP-MSPM0C1104",
+   "n": 26
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "ADC has a different API on the LP-MSPM0L1306",
+   "n": 26
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "ADC has a different API on the LP-MSPM0G3507",
+   "n": 26
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "ADC has a different API on the LP-MSPM0G3519",
+   "n": 26
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "ADC has a different API on the LP-MSPM0G5187",
+   "n": 26
+  },
+  {
+   "target": "am13e230",
+   "blocker": "ADC has a different API on the LP-AM13E230",
+   "n": 26
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no MULTICORE",
+   "n": 25
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no ADC",
+   "n": 24
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no LIN",
+   "n": 22
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "LIN has a different API on the LP-MSPM33C321A",
+   "n": 20
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no DMA",
+   "n": 20
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no DMA",
+   "n": 20
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no DMA",
+   "n": 20
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no TRNG",
+   "n": 19
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no TRNG",
+   "n": 19
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no TRNG",
+   "n": 19
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no TRNG",
+   "n": 19
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no SDFM",
+   "n": 19
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no WIFI",
+   "n": 18
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "SPI has a different API on the LP-MSPM0C1104",
+   "n": 16
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "SPI has a different API on the LP-MSPM0L1306",
+   "n": 16
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "SPI has a different API on the LP-MSPM0G3507",
+   "n": 16
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "SPI has a different API on the LP-MSPM0G3519",
+   "n": 16
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "SPI has a different API on the LP-MSPM0G5187",
+   "n": 16
+  },
+  {
+   "target": "am13e230",
+   "blocker": "SPI has a different API on the LP-AM13E230",
+   "n": 16
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no RTC",
+   "n": 14
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no RTC",
+   "n": 14
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no RTC",
+   "n": 14
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no RTC",
+   "n": 14
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no RTC",
+   "n": 14
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "I2C has a different API on the LP-MSPM0C1104",
+   "n": 14
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "I2C has a different API on the LP-MSPM0L1306",
+   "n": 14
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "I2C has a different API on the LP-MSPM0G3507",
+   "n": 14
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "I2C has a different API on the LP-MSPM0G3519",
+   "n": 14
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "I2C has a different API on the LP-MSPM0G5187",
+   "n": 14
+  },
+  {
+   "target": "am13e230",
+   "blocker": "I2C has a different API on the LP-AM13E230",
+   "n": 14
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no I2S",
+   "n": 12
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no I2S",
+   "n": 12
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no I2S",
+   "n": 12
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no I2S",
+   "n": 12
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no COMP",
+   "n": 12
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no I2C_TARGET",
+   "n": 12
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no I2C_TARGET",
+   "n": 12
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no I2C_TARGET",
+   "n": 12
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no I2C_TARGET",
+   "n": 12
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no I2C_TARGET",
+   "n": 12
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no I2C_TARGET",
+   "n": 12
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no I2C_TARGET",
+   "n": 12
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no PKA",
+   "n": 12
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no GSC",
+   "n": 11
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no GSC",
+   "n": 11
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no GSC",
+   "n": 11
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no GSC",
+   "n": 11
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no GSC",
+   "n": 11
+  },
+  {
+   "target": "am13e230",
+   "blocker": "GSC has a different API on the LP-AM13E230",
+   "n": 11
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no CAN",
+   "n": 11
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no CAN",
+   "n": 11
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no CAN",
+   "n": 10
+  },
+  {
+   "target": "am13e230",
+   "blocker": "PWM has a different API on the LP-AM13E230",
+   "n": 9
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no DAC",
+   "n": 9
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no HSM",
+   "n": 9
+  },
+  {
+   "target": "am13e230",
+   "blocker": "AES has a different API on the LP-AM13E230",
+   "n": 8
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "RTC has a different API on the LP-MSPM0G3507",
+   "n": 8
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no PKA",
+   "n": 8
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,048 B of RAM against 1 KB",
+   "n": 7
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,048 B of RAM against 4 KB",
+   "n": 7
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,048 B of RAM against 32 KB",
+   "n": 7
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,048 B of RAM against 32 KB",
+   "n": 7
+  },
+  {
+   "target": "am13e230",
+   "blocker": "CRC has a different API on the LP-AM13E230",
+   "n": 7
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "no TMU: the maths runs in software",
+   "n": 7
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no DISPLAY",
+   "n": 6
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "RTC has a different API on the LP-MSPM33C321A",
+   "n": 6
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no I2S",
+   "n": 6
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no TAMPER",
+   "n": 6
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no TAMPER",
+   "n": 6
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no TAMPER",
+   "n": 6
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no TAMPER",
+   "n": 6
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no TAMPER",
+   "n": 6
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no TAMPER",
+   "n": 6
+  },
+  {
+   "target": "am13e230",
+   "blocker": "COMP has a different API on the LP-AM13E230",
+   "n": 6
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no I2S",
+   "n": 6
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no CRC",
+   "n": 6
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no QEI",
+   "n": 5
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no QEI",
+   "n": 5
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no DISPLAY",
+   "n": 5
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no DISPLAY",
+   "n": 5
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,016 B of RAM against 1 KB",
+   "n": 5
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,016 B of RAM against 4 KB",
+   "n": 5
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,016 B of RAM against 32 KB",
+   "n": 5
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,016 B of RAM against 32 KB",
+   "n": 5
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no DISPLAY",
+   "n": 4
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "I2S has a different API on the LP-MSPM0G5187",
+   "n": 4
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "CAN has a different API on the LP-MSPM0G3507",
+   "n": 4
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "CAN has a different API on the LP-MSPM0G3519",
+   "n": 4
+  },
+  {
+   "target": "am13e230",
+   "blocker": "CAN has a different API on the LP-AM13E230",
+   "n": 4
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,080 B of RAM against 1 KB",
+   "n": 3
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,080 B of RAM against 4 KB",
+   "n": 3
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,080 B of RAM against 32 KB",
+   "n": 3
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,080 B of RAM against 32 KB",
+   "n": 3
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 19,264 B of flash against 16 KB",
+   "n": 3
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "TAMPER has a different API on the LP-MSPM33C321A",
+   "n": 3
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no SHA",
+   "n": 3
+  },
+  {
+   "target": "am13e230",
+   "blocker": "WDT has a different API on the LP-AM13E230",
+   "n": 3
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no RADAR",
+   "n": 3
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no AES",
+   "n": 2
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no AES",
+   "n": 2
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no AES",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,152 B of RAM against 1 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,152 B of RAM against 4 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,152 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,152 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,064 B of RAM against 1 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,064 B of RAM against 4 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,064 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,064 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 88,436 B of RAM against 1 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 88,436 B of RAM against 4 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 88,436 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 88,436 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 89,325 B of RAM against 1 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 89,325 B of RAM against 4 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 89,325 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 89,325 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 90,643 B of RAM against 1 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 90,643 B of RAM against 4 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 90,643 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 90,643 B of RAM against 32 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "I2S has a different API on the LP-MSPM33C321A",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 7,715 B of RAM against 1 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 7,715 B of RAM against 4 KB",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no QSPI",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no QSPI",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no QSPI",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no QSPI",
+   "n": 2
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no QSPI",
+   "n": 2
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no QSPI",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "LIN has a different API on the LP-MSPM0C1104",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "LIN has a different API on the LP-MSPM0L1306",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "LIN has a different API on the LP-MSPM0G3507",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "LIN has a different API on the LP-MSPM0G3519",
+   "n": 2
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "LIN has a different API on the LP-MSPM0G5187",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no PRU",
+   "n": 2
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no COMP",
+   "n": 2
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no QEI",
+   "n": 2
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no ESM",
+   "n": 2
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 979 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 2,312 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,336 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,336 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,336 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,336 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,096 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,096 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,096 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,096 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,021 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,021 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,021 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,021 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,176 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,176 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,176 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,176 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 61,184 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,213 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 61,184 B of flash against 64 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,213 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,213 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,213 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 27,440 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,117 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,117 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,117 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,117 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,112 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,112 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,112 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,112 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,044 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,044 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,044 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,044 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 15,768 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 89,888 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 89,888 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 89,888 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 89,888 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 26,128 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 88,544 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 88,544 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 88,544 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 88,544 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 22,112 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 26,304 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 16,808 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,124 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,124 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,124 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,124 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 20,104 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 17,960 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 92,000 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 92,000 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 92,000 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 92,000 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 27,976 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 89,436 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 89,436 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 89,436 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 89,436 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 23,360 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 25,512 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 19,024 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 19,528 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 93,504 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 93,504 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 93,504 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 93,504 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 32,072 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 90,784 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 90,784 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 90,784 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 90,784 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 32,288 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 32,872 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 25,496 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 86,092 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 86,092 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 86,092 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 86,092 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 21,416 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 92,584 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 92,584 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 92,584 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 92,584 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 89,480 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 89,480 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 89,480 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 89,480 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 17,352 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 87,136 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 87,136 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 87,136 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 87,136 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 89,600 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 89,600 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 89,600 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 89,600 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 90,952 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 90,952 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 90,952 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 90,952 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 27,800 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,687 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 25,616 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 8,273 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 8,273 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,576 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 2,305 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 2,306 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 3,095 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 72,600 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 11,710 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 72,600 B of flash against 64 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 11,710 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 70,744 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 26,704 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 70,744 B of flash against 64 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 26,704 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 7,056 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 7,056 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 2,984 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 24,136 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 3,340 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 328,344 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 33,008 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 328,344 B of flash against 64 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 33,008 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 328,344 B of flash against 128 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 33,008 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 328,344 B of flash against 128 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 33,008 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 5,724 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 5,724 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 116,680 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 20,138 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 116,680 B of flash against 64 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 20,138 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 88,592 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 17,030 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 88,592 B of flash against 64 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 17,030 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,628 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 66,920 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 59,028 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 66,920 B of flash against 64 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 59,028 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 59,028 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 59,028 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,732 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,620 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 49,512 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 61,709 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 61,709 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "native image 61,709 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "native image 61,709 B of RAM against 32 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 107,200 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 9,850 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 107,200 B of flash against 64 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 9,850 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,406 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,002 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 3,171 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 2,646 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 952 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,112 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 1,144 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "am263p",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no USB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 26,320 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 6,939 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 6,939 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 6,321 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 6,321 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 6,729 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 6,729 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 27,496 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 7,505 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 7,505 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 25,176 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 7,394 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 7,394 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 27,784 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 7,442 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 7,442 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 29,584 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 29,296 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 18,344 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 6,067 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 6,067 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 18,168 B of flash against 16 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "native image 5,947 B of RAM against 1 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "native image 5,947 B of RAM against 4 KB",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "tidrivers is not on the LP-MSPM0C1104 and no shim bridges MSPM33 to MSPM0",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "tidrivers is not on the LP-MSPM0L1306 and no shim bridges MSPM33 to MSPM0",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "tidrivers is not on the LP-MSPM0G3507 and no shim bridges MSPM33 to MSPM0",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "tidrivers is not on the LP-MSPM0G3519 and no shim bridges MSPM33 to MSPM0",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "tidrivers is not on the LP-MSPM0G5187 and no shim bridges MSPM33 to MSPM0",
+   "n": 1
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "tidrivers is not on the LP-EM-CC2340R5 and no shim bridges MSPM33 to F3",
+   "n": 1
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "tidrivers is not on the LP-EM-CC2755P10 and no shim bridges MSPM33 to F3",
+   "n": 1
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "tidrivers is not on the LP-CC1354P10-1 and no shim bridges MSPM33 to F2",
+   "n": 1
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "tidrivers is not on the LP-EM-CC35X1 and no shim bridges MSPM33 to WIFI",
+   "n": 1
+  },
+  {
+   "target": "am13e230",
+   "blocker": "tidrivers is not on the LP-AM13E230 and no shim bridges MSPM33 to AM13",
+   "n": 1
+  },
+  {
+   "target": "am263p",
+   "blocker": "tidrivers is not on the LP-AM263P and no shim bridges MSPM33 to AM263P",
+   "n": 1
+  },
+  {
+   "target": "f2800137",
+   "blocker": "tidrivers is not on the LAUNCHXL-F2800137 and no shim bridges MSPM33 to C2000",
+   "n": 1
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "tidrivers is not on the LAUNCHXL-F28P65X and no shim bridges MSPM33 to C2000",
+   "n": 1
+  },
+  {
+   "target": "tda4",
+   "blocker": "tidrivers is not on the SK-TDA4VM and no shim bridges MSPM33 to TDA4",
+   "n": 1
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "tidrivers is not on the IWRL6432BOOST and no shim bridges MSPM33 to MMWAVE",
+   "n": 1
+  },
+  {
+   "target": "am13e230",
+   "blocker": "QEI has a different API on the LP-AM13E230",
+   "n": 1
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no RTC",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "f28p65x",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "tda4",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no RADIO_THREAD",
+   "n": 1
+  },
+  {
+   "target": "mspm0c1104",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "mspm0l1306",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3507",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "mspm0g3519",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "mspm0g5187",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "mspm33c321a",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "cc2340r5",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "cc2755p10",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "cc1354p10",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "cc35x1",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "am13e230",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "f2800137",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  },
+  {
+   "target": "iwrl6432",
+   "blocker": "target has no ETHERNET",
+   "n": 1
+  }
+ ],
+ "queue": [
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 248
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 222
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 209
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 207
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 203
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 202
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 201
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 201
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 195
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 193
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 188
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 179
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 175
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 166
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 165
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 165
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 163
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 161
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 159
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 156
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 155
+  },
+  {
+   "source": "LP_AM263P",
+   "target": "iwrl6432",
+   "layer": "mcuplus_drivers",
+   "evidence": "untried",
+   "n": 155
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 152
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 148
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 147
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 147
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 144
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 144
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 142
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 142
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 133
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "untried",
+   "n": 131
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "untried",
+   "n": 131
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 128
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 128
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 128
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 128
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 127
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 126
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 123
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 123
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 123
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 122
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 120
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 120
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 120
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 120
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 120
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "untried",
+   "n": 120
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 119
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 119
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 119
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 119
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 118
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 118
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 118
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 118
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 118
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 116
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 116
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 115
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 115
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 114
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 113
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "untried",
+   "n": 112
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 110
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 108
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 108
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 108
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "f28p65x",
+   "layer": "c2000_driverlib",
+   "evidence": "inferred",
+   "n": 108
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0c1104",
+   "layer": "driverlib_msp",
+   "evidence": "untried",
+   "n": 107
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 107
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 106
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 105
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 105
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 104
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 104
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 102
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 101
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 101
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 99
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 97
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 96
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 96
+  },
+  {
+   "source": "LP_MSPM0C1104",
+   "target": "mspm0g3507",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 91
+  },
+  {
+   "source": "LP_MSPM0C1104",
+   "target": "mspm0g3519",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 91
+  },
+  {
+   "source": "LP_MSPM0C1104",
+   "target": "mspm0l1306",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 89
+  },
+  {
+   "source": "LP_MSPM0C1104",
+   "target": "mspm0g5187",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 89
+  },
+  {
+   "source": "LP_MSPM0C1104",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 87
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 86
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 84
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 78
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "am13e230",
+   "layer": "driverlib_msp",
+   "evidence": "untried",
+   "n": 77
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 70
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 69
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 69
+  },
+  {
+   "source": "IWRL6432BOOST",
+   "target": "am263p",
+   "layer": "mcuplus_drivers",
+   "evidence": "untried",
+   "n": 68
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 66
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 62
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 62
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 57
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 57
+  },
+  {
+   "source": "LP_MSPM0C1104",
+   "target": "mspm33c321a",
+   "layer": "driverlib_msp",
+   "evidence": "measured",
+   "n": 56
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 55
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 55
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 54
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 54
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 53
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 53
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 52
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 52
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 52
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 52
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 46
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 46
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 46
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 46
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 45
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 45
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 44
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 44
+  },
+  {
+   "source": "LP_EM_CC35X1ET",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 32
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 24
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 24
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 23
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 23
+  },
+  {
+   "source": "LP_EM_CC35X1",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 20
+  },
+  {
+   "source": "LP_EM_CC35X1",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 20
+  },
+  {
+   "source": "LP_EM_CC35X1ET",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 20
+  },
+  {
+   "source": "LP_EM_CC35X1ET",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 20
+  },
+  {
+   "source": "LP_EM_CC35X1",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 19
+  },
+  {
+   "source": "LP_EM_CC35X1ET",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 19
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 17
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 17
+  },
+  {
+   "source": "LP_EM_CC35X1",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 16
+  },
+  {
+   "source": "LP_EM_CC35X1",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 16
+  },
+  {
+   "source": "LP_EM_CC35X1ET",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 16
+  },
+  {
+   "source": "LP_EM_CC35X1ET",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 16
+  },
+  {
+   "source": "LP_EM_CC35X1",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 14
+  },
+  {
+   "source": "LP_EM_CC35X1ET",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 14
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 12
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 11
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 11
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 11
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "cc2340r5",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "tda4",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "LAUNCHXL_F2800137",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 7
+  },
+  {
+   "source": "CC2745R10_CS_EVM",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 4
+  },
+  {
+   "source": "CC2745R10_CS_EVM",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 4
+  },
+  {
+   "source": "CC2745R10_CS_EVM",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 4
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0C1106",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3507",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0H3216",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2117",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm33c321a",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 2
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G3218",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G3519",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0G5187",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L1117",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g3507",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g3519",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "mspm0g5187",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "cc2340r5",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "cc2755p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "cc1354p10",
+   "layer": "tidrivers",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L1306",
+   "target": "cc35x1",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM0L2228",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "inferred",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0c1104",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0l1306",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0g3507",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0g3519",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "mspm0g5187",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "cc2340r5",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "am13e230",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "am263p",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "f2800137",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "f28p65x",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "tda4",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_MSPM33C321A",
+   "target": "iwrl6432",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2340R5",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "cc2340r5",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2340R53",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "cc2340r5",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2745R10_Q1",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "cc2340r5",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755P10",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "cc2340r5",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755P20",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "cc2340r5",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "cc2755p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "cc1354p10",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC2755R10_BG",
+   "target": "cc35x1",
+   "layer": "plain_c",
+   "evidence": "measured",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC35X1",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 1
+  },
+  {
+   "source": "LP_EM_CC35X1ET",
+   "target": "mspm0l1306",
+   "layer": "tidrivers",
+   "evidence": "untried",
+   "n": 1
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: Apache-2.0
+
+if BOARD_LP_MSPM0L1306
+
+# The upstream driver does not build for this chip. The board folder supplies a copy.
+config GPIO_MSPM0
+	default n
+
+endif # BOARD_LP_MSPM0L1306

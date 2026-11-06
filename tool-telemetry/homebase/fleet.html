@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tool Fleet</title>
+<style>
+:root{--red:#B42418;--ink:#161312;--stone:#6B625B;--paper:#F4EFE6;--cream:#F7F3EC;--line:#E2D8C9;--ok:#2F6B3A;
+--bg:var(--paper);--card:var(--cream);--text:var(--ink);--sub:var(--stone)}
+@media (prefers-color-scheme:dark){:root{--bg:#161312;--card:#211C1A;--text:#F7F3EC;--sub:#B9AFA6;--line:#3A322E;--ok:#7FC08A}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 Barlow,"Helvetica Neue",Arial,system-ui,sans-serif}
+main{max-width:1080px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:30px;margin:0}
+.sub{color:var(--sub);font-size:14px}
+h2{font-size:14px;text-transform:uppercase;letter-spacing:.6px;color:var(--sub);margin:28px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 16px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:10px 8px;border-top:1px solid var(--line);white-space:nowrap}
+tr:first-child th{border-top:0}
+th{font-size:13px;color:var(--sub);font-weight:600}
+td.n{text-align:right} th.n{text-align:right}
+.alert{color:var(--red);font-weight:700}
+@media (prefers-color-scheme:dark){.alert{color:#F7F3EC;text-decoration:underline 2px #B42418}}
+.run{color:var(--ok);font-weight:600}
+.empty{color:var(--sub);padding:18px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.tile b{display:block;font-size:28px}
+.tile span{font-size:13px;color:var(--sub)}
+</style>
+</head>
+<body>
+<main>
+  <h1>Tool Fleet</h1>
+  <div class="sub">Fox Red Labs home base · everything the hubs and phones have uploaded · <span id="when"></span></div>
+  <div class="grid" id="tiles" style="margin-top:18px"></div>
+  <h2>Tools</h2><div class="card" id="fleet"></div>
+  <h2>Where Hubble heard them</h2><div class="card" id="hubble"></div>
+  <h2>Other devices</h2><div class="card" id="devices"></div>
+  <h2>Recent events</h2><div class="card" id="events"></div>
+  <h2>How records arrived</h2><div class="card" id="sources"></div>
+</main>
+<script>
+"use strict";
+const EV = {1:"Trigger pull",2:"Overcurrent trip",3:"Driver fault",4:"Tool restarted",5:"Tag restarted"};
+const VIA = {phone:"Phone (carried in)", modem:"Gateway modem line", wifi:"Gateway Wi-Fi uplink"};
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const num = n => Number(n ?? 0).toLocaleString();
+const run = s => { s = s|0; const h = (s/3600)|0, m = ((s%3600)/60)|0; return h ? `${h}h ${m}m` : `${m}m ${s%60}s`; };
+const t = u => u ? new Date(u*1000).toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit"}) : "–";
+const get = p => fetch(p, {cache:"no-store"}).then(r => r.json());
+async function load(){
+  const [fleet, events, sources, devs, hub] = await Promise.all([get("/api/fleet"), get("/api/events"), get("/api/sources"), get("/api/devices"), get("/api/hubble")]);
+  // Hubble: newest message per device. Heard at = the phone that heard it (ground); satellites give no position, so the
+  // tool's own "last site" from its 13-byte message is what places it.
+  const map = (la, lo) => la == null || lo == null ? "–" : `<a href="https://www.google.com/maps?q=${Number(la).toFixed(4)},${Number(lo).toFixed(4)}" target="_blank" rel="noopener">${Number(la).toFixed(3)}, ${Number(lo).toFixed(3)}</a>`;
+  const last = Object.values(hub.reduce((o, p) => (o[p.device] ??= p, o), {}));
+  document.getElementById("hubble").innerHTML = last.length ? `<table><tr><th>Device</th><th>When</th><th>By</th><th>Heard at</th><th>Last site</th><th class="n">Trigger pulls</th><th class="n">Motor hours</th><th class="n">Battery</th><th>Flags</th></tr>` +
+    last.map(p => { const m = p.msg || {}; return `<tr><td><b>${esc(p.name || p.device)}</b></td><td>${t(p.unix)}</td><td>${p.network == "SATELLITE" ? "Satellite" : "Phones nearby"}</td>
+    <td>${map(p.heard_lat, p.heard_lon)}</td><td>${map(m.lat, m.lon)}</td><td class="n">${m.trig == null ? "–" : num(m.trig)}</td><td class="n">${m.run_h == null ? "–" : Number(m.run_h).toFixed(1)}</td>
+    <td class="n">${m.soc == null ? "–" : esc(Number(m.soc)) + "%"}</td><td>${[m.fault && "fault", m.jam_since_last && "jam", m.battery_low && "battery low", m.used_24h && "used today"].filter(Boolean).map(esc).join(", ") || "–"}</td></tr>`; }).join("") + `</table>`
+    : `<div class="empty">No Hubble messages yet. Run homebase/hubble_sync.py after a pass; the CC2755P10 sends its asset message every 10 s.</div>`;
+  document.getElementById("devices").innerHTML = devs.length ? `<table><tr><th>Device</th><th>App</th>${[...new Set(devs.flatMap(d => d.headline))].map(h => `<th>${esc(h.replace(/_/g, " "))}</th>`).join("")}<th class="n">Records</th><th>Newest</th><th>Hub</th></tr>` +
+    devs.map(d => `<tr><td><b>${esc(d.name)}</b></td><td>${esc(d.app)}</td>${[...new Set(devs.flatMap(x => x.headline))].map(h => `<td>${esc(d.fields[h] ?? "–")}</td>`).join("")}
+    <td class="n">${num(d.records)}</td><td>${t(d.newest)}</td><td>${esc(d.hub)}</td></tr>`).join("") + `</table>` : `<div class="empty">None yet. Any app in portability/fielddata/apps shows up here.</div>`;
+  const tot = k => fleet.reduce((a, f) => a + (f[k] || 0), 0);
+  document.getElementById("tiles").innerHTML = [["Tools", fleet.length], ["Trigger pulls", num(tot("trig"))],
+    ["Overcurrent trips", num(tot("oc"))], ["Motor run time", run(tot("run"))], ["Records stored", num(tot("records"))]]
+    .map(([k, v]) => `<div class="tile"><b>${v}</b><span>${k}</span></div>`).join("");
+  document.getElementById("fleet").innerHTML = fleet.length ? `<table><tr><th>Tool</th><th>Tag</th><th class="n">Trigger pulls</th>
+    <th class="n">Overcurrent</th><th class="n">Faults</th><th class="n">Run time</th><th class="n" title="share of trigger pulls the tag's model called heavy or jam">Heavy or jam</th><th class="n">Battery</th><th>Last record</th><th>Hub</th><th>Last upload by</th></tr>` +
+    fleet.sort((a, b) => (b.last_unix||0) - (a.last_unix||0)).map(f => `<tr><td><b>${esc(f.tool)}</b></td><td class="sub">${esc(f.name)}</td>
+    <td class="n">${num(f.trig)}</td><td class="n ${f.oc ? "alert" : ""}">${num(f.oc)}</td><td class="n">${num(f.flt)}</td>
+    <td class="n">${run(f.run)}</td><td class="n ${f.pulls && (f.heavy + f.jam) / f.pulls >= 0.4 ? "alert" : ""}">${f.pulls ? Math.round(100 * (Number(f.heavy) + Number(f.jam)) / Number(f.pulls)) + "% of " + num(f.pulls) : "–"}</td><td class="n">${f.soc == null || f.soc == 255 ? "–" : esc(Number(f.soc)) + "%"}</td><td>${t(f.last_unix)}</td>
+    <td>${esc(f.hub)}</td><td>${esc(VIA[f.via] || f.via)}</td></tr>`).join("") + `</table>` : `<div class="empty">Nothing uploaded yet.</div>`;
+  document.getElementById("events").innerHTML = events.length ? `<table><tr><th>When</th><th>Tool</th><th>Event</th><th class="n">Value</th><th>Arrived by</th></tr>` +
+    events.slice(0, 40).map(e => `<tr><td>${t(e.unix)}</td><td>${esc(e.tool)}</td><td class="${e.type == 2 || e.type == 3 ? "alert" : ""}">${esc(EV[e.type] || e.type)}</td>
+    <td class="n">${e.type == 1 ? (Number(e.v)/1000).toFixed(1) + " s" : e.type == 2 ? (e.v ? (Number(e.v)/1000).toFixed(1) + " A" : "–") : esc(e.v)}</td><td>${esc(VIA[e.via] || e.via)}</td></tr>`).join("") + `</table>` : `<div class="empty">No events yet.</div>`;
+  document.getElementById("sources").innerHTML = sources.length ? `<table><tr><th>Path</th><th class="n">Uploads</th><th class="n">Records sent</th><th class="n">New</th><th class="n">Already here</th><th>Last</th></tr>` +
+    sources.map(s => `<tr><td>${esc(VIA[s.via] || s.via)}</td><td class="n">${num(s.posts)}</td><td class="n">${num(s.items)}</td><td class="n">${num(s.new)}</td>
+    <td class="n">${num(Number(s.items) - Number(s.new))}</td><td>${t(s.last)}</td></tr>`).join("") + `</table>` : `<div class="empty">No uploads yet.</div>`;
+  document.getElementById("when").textContent = "updated " + new Date().toLocaleTimeString();
+}
+load(); setInterval(load, 5000);
+</script>
+</body>
+</html>

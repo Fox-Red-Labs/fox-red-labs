@@ -1,0 +1,32 @@
+{
+ "schema": 1,
+ "id": "minmea",
+ "source": {"repo": "https://github.com/kosma/minmea", "commit": "c43c9e7", "file": "ports/minmea/README.md"},
+ "paths": ["ports/minmea/**"],
+ "original": {
+  "board": "host",
+  "not_on_bench": "minmea is a plain C library; its original target is any C host. Expected values are what the two NMEA sentences in app/main.c parse to, with the timestamp from macOS timegm.",
+  "captured": "2026-10-14",
+  "source": "ports/minmea/run-g3519.txt",
+  "expect": {
+   "stdout_all": ["g_rmc_ok = 1 ", "g_gga_ok = 1 ", "g_ts_ok = 1 ", "g_sats = 8 ", "g_alt_dm = 5454 ", "g_lat_e4 = 481172 ", "g_lon_e4 = 115166 ", "g_ts = 764426119 ", "MINMEA CHECK: PASS"]
+  },
+  "metrics": {}
+ },
+ "check": {
+  "cmd": "{py} ports/minmea/check.py ports/minmea/out/mspm0g3519/minmea.map MG000001",
+  "exit0": true,
+  "timeout_s": 120,
+  "pass": "The eight result globals read from the running board equal the values the two sentences parse to: both sentences parsed, 8 satellites, altitude 545.4 m (5454 dm), latitude 481172 and longitude 115166 (degrees x 10,000, latitude truncated by main.c), timestamp 764426119 (1994-03-23 12:35:19 UTC).",
+  "metrics": {}
+ },
+ "boards": {
+  "mspm0g3519": {
+   "build": "DEVICE=mspm0g3519 bash ports/minmea/build.sh shim",
+   "image": "ports/minmea/out/mspm0g3519/minmea.out",
+   "flash": "OpenOCD (xPack) over the board's XDS110, program and verify. The app has no console output; the check halts the core and reads the globals.",
+   "secs": 2,
+   "budget": []
+  }
+ }
+}

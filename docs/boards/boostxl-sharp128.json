@@ -1,0 +1,69 @@
+{
+ "name": "BOOSTXL-SHARP128 display BoosterPack plug-in module",
+ "sources": "User guide SLAU786 (August 2018: Figure 1 drawing, Tables 1 to 3, Figure 5 schematic); Sharp LS013B7DH03 specification ver 1.2 (power, clock); read 2026-10-07",
+ "columns": [
+  {
+   "head": "The screen: Sharp LS013B7DH03",
+   "items": [
+    [
+     "Screen: 1.28 in, 128 x 128",
+     "Black and white memory LCD. Each pixel holds itself, no backlight"
+    ],
+    [
+     "Power: about 4 uA holding a picture",
+     "12 uW typical at 3 V with no updates; 50 uW updating once a second (Sharp)"
+    ],
+    [
+     "Speed: SPI up to 1.1 MHz",
+     "A full frame is about 2.3 kB on the wire, so about 18 ms"
+    ],
+    [
+     "Limit: write only",
+     "The screen cannot be read back; the program keeps its own copy if it needs one"
+    ]
+   ]
+  },
+  {
+   "head": "Header pins it uses",
+   "items": [
+    [
+     "SPI: 7, 15, select on 6",
+     "Clock and data; the screen's select is active high"
+    ],
+    [
+     "GPIO: 2 power, 5 on/off",
+     "Pin 2 feeds the screen itself, so software can switch it off"
+    ],
+    [
+     "SD card: 8, 14, 17",
+     "Card select, data back, card-detect"
+    ],
+    [
+     "Not used: 19",
+     "EXTCOMIN is tied low on the board (R13 not fitted); software flips the VCOM bit instead"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "microSD slot, a 3 V to 5 V converter (off), 0-ohm links R14 to R20 that move select and detect pins"
+    ],
+    [
+     "Headers",
+     "40-pin BoosterPack connectors J1 to J4; works on 20-pin kits too"
+    ],
+    [
+     "Not fitted",
+     "No touch, no backlight, no SD card in the box"
+    ],
+    [
+     "Watch out",
+     "The 2 kB frame is larger than the LP-MSPM0C1104's 1 kB of RAM: draw line by line there"
+    ]
+   ]
+  }
+ ]
+}

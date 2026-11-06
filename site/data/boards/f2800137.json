@@ -1,0 +1,334 @@
+{
+ "id": "f2800137",
+ "board": "LAUNCHXL-F2800137",
+ "part": "TMS320F2800137",
+ "family": "C2000",
+ "title": "Is the TI LAUNCHXL-F2800137 the right board for my project?",
+ "short": "A LaunchPad development kit for TI's TMS320F2800137, a 120 MHz C28x control chip with trig and divide hardware (TMU), 256 kB of flash and 36 kB of RAM. A PWM-triggered sample, motor-control step and PWM update takes 2.3 to 2.6 µs, 12 to 13% of the period of the 50 kHz loop we chose to test. For control and neural nets the limit is CPU time. Four room-occupancy models run in 1.8 to 65 ms from flash as plain C, or 1.1 to 31 ms built by TI's Neural Network Compiler. RAM is the limit for big buffers: a 1,024-point float FFT takes 20 kB, and TI's build of its arc_fault AI example uses 34.4 kB of the 36 kB.",
+ "meet": {
+  "what": "A LaunchPad development kit (board marked MCU109A) for TI's TMS320F2800137 control microcontroller, with the XDS110 debug probe built in: one USB cable powers it, flashes it and carries a serial port. A chip marked X F2800137PM reads back as silicon revision B, and a board arrives running TI's out-of-box demo.",
+  "facts": [
+   [
+    "Chip",
+    "TMS320F2800137, silicon revision B (read from the chip)"
+   ],
+   [
+    "CPU",
+    "C28x at 120 MHz with FPU and TMU (trig and divide hardware). Not Arm"
+   ],
+   [
+    "Flash",
+    "256 kB"
+   ],
+   [
+    "RAM",
+    "36 kB"
+   ],
+   [
+    "Radios",
+    "None"
+   ],
+   [
+    "On the chip",
+    "14 PWM channels, 2 x 12-bit ADC, 4 comparator subsystems (8 comparators; the chip's data sheet, SPRSP63B, Table 4-1), 1 encoder input, 2 capture inputs, 3 UART, 1 SPI, 2 I2C, 1 CAN, 38 GPIO pins"
+   ],
+   [
+    "Debug probe",
+    "XDS110, on the board. Debug link is 2-pin cJTAG only; probe firmware 3.0.0.43 for CCStudio 21.0.1"
+   ],
+   [
+    "Headers",
+    "Two 40-pin BoosterPack sites"
+   ],
+   [
+    "Software",
+    "TI C2000Ware and the C2000 compiler; TI Arm tools do not apply"
+   ],
+   [
+    "Board price",
+    "US$35.09 on TI.com (read 2026-10-06)"
+   ]
+  ],
+  "source": "c2000-launchpad/README.md"
+ },
+ "projects": [
+  {
+   "t": "Blink an LED with TI's SDK",
+   "st": "works",
+   "result": "TI's `led_ex1_blinky` built in 4.6 s from a terminal and was loaded into RAM, not written to flash; the LED pin toggled every 500 ms (observed 2026-10-06; not saved as a log). Box to blink with a flash write: not measured",
+   "source": "c2000-launchpad/README.md"
+  },
+  {
+   "t": "Fast control math with the TMU",
+   "st": "works",
+   "result": "Cycles per loop iteration, including about 7 cycles of loop overhead: sine 8 against 82 in the C library, atan2 17 against 697, divide 8 against 241 (from RAM; 12, 20 and 12 from flash). The TMU build adds two compiler flags, --tmu_support=tmu0 and --fp_mode=relaxed, and the two were not tested apart. Worst sine error against double precision 2.2e-7",
+   "source": "c2000-launchpad/bench/control-loop.md"
+  },
+  {
+   "t": "PWM-triggered ADC to new PWM value",
+   "st": "works",
+   "result": "2.3 to 2.6 µs (means) from PWM trigger to new PWM value with a full motor-control step, from RAM or flash, with the interrupt at the end of the conversion. The ADC's early interrupt starts the code about 20 cycles sooner but reads the previous sample, so it is shown only to compare with TI's published figure",
+   "source": "c2000-launchpad/bench/control-loop.md"
+  },
+  {
+   "t": "Room-occupancy neural nets (500 to 30k weights)",
+   "st": "works",
+   "result": "1.8 / 4.8 / 17.6 / 65.4 ms per inference from flash, 20 of 20 test vectors right in every build (1.6 and 4.1 ms for the two small ones from RAM). The 30k model's 66 kB of weights cannot fit in 36 kB of RAM; our RAM-only 8k image did not fit only because the test harness adds 10 kB of test vectors",
+   "source": "c2000-launchpad/bench/ai-models.md"
+  },
+  {
+   "t": "Occupancy nets through TI's Neural Network Compiler",
+   "st": "works",
+   "result": "NNC builds all four for the C28x CPU (on a Linux machine; no Intel Mac build): 1.12 / 2.60 / 9.05 / 30.8 ms from flash, 38 to 53% fewer cycles than our fastest plain-C build from flash, 20 of 20 test vectors right; 4.4 to 5.2 times faster than NNC's build on the 80 MHz MSPM0G3507, with a different compiler",
+   "source": "c2000-launchpad/bench/ai-models.md"
+  },
+  {
+   "t": "TI's AI examples for this chip",
+   "st": "works",
+   "result": "All 11 C2000Ware AI examples, with models compiled by TI's NNC for the C28x CPU, build from a terminal and pass their own golden-vector check (each example's pass variable, read by the debugger)",
+   "source": "c2000-launchpad/sweep/RUNS.md"
+  },
+  {
+   "t": "Float FFT with TI's DSP library",
+   "st": "works",
+   "result": "256-point complex FFT 0.107 ms; 1,024 points 0.52 ms from RAM, 0.52 to 0.60 ms from flash depending on where the code lands; checked against numpy",
+   "source": "c2000-launchpad/bench/fft-and-adc.md"
+  },
+  {
+   "t": "CoreMark",
+   "st": "partial",
+   "result": "Unmodified it does not validate (16-bit byte). With a three-change patch every check matches the standard run: 141.0 per second (1.175 per MHz) from flash, 155.3 (1.294 per MHz) from RAM, with --opt_for_speed=5. Unofficial",
+   "source": "c2000-launchpad/bench/general-benchmarks.md"
+  },
+  {
+   "t": "Dhrystone 2.1",
+   "st": "works",
+   "result": "0.362 DMIPS/MHz from flash (43.5 DMIPS); 0.442 from RAM (53.1 DMIPS). Rules followed",
+   "source": "c2000-launchpad/bench/general-benchmarks.md"
+  },
+  {
+   "t": "Embench-IoT",
+   "st": "partial",
+   "result": "19 of 19 fit and run; 15 pass their own check. `st` fails on the Arm boards too; for edn, matmult-int and picojpeg we suspect the 16-bit char and int, not traced",
+   "source": "c2000-launchpad/bench/general-benchmarks.md"
+  },
+  {
+   "t": "FreeRTOS",
+   "st": "no",
+   "result": "No FreeRTOS for the F280013x in the public C2000Ware, and no upstream C28x port",
+   "source": "c2000-launchpad/bench/RESULTS.md"
+  },
+  {
+   "t": "Every C2000Ware example from a terminal",
+   "st": "works",
+   "result": "138 of 139 build from their project files by script, with TI's flags plus three additions the projects do not list; the 139th builds once one missing source file is added. 4 clock-check (DCC) examples report fail as shipped and pass with fixes: three need the board's crystal turned on, one a SysConfig clock setting",
+   "source": "c2000-launchpad/sweep/README.md"
+  },
+  {
+   "t": "Back to TI's out-of-box demo",
+   "st": "works",
+   "result": "Demo flashed back twice and the serial port printed the ADC reading again; flash read back identical to the copy saved on arrival both times",
+   "source": "c2000-launchpad/README.md"
+  }
+ ],
+ "chains": [
+  {
+   "t": "TI C2000Ware and compiler, from a terminal",
+   "st": "works",
+   "verdict": "Yes",
+   "why": "One script runs SysConfig, compiles and links, and a scripting runner loads and watches the program. C2000Ware came from TI's public GitHub repo with no login",
+   "source": "c2000-launchpad/README.md"
+  },
+  {
+   "t": "TI's UniFlash command line",
+   "st": "partial",
+   "verdict": "Partly",
+   "why": "One hand-written connection file failed until it set cJTAG, and each call reconnects, so it cannot watch a running program. Probe firmware 3.0.0.19 had to be updated first",
+   "source": "c2000-launchpad/FAQ.md"
+  },
+  {
+   "t": "Code running from flash",
+   "st": "works",
+   "verdict": "Yes",
+   "why": "2 wait states with TI's prefetch and cache cost 10 to 22% more cycles than RAM for the plain-C programs (the whole PWM loop 8%, because the ADC's time does not change); TI's NNC build of one model and the 256-point FFT ran faster from flash. Copying a control step to RAM with .TI.ramfunc removes the cost",
+   "source": "c2000-launchpad/bench/control-loop.md"
+  },
+  {
+   "t": "Zephyr",
+   "st": "no",
+   "verdict": "Not supported upstream (public sources)",
+   "why": "The C28x is not in upstream Zephyr (Zephyr issue 96186), TI has said it has no Zephyr plans for C28x, and neither GCC nor LLVM targets the C28x. From public sources in our research note; we did not try a port",
+   "source": "docs/research/realtime-control-competitors-2026-10-06.md",
+   "why_not": "no-software"
+  }
+ ],
+ "combine_title": "Software paths that work on the LAUNCHXL-F2800137",
+ "combine_lede": "The tools we tried, and what stopped the ones that did not work.",
+ "benchmarks": [
+  [
+   "sinf, cycles per loop iteration",
+   "8.0 with TMU",
+   "82.0 with the C library; 12.0 from flash. Includes about 7 cycles of loop overhead, as do the next two rows"
+  ],
+  [
+   "atan2f",
+   "17.0 with TMU",
+   "697.0 with the C library"
+  ],
+  [
+   "Float divide",
+   "8.0 with TMU",
+   "241.2 with the C library"
+  ],
+  [
+   "One field-oriented control step",
+   "194.1 cycles with TMU",
+   "Per loop iteration, including about 7 cycles of loop overhead, from RAM; 348.9 without the TMU flags; 220.6 from flash"
+  ],
+  [
+   "PWM trigger to first line of interrupt code",
+   "66 to 70 cycles",
+   "End-of-conversion interrupt, from RAM. 44 to 49 with the early interrupt, which starts the code before the result is ready"
+  ],
+  [
+   "PWM trigger to new PWM value written",
+   "279 to 290 cycles with TMU (2.4 µs)",
+   "From RAM, end-of-conversion interrupt. Across RAM, flash and the loop copied to RAM: means 278 to 310 cycles (2.3 to 2.6 µs), individual interrupts 274 to 315; 390 to 502 without the TMU flags"
+  ],
+  [
+   "CoreMark, patched (unofficial)",
+   "1.175 per MHz from flash",
+   "141.0 per second, -O4 --opt_for_speed=5. From RAM 1.294 per MHz (155.3 per second). Unmodified it does not validate"
+  ],
+  [
+   "Dhrystone 2.1",
+   "0.362 DMIPS/MHz from flash",
+   "43.5 DMIPS; 0.442 per MHz (53.1 DMIPS) from RAM. Rules followed"
+  ],
+  [
+   "Occupancy model, 30k weights",
+   "65.4 ms",
+   "7.8 million cycles, from flash; 20 of 20 vectors"
+  ],
+  [
+   "Occupancy model, 30k weights, TI NNC build",
+   "30.8 ms",
+   "3.69 million cycles, from flash; 20 of 20 vectors; 65.4 ms as plain C"
+  ],
+  [
+   "Complex FFT, 1,024 points, float",
+   "0.52 ms from RAM",
+   "62k cycles with TI's FPU DSP library; 62k to 72k (0.52 to 0.60 ms) from flash, depending on code placement"
+  ],
+  [
+   "ADC rate, no wiring",
+   "2.10 Msps",
+   "TI's continuous-mode settings; 3.98 Msps at a 9-cycle window, the data sheet's minimum (75 ns). The data sheet's maximum is 4 Msps"
+  ],
+  [
+   "CPU clock",
+   "120 MHz",
+   "Checked against the Mac: 3.06G cycles took 25.47 s by the chip and 25.5 s by the host"
+  ]
+ ],
+ "benchmarks_source": "c2000-launchpad/bench/RESULTS.md",
+ "glance": [
+  [
+   "8 cycles",
+   "Sine with the TMU",
+   "Per loop iteration, loop overhead included; 82 with the C library",
+   "c2000-launchpad/bench/control-loop.md"
+  ],
+  [
+   "2.4 µs",
+   "PWM trigger to new PWM value",
+   "PWM-triggered loop with a motor-control step, from RAM; 2.3 to 2.6 µs across builds, 12 to 13% of a 50 kHz loop (our choice)",
+   "c2000-launchpad/bench/control-loop.md"
+  ],
+  [
+   "31 ms",
+   "Largest occupancy model",
+   "30k weights, TI NNC build from flash, 20 of 20 right (65 ms as plain C)",
+   "c2000-launchpad/bench/ai-models.md"
+  ],
+  [
+   "1.175",
+   "CoreMark per MHz",
+   "Patched for the 16-bit byte; unofficial; from flash (1.294 from RAM)",
+   "c2000-launchpad/bench/general-benchmarks.md"
+  ],
+  [
+   "138 of 139 (139 with one file added)",
+   "TI examples build",
+   "From a terminal, by script",
+   "c2000-launchpad/sweep/README.md"
+  ],
+  [
+   "36 kB",
+   "RAM",
+   "The wall for big buffers: a 1,024-point float FFT takes 20 kB",
+   "c2000-launchpad/fit-check.md"
+  ]
+ ],
+ "good_for": [
+  "Motor control and power supplies. With the TMU, sine, cosine, atan2 and divide take 9.5 to 41 times fewer cycles than the C library from RAM, 7.8 to 39 from flash (loop overhead included). The PWM-sample-compute-update loop takes 2.3 to 2.6 µs",
+  "Small neural nets next to a control loop: four occupancy models run in 1.8 to 65 ms from flash as plain C, and TI ships 11 ready-built AI examples for this chip",
+  "Float signal processing: a 1,024-point FFT in 0.52 ms with TI's DSP library",
+  "Building and running from a Mac terminal with TI's own tools and C2000Ware from GitHub"
+ ],
+ "not_for": [
+  "Anything with a radio or USB of its own: the data sheet's Device Comparison table (SPRSP63B, Table 4-1) lists CAN, I2C, UART and SPI as its only communication peripherals",
+  "Porting byte-oriented C unchanged: the smallest unit is 16 bits, so int8_t does not exist and some code computes different answers",
+  "General integer code where per-MHz speed matters: from flash on both, patched CoreMark per MHz is 51% of the MSPM0G3507's and Dhrystone 50% of the MSPM0L1306's. Patched sources and different compilers, so not a matched comparison",
+  "FreeRTOS or Zephyr: no FreeRTOS for this chip in the public C2000Ware, and the C28x is not in upstream Zephyr",
+  "Big buffers in RAM: 36 kB; a 1,024-point float FFT already takes 20 kB, and TI's build of its arc_fault AI example uses 34.4 kB of the 36 kB"
+ ],
+ "buy": "US$35.09 on TI.com (ti.com/tool/LAUNCHXL-F2800137, read 2026-10-06). The debug probe is on the board, so one USB cable does power, flashing and the serial port.",
+ "gotchas": [
+  [
+   "TI's software refuses to connect on older probe firmware",
+   "A board with probe firmware 3.0.0.19 needs 3.0.0.43, updated with `xdsdfu`. **Tag: Tool or docs.** The probe's serial number reads `00000000` while the update runs"
+  ],
+  [
+   "UniFlash's command line fails with error -2131",
+   "\"Unable to access device register\" until the connection file sets `SWD Mode Settings` = 4 (cJTAG 2-pin). **Tag: Unknown (suspected: Tool or docs).** Copy TI's `TMS320F2800137_LaunchPad.ccxml` from C2000Ware"
+  ],
+  [
+   "4-pin JTAG does not work on this board as shipped",
+   "It is how the board is built: the probe is wired for 2-pin cJTAG only, and TDI and TDO need resistors R44 and R45 fitted (user guide SPRUJ32, section 3.2.1). **Tag: Setup or handling.** Use cJTAG"
+  ],
+  [
+   "The ti.com C2000Ware download needs a login and export approval",
+   "TI's public GitHub copy needs neither. **Tag: Tool or docs.** Use a sparse checkout, about 400 MB"
+  ],
+  [
+   "CoreMark fails its own checks unless patched",
+   "The smallest memory unit is 16 bits. **Tag: Chip limit.** That is for the unmodified sources; our three-change patch makes every check match the standard run, and the score is then unofficial"
+  ],
+  [
+   "`identifier \"int8_t\" is undefined`",
+   "The C28x has no 8-bit type. **Tag: Chip limit.** Typedef it to a 16-bit int and check the code never relies on 8-bit wraparound"
+  ],
+  [
+   "One C2000Ware example programs one-time security settings",
+   "`dcsm_security_tool` places data in the OTP security area. **Tag: TI example default.** Never load it on a board you want to keep"
+  ],
+  [
+   "Four DCC clock-check examples report fail as shipped",
+   "Three need the board's crystal, which TI's default clock setup leaves off, and one needs a SysConfig clock setting. **Tag: TI example default.** Build dcc_ex1 and dcc_ex2 with `--define=USE_PLL_SRC_XTAL`, dcc_ex4 also with `--define=CPU_FRQ_100MHZ`, and add `dcc1.fclk1 = 100;` to the dcc_ex3 SysConfig file"
+  ]
+ ],
+ "faq_page": "faq-f2800137.html",
+ "faq_source": "c2000-launchpad/FAQ.md",
+ "updated": "2026-10-07",
+ "measured_on": "Measured 2026-10-06 on an Intel Mac (macOS 15.7.9) with CCStudio 21.0.1, C2000 compiler 25.11.1.LTS, SysConfig 1.28.1, UniFlash 9.6.0 and C2000Ware 26.02.00.00 LTS. Code from RAM and from flash (2 wait states), 120 MHz.",
+ "next": {
+  "title": "What do I do first with the LAUNCHXL-F2800137?",
+  "steps": [
+   "Update the onboard probe to firmware 3.0.0.43 with TI's `xdsdfu`, and copy TI's `TMS320F2800137_LaunchPad.ccxml` from C2000Ware so the connection uses 2-pin cJTAG",
+   "Build and load TI's `led_ex1_blinky` from a terminal: `c2000-launchpad/tools/c2kbuild.sh <folder> RAM`, then the scripting runner `c2000-launchpad/tools/c2krun.js`. This loads into RAM; build with `FLASH` to keep the program at power-off",
+   "Read the board's README (`c2000-launchpad/README.md`) for the commands, the FAQ for every error we hit, and the bench pages for the numbers"
+  ],
+  "source": "c2000-launchpad/README.md"
+ }
+}

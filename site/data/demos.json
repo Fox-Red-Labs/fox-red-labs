@@ -1,0 +1,298 @@
+{
+ "note": "Demos that need hardware beyond the board on USB: wires, a display, a second board. Each entry names its picture in site/media/wiring/ (a web copy of the step graphic drawn by tools/step_graphic.py or tools/wiring_graphic.py from the spec next to the original), the parts from data/parts.json, the wiring steps, the measured results with their source file, and the benchmark test ids the results feed. Rendered on the board pages and site/demos.html by tools/render_boards.py. Boards: ids from data/boards.csv.",
+ "demos": [
+  {
+   "id": "g3507-display",
+   "boards": [
+    "mspm0g3507"
+   ],
+   "title": "A 3.5 inch touch screen on 12 jumper wires, 13 to read pixels back",
+   "picture": "g3507-display.jpg",
+   "alt": "LP-MSPM0G3507 from above with 12 numbered wires to the Waveshare 3.5 inch touch display",
+   "parts": [
+    "lp-mspm0g3507",
+    "waveshare-35-touch",
+    "elegoo-jumpers"
+   ],
+   "wiring": [
+    "Power: display VCC to J1 pin 1 (3V3), GND to J2 pin 20",
+    "Screen, SPI: SCLK to J1 pin 7 (PB9), MOSI to J2 pin 15 (PB8), LCD_CS to J2 pin 13 (PB6), LCD_DC to J4 pin 39 (PB1), LCD_RST to J4 pin 40 (PB4), LCD_BL to J4 pin 38 (PA28)",
+    "Touch, I2C: TP_SDA to J1 pin 10 (PB3), TP_SCL to J1 pin 9 (PB2), INT to J2 pin 11 (PB16), RST to J2 pin 12 (PB0)",
+    "Optional 13th wire: MISO to J2 pin 14 (PB7) to read pixels back",
+    "No jumpers move. The display's own 3V3, SD_CS and first MISO pins are left unconnected"
+   ],
+   "results": [
+    "Full-screen fill 364.9 ms at 8 MHz SPI, 168.1 ms at 16 MHz with 16-bit frames and DMA, 67.2 ms at 40 MHz SPI with the CPU at 80 MHz; 64 of 64 pixels of one row read back right at every speed",
+    "The driver is 7.4 kB of flash and 648 bytes of RAM",
+    "LVGL 9.6 on the same wiring: 7 refreshes a second at 32 MHz, 15 to 19 at 80 MHz, in 25.1 kB of RAM",
+    "Arduino_GFX's own benchmark, unmodified: five full fills in 2.55 s at 8 MHz SPI",
+    "Handwritten digits drawn on the screen read by a 64-wide BitNetMCU net with 34 ms of inference at 80 MHz, 10 of 10 right in the self-test"
+   ],
+   "sources": [
+    "mspm0g3507/display-test/README.md",
+    "mspm0g3507/lvgl-g3507/README.md",
+    "portability/arduino/README.md",
+    "ports/bitnetmcu/README.md",
+    "docs/research/display-board-compatibility-2026-10-06.md"
+   ],
+   "tests": [
+    "display_full_frame",
+    "display_ready",
+    "gui_fps",
+    "ai_mnist_cycles"
+   ],
+   "readme": "mspm0g3507/display-test/README.md",
+   "versions": "MSPM0 SDK 2.11.00.07, SysConfig 1.26.3, TI Arm Clang 5.1.1, LVGL 9.6.0; measured 2026-10-06",
+   "faq": "faq-mspm0g3507.html",
+   "next": "Look at the screen by eye at 16 and 40 MHz SPI, since only 64 pixels of one row were read back, and try hardware I2C for the touch chip",
+   "tags": [
+    "The touch chip did not answer the hardware I2C block, so touch uses software I2C. The cause was not found"
+   ]
+  },
+  {
+   "id": "g3507-loop1",
+   "boards": [
+    "mspm0g3507"
+   ],
+   "title": "Loop 1: the chip's voltage maker into its own voltmeter",
+   "picture": "g3507-loop1-dac-to-adc.jpg",
+   "alt": "LP-MSPM0G3507 from above with one wire from J3 pin 30 to J1 pin 2",
+   "parts": [
+    "lp-mspm0g3507",
+    "elegoo-jumpers"
+   ],
+   "wiring": [
+    "Unplug USB",
+    "One wire from J3 pin 30 (PA15, the DAC output) to J1 pin 2 (PA25, an ADC input). J1 pin 2 sits under the square 3V3 pad",
+    "No jumpers move"
+   ],
+   "results": [
+    "Gain error 0.34%, gain 0.99656, across 257 DAC steps, 16 ADC reads each, both against the 3.3 V supply",
+    "The ADC reads 0 to 13.5 codes low, averaging 7.2 codes or 0 to 11 mV; noise 1.56 codes, about 9.6 effective bits"
+   ],
+   "sources": [
+    "mspm0g3507/example-sweep/loop-tests/README.md",
+    "mspm0g3507/example-sweep/JUMPERS.md"
+   ],
+   "tests": [
+    "adc_dac_error"
+   ],
+   "readme": "mspm0g3507/example-sweep/JUMPERS.md",
+   "versions": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1; measured 2026-10-06",
+   "faq": "faq-mspm0g3507.html",
+   "next": "The same loop through the op-amp, and a second ADC channel"
+  },
+  {
+   "id": "g3507-loop2",
+   "boards": [
+    "mspm0g3507"
+   ],
+   "title": "Loop 2: the chip texts itself over UART",
+   "picture": "g3507-loop2-uart.jpg",
+   "alt": "LP-MSPM0G3507 from above with jumpers J21 and J22 moved down and one wire from J4 pin 34 to J4 pin 33",
+   "parts": [
+    "lp-mspm0g3507",
+    "elegoo-jumpers"
+   ],
+   "wiring": [
+    "Unplug USB",
+    "Move jumpers J21 and J22 down, from XDS to BP, so the UART pins reach the header instead of the USB chip",
+    "One wire from J4 pin 34 (PA10, transmit) to J4 pin 33 (PA11, receive)",
+    "When done, move J21 and J22 back up or the board's serial window stays silent"
+   ],
+   "results": [
+    "All 2 kB right at every speed from 9.6 kbaud to 4.5 Mbaud and again from 6.4 to 10.67 Mbaud",
+    "Dead band at 5 to 6 Mbaud: 5 Mbaud gets 39 of 2,048 right and 6 Mbaud gets 1,921, which is 94%; 12 Mbaud sends nothing. The LP-MSPM0L1306 shows the same dead band. The cause was not found; TI does not document the baud divider's behavior at those settings",
+    "If your serial window goes silent after moving J21 and J22, move them back to XDS. TI's example README says only to jumper PA10 to PA11 and does not mention J21 and J22"
+   ],
+   "sources": [
+    "mspm0g3507/example-sweep/loop-tests/README.md",
+    "mspm0g3507/example-sweep/JUMPERS.md"
+   ],
+   "tests": [
+    "uart_max_clean"
+   ],
+   "readme": "mspm0g3507/example-sweep/JUMPERS.md",
+   "versions": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1; measured 2026-10-06",
+   "faq": "faq-mspm0g3507.html",
+   "next": "Find the cause of the dead band: try the fractional baud divider settings one at a time"
+  },
+  {
+   "id": "g3507-loop3",
+   "boards": [
+    "mspm0g3507"
+   ],
+   "title": "Loop 3: the chip checks its own PWM",
+   "picture": "g3507-loop3-pwm.jpg",
+   "alt": "LP-MSPM0G3507 from above with one wire from J4 pin 32 to J4 pin 31",
+   "parts": [
+    "lp-mspm0g3507",
+    "elegoo-jumpers"
+   ],
+   "wiring": [
+    "Unplug USB. Every display wire can stay where it is",
+    "One wire from J4 pin 32 (PA12, PWM channel 4) to J4 pin 31 (PA13, read back as a plain input)",
+    "Plug USB back in and run the PWM example; the program samples PA13 600 times"
+   ],
+   "results": [
+    "PA13 high in 88 of 600 samples: 14.7% plus or minus 2.8%, against 12.5% in the original STM32 example this was ported from",
+    "Measures the share of time high, not the frequency; channels 1 to 3 not measured"
+   ],
+   "sources": [
+    "mspm0g3507/stm32-port-eval/05-tim-pwm/README.md",
+    "mspm0g3507/example-sweep/JUMPERS.md"
+   ],
+   "tests": [],
+   "readme": "mspm0g3507/example-sweep/JUMPERS.md",
+   "versions": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1, TI's migration skill; measured 2026-10-06",
+   "faq": "faq-mspm0g3507.html",
+   "next": "Measure channels 1 to 3 and the frequency with a timer capture instead of debugger reads"
+  },
+  {
+   "id": "l1306-uart-loop",
+   "boards": [
+    "mspm0l1306"
+   ],
+   "title": "UART loop on one wire",
+   "picture": "l1306-uart-loop.jpg",
+   "alt": "LP-MSPM0L1306 from above with jumpers J16 and J17 moved to BP and one wire from J1 pin 4 to J1 pin 3",
+   "parts": [
+    "lp-mspm0l1306",
+    "elegoo-jumpers"
+   ],
+   "wiring": [
+    "Unplug USB",
+    "Move jumpers J16 and J17 to BP (left), so the chip's UART leaves the USB serial port and reaches the header",
+    "One wire from J1 pin 4 (PA8, transmit) to J1 pin 3 (PA9, receive)",
+    "Plug USB back in; results are read over the debugger. When done, move J16 and J17 back to XDS (right)"
+   ],
+   "results": [
+    "All bytes right from 9.6 kbaud to 4.5 Mbaud and from 6.4 to 10.67 Mbaud; dead band at 5 to 6 Mbaud (5 Mbaud: 38 of 2,048 right; 6 Mbaud 1,925, which is 94%); 12 Mbaud sends nothing. The cause was not found; it is the same band as the LP-MSPM0G3507",
+    "The test program is 1.5 kB of flash and 716 bytes of RAM"
+   ],
+   "sources": [
+    "mspm0l1306/bench/uart_loop/README.md"
+   ],
+   "tests": [
+    "uart_max_clean"
+   ],
+   "readme": "mspm0l1306/bench/uart_loop/README.md",
+   "versions": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1, OpenOCD 0.12.0; measured 2026-10-06",
+   "faq": "faq-mspm0l1306.html",
+   "next": "Loop the other UART (PA22 and PA23) the same way"
+  },
+  {
+   "id": "border-router-m1",
+   "boards": [
+    "cc1354p10",
+    "cc2340r5"
+   ],
+   "title": "Two boards, three wires: a Thread border router host and its radio",
+   "picture": "border-router-m1.jpg",
+   "alt": "LP-CC1354P10-1 and LP-EM-CC2340R5 side by side with three wires between their headers; the host is drawn as TI's LP-EM-CC1354P10-1, which has the same header but no onboard probe section",
+   "parts": [
+    "lp-cc1354p10-1",
+    "lp-em-cc2340r5",
+    "elegoo-jumpers"
+   ],
+   "wiring": [
+    "Host LP-CC1354P10-1 pin 2, DIO23, UART1 TX, to radio LP-EM-CC2340R5 pin 14, DIO12, UART0 RX",
+    "Radio pin 7, DIO18, UART0 TX, to host pin 5, DIO22, UART1 RX",
+    "Host pin 20 GND to radio pin 22 GND",
+    "Both boards run 3.3 V, so no level shifter. Leave each board's debugger UART pins alone: host pins 3 and 4, radio pins 3 and 4"
+   ],
+   "results": [
+    "The host runs OpenThread with the CC2340R5 as its radio over the wire. It forms a network and is leader within 16 s of a fresh dataset (one check), 37 to 39 s after a restart",
+    "The host image is 437.8 kB of code, 456.7 kB of flash with its initialized data. It needs 125.9 kB of RAM with logging compiled in. The wire runs at 921,600 baud",
+    "Both signal wires were checked by driving each from one chip and reading it on the other through the two debuggers. A wire-less pin was the negative control. The ground wire was not driven, so shared ground is assumed",
+    "Standby had to be turned off on the host or the link froze. Whether the radio link or the console dropped first is not known"
+   ],
+   "sources": [
+    "border-router/host-cc1354/README.md",
+    "border-router/WIRING.md"
+   ],
+   "tests": [
+    "radio_join"
+   ],
+   "readme": "border-router/host-cc1354/README.md",
+   "versions": "SimpleLink F2 SDK 8.32 and F3 SDK 9.21.00.36, ot-ti, TI Arm Clang 5.1.1 and GCC 12.2; measured 2026-10-07",
+   "faq": "faq-cc2340r5.html",
+   "next": "A second Thread radio so a device can join through the host and be pinged; then Wi-Fi on the host board with the CC35X1"
+  },
+  {
+   "id": "am13e230-stepper-uln2003",
+   "boards": [
+    "am13e230"
+   ],
+   "title": "Spin the kit stepper through its ULN2003 board",
+   "picture": "am13e230-stepper-uln2003.jpg",
+   "alt": "The 28BYJ-48 stepper on the desk with its five-wire lead, the LP-AM13E230 at the top edge",
+   "parts": [
+    "lp-am13e230",
+    "freenove-fnk0058"
+   ],
+   "wiring": [
+    "Unplug USB",
+    "J3 pin 21 (5V) to the driver board's + pin and J3 pin 22 (GND) to its - pin",
+    "J4 pin 40 (PB3) to IN1, pin 38 (PB1) to IN2, pin 36 (PB2) to IN3, pin 34 (PB7) to IN4",
+    "Plug USB back in and run ./build.sh --flash in am13e230/stepper-uln2003/"
+   ],
+   "results": [
+    "Turned one full turn each way on the first flash, 2026-10-09; about 5 s a turn at 1.2 ms a half-step",
+    "Build 3.1 s, flash 4.2 s, 8 kB of flash; no soldering, no breadboard, six jumper wires",
+    "Microstepping on the same wires (sine duties from the PWM units at 20 kHz): the update costs 138 cycles with the trig unit, 246 with the C library sine, 1.4 and 2.5 percent of the CPU; the shaft was not watched under this drive"
+   ],
+   "sources": [
+    "am13e230/stepper-uln2003/README.md",
+    "docs/experiments/2026-10-09-am13e230-stepper-uln2003.md",
+    "docs/experiments/2026-10-09-am13e230-microstep-tmu.md"
+   ],
+   "tests": [],
+   "readme": "am13e230/stepper-uln2003/README.md",
+   "versions": "AM13E2x SDK 26.01.00.03, TI Arm Clang 5.1.1, SysConfig 1.28.0; run 2026-10-09",
+   "faq": "",
+   "next": "The DC motor through the L293D (program built), then the DRV8833 after soldering; the knob on the eQEP header to set speed"
+  },
+  {
+   "id": "g5187-sensors-boosterpack",
+   "boards": [
+    "mspm0g5187"
+   ],
+   "title": "Six sensors on one BoosterPack: what you get, what is read, how accurate it is",
+   "picture": "g5187-sensors-boosterpack.jpg",
+   "alt": "The BP-BASSENSORSMKII Sensors BoosterPack stacked on the LP-MSPM0G5187, with each sensor numbered and labelled with what it measures and what is read",
+   "parts": [
+    "lp-mspm0g5187",
+    "bp-bassensorsmkii"
+   ],
+   "wiring": [
+    "No wires and no jumpers: press the BoosterPack straight down until its pin 1 (3V3) sits in the LaunchPad kit's J1 pin 1, with the USB cable unplugged",
+    "The program switches the sensors on: pin 6 (PB22) low for humidity, pin 24 (PB15) low for the magnet sensor, pin 27 (PA15) high for light, pin 28 (PA12) high for the TMP117",
+    "I2C on pins 9 (PA9, clock) and 10 (PA8, data); the magnet sensor's analog output on pin 2 (PA25)",
+    "TMP117 only: the flat cable from J5 to J6, contacts down, black tab up; it only works one way round, and the wrong way kills the I2C bus (the TMP117 did not answer in any fit)",
+    "Only the J1 and J3 header rows have pins on this LaunchPad, so BoosterPack pins 1 to 10 and 21 to 30 are connected",
+    "The two LEDs (pins 39 and 40) and the motion sensor's second interrupt (pin 13) are not; the other alert lines are connected but the program does not read them"
+   ],
+   "results": [
+    "Humidity and temperature (HDC2080): 24.3 to 24.5 C and 37.4 to 37.8 percent RH; the data sheet says within 2 percent RH and 0.2 C typical",
+    "Light (OPT3001): 296 to 319 lux in the bench light; the data sheet gives 1800 to 2200 for a 2000 lux input and no figure at 300 lux",
+    "Magnet sensor (DRV5055A4): 1.64 V with no magnet, against 1.65 V at rest in the data sheet (1.59 to 1.71 V guaranteed), assuming a 3.3 V ADC reference",
+    "TMP117 (flat cable tried in every fit, also with 3.3 V wired to its power pin) and the motion sensor (BMI160, fitted but silent): no readings, cause not found for either",
+    "No reference instrument was used, so these are not accuracy tests; the accuracy figures are the data sheets', at the conditions the guide lists"
+   ],
+   "sources": [
+    "mspm0g5187/bench/bassens/README.md",
+    "mspm0g5187/bench/bassens/results/uart-153202.txt",
+    "mspm0g5187/bench/bassens/results/uart-153402.txt",
+    "mspm0g5187/bench/bassens/results/bs-152553.txt",
+    "docs/experiments/2026-10-10-mspm0g5187-npu-live-light.md"
+   ],
+   "tests": [],
+   "readme": "mspm0g5187/bench/bassens/README.md",
+   "versions": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1, SysConfig 1.26.3, LP-MSPM0G5187 Rev. A; run 2026-10-10",
+   "faq": "../mspm0g5187/FAQ.md",
+   "next": "Try a second flat cable or the BoosterPack on another LaunchPad to see whether the TMP117 and the BMI160 answer there, then cover the light sensor and bring a magnet to the DRV5055. The light reading also feeds an occupancy model on the chip's neural accelerator.",
+   "picture_note": "A photo of the stack with each sensor numbered; the ribbon-cable sockets at the right are empty. The photo and the labelled picture are in the repo next to the README."
+  }
+ ]
+}

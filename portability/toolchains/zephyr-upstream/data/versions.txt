@@ -1,0 +1,30 @@
+zephyr: v4.4.2
+toolchain: arm-zephyr-eabi-gcc (Zephyr SDK 0.17.4) 12.2.0
+west: West version: v1.5.0
+host: Darwin 24.6.0 x86_64
+date: 2026-10-14T12:34:59Z
+
+TI boards known to this Zephyr (west boards, vendor ti):
+am243x_evm
+am62l_evm
+cc1312r1_launchxl
+cc1352p1_launchxl
+cc1352p7_launchpad
+cc1352r1_launchxl
+cc1352r_sensortag
+cc26x2r1_launchxl
+cc3220sf_launchxl
+cc3235sf_launchxl
+lp_em_cc2340r5
+lp_mspm0g3507
+lp_mspm0g3519
+lp_mspm0l2228
+msp_exp432p401r_launchxl
+sk_am62
+sk_am64
+
+west modules present in the workspace (trimmed checkout):
+  modules/hal: cmsis cmsis_6 rpi_pico stm32 ti
+  modules/lib: gui picolibc
+python tools: west 1.5.0, cmake 4.4.4, natsort 8.4.0, junitparser 5.0.3, pytest 9.1.1, ply 3.11 (the last four are twister's own imports; installed into the venv for this sweep)
+twister flags: --build-only --force-toolchain -M pass --report-filtered, one run per board per sample group, jobs 3

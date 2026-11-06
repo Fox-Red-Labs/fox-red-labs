@@ -1,0 +1,3847 @@
+{
+ "target": "TI MSPM0, MSPM33 and AM13 (DriverLib)",
+ "impl": [
+  {
+   "idiom": "system.init",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Put the pin, clock and peripheral set-up in a .syscfg file and call SYSCFG_DL_init() once at the top of main (replaces HAL_Init, SystemClock_Config and the MX_*_Init calls).",
+   "trap": "SysConfig keeps the old pin numbers if you copy an STM32 pin list: re-read every pin against the target header (B20 chose pins instead of translating them, and the first UART pins it chose were invalid for the package).",
+   "check": "LED or console shows the program reached main",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "ports 01 to 05 call SYSCFG_DL_init; 01 toggles LED1 every 98.5 ms against 100 ms",
+     "path": "mspm0g3507/stm32-port-eval/01-gpio-iotoggle/Src/main.c"
+    },
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "SYSCFG_DL_init() at the top of main replaces HAL_Init, SystemClock_Config and the MX_ calls; 6 of 6 host checks",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/Src/main.c",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:system.init/default"
+  },
+  {
+   "idiom": "clock.system_config",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "Set the clock tree in the SysConfig SYSCTL block. The default is 32 MHz from SYSOSC; keep it unless a rate needs more.",
+   "trap": "STM32 code runs at 48 or 64 MHz from a PLL; the ports ran at 32 MHz, so a timing number compares two different CPU clocks. A 56 MHz setting with the bus divider at 1 printed correctly on the UART, but TI's header says that bus clock is to stay under 40 MHz: unknown whether 56 MHz is in spec.",
+   "degrades": "lower CPU clock than the original",
+   "check": "measure a timer or a baud rate against the clock the code assumes; state the clock in the results row",
+   "see_also": "stm32-to-mspm0/core-architecture.md",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "left at the 32 MHz default, 6 of 6 host checks at 115200 baud",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/PORT-NOTES.md",
+     "results": "mspm0g3519:uartdma_burst_pps"
+    },
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "left at the SysConfig default 32 MHz (the original runs from an 8 MHz crystal); the 1 s receive timeout and 115200 baud divisors both come from CPUCLK_FREQ; 6 of 6 host checks",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/Src/uart.c",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:clock.system_config/default"
+  },
+  {
+   "idiom": "clock.peripheral_enable",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "SysConfig writes SYSCFG_DL_initPower(): enable power for each block before use. Hand-written init needs DL_<block>_reset(), DL_<block>_enablePower(), then a short delay_cycles.",
+   "trap": "A peripheral that is not powered reads 0 instead of faulting. If a block returns zero, check power first.",
+   "check": "read a register or a result back; zero after start means no power",
+   "glue": "ports/cms32/glue/l1306/tim_demo.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "CRC block read 0 until powered, then matched a host CRC-32",
+     "path": "ports/cms32/runs/CRC.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:clock.peripheral_enable/default"
+  },
+  {
+   "idiom": "time.delay_ms",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "DL_Common_delayCycles(cpu_hz / 1000 * ms), or a loop of microsecond delays at the clock in use.",
+   "trap": "Cycle counts depend on the clock the port runs at; the 98.5 ms against 100 ms is 1.5% short at the ported clock.",
+   "check": "logic analyzer on a toggling pin against the period the source states",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "measured",
+     "what": "LED1 toggles every 98.5 ms against 100 ms in the original",
+     "path": "mspm0g3507/stm32-port-eval/01-gpio-iotoggle/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.delay_ms/default"
+  },
+  {
+   "idiom": "time.delay_us",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Loop DL_Common_delayCycles(cycles_per_us), where cycles_per_us = clock / 1,000,000.",
+   "check": "pulse width on a pin",
+   "glue": "ports/cms32/glue/l1306/delay_demo.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "built",
+     "what": "delayUS and delayMS in the glue were compiled into every example that ran",
+     "path": "ports/cms32/glue/l1306/delay_demo.c"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:time.delay_us/default"
+  },
+  {
+   "idiom": "time.delay_cycles",
+   "families": [
+    "MSPM0",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "DL_Common_delayCycles. On the AM13E230 the one-line header maps the SysConfig macro delay_cycles to it.",
+   "check": "pin pulse width at the clock in use",
+   "glue": "portability/shim/mspm0_on_am13e230/ti_msp_dl_config.h",
+   "proof": [
+    {
+     "port": "mspm0-on-am13",
+     "board": "am13e230",
+     "level": "ran",
+     "what": "gpio, uart and pwm programs built unchanged against a 13-line stand-in header",
+     "path": "portability/shim/mspm0_on_am13e230/ti_msp_dl_config.h"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.delay_cycles/default"
+  },
+  {
+   "idiom": "time.tick_ms",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "SysTick or a timer interrupt every 1 ms that increments a counter. A polled counter must be volatile.",
+   "trap": "Cmsemicon's examples poll a plain extern counter that an interrupt decrements. At -O2 TI Arm Clang turns the wait into an endless branch and the LED never moves. Build those at -O0 (Cmsemicon's own projects do) or make the counter volatile.",
+   "check": "two reads 1 s apart differ by 1000",
+   "glue": "ports/cms32/glue/l1306/cms_core.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "systick example, main.c unchanged: LED1 toggles every 250 ms",
+     "path": "ports/cms32/runs/systick.txt"
+    },
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "a 1 s receive timeout counted on the polled SysTick COUNTFLAG (no interrupt) makes the bootloader repeat 'C' until the first packet; 6 of 6 host checks",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/Src/uart.c",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.tick_ms/default"
+  },
+  {
+   "idiom": "time.tick_ms",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "arduino-layer",
+   "difficulty": "adapter",
+   "boards": [
+    "mspm0g3507"
+   ],
+   "replace": "Arduino layer: millis() and micros() from SysTick.",
+   "trap": "micros ran 1,725 us ahead of millis in one line; suspected to be the print time of the sketch, not tested.",
+   "glue": "portability/arduino/core/wiring.cpp",
+   "proof": [
+    {
+     "port": "arduino-libs",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "shimcheck printed millis=1000 micros=1001725 (values seen on the serial port, not saved)",
+     "path": "portability/arduino/core/wiring.cpp"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.tick_ms/arduino-layer"
+  },
+  {
+   "idiom": "time.tick_us",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "boards": [
+    "mspm0g3507"
+   ],
+   "replace": "Arduino layer micros() from the SysTick count.",
+   "glue": "portability/arduino/core/wiring.cpp",
+   "proof": [
+    {
+     "port": "arduino-libs",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "shimcheck printed micros alongside millis",
+     "path": "portability/arduino/core/wiring.cpp"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.tick_us/default"
+  },
+  {
+   "idiom": "time.periodic_irq",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "1 ms periodic interrupt from TIMG0 (G3519, L1306) or from SysTick (G5187, MSPM33C321A). Give it the same interrupt priority as the UART handler when both call the same routine, so they cannot preempt each other.",
+   "check": "count interrupts in 10 s",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "1 ms TIMG0 poll, 6 of 6 checks at 115200",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c",
+     "results": "mspm0g3519:uartdma_burst_pps"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "1 ms SysTick poll, 6 of 6 checks",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g5187/main.c",
+     "results": "mspm0g5187:uartdma_burst_pps"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "1 ms SysTick poll, 6 of 6 checks at 115200",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm33c321a/src/main.c",
+     "results": "mspm33c321a:uartdma_burst_pps"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.periodic_irq/default"
+  },
+  {
+   "idiom": "irq.enable",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Same CMSIS call, NVIC_EnableIRQ; the IRQ name comes from the SysConfig header (GPIO_SWITCHES_INT_IRQN, UART_0_INST_INT_IRQN), not the STM32 vector number.",
+   "check": "handler runs once per event",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "GPIO interrupt toggles LED1 per press after the polarity fix",
+     "path": "mspm0g3507/stm32-port-eval/03-gpio-exti/Src/main.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:irq.enable/default"
+  },
+  {
+   "idiom": "irq.priority",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Same CMSIS call, NVIC_SetPriority. Give handlers that call one shared routine the same priority.",
+   "check": "no corrupted shared state under a burst",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "UART and timer handlers at one priority, 6 of 6 checks",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c"
+    },
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "HAL_NVIC_SetPriorityGrouping dropped with nothing in its place; the bootloader and the application's timer interrupt run at the default priority, 6 of 6 host checks",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/Src/flash.c",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:irq.priority/default"
+  },
+  {
+   "idiom": "irq.global_disable",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "__get_PRIMASK, __disable_irq, __set_PRIMASK: same CMSIS calls.",
+   "check": "TX buffer not corrupted under a burst",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "guards the TX DMA start; 6 of 6 checks",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:irq.global_disable/default"
+  },
+  {
+   "idiom": "irq.vector_name",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Peripheral handlers get the SysConfig names (UART_0_INST_IRQHandler, DMA_IRQHandler). GPIO pins arrive in GROUP1_IRQHandler: read DL_Interrupt_getPendingGroup, then DL_GPIO_getPendingInterrupt. On the G5187 and MSPM33C321A one DMA handler serves both channels: read DL_DMA_getPendingInterrupt.",
+   "trap": "TI's startup file aliases every handler to a weak default endless loop; a second weak definition in glue code did not win, so the port carried a copy of the startup file.",
+   "check": "handler runs; a missing name hangs in the default loop",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "GROUP1_IRQHandler toggles LED1 on the button interrupt",
+     "path": "mspm0g3507/stm32-port-eval/03-gpio-exti/Src/stm32g0xx_it.c"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "one DMA interrupt for both channels, 6 of 6 checks",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g5187/main.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:irq.vector_name/default"
+  },
+  {
+   "idiom": "gpio.config_pin",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "A SysConfig GPIO instance per group: direction, pull, interrupt enable and pin assignment. Code only reads, writes and toggles.",
+   "trap": "Pins are chosen by the migration, not translated: the first UART pins it chose were invalid for the package, and the ADC input moved from PA4 to PA27.",
+   "check": "read the pin level with and without a load",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "ports 01 to 05 configure pins in .syscfg",
+     "path": "mspm0g3507/stm32-port-eval/01-gpio-iotoggle/empty.syscfg"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.config_pin/default"
+  },
+  {
+   "idiom": "gpio.write",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "DL_GPIO_setPins(port, mask) and DL_GPIO_clearPins(port, mask).",
+   "trap": "The LaunchPad LEDs are active low: clearPins turns the LED on. Check the board's AGENTS.md before porting the polarity.",
+   "check": "pin level on a meter or logic analyzer",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "LED1 toggles every 98.5 ms",
+     "path": "mspm0g3507/stm32-port-eval/01-gpio-iotoggle/Src/main.c"
+    },
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "PORT_SetBit and PORT_ClrBit on LED1",
+     "path": "ports/cms32/runs/systick.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.write/default"
+  },
+  {
+   "idiom": "gpio.toggle",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "DL_GPIO_togglePins(port, mask).",
+   "check": "pin changes on every call",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "the button interrupt toggles LED1",
+     "path": "mspm0g3507/stm32-port-eval/03-gpio-exti/Src/stm32g0xx_it.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.toggle/default"
+  },
+  {
+   "idiom": "gpio.read",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "DL_GPIO_readPins(port, mask) != 0.",
+   "trap": "Only idle readings were seen; no pressed state was read (Arduino layer on the G3507: S1=1 with no press).",
+   "check": "read with the input driven both ways",
+   "glue": "ports/cms32/glue/l1306/cms_core.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "Gpio_input example ran; its 100 ms pulses were not caught by the five reads",
+     "path": "ports/cms32/runs/Gpio_input.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.read/default"
+  },
+  {
+   "idiom": "gpio.input_irq_edge",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "SysConfig input pin with the pull and edge the button needs and interrupt enable on; the handler is the GROUP1 read above.",
+   "trap": "The migration copied ST's active-low setup (PULL_UP, FALL) onto S1, which is active high: the LED toggled for an active-low press only. Read the button's idle level on the target board and set pull and edge from it.",
+   "degrades": "presses were simulated, nobody pressed the button",
+   "check": "drive or press the button, one handler run per press",
+   "ti_guide_silent": "stm32-to-mspm0/peripherals/GPIO.md warns about LED polarity only; it does not say the button's pull and edge must be re-derived",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "with PULL_DOWN and RISE on PA18, each active-high press toggled LED1; presses were driven by the debugger",
+     "path": "mspm0g3507/stm32-port-eval/03-gpio-exti/fixed/fix.diff"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.input_irq_edge/default"
+  },
+  {
+   "idiom": "gpio.irq_callback",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "No HAL callback layer: the group handler reads the pending pin and calls the application code directly.",
+   "check": "one call per edge",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "handler toggles LED1",
+     "path": "mspm0g3507/stm32-port-eval/03-gpio-exti/Src/stm32g0xx_it.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.irq_callback/default"
+  },
+  {
+   "idiom": "board.led_button",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Take the LED and button pins and their active level from the target board's AGENTS.md, not from the source board file.",
+   "trap": "Clone ST's BSP submodule with the examples; without it ports 03 to 05 fell back to default LED and button pins.",
+   "check": "LED on when the code says on",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "after the board's own pins were used, LED1 and S1 worked",
+     "path": "mspm0g3507/stm32-port-eval/03-gpio-exti/fixed/empty.syscfg"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:board.led_button/default"
+  },
+  {
+   "idiom": "uart.init_8n1",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "SysConfig UART instance (pins, clock, FIFO, DMA triggers). Baud: with the UART disabled, DL_UART_Main_configBaudRate(inst, UART_0_INST_FREQUENCY, baud), or DL_UART_setBaudRateDivisor(inst, ibrd, fbrd) computed from the clock; then enable.",
+   "trap": "SysConfig 1.28.0 turns UART internal loopback ON for a new instance on the G5187, so TX echoes into RX; set enableInternalLoopback to false in the .syscfg.",
+   "check": "host terminal at that baud shows the text; no echo of what the board sends",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "DL_UART_Main_configBaudRate from a single build-time define, 6 of 6 at 115200",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c",
+     "results": "mspm0g3519:uartdma_burst_pps"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "divisor computed from the baud define, 6 of 6",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g5187/main.c",
+     "results": "mspm0g5187:uartdma_burst_pps"
+    },
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "DL_UART_Main_configBaudRate at 115200 with enableInternalLoopback false in the .syscfg; no echo of the board's own bytes; 6 of 6 host checks",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/bootloader.syscfg",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.init_8n1/default"
+  },
+  {
+   "idiom": "uart.fifo_config",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "DL_UART_enableFIFOs, RX threshold DL_UART_RX_FIFO_LEVEL_ONE_ENTRY, TX threshold DL_UART_TX_FIFO_LEVEL_1_2_EMPTY.",
+   "trap": "The RX FIFO is 4 deep: bytes that arrive while a DMA block is being re-armed wait there; a faster burst than 115200 can overrun it.",
+   "check": "no lost bytes at the line rate",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "6 of 6 checks",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.fifo_config/default"
+  },
+  {
+   "idiom": "uart.tx_byte_blocking",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "DL_UART_Main_transmitData(inst, byte), then while DL_UART_Main_isBusy(inst) wait.",
+   "check": "host reads the exact bytes",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "each simulated S2 press printed ST's exact message at 115200 baud",
+     "path": "mspm0g3507/stm32-port-eval/02-usart-tx-vcp/Src/main.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.tx_byte_blocking/default"
+  },
+  {
+   "idiom": "uart.rx_byte_blocking",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "DL_UART_Main_receiveDataBlocking(inst).",
+   "check": "send one byte from the host, see it in code",
+   "glue": "ports/cms32/glue/l1306/uart_demo.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "uartSendReceive: 96 lines in 3 s at 115200",
+     "path": "ports/cms32/runs/uart_uartSendReceive.txt"
+    },
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "RX FIFO polled with a SysTick timeout, one byte per call; 128-byte and 1024-byte Xmodem packets received without loss, 6 of 6 host checks",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/Src/uart.c",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.rx_byte_blocking/default"
+  },
+  {
+   "idiom": "uart.tx_blocking",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "A loop of single-byte blocking sends. The Cmsemicon DMA and interrupt send names are implemented this way in the glue.",
+   "check": "host reads the exact bytes",
+   "glue": "ports/cms32/glue/l1306/uart_demo.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "usart_printf example printed Hello, USART",
+     "path": "ports/cms32/runs/usart_usart_printf.txt"
+    },
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "DL_UART_Main_transmitDataBlocking per byte; the host reads the exact banner, prompt and Xmodem reply bytes",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/Src/uart.c",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.tx_blocking/default"
+  },
+  {
+   "idiom": "uart.tx_dma",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "Take the linear read block of the TX ring buffer, then with the channel disabled set source, destination and size, enable it, and let DL_UART_enableDMATransmitEvent trigger it. The DMA-done interrupt skips the sent bytes and starts the next block. Guard the start with PRIMASK.",
+   "trap": "G5187 and MSPM33C321A: one DMA interrupt for both channels, read with DL_DMA_getPendingInterrupt.",
+   "check": "host reads the exact bytes while the CPU does other work",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "6 of 6 checks, 2,246 packets/s at 115200",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c",
+     "results": "mspm0g3519:uartdma_burst_pps"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "am13e230",
+     "level": "measured",
+     "what": "5 of 6 checks",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/am13e230/main.c",
+     "results": "am13e230:uartdma_burst_pps"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.tx_dma/default"
+  },
+  {
+   "idiom": "uart.tx_dma",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "no-uart-dma",
+   "difficulty": "none",
+   "boards": [
+    "mspm0c1104"
+   ],
+   "replace": "No UART DMA on the MSPM0C1104: SysConfig says so.",
+   "instead": "Interrupt-driven transmit from the ring buffer; the ring buffer and parser stay unchanged.",
+   "degrades": "fails the burst at 921600 baud (loses 447 to 452 of 500 packets); holds at 115200",
+   "check": "500 back-to-back packets at the stated baud, none lost",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0c1104",
+     "level": "measured",
+     "what": "RX interrupt drains the 4-byte FIFO into the ring buffer; 6 of 6 at 115200, 447 to 452 of 500 packets lost at 921600",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0c1104/usart_dma_rx_idle.c",
+     "results": "mspm0c1104:uartdma_burst_pps"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.tx_dma/no-uart-dma"
+  },
+  {
+   "idiom": "uart.dma_trigger",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "DL_UART_enableDMAReceiveEvent and DL_UART_enableDMATransmitEvent, with the DMA channel's trigger set to the UART in SysConfig.",
+   "trap": "DL_UART_setRXInterruptTimeout only fires while bytes sit in the RX FIFO, and a DMA receive trigger empties the FIFO on every byte, so the timeout never fires. The header says to enable one DMA receive interrupt source at a time.",
+   "ti_guide_silent": "stm32-to-mspm0/api_guides/stm32g0-uart-api-reference.md lists the LL_USART DMA request calls and the IDLE flags with no MSPM0 counterpart",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "6 of 6 checks",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.dma_trigger/default"
+  },
+  {
+   "idiom": "dma.config_channel",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Channel type, trigger, widths and address modes in SysConfig (DL_DMA_Config or DL_DMA_initChannel in code). Address modes: UNCHANGED for a peripheral register, INCREMENT for memory.",
+   "check": "memory holds the expected bytes after one transfer",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "ADC DMA works once source width is WORD and the address mode is block-to-block",
+     "path": "mspm0g3507/stm32-port-eval/04-adc-multichannel/fixed/fix.diff"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "UART RX and TX channels, 6 of 6",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.syscfg"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dma.config_channel/default"
+  },
+  {
+   "idiom": "dma.set_addr_len",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "With the channel disabled: DL_DMA_setSrcAddr, DL_DMA_setDestAddr, DL_DMA_setTransferSize, then DL_DMA_enableChannel.",
+   "check": "length moved equals the length asked",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "re-armed on every block",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dma.set_addr_len/default"
+  },
+  {
+   "idiom": "dma.channel_enable",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "DL_DMA_enableChannel and DL_DMA_disableChannel.",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "re-armed on every block",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dma.channel_enable/default"
+  },
+  {
+   "idiom": "dma.remaining_count",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Write position = buffer length minus DL_DMA_getTransferSize(DMA, channel).",
+   "check": "position equals the bytes received",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "usart_rx_check reads it",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dma.remaining_count/default"
+  },
+  {
+   "idiom": "dma.complete_irq",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Enable the done interrupt in SysConfig; in the handler read DL_DMA_getPendingInterrupt (or DL_UART_getPendingInterrupt with DL_UART_MAIN_IIDX_DMA_DONE_RX or _TX), then DL_DMA_clearInterruptStatus.",
+   "check": "one interrupt per transfer",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "one DMA interrupt for two channels",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g5187/main.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dma.complete_irq/default"
+  },
+  {
+   "idiom": "dma.circular_halfcomplete",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "rearm-block",
+   "difficulty": "redesign",
+   "boards": [
+    "mspm0g3519",
+    "mspm0l1306",
+    "mspm33c321a"
+   ],
+   "replace": "RX into one 64-byte block that the UART DMA-done interrupt re-arms, plus the 1 ms poll. STM32's half-transfer interrupt has no equal here.",
+   "trap": "Bytes that arrive during the re-arm wait in the 4-deep RX FIFO; the MSPM33C321A has a block-done interrupt only.",
+   "degrades": "MSPM33C321A loses 152 to 181 of 500 packets at 921600 baud; MSPM0G3519 and L1306 lose none",
+   "check": "500 back-to-back packets at the stated baud",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "6 of 6 at 115200 and at 921600",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c",
+     "results": "mspm0g3519:uartdma_burst_lost"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "6 of 6 at 115200; 152 to 181 of 500 lost at 921600",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm33c321a/src/main.c",
+     "results": "mspm33c321a:uartdma_burst_pps"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dma.circular_halfcomplete/rearm-block"
+  },
+  {
+   "idiom": "dma.circular_halfcomplete",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "repeat-single-early-half",
+   "difficulty": "redesign",
+   "boards": [
+    "mspm0g5187"
+   ],
+   "replace": "A FULL channel in repeat-single mode with the early interrupt at HALF (DL_DMA_Full_Ch_setEarlyInterruptThreshold, DL_DMA_EARLY_INTERRUPT_THRESHOLD_HALF) and the done interrupt.",
+   "check": "500 back-to-back packets at the stated baud",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "6 of 6 at 115200 and at 921600",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g5187/main.c",
+     "results": "mspm0g5187:uartdma_burst_pps"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dma.circular_halfcomplete/repeat-single-early-half"
+  },
+  {
+   "idiom": "uart.rx_circular_dma",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "See dma.circular_halfcomplete for the receive buffer and uart.rx_until_idle for the hand-off. The RX DMA trigger is DL_UART_DMA_INTERRUPT_RX.",
+   "check": "burst of packets at the line rate, none lost",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "2,246 packets/s against 2,259 on the original, none lost",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/usart_dma.c",
+     "results": "mspm0g3519:uartdma_burst_pps"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.rx_circular_dma/default"
+  },
+  {
+   "idiom": "uart.rx_until_idle",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "timer-poll-1ms",
+   "difficulty": "redesign",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g5187",
+    "mspm0l1306",
+    "mspm33c321a"
+   ],
+   "replace": "No idle-line interrupt. A 1 ms timer or SysTick interrupt runs the same check as the idle handler: if the RX DMA position has not moved since the last tick and is past the processed position, hand the new bytes on.",
+   "trap": "The RX timeout interrupt (DL_UART_INTERRUPT_RX_TIMEOUT_ERROR) needs a non-empty RX FIFO and DMA empties it per byte, so it never reports idle: the first build only answered after 64 bytes.",
+   "degrades": "a one-packet message is answered up to 1 ms later than with the idle interrupt",
+   "check": "send one packet, no follow-up: reply arrives; then 500 back-to-back at the stated baud",
+   "see_also": "stm32-to-mspm0/api_guides/stm32g0-uart-api-reference.md",
+   "ti_guide_silent": "that guide lists LL_USART_*IDLE* flags and interrupt calls but gives no MSPM0 replacement; stm32-to-mspm0/peripherals/UART.md does not mention idle-line at all",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "6 of 6 checks, round trip 2.86 ms against 1.72 ms on the original",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/PORT-NOTES.md",
+     "results": "mspm0g3519:uartdma_rtt_ms"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "6 of 6 checks, SysTick poll",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g5187/PORT-NOTES.md",
+     "results": "mspm0g5187:uartdma_rtt_ms"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0l1306",
+     "level": "measured",
+     "what": "6 of 6 checks, 636 B of RAM",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0l1306/PORT-NOTES.md",
+     "results": "mspm0l1306:uartdma_rtt_ms"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "6 of 6 at 115200",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm33c321a/src/main.c",
+     "results": "mspm33c321a:uartdma_burst_pps"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.rx_until_idle/timer-poll-1ms"
+  },
+  {
+   "idiom": "uart.rx_until_idle",
+   "families": [
+    "MSPM0",
+    "AM13"
+   ],
+   "variant": "rx-timeout",
+   "difficulty": "redesign",
+   "boards": [
+    "mspm0c1104",
+    "am13e230"
+   ],
+   "replace": "UART receive timeout: DL_UART_setRXInterruptTimeout(inst, n) and the DL_UART_INTERRUPT_RX_TIMEOUT_ERROR interrupt; on the AM13E230 the timeout also triggers the DMA (DL_UART_DMA_INTERRUPT_RX_TIMEOUT). On the C1104 (no UART DMA) the interrupt drains the FIFO.",
+   "trap": "Works only while bytes are in the FIFO. Changing the timeout from 4 to 15 and adding a software flush did not remove the AM13E230's late replies.",
+   "degrades": "AM13E230: 12 of 100 isolated replies late; C1104: burst fails at 921600",
+   "check": "100 isolated packets: all answered; 500 back-to-back at the stated baud",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0c1104",
+     "level": "measured",
+     "what": "6 of 6 at 115200; 447 to 452 of 500 lost at 921600",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0c1104/usart_dma_rx_idle.c",
+     "results": "mspm0c1104:uartdma_burst_pps"
+    },
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "am13e230",
+     "level": "measured",
+     "what": "5 of 6 checks; 12 of 100 isolated packets answered only when the next arrived, cause unknown",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/am13e230/main.c",
+     "results": "am13e230:uartdma_burst_pps"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.rx_until_idle/rx-timeout"
+  },
+  {
+   "idiom": "console.print",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Override printf (or the retarget write) to send through the UART; the Cmsemicon glue does this, and the Arduino layer's Serial.write.",
+   "check": "same text on the host terminal",
+   "glue": "ports/cms32/glue/l1306/cms_core.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "Hello, USART and 'Cmsemicon SCI0 transmit & receive test !'",
+     "path": "ports/cms32/runs/usart_usart_printf.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:console.print/default"
+  },
+  {
+   "idiom": "adc.config_channel",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "SysConfig ADC12 instance: channels, resolution, trigger, sample time, DMA channel.",
+   "trap": "The migration dropped the count-to-millivolt code and moved the input from PA4 to PA27. Channel 0 read 0 counts on PA27; what is wired there was not checked.",
+   "check": "known input voltage reads the expected counts",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "three channels converted once with the skill's version; all three per start after the fixes",
+     "path": "mspm0g3507/stm32-port-eval/04-adc-multichannel/fixed/empty.syscfg"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:adc.config_channel/default"
+  },
+  {
+   "idiom": "adc.start_conversion",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "DL_ADC12_enableConversions then DL_ADC12_startConversion; read DL_ADC12_getMemResult.",
+   "trap": "The first ADC_Converse waited on a status flag the interrupt handler had already cleared and hung: wait on the flag or the interrupt count.",
+   "check": "known input voltage",
+   "glue": "ports/cms32/glue/l1306/adc_demo.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "adcHardTrigNoWait and adcSoftTrigger examples ran",
+     "path": "ports/cms32/runs/adc_adc_demo_adcSoftTrigger.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:adc.start_conversion/default"
+  },
+  {
+   "idiom": "adc.multichannel_dma",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "DL_ADC12_setDMASamplesCnt(ADC12_0_INST, 1); source = DL_ADC12_getMemResultAddress(ADC12_0_INST, ADC12_0_ADCMEM_0), one 32-bit result register per trigger; SysConfig DMA addressMode b2b (not f2b), srcLength WORD, dstLength HALF_WORD, transferMode FULL_CH_REPEAT_SINGLE, size 3.",
+   "trap": "As the migration wrote it (source = DL_ADC12_getFIFOAddress with ADC FIFO mode off, sample count 0) it converts once and stalls: DMA moves nothing and later starts are ignored. Three corrections: source address, sample count, button polarity.",
+   "degrades": "converts all three channels per start where the original converts one per press; presses were simulated",
+   "check": "buffer holds one fresh result per channel after each start, and the second and third starts work too",
+   "ti_guide_silent": "stm32-to-mspm0/peripherals/DMA.md shows DL_ADC12_getFIFOAddress as the ADC DMA source and names FIFO packing, but never says ADC FIFO mode has to be on for that address to work, and gives no sample-count call",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "buffer held all three results and the DMA done callback ran; the fixed code converts all three channels per start, ST's one per press",
+     "path": "mspm0g3507/stm32-port-eval/04-adc-multichannel/board/adc-fixed-run.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:adc.multichannel_dma/default"
+  },
+  {
+   "idiom": "adc.done_callback",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Enable the ADC DMA_DONE interrupt in SysConfig (DL_ADC12_INTERRUPT_DMA_DONE) and call the application function from the ADC handler.",
+   "check": "callback runs once per sequence",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "ran",
+     "what": "the DMA done callback ran after the fixes",
+     "path": "mspm0g3507/stm32-port-eval/04-adc-multichannel/board/adc-fixed-run.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:adc.done_callback/default"
+  },
+  {
+   "idiom": "pwm.config_channel",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "SysConfig timer instance in PWM mode (period, duty, polarity, pin). Pins are chosen again on the target.",
+   "trap": "Only channel 4 was measured; channels 1 to 3 and the frequency were not. The migration moved channel 4 from PA11 to PA12.",
+   "check": "duty and frequency on a logic analyzer",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "measured",
+     "what": "channel 4: 14.7% of samples high against 12.5% duty",
+     "path": "mspm0g3507/stm32-port-eval/05-tim-pwm/board/pa13-samples-loop3.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:pwm.config_channel/default"
+  },
+  {
+   "idiom": "pwm.config_channel",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "complementary-4ch",
+   "difficulty": "adapter",
+   "boards": [
+    "mspm0l1306"
+   ],
+   "replace": "Four complementary channels with dead band become two channels on TIMG; the G-series TIMA has four, dead band and a fault input.",
+   "degrades": "2 of the original 4 channels, no complementary outputs, no dead band or break input on TIMG (L1306 data sheet)",
+   "check": "each channel and the dead time on a logic analyzer",
+   "glue": "ports/cms32/glue/l1306/tim_demo.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "timer1 ran: TIMG0 counting at the 17.57 kHz PWM period",
+     "path": "ports/cms32/runs/timer_timer1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:pwm.config_channel/complementary-4ch"
+  },
+  {
+   "idiom": "pwm.start_channel",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "DL_TimerA_startCounter(PWM_0_INST) once SysConfig has configured the instance.",
+   "check": "pin shows the duty the source set",
+   "proof": [
+    {
+     "port": "stm32cubeg0-migration",
+     "board": "mspm0g3507",
+     "level": "measured",
+     "what": "channel 4 duty matches",
+     "path": "mspm0g3507/stm32-port-eval/05-tim-pwm/Src/main.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:pwm.start_channel/default"
+  },
+  {
+   "idiom": "power.sleep",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Sleep: DL_SYSCTL_setPowerPolicyRUN0SLEEP0() then __WFI(). Deep sleep: DL_SYSCTL_setPowerPolicySTOP0() then __WFI().",
+   "check": "the wake interrupt runs; measure current for the saving",
+   "glue": "ports/cms32/glue/l1306/CMS32F04xx.h",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "STB sleep wakes on the timer; deepsleep_itWakeup woken from STOP0 by the 32 kHz timer",
+     "path": "ports/cms32/runs/STB_deepsleep_itWakeup.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:power.sleep/default"
+  },
+  {
+   "idiom": "wdt.watchdog",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "WWDT0 in plain watchdog mode (the L1306 has one watchdog; the source chip may have two). If window mode is used, open the window fully in the glue.",
+   "trap": "Refreshing a window watchdog inside its closed window reset the chip every few ms from the first boot, and every debug connect then failed (OpenOCD: Could not find MEM-AP; DSLite: Connection to MSPM0 core failed). Recovery: mass erase through the debug mailbox with OpenOCD (mspm0x mass erase script).",
+   "check": "unfed watchdog resets, a fed one does not; keep a recovery route before running",
+   "glue": "ports/cms32/glue/l1306/iwdg_demo.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "iwdg ran on WWDT0: unfed, the chip rebooted",
+     "path": "ports/cms32/runs/iwdg.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:wdt.watchdog/default"
+  },
+  {
+   "idiom": "crc.compute",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "The CRC block: power it first (clock.peripheral_enable), feed bytes, read the result.",
+   "trap": "The block read 0 until powered. The block feeds bytes: a word-wise guess gave another value.",
+   "check": "same value as a host script for the same bytes",
+   "glue": "ports/cms32/glue/l1306/demo_crc.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "CrcResult 0x005D4625 equals a host byte-wise unreflected CRC-32 of the same words",
+     "path": "ports/cms32/runs/CRC.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:crc.compute/default"
+  },
+  {
+   "idiom": "flash.write",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "Erase 1 kB sectors and program 8-byte words with the SDK flash driver; fold example addresses into the chip's range.",
+   "trap": "MSPM0 flash programs 8-byte words and refuses a second write into the same word (4-byte writes left every other 4 bytes at 0xFF). Sectors are 1 kB against the source's 512 B, so two of four erases wiped a neighbour. The example's addresses at 0x1F000 are past the L1306's 64 kB. Upstream passes a byte-aligned packet buffer; three of six agent ports copy each 8 bytes into an aligned pair before the 64-bit program call, because a 32-bit load from the buffer can fault on Cortex-M0+ (not seen as a fault in these runs). Erase and program with the SDK's FromRAM calls, interrupts off, a sector unprotected before each command.",
+   "check": "read back equals what was written; neighbours intact",
+   "glue": "ports/cms32/glue/l1306/cms_core.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "flashEraseWrite: all four result lines after two fixes",
+     "path": "ports/cms32/runs/flashEraseWrite.txt"
+    },
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "448 sectors erased and the image written in 8-byte ECC words; flash content equal to the sent image byte for byte; update of 4,480 B in 1.54 s with the erase",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/Src/flash.c",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:flash.write/default"
+  },
+  {
+   "idiom": "analog.comparator",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "COMP0: DL_COMP_reset, DL_COMP_enablePower, delay_cycles(16), DL_COMP_init with the channel, polarity and hysteresis, DL_COMP_refVoltageInit for a DAC reference, DL_COMP_enable; route the output with DL_GPIO_initPeripheralOutputFunction.",
+   "trap": "One comparator on the L1306 against two on the CMS32F040: ACMP1 lands on the same COMP0.",
+   "degrades": "one comparator, not two; the crossing was not tested",
+   "check": "output follows the input crossing the reference",
+   "glue": "ports/cms32/glue/l1306/demo_acmp.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "ACMP0 and ACMP1 examples: COMP0 on, program in its loop; nothing was driven on the inputs",
+     "path": "ports/cms32/runs/acmp_ACMP0.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:analog.comparator/default"
+  },
+  {
+   "idiom": "analog.opamp",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "OPA0 and OPA1 on the L1306 (glue demo_op.c).",
+   "degrades": "gain not measured",
+   "check": "output equals gain times input on a known input",
+   "glue": "ports/cms32/glue/l1306/demo_op.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "OP0 and OP1 examples: op amp on, program in its loop; gain not measured",
+     "path": "ports/cms32/runs/OP_OP0_code.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:analog.opamp/default"
+  },
+  {
+   "idiom": "system.reset",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "NVIC_SystemReset is the same CMSIS call; read the cause with DL_SYSCTL_getResetCause (the glue maps it onto Cmsemicon's RESF bit positions).",
+   "check": "cause flag differs after a software reset from after power-up",
+   "glue": "ports/cms32/glue/l1306/cms_core.c",
+   "proof": [
+    {
+     "port": "cmsemicon",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "softReset: RESF 0x00 on the first boot, 0x04 on every boot after",
+     "path": "ports/cms32/runs/softReset.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:system.reset/default"
+  },
+  {
+   "idiom": "rtos.task_create",
+   "families": [
+    "MSPM0",
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Same FreeRTOS API; build the FreeRTOS library for the target with the SDK's kernel sources.",
+   "trap": "Two of the 41 FreeRTOS files for the MSPM0 projects failed to compile and the 10 images still linked.",
+   "check": "tasks share the CPU",
+   "proof": [
+    {
+     "port": "mspm0-to-f3",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "empty_freertos twin builds both ways",
+     "path": "portability/shim/data/twins.jsonl"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:rtos.task_create/default"
+  },
+  {
+   "idiom": "rtos.delay",
+   "families": [
+    "MSPM0",
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "vTaskDelay: same call; the tick comes from the target's kernel port.",
+   "check": "period on a pin",
+   "proof": [
+    {
+     "port": "mspm0-to-f3",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "empty_freertos twin builds both ways",
+     "path": "portability/shim/data/twins.jsonl"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:rtos.delay/default"
+  },
+  {
+   "idiom": "atomic.c11",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Keep the library's default C11 atomics. TI Arm Clang warns (-Watomic-alignment, 22 warnings for lwrb) and links no atomic library call.",
+   "check": "library test passes; nm on the image shows no __atomic call",
+   "proof": [
+    {
+     "port": "stm32-usart-dma-rx-tx",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "nm showed no libatomic call; 6 of 6 checks",
+     "path": "ports/stm32-usart-dma-rx-tx/boards/mspm0g3519/PORT-NOTES.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:atomic.c11/default"
+  },
+  {
+   "idiom": "ble.hid_service",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "no-radio",
+   "difficulty": "none",
+   "replace": "No radio on these parts.",
+   "instead": "Keep the portable report core and send it over the serial console to check the bytes; use a CC23xx part for the radio.",
+   "check": "descriptor and reports equal the original's bytes",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "the report core alone printed the descriptor and four reports, equal to the library's output on an ESP32-C6",
+     "path": "ports/esp32-ble-gamepad/boards/mspm0g3519/frl_gamepad.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:ble.hid_service/no-radio"
+  },
+  {
+   "idiom": "uart.driver_api",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "F3 source: UART2_ calls become UART_ calls; CONFIG_UART2_0 becomes CONFIG_UART_0.",
+   "check": "same echo as the original driver example",
+   "glue": "portability/shim/f3_on_mspm0/fr_f3_on_mspm0.h",
+   "proof": [
+    {
+     "port": "mspm0-to-f3",
+     "board": "mspm0g3507",
+     "level": "built",
+     "what": "the F3 apps build on the G3507",
+     "path": "portability/shim/f3_on_mspm0/fr_f3_on_mspm0.h"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:uart.driver_api/default"
+  },
+  {
+   "idiom": "config.generated_names",
+   "families": [
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "The AM13 generator names one port per pin; the header defines GPIO_LEDS_PORT as GPIO_LEDS_USER_LED_1_PORT and CPUCLK_FREQ as CPUCLK_FREQ_HZ.",
+   "check": "application compiles with no edit; pins match",
+   "glue": "portability/shim/mspm0_on_am13e230/ti_msp_dl_config.h",
+   "proof": [
+    {
+     "port": "mspm0-on-am13",
+     "board": "am13e230",
+     "level": "ran",
+     "what": "gpio, uart and pwm programs unchanged",
+     "path": "portability/shim/mspm0_on_am13e230/ti_msp_dl_config.h"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:config.generated_names/default"
+  },
+  {
+   "idiom": "boot.jump_to_app",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Read the stack pointer and reset vector from the application's first two words, set SCB->VTOR to the application's vector table, clear the NVIC enable and pending bits, put the UART and SysTick the bootloader used back to reset state, load MSP, then call the reset vector.",
+   "trap": "Leave interrupts enabled at the jump: a bootloader that masks them (__disable_irq around the hand-off, kept to the end) starts the application with PRIMASK set, so the application prints from main but none of its interrupts ever run. Four of six agent ports hit this first. Without the VTOR write the first interrupt lands in the bootloader's vector table.",
+   "check": "the application's own interrupts run after the jump (a timer tick line every 250 ms), and a reset with a stored image jumps again",
+   "glue": "ports/stm32-bootloader/boards/mspm0g3519/Src/flash.c",
+   "proof": [
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "application's timer interrupt ticks after the jump, after an update and after a reset; 6 of 6 host checks",
+     "path": "ports/stm32-bootloader/boards/mspm0g3519/Src/flash.c",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:boot.jump_to_app/default"
+  },
+  {
+   "idiom": "uart.recover_after_error",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Poll the RX FIFO against a SysTick millisecond count for the timeout, and after each received byte clear the latched overrun, framing, noise, break and parity flags with DL_UART_Main_clearInterruptStatus; nothing else is needed for a blocking sender.",
+   "check": "after three bad packets and the abort, a good update still works",
+   "glue": "ports/stm32-bootloader/boards/mspm0g3519/Src/uart.c",
+   "proof": [
+    {
+     "port": "stm32-bootloader",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "CAN CAN after the third error, then a good Xmodem update succeeds; abort test of the host check",
+     "path": "ports/stm32-bootloader/runs/2026-10-20/checks/port-bootloader-g3519-3.json",
+     "results": "mspm0g3519:bootloader_checks_passed"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.recover_after_error/default"
+  },
+  {
+   "idiom": "gpio.open_drain_soft_i2c",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Latch the data bit low, switch the output enable with DL_GPIO_enableOutput and disableOutput, read the pin.",
+   "trap": "SysConfig makes a GPIO output with the input stage off: the read-back is always 0 until DL_GPIO_initDigitalInputFeatures is called.",
+   "check": "device ID reads back over the bit-banged bus",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "OPT3001 IDs 0x5449 and 0x3001 read on the L1306",
+     "path": "portability/boosterpacks/edumkii/boards/common/port_dl.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.open_drain_soft_i2c/default"
+  },
+  {
+   "idiom": "adc.single_channel_runtime_select",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Disable conversions, DL_ADC12_configConversionMem on MEM0 with the new channel, enable, start, poll the raw MEM0 flag, read.",
+   "trap": "One SysConfig ADC instance covers pins that are unassigned in the file (pins stay analog by reset state). The G3507 needs two instances because the BoosterPack analog pins split across ADC0 and ADC1.",
+   "check": "counts at rest are mid-scale for the stick and accelerometer",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "joystick Y 2033 to 2041, accelerometer X and Y, microphone read",
+     "path": "portability/boosterpacks/edumkii/RUN-LOG.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:adc.single_channel_runtime_select/default"
+  },
+  {
+   "idiom": "adc.button_on_analog_only_pin",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "l1306",
+   "difficulty": "redesign",
+   "replace": "On the VQFN-32 package PA24 is not a GPIO: read it as ADC0.3 and compare to 2048 against the BoosterPack 10 kOhm pull-up.",
+   "trap": "SysConfig rejects PA24 for GPIO (No option named PA24) while the board notes list it as GPIO-like.",
+   "check": "released reads near full scale",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "reads released at rest; nobody pressed it",
+     "path": "portability/boosterpacks/edumkii/RUN-LOG.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:adc.button_on_analog_only_pin/l1306",
+   "boards": [
+    "mspm0l1306"
+   ]
+  },
+  {
+   "idiom": "uart.tx_only_console",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "SysConfig UART with direction TX: only the transmit pin is claimed.",
+   "trap": "Assigning the receive pin muxes PA11 to the UART and takes the BoosterPack S1 button away.",
+   "check": "S1 still reads as a button while the console prints",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "console on PA8 with the buttons free",
+     "path": "portability/boosterpacks/edumkii/RUN-LOG.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.tx_only_console/default"
+  },
+  {
+   "idiom": "spi.display_stream_dma",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "SPI TX DMA trigger, byte-to-byte channel, done flag from the SPI interrupt, DL_SPI_flushTXFIFO before each block.",
+   "trap": "SysConfig names: DMA instance DMA0, channel CH1, then DMA0_CH1_CHAN_ID. A port that falls back to polling to get going should not stay there: the polled FIFO loop took 55.3 ms a frame at 16 MHz where DMA took 19.5 ms.",
+   "check": "frame time equals bytes x 8 over the clock",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "M33 screen path links; the screen showed Snake after the DMA blit",
+     "path": "portability/boosterpacks/edumkii/RUN-LOG.md"
+    },
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "one 128 x 128 frame: 19.5 ms DMA at 16 MHz, 39.0 ms at 8 MHz, 55.3 and 67.6 ms polled",
+     "path": "portability/boosterpacks/edumkii/RESULTS-ROWS-wave3.csv",
+     "results": "mspm33c321a:display_full_frame"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:spi.display_stream_dma/default"
+  },
+  {
+   "idiom": "time.cycle_stamp",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Cortex-M33: DWT cycle counter. Cortex-M0+: SysTick counting down, 24 bits, difference masked.",
+   "trap": "SysTick wraps after 0.52 s at 32 MHz: fine for a frame, not for a second.",
+   "check": "two stamps around a known delay",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "used by the screen path on five boards",
+     "path": "portability/boosterpacks/edumkii/boards/common/port_dl.c"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:time.cycle_stamp/default"
+  },
+  {
+   "idiom": "sysconfig.generate_from_pin_table",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "tools/gen_board.py writes the SysConfig file and the C header from one pins.json.",
+   "trap": "Pin names inside a GPIO instance must be unique across instances; SPI frameFormat options are MOTO4 and MOTO3 only; some chips name serial blocks UC0 to UC3 and reject SPI2 and UART0.",
+   "check": "generated files build for each board",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g3507",
+     "level": "built",
+     "what": "pin maps for five LaunchPad kits from one table",
+     "path": "portability/boosterpacks/edumkii/boards/common/edu_board.h"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:sysconfig.generate_from_pin_table/default"
+  },
+  {
+   "idiom": "display.frl_platform_adapter",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "m33",
+   "difficulty": "adapter",
+   "replace": "examples/snake/frl_edumkii.cpp: write_lines to edumkii_blit, stick and S1/S2 to the layer input, SysTick-driven non-blocking tone, millis from the cycle counter.",
+   "trap": "tone() must return at once: the core edumkii_tone blocks, so the adapter toggles the buzzer from the SysTick interrupt. The raw stick Y rises toward the player, so invert_y = 1.",
+   "check": "Snake draws and the stick moves the snake",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "Snake drawn on the Educational pack screen (bench camera 2026-10-20 23:11:56); stick not judged",
+     "path": "portability/boosterpacks/edumkii/RUN-LOG.md",
+     "results": "mspm33c321a:port_flash_bytes"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:display.frl_platform_adapter/m33",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "spi.frame_whole_word",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Hold SYNC low across all 16 clocks: bit-banged GPIO, or 16-bit SPI data size with chip select as a software GPIO.",
+   "trap": "Chip select rising between two bytes makes the DAC8311 cancel the write: the output stays at zero and nothing plays (E237).",
+   "check": "the converter output changes with whole frames and not with split ones",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "measured",
+     "what": "wrong frame silent (59.9 Hz floor), right frame 1000.0 Hz",
+     "path": "portability/boosterpacks/audio/results/am13e230-20261020/console-run1.log",
+     "results": "am13e230:audio_dac8311_split8"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:spi.frame_whole_word/default"
+  },
+  {
+   "idiom": "gpio.shutdown_active_high",
+   "families": [
+    "MSPM0",
+    "MSPM33",
+    "AM13"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Drive the line low to enable the TPA301; release it or drive it high to shut it down.",
+   "trap": "The header name AMP_ON suggests active high; SHUTDOWN is active high, so driving it high silences the pack.",
+   "check": "sound with the line low and none floating or high",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "measured",
+     "what": "amp low plays, floating and high do not",
+     "path": "portability/boosterpacks/audio/results/am13e230-20261020/console-run1.log",
+     "results": "am13e230:audio_dac8311_tone"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.shutdown_active_high/default"
+  },
+  {
+   "idiom": "adc.software_triggered_single",
+   "families": [
+    "AM13"
+   ],
+   "variant": "am13",
+   "difficulty": "adapter",
+   "replace": "DL_ADC_forceSequencer plus DL_ADC_readResult after DL_ADC_powerUp and a 5 ms wait; one SOC in one sequencer.",
+   "trap": "SysConfig rejects PA31 as an SOC channel on the default ADC: AIN33 lives on ADC1 or ADC2, so set adcBase before choosing the channel.",
+   "check": "capture of the pack microphone shows the tone bins",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "ran",
+     "what": "pack microphone captured at 8 kHz",
+     "path": "portability/boosterpacks/audio/boards/am13e230/audio.syscfg"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:adc.software_triggered_single/am13",
+   "boards": [
+    "am13e230"
+   ]
+  },
+  {
+   "idiom": "adc.software_triggered_single",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "m33",
+   "difficulty": "adapter",
+   "replace": "DL_HSADC_triggerSequencerSoftwareForce plus DL_HSADC_getResult; SysConfig needs soc0Channel and the matching adcPin.",
+   "trap": "The example SOC 0 is channel 0; a header pin on another channel needs both properties.",
+   "check": "known voltage reads expected counts",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "audio app builds for the M33",
+     "path": "portability/boosterpacks/audio/boards/mspm33c321a/build.sh"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:adc.software_triggered_single/m33",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "timer.periodic_tick_8khz",
+   "families": [
+    "AM13"
+   ],
+   "variant": "am13",
+   "difficulty": "direct",
+   "replace": "SysTick on the AM13E230 counts the 200 MHz core clock: period 25000 gives 125 us.",
+   "trap": "Copying the MSPM0 period (4000 at 32 MHz) gives a 50 kHz tick.",
+   "check": "DFT bins of a captured tone land where the 8 kHz rate predicts",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "ran",
+     "what": "8 kHz capture rate matches the DFT bins",
+     "path": "portability/boosterpacks/audio/tools/mic_analyze.py"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:timer.periodic_tick_8khz/am13",
+   "boards": [
+    "am13e230"
+   ]
+  },
+  {
+   "idiom": "build.sdk_example_frame_extra_sources",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Copy the example, delete its generated ti_msp_dl_config files, add EXTRA_SRCS and one C_RULE line per file to the makefile.",
+   "trap": "A stale generated header in the example folder shadows the new one and every pin macro is undeclared.",
+   "check": "image builds",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "both board build scripts",
+     "path": "portability/boosterpacks/audio/boards/mspm0g3519/build.sh"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:build.sdk_example_frame_extra_sources/default"
+  },
+  {
+   "idiom": "i2c.controller_poll",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "unicomm",
+   "difficulty": "adapter",
+   "replace": "MSPM0 UNICOMM parts (G5187, MSPM33) use DL_I2CC calls where the G3x DriverLib uses DL_I2C Controller calls.",
+   "trap": "The two families name the same calls differently; one macro layer at the top of the port file covers both.",
+   "check": "a device ID reads back",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "HDC2080 and OPT3001 read",
+     "path": "portability/boosterpacks/bassensorsmkii/results/hello-run1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:i2c.controller_poll/unicomm"
+  },
+  {
+   "idiom": "i2c.bus_recover",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Nine clocks and a stop with the pins as GPIO, then SYSCFG_DL_GPIO_init and SYSCFG_DL_I2C_init again.",
+   "trap": "SYSCFG_DL_GPIO_init puts the power-switch pins back to their initial level, so the sensor power must be set again after it.",
+   "check": "bus idle high and the next transfer works",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "bus_recover in the port file ran",
+     "path": "portability/boosterpacks/bassensorsmkii/boards/mspm0_common/bs_port_mspm0.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:i2c.bus_recover/default"
+  },
+  {
+   "idiom": "gpio.power_switch_pin",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "One enum, polarity kept in the driver, the port writes the electrical level.",
+   "trap": "Two switches are P-channel (low = on), two direct (high = on); the user guide text names pin 28 for the HDC2080 where its table and schematic say pin 6.",
+   "check": "each sensor answers only when switched on",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "HDC2080 22.0 C, 44.7 percent RH after the switch",
+     "path": "portability/boosterpacks/bassensorsmkii/results/hello-run1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.power_switch_pin/default"
+  },
+  {
+   "idiom": "sysconfig.pin_missing",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "m33",
+   "difficulty": "redesign",
+   "replace": "SysConfig for the LQFP-100 offers no GPIO for header pins 24, 27 and 28: leave the group out and wire the pack top pin (OPT3001 and TMP117 from 3V3, DRV5055 power to GND).",
+   "trap": "The board file and the SysConfig device data disagree; found only by running SysConfig.",
+   "check": "SysConfig runs and the sensors answer",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "bassens.syscfg builds; wiring not tried",
+     "path": "portability/boosterpacks/bassensorsmkii/boards/mspm33c321a/bassens.syscfg"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:sysconfig.pin_missing/m33",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "adc.single_channel_mv",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "G5187: ADC12 channel 2 on PA25; G3519: channel 12 on PA14.",
+   "trap": "The channel number must match the pin name in SysConfig.",
+   "check": "DRV5055 reads 1.638 V at rest",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "DRV5055 1.638 V",
+     "path": "portability/boosterpacks/bassensorsmkii/results/hello-run1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:adc.single_channel_mv/default"
+  },
+  {
+   "idiom": "imu.bmi160_stream",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "15-byte burst from 0x0C (gyro, accel, sensor time), timestamps from the 24-bit sensor clock.",
+   "trap": "Not proven on hardware: the BMI160 never answered.",
+   "check": "100 Hz with no missing sample over a minute",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g5187",
+     "level": "built",
+     "what": "host loop proven with a stand-in at 100.000 Hz; the BMI160 itself never ran",
+     "path": "portability/boosterpacks/bassensorsmkii/results/motion-standin-60s.csv"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:imu.bmi160_stream/default"
+  },
+  {
+   "idiom": "serial.csv_stream_100hz",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "115200 baud is 31 percent loaded at 36-byte lines and 100 lines a second; polled transmit between 10 ms ticks.",
+   "trap": "None at this rate; a faster rate or more columns would need DMA.",
+   "check": "6241 samples in 62.4 s, no gap over 15 ms",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "100.000 Hz stream",
+     "path": "portability/boosterpacks/bassensorsmkii/results/motion-standin-60s.csv"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:serial.csv_stream_100hz/default"
+  },
+  {
+   "idiom": "spi.byte_order_lsb_first",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Keep SPI MSB first and reverse each byte in software (three mask-and-shift steps, no table), so one SPI setup also serves the microSD card.",
+   "trap": "Reversing in the SPI hardware forces a bit-order switch with the peripheral disabled between every panel and card transfer.",
+   "check": "panel shows the right pixels",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0c1104",
+     "level": "ran",
+     "what": "hello on the C1104, counter seen on the panel",
+     "path": "portability/boosterpacks/sharp128/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:spi.byte_order_lsb_first/default"
+  },
+  {
+   "idiom": "time.ms_tick_no_systick",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "c1104",
+   "difficulty": "adapter",
+   "replace": "TIMG14 periodic at the CPU clock over 1000, one interrupt a millisecond, microseconds from its down-counter.",
+   "trap": "SysTick registers read zero on that chip, so every delay and timeout hangs; the program looks alive and never advances.",
+   "check": "counter rises once per millisecond",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0c1104",
+     "level": "ran",
+     "what": "hello_res.counter rose",
+     "path": "portability/boosterpacks/sharp128/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.ms_tick_no_systick/c1104",
+   "boards": [
+    "mspm0c1104"
+   ]
+  },
+  {
+   "idiom": "display.no_framebuffer_bands",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "One drawing function called once per band of 1 to 16 rows into a 16 to 256 byte buffer, each band sent as its own panel update.",
+   "trap": "Time grows as the band shrinks: 154 ms at 1 row, 41 ms at 16 rows, because the whole scene is drawn per band. Stack needed 352 B.",
+   "check": "scene right on the panel; frame time per band size",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0c1104",
+     "level": "measured",
+     "what": "153.7 ms at 1 row, 41.1 ms at 16 rows, 609 B RAM",
+     "path": "portability/boosterpacks/sharp128/README.md",
+     "results": "mspm0c1104:display_full_frame"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:display.no_framebuffer_bands/default"
+  },
+  {
+   "idiom": "fs.fat_read_small_ram",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "Petit FatFs R0.03a: no sector buffer, reads a byte range of a sector and drops the rest.",
+   "trap": "A partial read costs a full 514-byte sector on the bus: 1-row reads cost 16 times the bytes of 8-row reads; seeking needs PF_USE_LSEEK.",
+   "check": "30 of 30 frames equal in simulation",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0c1104",
+     "level": "built",
+     "what": "simulated on the Mac against FAT16 and FAT32 images; links at 7.2 kB flash and 779 B RAM; no card yet",
+     "path": "portability/boosterpacks/sharp128/tests/run_sim.sh"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:fs.fat_read_small_ram/default"
+  },
+  {
+   "idiom": "sd.spi_mode_shared_bus",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "One SPI shared with a panel: panel select forced low before every card command, card select high before every panel update, clock 0.4 MHz for card start-up, then the card rate, 1 MHz for the panel.",
+   "trap": "A disk driver that returned success only for multi-sector reads mounted nothing.",
+   "check": "card reads work and the panel stays right",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0c1104",
+     "level": "built",
+     "what": "simulated only; no card on the bench",
+     "path": "portability/boosterpacks/sharp128/tests/run_sim.sh"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:sd.spi_mode_shared_bus/default"
+  },
+  {
+   "idiom": "rtos.none_stack_painting",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Paint the unused stack at start and count untouched bytes later.",
+   "trap": "The generated linker file sets a 64-byte stack; the band renderer needs 352 B.",
+   "check": "stack_free read after the run",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0c1104",
+     "level": "ran",
+     "what": "352 B of stack used, read back",
+     "path": "portability/boosterpacks/sharp128/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:rtos.none_stack_painting/default"
+  },
+  {
+   "idiom": "debug.attach_resets_target",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "c1104",
+   "difficulty": "adapter",
+   "replace": "Flash, run, wait and read the result struct in one OpenOCD session (boards/c1104_run.py).",
+   "trap": "A second attach to read the struct reset the chip, so the read showed the program 5 ms after reset and looked like a hang.",
+   "check": "the struct shows the running state",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0c1104",
+     "level": "ran",
+     "what": "c1104_run.py read the struct",
+     "path": "portability/boosterpacks/sharp128/boards/c1104_run.py"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:debug.attach_resets_target/c1104",
+   "boards": [
+    "mspm0c1104"
+   ]
+  },
+  {
+   "idiom": "dsp.fir_block",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "nnc-npu",
+   "difficulty": "redesign",
+   "replace": "Conv with kernel [taps,1] on a [1,1,N+taps-1,1] input, flipped taps, integer weights, power-of-two output shift.",
+   "trap": "Output channels must be a multiple of 4, so a single FIR needs three more filters; the caller keeps the taps-1 history samples.",
+   "check": "output equals the integer reference byte for byte",
+   "proof": [
+    {
+     "port": "npu-dsp-g5187",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "0.566 ms for 4 x 256 x 64 against 3.286 ms for one hand-written channel; 29.7x NNC CPU",
+     "path": "mspm0g5187/npu-dsp/model/fir64",
+     "results": "mspm0g5187:npu_dsp_block_ms"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dsp.fir_block/nnc-npu",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "dsp.filter_bank",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "nnc-npu",
+   "difficulty": "redesign",
+   "replace": "Conv with one output channel per band.",
+   "trap": "Taps scaled per band by the largest power of two within plus or minus 127, so weak bands lose bits (17 to 30 dB end to end).",
+   "check": "output equals the integer reference byte for byte",
+   "proof": [
+    {
+     "port": "npu-dsp-g5187",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "8-band bank 0.967 ms",
+     "path": "mspm0g5187/npu-dsp/model/bank8"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dsp.filter_bank/nnc-npu",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "dsp.decimate_fir",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "nnc-npu",
+   "difficulty": "redesign",
+   "replace": "Conv with stride.",
+   "trap": "None found at stride 4.",
+   "check": "output equals the integer reference byte for byte",
+   "proof": [
+    {
+     "port": "npu-dsp-g5187",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "0.185 ms",
+     "path": "mspm0g5187/npu-dsp/model/fir64_dec4"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dsp.decimate_fir/nnc-npu",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "dsp.block_peak",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "nnc-npu",
+   "difficulty": "direct",
+   "replace": "MaxPool with kernel and stride equal to the block.",
+   "trap": "Positive peaks only on a signed band output.",
+   "check": "output equals the integer reference byte for byte",
+   "proof": [
+    {
+     "port": "npu-dsp-g5187",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "bank8_trip graph",
+     "path": "mspm0g5187/npu-dsp/model/bank8_trip"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dsp.block_peak/nnc-npu",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "dsp.threshold_compare",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "nnc-npu",
+   "difficulty": "adapter",
+   "replace": "1x1 Conv with 127 on the diagonal, bias -127*thr, clip.",
+   "trap": "A re-scaling shift of exactly 2^0 stopped the compiler matching the layer; it then ran on the CPU. Use 2^-1.",
+   "check": "output equals the integer reference byte for byte",
+   "proof": [
+    {
+     "port": "npu-dsp-g5187",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "0.677 ms, 49.1x NNC CPU",
+     "path": "mspm0g5187/npu-dsp/model/bank8_trip/npu/compile.log"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dsp.threshold_compare/nnc-npu",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "dsp.dft_matrix",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "nnc-npu",
+   "difficulty": "redesign",
+   "replace": "MatMul (FC) with cos and sin rows at 127.",
+   "trap": "Needs at least 16 inputs for 8-bit weights; the NPU reached 0.26 multiply-adds per cycle, 4.3x over NNC CPU, not 30x.",
+   "check": "output equals the integer reference byte for byte",
+   "proof": [
+    {
+     "port": "npu-dsp-g5187",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "0.195 ms",
+     "path": "mspm0g5187/npu-dsp/model/dft64"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:dsp.dft_matrix/nnc-npu",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "npu.skip_normalize",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "nnc-npu",
+   "difficulty": "direct",
+   "replace": "skip_normalize=true output_int=true at compile time and int8 buffers in the application.",
+   "trap": "Without it the float input scaling runs on the CPU before every call.",
+   "check": "output equals the integer reference byte for byte",
+   "proof": [
+    {
+     "port": "npu-dsp-g5187",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "all images",
+     "path": "mspm0g5187/npu-dsp/nnc.sh"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:npu.skip_normalize/nnc-npu",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "display.spi_panel_init",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "zephyr-main",
+   "difficulty": "adapter",
+   "replace": "zephyr,mipi-dbi-spi node with a sitronix,st7735r child; SPI on the BoosterPack labels, data/command and reset on header pins.",
+   "trap": "This panel needs x-offset 2, y-offset 3, madctl 0xc8 and inversion off; the Adafruit shield values draw a shifted picture. Backlight is a regulator-fixed on header pin 39 through J5.",
+   "check": "builds without devicetree errors; the picture or tone appears on a board (not yet run)",
+   "proof": [
+    {
+     "port": "zephyr-shields",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "Educational screen shield builds on the G3519 (32.0 kB) and G3507 (31.9 kB)",
+     "path": "portability/boosterpacks/zephyr/dts/boosterpack"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:display.spi_panel_init/zephyr-main",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g3507"
+   ]
+  },
+  {
+   "idiom": "gpio.header_nexus",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "zephyr-main",
+   "difficulty": "direct",
+   "replace": "A node with compatible ti,boosterpack-header, gpio-map entries per pin, and gpio-map-mask <0xffffffff 0xffffffc0> with pass-thru <0 0x3f>.",
+   "trap": "Without the mask a reference with flags does not match the map entry written with flag 0; the error names the first node that asked, not the pin.",
+   "check": "builds without devicetree errors; the picture or tone appears on a board (not yet run)",
+   "proof": [
+    {
+     "port": "zephyr-shields",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "header files for three LaunchPad kits",
+     "path": "portability/boosterpacks/zephyr/dts/boosterpack"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:gpio.header_nexus/zephyr-main",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g3507"
+   ]
+  },
+  {
+   "idiom": "devicetree.label_order",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "zephyr-main",
+   "difficulty": "adapter",
+   "replace": "Connector include first in boards/<board>.overlay, then the shield common.dtsi; keep <shield>.overlay empty.",
+   "trap": "Zephyr applies <shield>.overlay before boards/<board>.overlay; a label used before it is defined is a parse error.",
+   "check": "builds without devicetree errors; the picture or tone appears on a board (not yet run)",
+   "proof": [
+    {
+     "port": "zephyr-shields",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "shields build",
+     "path": "portability/boosterpacks/zephyr/boards/shields"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:devicetree.label_order/zephyr-main",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g3507"
+   ]
+  },
+  {
+   "idiom": "spi.pin_mux_missing",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "zephyr-main",
+   "difficulty": "adapter",
+   "replace": "Write the pinctrl node in the module: pinmux MSP_PINMUX(68, function 3) for PB31 under &pinctrl.",
+   "trap": "The main board file routes SPI1 clock to PB9, and the hal_ti pinctrl file has no PB31 node.",
+   "check": "builds without devicetree errors; the picture or tone appears on a board (not yet run)",
+   "proof": [
+    {
+     "port": "zephyr-shields",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "G3519 shield builds",
+     "path": "portability/boosterpacks/zephyr/dts/boosterpack"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:spi.pin_mux_missing/zephyr-main",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g3507"
+   ]
+  },
+  {
+   "idiom": "spi.bitbang_fallback",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "zephyr-main",
+   "difficulty": "adapter",
+   "replace": "zephyr,spi-bitbang with clock and data on header pins; the same mipi-dbi-spi node sits on it.",
+   "trap": "On 4.4.2 the display sample links 39.2 kB over the G3507 32 kB RAM; on main it fits (23.1 kB).",
+   "check": "builds without devicetree errors; the picture or tone appears on a board (not yet run)",
+   "proof": [
+    {
+     "port": "zephyr-shields",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "G3507 gpio-spi shield builds",
+     "path": "portability/boosterpacks/zephyr/boards/shields"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:spi.bitbang_fallback/zephyr-main",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g3507"
+   ]
+  },
+  {
+   "idiom": "display.memory_lcd",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "zephyr-main",
+   "difficulty": "direct",
+   "replace": "sharp,ls0xx with serial-vcom-inversion and serial-vcom-interval 1000, panel select as active-high chip select, disp-en-gpios on pin 5.",
+   "trap": "The shield does not bring EXTCOMIN to the header (R12 ties it to ground), so the VCOM flip goes in the serial data; clock at most 1 MHz.",
+   "check": "builds without devicetree errors; the picture or tone appears on a board (not yet run)",
+   "proof": [
+    {
+     "port": "zephyr-shields",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "Sharp128 shield builds on G3519 and G3507",
+     "path": "portability/boosterpacks/zephyr/boards/shields"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:display.memory_lcd/zephyr-main",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g3507"
+   ]
+  },
+  {
+   "idiom": "dac.spi_dac_audio",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "zephyr-main",
+   "difficulty": "adapter",
+   "replace": "ti,dac8311 on the SPI label, chip select on header pin 12 (active low), amplifier line on pin 13 and microphone supply on pin 5 as regulator-fixed.",
+   "trap": "Chip-select and amplifier polarity are the least certain pins in the clash matrix; check SYNC framing first.",
+   "check": "builds without devicetree errors; the picture or tone appears on a board (not yet run)",
+   "proof": [
+    {
+     "port": "zephyr-shields",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "Audio shield builds on G3519, G3507 and CC2340R5",
+     "path": "portability/boosterpacks/zephyr/boards/shields"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:dac.spi_dac_audio/zephyr-main",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g3507"
+   ]
+  },
+  {
+   "idiom": "gpio.port_tables",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "zephyr-main",
+   "difficulty": "none",
+   "replace": "No port table for those pins in Zephyr main today.",
+   "instead": "Leave the pins out of the map and use another header pin, or add the table to the driver.",
+   "trap": "Main gpio_mspm0.c has a 28-entry port B table for the G series and a port C table for the L series only; enabling gpioc on the G3519 stops the build with gpioc_pins undeclared. The Sharp DISP line (pin 5, PB29) returns an error at run time.",
+   "check": "no undeclared-table error",
+   "proof": [
+    {
+     "port": "zephyr-shields",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "failure recorded; pins 9, 10, 37 and 38 left out of the map",
+     "path": "portability/boosterpacks/zephyr/dts/boosterpack"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:gpio.port_tables/zephyr-main",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "runtime.python_console_uart",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "UART0 on PA10 and PA11, baud divisor from the real bus clock (40 MHz with the PLL on), 1-entry RX FIFO threshold, RX and receive-timeout interrupts into a 128-byte ring; Ctrl-C calls mp_sched_keyboard_interrupt() from the interrupt.",
+   "trap": "The bus clock is half the CPU clock after the PLL starts; the divisor must use the real clock.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "first boot on the G3519 (banner, freq, heap, float)",
+     "path": "ports/micropython/mphalport.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:runtime.python_console_uart/default",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "clock.pll_80mhz_checked",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "DL_SYSCTL_configSYSPLL with the SYSOSC reference, retry disable and enable until the frequency counter reads PLL CLK1 at 1.25 times SYSOSC within 0.3 percent, then setMCLKSource(HSCLK); give up after 20 tries and stay at 32 MHz.",
+   "trap": "The errata workaround (SYSPLL_ERR_01) is a loop SysConfig writes for you; a hand-written clock init must carry it.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "first boot on the G3519 (banner, freq, heap, float)",
+     "path": "ports/micropython/mphalport.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:clock.pll_80mhz_checked/default",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "time.tick_ms",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "systick-us",
+   "difficulty": "direct",
+   "replace": "SysTick at 1 ms from the CPU clock; microseconds are ms x 1000 plus the down-count over the clock in MHz; WFI in the delay loop.",
+   "trap": "The Cortex-M0+ has no cycle counter, so ticks_cpu is built from the same SysTick.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "first boot on the G3519 (banner, freq, heap, float)",
+     "path": "ports/micropython/mphalport.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.tick_ms/systick-us",
+   "boards": [
+    "mspm0g3519",
+    "mspm0g3507"
+   ]
+  },
+  {
+   "idiom": "gpio.pin_by_name",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "A table from port and bit to IOMUX index, generated from SysConfig device data; DL_GPIO init, set, clear, toggle, read.",
+   "trap": "DriverLib wants the PINCM number minus 1, and PINCM numbers do not follow pin order (PA2 is PINCM7, PB0 is PINCM12); a hand-typed table compiles and is wrong.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "first boot on the G3519 (banner, freq, heap, float)",
+     "path": "ports/micropython/machine_pin.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.pin_by_name/default",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "gpio.open_drain_emulated",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Input buffer on with the internal pull-up; low clears the data bit and enables the output; high disables the output.",
+   "trap": "No open-drain mode that reads back by default.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "built; host emulator exercised the path",
+     "path": "ports/micropython/mphalport.c"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:gpio.open_drain_emulated/default",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "bus.soft_i2c_spi",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "MicroPython's shared bit-bang code on the pin helpers; mp_hal_delay_us_fast must exist.",
+   "trap": "None beyond the helpers.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "built; host emulator exercised the path",
+     "path": "ports/micropython/mphalport.c"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:bus.soft_i2c_spi/default",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "memory.ecc_sram_prime",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "main() writes zero to every heap word and the unused stack with 32-bit stores before the first byte store.",
+   "trap": "Suspected, not proven: the G3519 first SRAM bank has error correction and Zephyr blinky stopped on an SRAM double-error NMI; the MicroPython image booted with this priming and showed no ECC fault.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "first boot on the G3519 (banner, freq, heap, float)",
+     "path": "ports/micropython/main.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:memory.ecc_sram_prime/default",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "gc.heap_from_linker",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "The linker script ends .bss at __heap_start__ and puts __stack_floor__ below the stack; gc_init takes that range.",
+   "trap": "The helper file is gchelper_thumb1.s for the M0+, not the Thumb-2 one.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "first boot on the G3519 (banner, freq, heap, float)",
+     "path": "ports/micropython/mspm0.ld"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gc.heap_from_linker/default",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "build.vendor_startup_reuse",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "TI's startup_mspm0g351x_gcc.c compiled unchanged; the linker script supplies __data_load__, __data_start__, __bss_start__, __StackTop.",
+   "trap": "The SDK startup symbol names differ from those the MicroPython minimal port uses.",
+   "check": "check named in the row",
+   "proof": [
+    {
+     "port": "micropython",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "first boot on the G3519 (banner, freq, heap, float)",
+     "path": "ports/micropython/Makefile"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:build.vendor_startup_reuse/default",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "lcd.fill_rect_push_pixels",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "spi16",
+   "difficulty": "adapter",
+   "replace": "MSPM0 DriverLib SPI, 16-bit frames, address window command then a polled DL_SPI_transmitData16 loop.",
+   "trap": "The SPI block ignores a frame-size change while enabled: disable, change, enable, for every window. Chip select needs a 10 us gap after it goes high or the screen drops commands. Polled sending reaches the same 67.2 ms full-screen fill as DMA at 40 MHz.",
+   "check": "full-screen fill time",
+   "proof": [
+    {
+     "port": "touch-games",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "fill_full_us=67248 at 40 MHz SPI",
+     "path": "ports/touch-games/results/g3519-spi40-run1.txt",
+     "results": "mspm0g3519:touch_2048_swipe_ms"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:lcd.fill_rect_push_pixels/spi16",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "lcd.full_frame_buffer",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "dirty-tiles",
+   "difficulty": "redesign",
+   "replace": "Dirty-tile redraw with one 3 kB scratch buffer; the screen controller holds the picture.",
+   "trap": "A full RGB565 frame is 300 kB, larger than every MSPM0 RAM here; games must know which tiles changed. 2048 sends 51 to 66 thousand pixels a swipe instead of 153,600.",
+   "check": "pixels sent per swipe",
+   "proof": [
+    {
+     "port": "touch-games",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "mv_px_avg=66459",
+     "path": "ports/touch-games/results/g3519-spi40-run1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:lcd.full_frame_buffer/dirty-tiles",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "touch.read_point",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "softi2c",
+   "difficulty": "adapter",
+   "replace": "Bit-banged I2C on the two touch pins, 5 us half bit, 5-byte read of registers 0x02 to 0x06, 0.89 ms.",
+   "trap": "On these boards the chip I2C block gets no answer from the touch chip; plain GPIO with the chip pull-ups does. A failed read must keep the last finger state or a swipe breaks into a tap.",
+   "check": "16 reads, 0 failures",
+   "proof": [
+    {
+     "port": "touch-games",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "886 us per read, 0 failures; a finger moved the 2048 board by hand",
+     "path": "ports/touch-games/results/g3519-spi40-run1.txt",
+     "results": "mspm0g3519:touch_read_us"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:touch.read_point/softi2c",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "touch.gesture",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "src/gesture.c: one gesture_feed(down, x, y, ms) call per poll returns tap, long press or swipe direction.",
+   "trap": "Fire swipes when the finger passes the distance, not at lift. A lift after a long press or a swipe must not also report a tap.",
+   "check": "scripted gestures give the expected events",
+   "proof": [
+    {
+     "port": "touch-games",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "9 gesture cases on the host; scripted gestures through the real dispatch path on the board",
+     "path": "ports/touch-games/host/test_host.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:touch.gesture/default"
+  },
+  {
+   "idiom": "time.millis_micros",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "systick",
+   "difficulty": "direct",
+   "replace": "SysTick at 1 kHz, microseconds from the SysTick down-counter, read twice for a stable pair.",
+   "trap": "The 1 ms interrupt wakes the WFI loop; the poll period is a multiple of it.",
+   "check": "boot measurement timestamps",
+   "proof": [
+    {
+     "port": "touch-games",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "timestamps in the boot measurement",
+     "path": "ports/touch-games/results/g3519-spi40-run1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.millis_micros/systick",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "gpio.output_inverted_led",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "embassy-set-inversion",
+   "difficulty": "direct",
+   "replace": "embassy_mspm0::gpio::Output::new(p.PA0, Level::Low) then set_inversion(true) and toggle().",
+   "trap": "LED1 is active low; without inversion \"high\" is dark.",
+   "check": "pin check sees the pin change",
+   "proof": [
+    {
+     "port": "rust-mspm0",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "pin check PASS: 12 samples over 3 s, 5 changes",
+     "path": "ports/rust-mspm0/l1306/src/bin/blinky.rs"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:gpio.output_inverted_led/embassy-set-inversion",
+   "boards": [
+    "mspm0l1306"
+   ]
+  },
+  {
+   "idiom": "time.async_timer_delay",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "embassy-timer",
+   "difficulty": "direct",
+   "replace": "Timer::after_millis(500).await on the time-driver-any feature, which takes a general-purpose timer.",
+   "trap": "None, but the feature must be on or the executor does not start.",
+   "check": "the pin toggles at the period",
+   "proof": [
+    {
+     "port": "rust-mspm0",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "blinky at one toggle a second",
+     "path": "ports/rust-mspm0/l1306/src/bin/blinky.rs"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.async_timer_delay/embassy-timer",
+   "boards": [
+    "mspm0l1306"
+   ]
+  },
+  {
+   "idiom": "uart.blocking_write_new",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "embassy-new-blocking",
+   "difficulty": "direct",
+   "replace": "Uart::new_blocking(p.UART0, p.PA9, p.PA8, Config::default()) then blocking_write.",
+   "trap": "new_blocking takes RX before TX.",
+   "check": "the console shows the banner",
+   "proof": [
+    {
+     "port": "rust-mspm0",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "banner then a running count on the back-channel",
+     "path": "ports/rust-mspm0/l1306/src/bin/uart_hello.rs"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:uart.blocking_write_new/embassy-new-blocking",
+   "boards": [
+    "mspm0l1306"
+   ]
+  },
+  {
+   "idiom": "debug.text_without_rtt",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "uart-print",
+   "difficulty": "redesign",
+   "replace": "Print on the UART instead of defmt over RTT.",
+   "trap": "RTT is read only by probe-rs or an OpenOCD RTT session; the repository's flash path shows nothing.",
+   "check": "the console shows the text",
+   "proof": [
+    {
+     "port": "rust-mspm0",
+     "board": "mspm0l1306",
+     "level": "ran",
+     "what": "hello text on the UART",
+     "path": "ports/rust-mspm0/l1306/src/bin/uart_hello.rs"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:debug.text_without_rtt/uart-print",
+   "boards": [
+    "mspm0l1306"
+   ]
+  },
+  {
+   "idiom": "build.hal_git_dependency",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "pinned-commit",
+   "difficulty": "adapter",
+   "replace": "A git dependency on the embassy repository at one commit; commit Cargo.lock.",
+   "trap": "The crate named embassy-mspm0 on crates.io is an empty reserved 0.0.0.",
+   "check": "the build resolves the same sources twice",
+   "proof": [
+    {
+     "port": "rust-mspm0",
+     "board": "mspm0l1306",
+     "level": "built",
+     "what": "Cargo.toml pins the commit",
+     "path": "ports/rust-mspm0/l1306/Cargo.toml"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:build.hal_git_dependency/pinned-commit",
+   "boards": [
+    "mspm0l1306"
+   ]
+  },
+  {
+   "idiom": "build.link_interrupt_group",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "build-rs-script",
+   "difficulty": "adapter",
+   "replace": "Add -Tinterrupt_group.x in build.rs.",
+   "trap": "Needed for the rt feature; absent in a plain cortex-m template, and the link fails on missing interrupt symbols.",
+   "check": "the image links",
+   "proof": [
+    {
+     "port": "rust-mspm0",
+     "board": "mspm0l1306",
+     "level": "built",
+     "what": "build.rs links interrupt_group.x",
+     "path": "ports/rust-mspm0/l1306/build.rs"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:build.link_interrupt_group/build-rs-script",
+   "boards": [
+    "mspm0l1306"
+   ]
+  },
+  {
+   "idiom": "clock.mspm33_160mhz",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "pll-qdiv10",
+   "difficulty": "adapter",
+   "replace": "PLL_QDIV 10 and EXTDIVMCLK divide value 1, MCLK from HSCLK (SysConfig).",
+   "trap": "The default is 32 MHz and an extra divide by 2 after the PLL gives 80 MHz even with the PLL set; check CPUCLK_FREQ in the generated header.",
+   "check": "the firmware reports 160 MHz",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "CPU clock reported by the firmware: 160 MHz",
+     "path": "ports/peanut-gb/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:clock.mspm33_160mhz/pll-qdiv10",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "emu.core_in_sram",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "ramfunc-bank1",
+   "difficulty": "adapter",
+   "replace": "#pragma clang section text=\".TI.ramfunc\" around the core; the BINIT table copies it to SRAM bank 1 and the linker line run=SRAM_BANK1 keeps bank 0 for the 48 kB machine RAM.",
+   "trap": "62.5 kB of .bss already fills SRAM bank 0 (64 kB with the stack), so the code copy has to go to bank 1.",
+   "check": "speed before and after from the firmware's timers",
+   "proof": [
+    {
+     "port": "zx-spectrum",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "core only 15.9 percent in flash and 18.9 in SRAM",
+     "path": "ports/zx-spectrum/README.md",
+     "results": "mspm0g3519:emu_speed_pct_x10"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:emu.core_in_sram/ramfunc-bank1",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "time.dwt_cycles_around_call",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "cyccnt-around-each-call",
+   "difficulty": "direct",
+   "replace": "Read DWT->CYCCNT before and after each call, sum the 32-bit differences, keep checksumming outside the timed region.",
+   "trap": "Hashing 2,304 samples costs more than a percent; timing the whole loop would hide that.",
+   "check": "cycle counts repeat between runs",
+   "proof": [
+    {
+     "port": "minimp3",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "two runs gave identical cycle counts",
+     "path": "ports/minimp3/common/mp3run.c",
+     "results": "mspm33c321a:mp3_decode_cycles"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.dwt_cycles_around_call/cyccnt-around-each-call",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "float.soft_float_cost",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "cortex-m0plus-library-calls",
+   "difficulty": "none",
+   "replace": "On a Cortex-M0+ every float operation is a library call: 33 times the cycles of the M33 with its unit (20.6 M on the LP-MSPM0G3519 against 0.63 M on the LP-MSPM33C321A per stereo frame).",
+   "trap": "The board needed 1.27 times the cycles the emulator priced (20.6 M against 16.1 M), the same ratio for stereo and mono; the emulator prices instructions and has no flash stalls.",
+   "check": "cycles per frame on the core with and without the unit",
+   "instead": "Use a part with a float unit, such as the LP-MSPM33C321A (0.151 times real time for stereo), or a decoder with an integer path; neither was tried on the M0+ here.",
+   "proof": [
+    {
+     "port": "minimp3",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "ran on the board: 9.84 times real time stereo and 7.38 mono, bit-exact",
+     "path": "ports/minimp3/results/g3519-board-run.txt",
+     "results": "mspm0g3519:mp3_decode_rtf"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:float.soft_float_cost/cortex-m0plus-library-calls",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "float.fpu_check",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "count-in-disassembly",
+   "difficulty": "direct",
+   "replace": "Count FPU instructions and float-library calls in the disassembly of the image (-mfloat-abi=hard -mfpu=fpv5-sp-d16).",
+   "trap": "The disassembler prints FPU opcodes as <unknown> unless given --mattr=+fp-armv8d16sp.",
+   "check": "the count shows the unit in use and no library calls",
+   "proof": [
+    {
+     "port": "minimp3",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "1.9k FPU instructions and no float-library calls",
+     "path": "ports/minimp3/results/fpu-check.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:float.fpu_check/count-in-disassembly",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "arduino.serial_console",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "uart-poll-tx-irq-ring-rx",
+   "difficulty": "adapter",
+   "replace": "FrlSerial over the back-channel UART: transmit polled, receive by interrupt into a 512-byte ring.",
+   "trap": "available() must poll the ring on every call; a version that looked once and cached 'nothing' left the prompt deaf. Reading the FIFO from both the interrupt and the main loop doubled typed characters.",
+   "check": "typed characters reach the prompt once each",
+   "proof": [
+    {
+     "port": "ulisp",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "prompt answers 19 of 19 checks over the serial port",
+     "path": "ports/ulisp/shim/arduino_shim.cpp",
+     "results": "mspm0g5187:port_repl_checks"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:arduino.serial_console/uart-poll-tx-irq-ring-rx",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "arduino.time_millis_micros",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "systick-1khz-downcounter",
+   "difficulty": "direct",
+   "replace": "SysTick at 1 kHz for milliseconds; microseconds from the SysTick down-counter.",
+   "trap": "Read the millisecond count and the counter twice to catch a rollover between them.",
+   "check": "uLisp's own (time ...) repeats between runs",
+   "proof": [
+    {
+     "port": "ulisp",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "tak 18 12 6 took 7.5 s on both runs",
+     "path": "ports/ulisp/results/repl-check-g5187.txt",
+     "results": "mspm0g5187:lisp_tak_18_12_6_s"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:arduino.time_millis_micros/systick-1khz-downcounter",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "arduino.digital_pins",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "three-led-table",
+   "difficulty": "adapter",
+   "replace": "Pins 13, 14 and 15 are the three LaunchPad LEDs through a three-entry table (port, pin, IOMUX register); other numbers are ignored.",
+   "trap": "The G5187 LEDs are PA17, PB13 and PA24, not the pins the G3507 and G3519 use (PB27, PB26, PB22). digitalRead of an output pin must read the output register, since the input path of a pin set up as an output is off.",
+   "check": "a pin read shows t then nil after writes",
+   "proof": [
+    {
+     "port": "ulisp",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "6 changes in 16 samples on PA17 at 150 ms half period; read back t then nil",
+     "path": "ports/ulisp/results/blink-check-g5187.txt",
+     "results": "mspm0g5187:led_toggle_blink_check"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:arduino.digital_pins/three-led-table",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "mcu.uart_instance_name",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "uc0-on-g5187",
+   "difficulty": "direct",
+   "replace": "The G5187 names the same UART block UC0 and its vector UC0_IRQHandler; the G3507 and G3519 name them UART0.",
+   "trap": "The G5187 start-up file has no UART0 symbols, so a handler with the old name builds and never runs.",
+   "check": "a typed character reaches the program",
+   "proof": [
+    {
+     "port": "ulisp",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "prompt answers over the serial port",
+     "path": "ports/ulisp/boards/hal.c"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:mcu.uart_instance_name/uc0-on-g5187",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "audio.lc3_codec_float",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "static-buffers-per-10ms-frame",
+   "difficulty": "direct",
+   "replace": "Call lc3_setup_encoder, lc3_encode, lc3_setup_decoder and lc3_decode once per 10 ms frame with 16-bit PCM; state in static buffers sized by LC3_ENCODER_MEM_T and LC3_DECODER_MEM_T; no malloc. The library needs no port.",
+   "trap": "The Arm DSP paths sit behind __GNUC__ >= 10 and Clang reports 4, so they are off unless the build says otherwise.",
+   "check": "encoded bytes and decoded PCM CRC-32 equal the Mac build in all three configurations",
+   "proof": [
+    {
+     "port": "lc3",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "3 of 3 configurations bit-exact; 12.4 to 24.2 percent of real time encode at 160 MHz",
+     "path": "ports/lc3/results/boards/lc3-O2-hard-strict.json",
+     "results": "mspm33c321a:lc3_encode_cycles"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:audio.lc3_codec_float/static-buffers-per-10ms-frame",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "codec.arm_dsp_path_guard",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "define-gnuc-10-for-clang",
+   "difficulty": "adapter",
+   "replace": "Compile the library with -U__GNUC__ -D__GNUC__=10 so the Arm DSP paths are taken.",
+   "trap": "Nothing breaks, so the slower default goes unnoticed; encode is 11 to 16 percent faster with the paths on and still bit-exact.",
+   "check": "cycles fall and the CRC-32 of every frame stays equal",
+   "proof": [
+    {
+     "port": "lc3",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "encode 11 to 16 percent faster, still bit-exact",
+     "path": "ports/lc3/results/boards/lc3-O2-hard-strict-armpaths.json"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:codec.arm_dsp_path_guard/define-gnuc-10-for-clang",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "size.codec_feature_switch_off",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "lc3-plus-off",
+   "difficulty": "direct",
+   "replace": "Build with -DLC3_PLUS=0 -DLC3_PLUS_HR=0.",
+   "trap": "Flash falls from 161.6 to 126.3 kB at -O2 (85.2 kB at -Os) and peak stack from 5.7 to 3.7 kB, but the 2.5 and 5 ms frames are gone.",
+   "check": "same CRC-32 per frame as the full build for the 10 ms modes",
+   "proof": [
+    {
+     "port": "lc3",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "126.3 kB flash and 3.7 kB peak stack at -O2, same CRCs",
+     "path": "ports/lc3/results/boards/lc3-O2-hard-strict-minimal.json"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:size.codec_feature_switch_off/lc3-plus-off",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "float.fastmath_changes_bytes",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "build-strict-to-compare",
+   "difficulty": "direct",
+   "replace": "Build both the host reference and the board with -ffp-contract=off and no fast-math wherever bytes are compared.",
+   "trap": "The fast-math encoder writes different bytes from the strict one on the Mac and on the board alike, and gives no speed-up on the M33.",
+   "check": "strict host build against strict board build, then fast against fast",
+   "proof": [
+    {
+     "port": "lc3",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "fast and strict builds differ in bytes; strict pair equal",
+     "path": "ports/lc3/results/boards/hard-fast.json"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:float.fastmath_changes_bytes/build-strict-to-compare",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "float.soft_float_link",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "build-driverlib-sources-soft",
+   "difficulty": "adapter",
+   "replace": "Build the few driverlib sources the clock setup needs with the soft-float flags instead of linking the hard-float driverlib.a.",
+   "trap": "The linker error names Tag_ABI_VFP_args and combining incompatible files, not the archive.",
+   "check": "the link succeeds and a disassembly shows no float-unit instructions in the codec",
+   "proof": [
+    {
+     "port": "lc3",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "FPU-off build ran and matched the strict CRCs",
+     "path": "ports/lc3/results/boards/soft-strict.json"
+    }
+   ],
+   "status": "proven",
+   "degrades": "the FPU-off build costs 9.7 to 13.4 times the cycles",
+   "id": "mspm0:float.soft_float_link/build-driverlib-sources-soft",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "debug.dslite_memory_scale",
+   "families": [
+    "MSPM0",
+    "MSPM33"
+   ],
+   "variant": "ask-n-over-4",
+   "difficulty": "adapter",
+   "replace": "Ask for n/4 and keep the first n bytes (DSLite memory -r addr,n -s 8).",
+   "trap": "The file holds 4 times the requested count, and a large request fails at the end of RAM.",
+   "check": "the first bytes equal a known value",
+   "proof": [
+    {
+     "port": "lc3",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "results read back through the debugger",
+     "path": "ports/lc3/run_board.py"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:debug.dslite_memory_scale/ask-n-over-4",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "test.arm_binary_in_emulator",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "cortex-m0-cycle-prices",
+   "difficulty": "adapter",
+   "replace": "Run the real instructions in a Unicorn Cortex-M0 model and answer each MMIO address with a modelled cycle count.",
+   "trap": "The model has no flash or bus stalls, so its numbers are a floor, not a measurement.",
+   "check": "CRC-32 of the frames equals the host build for the frames run",
+   "proof": [
+    {
+     "port": "lc3",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "10 of 10 frames bit-exact in the emulator; 16 kHz encode 2.63 M cycles a frame",
+     "path": "ports/lc3/tests/emu_m0.py"
+    }
+   ],
+   "status": "built",
+   "degrades": "speed is an estimate that counts instructions only",
+   "id": "mspm0:test.arm_binary_in_emulator/cortex-m0-cycle-prices",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "sensor.fixed_rate_slow_sensors",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "trigger-then-read-two-slots-later",
+   "difficulty": "adapter",
+   "replace": "Trigger the HDC2080 in one 10 ms slot and read it two slots later; keep the OPT3001 in continuous mode and only read it; the hall sensor is read every slot.",
+   "trap": "A dataset channel above 32767 (centilux) makes check.py warn that the sensor range is exceeded; send whole lux.",
+   "check": "capture.py and check.py on a live log: 100.00 Hz, 0 gaps",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "65.3 s, 6,528 rows, 100.00 Hz, 0 gaps, 0 overruns",
+     "path": "portability/boosterpacks/bassensorsmkii/results/pack-rest-1.csv",
+     "results": "mspm0g5187:host_throughput"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:sensor.fixed_rate_slow_sensors/trigger-then-read-two-slots-later",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "time.grid_without_64bit_divide",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "n-times-period-32bit",
+   "difficulty": "adapter",
+   "replace": "Keep the due time as n times the period in 32 bits and print '# overrun <n>' when a slot is missed.",
+   "trap": "The core's ds_due needs a 64-bit divide on a Cortex-M0+.",
+   "check": "0 overruns over a 65 s capture",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm0g5187",
+     "level": "measured",
+     "what": "0 overruns in 6,530 rows",
+     "path": "portability/boosterpacks/bassensorsmkii/results/dataset-standin-rest-1.csv"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.grid_without_64bit_divide/n-times-period-32bit",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "audio.synth_voice_block_render",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "voice-render-12-sample-blocks",
+   "difficulty": "direct",
+   "replace": "Call Voice::Init once and Voice::Render per 12-sample block; the shared engine memory is a static 16 kB array in a BufferAllocator; frames go to RAM.",
+   "trap": "Patch::engine is the integer base and Modulations::engine the 0..1 fraction; passing engine/23.0f as the patch value rounds to 0 and silently renders the first engine 24 times (identical CRC).",
+   "check": "print the CRC per engine first: 24 equal CRCs is a bug",
+   "proof": [
+    {
+     "port": "plaits",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "24 of 24 engines CRC-equal to the Mac; 10.7 to 34.5 percent of real time at 160 MHz",
+     "path": "ports/plaits/results/boards/plaits-O2-hard-strict.json",
+     "results": "mspm33c321a:plaits_cycles_per_block"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:audio.synth_voice_block_render/voice-render-12-sample-blocks",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "cpp.tiarmclang_cxx_embedded",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "cxx11-no-exceptions-no-rtti",
+   "difficulty": "direct",
+   "replace": "Compile with -std=c++11 -fno-exceptions -fno-rtti, link libc++.a, libc++abi.a and libc.a with --rom_model.",
+   "trap": "Nothing needed a flag beyond the usual; 40 sources with virtual-function engine classes compile unchanged.",
+   "check": "image links and the checksums equal the host",
+   "proof": [
+    {
+     "port": "plaits",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "40 C++ files built and ran with no source change",
+     "path": "ports/plaits/target-m33/build.sh"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:cpp.tiarmclang_cxx_embedded/cxx11-no-exceptions-no-rtti",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "build.test_macro_collision",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "define-for-library-files-only",
+   "difficulty": "adapter",
+   "replace": "Pass -DTEST to the library files only.",
+   "trap": "The SDK header hw_memcfg.h has a field named TEST; defining the macro for the whole build stops the compile with 'expected member name'.",
+   "check": "build compiles; the flag is absent from the SDK-facing files",
+   "proof": [
+    {
+     "port": "plaits",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "builds with the flag on the library files only",
+     "path": "ports/plaits/target-m33/build.sh"
+    }
+   ],
+   "status": "built",
+   "id": "mspm0:build.test_macro_collision/define-for-library-files-only",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "audio.opus_codec_fixed",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "fixed-point-static-state",
+   "difficulty": "direct",
+   "replace": "Static state buffers sized from opus_encoder_get_size and opus_decoder_get_size; config.h with FIXED_POINT, DISABLE_FLOAT_API and VAR_ARRAYS; sources from the library's source lists, repacketizer.c included.",
+   "trap": "The library needs no port. Stack use is 27.5 kB because scratch buffers are variable-length arrays; repacketizer.c is needed for constant-bit-rate padding.",
+   "check": "packet and decoded-frame CRC-32 equal a Mac build with matching multiply macros",
+   "proof": [
+    {
+     "port": "opus",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "12 of 12 runs equal the Mac with matching macros; CELT 48 kHz 10 ms encode 29 to 54 percent of real time at 160 MHz",
+     "path": "ports/opus/results/boards/opus-fixed-O2.json",
+     "results": "mspm33c321a:opus_encode_cycles"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:audio.opus_codec_fixed/fixed-point-static-state",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "audio.opus_arm_edsp",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "inline-edsp-flag",
+   "difficulty": "direct",
+   "replace": "Build with -DOPUS_ARM_INLINE_EDSP.",
+   "trap": "4 to 10 percent faster and the SILK output equal, but the CELT output equals neither Mac reference.",
+   "check": "compare the output with both host references",
+   "proof": [
+    {
+     "port": "opus",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "4 to 10 percent fewer cycles, SILK equal, CELT differs",
+     "path": "ports/opus/results/boards/opus-fixed-O2-edsp.json"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:audio.opus_arm_edsp/inline-edsp-flag",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "time.systick_overflow_32bit",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "systick-24bit-plus-overflow-count",
+   "difficulty": "adapter",
+   "replace": "Use the 24-bit SysTick down counter on the processor clock plus an overflow count bumped in SysTick_Handler; read with interrupts off and add one to the count if ICSR.PENDSTSET is set and the elapsed part is small.",
+   "trap": "One stereo MP3 frame (20.6 M cycles) is longer than the 24-bit wrap (16.8 M), so a bare SysTick read is silently wrong by a fifth.",
+   "check": "the clock counts 80,000,264 cycles over delay_cycles(80 M) and agrees with the host clock within 0.5 percent",
+   "proof": [
+    {
+     "port": "minimp3",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "194 of 194 frames timed; clock checked to 3 ppm against delay_cycles",
+     "path": "ports/minimp3/results/g3519-board-run.txt",
+     "results": "mspm0g3519:mp3_decode_rtf"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:time.systick_overflow_32bit/systick-24bit-plus-overflow-count",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "debug.read_ram_without_reset",
+   "families": [
+    "MSPM0"
+   ],
+   "variant": "dslite-memory-read-while-running",
+   "difficulty": "adapter",
+   "replace": "DSLite memory -r <addr>,<bytes> while the core runs.",
+   "trap": "Each OpenOCD connect through the on-board XDS110 resets the board; a poll loop restarted the image every 5 s and the results never appeared.",
+   "check": "the image keeps running and the result block is read once",
+   "proof": [
+    {
+     "port": "minimp3",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "results read from the running LP-MSPM0G3519",
+     "path": "ports/minimp3/run_board_g3519.py"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:debug.read_ram_without_reset/dslite-memory-read-while-running",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "float.double_in_codec",
+   "families": [
+    "MSPM33"
+   ],
+   "variant": "float-build-soft-double",
+   "difficulty": "none",
+   "replace": "Use the fixed-point build.",
+   "trap": "The float image calls the soft-double routines at 1,080 sites on a single-precision FPU; it is 1.6 to 7.2 times slower than fixed-point.",
+   "check": "count the double calls in the image listing before choosing a float build",
+   "instead": "Build fixed-point (FIXED_POINT).",
+   "proof": [
+    {
+     "port": "opus",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "float build slower in all 12 runs",
+     "path": "ports/opus/results/double-check.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "mspm0:float.double_in_codec/float-build-soft-double",
+   "boards": [
+    "mspm33c321a"
+   ]
+  }
+ ]
+}

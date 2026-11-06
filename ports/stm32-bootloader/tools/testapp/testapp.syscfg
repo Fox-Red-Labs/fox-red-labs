@@ -1,0 +1,27 @@
+//@cliArgs --device "MSPM0G351X" --package "LQFP-100(PZ)" --part "Default"
+//@v2CliArgs --device "MSPM0G3519" --package "LQFP-100(PZ)"
+// @cliArgs --board /ti/boards/LP_MSPM0G3519 --rtos nortos
+// Test application for the stm32-bootloader port: linked at 0x00010000, prints on UART0 (PA10 TX, PA11 RX, XDS110 back-channel).
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const TIMER  = scripting.addModule("/ti/driverlib/TIMER", {}, false);
+const TIMER1 = TIMER.addInstance();
+const Board                       = scripting.addModule("/ti/driverlib/Board", {}, false);
+Board.peripheral.$assign          = "DEBUGSS";
+Board.peripheral.swclkPin.$assign = "PA20";
+Board.peripheral.swdioPin.$assign = "PA19";
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;
+UART1.$name                             = "UART_0";
+UART1.targetBaudRate                    = 115200;
+UART1.peripheral.$assign                = "UART0";
+UART1.peripheral.rxPin.$assign          = "PA11";
+UART1.peripheral.txPin.$assign          = "PA10";
+TIMER1.$name              = "TIMER_TICK";
+TIMER1.timerClkSrc        = "BUSCLK";
+TIMER1.timerClkDiv        = 8;
+TIMER1.timerClkPrescale   = 250;
+TIMER1.timerMode          = "PERIODIC";
+TIMER1.timerPeriod        = "250 ms";
+TIMER1.interrupts         = ["ZERO"];

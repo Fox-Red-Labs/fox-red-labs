@@ -1,0 +1,33 @@
+{
+ "schema": 1,
+ "id": "bitnetmcu",
+ "source": {"repo": "https://github.com/cpldcpu/BitNetMCU", "commit": "0715bfc", "file": "third-party/bitnetmcu/UPSTREAM.txt"},
+ "paths": ["ports/bitnetmcu/mspm0/**", "third-party/bitnetmcu/**"],
+ "original": {
+  "board": "ch32v002",
+  "not_on_bench": "The author's CH32V002 (RISC-V, 48 MHz) is not on the bench; the numbers are his published ones (docs/documentation_cnn.md), not rerun.",
+  "captured": "2026-10-06",
+  "source": "ports/bitnetmcu/README.md",
+  "expect": {
+   "stdout_all": ["\\(done\\)", "right 10 of 10"]
+  },
+  "metrics": {"cycles": 2736250}
+ },
+ "check": {
+  "cmd": "PROBE=ML130001 bash ports/bitnetmcu/mspm0/run.sh {out}/build-l1306-cnn_64-O3-32 20",
+  "exit0": true,
+  "timeout_s": 240,
+  "pass": "The board reports the run done (magic word set), 10 of 10 test digits right, and a mean cycle count for the 64-wide CNN no higher than the author's 2,736,250 on the CH32V002.",
+  "metrics": {"cycles": {"regex": "\\(mean ([0-9,]+);"}}
+ },
+ "boards": {
+  "mspm0l1306": {
+   "build": "OUT={out}/build-l1306-cnn_64-O3-32 bash ports/bitnetmcu/mspm0/build.sh l1306 cnn_64 O3 32",
+   "image": "{out}/build-l1306-cnn_64-O3-32/bitnet.out",
+   "flash": "run.sh flashes the image itself (OpenOCD helper, verify, up to 3 tries), fills RAM with a pattern, runs 20 s and reads the answers; hil.py does not flash this board.",
+   "self_flash": true,
+   "secs": 2,
+   "budget": [{"metric": "cycles", "rule": "max_pct_of_original", "pct": 100}]
+  }
+ }
+}

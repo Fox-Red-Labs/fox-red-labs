@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+
+if SHIELD_BOOSTXL_SHARP128
+
+# The panel supply is a regulator-fixed on BoosterPack pin 2 (resistor R7).
+# LVGL settings differ between Zephyr releases, so none are set here; the
+# README lists the ones to add for a 1-bit or 16-bit LVGL build.
+# The header pins are driven through the GPIO API.
+config GPIO
+	default y
+
+config REGULATOR
+	default y if DISPLAY
+
+endif # SHIELD_BOOSTXL_SHARP128

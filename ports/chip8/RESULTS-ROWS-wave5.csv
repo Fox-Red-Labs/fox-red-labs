@@ -1,0 +1,9 @@
+board,test,variant,status,value,value_hi,runs,clock_mhz,conditions,date,source,checked,note
+mspm0g3519,port_flash_bytes,chip8-play,measured,13832,,1,80,CHIP-8 core + front end + six test ROMs (6339 B); BOOT_ROM=2 BENCH=0; TI Arm Clang 5.1.1 -Oz,2026-10-21,ports/chip8/README.md,linker,
+mspm0g3519,port_flash_bytes,chip8-bench,measured,14456,,1,80,same plus the boot speed run and UART log; -Oz,2026-10-21,ports/chip8/README.md,linker,
+mspm0g3519,port_ram_bytes,chip8-play,measured,10652,,1,80,data plus bss with the 1024 B stack included; 4096 B interpreter memory + 2048 B screen + 3200 B draw buffer,2026-10-21,ports/chip8/README.md,linker,
+mspm0g3519,emu_instr_per_s,chip8-core-flat-out,measured,526153,472669,1,80,200k CHIP-8 instructions per ROM with no screen and display wait off; value is Corax+ (logo 526607; IBM 526997; flags 525930) and value_hi column holds the keypad ROM (quirks 472699); -Oz; code in flash,2026-10-21,ports/chip8/README.md,firmware timestamps,run by the UART speed run; one run
+mspm0g3519,emu_headroom,chip8-vs-700ips,computed,751,,1,80,526153 / 700 instructions per second (a typical CHIP-8 game pace),2026-10-21,ports/chip8/README.md,arithmetic,
+mspm0g3519,gui_full_redraw_us,chip8-64x32-5x,measured,14212,,1,80,51200 px in 32 row blits at 40 MHz SPI; logo ROM; last_draw_us from c8_stats at 0x202024E0+0x18,2026-10-21,ports/chip8/README.md,RAM read through OpenOCD,one read
+mspm0g3519,conformance,chip8-test-suite-frame-buffer,measured,5,,1,80,frame buffer on the board equal to the host interpreter's screen for logo IBM Corax+ flags quirks (5 of 5); host screens matched the suite's pictures by eye,2026-10-21,ports/chip8/tools/verify_board.py,OpenOCD dump_image,keypad ROM checked on the host only
+mspm0g3519,touch_pad_response,chip8-pad,waiting,,,,80,no finger on the panel; needs a person to tap keys 1 and 5 on the keypad ROM and read c8_stats.touches,2026-10-21,ports/chip8/README.md,,pad and ROM bar are drawn and polled; untested

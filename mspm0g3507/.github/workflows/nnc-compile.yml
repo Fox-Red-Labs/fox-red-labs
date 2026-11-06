@@ -1,0 +1,125 @@
+# Compile the four occupancy models with TI's Neural Network Compiler (NNC).
+# Runs on GitHub's Linux machines because NNC has no build for Intel Macs.
+# Started by hand only (Actions tab, or: gh workflow run nnc-compile.yml). Nothing here touches a board.
+# Output: one artifact per run, "nnc-occupancy", with tvmgen_default.h and mod.a for
+#   nnc_g3507_cpu: MSPM0G3507, software inference on the Cortex-M0+
+#   nnc_g5187_npu: MSPM0G5187, inference on the TinyEngine NPU
+#   nnc_am13e230_npu / _soft / _cde: AM13E230 Cortex-M33 with the TinyEngine NPU, software only, and CDE
+#   nnc_f280013x_cpu: TMS320F280013x (C28x with FPU32, no NPU), software inference on the C28x
+name: nnc-compile
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      NNC_WHEEL: ti_mcu_nnc-2.1.2-cp310-cp310-linux_x86_64.whl
+      # Computed from TI's server on 2026-10-05; TI's page does not list one for the wheel.
+      NNC_SHA256: 090c7a9c367ba77576473a61a0c9e9bb7043d78e7164f0adbf5b8a12769f3506
+      CGT_VER: 5.1.1.LTS
+      CGT_URL: https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-ayxs93eZNN/5.1.1.LTS/ti_cgt_armllvm_5.1.1.LTS_linux-x64_installer.bin
+      # From TI's download page for ARM-CGT-CLANG 5.1.1.LTS.
+      CGT_SHA256: ec4c54500b04aa3245d855038a86d3123c53c9eb14c2bfba5fcfb633dc3b3869
+      C2000_CGT_URL: https://dr-download.ti.com/software-development/ide-configuration-compiler-or-debugger/MD-xqxJ05PLfM/25.11.1.LTS/ti_cgt_c2000_25.11.1.LTS_linux-x64_installer.bin
+      # From TI's download page for C2000-CGT 25.11.1.LTS.
+      C2000_CGT_SHA256: 2f3a978e24a53279c9796ad374c32b530fc58fd085fd71288597846fe169c821
+      MODELS_DIR: mcu-bench/edgeai/uci-room-occupancy
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.10"
+
+      - name: Install TI NNC
+        run: |
+          curl -fsSL -o "$NNC_WHEEL" "https://downloads.ti.com/mctools/esd/tvm/mcu/$NNC_WHEEL"
+          echo "$NNC_SHA256  $NNC_WHEEL" | sha256sum -c -
+          # Versions that worked on 2026-10-05.
+          pip install "./$NNC_WHEEL" onnx==1.23.1 numpy==2.2.6 scipy==1.15.3 protobuf==7.36.2 ml-dtypes==0.6.0
+          pip show ti_mcu_nnc | head -3
+
+      - name: Install TI Arm Clang
+        run: |
+          curl -fsSL -o cgt.bin "$CGT_URL"
+          echo "$CGT_SHA256  cgt.bin" | sha256sum -c - || { echo "Checksum mismatch. Actual:"; sha256sum cgt.bin; exit 1; }
+          chmod +x cgt.bin
+          ./cgt.bin --mode unattended --prefix "$HOME/ti"
+          CGT=$(ls -d "$HOME"/ti/ti-cgt-armllvm*)
+          echo "ARM_CGT_PATH=$CGT" >> "$GITHUB_ENV"
+          echo "$CGT/bin" >> "$GITHUB_PATH"
+
+      - name: Install TI C2000 compiler
+        run: |
+          curl -fsSL -o c2000cgt.bin "$C2000_CGT_URL"
+          echo "$C2000_CGT_SHA256  c2000cgt.bin" | sha256sum -c - || { echo "Checksum mismatch. Actual:"; sha256sum c2000cgt.bin; exit 1; }
+          chmod +x c2000cgt.bin
+          ./c2000cgt.bin --mode unattended --prefix "$HOME/ti"
+          C2000_CGT=$(ls -d "$HOME"/ti/ti-cgt-c2000*)
+          echo "C2000_CGT_PATH=$C2000_CGT" >> "$GITHUB_ENV"
+          echo "$C2000_CGT/bin" >> "$GITHUB_PATH"
+
+      - name: Compile each model for both targets
+        run: |
+          # Compiler options from TI's NNC user's guide, MSPM0 section.
+          OPTS="-Os -mcpu=cortex-m0plus -march=thumbv6m -mtune=cortex-m0plus -mthumb -mfloat-abi=soft -I. -Wno-return-type"
+          tiarmclang --version | head -1 | cut -d'(' -f1
+          mkdir -p out
+          for m in occ_cnn_500 occ_cnn_2k occ_cnn_8k occ_cnn_30k; do
+            for t in g3507_cpu g5187_npu; do
+              if [ "$t" = g3507_cpu ]; then TARGET="c, ti-npu type=soft"; else TARGET="c, ti-npu"; fi
+              d="out/$m/nnc_$t"; mkdir -p "$d"
+              tvmc compile --target="$TARGET" --target-c-mcpu=cortex-m0plus \
+                "$MODELS_DIR/$m/model_tinpu_int8.onnx" -o "$d/mod.a" \
+                --cross-compiler="tiarmclang" --cross-compiler-options="$OPTS" 2>&1 | tee "$d/compile.log"
+              ls -la "$d"
+            done
+          done
+
+      - name: Compile each model for the C28x (F280013x, CPU)
+        run: |
+          # Compiler options from TI's NNC user's guide, F28x section (fpu32 for the F280013x).
+          # Target "ti-npu type=soft" because the F280013x has no NPU.
+          OPTS="--float_support=fpu32 --abi=eabi -O3 --opt_for_speed=5 --c99 -v28 -ml -mt --gen_func_subsections -I$C2000_CGT_PATH/include -I."
+          cl2000 --compiler_revision
+          for m in occ_cnn_500 occ_cnn_2k occ_cnn_8k occ_cnn_30k; do
+            d="out/$m/nnc_f280013x_cpu"; mkdir -p "$d"
+            tvmc compile --target="c, ti-npu type=soft" --target-c-mcpu=c28 \
+              "$MODELS_DIR/$m/model_tinpu_int8.onnx" -o "$d/mod.a" \
+              --cross-compiler="cl2000" --cross-compiler-options="$OPTS" 2>&1 | tee "$d/compile.log"
+            ls -la "$d"
+          done
+
+      - name: Compile each model for the AM13E230 (Cortex-M33 with NPU, software only, CDE)
+        run: |
+          # Compiler options from TI's NNC user's guide, section 2.1.4 and 2.2.4 (Arm Cortex-M33).
+          # https://software-dl.ti.com/mctools/nnc/mcu/users_guide/compiling.html
+          M33="-DARM_CPU_INTRINSICS_EXIST -mcpu=cortex-m33 -mfloat-abi=hard -mfpu=fpv5-sp-d16 -mlittle-endian -O3 -I. -Wno-return-type"
+          # TI Arm Clang 5.1.1 rejects the pointer types in the CDE code NNC 2.1.2 writes (uint32 weight arrays passed as int8); the flag turns that error back into a warning.
+          M33_CDE="$M33 -march=thumbv8.1-m.main+cdecp0 -Wno-error=incompatible-pointer-types"
+          for m in occ_cnn_500 occ_cnn_2k occ_cnn_8k occ_cnn_30k; do
+            for t in npu soft cde; do
+              case $t in
+                npu)  TARGET="c, ti-npu";            O="$M33" ;;
+                soft) TARGET="c, ti-npu type=soft";  O="$M33" ;;
+                cde)  TARGET="c, ti-npu type=m33cde"; O="$M33_CDE" ;;
+              esac
+              d="out/$m/nnc_am13e230_$t"; mkdir -p "$d"
+              tvmc compile --target="$TARGET" --target-c-mcpu=cortex-m33 \
+                "$MODELS_DIR/$m/model_tinpu_int8.onnx" -o "$d/mod.a" \
+                --cross-compiler="tiarmclang" --cross-compiler-options="$O" 2>&1 | tee "$d/compile.log" || echo "FAILED $d"
+              ls -la "$d"
+            done
+          done
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: nnc-occupancy
+          path: out/
+          retention-days: 14

@@ -1,0 +1,6 @@
+/*
+ * Intentionally empty: the board overlay in boards/ includes the connector
+ * map first and then common.dtsi, because devicetree labels must exist
+ * before they are used.
+ * SPDX-License-Identifier: Apache-2.0
+ */

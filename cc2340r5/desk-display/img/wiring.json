@@ -1,0 +1,95 @@
+{
+ "image": "../../../docs/arrivals/img/source-lp-em-cc2340r5-swru588a.png",
+ "margin_left": 120,
+ "margin_right": 1000,
+ "label_gap": 60,
+ "title": "Desk display: four wires from the OLED to the LP-EM-CC2340R5",
+ "warning": "Probe stays clipped on. Wire with USB unplugged. The OLED takes 3.3 V, never the 5 V pin",
+ "credit": "Pinout drawing: TI SWRU588A",
+ "tag_size": 20,
+ "board": "../../../docs/boards/lp-em-cc2340r5.json",
+ "steps": [
+  {
+   "label": [
+    "Power: J1 pin 1 (3V3) to OLED VCC,",
+    "J3 pin 22 (GND) to OLED GND.",
+    "3V3 is the top pin of J1; GND is the",
+    "second pin of the inner row, J3.",
+    "Use 3V3, not pin 21 (5V)."
+   ],
+   "side": "right",
+   "label_y": 120,
+   "marks": [
+    {
+     "pin": [
+      438,
+      36
+     ],
+     "r": 18,
+     "tag": "VCC",
+     "tag_side": "right",
+     "color": [
+      0,
+      220,
+      255
+     ]
+    },
+    {
+     "pin": [
+      470,
+      453
+     ],
+     "r": 18,
+     "tag": "GND",
+     "tag_side": "right",
+     "color": [
+      0,
+      220,
+      255
+     ]
+    }
+   ]
+  },
+  {
+   "label": [
+    "Bus: J1 pin 9 (DIO24, I2C_SCL) to OLED SCL,",
+    "J1 pin 10 (DIO0, I2C_SDA) to OLED SDA.",
+    "The module's own pull-ups hold the lines",
+    "up; the LaunchPad has none. ELEGOO prints",
+    "GND, VCC, SCL, SDA in that order."
+   ],
+   "side": "right",
+   "label_y": 440,
+   "marks": [
+    {
+     "pin": [
+      438,
+      310
+     ],
+     "r": 18,
+     "tag": "SCL",
+     "tag_side": "right",
+     "color": [
+      100,
+      210,
+      0
+     ]
+    },
+    {
+     "pin": [
+      438,
+      344
+     ],
+     "r": 18,
+     "tag": "SDA",
+     "tag_side": "right",
+     "color": [
+      100,
+      210,
+      0
+     ]
+    }
+   ]
+  }
+ ]
+}

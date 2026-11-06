@@ -1,0 +1,93 @@
+/**
+ * Alarm listener on the LP-MSPM0G5187: the onboard microphone (ICS-40720 into the PCM1809) on I2S,
+ * the TinyEngine NPU, the backchannel UART at 921600, the RGB LED and button S2.
+ * I2S block copied from TI's tinyusb/device_uac_microphone_i2s (SDK 2.11.00.07): controller mode,
+ * SYSOSC 32 MHz / 7 / 96 = 47,619 Hz, one 32-bit slot, DMA in two halves of 48 words (1 ms each).
+ * Clock tree from the same example without the USB parts: SYSPLL 80 MHz.
+ * @cliArgs --device "MSPM0G518X" --part "Default" --package "LQFP-64(PM)"
+ * @v2CliArgs --device "MSPM0G5187" --package "LQFP-64(PM)"
+ */
+// @cliArgs --board /ti/boards/LP_MSPM0G5187 --rtos nortos
+
+const DMA           = scripting.addModule("/ti/driverlib/DMA");
+const GPIO          = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1         = GPIO.addInstance();
+const GPIO2         = GPIO.addInstance();
+const I2S           = scripting.addModule("/ti/driverlib/I2S", {}, false);
+const I2S1          = I2S.addInstance();
+const SYSCTL        = scripting.addModule("/ti/driverlib/SYSCTL");
+const SYSTICK       = scripting.addModule("/ti/driverlib/SYSTICK");
+const UART          = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1         = UART.addInstance();
+const ProjectConfig = scripting.addModule("/ti/project_config/ProjectConfig");
+
+const divider9       = system.clockTree["UDIV"];
+divider9.divideValue = 2;
+
+const multiplier2         = system.clockTree["PLL_QDIV"];
+multiplier2.multiplyValue = 5;
+const mux7       = system.clockTree["HSCLKMUX"];
+mux7.inputSelect = "HSCLKMUX_SYSPLL0";
+
+const Board = scripting.addModule("/ti/driverlib/Board", {}, false);
+
+GPIO1.$name                         = "GPIO_LED";
+GPIO1.associatedPins.create(3);
+GPIO1.associatedPins[0].$name       = "BLUE";
+GPIO1.associatedPins[0].pin.$assign = "PB13";
+GPIO1.associatedPins[1].$name       = "RED";
+GPIO1.associatedPins[1].pin.$assign = "PA17";
+GPIO1.associatedPins[2].$name       = "GREEN";
+GPIO1.associatedPins[2].pin.$assign = "PA24";
+
+GPIO2.$name                               = "GPIO_BTN";
+GPIO2.associatedPins[0].$name             = "S2";
+GPIO2.associatedPins[0].direction         = "INPUT";
+GPIO2.associatedPins[0].internalResistor  = "PULL_UP";
+GPIO2.associatedPins[0].pin.$assign       = "PA7";
+
+I2S1.$name                                   = "I2S_0";
+I2S1.phase                                   = "DUAL";
+I2S1.dataDelay                               = "ONE";
+I2S1.memoryAccessLength                      = "32";
+I2S1.dataPin0Enable                          = true;
+I2S1.wordBaudClockSource                     = "INTERNAL";
+I2S1.enabledDMAEvent1Triggers                = "DL_I2S_DMA_INTERRUPT_RX_TRIGGER";
+I2S1.enableFreeRun                           = true;
+I2S1.enabledInterrupts                       = ["DMA_DONE_RX"];
+I2S1.wclkDivider                             = 48;
+I2S1.bclkDivider                             = 7;
+I2S1.wclkPhase                               = "DUAL";
+I2S1.wclkInvert                              = true;
+I2S1.samplingEdge                            = "POS";
+I2S1.sampleWordLength                        = 32;
+I2S1.rxFIFOThreshold                         = "1_4_FULL";
+I2S1.peripheral.AD0Pin.$assign               = "PB12";
+I2S1.peripheral.BCLKPin.$assign              = "PB11";
+I2S1.peripheral.WCLKPin.$assign              = "PB10";
+I2S1.DMA_CHANNEL_EVENT1.$name                = "DMA_CH0";
+I2S1.DMA_CHANNEL_EVENT1.addressMode          = "f2b";
+I2S1.DMA_CHANNEL_EVENT1.transferMode         = "FULL_CH_REPEAT_SINGLE";
+I2S1.DMA_CHANNEL_EVENT1.enableInterrupt      = true;
+I2S1.DMA_CHANNEL_EVENT1.enableEarlyInterrupt = true;
+I2S1.DMA_CHANNEL_EVENT1.earlyIntThresh       = "HALF";
+I2S1.DMA_CHANNEL_EVENT1.peripheral.$assign   = "DMA_CH0";
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;
+
+SYSTICK.periodEnable    = true;
+SYSTICK.period          = 80000;
+SYSTICK.interruptEnable = true;
+SYSTICK.systickEnable   = true;
+
+UART1.$name             = "UART_0";
+UART1.targetBaudRate    = 921600;
+UART1.enableFIFO        = true;
+UART1.peripheral.$assign       = "UC0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+UART1.txPinConfig.$name = "ti_driverlib_gpio_GPIOPinGeneric0";
+UART1.rxPinConfig.$name = "ti_driverlib_gpio_GPIOPinGeneric1";
+
+ProjectConfig.genLibNPU = true;

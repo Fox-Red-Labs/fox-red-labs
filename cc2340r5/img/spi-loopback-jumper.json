@@ -1,0 +1,27 @@
+{
+ "image": "../../docs/arrivals/img/source-lp-em-cc2340r5-swru588a.png",
+ "margin_left": 300,
+ "margin_right": 1000,
+ "label_gap": 60,
+ "title": "SPI loopback: one jumper on the LP-EM-CC2340R5",
+ "warning": "Probe stays clipped on; no power change needed",
+ "credit": "Pinout drawing: TI SWRU588A",
+ "tag_size": 24,
+ "steps": [
+  {
+   "label": [
+    "Fit one jumper from pin 15 (DIO13, SPI MOSI)",
+    "to pin 14 (DIO12, SPI MISO), header J2.",
+    "The two pins sit next to each other, so a",
+    "2.54 mm shunt or a short female wire works.",
+    "What goes out on MOSI then comes back on MISO"
+   ],
+   "side": "right",
+   "label_y": 160,
+   "marks": [
+    {"pin": [1100, 206], "r": 15, "tag": "15 MOSI", "tag_side": "right", "color": [0, 220, 255]},
+    {"pin": [1100, 240], "r": 15, "tag": "14 MISO", "tag_side": "right", "color": [0, 220, 255]}
+   ]
+  }
+ ]
+}

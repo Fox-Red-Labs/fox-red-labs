@@ -1,0 +1,47 @@
+diff --git a/examples/apps/CMakeLists.txt b/examples/apps/CMakeLists.txt
+index 9a58379..4ae8812 100644
+--- a/examples/apps/CMakeLists.txt
++++ b/examples/apps/CMakeLists.txt
+@@ -35,7 +35,7 @@ if(OT_APP_CLI)
+    add_subdirectory(cli)
+ endif()
+ 
+-if(NOT TI_SIMPLELINK_BOARD STREQUAL "LP_EM_CC2340R5")
++if(TRUE) # LOCAL PATCH: was if(NOT TI_SIMPLELINK_BOARD STREQUAL "LP_EM_CC2340R5")
+ if(NCP_BUILD_ENABLED)
+   add_subdirectory(ncp)
+ endif() #NCP_BUILD_ENABLED
+diff --git a/examples/apps/cli/CMakeLists.txt b/examples/apps/cli/CMakeLists.txt
+index 35e6c4d..d2f26ea 100644
+--- a/examples/apps/cli/CMakeLists.txt
++++ b/examples/apps/cli/CMakeLists.txt
+@@ -46,13 +46,11 @@ else()
+     message(FATAL_ERROR "Unsuported TI_SIMPLELINK_KERNEL: ${TI_SIMPLELINK_KERNEL}")
+ endif()
+ 
+-if((OT_FTD) AND (NOT TI_SIMPLELINK_DEVICE STREQUAL "cc13x2_cc26x2") AND
+-    (NOT TI_SIMPLELINK_BOARD STREQUAL "LP_EM_CC2340R5"))
++if((OT_FTD) AND (NOT TI_SIMPLELINK_DEVICE STREQUAL "cc13x2_cc26x2"))  # LOCAL PATCH: R5 gate removed
+     include(ftd.cmake)
+ endif()
+ 
+-if((OT_MTD) AND (NOT TI_SIMPLELINK_DEVICE STREQUAL "cc13x2_cc26x2") AND
+-    (NOT TI_SIMPLELINK_BOARD STREQUAL "LP_EM_CC2340R5"))
++if((OT_MTD) AND (NOT TI_SIMPLELINK_DEVICE STREQUAL "cc13x2_cc26x2"))  # LOCAL PATCH: R5 gate removed
+ include(mtd.cmake)
+ endif()
+ 
+diff --git a/src/cc23xx_cc27xx/openthread.syscfg b/src/cc23xx_cc27xx/openthread.syscfg
+index 2ec0854..0aedd5e 100755
+--- a/src/cc23xx_cc27xx/openthread.syscfg
++++ b/src/cc23xx_cc27xx/openthread.syscfg
+@@ -103,7 +103,8 @@ NVS1.$name = "CONFIG_NVSINTERNAL";
+ /* place at the end of Flash */
+ if(deviceId.match(/CC(23.*)/))
+ {
+-    NVS1.internalFlash.regionBase = 0x10000;
++    /* LOCAL PATCH (fox-red-labs): was 0x10000, which sits inside .text once the image passes 64 KB */
++    NVS1.internalFlash.regionBase = 0x7C000;
+     NVS1.internalFlash.regionSize = 0x4000;
+ }
+ else if (deviceId.match(/cc2755p10/i))

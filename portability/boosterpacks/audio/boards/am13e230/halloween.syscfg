@@ -1,0 +1,107 @@
+/**
+ * Halloween show on the LP-AM13E230: BOOSTXL-AUDIO plus an 8-LED WS2812 ring (pin numbers are BoosterPack pins,
+ * SLVUDH9 Figure 2-9; the pack's pins from SLAU670A tables 1 and 2; the DRV8376EVM's from SLVUD20 tables 2-1 and 2-2).
+ * Boot interlock: SysConfig sets up only pins that no stacked board can mind. Of the DAC lines only SYNC (pin 12,
+ * PB12, unused by the DRV8376EVM) is an output here. Pins 7 (PB5, SCLK), 15 (PB10, DIN) and 13 (PB18, amplifier line)
+ * stay inputs, as at reset, until main_halloween.c has checked which BoosterPack is stacked: on the DRV8376EVM they
+ * are SCLK, SDI and DRVOFF. Pin 6 (PA31, the microphone, ADC1 AIN33) is an analog input from the start; pin 5
+ * (PA3, microphone power) is driven only in play mode, for scare mode.
+ *   SysTick at 8 kHz paces the samples (period 25000 at 200 MHz); UC4 is the console (PA0 TX, PA1 RX) at 115200.
+ *   UC0 is an SPI controller, PICO only, on J1 pin 2 (PA26): the ring's data line. Its clock comes out on J2 pin 18
+ *   (PB15); leave that pin unwired. Neither pin is used by the BOOSTXL-AUDIO or the DRV8376EVM.
+ *   DMA channel 0 feeds the UC0 TX FIFO from a RAM buffer (trigger UC0_TX): the ring frame takes no CPU time.
+ *   LED4 red on PA5 and LED5 green on PB0, both active low and not on the headers: the beat when no ring is wired.
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+const adc     = scripting.addModule("/drivers/adc", {}, false);
+const adc1    = adc.addInstance();
+const gpio    = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1   = gpio.addInstance();
+const sysctl  = scripting.addModule("/drivers/sysctl");
+const systick = scripting.addModule("/drivers/systick");
+const uart    = scripting.addModule("/drivers/uart", {}, false);
+const spi     = scripting.addModule("/drivers/spi", {}, false);
+const spi1    = spi.addInstance();
+const dma     = scripting.addModule("/drivers/dma");
+const dma1    = dma.addInstance();
+const gpio3   = gpio.addInstance();
+const uart1   = uart.addInstance();
+
+
+adc1.numberOfSOCs      = 1;
+adc1.enableSEQs        = true;
+adc1.numberOfSEQs      = 1;
+adc1.$name             = "MIC_ADC";
+adc1.adcBase           = "ADC1";
+adc1.SOC0.channel      = "PA31";
+adc1.SEQ1.numberOfSOCs = 1;
+
+gpio1.$name                          = "DAC";
+gpio1.associatedPins.create(1);
+gpio1.associatedPins[0].$name        = "SYNC";
+gpio1.associatedPins[0].initialValue = "SET";
+gpio1.associatedPins[0].pin.$assign  = "PB12";
+
+
+gpio3.$name                          = "LEDS";
+gpio3.associatedPins.create(2);
+gpio3.associatedPins[0].$name        = "RED";
+gpio3.associatedPins[0].initialValue = "SET";
+gpio3.associatedPins[0].pin.$assign  = "PA5";
+gpio3.associatedPins[1].$name        = "GREEN";
+gpio3.associatedPins[1].initialValue = "SET";
+gpio3.associatedPins[1].pin.$assign  = "PB0";
+
+spi1.$name                  = "RING_SPI";
+spi1.frameFormat            = "MOTO3";
+spi1.direction              = "PICO";
+spi1.targetBitRate          = 2400000;
+spi1.dataSize               = "DL_SPI_DATA_SIZE_8";
+spi1.peripheral.$assign     = "UC0";
+spi1.peripheral.mosiPin.$assign = "PA26";
+spi1.peripheral.sclkPin.$assign = "PB15";
+spi1.sclkPinConfig.$name     = "ring_sclk_cfg";
+spi1.mosiPinConfig.$name     = "ring_pico_cfg";
+spi1.enabledDMAEvent2Triggers = "DL_SPI_DMA_INTERRUPT_TX";
+
+dma1.$name          = "RING_DMA";
+dma1.addressMode    = "b2f";
+dma1.srcLength      = "DL_DMA_WIDTH_BYTE";
+dma1.dstLength      = "DL_DMA_WIDTH_BYTE";
+dma1.srcIncDec      = "DL_DMA_ADDR_INCREMENT";
+dma1.dstIncDec      = "DL_DMA_ADDR_UNCHANGED";
+dma1.transferMode   = "SINGLE";
+dma1.triggerSelect  = "DL_DMA_TRIGGER_SOURCE_UC0_TX";
+
+systick.periodEnable    = true;
+systick.period          = 25000;
+systick.interruptEnable = true;
+systick.registerInt     = true;
+systick.systickEnable   = true;
+
+uart1.$name                            = "UART_0";
+uart1.enableFIFO                       = true;
+uart1.targetBaudRate                   = 115200;
+uart1.peripheral.$assign               = "UC4";
+uart1.peripheral.rxPin.$assign         = "PA1";
+uart1.peripheral.txPin.$assign         = "PA0";
+uart1.txPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig0";
+uart1.txPinConfig.direction            = scripting.forceWrite("OUTPUT");
+uart1.txPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.txPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.txPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+uart1.rxPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig1";
+uart1.rxPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.rxPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+
+sysctl.VREFSource   = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+sysctl.peripheral.$suggestSolution       = "SYSCTL";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";
+adc1.SOC0.peripheral.$suggestSolution      = "ANALOG";
+adc1.SOC0.peripheral.AIN33.$suggestSolution = "PA31";

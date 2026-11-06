@@ -1,0 +1,15 @@
+# Renode script for the E242 ring images: boot, run 2 simulated seconds, then print the ring header and bytes (0x70813000, see apps/core1-hello/src/ring_console.c).
+using sysbus
+$elf?=@zephyr.elf
+mach create "am62l"
+machine LoadPlatformDescription @am62l-sram.repl
+sysbus LoadELF $elf
+logLevel 3
+emulation RunFor "2"
+echo "RING magic/head/size:"
+sysbus ReadDoubleWord 0x70813000
+sysbus ReadDoubleWord 0x70813004
+sysbus ReadDoubleWord 0x70813008
+echo "RING bytes:"
+sysbus ReadBytes 0x70813010 240
+quit

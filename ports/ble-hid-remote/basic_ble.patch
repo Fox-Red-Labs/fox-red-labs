@@ -1,0 +1,108 @@
+--- a/app/app_main.c
++++ b/app/app_main.c
+@@ -51,6 +51,7 @@
+ #include "ti/ble/app_util/framework/bleapputil_api.h"
+ #include "ti/ble/app_util/menu/menu_module.h"
+ #include <app_main.h>
++#include "hid_remote.h"
+ 
+ //*****************************************************************************
+ //! Defines
+@@ -125,8 +126,12 @@
+ {
+     bStatus_t status = SUCCESS;
+ 
+-    // Menu
+-    Menu_start();
++    // Prints only (ports/ble-hid-remote): the two buttons are the remote's keys, so
++    // the button menu is not started. Status lines still go to the XDS110 UART.
++    {
++        MenuModule_params_t menuParams = { .mode = MenuModule_Mode_PRINTS_ONLY };
++        MenuModule_init(NULL, &menuParams);
++    }
+ 
+     // Print the device ID address
+     MenuModule_printf(APP_MENU_DEVICE_ADDRESS, 0, "BLE ID Address: "
+@@ -148,7 +153,7 @@
+     {
+         // TODO: Call Error Handler
+     }
+-    status = SimpleGatt_start();
++    status = HidRemote_start();
+     if(status != SUCCESS)
+     {
+         // TODO: Call Error Handler
+--- a/freertos/basic_ble.syscfg	2026-10-12 20:04:05
++++ b/freertos/basic_ble.syscfg	2026-10-12 20:10:41
+@@ -52,23 +52,36 @@
+ ble.basicBLE = true;
+ ble.disDevBySerUuid = true;
+ ble.maxConnNum = 1;
+-ble.deviceName = "Basic BLE project";
++ble.deviceName = "FRL Remote";
++// Bond manager (ports/ble-hid-remote): the HID over GATT Profile wants an encrypted, bonded link.
++// Wait for the host to pair: Apple's Accessory Design Guidelines (58.10) say an accessory should not
++// request pairing until an ATT request has been refused with Insufficient Authentication, which the
++// encrypted HID characteristics do. Just Works (no display, no keyboard on the board),
++// LE Secure Connections allowed, bonds kept in flash so the host reconnects without pairing again.
++ble.bondPairing = "GAPBOND_PAIRING_MODE_WAIT_FOR_REQ";
++ble.bondMITMProtection = false;
++ble.bondIOCaps = "GAPBOND_IO_CAP_NO_INPUT_NO_OUTPUT";
++ble.bonding = true;
++ble.secureConn = "GAPBOND_SECURE_CONNECTION_ALLOW";
+ ble.numOfAdvSets = 1;
+ // Gap Advertising Flags
+ ble.advSet1.advData1.GAP_ADTYPE_FLAGS = true;
+ ble.advSet1.advData1.advertisingFlags = ["GAP_ADTYPE_FLAGS_BREDR_NOT_SUPPORTED","GAP_ADTYPE_FLAGS_GENERAL"];
+-// More 16-bit UUIDs available
+-ble.advSet1.advData1.GAP_ADTYPE_16BIT_MORE = true;
+-ble.advSet1.advData1.numOfUUIDs16More = 1;
+-ble.advSet1.advData1.UUID016More = 65520;
++// Appearance: Generic HID (0x03C0). This template writes it low byte first, as the air wants.
++ble.advSet1.advData1.GAP_ADTYPE_APPEARANCE = true;
++ble.advSet1.advData1.appearanceValue = 0x03C0;
++// Complete list of 16-bit service UUIDs: HID (0x1812) and Battery (0x180F). Also written low byte first.
++ble.advSet1.advData1.GAP_ADTYPE_16BIT_COMPLETE = true;
++ble.advSet1.advData1.numOfUUIDs16Complete = 2;
++ble.advSet1.advData1.UUID016Complete = 0x1812;
++ble.advSet1.advData1.UUID116Complete = 0x180F;
+ // Complete local name
+ ble.advSet1.scanRes1.GAP_ADTYPE_LOCAL_NAME_COMPLETE = true;
+ const connIntervalRange = system.getScript("/ti/ble/ble_common.js").getPeripheralConnIntervalRange();
+ ble.advSet1.scanRes1[connIntervalRange] = true;
+-// Min Connection Interval
+-ble.advSet1.scanRes1.minConnInterval = 100;
+-// Max Connection Interval
+-ble.advSet1.scanRes1.maxConnInterval = 130;
++// Preferred connection interval 15 to 30 ms (was 100 to 130 ms): a key press waits for the next connection event
++ble.advSet1.scanRes1.minConnInterval = 15;
++ble.advSet1.scanRes1.maxConnInterval = 30;
+ // TX Power Level
+ ble.advSet1.scanRes1.GAP_ADTYPE_POWER_LEVEL = true;
+ 
+--- a/freertos/ticlang/makefile	2026-10-12 20:04:05
++++ b/freertos/ticlang/makefile	2026-10-12 20:04:28
+@@ -20,7 +20,7 @@
+   V :=
+ endif
+ 
+-OBJECTS = app_app_main.obj app_app_menu.obj app_Profiles_app_dev_info.obj common_Services_dev_info_dev_info_service.obj common_BLEAppUtil_bleapputil_task.obj common_BLEAppUtil_bleapputil_init.obj common_BLEAppUtil_bleapputil_process.obj common_BLEAppUtil_bleapputil_stack_callbacks.obj common_BLEAppUtil_bleapputil_timers.obj common_Startup_osal_icall_ble.obj common_Startup_rom_init.obj common_lib_opt_ctrl_opt_rssi_monitor.obj common_lib_opt_ctrl_opt_connection_handover.obj common_lib_opt_ctrl_opt_dmm.obj common_lib_opt_ctrl_opt_dmm_dynamic_priority.obj common_lib_opt_ctrl_opt_ts_periodic.obj common_lib_opt_ctrl_opt_cm.obj common_lib_opt_ctrl_opt_health_check.obj common_lib_opt_ctrl_opt_ble_health.obj common_lib_opt_ctrl_opt_padv.obj common_lib_opt_ctrl_opt_pscan.obj common_lib_opt_ctrl_opt_pawr_scan.obj common_lib_opt_ctrl_opt_pawr_advertiser.obj common_lib_opt_ctrl_opt_cs.obj common_lib_opt_ctrl_opt_cs_test.obj common_lib_opt_ctrl_opt_initiator.obj common_lib_opt_ctrl_opt_connectable.obj common_lib_opt_ctrl_opt_scanner.obj common_lib_opt_ctrl_opt_power_control.obj common_lib_opt_ctrl_opt_adv_conn.obj common_lib_opt_ctrl_opt_adv_nconn.obj common_lib_opt_ctrl_opt_ae.obj common_lib_opt_ctrl_opt_adaptivity.obj common_lib_opt_ctrl_opt_past_sender.obj common_lib_opt_ctrl_opt_past_receiver.obj common_lib_opt_ctrl_opt_vendor_specific_cmd.obj common_lib_opt_ctrl_opt_ext_vendor_specific_cmd.obj common_lib_opt_ctrl_opt_coex.obj common_lib_opt_ctrl_opt_legacy_cmd.obj common_lib_opt_host_opt_gap_bond_mgr.obj common_lib_opt_host_opt_gap_pawr_scan.obj common_lib_opt_host_opt_gap_pawr_adv.obj common_lib_opt_host_opt_gap_past_receiver.obj common_lib_opt_host_opt_gap_past_sender.obj common_Drivers_NV_crc.obj common_Drivers_NV_nvocmp.obj common_iCall_icall.obj common_iCall_icall_user_config.obj common_config_ble_user_config.obj common_config_hci_supported_cmd.obj app_app_broadcaster.obj app_app_peripheral.obj app_app_observer.obj app_app_central.obj app_app_connection.obj app_app_pairing.obj app_app_data.obj app_app_time_sync.obj app_app_padv_time_sync.obj app_Profiles_app_oad.obj common_Services_oad_oad_service.obj common_Services_oad_oad_reset_service.obj common_Profiles_oad_ms_oad_profile.obj app_app_ms_oad_peripheral.obj app_app_ms_oad_pairing.obj common_Profiles_oad_oad_profile.obj common_Util_SwUpdate_sw_update.obj common_Util_SwUpdate_flash_interface_oad.obj common_Util_util.obj HealthToolkit_debugInfo.obj HealthToolkit_ble_sys_stat.obj common_MenuModule_menu_module.obj app_Profiles_app_simple_gatt.obj common_Profiles_simple_gatt_simple_gatt_profile.obj app_app_l2cap_coc.obj common_iCall_icall_POSIX.obj common_Startup_main_freertos.obj $(patsubst %.c,%.obj,$(notdir $(SYSCFG_C_FILES)))
++OBJECTS = app_app_main.obj app_app_menu.obj app_Profiles_app_dev_info.obj common_Services_dev_info_dev_info_service.obj common_BLEAppUtil_bleapputil_task.obj common_BLEAppUtil_bleapputil_init.obj common_BLEAppUtil_bleapputil_process.obj common_BLEAppUtil_bleapputil_stack_callbacks.obj common_BLEAppUtil_bleapputil_timers.obj common_Startup_osal_icall_ble.obj common_Startup_rom_init.obj common_lib_opt_ctrl_opt_rssi_monitor.obj common_lib_opt_ctrl_opt_connection_handover.obj common_lib_opt_ctrl_opt_dmm.obj common_lib_opt_ctrl_opt_dmm_dynamic_priority.obj common_lib_opt_ctrl_opt_ts_periodic.obj common_lib_opt_ctrl_opt_cm.obj common_lib_opt_ctrl_opt_health_check.obj common_lib_opt_ctrl_opt_ble_health.obj common_lib_opt_ctrl_opt_padv.obj common_lib_opt_ctrl_opt_pscan.obj common_lib_opt_ctrl_opt_pawr_scan.obj common_lib_opt_ctrl_opt_pawr_advertiser.obj common_lib_opt_ctrl_opt_cs.obj common_lib_opt_ctrl_opt_cs_test.obj common_lib_opt_ctrl_opt_initiator.obj common_lib_opt_ctrl_opt_connectable.obj common_lib_opt_ctrl_opt_scanner.obj common_lib_opt_ctrl_opt_power_control.obj common_lib_opt_ctrl_opt_adv_conn.obj common_lib_opt_ctrl_opt_adv_nconn.obj common_lib_opt_ctrl_opt_ae.obj common_lib_opt_ctrl_opt_adaptivity.obj common_lib_opt_ctrl_opt_past_sender.obj common_lib_opt_ctrl_opt_past_receiver.obj common_lib_opt_ctrl_opt_vendor_specific_cmd.obj common_lib_opt_ctrl_opt_ext_vendor_specific_cmd.obj common_lib_opt_ctrl_opt_coex.obj common_lib_opt_ctrl_opt_legacy_cmd.obj common_lib_opt_host_opt_gap_bond_mgr.obj common_lib_opt_host_opt_gap_pawr_scan.obj common_lib_opt_host_opt_gap_pawr_adv.obj common_lib_opt_host_opt_gap_past_receiver.obj common_lib_opt_host_opt_gap_past_sender.obj common_Drivers_NV_crc.obj common_Drivers_NV_nvocmp.obj common_iCall_icall.obj common_iCall_icall_user_config.obj common_config_ble_user_config.obj common_config_hci_supported_cmd.obj app_app_broadcaster.obj app_app_peripheral.obj app_app_observer.obj app_app_central.obj app_app_connection.obj app_app_pairing.obj app_app_data.obj app_app_time_sync.obj app_app_padv_time_sync.obj app_Profiles_app_oad.obj common_Services_oad_oad_service.obj common_Services_oad_oad_reset_service.obj common_Profiles_oad_ms_oad_profile.obj app_app_ms_oad_peripheral.obj app_app_ms_oad_pairing.obj common_Profiles_oad_oad_profile.obj common_Util_SwUpdate_sw_update.obj common_Util_SwUpdate_flash_interface_oad.obj common_Util_util.obj HealthToolkit_debugInfo.obj HealthToolkit_ble_sys_stat.obj common_MenuModule_menu_module.obj app_Profiles_app_simple_gatt.obj common_Profiles_simple_gatt_simple_gatt_profile.obj app_hid_remote.obj common_Services_battery_battery_server.obj app_app_l2cap_coc.obj common_iCall_icall_POSIX.obj common_Startup_main_freertos.obj $(patsubst %.c,%.obj,$(notdir $(SYSCFG_C_FILES)))
+ 
+ NAME = basic_ble
+ 
+@@ -415,6 +415,14 @@
+ 	$(V) $(CC) $(CFLAGS) -c $< -o $@
+ 
+ app_Profiles_app_simple_gatt.obj: ../../app/Profiles/app_simple_gatt.c $(SYSCFG_H_FILES) prebuild
++	@ echo Building $@
++	$(V) $(CC) $(CFLAGS) -c $< -o $@
++
++app_hid_remote.obj: ../../app/hid_remote.c $(SYSCFG_H_FILES) prebuild
++	@ echo Building $@
++	$(V) $(CC) $(CFLAGS) -c $< -o $@
++
++common_Services_battery_battery_server.obj: $(SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR)/source/ti/ble/services/battery/src/battery_server.c $(SYSCFG_H_FILES) prebuild
+ 	@ echo Building $@
+ 	$(V) $(CC) $(CFLAGS) -c $< -o $@
+ 

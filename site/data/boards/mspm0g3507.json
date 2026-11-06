@@ -1,0 +1,358 @@
+{
+ "id": "mspm0g3507",
+ "board": "LP-MSPM0G3507",
+ "part": "MSPM0G3507",
+ "family": "MSPM0",
+ "title": "Is the TI LP-MSPM0G3507 the right board for my project?",
+ "short": "TI's LaunchPad for the MSPM0G3507 chip: an 80 MHz Arm Cortex-M0+ with 128 kB of flash, 32 kB of RAM, a math accelerator and the debugger on the board. It blinked in 2 min 29 s from board in hand with the tools installed, drove a 3.5 inch touch screen, and ran small AI models and Zephyr. It has no radio, and 32 kB of RAM and 128 kB of flash are what limit bigger programs.",
+ "meet": {
+  "what": "A LaunchPad development kit for TI's MSPM0G3507 microcontroller. A USB debugger and serial port are built in, so one cable powers it, programs it and carries its text output. It has a red LED, an RGB LED, two buttons, a thermistor, a light sensor and 40-pin BoosterPack headers for plug-on boards.",
+  "facts": [
+   [
+    "Chip",
+    "MSPM0G3507 (LQFP-64)"
+   ],
+   [
+    "CPU",
+    "Arm Cortex-M0+, 80 MHz"
+   ],
+   [
+    "Flash",
+    "128 kB"
+   ],
+   [
+    "RAM",
+    "32 kB"
+   ],
+   [
+    "Radios",
+    "None"
+   ],
+   [
+    "On the chip",
+    "Two 12-bit 4 Msps ADCs, a 12-bit DAC, 2 op-amps, 3 comparators, a math accelerator (divide, square root, multiply-accumulate, trig), AES, CAN-FD, 4 UARTs, 2 I2C, 2 SPI"
+   ],
+   [
+    "Debug probe",
+    "XDS110, on the board"
+   ],
+   [
+    "Software",
+    "TI MSPM0 SDK 2.11 (DriverLib and TI Drivers) and upstream Zephyr (board lp_mspm0g3507)"
+   ],
+   [
+    "Board price",
+    "$20.56 at TI.com (2026-10-09); stock shows only after a login"
+   ],
+   [
+    "Chip price",
+    "$1.081 at 1,000 units on TI.com (MSPM0G3507SPMR)"
+   ]
+  ],
+  "source": "docs/research/ti-portfolio-specs-2026-10-06.md"
+ },
+ "projects": [
+  {
+   "t": "Blink an LED with TI's SDK",
+   "st": "works",
+   "result": "2 min 29 s from board in hand to our own changed blink, tools already installed; CCStudio build 6 s",
+   "source": "mspm0g3507/STOPWATCH.md"
+  },
+  {
+   "t": "Blink an LED with Zephyr",
+   "st": "works",
+   "result": "3 min to blinking from a clean machine with our setup script (about 9.5 min the first time, with a workaround found on the way)",
+   "source": "mspm0g3507/zephyr/README.md"
+  },
+  {
+   "t": "Show text on a small screen",
+   "st": "works",
+   "result": "Full-screen fill 67 ms at 40 MHz SPI, 365 ms at 8 MHz; 64 of 64 pixels of one row read back right at every speed",
+   "source": "mspm0g3507/display-test/README.md"
+  },
+  {
+   "t": "Read handwritten digits (BitNetMCU)",
+   "st": "works",
+   "result": "10 of 10 stored digits right; 34 ms per digit at 80 MHz",
+   "source": "ports/bitnetmcu/README.md"
+  },
+  {
+   "t": "Small AI model, in software",
+   "st": "works",
+   "result": "Room-occupancy models of 500 to 30k weights: 4.0 to 129 ms per answer at 80 MHz, 20 of 20 right",
+   "source": "mspm0g3507/mcu-bench/RESULTS-2.md"
+  },
+  {
+   "t": "Dim an LED or move a servo",
+   "st": "partial",
+   "result": "TI's PWM examples run, and their output was not measured; a ported PWM program read 14.7% high against 12.5% duty on one channel",
+   "source": "mspm0g3507/stm32-port-eval/05-tim-pwm/README.md"
+  },
+  {
+   "t": "Arduino display libraries",
+   "st": "partial",
+   "result": "Four Arduino programs built and two ran on our API layer; no Arduino core for MSPM0 found",
+   "source": "portability/arduino/README.md"
+  }
+ ],
+ "chains": [
+  {
+   "t": "TI's MSPM0 SDK, DriverLib, no operating system",
+   "st": "works",
+   "verdict": "Yes",
+   "why": "262 of 270 TI examples build from a terminal, and every one that was safe to run ran with no crash (213 flashed and run)",
+   "source": "mspm0g3507/example-sweep/README.md"
+  },
+  {
+   "t": "Zephyr",
+   "st": "works",
+   "verdict": "Yes, on the upstream board",
+   "why": "Blinky runs. A blinky-class app uses 12,704 bytes of flash and 3,992 bytes of RAM; CoreMark under Zephyr scores 95 to 140 depending on compiler flags",
+   "source": "portability/three-ways/README.md"
+  },
+  {
+   "t": "FreeRTOS with TI Drivers",
+   "st": "partial",
+   "verdict": "Builds with this repo's script; not run",
+   "why": "TI's 48 MSPM0 FreeRTOS example makefiles fail as shipped. Our build script builds TI Drivers on FreeRTOS for this board: 21,040 bytes of flash and 7,059 bytes of RAM",
+   "source": "portability/three-ways/README.md"
+  },
+  {
+   "t": "Bluetooth host on the chip, radio on another chip over UART",
+   "st": "partial",
+   "verdict": "Fits; not run",
+   "why": "Zephyr's Bluetooth host with H4 over UART builds for this board: a beacon needs 39,256 bytes of flash and 14,592 bytes of RAM, the heart-rate peripheral sample 98,600 and 22,164. The radio end of the wire was not built here",
+   "source": "docs/research/host-scaling-plan-2026-10-09.md"
+  },
+  {
+   "t": "Thread host (OpenThread) for a separate radio",
+   "st": "no",
+   "verdict": "No, not with TI's configuration",
+   "why": "TI's CC1354P10 host build needs 467,648 bytes of flash and 128,916 bytes of RAM against this chip's 131,072 and 32,768",
+   "source": "border-router/host-cc1354/results/2026-10-07/size.txt",
+   "why_not": "ram"
+  }
+ ],
+ "combine_title": "Software stacks and radios over a wire",
+ "combine_lede": "The operating systems and SDKs we tried on this board, and the radio hosts that fit or did not. The chip has no radio of its own.",
+ "benchmarks": [
+  [
+   "CoreMark, TI Arm Clang -O3, bare metal, 80 MHz",
+   "183.61",
+   "2.3 per MHz; 78.8 at 32 MHz (2.46 per MHz, Arm's published figure)"
+  ],
+  [
+   "Interrupt latency, bare metal",
+   "29 to 36 cycles",
+   "About 0.4 µs at 80 MHz; 163 to 181 cycles through Zephyr"
+  ],
+  [
+   "One motor-control step (float), hardware math",
+   "88.5 µs",
+   "171.9 µs with software math; the Cortex-M0+ has no floating-point unit"
+  ],
+  [
+   "Control loop top rate, no missed period in 1,000",
+   "4.26 kHz soft float; 10.9 kHz with the math accelerator",
+   "70.8 kHz in TI's IQmath fixed point on the accelerator"
+  ],
+  [
+   "Full-screen fill, 3.5 inch display",
+   "67.2 ms",
+   "At 40 MHz SPI, over the pin rating; 364.9 ms at 8 MHz"
+  ],
+  [
+   "Handwritten digit, 64-wide BitNetMCU net",
+   "34 ms",
+   "10 of 10 stored digits right at 80 MHz"
+  ],
+  [
+   "Room-occupancy AI model, 500 to 30k weights",
+   "4.0 to 129 ms",
+   "Plain C at -O3; 20 of 20 right on every model"
+  ],
+  [
+   "DAC to ADC loopback",
+   "0.34% low",
+   "Gain 0.99656 across 257 steps; noise about 9.6 effective bits"
+  ],
+  [
+   "UART loopback, all bytes right",
+   "9.6 kbaud to 10.67 Mbaud",
+   "Except a dead band at 5 to 6 Mbaud; 12 Mbaud sends nothing"
+  ],
+  [
+   "TI examples built from a terminal",
+   "262 of 270",
+   "222 with one make command each; the rest with our shared builder"
+  ],
+  [
+   "Time to a blinking LED",
+   "2 min 29 s",
+   "Board in hand, tools installed; 3 min to Zephyr from a clean machine with this repo's script"
+  ]
+ ],
+ "benchmarks_source": "data/results/mspm0g3507.csv",
+ "glance": [
+  [
+   "184",
+   "CoreMark score",
+   "Speed test, TI Arm Clang, 80 MHz",
+   "mspm0g3507/mcu-bench/RESULTS-2.md"
+  ],
+  [
+   "32 kB",
+   "RAM",
+   "Working memory; this is what runs out first",
+   "docs/research/ti-portfolio-specs-2026-10-06.md"
+  ],
+  [
+   "128 kB",
+   "Flash",
+   "Program storage; the trimmed LVGL demo uses 125.4 kB of it",
+   "mspm0g3507/FAQ.md"
+  ],
+  [
+   "88.5 µs",
+   "One motor-control step",
+   "Float math on the accelerator; 172 µs without it",
+   "data/results/mspm0g3507.csv"
+  ],
+  [
+   "2 min 29 s",
+   "To a blinking LED",
+   "Board in hand, tools installed",
+   "mspm0g3507/STOPWATCH.md"
+  ]
+ ],
+ "good_for": [
+  "A first board: the debugger is on it, and the blink took 2 min 29 s with the tools installed",
+  "Screens: a 3.5 inch touch display on 12 jumper wires, 67 ms for a full-screen fill and LVGL in 25.1 kB of RAM",
+  "Small AI models in plain C: occupancy models of up to 30k weights ran, and a handwritten-digit net reads a digit in 34 ms",
+  "Zephyr on a board upstream Zephyr already supports",
+  "Control maths with a speed-up: a math accelerator gives one motor-control step in 88.5 µs against 172 µs without it, and 70.8 kHz in IQmath fixed point"
+ ],
+ "not_for": [
+  "Anything with a radio: the chip has none; a separate radio chip can sit on a UART or SPI link",
+  "Programs over about 128 kB: the chip has no external memory bus, and the trimmed LVGL demo already uses 125.4 kB",
+  "Floating-point control loops at tens of kHz: there is no floating-point unit, so a float motor-control step cannot run at 50 kHz",
+  "A Thread or Matter host on the chip: TI's Thread host build is about 94 kB of RAM short",
+  "Bluetooth or Wi-Fi without a second chip"
+ ],
+ "instead": [
+  {
+   "match": "Programs over about 128 kB",
+   "try": "LP-MSPM0G3519",
+   "why": "512 kB of flash and 128 kB of RAM",
+   "source": "mspm0g3507/FAQ.md"
+  },
+  {
+   "match": "Floating-point control loops",
+   "try": "LP-AM13E230",
+   "why": "a Cortex-M33 with a floating-point unit; one control step in 117 cycles (0.585 µs) with its trig unit and 656 cycles (3.28 µs) in plain software at 200 MHz; the whole trigger, ADC, step and PWM-write loop takes 1.33 µs against 4.74 µs",
+   "source": "data/results/am13e230.csv"
+  },
+  {
+   "match": "A Thread or Matter host",
+   "try": "LP-EM-CC2755P10",
+   "why": "the board TI's Thread and Matter software targets",
+   "source": "docs/research/matter-on-ti-2026-10-06.md"
+  },
+  {
+   "match": "Bluetooth or Wi-Fi",
+   "try": "LP-EM-CC2340R53",
+   "why": "the lowest-priced radio board in the catalog ($27.50); it needs the separate $59.29 LP-XDS110ET probe",
+   "source": "data/parts.json"
+  }
+ ],
+ "buy": "$20.56 at TI.com for one board (2026-10-09); stock shows only after a login. The debug probe is on the board, so one USB cable does power, flashing and the serial port.",
+ "gotchas": [
+  [
+   "your serial window goes silent after you moved jumpers J21 and J22 for the UART loopback",
+   "move J21 and J22 back up to XDS (mspm0g3507/example-sweep/JUMPERS.md)"
+  ],
+  [
+   "the screen stays dark or shows static although every wire is right",
+   "wait about 10 µs after chip select goes high before the next command; the second of two back-to-back commands is lost (mspm0g3507/FAQ.md)"
+  ],
+  [
+   "the touch chip does not answer on I2C1 at address 0x38",
+   "drive the two pins as software I2C; it answered every time that way (mspm0g3507/display-test/README.md)"
+  ],
+  [
+   "your SysConfig clock line is ignored and the chip stays at 32 MHz when you ask for 80",
+   "remove SYSCTL.forceDefaultClkConfig and set the clocks through the clock tree (mspm0g3507/FAQ.md)"
+  ],
+  [
+   "16-bit SPI frames are silently ignored and the picture is garbled",
+   "switch the SPI block off, set the frame size, then switch it back on (mspm0g3507/FAQ.md)"
+  ],
+  [
+   "a ported button interrupt never fires on S1",
+   "S1 (PA18) is active-high on this board; set PA18 to pull-down with a rising-edge interrupt in SysConfig (mspm0g3507/FAQ.md)"
+  ],
+  [
+   "a ported ADC program converts once and then stalls",
+   "set the DMA sample count to 1 and point the DMA at the ADC result registers, not the FIFO address (mspm0g3507/FAQ.md)"
+  ],
+  [
+   "`make` in `Debug/` stops with `invalid option -- O`",
+   "use the gmake that ships with CCStudio, at ccs/utils/bin/gmake (mspm0g3507/FAQ.md)"
+  ],
+  [
+   "OpenOCD's `program ... verify` fails about every other time",
+   "run it again; the next attempt passes (mspm0g3507/FAQ.md)"
+  ],
+  [
+   "the Mac sees nothing when you plug the board in",
+   "try another micro-USB cable; a charge-only cable looks the same (mspm0g3507/STOPWATCH.md)"
+  ]
+ ],
+ "faq_page": "faq-mspm0g3507.html",
+ "faq_source": "mspm0g3507/FAQ.md",
+ "memory_source": "mspm0g3507/memory-breakdown.json",
+ "updated": "2026-10-15",
+ "measured_on": "Measured 2026-10-05 to 2026-10-09 on an Intel Mac (macOS 15.7) with CCStudio 21.0.1, MSPM0 SDK 2.11.00.07, SysConfig 1.26.3 to 1.28.1 and TI Arm Clang 5.1.1; Zephyr 4.4.2 with GCC 12.2.",
+ "hotspots": [
+  {
+   "x": 38.5,
+   "y": 55,
+   "label": "The chip",
+   "title": "MSPM0G3507",
+   "text": "An 80 MHz Arm Cortex-M0+ with 128 kB of flash and 32 kB of RAM. What sets it apart: a math accelerator for divide, square root and trig, two 4 Msps ADCs and CAN-FD.",
+   "source": "docs/research/ti-portfolio-specs-2026-10-06.md"
+  },
+  {
+   "x": 74,
+   "y": 32,
+   "label": "Built-in debug probe",
+   "title": "XDS110 probe",
+   "text": "The right half of the board is the debugger. One USB cable powers the board, flashes it and carries its text output, with no separate probe to buy.",
+   "source": "mspm0g3507/README.md"
+  },
+  {
+   "x": 41.5,
+   "y": 18.5,
+   "label": "BoosterPack headers",
+   "title": "40-pin BoosterPack headers",
+   "text": "The header pins carry the chip's two ADCs, the DAC, two op-amps, four UARTs, two I2C and two SPI. Plug-on boards stack on top.",
+   "source": "docs/research/ti-portfolio-specs-2026-10-06.md"
+  },
+  {
+   "x": 11.5,
+   "y": 52.5,
+   "label": "LEDs",
+   "title": "Two LEDs",
+   "text": "One red, one RGB, labelled LED1 and LED2 on the silkscreen. Blinking the red one is the first project.",
+   "source": "mspm0g3507/README.md"
+  },
+  {
+   "x": 26.5,
+   "y": 41,
+   "label": "On-board sensors",
+   "title": "Thermistor and light sensor",
+   "text": "The thermistor is marked on the board here. The light sensor is on TI's kit page list but not marked in this photo. Per TI's kit page, both are analog.",
+   "source": "docs/research/ti-portfolio-specs-2026-10-06.md"
+  }
+ ]
+}

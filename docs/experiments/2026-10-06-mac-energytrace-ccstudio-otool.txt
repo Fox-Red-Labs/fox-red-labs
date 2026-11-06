@@ -1,0 +1,287 @@
+# otool and dlopen output, CCStudio 21.0.1.00010 as shipped, macOS 15.7.9 Intel, 2026-10-06
+
+## otool -L libCloudTrace.dylib
+libCloudTrace.dylib:
+	@rpath/libCloudTrace.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libti_logger.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libTraceFactory.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libtiofr11.dylib (compatibility version 0.0.0, current version 0.0.0)
+	<ti-build-path> (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libxerces-c.dylib (compatibility version 0.0.0, current version 0.0.0)
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1600.157.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1336.61.1)
+
+## otool -l libCloudTrace.dylib (LC_RPATH entries)
+          cmd LC_RPATH
+      cmdsize 88
+         path $ORIGIN/../../../DebugServer/bin:$ORIGIN/../../../common/bin:$ORIGIN/ (offset 12)
+
+## otool -L libsqlite3.dylib
+libsqlite3.dylib:
+	<ti-build-path> (compatibility version 0.0.0, current version 0.0.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1336.61.1)
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1600.157.0)
+
+## otool -L libenergytraceccs.dylib
+libenergytraceccs.dylib:
+	@rpath/libenergytraceccs.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libxdsfast3.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libjscxds110.dylib (compatibility version 0.0.0, current version 0.0.0)
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1600.157.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1336.61.1)
+
+## otool -l libenergytraceccs.dylib (LC_RPATH entries)
+          cmd LC_RPATH
+      cmdsize 32
+         path @loader_path/ (offset 12)
+
+## python3 -c 'import ctypes; ctypes.CDLL("<lib>")' on the shipped files
+libCloudTrace.dylib: dlopen(/Applications/ti/ccs2101/ccs/ccs_base/emulation/analysis/bin/libCloudTrace.dylib, 0x0006): Library not loaded: @rpath/libti_logger.dylib
+libenergytraceccs.dylib: dlopen(/Applications/ti/ccs2101/ccs/ccs_base/emulation/analysis/bin/libenergytraceccs.dylib, 0x0006): Library not loaded: @rpath/libxdsfast3.dylib
+libTraceFactory.dylib: loaded
+
+## grep -c in app.asar
+general_1.CCSIDE.onMacOS: 16
+'not yet supported on Mac OS, only windows and linux': 8
+
+# After the patch, 2026-10-06. The patched copies were placed in a mirror of the install tree
+# (ccs_base/emulation/analysis/bin, with common/bin, common/uscif and DebugServer/bin linked to the real install),
+# because the new search paths are relative to the library's own folder. The install itself was not changed.
+
+## otool -L libCloudTrace.dylib (patched)
+<scratch>/-tmp-fox-red-labs/63bf9cea-a79c-4d29-b3f9-66215924dbf1/scratchpad/mirror/ccs_base/emulation/analysis/bin/libCloudTrace.dylib:
+	@rpath/libCloudTrace.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libti_logger.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libTraceFactory.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libtiofr11.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libsqlite3.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libxerces-c.dylib (compatibility version 0.0.0, current version 0.0.0)
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1600.157.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1336.61.1)
+
+## otool -l libCloudTrace.dylib (LC_RPATH entries, patched)
+          cmd LC_RPATH
+      cmdsize 56
+         path @loader_path/../../../DebugServer/bin (offset 12)
+--
+          cmd LC_RPATH
+      cmdsize 48
+         path @loader_path/../../../common/bin (offset 12)
+--
+          cmd LC_RPATH
+      cmdsize 32
+         path @loader_path/ (offset 12)
+
+## otool -l libenergytraceccs.dylib (LC_RPATH entries, patched)
+          cmd LC_RPATH
+      cmdsize 32
+         path @loader_path/ (offset 12)
+--
+          cmd LC_RPATH
+      cmdsize 48
+         path @loader_path/../../../common/uscif (offset 12)
+--
+          cmd LC_RPATH
+      cmdsize 48
+         path @loader_path/../../../common/bin (offset 12)
+--
+          cmd LC_RPATH
+      cmdsize 56
+         path @loader_path/../../../DebugServer/bin (offset 12)
+
+## python3 ctypes.CDLL on the patched copies in the mirror tree
+libCloudTrace.dylib: loaded
+libenergytraceccs.dylib: loaded
+libTraceFactory.dylib: loaded
+
+## codesign -dvv on the shipped files
+ccs_base/emulation/analysis/bin/libCloudTrace.dylib: code object is not signed at all
+ccs_base/emulation/analysis/bin/libenergytraceccs.dylib: code object is not signed at all
+ccs_base/DebugServer/bin/DSLite: code object is not signed at all
+Code Composer Studio.app: code object is not signed at all
+
+## ls ccs_base/emulation/analysis/bin/*.dylib | wc -l
+75
+
+## The 8 copies of the 'not yet supported on Mac OS' comment inside app.asar (paths inside the archive)
+node_modules/@ccs/ccstudio-trace-config/src/browser/trace-menu-contribution.ts   (TypeScript source, not executed)
+node_modules/@ccs/ccstudio-trace-viewer/src/browser/trace-viewer/trace-feature-commands.ts   (TypeScript source, not executed)
+node_modules/@ccs/ccstudio-trace-config/lib/browser/trace-menu-contribution.js   (compiled package copy, patched)
+node_modules/@ccs/ccstudio-trace-viewer/lib/browser/trace-viewer/trace-feature-commands.js   (compiled package copy, patched)
+lib/frontend/packages_ccstudio-trace-config_lib_browser_trace-config-frontend-module_js.js   (page bundle the app runs, patched)
+lib/frontend/packages_ccstudio-trace-viewer_lib_browser_trace-explorer_trace-explorer-commands_js-packages-97bec7.js   (page bundle the app runs, patched)
+lib/frontend/...trace-config-frontend-module_js.js.map and ...trace-explorer-commands_js-packages-97bec7.js.map   (source maps, not executed)
+
+## The three trace-server calls in the IDE source (grep -n on trace-menu-contribution.ts from the archive)
+906:            const res = await trace?.cloudTrace.configureTargetSession(coreFullName, cfg);
+979:            const routes: TraceRoute[] = await trace?.cloudTrace.getLiveTraceReceivers(coreFullName);
+1019:                    case 'DataReady':
+
+## The switch runs in the class constructor (same file)
+133:        TRACE_FEATURE_FLAGS.isTraceSupported = isTraceSupported(this.tracePreferences[TRACE_ENABLE]);
+
+# More of the evidence the page cites, 2026-10-06
+
+## The two switch functions (TypeScript source from the archive, grep -n -A with context)
+101-
+102:function isTraceSupported(isTraceEnabledInPreferences: boolean): boolean {
+103-    let result = isTraceEnabledInPreferences;
+104-    if (result === undefined) {
+105-        result = true;
+106-    }
+107-    // NOTE: trace is not supported in the browser / cloud, only on the desktop / electron.
+108-    if (!CCSIDE.isDesktop) {
+109-        result = false;
+110-    } else {
+111-        // NOTE: trace is not yet supported on Mac OS, only windows and linux
+112-        if (isMacOS()) {
+113-            result = false;
+114-        }
+115-    }
+116-    return result;
+...
+80:    public doesPlatformSupportTrace(): boolean {
+81-        let result = true;
+82-        // NOTE: trace is not supported in the browser / cloud, only on the desktop / electron.
+83-        if (!CCSIDE.isDesktop) {
+84-            result = false;
+85-        } else {
+86-            // NOTE: trace is not yet supported on Mac OS, only windows and linux
+87-            if (CCSIDE.onMacOS) {
+88-                result = false;
+89-            }
+90-        }
+91-        return result;
+92-    }
+
+## The 16 occurrences of general_1.CCSIDE.onMacOS in app.asar: byte offset, then 70 bytes of context. The four marked PATCHED are inside the two trace functions: offsets 125026108 and 125245615 are in the page bundles under lib/frontend that the app runs; 402667427 and 403534644 are the compiled package copies under node_modules/@ccs.
+left    122167098 \n    async getMcpPathContext(installPath) {\n        const theiaBase = general_1.CCSIDE.onMacOS
+left    122167542 h.join(installPath, theiaBase);\n        }\n        const ccsAiSubdir = general_1.CCSIDE.onMacOS
+PATCHED 125026108 tform() === 'darwin') {\n    //     result = true;\n    // }\n    return general_1.CCSIDE.onMacOS
+PATCHED 125245615 s not yet supported on Mac OS, only windows and linux\n            if (general_1.CCSIDE.onMacOS
+left    286443613 `local-dir:${new core_1.Path(general_1.CCSIDE.theiaLocation).resolve(!general_1.CCSIDE.onMacOS
+left    288429718 point-json') :\n            path.join(general_1.CCSIDE.theiaLocation, !general_1.CCSIDE.onMacOS
+left    288594802         clangdLocation = m_path.join(general_1.CCSIDE.theiaLocation, !general_1.CCSIDE.onMacOS
+left    288621085 st ccsServerLocation = m_path.join(general_1.CCSIDE.installLocation, !general_1.CCSIDE.onMacOS
+left    371793170         clangdLocation = m_path.join(general_1.CCSIDE.theiaLocation, !general_1.CCSIDE.onMacOS
+left    371819453 st ccsServerLocation = m_path.join(general_1.CCSIDE.installLocation, !general_1.CCSIDE.onMacOS
+left    372055111 `local-dir:${new core_1.Path(general_1.CCSIDE.theiaLocation).resolve(!general_1.CCSIDE.onMacOS
+left    375095608 point-json') :\n            path.join(general_1.CCSIDE.theiaLocation, !general_1.CCSIDE.onMacOS
+left    378924102 \n    async getMcpPathContext(installPath) {\n        const theiaBase = general_1.CCSIDE.onMacOS
+left    378924546 h.join(installPath, theiaBase);\n        }\n        const ccsAiSubdir = general_1.CCSIDE.onMacOS
+PATCHED 402667427 tform() === 'darwin') {\n    //     result = true;\n    // }\n    return general_1.CCSIDE.onMacOS
+PATCHED 403534644 s not yet supported on Mac OS, only windows and linux\n            if (general_1.CCSIDE.onMacOS
+replacement: b"false" + 19 spaces = 24 bytes, same as len(b"general_1.CCSIDE.onMacOS") = 24
+
+## nm -gU libmsp430.dylib | grep -i energy
+000000000001213e T _MSP430_DisableEnergyTrace
+0000000000012104 T _MSP430_EnableEnergyTrace
+000000000001216c T _MSP430_ResetEnergyTrace
+
+## strings libtixds510cortexm0.dylib | grep -i energytrace
+energytrace_get_core_freerun
+energytrace_stop
+energytrace_start
+energytrace_set_core_freerun
+energytrace_cleanup
+energytrace_destroy
+libenergytraceccs.dylib
+energytrace_create
+
+## nm -gU libenergytraceccs.dylib | grep -E 'EnergyTrace_LPRF|DecoderStateMachine|Calibration' (first 12)
+0000000000030080 T __ZN16EnergyTrace_LPRF12GetFWVersionERNSt3__13mapINS0_12basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEEiNS0_4lessIS7_EENS5_INS0_4pairIKS7_iEEEEEE
+000000000002f1f0 T __ZN16EnergyTrace_LPRF12PerformSetupEv
+000000000002fef0 T __ZN16EnergyTrace_LPRF13StopCollectorEv
+000000000002f670 T __ZN16EnergyTrace_LPRF14GetCurrentInNAEj
+000000000002f840 T __ZN16EnergyTrace_LPRF14StartCollectorEv
+000000000002f2d0 T __ZN16EnergyTrace_LPRF15InitEnergyTraceEv
+000000000002fe20 T __ZN16EnergyTrace_LPRF15StopEnergyTraceEv
+000000000002f770 T __ZN16EnergyTrace_LPRF16StartEnergyTraceEv
+0000000000030090 T __ZN16EnergyTrace_LPRF18CleanupEnergyTraceEv
+000000000002f380 T __ZN16EnergyTrace_LPRF18PerformCalibrationEv
+000000000002f2a0 T __ZN16EnergyTrace_LPRFC1EP16_EnergyTracePropP13IEmulatorComm
+000000000002e3f0 T __ZN16EnergyTrace_LPRFC2EP16_EnergyTracePropP13IEmulatorComm
+
+## strings libenergytraceccs.dylib | grep -c MSP432 ; grep cJTAG
+7
+ET++ (digital state scanning) is NOT supported with 2-pin cJTAG protocol. Please change target configuration to 4-pin cJTAG protocol.
+
+## strings libCloudTrace.dylib | grep 'Running server on port'
+Running server on port %d
+
+## Default trace server port, from the archive: node_modules/@ccs/ccstudio-trace-viewer/src/common/trace-server-url-provider.ts
+3:export const TRACE_VIEWER_DEFAULT_PORT = 1239;  // bc was 8080
+
+## ls emulation/analysis/bin/td emulation/analysis/bin/bin2tdf; find . -iname 'stune*' (no output means none)
+emulation/analysis/bin/bin2tdf
+emulation/analysis/bin/td
+(find stune: done)
+
+## otool -l LC_RPATH for common/bin/libxerces-c.dylib and libCCReg.dylib; otool -L for the two tpi disassembler libraries (the /Users line only)
+common/bin/libxerces-c.dylib:
+         path $ORIGIN (offset 12)
+common/bin/libCCReg.dylib:
+         path $ORIGIN (offset 12)
+emulation/tpi/libdisassemble_ank.dylib:
+	<ti-build-path> (compatibility version 0.0.0, current version 0.0.0)
+emulation/tpi/libdisassemble_c6x.dylib:
+	<ti-build-path> (compatibility version 0.0.0, current version 0.0.0)
+
+## file on the three tested libraries and DSLite
+emulation/analysis/bin/libCloudTrace.dylib:     Mach-O 64-bit dynamically linked shared library x86_64
+emulation/analysis/bin/libenergytraceccs.dylib: Mach-O 64-bit dynamically linked shared library x86_64
+emulation/analysis/bin/libTraceFactory.dylib:   Mach-O 64-bit dynamically linked shared library x86_64
+DebugServer/bin/DSLite:                         Mach-O 64-bit executable x86_64
+
+## DSLite help (first line)
+DSLite version 21.0.0.4166
+
+## codesign -dvv libsqlite3.dylib (shipped)
+emulation/analysis/bin/libsqlite3.dylib: code object is not signed at all
+
+## otool -L and -D libsqlite3.dylib (patched copy)
+out/energytrace-mac/patched/libsqlite3.dylib:
+@rpath/libsqlite3.dylib
+out/energytrace-mac/patched/libsqlite3.dylib:
+	@rpath/libsqlite3.dylib (compatibility version 0.0.0, current version 0.0.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1336.61.1)
+	/usr/lib/libc++.1.dylib (compatibility version 1.0.0, current version 1600.157.0)
+
+## Where the switch result is used (grep -n isTraceSupported in the trace-config source): the Trace menu and commands register only when it is true
+102:function isTraceSupported(isTraceEnabledInPreferences: boolean): boolean {
+133:        TRACE_FEATURE_FLAGS.isTraceSupported = isTraceSupported(this.tracePreferences[TRACE_ENABLE]);
+796:        if (TRACE_FEATURE_FLAGS.isTraceSupported) {
+1171:        if (TRACE_FEATURE_FLAGS.isTraceSupported) {
+
+## EnergyTrace.enable in the session config sent to the trace server (grep -n -A1)
+886:                EnergyTrace: {
+887-                    enable: TRACE_FEATURE_FLAGS.getEnergyTraceInProgress(coreFullName) || TRACE_FEATURE_FLAGS.getETplusInProgress(coreFullName),
+
+## The probe driver files libenergytraceccs needs, and where they are (otool -L, then ls)
+	@rpath/libxdsfast3.dylib (compatibility version 0.0.0, current version 0.0.0)
+	@rpath/libjscxds110.dylib (compatibility version 0.0.0, current version 0.0.0)
+/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/libjscxds110.dylib
+/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/libxdsfast3.dylib
+
+## The Trace Compass server is an off-by-default preference (grep -n -A3 TRACE_SERVER_ENABLE in trace-server-preference.ts from the archive)
+30:        [TRACE_SERVER_ENABLE]: {
+31-            type: 'boolean',
+32-            default: false,
+33-            description: 'Enable if you wish to use the open source Trace Compass Server executable for working with e.g. LTTng files' +
+34-                '  (CCS must be restarted for change to take effect)',
+
+## libCloudTrace.dylib is a websocket server (strings | grep -c websocketpp; the port line)
+68
+Running server on port %d
+Failed to listen on port %u: %s
+
+## Decoder names in libenergytraceccs.dylib (strings | grep DecoderStateMachine)
+23DecoderStateMachineLPRF
+23DecoderStateMachineNoET
+25DecoderStateMachineMSP432
+
+## Core Trace and EnergyTrace enable flags live in the same file and menu (grep -n in trace-menu-contribution.ts); the gate itself is the isTraceSupported check at lines 796 and 1171 above
+473:        TRACE_FEATURE_FLAGS.setCoreTraceEnabled(coreName, this.isDebugSessionActive && this.isCoreTraceSupported(coreName)); // Bruce: disable if not supported
+476:        TRACE_FEATURE_FLAGS.setEnergyTraceEnabled(coreName, this.isDebugSessionActive && TRACE_FEATURE_FLAGS.getEnergyTraceSupported(coreName));
+
+## External sources quoted on the page were read on 2026-10-06 and are not saved here: CCStudio 21.0.1 user's guide 'Trace' section; E2E threads 880175, 918854, 1466304, 1579854; TI tracker EXT_EP-12168; SPRUI94 3.6.5; SLAU869E 2.3.2 and 2.6; SLAU873 (LP-MSPM0G3507 user's guide); SPRUJ01 (LP-XDS110ET quick start).

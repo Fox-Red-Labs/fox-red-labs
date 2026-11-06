@@ -1,0 +1,7 @@
+shield:
+  name: boostxl_edumkii_gpiospi
+  full_name: BOOSTXL-EDUMKII, screen over GPIO SPI (for Zephyr without an MSPM0 SPI driver)
+  vendor: ti
+  supported_features:
+    - display
+    - input

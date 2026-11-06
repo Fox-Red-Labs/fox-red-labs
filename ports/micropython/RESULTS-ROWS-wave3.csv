@@ -1,0 +1,8 @@
+board,test,variant,status,value,value_hi,runs,clock_mhz,conditions,date,source,checked,note
+mspm0g3519,port_flash_bytes,micropython-full-spi,measured,179832,,1,,MicroPython v1.29.0 plus the MSPM0 port with machine.SPI; GNU Arm Embedded 14.3.1 -Os; text+data from the size tool,2026-10-20,ports/micropython/results/build-log.txt,build-log,
+mspm0g3519,micropython_lcd_fill_ms,full,measured,147.4,,3,80,320x480 fill with spi.write_repeat; SPI1 20 MHz; ST7796S; three fills 147.99/147.68/147.68 ms,2026-10-20,ports/micropython/README.md,camera,red fill with green and blue boxes seen on the panel
+mspm0g3519,micropython_lcd_fill_ms,full-python-loop,measured,158.7,,1,80,same fill with one spi.write call per row from a Python loop,2026-10-20,ports/micropython/README.md,,
+mspm0g3519,micropython_lcd_fill_ms,full-40mhz,rejected,74.4,,2,80,SPI1 at 40 MHz: transfer time only; panel ignored the writes (old picture stayed),2026-10-20,ports/micropython/README.md,camera,not a usable speed
+mspm0g3519,micropython_touch_read_us,full,measured,1426,,50,80,FT6336U 5 bytes via SoftI2C at the 400 kHz setting; internal pull-ups plus board pull-ups,2026-10-20,ports/micropython/README.md,,touch IDs 0x11 0x64 firmware 18 read
+mspm0g3519,micropython_touch_finger_track,full,waiting,,,,,paint demo is running; a finger drag on the screen is not yet tested,2026-10-20,ports/micropython/README.md,,
+mspm0g3519,micropython_pystone,full,not_run,,,,80,still no speed number; a pystone script is a separate run,2026-10-20,ports/micropython/README.md,,

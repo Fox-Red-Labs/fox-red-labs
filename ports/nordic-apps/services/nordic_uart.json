@@ -1,0 +1,8 @@
+{
+  "service": "Nordic Uart",
+  "uuid": "6e400001-b5a3-f393-e0a9-e50e24dcca9e",
+  "characteristics": [
+    {"name": "Rx", "uuid": "6e400002-b5a3-f393-e0a9-e50e24dcca9e", "properties": ["write", "write-no-response"], "length": 244, "variable": true},
+    {"name": "Tx", "uuid": "6e400003-b5a3-f393-e0a9-e50e24dcca9e", "properties": ["notify"], "length": 244, "variable": true}
+  ]
+}

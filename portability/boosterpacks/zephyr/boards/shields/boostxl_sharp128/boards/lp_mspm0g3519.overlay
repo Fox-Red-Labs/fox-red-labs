@@ -1,0 +1,8 @@
+/*
+ * BOOSTXL-SHARP128 on the lp_mspm0g3519: connector and SPI labels.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <boosterpack/lp_mspm0g3519.dtsi>
+
+#include "../common.dtsi"

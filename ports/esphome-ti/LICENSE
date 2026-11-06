@@ -1,0 +1,12 @@
+SPDX-License-Identifier: BSD-3-Clause (the source files here); GPL-3.0-only (a firmware image built from them)
+
+The platform files here (the Python in components/, the YAML files and the scripts) and the shim sources under
+components/*/shim are written by Fox Red Labs and licensed under the BSD-3-Clause license of the repository's
+root LICENSE. The shim sources do not stand alone: they replace the hardware layer of ESPHome and are
+compiled together with ESPHome's C++ runtime (esphome/core and the components), which is licensed under the
+GNU General Public License, version 3 (ESPHome's Python code is MIT). A firmware image built from this folder
+is therefore a combined work under GPLv3, and anyone who passes that image on must offer its complete
+corresponding source under GPLv3, which includes these shim sources and any change made to ESPHome. The
+image also links Texas Instruments SDK code and libraries under their own licenses; check each for
+compatibility with GPLv3 before passing an image on. Reading, copying or reusing the source files in this folder on their own is covered by the BSD-3-Clause
+license only.

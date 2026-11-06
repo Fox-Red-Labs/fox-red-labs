@@ -1,0 +1,34 @@
+// @cliArgs --board /ti/boards/LP_MSPM0L1306 --rtos nortos
+//@cliArgs --device "MSPM0L130X" --package "VQFN-32(RHB)" --part "Default"
+//@v2CliArgs --device "MSPM0L1306" --package "VQFN-32(RHB)"
+// Port of msp430fr243x_euscia0_uart_01: 9600 baud echo, receive interrupt, chip in deep sleep between bytes.
+// UART0 is clocked from the 32768 Hz LFCLK with 3x oversampling: the only mode in which UART0 keeps receiving in STANDBY1.
+// It echoes single typed characters; a back-to-back burst loses bytes (PORT.md).
+const Board  = scripting.addModule("/ti/driverlib/Board", {}, false);
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+
+Board.configureUnused = true;
+
+GPIO1.$name                          = "GPIO_LEDS";
+GPIO1.associatedPins[0].$name        = "USER_LED_1";
+GPIO1.associatedPins[0].assignedPort = "PORTA";
+GPIO1.associatedPins[0].assignedPin  = "0";
+GPIO1.associatedPins[0].initialValue = "CLEARED";
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.txPin.$assign = "PA8";
+UART1.peripheral.rxPin.$assign = "PA9";
+UART1.uartClkSrc               = "LFCLK";
+UART1.ovsRate                  = "3";
+UART1.targetBaudRate           = 9600;
+UART1.enableFIFO               = true;
+UART1.rxFifoThreshold          = "DL_UART_RX_FIFO_LEVEL_ONE_ENTRY";
+UART1.enabledInterrupts        = ["RX"];
+
+SYSCTL.powerPolicy = "STANDBY0";
+SYSCTL.clockTreeEn = true;

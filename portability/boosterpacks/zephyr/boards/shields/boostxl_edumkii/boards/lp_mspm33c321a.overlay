@@ -1,0 +1,12 @@
+/*
+ * LP-MSPM33C321A, BoosterPack site 1.
+ * Joystick X (pin 2) is PA18 = ADC1 channel 3, Y (pin 26) is PB27 = ADC1
+ * channel 14. Zephyr's board file for this LaunchPad has no GPIO, SPI or ADC
+ * node, so this overlay documents the pins and the build stops in devicetree.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <boosterpack/lp_mspm33c321a.dtsi>
+
+#include "../common.dtsi"

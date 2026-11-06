@@ -1,0 +1,301 @@
+{
+ "target": "TI AM13: ports of MSP430 idioms (reported from vendor documents, with tested traps from runs on the board)",
+ "impl": [
+  {
+   "idiom": "memory.persistent_variable",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "redesign",
+   "replace": "No FRAM. Use the last sector (2 kB) of flash bank 1; the program lives in bank 0. DL_Flash_program(addr, buf, bytes) and DL_Flash_eraseSector(addr), return DL_FLASH_SUCCESS.",
+   "trap": "Never erase or program the bank the program runs from (the SDK flash example says so). A tool that loads the program may erase whole banks: a load that erases only bank 0 leaves the data in bank 1 alone.",
+   "check": "a counter read after a software reset equals the last value written",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/flash (main.c, banks); SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Tables 3-6 and 3-7 for the MSP430 side",
+   "status": "reported",
+   "id": "am13:memory.persistent_variable/from-msp430"
+  },
+  {
+   "idiom": "storage.append_log_counter",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "Same log as the MSPM0 entry with 256 slots of 8 bytes per 2 kB sector; DL_Flash_program for a slot and DL_Flash_eraseSector when full.",
+   "trap": "As on MSPM0: a power loss between erase and first program loses the count.",
+   "check": "count after N resets is N more; the log wraps once without losing the count",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/flash",
+   "status": "reported",
+   "id": "am13:storage.append_log_counter/from-msp430"
+  },
+  {
+   "idiom": "memory.nvm_write_unprotect",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "direct",
+   "replace": "Nothing to open: DL_Flash_program and DL_Flash_eraseSector take the address and do the unprotect. Delete the SYSCFG0 writes.",
+   "trap": "Flash protection registers (FlashEraseProtectionA and B) can lock sectors; check them if a call fails.",
+   "check": "program then read back",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/flash",
+   "status": "reported",
+   "id": "am13:memory.nvm_write_unprotect/from-msp430"
+  },
+  {
+   "idiom": "memory.nvm_wait_states",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "direct",
+   "replace": "Nothing to port: the SDK's Device_Init sets the flash wait states for the 200 MHz clock.",
+   "trap": "Do not copy the 8 MHz FRAM limit.",
+   "check": "the program runs",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Section 3.4.2",
+   "status": "reported",
+   "id": "am13:memory.nvm_wait_states/from-msp430"
+  },
+  {
+   "idiom": "power.sleep",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "DL_SYSCTL_setPowerPolicyRUNSLEEP() then __WFI() for sleep; DL_SYSCTL_setPowerPolicySTOP() for deep sleep with PD0 peripherals running; STANDBY0 or STANDBY1 for the lowest states.",
+   "trap": "Tested 2026-10-21: a program that entered STANDBY0 with only the watchdog interval timer as a wake source never woke, and the debugger could not connect afterwards (DSLite error -613, OpenOCD -613); a power-cycle of the probe's USB port, xds110reset and connect-under-reset did not recover it. Give STANDBY a GPIO wake pin, and keep a way back to a debuggable state (a delay before sleeping, a button to hold).",
+   "check": "the wake interrupt runs; the debugger still connects after a reset",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/sysctl/sysctl_low_power_modes (README_AM13E230X.md)",
+   "status": "reported",
+   "id": "am13:power.sleep/from-msp430"
+  },
+  {
+   "idiom": "power.deep_sleep_timer_wake",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "redesign",
+   "replace": "STOP with WWDT in interval mode (power domain 0, LFOSC) as the wake source: DL_SYSCTL_setPowerPolicySTOP(). The SDK documents the watchdog as the STOP wake source and a GPIO as the STANDBY wake source.",
+   "trap": "Do not use STANDBY0 with only the watchdog timer: see power.sleep above.",
+   "check": "CPU-clock ticks across the sleep are a tiny fraction of the sleep time; the wake period matches a wall clock",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/sysctl/sysctl_low_power_modes (README_AM13E230X.md)",
+   "status": "reported",
+   "id": "am13:power.deep_sleep_timer_wake/from-msp430"
+  },
+  {
+   "idiom": "power.shutdown_pin_wake",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "DL_SYSCTL_setPowerPolicySHUTDOWN(); reset cause DL_SYSCTL_RESET_CAUSE_BORWAKESHUTDN on wake.",
+   "trap": "As on MSPM0, an image that sleeps at once cannot be debugged; stay awake for seconds first.",
+   "check": "reset cause reads wake from shutdown",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/sysctl/sysctl_low_power_modes; dl_sysctl.h reset cause names",
+   "status": "reported",
+   "id": "am13:power.shutdown_pin_wake/from-msp430"
+  },
+  {
+   "idiom": "system.reset",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "direct",
+   "replace": "NVIC_SystemReset(); DL_SYSCTL_getResetCause() returns the AM13 names (PORHWFAIL, POREXNRST, BORWAKESHUTDN, CPUSW, SYSDBG and others).",
+   "trap": "The enum names differ from the MSPM0 ones (BOR_WAKE_FROM_SHUTDOWN becomes BORWAKESHUTDN); the shim header does not map them.",
+   "check": "cause differs after a software reset from after power-up",
+   "cite": "AM13E2x SDK source/driverlib/am13e230x/dl_sysctl.h",
+   "status": "reported",
+   "id": "am13:system.reset/from-msp430"
+  },
+  {
+   "idiom": "wdt.watchdog",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "WWDT through the SysConfig watchdog module in watchdog mode.",
+   "trap": "Window mode: open the window fully when porting a plain MSP430 watchdog.",
+   "check": "unfed watchdog resets; fed one does not",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/wwdt/wwdt_window_mode",
+   "status": "reported",
+   "id": "am13:wdt.watchdog/from-msp430"
+  },
+  {
+   "idiom": "timer.interval_watchdog_as_timer",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "SysConfig WWDT in INTERVAL mode, sleepMode true, interrupt registered (registerInterrupt); the handler is named by SysConfig (APP_WWDT_0_INT_Handler for an instance named APP_WWDT_0). 15-bit period with divider 1 is 1 s.",
+   "trap": "Divider 2 with 15 bits is 2 s (the SDK example); set divider 1 for 1 s.",
+   "check": "one interrupt per second, no reset",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/wwdt/wwdt_interval_timer_mode",
+   "status": "reported",
+   "id": "am13:timer.interval_watchdog_as_timer/from-msp430"
+  },
+  {
+   "idiom": "time.periodic_irq",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "SysConfig timer module (periodic mode) with registerInterrupt; the handler is named by the instance.",
+   "trap": "A timer in power domain 1 stops in STOP and STANDBY.",
+   "check": "count of interrupts in 10 s",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/timer/timer_periodic_interrupt",
+   "status": "reported",
+   "id": "am13:time.periodic_irq/from-msp430"
+  },
+  {
+   "idiom": "flash.write",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "redesign",
+   "replace": "DL_Flash_eraseSector and DL_Flash_program in bank 1 (2 kB sectors).",
+   "trap": "Never the bank the program runs from.",
+   "check": "read back equals what was written",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/flash",
+   "status": "reported",
+   "id": "am13:flash.write/from-msp430"
+  },
+  {
+   "idiom": "gpio.release_after_lowpower_reset",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "Nothing after a normal reset. After SHUTDOWN wake the SDK sysctl example re-initialises the pins; follow it.",
+   "trap": "Re-run SYSCFG_DL_init after SHUTDOWN wake.",
+   "check": "pin state after wake equals the state set before sleep",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/sysctl/sysctl_low_power_modes",
+   "status": "reported",
+   "id": "am13:gpio.release_after_lowpower_reset/from-msp430"
+  },
+  {
+   "idiom": "gpio.unused_pins_safe",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "Park unused pins in SysConfig; the AM13 SysConfig has no single configureUnused switch.",
+   "trap": "Check each pin against the BoosterPack headers.",
+   "check": "unused pins read back as set",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/gpio",
+   "status": "reported",
+   "id": "am13:gpio.unused_pins_safe/from-msp430"
+  },
+  {
+   "idiom": "clock.low_freq_aclk",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "LFOSC (32 kHz internal) runs the PD0 peripherals in STANDBY; peripherals that run from it (WWDT) need no clock setup.",
+   "trap": "STOP and STANDBY limit PD0 peripherals to 4 MHz and 32 kHz.",
+   "check": "interval timer measured against a wall clock",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/sysctl/sysctl_low_power_modes (README_AM13E230X.md)",
+   "status": "reported",
+   "id": "am13:clock.low_freq_aclk/from-msp430"
+  },
+  {
+   "idiom": "clock.fll_dco_trim",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "none",
+   "replace": "No trim loop: the clock tree is set in SysConfig and Device_Init.",
+   "trap": "Do not port Software_Trim().",
+   "instead": "the SysConfig SYSCTL block",
+   "check": "measured clock",
+   "cite": "SLAAE74B, Migration Guide From MSP430 MCUs to MSPM0 MCUs, Rev. B, June 2025, Table 3-2",
+   "status": "reported",
+   "id": "am13:clock.fll_dco_trim/from-msp430"
+  },
+  {
+   "idiom": "uart.rx_wake_deep_sleep",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "redesign",
+   "replace": "UART receive interrupt (SysConfig uart module, registerInterrupt, FIFO on; handler APP_UART_0_INT_Handler) drained in a loop. Wake from STOP or STANDBY on a received byte is not documented in the SDK examples and was not tried.",
+   "trap": "Do not combine with STANDBY on this board until a wake pin is configured: see power.sleep.",
+   "check": "a typed byte echoes",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/uart/uart_external_loopback_interrupt",
+   "status": "reported",
+   "id": "am13:uart.rx_wake_deep_sleep/from-msp430"
+  },
+  {
+   "idiom": "timer.capture_compare_pwm",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "AM13 has MCPWM modules for motor PWM and TIMG/TIMA-style timers; the SysConfig timer module has no PWM mode on this SDK (portability/shim/mspm0_on_am13e230 carries the generated MSPM0 PWM init instead).",
+   "trap": "Use the MCPWM module for motor outputs.",
+   "check": "frequency and duty on a logic analyzer",
+   "cite": "AM13E2x SDK source and portability/shim/mspm0_on_am13e230/README.md",
+   "status": "reported",
+   "id": "am13:timer.capture_compare_pwm/from-msp430"
+  },
+  {
+   "idiom": "spi.controller_init",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "SysConfig SPI instance.",
+   "trap": "Check the mode with a loopback.",
+   "check": "a loopback returns the bytes sent",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/spi",
+   "status": "reported",
+   "id": "am13:spi.controller_init/from-msp430"
+  },
+  {
+   "idiom": "i2c.controller_init",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "adapter",
+   "replace": "SysConfig I2C instance.",
+   "trap": "7-bit address.",
+   "check": "a device ID reads back",
+   "cite": "AM13E2x SDK 26.01.00.03 examples/driverlib/i2c",
+   "status": "reported",
+   "id": "am13:i2c.controller_init/from-msp430"
+  },
+  {
+   "idiom": "vendor.no_equivalent",
+   "families": [
+    "AM13"
+   ],
+   "variant": "from-msp430",
+   "difficulty": "none",
+   "replace": "RTC code has no tested replacement here; this repo's profile for the LP-AM13E230 lists RTC missing.",
+   "trap": "Do not stub RTC registers.",
+   "instead": "a timer for elapsed time",
+   "check": "behavior that the call served is checked by name",
+   "cite": "portability/everywhere/profiles.json (hw_missing)",
+   "status": "reported",
+   "id": "am13:vendor.no_equivalent/from-msp430"
+  }
+ ]
+}

@@ -1,0 +1,49 @@
+# Pumpkin Patrol: an original tune for the chiptune player
+# Composer and arrangement: ours, 2026-10-25. E minor with the Phrygian F and a tritone (E to B-flat) for the spooky
+# color, 144 beats a minute, 36 bars. A: the tune, B: the patrol march, then both again with all drums.
+# One row is an eighth note. Columns: lead (pulse 25%) | harmony (pulse 50%) | bass (triangle) | drums (noise).
+vol 11 5 13 8
+tempo 144
+# intro: the bass creeps E to F (ours throughout)
+. . . . . . . . | B3 . B3 . B3 . B3 . | E2 - - - F2 - - - | . . . . . . h -
+. . . . . . . . | B3 . B3 . A#3 . A#3 . | E2 - - - F2 - - - | k - . . . . h h
+# A: the tune
+E5 G5 F#5 E5 - B4 E5 - | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k - h - s - h -
+B5 - - - A#5 - B5 . | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k - h - s - h -
+C6 - B5 - A5 - G5 - | A4 C5 E5 C5 A4 C5 E5 C5 | A2 . A2 . A3 . E3 . | k - h - s - h -
+F#5 - - - - . . . | B3 D#4 F#4 A4 B3 D#4 F#4 A4 | B2 . B2 . B3 . F#3 . | k - h - s - h -
+E5 G5 F#5 E5 - B4 E5 - | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k - h - s - h -
+B5 - - - A#5 - B5 . | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k - h - s - h -
+C6 - E6 - D#6 - C6 . | C4 E4 G4 E4 C4 E4 G4 E4 | C3 . C3 . C4 . G3 . | k - h - s - h -
+B5 - - - - . . . | B3 D#4 F#4 A4 B3 D#4 F#4 A4 | B2 . B2 . B3 . F#3 . | k - h - s - h -
+# B: the patrol
+E5 E5 F5 E5 D5 E5 . . | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k k h - s - h h
+G5 G5 A#5 G5 F5 G5 . . | E4 G4 A#4 G4 E4 G4 A#4 G4 | E2 . E2 . E3 . A#2 . | k k h - s - h h
+E5 E5 F5 E5 D5 E5 B4 . | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k k h - s - h h
+C5 - B4 - A#4 - B4 . | B3 D#4 F#4 A4 B3 D#4 F#4 A4 | B2 . B2 . B3 . F#3 . | k k h - s - h h
+E5 E5 F5 E5 D5 E5 . . | F4 A4 C5 A4 F4 A4 C5 A4 | F2 . F2 . F3 . C3 . | k k h - s - h h
+A#5 A#5 B5 A#5 G5 A#5 . . | A#3 D4 F4 D4 A#3 D4 F4 D4 | A#2 . A#2 . A#3 . F3 . | k k h - s - h h
+G5 F5 E5 D5 C5 B4 A#4 B4 | A4 C5 E5 C5 A4 C5 E5 C5 | A2 . A2 . A3 . E3 . | k k h - s - h h
+E5 - - - - . . . | B3 D#4 F#4 A4 B3 D#4 F#4 A4 | B2 . B2 . B3 . F#3 . | k k h - s - h h
+# A again, all drums
+E5 G5 F#5 E5 - B4 E5 - | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k h h h s h k h
+B5 - - - A#5 - B5 . | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k h h h s h k h
+C6 - B5 - A5 - G5 - | A4 C5 E5 C5 A4 C5 E5 C5 | A2 . A2 . A3 . E3 . | k h h h s h k h
+F#5 - - - - . . . | B3 D#4 F#4 A4 B3 D#4 F#4 A4 | B2 . B2 . B3 . F#3 . | k h h h s h k h
+E5 G5 F#5 E5 - B4 E5 - | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k h h h s h k h
+B5 - - - A#5 - B5 . | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k h h h s h k h
+C6 - E6 - D#6 - C6 . | C4 E4 G4 E4 C4 E4 G4 E4 | C3 . C3 . C4 . G3 . | k h h h s h k h
+B5 - - - - . . . | B3 D#4 F#4 A4 B3 D#4 F#4 A4 | B2 . B2 . B3 . F#3 . | k h h h s h k h
+# B again, all drums
+E5 E5 F5 E5 D5 E5 . . | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k h h h s h k h
+G5 G5 A#5 G5 F5 G5 . . | E4 G4 A#4 G4 E4 G4 A#4 G4 | E2 . E2 . E3 . A#2 . | k h h h s h k h
+E5 E5 F5 E5 D5 E5 B4 . | E4 G4 B4 G4 E4 G4 B4 G4 | E2 . E2 . E3 . B2 . | k h h h s h k h
+C5 - B4 - A#4 - B4 . | B3 D#4 F#4 A4 B3 D#4 F#4 A4 | B2 . B2 . B3 . F#3 . | k h h h s h k h
+E5 E5 F5 E5 D5 E5 . . | F4 A4 C5 A4 F4 A4 C5 A4 | F2 . F2 . F3 . C3 . | k h h h s h k h
+A#5 A#5 B5 A#5 G5 A#5 . . | A#3 D4 F4 D4 A#3 D4 F4 D4 | A#2 . A#2 . A#3 . F3 . | k h h h s h k h
+G5 F5 E5 D5 C5 B4 A#4 B4 | A4 C5 E5 C5 A4 C5 E5 C5 | A2 . A2 . A3 . E3 . | k h h h s h k h
+E5 - - - - . . . | B3 D#4 F#4 A4 B3 D#4 F#4 A4 | B2 . B2 . B3 . F#3 . | k h h h s h k h
+# outro
+E5 - G5 - B5 - - - | E4 - G4 - B4 - - - | E2 - - - - - - - | k - h - s - - -
+# the tritone stab, then E
+A#4 . . . E4 - - . | E4 . . . E3 - - . | A#2 . . . E2 - - . | s - . . k - - -

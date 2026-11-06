@@ -1,0 +1,29 @@
+// TI CC35xx shim (copied from the cc27xx platform) for ESPHome's "zephyr" HAL header. Same names, FreeRTOS underneath.
+// Shadows esphome/components/zephyr/hal.h on the include path; ESPHome's own file is not edited.
+#pragma once
+#ifdef USE_ZEPHYR
+#include <cstdint>
+extern "C" {
+#include <FreeRTOS.h>
+#include <task.h>
+}
+#define IRAM_ATTR
+#define PROGMEM
+// The generated main.cpp passes these to ZephyrGPIOPin; the shim ignores them.
+#define DEVICE_DT_GET_OR_NULL(x) (static_cast<const void *>(nullptr))
+#define DT_NODELABEL(x) 0
+namespace esphome::zephyr {}
+namespace esphome {
+inline bool in_isr_context() { return false; }
+inline void yield() { taskYIELD(); }
+inline void delay(uint32_t ms) { vTaskDelay(pdMS_TO_TICKS(ms)); }
+inline uint32_t millis() { return static_cast<uint32_t>(xTaskGetTickCount()) * portTICK_PERIOD_MS; }
+uint64_t millis_64();
+inline uint32_t micros() { return millis() * 1000u; }
+void delayMicroseconds(uint32_t us);
+uint32_t arch_get_cpu_cycle_count();
+inline uint32_t arch_get_cpu_freq_hz() { return 160000000u; }  // CC3551E Cortex-M33 at 160 MHz
+void arch_feed_wdt();
+void arch_init();
+}  // namespace esphome
+#endif

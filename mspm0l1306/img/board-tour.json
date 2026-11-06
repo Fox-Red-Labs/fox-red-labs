@@ -1,0 +1,378 @@
+{
+ "image": "source-lp-mspm0l1306-slau869e.png",
+ "margin_left": 1000,
+ "margin_right": 1000,
+ "title": "Meet the LP-MSPM0L1306: what each part is for",
+ "credit": "Board drawing: TI SLAU869E, leader lines removed",
+ "board": "../../docs/boards/lp-mspm0l1306.json",
+ "task_facts": {
+  "head": "What we ran on it",
+  "items": [
+   [
+    "Speed",
+    "CoreMark 78.27 at 32 MHz, 2.45 per MHz: the same per-MHz score as the larger MSPM0G3507 chip at 32 MHz"
+   ],
+   [
+    "What fits",
+    "Standard CoreMark with 144 bytes of RAM spare, Zephyr with our board files, an 8k-parameter AI model; not a 30k one"
+   ],
+   [
+    "Wiring changes",
+    "Only the UART loop test needs any (J16 and J17 to BP, one wire). Everything else runs on the board as shipped"
+   ]
+  ]
+ },
+ "steps": [
+  {
+   "label": [
+    "USB and the debugger",
+    "Plug in here. The top half is a debugger",
+    "(XDS110): it loads your program onto the",
+    "chip and carries the chip's serial text",
+    "to your computer"
+   ],
+   "side": "left",
+   "label_y": 60,
+   "marks": [
+    {
+     "box": [
+      130,
+      0,
+      275,
+      105
+     ]
+    },
+    {
+     "box": [
+      140,
+      230,
+      420,
+      540
+     ]
+    }
+   ],
+   "badge": [
+    300,
+    180
+   ],
+   "anchor": [
+    140,
+    385
+   ]
+  },
+  {
+   "label": [
+    "J101: debugger to chip",
+    "Nine jumpers join the debugger to the chip:",
+    "power, serial, reset, programming. Leave",
+    "them on; take them off only to cut the",
+    "debugger off"
+   ],
+   "side": "left",
+   "label_y": 400,
+   "marks": [
+    {
+     "box": [
+      180,
+      650,
+      580,
+      742
+     ]
+    }
+   ],
+   "anchor": [
+    180,
+    696
+   ]
+  },
+  {
+   "label": [
+    "S1 button (PA18)",
+    "A button your program can read. Held",
+    "while the board resets, it starts TI's",
+    "serial bootloader instead"
+   ],
+   "side": "left",
+   "label_y": 700,
+   "marks": [
+    {
+     "box": [
+      0,
+      712,
+      72,
+      850
+     ]
+    }
+   ],
+   "badge": [
+    110,
+    790
+   ],
+   "anchor": [
+    0,
+    781
+   ]
+  },
+  {
+   "label": [
+    "Header pins J1 to J4",
+    "40 pins that fit BoosterPack plug-in",
+    "modules. Each pin's name is printed",
+    "beside it; 8 are not connected (NC)"
+   ],
+   "side": "left",
+   "label_y": 960,
+   "marks": [
+    {
+     "box": [
+      92,
+      935,
+      178,
+      1372
+     ]
+    },
+    {
+     "box": [
+      838,
+      935,
+      924,
+      1372
+     ]
+    }
+   ],
+   "badge": [
+    60,
+    1150
+   ],
+   "anchor": [
+    92,
+    1150
+   ]
+  },
+  {
+   "label": [
+    "Light sensor D1",
+    "A photodiode read through op-amp 0.",
+    "Jumpers J4, J5 and J6 connect it to",
+    "PA25, PA24 and PA22; take them off",
+    "to use those pins for your own parts"
+   ],
+   "side": "left",
+   "label_y": 1230,
+   "marks": [
+    {
+     "box": [
+      200,
+      1448,
+      372,
+      1548
+     ]
+    },
+    {
+     "box": [
+      212,
+      1572,
+      262,
+      1612
+     ]
+    }
+   ],
+   "badge": [
+    160,
+    1500
+   ],
+   "anchor": [
+    200,
+    1500
+   ]
+  },
+  {
+   "label": [
+    "Thermistor RT1 (PA15)",
+    "Reads room temperature on ADC",
+    "channel 9. The two jumpers marked",
+    "T.PATH and T.PWR connect and power it"
+   ],
+   "side": "left",
+   "label_y": 1520,
+   "marks": [
+    {
+     "box": [
+      400,
+      1440,
+      590,
+      1548
+     ]
+    },
+    {
+     "box": [
+      452,
+      1508,
+      522,
+      1548
+     ]
+    }
+   ],
+   "badge": [
+    480,
+    1680
+   ],
+   "anchor": [
+    400,
+    1600
+   ]
+  },
+  {
+   "label": [
+    "S3: reset",
+    "Restarts your program from the top"
+   ],
+   "side": "right",
+   "label_y": 50,
+   "marks": [
+    {
+     "box": [
+      740,
+      0,
+      880,
+      78
+     ]
+    }
+   ],
+   "badge": [
+    700,
+    40
+   ],
+   "anchor": [
+    880,
+    40
+   ]
+  },
+  {
+   "label": [
+    "S2 button (PA14)",
+    "A second button, free for your program"
+   ],
+   "side": "right",
+   "label_y": 620,
+   "marks": [
+    {
+     "box": [
+      948,
+      712,
+      1020,
+      850
+     ]
+    }
+   ],
+   "badge": [
+    910,
+    700
+   ],
+   "anchor": [
+    1020,
+    781
+   ]
+  },
+  {
+   "label": [
+    "J16 and J17: serial switch",
+    "Where serial pins PA8 and PA9 go.",
+    "XDS (right, as shipped): your computer.",
+    "BP (left): the header, for your own wires"
+   ],
+   "side": "right",
+   "label_y": 880,
+   "marks": [
+    {
+     "box": [
+      412,
+      862,
+      548,
+      955
+     ]
+    }
+   ],
+   "badge": [
+    600,
+    880
+   ],
+   "anchor": [
+    548,
+    908
+   ]
+  },
+  {
+   "label": [
+    "The chip: MSPM0L1306",
+    "What you program: 32 MHz, 64 kB flash,",
+    "4 kB RAM. The RAM runs out first"
+   ],
+   "side": "right",
+   "label_y": 1150,
+   "marks": [
+    {
+     "box": [
+      445,
+      1078,
+      545,
+      1172
+     ]
+    }
+   ],
+   "badge": [
+    600,
+    1245
+   ],
+   "anchor": [
+    545,
+    1125
+   ]
+  },
+  {
+   "label": [
+    "LEDs",
+    "LED1 red on PA0, lit when the pin is low.",
+    "LED2 color: PA26 red, PA13 green,",
+    "PA27 blue. Jumpers J2, J3, J12 and J13",
+    "connect them"
+   ],
+   "side": "right",
+   "label_y": 1420,
+   "marks": [
+    {
+     "box": [
+      600,
+      1440,
+      830,
+      1548
+     ]
+    },
+    {
+     "box": [
+      630,
+      1615,
+      680,
+      1665
+     ]
+    },
+    {
+     "box": [
+      780,
+      1615,
+      830,
+      1655
+     ]
+    }
+   ],
+   "badge": [
+    960,
+    1420
+   ],
+   "anchor": [
+    830,
+    1500
+   ]
+  }
+ ]
+}

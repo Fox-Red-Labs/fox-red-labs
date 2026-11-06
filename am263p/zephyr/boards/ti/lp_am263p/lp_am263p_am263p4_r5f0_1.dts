@@ -1,0 +1,17 @@
+/* Fox Red Labs: LP-AM263P, R5FSS0-1 (core 1), with no console: it runs beside TI's software on core 0, which owns
+ * UART0. Its RAM is the 256 kB region TI's multicore examples give core 1 (0x70080000). */
+/dts-v1/;
+#include <ti/am263p4_r5f.dtsi>
+
+/ {
+	model = "TI LP-AM263P R5FSS0-1 (Fox Red Labs port)";
+	compatible = "frl,lp-am263p-r5f0-1";
+
+	chosen {
+		zephyr,sram = &sram;
+	};
+};
+
+&sram {
+	reg = <0x70080000 DT_SIZE_K(256)>;
+};

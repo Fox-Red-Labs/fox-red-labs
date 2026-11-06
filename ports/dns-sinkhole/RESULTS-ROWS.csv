@@ -1,0 +1,11 @@
+board,test,variant,status,value,value_hi,runs,clock_mhz,conditions,date,source,checked,note
+cc35x1,dns_sinkhole_stage1_answer,fixed-a-record,measured,yes,,1,,dig @board test.example gave NOERROR 192.0.2.1 in 4 ms (first query after idle 674 ms),2026-10-20,ports/dns-sinkhole/measure.py,by-us,
+cc35x1,dns_blocked_latency_median_ms,71492-domains,measured,6,,3,,"100 queries per run from the Mac over Wi-Fi, dig; runs gave 6, 7, 6",2026-10-20,ports/dns-sinkhole/measure.py,by-us,
+cc35x1,dns_blocked_latency_p95_ms,71492-domains,measured,20,,3,,"same runs; 20, 30, 20",2026-10-20,ports/dns-sinkhole/measure.py,by-us,
+cc35x1,dns_allowed_latency_median_ms,71492-domains,measured,70,,3,,"100 made-up names via the board; gateway direct 52 ms median; runs 64, 79, 70",2026-10-20,ports/dns-sinkhole/measure.py,by-us,via-board
+cc35x1,dns_allowed_latency_p95_ms,71492-domains,measured,172,,3,,"same runs; gateway direct p95 99; board 112, 142, 172",2026-10-20,ports/dns-sinkhole/measure.py,by-us,via-board
+cc35x1,dns_hardware_random_id,psa_generate_random,measured,yes,,1,,console line hardware random IDs: yes,2026-10-20,ports/dns-sinkhole/firmware/dns_sinkhole.c,by-us,
+cc35x1,dns_table_bytes_per_10k_domains,40-bit-hash,measured,50000,,1,,gen_blocklist.py on StevenBlack/hosts 2026-10-18: 71492 names gave 357460 bytes,2026-10-20,ports/dns-sinkhole/gen_blocklist.py,by-us,5 bytes per domain
+cc35x1,dns_blocker_static_ram_bytes,full,measured,730,,1,,link map of mqtt_client.out: .bss.slots 0x280 plus .data 0x58 and 0x2,2026-10-20,ports/dns-sinkhole/build.sh,by-us,packet buffers come from the shared lwIP pool; whole image bss 482405 bytes
+cc35x1,dns_image_flash_bytes,71492-domains,measured,1587454,,1,,"FLASH_NON_SECURE used, link map",2026-10-20,ports/dns-sinkhole/build.sh,by-us,includes the 357460-byte table
+cc35x1,dns_max_list_domains,flash-slot,measured,304298,,1,,"slot 2751488 B minus 1229994 B code at 5 B each; link-time arithmetic, not boot-tested",2026-10-20,ports/dns-sinkhole/README.md,by-us,application slot set by the Toolbox flash map

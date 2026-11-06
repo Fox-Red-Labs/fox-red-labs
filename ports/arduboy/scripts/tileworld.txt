@@ -1,0 +1,5 @@
+# TileWorld: walk right for 60 frames, then jump with A.
+0 NONE
+20 RIGHT
+80 RIGHT+A
+85 NONE

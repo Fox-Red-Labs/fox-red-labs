@@ -1,0 +1,17 @@
+Upstream: https://github.com/nvidia-holoscan/holoscan-sensor-bridge
+Commit: 4b192aee3fbf1cfa35a498c592c0f5d4081b4cdc (2026-09-08, "MPF200-ETH-SENSOR-BRIDGE-R2 Support (#130)")
+Licence: Apache-2.0 (LICENSE in this folder; SPDX headers in every file)
+Taken: src/hololink/emulation (the HSB Emulator: device-side BOOTP, ECB, RoCE v2 / CoE data planes, Linux and STM32 targets)
+       and the two header-only core files it includes (src/hololink/core/serializer.hpp, deserializer.hpp).
+Dropped: examples/*.cu (CUDA utilities, not buildable here).
+Unmodified. Our build files, stub and programs are in tda4/hsb/ (docs/repo-layout.md: upstream code stays unmodified in third-party/).
+Retrieved 2026-10-10 by git clone --depth 1.
+
+Review note (2026-10-10): a commit security scan flagged unvalidated lengths in the STM32 target (src/STM32/spi.cpp and
+siblings). That target is NVIDIA's microcontroller port; it is not built or run here (only src/common and src/linux are
+compiled, on the TDA4VM, on a private bench network). Upstream code is left as is; report upstream if it matters to a reader.
+
+Second review note (2026-10-10): the same scan flagged src/common/hsb_emulator.cpp, which we do build: the ECB control-plane
+handler takes the address count from the UDP length field without checking it against the received buffer. Upstream
+behaviour, unmodified here. Treat the emulator as a bench tool on a private link between the board and one host, never on
+a shared or untrusted network. Worth reporting upstream; a fix would be a patch file in tda4/hsb, not an edit here.

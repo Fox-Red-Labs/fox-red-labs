@@ -1,0 +1,163 @@
+Fox Red Labs
+Copyright (c) 2026 Fox Red Labs
+
+Fox Red Labs is an independent project. It is not affiliated with, sponsored by, or endorsed by
+Texas Instruments Incorporated. Texas Instruments, TI, LaunchPad, BoosterPack, SimpleLink, MSPM0, C2000 and
+Code Composer Studio are trademarks of Texas Instruments Incorporated and are used here only to name the
+products the work was done on.
+
+How to read this file. The root LICENSE covers what Fox Red Labs wrote. Everything below keeps the license it
+came with. Each folder named here holds the license text, and most hold a SOURCE.md with the upstream, the pinned
+version and checksums. Where a license here is stricter than BSD-3-Clause, the root LICENSE lists it under
+"Exceptions" and that license governs that folder.
+
+1. TEXAS INSTRUMENTS CODE
+
+Texas Instruments SDK examples, generated configuration files and Edge AI model code (MSPM0 SDK 2.11, MSPM33 SDK
+1.04, AM13E2 SDK, SimpleLink Low Power F2 and F3 SDKs, SimpleLink Wi-Fi SDK 10.20, C2000Ware, TI's prop_rf
+examples, TI's simplelink-zephyr fork). Copyright (c) Texas Instruments Incorporated. In this copy, 231 files
+carry a TI copyright line and one of three licenses:
+
+  218 files, TI's BSD-3-Clause header, kept unchanged. Where Fox Red Labs changed a file, a "Modified by Fox Red
+      Labs" block sits under that header.
+    9 files, Apache-2.0 under a TI copyright (SPDX line in each file): the Zephyr wrappers and overlays in
+      third-party/ti-cc140xp-host/, mspm0l1306/zephyr/ and portability/zephyr-mspm0/. The Apache-2.0 text is
+      third-party/ti-cc140xp-host/LICENSE-simplelink-zephyr.
+    4 files, TI's "Limited License" (see below).
+
+Four more files name TI in prose or comments and are Fox Red Labs files. The hand-edited copies of TI examples are:
+    cc1354p10/radio-rx/rfrx.c, partner.c, RFQueue.c, RFQueue.h, main_nortos.c, rfrx.syscfg
+      (TI prop_rf rfPacketRx, F2 SDK 8.33.00.16)
+    cc35x1/chained-demo/chained_app.c, ota_glue.c, prov_glue.c, wifi_if.c
+      (TI mqtt_client, ota_example, ble_wifi_provisioning, SimpleLink Wi-Fi SDK 10.20.00.39)
+    portability/three-ways/tidrivers/*/ti_drivers_config.c and .h
+      (TI adc_singlechannel and uart_echo, MSPM0 SDK 2.11.00.07)
+    am13e230/foc-drv8376/ (TI's AM13E2 SDK motor-control solution, ported to the DRV8376EVM; the upstream's own
+      README is kept as UPSTREAM-README_AM13E230X.md), board-to-board/ble-cc2340r5-central/ (TI basic_ble, F3 SDK
+      9.21), border-router/host-cc1354/ (ot-ti), cc2340r5/zigbee-alarm/ (TI Zigbee and FreeRTOS example files),
+      cc2755p10/ble-light/frl_light.c (derived from TI's simple_gatt_profile.c),
+      mspm0g5187/wakeword/wakeword_detection_ai_npu.c, third-party/ti-cc140xp-host/host/ (TI CC140xP host driver)
+
+The TI Limited License. Four files are under it, not under BSD-3-Clause. Source may be modified and redistributed
+only for use with TI devices (devices manufactured by or for TI), with the license reproduced and without using
+TI's name to endorse a product. They are for TI devices only:
+    cc35x1/matter/thermostat/csi/ti/feature_extract.c and feature_extract.h
+    cc2340r5/zigbee/onoff_light/dmm/rcl_stub_dmm.c, and the same file in cc2340r5/zigbee-alarm/dmm/rcl_stub_dmm.c
+The license text, copied from the file headers, is in LICENSE-TI-LIMITED.txt in each of those three folders. The
+headers are unchanged.
+
+Files whose TI header does not permit redistribution (TI Z-Stack 3.0 sample code under TI's old per-user license)
+are not in this repository.
+
+2. OTHER VENDORS' CODE
+
+- STMicroelectronics STM32Cube example code in am13e230/stm32g4-hal/ and ports/stm32-usart-dma-rx-tx/ (9 ST-headed
+  files). BSD-3-Clause, STMicroelectronics. The terms are in am13e230/stm32g4-hal/LICENSE. ST's own unmodified
+  examples are fetched, not stored.
+- Renesas FSP source files in third-party/renesas/ and ports/renesas-ra-fsp/. BSD-3-Clause, Renesas Electronics
+  Corporation; license in third-party/renesas/LICENSE.
+- Raspberry Pi Pico SDK and pico-examples files in third-party/pico-examples/ and ports/pico-sdk/. BSD-3-Clause,
+  Raspberry Pi Ltd; license in third-party/pico-examples/LICENSE.
+- Arm CMSIS-DSP files in cc35x1/matter/thermostat/csi/cmsis/ (52 files). Apache-2.0, Arm Limited; the SPDX line and
+  license text are in each file's header.
+- CMSIS-NN and CMSIS_6 core headers in third-party/cmsis-nn/. Apache-2.0, Arm Limited; license in
+  third-party/cmsis-nn/LICENSE.
+- NVIDIA Holoscan Sensor Bridge emulation sources in third-party/holoscan-sensor-bridge/. Apache-2.0, NVIDIA
+  CORPORATION & AFFILIATES; LICENSE and SOURCE.txt in that folder name the commit.
+- Adafruit CapTouchPaint and PDQ graphics test sketches in portability/arduino/sketches/. MIT, Adafruit Industries; the
+  notice text is kept in each sketch.
+- Adafruit Blinka. The files in am62l-evm/linux-apps/blinka/ are modeled on Blinka's am625x and BeaglePlay board
+  files. MIT, Copyright (c) Adafruit Industries. Blinka itself is installed with pip, not copied here.
+
+3. THIRD-PARTY PROJECTS COPIED UNMODIFIED (third-party/)
+
+MIT: LVGL (third-party/lvgl/; LVGL bundles further libraries, ThorVG, a barcode generator, FreeType interfaces,
+Liberation Sans and others, under their own licenses, listed with SPDX expressions in
+third-party/lvgl/COPYRIGHTS.md), MicroPython (third-party/micropython/, v1.29.0), Plaits and stmlib (Emilie Gillet;
+the name "Mutable Instruments" is not used on derivative works), wasm3 (v0.9.0), llama2.c (Andrej Karpathy),
+Peanut-GB (Mahyar Koshkouei; two small parts from SameBoy, MIT), uLisp (David Johnson-Davies), the
+Adafruit_BusIO and Adafruit_FT6206 Arduino libraries, the Arduboy games crate-confusion and snake.
+Apache-2.0: TFLite Micro (third-party/tflite-micro/, with flatbuffers Apache-2.0 and kissfft BSD-3-Clause), the
+TensorFlow microfrontend (third-party/microfrontend/), liblc3 (v1.1.3), the Arduboy game tileworld, ESPHome
+micro-wake-word-models (Open Home Foundation; their NOTICE file is third-party/micro-wake-word-models/NOTICE and
+carries the wake-word trademark statement; the names "Okay Nabu" and "Hey Jarvis" belong to third parties).
+BSD-3-Clause: Opus (v1.5.2, with the Xiph, Skype and Octasic patent grants in COPYING and
+LICENSE_PLEASE_READ.txt), speexdsp (Xiph.Org Foundation).
+BSD-2-Clause: U8g2 (olikraus, 2.37.1; the Adobe font license is quoted in third-party/u8g2/LICENSE).
+FatFs license (BSD-style, equal to the 1-clause BSD license): FatFs and Petit FatFs (ChaN), third-party/fatfs/ and
+third-party/pff/.
+zlib: the Z80 chip core in third-party/chips/ (Andre Weissflog).
+CC0 1.0: minimp3 (third-party/minimp3/).
+Apache-2.0 OR ISC OR MIT, used here under MIT: mlkem-native and mldsa-native (PQ Code Package, v2.0.0).
+Apache-2.0 plus the EEMBC Acceptable Use Agreement: CoreMark (third-party/coremark/LICENSE.md). Scores quoted by
+Fox Red Labs are not certified EEMBC scores; the LAUNCHXL-F2800137 build is patched for a 16-bit byte and is labelled
+unofficial wherever it appears.
+LGPL-2.1: ArduinoCore-API (third-party/arduino/), unmodified, license file kept.
+BSD-3-Clause: Arduino_GFX (third-party/arduino/). Its fonts keep their own licenses: GNU Unifont under SIL OFL 1.1 or
+GPL-2.0-or-later with the GNU Font Embedding Exception, stated in the file headers. Sources, tags and commits of the
+Arduino libraries are in third-party/arduino/SOURCES.txt.
+GPL-3.0: BitNetMCU (third-party/bitnetmcu/, Tim (cpldcpu), commit 0715bfc). That folder, ports/bitnetmcu/ and
+derivatives of it are under GPL-3.0.
+GPL-2.0 and others: third-party/rp2040-doom/ holds a fetch script and patches only; no upstream source is copied.
+The upstream's code derived from Chocolate Doom is GPL-2.0, its new code BSD-3-Clause, its ADPCM-XQ BSD-3-Clause and
+its emu8950-derived code MIT.
+
+Not copied, fetched at build time: Dhrystone 2.1 (Reinhold P. Weicker) and Embench-IoT (GPL-3.0 for the Embecosm
+benchmarks). Only Fox Red Labs' own harness files are here.
+
+4. PORTS OF UPSTREAM CODE AND GPL FOLDERS (ports/, am62l-evm/)
+
+- ports/doom/. GPL-2.0, id Software, Simon Howard and the doomgeneric contributors. The engine source is not in the
+  repository: fetch.sh downloads a pinned commit and the folder keeps patches and platform layers, all GPL-2.0. The
+  shareware game data is never stored here. Terms: ports/doom/LICENSING.md and ports/doom/LICENSE.
+- ports/openocd-cc23xx/. GPL-2.0-or-later, a flash driver contributed to OpenOCD. License in the folder.
+- am62l-evm/linux/cpu1_start/ and am62l-evm/rpmsg/. Fox Red Labs Linux kernel modules, GPL-2.0 (SPDX line in each
+  module). License in each folder.
+- ports/esphome-ti/. ESPHome is MIT for its Python code and GPLv3 for its C++ runtime; the shim sources in
+  ports/esphome-ti/components/*/shim compile into that runtime. License note in ports/esphome-ti/LICENSE.
+- ports/bitnetmcu/. GPL-3.0, with the BitNetMCU text beside it.
+- ports/stm32-bootloader/. MIT, Ferenc Nemeth.
+- ports/stm32-usart-dma-rx-tx/. MIT, Tilen Majerle (the lwrb middleware included); the 9 ST-headed files are
+  STM32Cube, BSD-3-Clause.
+- ports/esp32-ble-gamepad/. MIT, lemmingDev; license in LICENSE-upstream.txt.
+- ports/arduboy/. Arduboy2, BSD-3-Clause, license in LICENSE-Arduboy2.txt.
+- ports/minmea/. minmea (Kosma Moczek) is cloned at a pinned commit by the build and not stored here; it is offered
+  under WTFPL with an explicit grant of MIT or LGPL-3.0-or-later at your option. The shim files here are Fox Red Labs.
+- ports/microwakeword/. Fox Red Labs code on microWakeWord (Apache-2.0), TFLite Micro (Apache-2.0), the TensorFlow
+  microfrontend (Apache-2.0) and kissfft (BSD-3-Clause).
+- ports/microwakeword/models/hey_sparky.tflite and hey_sparky.json. The Hey Sparky wake-word model. Non-commercial,
+  personal use only: it was trained on data that includes CC BY-NC 4.0 sets. The terms are in
+  ports/microwakeword/models/LICENSE, and a firmware image that embeds the model carries them.
+- Other ports (micropython, llama2c, minimp3, lc3, opus, plaits, wasm3, ulisp, peanut-gb, zx-spectrum, chip8) hold
+  build scripts and patches; the licenses are the ones named in section 3. The chip8 test ROMs (GPL-3.0) are fetched,
+  never stored.
+- Zephyr Project board and sample files, Apache-2.0, The Zephyr Project Contributors. The Zephyr thread_metric
+  porting layer in mspm0l1306/zephyr/ is MIT, Microsoft Corporation and Intel Corporation.
+- OpenThread and ot-ti. BSD-3-Clause, The OpenThread Authors and Texas Instruments.
+
+5. FONTS, DATA AND MEDIA
+
+- Barlow, JetBrains Mono and STIX Two Text fonts (site/fonts/, each with its OFL text beside it). SIL Open Font
+  License 1.1.
+- UCI Room Occupancy Estimation data set, CC BY 4.0, used to train the occupancy models in
+  mspm0g5187/ and the code built from them. Cite as: Singh, A. & Chaudhari, S. (2018). Room Occupancy Estimation
+  [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5P605. The data was converted to windows and
+  used to train; the data set itself is not in this repository.
+- Audio tracks in portability/boosterpacks/audio/tracks/ (IMA ADPCM, cut and filtered from recordings on Wikimedia
+  Commons and Musopen; each .json beside a track holds the source page, license and checksum). Night on Bald
+  Mountain (Musopen), Danse macabre (Philadelphia Orchestra, Leopold Stokowski, Victor 6505, 1925), In the Hall of
+  the Mountain King (Musopen Symphony, 2012) and Toccata in D minor (Ashtar Moira, c. 2006) are public domain as the
+  source pages state. Funeral March of a Marionette (rec_marionette.ima and rec_marionette.json; San Francisco
+  Symphony, Alfred Hertz, HMV D1286): recording date unknown; status unverified. The source page lists it as public
+  domain but gives no recording date, so its US public-domain status has not been confirmed.
+- portability/h264/streams/bbb-640x360.h264. The first 30 pictures of a clip from "Big Buck Bunny", (c) copyright
+  2008, Blender Foundation, www.bigbuckbunny.org, licensed under Creative Commons Attribution 3.0
+  (https://creativecommons.org/licenses/by/3.0/). Cut from the clip in the h264bsd repository's test folder and
+  re-encoded to a raw H.264 stream; no endorsement by the Blender Foundation is implied.
+
+6. BOARD DRAWINGS
+
+Wiring pictures for the Texas Instruments kits are drawn on figures from the kits' public user's guides, which TI
+owns; each picture's caption and its credit file name the guide and the figure. They teach one step on that product and
+are being replaced, board by board, by this project's own photographs. Pictures based on other makers' documents are
+not included.

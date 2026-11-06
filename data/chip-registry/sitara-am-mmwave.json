@@ -1,0 +1,1012 @@
+{
+ "generated": "2026-10-24",
+ "scope": "Sitara and mmWave families: AM13 (AM13E230x), Sitara MCUs AM26x (AM263, AM263P, AM261, AM273x) and AM24x (AM243x), K3 Linux processors (AM62x, AM62A, AM62P, AM62L, AM64x, TDA4VM) and the mmWave radar sensors (IWR6843, IWR6843AOP, AWR6843, IWRL6432, AWRL6432, AWR2944 family). Research only; no board was connected, flashed or reset. Sources: CCStudio 21.0.1 targetdb, GEL and DebugServer flashDB/propertyDB; UniFlash 9.6.0 (DSLite, FlashDLLDB, sitara_mcu and mmWave Python programmers); xPack OpenOCD 0.12.0-7 and TI's OpenOCD fork scripts and the am13e230x.c driver; AM13E230x SDK 26.01.00.03 docs; datasheets SPRSPC3A, SPRSP81E, SPRSP74F, SPRSPA7C, SWRS245D, SPRSP65J, SPRSP58C, SPRSP77E, SPRSP89E, SPRSPA1B, SPRSP56J, SPRSP36L, SWRS219F, SWRS248E, SWRS237C, SWRS298B, SWRS323B; TRMs SPRUJ55D, SPRUJ17I, SPRUJB6B, SPRUIU0E, SPRUIM2J, SPRUIV7C, SPRUJ16C, SPRUJ83E, SPRUJB4A, SPRUIL1D; repo measured facts by path. 'unknown' means no file read answers it. The AM263P board is returned; its notes are history.",
+ "probe_sequence": [
+  {
+   "step": 1,
+   "do": "Read what the probe is (XDS110 on a LaunchPad or EVM, external XDS110/XDS200). Do not pick a tool by the user's word.",
+   "source": "data/routes.json"
+  },
+  {
+   "step": 2,
+   "do": "Try JTAG and read the TAP IDCODE. Mask 0x0FFFFFFF. 0x0BB3802F AM64x/AM243x; 0x0BB7E02F AM62x; 0x0BB8D02F AM62A; 0x0BB9D02F AM62P; 0x0BBA702F AM62L; 0x0BB6402F TDA4VM (J721E); 0x0BB7D02F AM263x; 0x0BB9502F AM263P; 0x0BBA602F AM261x; 0x0BB6A02F AM273x; 0x0BB8902F IWRL6432. AM13 answers with the Arm DAP IDCODE 0x6BA00477 and needs the DEVICEID read.",
+   "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg; ti_am13e230x.cfg; TRMs Table 1-3; iwrl6432boost/README.md"
+  },
+  {
+   "step": 3,
+   "do": "Read the family's device-ID register to get the member: AM26x 0x50D80038; K3 0x43000018 (JTAGID at 0x43000014); AM13 0x60111004 and 0x6011101C. Mask as in each identify entry.",
+   "source": "identify entries"
+  },
+  {
+   "step": 4,
+   "do": "No JTAG answer and a serial port: try the ROM. AM26x and K3 print 'C' at 115200 in UART boot mode; mmWave answers the 0xAA/0x20 ping in flashing mode; AM13 answers the BSL.",
+   "source": "TRMs; UniFlash FlashPython files; bsl_toolkit_am13e230x.md"
+  },
+  {
+   "step": 5,
+   "do": "Write: AM13 through OpenOCD (TI fork) or DSLite or ti-bsl; AM26x and AM24x through DSLite (JTAG flasher) or the UART flasher; K3 by writing the SD card or going by UART or DFU boot to U-Boot; mmWave only through UniFlash or arprog over the serial port.",
+   "source": "write_paths entries"
+  }
+ ],
+ "families": [
+  {
+   "family": "AM13",
+   "members": [
+    {
+     "part": "AM13E23019",
+     "partnum": "0x0BBE",
+     "jtag_idcode": "0x6BA00477",
+     "core": "Cortex-M33 250 MHz, TMU, NPU",
+     "flash": "internal 512 kB (ECC), SRAM 128 kB",
+     "boards": [
+      "LP-AM13E230"
+     ]
+    },
+    {
+     "part": "AM13E23018",
+     "partnum": "0x0BBE",
+     "jtag_idcode": "0x6BA00477",
+     "core": "Cortex-M33 250 MHz, TMU, NPU",
+     "flash": "internal 256 kB (ECC), SRAM 128 kB",
+     "boards": []
+    },
+    {
+     "part": "AM13E23017",
+     "partnum": "0x0BBE",
+     "jtag_idcode": "0x6BA00477",
+     "core": "Cortex-M33 250 MHz, TMU, NPU",
+     "flash": "internal 128 kB (ECC), SRAM 64 kB",
+     "boards": []
+    }
+   ],
+   "members_note": "Names and sizes: SPRSPC3A Table 4-1. Table 7-3 lists PARTNUM 0x0BBE once beside all three rows, so the datasheet does not give a per-member PARTNUM; the flash size comes from the SRAMFLASH factory word. CCStudio carries one device file per member (AM13E23017/18/19.xml) with flash database AM13E2x_128KB/256KB/512KB. The jtag_idcode is the Arm DAP IDCODE the TI OpenOCD config expects; it is Arm's value, not unique to TI.",
+   "debug_port": {
+    "protocol": "JTAG (4-pin, IR length 4) into an Arm CoreSight DAP; CCStudio file names the router CS_DAP and a SEC_AP",
+    "access": "XDS110 (LaunchPad onboard, USB 0451:bef3). CCStudio default connection TIXDS110_Connection.xml. DSLite and TI's OpenOCD fork both reach the M33. CCStudio exposes an optional SWD password (AM13XSWDPassword0..3) and the datasheet lists JTAGLOCK.",
+    "notes": "If the debugger cannot connect, hold BSL_INVOKE high through power-on reset, then send FactoryReset or MassErase over the DSSM mailbox (GEL) or the BSL. TI's board file runs the XDS110 at 10 MHz.",
+    "source": "SPRSPC3A Table 4-1; TI OpenOCD fork ~/ti/ti-openocd scripts/target/ti_am13e230x.cfg and board/ti_am13e230x_launchpad.cfg; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM13E23017.xml; AM13E230x SDK 26.01.00.03 docs user_guide/chapters/getting_started/ccs_debug_tips_am13e230x.md; data/routes.json boards.am13e230"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "JTAG DR scan after reset (default IDCODE)",
+     "field": "full 32 bits",
+     "mask": "0xFFFFFFFF",
+     "value": "0x6BA00477",
+     "source": "TI OpenOCD fork ~/ti/ti-openocd scripts/target/ti_am13e230x.cfg (_DAP_TAPID 0x6ba00477, irlen 4). Arm value: only says 'AM13 DAP', then read DEVICEID."
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x60111004 (DEVICEID in the FACTORY region)",
+     "field": "PARTNUM bits 27:12 = 0x0BBE; MANUFACTURER bits 11:1 = 0x17 (TI); VERSION bits 31:28 masked",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0BBE002F production. Our prototype XAM13E23019 reads 0x0000002F (PARTNUM 0).",
+     "source": "SPRSPC3A section 7.3, Table 7-3; AM13E230x SDK hw_factoryregion.h; data/routes.json boards.am13e230 target.identity (prototype read 2026-10-14 and 2026-10-24)"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x6011101C (SRAMFLASH)",
+     "field": "bits 11:0 main flash kB; bits 13:12 number of flash banks; bits 25:16 SRAM kB",
+     "mask": "per field",
+     "source": "TI OpenOCD fork src/flash/nor/am13e230x.c lines 34 and 627 to 633 (archived copy /Volumes/Seagate/agent-runs-archive/2026-10-18-open-flash-survey/ti-openocd)"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x60111008 (USERID) and 0x60111000 (TRACEID)",
+     "field": "USERID.PART bits 15:0 (0x5377 for AM13E23019GTPDTR), VARIANT bits 23:16 (0x01)",
+     "mask": "0x00FFFFFF",
+     "source": "SPRSPC3A Table 7-4; prototype reads USERID and TRACEID as 0 (data/routes.json)"
+    },
+    {
+     "method": "uart_rom",
+     "addr": "BSL over UART (BSL_UART_RX/TX), password-protected",
+     "field": "`ti-bsl info`",
+     "mask": "",
+     "source": "AM13E230x SDK docs user_guide/chapters/tools_and_utilities/bsl_toolkit_am13e230x.md; SPRSPC3A section 7.11"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "openocd",
+     "status": "TI fork",
+     "detail": "TI's OpenOCD fork (target/ti_am13e230x.cfg, driver `am13`, banks main at 0x00000000 and nonmain at 0x60100000, 0x800-byte sectors, 128-bit ECC program). frl writes main flash this way today; a 512 kB dump plus NONMAIN took 6.7 s without halting the core (E216). xPack OpenOCD 0.12.0-7 has no am13e230x file. The research note of 2026-10-18 says upstream OpenOCD master has it; not checked here.",
+     "erase": "sector (2 kB); never mass erase",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "TI OpenOCD fork ~/ti/ti-openocd scripts/target/ti_am13e230x.cfg; TI fork am13e230x.c; docs/research/open-flash-path-by-family-2026-10-18.md; data/routes.json"
+    },
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "libFlashAM13E2x.dylib with flash database AM13E2x_{128,256,512}KB. Properties: Erase and Program / Program Only / Verify Only; erase Necessary Banks / Entire Flash / Bank 0 / Bank 1; CMDWEPROTA/B sector write protection; 'Program Non-Main Flash' toggle (default off, warns an incorrect Non-Main field can brick the device); range avoidance; checksum. The FlashDLLDB.xml in UniFlash 9.6.0 has no AM13 line, so the AM13 flash path is reached through the device file's FlashDB property, not the part-number table.",
+     "erase": "bank or entire flash",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "ccs_base/DebugServer/flashDB/AM13E2x_512KB_flashDB.json; ccs_base/DebugServer/propertyDB/AM13E2x_512KB_FlashProperties.xml; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM13E23017.xml; not run on hardware by this task"
+    },
+    {
+     "tool": "other",
+     "status": "TI supported",
+     "detail": "ti-bsl (TI BSL Toolkit, Python 3.12+ wheel in SDK tools/am13e230x): info, read, mass-erase, range erase, flash firmware, factory reset (erases NONMAIN and MAIN, reprograms NONMAIN), change baud, start application. UART over a serial port on Windows, Linux and macOS; I2C needs an FT232H. A blank device invokes the BSL by itself. Password file needed for protected operations.",
+     "erase": "mass, range, factory reset",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "AM13E230x SDK 26.01.00.03 docs user_guide/chapters/tools_and_utilities/bsl_toolkit_am13e230x.md; SPRSPC3A section 7.11, Table 7-8; not run here"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "NONMAIN (boot and BSL configuration)",
+     "range": "0x60100000 and 0x60101000, 0x1000 bytes per bank",
+     "why": "Holds boot, BSL and debug-lock configuration. A wrong field can brick the part (CCStudio warning text). Only factory reset reprograms it.",
+     "source": "TI fork am13e230x.c (AM13_FLASH_BASE_NONMAIN, AM13_NONMAIN_SIZE_PER_BANK); AM13E2x_512KB_FlashProperties.xml FlashNonMainWarningText; data/routes.json never_write"
+    },
+    {
+     "region": "FACTORY region",
+     "range": "0x60111000 and up (TRACEID, DEVICEID, USERID, SRAMFLASH, trim)",
+     "why": "Read-only factory data and trim; not a write target.",
+     "source": "SPRSPC3A section 7.3; data/routes.json never_write"
+    },
+    {
+     "region": "ECC words of main flash",
+     "range": "ECC region (address not read)",
+     "why": "The program command generates ECC itself (PROGRAM_128_WITH_ECC); writing it by hand breaks reads.",
+     "source": "TI fork am13e230x.c AM13_PROGRAM_128_BYTEN; data/routes.json never_write"
+    },
+    {
+     "region": "Mass erase and factory reset",
+     "range": "whole device",
+     "why": "Factory reset erases NONMAIN and MAIN and rewrites NONMAIN. Use only to recover a locked part, with owner approval.",
+     "source": "bsl_toolkit_am13e230x.md (Factory Reset); ccs_debug_tips_am13e230x.md"
+    }
+   ],
+   "boot_mode": {
+    "pins": "No boot-mode strap. BSL_INVOKE pin high (level set in NONMAIN) at reset invokes the BSL; a blank part (no reset vector or stack pointer) invokes it automatically; the application can invoke it by SYSRST. LaunchPad: populate jumper J11 and press BSL_INV.",
+    "source": "SPRSPC3A section 7.11; ccs_debug_tips_am13e230x.md"
+   },
+   "recovery": [
+    {
+     "symptom": "Debugger cannot connect to the M33, or stuck after 'Attempting CS_DAP Connection'",
+     "fix": "Pull BSL_INVOKE high (LaunchPad: J11 populated, press BSL_INV), power-on reset, keep it high, issue FactoryReset or MassErase through the DSSM GEL commands. This erases the part: owner approval only.",
+     "source": "AM13E230x SDK ccs_debug_tips_am13e230x.md"
+    },
+    {
+     "symptom": "Blank or bad image",
+     "fix": "BSL over UART (ti-bsl) writes it without a debugger; a blank part invokes the BSL on its own.",
+     "source": "SPRSPC3A section 7.11; bsl_toolkit_am13e230x.md"
+    }
+   ],
+   "backup_restore": "Back up: OpenOCD dump_image of main flash (512 kB) and NONMAIN (E216: 6.7 s, identical to the motor lane's image) or `ti-bsl read` for the readable regions. Restore: OpenOCD flash write with sector erase of main flash. Do not restore NONMAIN unless a factory reset forces it.",
+   "probe": {
+    "board": "XDS110 on the LP-AM13E230; JTAG; OpenOCD board file ti_am13e230x_launchpad.cfg.",
+    "bare_chip": "4-pin JTAG from an XDS110 or XDS200 for debug and flash; or only UART RX/TX plus BSL_INVOKE and NRST for the BSL."
+   },
+   "ccs_device_files": [
+    "AM13E23017",
+    "AM13E23018",
+    "AM13E23019"
+   ],
+   "unknowns": [
+    "PARTNUM per member: Table 7-3 gives one value for all three.",
+    "Whether DSLite flash runs on macOS against AM13: library present, no run recorded here.",
+    "Whether upstream OpenOCD master carries am13e230x (xPack 0.12.0-7 does not).",
+    "Address of the main-flash ECC region.",
+    "BSL password handling on a production-locked part."
+   ]
+  },
+  {
+   "family": "AM26x",
+   "members": [
+    {
+     "part": "AM263P4",
+     "partnum": "DEVICE_ID[31:13] D 0x30884, E 0x30885, K 0x3088B, L 0x3088C, M 0x3088D, N 0x3088E",
+     "jtag_idcode": "0x1BB9502F",
+     "core": "4x Cortex-R5F 400 MHz (+ M4F per the OpenOCD config note)",
+     "flash": "external OSPI; flash-in-package 64 Mb (8 MB) on ZCZ-F",
+     "boards": [
+      "LP-AM263P (measured: reads 0x3088D)"
+     ]
+    },
+    {
+     "part": "AM263P2",
+     "partnum": "DEVICE_ID[31:13] D 0x30844, E 0x30845, K 0x3084B, L 0x3084C, M 0x3084D",
+     "jtag_idcode": "0x1BB9502F",
+     "core": "Cortex-R5F (core count not read)",
+     "flash": "external OSPI",
+     "boards": []
+    },
+    {
+     "part": "AM2634",
+     "partnum": "JTAG Device ID (industrial) M 0x4111BBE6, L 0x41119BE6, K 0x41117BE6, E 0x4110BBE6, D 0x41109BE6; automotive K 0x41117BFE, D 0x41109BFE, D (Grade P) 0x41109C3E",
+     "jtag_idcode": "0x2BB7D02F",
+     "core": "4x Cortex-R5F",
+     "flash": "external QSPI",
+     "boards": [
+      "LP-AM263",
+      "AM263x controlCARD"
+     ]
+    },
+    {
+     "part": "AM2632",
+     "partnum": "JTAG Device ID M 0x4109BBE6, L 0x41099BE6, K 0x41097BE6, E 0x4108BBA6, D 0x41089BA6",
+     "jtag_idcode": "0x2BB7D02F",
+     "core": "2x Cortex-R5F",
+     "flash": "external QSPI",
+     "boards": []
+    },
+    {
+     "part": "AM2631",
+     "partnum": "JTAG Device ID E 0x4104B3A6, D 0x410493A6, D (auto) 0x410493BE",
+     "jtag_idcode": "0x2BB7D02F",
+     "core": "1x Cortex-R5F",
+     "flash": "external QSPI",
+     "boards": []
+    },
+    {
+     "part": "AM2612",
+     "partnum": "JTAG_USER_ID 0x5908xxxx (e.g. AM2612AOFFHMZCZR 0x5908DBFE; AM2612AODFHIZFGR 0x59089BEA)",
+     "jtag_idcode": "0x1BBA602F",
+     "core": "2x Cortex-R5F (+ M4F per OpenOCD note)",
+     "flash": "external OSPI",
+     "boards": [
+      "LP-AM261",
+      "AM261x SOM"
+     ]
+    },
+    {
+     "part": "AM2611",
+     "partnum": "JTAG_USER_ID 0x5904xxxx (e.g. AM2611AOFFHIZCZR 0x5904DBFE)",
+     "jtag_idcode": "0x1BBA602F",
+     "core": "1x Cortex-R5F",
+     "flash": "external OSPI",
+     "boards": []
+    },
+    {
+     "part": "AM2732 (AM273x)",
+     "partnum": "unknown (no ID register found in SWRS245D or SPRUIU0E text)",
+     "jtag_idcode": "0x1BB6A02F",
+     "core": "2x Cortex-R5F + C66x DSP + HSM",
+     "flash": "external QSPI (two chip selects)",
+     "boards": [
+      "AM273x EVM"
+     ]
+    }
+   ],
+   "members_note": "Parts and DEVICE_ID values: AM263P datasheet SPRSP81E Table 4-1 and Table 4-2; AM263x SPRSP74F Table 4-1 (JTAG Device ID row); AM261x SPRSPA7C Table 4-2; AM273x SWRS245D. TAP IDCODEs are the values TI wrote into OpenOCD target/ti_k3.cfg (version nibble ignored by `-ignore-version`). AM263P2 core count and AM263P4 M4F: not read. Boards from CCStudio targetdb/boards (AM263x_LaunchPad, AM263x_ControlCard, AM261x_LaunchPad, AM261x_SOM, evmam273x) and OpenOCD board files ti_am263p_launchpad.cfg, ti_am261_launchpad.cfg, ti_am263_launchpad.cfg, ti_am273_launchpad.cfg. CCStudio 21.0.1 has no LP-AM263P board file (am263p/AGENTS.md).",
+   "debug_port": {
+    "protocol": "JTAG (4-pin) into a CoreSight DAP; OneMCU DebugSS in CCStudio",
+    "access": "XDS110 on each LaunchPad. OpenOCD board files select `transport select jtag`, srst_only, adapter speed 250 kHz. TAP irlen 4, `-expected-id` per SoC, MEM-AP 6, R5 debug base 0x90030000 (0x90030000, 0x90032000, 0x90050000, 0x90052000), power AP 7. DSLite needs a hand-made connection file on AM263P.",
+    "notes": "Connecting with TI's usual connection file switches both R5 clusters to dual-core and clears on-chip RAM; the chip comes out of reset in lockstep (am263p/FAQ.md). OpenOCD upstream declares no flash bank for k3 targets.",
+    "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg (am261, am263p, am263, am273 cases); xPack OpenOCD 0.12.0-7 scripts/board/ti_am263p_launchpad.cfg; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM263Px.xml; am263p/AGENTS.md"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "TAP IDCODE (JTAG DR scan)",
+     "field": "bits 27:12 part number",
+     "mask": "0x0FFFFFFF",
+     "value": "AM263x 0x0BB7D02F; AM263P 0x0BB9502F; AM261x 0x0BBA602F; AM273x 0x0BB6A02F (version nibble 1 or 2 observed in the config; ignored)",
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x50D80038 (TOP_CTRL + 0x38, EFUSE_JTAG_USERCODE_ID)",
+     "field": "AM263P: DEVICE_ID bits 31:13 (0x3088D on the measured board), SAFETY bit 12, PACKAGE bit 11 (0x06 = ZCZ), SPEED bits 10:6, TEMP bits 5:3, FEATURE bits 2:0. AM261x: bits 2:0 package (6 ZCZ, 2 ZFG, 4 ZEJ, 1 ZNC).",
+     "mask": "0xFFFFE000 for the base part",
+     "value": "see members",
+     "source": "TRM SPRUJ55D section 1.5 Table 1-1; datasheet SPRSP81E Table 4-2; GEL AM263_common.gel (TOP_CTRL_U_BASE 0x50D80000, TOP_CTRL_JTAG_USERCODE_ID 0x38), AM261x_reg_offsets.gel (0x38); am263p/README.md (measured read of 0x50D80038)"
+    },
+    {
+     "method": "uart_rom",
+     "addr": "UART0 at 115200 8N1 with boot pins set to UART (SOP[3:0] = 0001)",
+     "field": "the ROM prints 'C' (XMODEM-CRC request); UniFlash checks for the 'CCC' string before it sends the flasher image",
+     "mask": "",
+     "source": "TRM SPRUJ55D Table 5-1, Table 5-2; UniFlash 9.6.0 sitara_mcu/serial/FlashPython.py checkCCCPrint"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 / CCStudio DSLite, flash library libFlashSitaraMCU.dylib (FlashDLLDB: JTAG, TMS470RDX, part numbers beginning AM2). DSLite loads TI's flasher program over JTAG into R5F RAM (ccs_base/sitara_mcu/flasher/: am263x, am263px_cc, am263px_lp, am263px_sip, am261x_lp, am261x_som, am243x_alv, am243x_alx, am273x). Choose board (CC or LP), part (Standard or SIP) or a custom flasher .out. Images and addresses in the device file: SBL 0x60000000, application 0x60081000 (AM263P, AM261x) or 0x60080000 (AM263x, AM273x), XIP 0xE0000000, HSM runtime 0x60040000. Erase: entire flash or a sector list.",
+     "erase": "entire flash or listed sectors",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "ccs_base/DebugServer/bin/FlashDLLDB.xml; ccs_base/DebugServer/propertyDB/AM263Px_FlashProperties.xml; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM263Px.xml, AM263x.xml, AM261x.xml, am273x.xml; Mac use on AM263P recorded in am263p/AGENTS.md (history)"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "UART flash: set boot pins to UART, open UART0 at 115200, send TI's flasher .tiimage by XMODEM-1K, then each file with a header (magic 'BLUF', operation 0xF0 flash, 0xF1 flash+verify, 0xF2/0xF3 XIP, 0xF8/0xF9 MCELF XIP, 0xFE erase). The same protocol is in the MCU+ SDK `tools/boot/uart_uniflash.py` (SDK not installed on this Mac). Application offset must be non-zero and 128 kB aligned. The protocol has verify but no read command: no backup by UART.",
+     "erase": "optype 0xFE (erase) or erase-before-write",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 sitara_mcu/serial/FlashPython.py and FlashPythonUtils.py; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM263Px_Serial.xml, AM261x_Serial.xml, AM273x_Serial.xml; docs/research/open-flash-path-by-family-2026-10-18.md (uart_uniflash.py)"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "Debug, load to RAM and run only: ti_k3.cfg declares no flash bank. TI's board files cover LP-AM263, LP-AM263P, LP-AM261, AM273x. Flash writing through OpenOCD would mean loading TI's flasher by hand: not tried.",
+     "erase": "none",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg (no flash bank); xPack OpenOCD 0.12.0-7 scripts/board/ti_am26*_launchpad.cfg"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "Secondary bootloader (SBL) in external flash",
+     "range": "0x0 to the application offset: SBL at 0x0 (flash offset; CCStudio address 0x60000000)",
+     "why": "The ROM loads the SBL from flash. Erasing it sends the ROM to its UART fallback (OSPI/QSPI modes) or to nothing. Rewrite only with a known-good .tiimage.",
+     "source": "UniFlash 9.6.0 sitara_mcu/serial/FlashPythonUtils.py default_device_config (sbl_offset 0x0); CCStudio devices AM263Px.xml ufImageAddress0 0x60000000; TRM SPRUJ55D Table 5-1"
+    },
+    {
+     "region": "HSM runtime image (security core firmware)",
+     "range": "flash offset 0x40000 (AM263x, AM263P, AM261x); CCStudio address 0x60040000",
+     "why": "The HSM runs it at boot. Treat as part of the boot chain; write only with TI's .hsmimage.bin.",
+     "source": "FlashPythonUtils.py hsmrtimg_offset 0x40000; devices AM263x.xml ufImageAddress2"
+    },
+    {
+     "region": "OSPI PHY tuning pattern sector (AM263P board, measured)",
+     "range": "4 kB sector at flash offset 0x80000, just below the AM263P application image at 0x81000",
+     "why": "TI's flash driver erases and writes it when PHY tuning fails to read back. A backup that skips it loses a block.",
+     "source": "am263p/FAQ.md, am263p/AGENTS.md rule 2 (history, board returned)"
+    },
+    {
+     "region": "Chip-wide eFuse and boot-mode configuration",
+     "range": "TOP_CTRL EFUSE registers (0x50D80000 base)",
+     "why": "One-time programmable; not part of any flash path.",
+     "source": "GEL AM263_common.gel / AM261x_reg_offsets.gel (TOP_CTRL_U_BASE 0x50D80000); no write path read"
+    }
+   ],
+   "boot_mode": {
+    "pins": "SOP[3:0] sampled at PORz release: SPI0_D0 (SOP3), SPI0_CLK (SOP2), OSPI0_D1/QSPI_D1 (SOP1), OSPI0_D0/QSPI_D0 (SOP0). AM263P: 0000 OSPI 4S, 0001 UART, 0010 OSPI 1S, 0011 OSPI 8S, 1011 DevBoot, 1100 xSPI 8D (SFDP). AM263x: 0000 QSPI 4S, 0001 UART, 0010 QSPI 1S, 0100 QSPI 4S with UART fallback, 0101 QSPI 1S with UART fallback, 1011 DevBoot. AM261x: AM263P list plus 1110 USB DFU. AM273x: SOP_MODE4 QSPI, SOP_MODE5 UART, SOP_MODE6 SBL development, set on PMIC_OUT, SYNC_OUT and TDO. The AM263P OSPI modes fall back to UART on failure. LP-AM263P boot switch SW1 positions 1 and 2 ON, 3 and 4 OFF is the OSPI setting by photo (history).",
+    "source": "TRM SPRUJ55D Table 5-1 and 5-2; SPRUJ17I Table 5-2; SPRUJB6B Table 5-2; SPRUIU0E Table 5-2; am263p/README.md"
+   },
+   "recovery": [
+    {
+     "symptom": "SBL erased or corrupt, OSPI boot fails",
+     "fix": "Set the boot pins to UART (0001, AM273x SOP_MODE5), power cycle, send the flasher and SBL again by UART or DSLite. The ROM cannot be damaged.",
+     "source": "TRM SPRUJ55D Table 5-1; UniFlash sitara_mcu FlashPython.py"
+    },
+    {
+     "symptom": "DSLite error -615 on LP-AM263P",
+     "fix": "Plug the USB-C supply (micro-B feeds only the probe); delete a copied 'SWD Mode' property from the connection file.",
+     "source": "am263p/AGENTS.md (history)"
+    },
+    {
+     "symptom": "Memory window at 0x60000000 reads one byte value throughout",
+     "fix": "The flash controller is not set up. A read-only backup needs a program or the ROM boot to have opened the flash first; opening can rewrite sector 0x80000, so read the sector first.",
+     "source": "am263p/tools/flash_backup.sh; am263p/AGENTS.md rules 1 and 2 (history)"
+    },
+    {
+     "symptom": "'XMODEM send failed' from UniFlash",
+     "fix": "Power cycle the board and run again.",
+     "source": "UniFlash sitara_mcu FlashPython.py message text"
+    }
+   ],
+   "backup_restore": "These parts have no flash inside (except the AM263P ZCZ-F in-package flash on its OSPI bus). Back up = read the OSPI window at 0x60000000 over JTAG with DSLite `memory` (8 reads of 4 MB, twice, compare); worked on the AM263P with caveats (needs the controller opened; the upper 16 MB mirrored the lower; history). Restore = DSLite flash with the same bytes at the same offsets, or UART flash with verify. The UART path cannot read back.",
+   "probe": {
+    "board": "XDS110 on the LaunchPad over JTAG; UART0 on the probe's first serial port for ROM boot.",
+    "bare_chip": "20-pin cTI JTAG from an XDS110 or XDS200; UART0 plus the four SOP straps and nRESET for ROM boot."
+   },
+   "ccs_device_files": [
+    "AM263x",
+    "AM263x_Serial",
+    "AM263Px (+ _ZCZ_C/_F/_S, _Lock_Step, _Serial)",
+    "AM261x (+ ZCZ, ZEJ, ZFG, ZNC, _Lock_Step, _Serial)",
+    "AM2611_Single_Core",
+    "AM2631/32/34",
+    "am273x",
+    "AM273x_Serial"
+   ],
+   "unknowns": [
+    "AM273x ID register: no address or value found in SWRS245D or the TRM text.",
+    "AM263P4 M4F and AM263P2 core count.",
+    "TAP IDCODE for AM263x variants beyond the one OpenOCD value (0x2BB7D02F): TRM says the JTAG ID is read via the configuration port; no table read.",
+    "Whether MCU+ SDK tools/boot/uart_uniflash.py (SDK not installed on this Mac) matches the UniFlash 9.6.0 copy.",
+    "DSLite flash on Windows and Linux: same package, not run here.",
+    "Full list of flash parts the ROM supports.",
+    "AM263P board no longer on the bench: no new runs."
+   ]
+  },
+  {
+   "family": "AM24x",
+   "members": [
+    {
+     "part": "AM2434",
+     "partnum": "MAIN_CTRL_MMR_CFG0_JTAG_USER_ID[31:13] D 0x19064, E 0x19065, F 0x19066",
+     "jtag_idcode": "0x0BB3802F",
+     "core": "2x dual-core R5F (4 cores), M4F, DMSC M3, PRU_ICSSG",
+     "flash": "external OSPI",
+     "boards": [
+      "LP-AM243 (CCStudio AM243x_LP)",
+      "AM243x GP EVM"
+     ]
+    },
+    {
+     "part": "AM2432",
+     "partnum": "C 0x19023, D 0x19024, E 0x19025, F 0x19026",
+     "jtag_idcode": "0x0BB3802F",
+     "core": "2x single-core R5F",
+     "flash": "external OSPI",
+     "boards": []
+    },
+    {
+     "part": "AM2431",
+     "partnum": "C 0x19003, D 0x19004",
+     "jtag_idcode": "0x0BB3802F",
+     "core": "1x single-core R5F",
+     "flash": "external OSPI",
+     "boards": []
+    }
+   ],
+   "members_note": "SPRSP65J Table 4-1 (ALV, ALX packages; ALV/ANI for AM2434 and AM2432). JTAG ID is shared with AM64x: TRM SPRUIM2J Table 1-3 lists AM243x SR1.0 0x0BB3802F. Package field PKG bits 2:0: 3 ANI, 4 ALV, 5 ALX.",
+   "debug_port": {
+    "protocol": "JTAG (4-pin) into a CoreSight DAP; DMSC (Cortex-M3) behind a power AP that must be unlocked",
+    "access": "XDS110 on LP-AM243 and the EVM (OpenOCD board file ti_am243_launchpad.cfg, JTAG, 250 kHz). CCStudio device files AM2431/32/34 ALV and ALX plus AM243x_Serial.",
+    "notes": "OpenOCD maps SOC am243 to the am642 case in ti_k3.cfg.",
+    "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg (am243 - am642 case); xPack OpenOCD 0.12.0-7 scripts/board/ti_am243_launchpad.cfg; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM2434_ALV.xml"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "TAP IDCODE",
+     "field": "bits 27:12 = 0xBB38",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0BB3802F (SR1.0); AM64x SR2.0 reads 0x1BB3802F",
+     "source": "TRM SPRUIM2J Table 1-3; xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x43000018 (MAIN_CTRL_MMR_CFG0_JTAG_USER_ID; JTAGID at 0x43000014)",
+     "field": "DEVICE_ID bits 31:13; SAFETY 12; SECURITY 11; SPEED 10:6 (0x0B K, 0x02 S); TEMP 5:3; PKG 2:0",
+     "mask": "0xFFFFE000",
+     "source": "TRM SPRUIM2J section 1.5 Table 1-1; datasheet SPRSP65J Table 4-1; address from AM64_common.gel (same MAIN_CTRL_MMR block; AM24 GEL does not define it)"
+    },
+    {
+     "method": "uart_rom",
+     "addr": "UART0 115200, boot mode UART (BOOTMODE[6:3] = 0111)",
+     "field": "'C' XMODEM request",
+     "mask": "",
+     "source": "TRM SPRUIM2J Table 4-4; UniFlash sitara_mcu FlashPython.py"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "libFlashSitaraMCU (JTAG, part numbers beginning AM2). Bundled flashers am243x_alv_flasher.out (EVM) and am243x_alx_flasher.out (LaunchPad), or a custom flasher_jtag_uniflash.out from the MCU+ SDK. Images: SBL 0x60000000, application 0x60080000, XIP 0xF0000000 (ALV device file). Authentication File and Authentication Scheme 'K3' properties exist for HS parts. Erase entire flash or listed sectors.",
+     "erase": "entire flash or sectors",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "ccs_base/sitara_mcu/flasher/; ccs_base/DebugServer/propertyDB/AM243x_FlashProperties.xml; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM2434_ALV.xml"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "UniFlash serial target 'AM243x(Serial)': same XMODEM-1K flasher protocol as AM26x. Defaults: SBL offset 0x0, application offset 0x80000, XIP supported, flasher am243x_alv or am243x_alx by board type EVM or LP.",
+     "erase": "optype 0xFE",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash sitara_mcu/serial/FlashPythonUtils.py default_device_config am243x; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM243x_Serial.xml"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "Debug and RAM load only; no flash bank in ti_k3.cfg.",
+     "erase": "none",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "SBL image",
+     "range": "flash offset 0x0 up to 0x80000",
+     "why": "Boot chain; ROM cannot recover a bad SBL except through UART, SD, USB or Ethernet boot modes.",
+     "source": "FlashPythonUtils.py am243x sbl_offset 0x0, app_offset 0x80000; TRM SPRUIM2J Table 4-4"
+    },
+    {
+     "region": "Boot-mode eFuse and security fuses (HS-FS parts)",
+     "range": "not a flash path",
+     "why": "One-time programmable.",
+     "source": "TRM SPRUIM2J boot chapter (no write path used)"
+    }
+   ],
+   "boot_mode": {
+    "pins": "BOOTMODE[15:0] pulled high or low (none left floating). B6:B3 primary: 0001 OSPI, 0010 QSPI, 0011 SPI, 0100 Ethernet RGMII, 0101 RMII, 0110 I2C, 0111 UART, 1000 MMCSD (SD or eMMC UDA), 1001 eMMC, 1010 USB, 1011 GPMC NAND, 1100 GPMC NOR, 1101 PCIe, 1110 xSPI, 1111 no-boot/dev boot. B12:B10 backup: 001 USB, 011 UART, 100 Ethernet, 101 MMCSD, 110 SPI, 111 I2C. B2:B0 = 011 for a 25 MHz reference. LP-AM243 switch settings: not read.",
+    "source": "TRM SPRUIM2J Table 4-2 to 4-5"
+   },
+   "recovery": [
+    {
+     "symptom": "Flash holds no valid SBL",
+     "fix": "Set UART (or USB, Ethernet, SD) boot mode, power cycle, send the flasher and SBL again.",
+     "source": "TRM SPRUIM2J Table 4-4, 4-5"
+    },
+    {
+     "symptom": "'XMODEM send failed' from UniFlash",
+     "fix": "Power cycle the EVM and run again.",
+     "source": "UniFlash sitara_mcu FlashPython.py"
+    }
+   ],
+   "backup_restore": "External OSPI flash: same cycle as AM26x. Back up by reading the flash window over JTAG; restore by DSLite flash or UART flash with verify. Not run on an AM243x here.",
+   "probe": {
+    "board": "XDS110 on LP-AM243 or the GP EVM; JTAG.",
+    "bare_chip": "20-pin cTI JTAG from an XDS110 or XDS200; UART0 and the BOOTMODE straps."
+   },
+   "ccs_device_files": [
+    "AM2431_ALV/ALX",
+    "AM2432_ALV/ALX",
+    "AM2434_ALV/ALX",
+    "AM243x_Serial"
+   ],
+   "unknowns": [
+    "Where the memory-mapped OSPI window sits for a read-back on AM243x (device file shows XIP at 0xF0000000, SBL at 0x60000000; no run).",
+    "LP-AM243 switch table.",
+    "Never-write list beyond the SBL region: tuning-data location not read.",
+    "Whether MAIN_CTRL_MMR address 0x43000018 holds on AM243x: inferred from the shared AM64x/AM243x TRM."
+   ]
+  },
+  {
+   "family": "K3 Linux processors (AM62x, AM62A, AM62P, AM62L, AM64x, TDA4VM)",
+   "members": [
+    {
+     "part": "AM6254",
+     "partnum": "WKUP_CTRL_MMR_CFG0_JTAG_USER_ID[31:13] C 0x1D123, G 0x1D127",
+     "jtag_idcode": "0x0BB7E02F",
+     "core": "4x A53, M4F (MCU domain), R5F (device management), PRU",
+     "flash": "none inside: SD, eMMC, OSPI/QSPI, USB, UART",
+     "boards": [
+      "CCStudio boards AM62x_SK_EVM, AM62x_LP_SKEVM, AM62x_SiP_SK_EVM"
+     ]
+    },
+    {
+     "part": "AM6252 / AM6251",
+     "partnum": "AM6252 C 0x1D0A3, G 0x1D0A7; AM6251 G 0x1D067",
+     "jtag_idcode": "0x0BB7E02F",
+     "core": "2x / 1x A53",
+     "flash": "none inside",
+     "boards": []
+    },
+    {
+     "part": "AM6234 / AM6232 / AM6231",
+     "partnum": "AM6234 C 0x1D103, G 0x1D107; AM6232 C 0x1D083, G 0x1D087; AM6231 G 0x1D047",
+     "jtag_idcode": "0x0BB7E02F",
+     "core": "4x / 2x / 1x A53, no 3D graphics",
+     "flash": "none inside",
+     "boards": []
+    },
+    {
+     "part": "AM6204 / AM6202 / AM6201",
+     "partnum": "G 0x1D307 / 0x1D287 / 0x1D247",
+     "jtag_idcode": "0x0BB7E02F",
+     "core": "4x / 2x / 1x A53",
+     "flash": "none inside",
+     "boards": []
+    },
+    {
+     "part": "AM62A74 and siblings",
+     "partnum": "AM62A74 M 0x253ED; AM62A72 L 0x253AC, M 0x253AD; AM62A34 L 0x251EC, M 0x251ED; AM62A32 L 0x251AC, M 0x251AD; AM62A31 L 0x2518C; AM62A14 M 0x250ED; AM62A12 M 0x250AD",
+     "jtag_idcode": "0x0BB8D02F",
+     "core": "A53, MCU R5F, C7x MMA",
+     "flash": "none inside",
+     "boards": [
+      "CCStudio board AM62A_SK_EVM"
+     ]
+    },
+    {
+     "part": "AM62P54 and siblings",
+     "partnum": "AM62P54 M 0x352ED; AM62P52 G 0x352A7, M 0x352AD; AM62P34 M 0x351ED; AM62P32 G 0x351A7, M 0x351AD",
+     "jtag_idcode": "0x0BB9D02F",
+     "core": "A53, MCU R5F, GPU, VENC/VDEC",
+     "flash": "none inside",
+     "boards": [
+      "CCStudio board AM62P_SK_EVM"
+     ]
+    },
+    {
+     "part": "AM62L32 / AM62L31",
+     "partnum": "G 0x391A7 / 0x39187",
+     "jtag_idcode": "0x0BBA702F (SR1.0), 0x1BBA702F (SR1.1)",
+     "core": "2x / 1x A53, no R5F",
+     "flash": "none inside (OSPI NOR 512 Mbit and eMMC on the EVM)",
+     "boards": [
+      "AM62L EVM (TMDS62LEVM, CCStudio AM62L_SK_EVM)"
+     ]
+    },
+    {
+     "part": "AM6442 and siblings",
+     "partnum": "AM6442 D 0x19464, E 0x19465, F 0x19466; AM6441 D 0x19264, E 0x19265, F 0x19266; AM6422 D 0x19424; AM6421 D 0x19224, E 0x19225, F 0x19226; AM6412 C 0x19403; AM6411 C 0x19203",
+     "jtag_idcode": "0x0BB3802F (SR1.0), 0x1BB3802F (SR2.0)",
+     "core": "2x / 1x A53, 4x R5F, M4F, DMSC M3",
+     "flash": "none inside",
+     "boards": [
+      "CCStudio boards AM64x_SK_EVM, AM64x_GP_EVM"
+     ]
+    },
+    {
+     "part": "TDA4VM (J721E, DRA829)",
+     "partnum": "CTRLMMR_WKUP_JTAG_USER_ID[31:16] 0x1340 (TDA4VM88); J721E superset 0x1317",
+     "jtag_idcode": "0x0BB6402F SR1.0, 0x1BB6402F SR1.1, 0x2BB6402F SR2.0",
+     "core": "2x A72, 6x R5F, C7x + MMA, M3",
+     "flash": "none inside (OSPI/HyperFlash, eMMC, SD on the board)",
+     "boards": [
+      "SK-TDA4VM"
+     ]
+    }
+   ],
+   "members_note": "Device IDs: datasheets SPRSP58C (AM62x), SPRSP77E (AM62A), SPRSP89E (AM62P), SPRSPA1B (AM62L), SPRSP56J (AM64x), SPRSP36L (TDA4VM), Table 4-1 'Device Comparison'. JTAGID values: TRMs SPRUIV7C, SPRUJ16C, SPRUJ83E, SPRUJB4A, SPRUIM2J, SPRUIL1D, Table 1-3. Board names marked are the common TI kits and EVMs from CCStudio targetdb/boards (AM62x_SK_EVM, AM62x_LP_SKEVM, AM62x_SiP_SK_EVM, AM62A_SK_EVM, AM62P_SK_EVM, AM62L_SK_EVM, AM64x_SK_EVM, AM64x_GP_EVM, evm_J721E); only AM62L EVM and SK-TDA4VM were on this bench. J721S2, J784S4, J7200 and J722S are other K3 members with CCStudio files and OpenOCD IDs (0x0BB7502F, 0x0BB8002F, 0x0BB6D02F, 0x0BBA002F) but are outside this group.",
+   "debug_port": {
+    "protocol": "JTAG (4-pin) into a CoreSight DAP; CCStudio file names CS_DAP router with CFGAP, PWRAP and SECAP, then A53, R5, M4F, DMSC cores. OpenOCD also has 'SWD native' (dmem) boards for running OpenOCD on the SoC itself (am625, am62a7, am62p, j721e, j722s).",
+    "access": "XDS110 on the EVMs (OpenOCD board files use xds110.cfg, JTAG, 2.5 MHz; AM62L J8 USB). TAP irlen 4, `-expected-id` and `-ignore-version`. The AM62L OpenOCD case is in xPack 0.12.0-7 only; the TI fork copy lacks AM62L and AM261/AM263P.",
+    "notes": "DSLite cannot connect to AM62L core 1 while it is powered down (error -1062); start it with PSCI CPU_ON from U-Boot (am62l-evm/AGENTS.md). For JTAG on the AM62L EVM set SW4.4 to SW4.7 ON and SW3 all OFF (no boot). K3 JTAG is for debug, not for programming the boot medium.",
+    "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg (all K3 cases); CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM62x.xml, AM62L.xml, AM64x.xml; xPack OpenOCD 0.12.0-7 scripts/board/ti_am625evm.cfg, ti_am62levm.cfg, ti_j721evm.cfg, ti_am62p_swd_native.cfg; am62l-evm/AGENTS.md"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "TAP IDCODE",
+     "field": "bits 27:12 PARTNO",
+     "mask": "0x0FFFFFFF",
+     "value": "AM64x/AM243x 0x0BB3802F; AM62x 0x0BB7E02F; AM62A 0x0BB8D02F; AM62P 0x0BB9D02F; AM62L 0x0BBA702F; J721E 0x0BB6402F; also J7200 0x0BB6D02F, J721S2 0x0BB7502F, J784S4 0x0BB8002F, J722S 0x0BBA002F, AM65x 0x0BB5A02F",
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg; TRMs Table 1-3 for AM62x, AM62A, AM62P, AM62L, AM64x, J721E"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x43000014 (JTAGID) and 0x43000018 (JTAG_USER_ID) in WKUP_CTRL_MMR0 (AM62x, AM62A, AM62P, AM62L, TDA4VM) or MAIN_CTRL_MMR_CFG0 (AM64x)",
+     "field": "JTAG_USER_ID bits 31:13 DEVICE_ID (AM62x, AM62P, AM64x, AM62L), 31:11 in the older AM62A GEL, 31:16 on TDA4VM; JTAGID bits 31:28 silicon revision",
+     "mask": "0xFFFFE000 (TDA4VM 0xFFFF0000)",
+     "source": "GEL AM62_common.gel, AM62A_common.gel, AM62L_common.gel, AM64_common.gel (CTRLMMR_JTAGID 0x43000014, CTRLMMR_JTAG_USER_ID 0x43000018); TDA4VM registers guide (SPRUIL1D zip, WKUP_CTRL_MMR0 base 0x43000000, offsets 14h and 18h, Table 2-2); docs/arrivals/am62l-evm.md plan step 5"
+    },
+    {
+     "method": "uart_rom",
+     "addr": "UART0 at 115200 8N1 with boot mode UART",
+     "field": "the ROM sends a lone 'C' about once a second for a few seconds after power-up (XMODEM-CRC)",
+     "mask": "",
+     "source": "TRM SPRUJB4A 5.5.5 (via am62l-evm/UART-BOOT.md); measured on the AM62L EVM (E242)"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "sd_card",
+     "status": "TI supported",
+     "detail": "The program is the boot medium: an SD card (MMCSD boot, FAT with tiboot3.bin, tispl.bin, u-boot.img, then a Linux image). Write TI's .wic image to the card (`xz -dc IMAGE | sudo dd of=/dev/rdiskN bs=4m` on Mac). TDA4VM: tda4/tools/write-card.sh; with no card reader, UART boot then write from the board (tda4/tools/uart_boot.py, write_from_stick.py).",
+     "erase": "none (whole-card image write)",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "tda4/AGENTS.md; am62l-evm/AGENTS.md; am62l-evm/UART-BOOT.md"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "UART boot: XMODEM tiboot3.bin to the ROM, then tispl.bin and u-boot.img (XMODEM or YMODEM from SPL) to reach U-Boot with no card. 115200 baud, about 11.5 kB/s; AM62L ROM times out at 5 minutes; measured 7 minutes to U-Boot on the AM62L. USB DFU boot (AM62L SW3 ON ON ON ON; AM64x/AM62x primary 1010) is far faster. From U-Boot write SD, eMMC or OSPI.",
+     "erase": "n/a",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "am62l-evm/UART-BOOT.md; TRM SPRUJB4A Table 5-1; tda4/README.md; TI Linux SDK UART page not available here"
+    },
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "Debug only: connect, halt, load RAM (AM62L Zephyr in SRAM was loaded this way). UniFlash 9.6.0 has no flash library for K3 Linux parts: FlashDLLDB part-number rules cover AM2* (JTAG) and AM*(Serial) but the K3 Linux device files carry no flash database or serial variant.",
+     "erase": "none",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/common/targetdb/devices/AM62x.xml (no flash properties); am62l-evm/tools/load_sram.sh"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "k3 target with board files for every K3 EVM: debug and RAM load only, no flash bank.",
+     "erase": "none",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_k3.cfg"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "ROM and boot-mode eFuses",
+     "range": "WKUP_CTRL_MMR_CFG1_BOOTMODE_EFUSE (AM62L: 22 fuse bits encode a 16-bit boot mode; programming inverts the programmed bits)",
+     "why": "One-time programmable. Changes boot mode for the life of the part.",
+     "source": "TRM SPRUJB4A Table 5-7 note (2)"
+    },
+    {
+     "region": "Security fuses and keys on HS-FS and HS-SE parts",
+     "range": "OTP",
+     "why": "One-time programmable; the ROM rejects images signed for the wrong device type.",
+     "source": "am62l-evm/AGENTS.md ('The ROM refuses mkphase1.sh images on this HS-FS part'); GEL Device_Status functions read device type GP/TEST/EMU/HS and subtype FS/KP/FA/SE"
+    },
+    {
+     "region": "eMMC boot partitions and the SD card's boot FAT",
+     "range": "tiboot3.bin, tispl.bin, u-boot.img",
+     "why": "Writing a wrong tiboot3 for the device type (GP vs HS-FS vs HS-SE) leaves the board in the ROM's backup mode. Recoverable by UART or DFU boot; keep a card image.",
+     "source": "TRM SPRUJB4A section 5.3.3 to 5.3.4 via am62l-evm/UART-BOOT.md"
+    }
+   ],
+   "boot_mode": {
+    "pins": "BOOTMODE[15:0]: B2:B0 reference clock, B6:B3 primary boot mode, B9:B7 primary options, B12:B10 backup mode, B13 backup option. Primary B6:B3 (AM62x, AM62A, AM62P): 0001 OSPI, 0010 QSPI, 0011 SPI, 0100 Ethernet RGMII, 0101 RMII, 0110 I2C, 0111 UART, 1000 MMCSD (SD card or eMMC UDA), 1001 eMMC boot partition, 1010 USB, 1011 GPMC NAND, 1100 GPMC NOR, 1110 xSPI, 1111 no-boot/dev boot. Backup B12:B10: 001 USB, 011 UART, 100 Ethernet, 101 MMCSD, 110 SPI, 111 I2C. AM62L (reduced pincount, SW3 = BOOTMODE[15:12]): ON is 1; shipped OFF OFF OFF OFF is SD primary with full pincount; ON OFF ON OFF is SD primary, UART backup; ON ON ON OFF is UART primary, SD backup; ON ON ON ON is USB DFU primary; table values 0x007B DevBoot, 0x0D53 USB host MSC, 0x044B eMMC, 0x0C13 QSPI, 0x0E43 SD, 0x343B UART, 0x3453 USB DFU. SK-TDA4VM SW1: all OFF boots the SD card; 1 ON, 2 OFF, 3 ON, 4 OFF is UART boot. TDA4VM also has MCU_BOOTMODE pins and an MCU-only mode. Full power cycle after any change; the AM62L SW7 reset does not re-read them. Boards other than AM62L and SK-TDA4VM: switch tables not read.",
+    "source": "TRMs SPRUIV7C Table 5-4, 5-5; SPRUJ16C and SPRUJ83E Table 5-4; SPRUIM2J Table 4-2 to 4-5; SPRUJB4A Tables 5-3, 5-5, 5-6, 5-7; SPRUIL1D Tables 4-2 to 4-9; am62l-evm/AGENTS.md; tda4/AGENTS.md"
+   },
+   "recovery": [
+    {
+     "symptom": "No boot, console silent",
+     "fix": "Check boot switches and the serial port first; the card or eMMC may be blank. Switch to UART or DFU boot and rebuild the card from U-Boot.",
+     "source": "am62l-evm/AGENTS.md; tda4/AGENTS.md"
+    },
+    {
+     "symptom": "AM62L: switches changed, nothing new happens",
+     "fix": "Unplug and replug the main power (J17); SW7 does not re-read the pins.",
+     "source": "am62l-evm/UART-BOOT.md"
+    },
+    {
+     "symptom": "UART boot sent more than 5 minutes after power gets 'receiver cancelled'",
+     "fix": "Power cycle and send within the ROM window; a `reboot` from default Linux returns to the ROM ping.",
+     "source": "am62l-evm/AGENTS.md"
+    },
+    {
+     "symptom": "Micro-SD 'Transfer data timeout' / 'Card did not respond to voltage select'",
+     "fix": "Bad or unseated card; eMMC still answers. Use UART boot plus a USB stick.",
+     "source": "am62l-evm/AGENTS.md"
+    }
+   ],
+   "backup_restore": "Nothing programmable lives in the chip: the ROM and fuses are fixed. The 'program' is the boot medium. Back up = read the whole SD card (or eMMC) to an image file; restore = write that image back (an interrupted write is safe to rerun because chunks go to fixed block addresses, TDA4VM tool). If the card cannot be read on the Mac (no reader), reach U-Boot by UART boot and use `ums` or a USB stick as the bridge. A box-shipped card was never read back on this bench, so the factory content is only recoverable from TI's published image.",
+   "probe": {
+    "board": "Onboard XDS110 (AM62L J8; the other EVMs per OpenOCD board files) for JTAG; serial console on the board's UART; boot switches.",
+    "bare_chip": "20-pin cTI JTAG to read the IDCODE; UART0 plus the BOOTMODE straps for ROM boot; the boot medium (SD, eMMC, OSPI) on its own pins."
+   },
+   "ccs_device_files": [
+    "AM62x",
+    "AM62A",
+    "AM62D",
+    "AM62L",
+    "AM62P",
+    "AM64x",
+    "J721E_DRA829_TDA4VM",
+    "J7200_DRA821",
+    "J721S2_TDA4VL",
+    "J722S_TDA4VEN_TDA4AEN_AM67",
+    "J784S4_TDA4VH"
+   ],
+   "unknowns": [
+    "Boot switch tables for SK-AM62, SK-AM62A, SK-AM62P, SK-AM64B: the user guides were not read.",
+    "TI's Linux SDK UART/DFU boot pages for AM62x, AM64x, TDA4VM (SDK not installed): commands taken from the TRMs and the AM62L bench run.",
+    "Whether UniFlash 9.6.0 can program the OSPI or eMMC of any K3 Linux part: no flash library or Serial device file found for them.",
+    "AM62A GEL decodes DEVICE_ID with >>11 and the AM62A datasheet lists bits 31:13: values differ only in bit 12 (safety); the datasheet is used.",
+    "Per-silicon-revision JTAGID for AM62A (only SR1.0 listed) and AM62x (SR1.0 and 1.1 identical)."
+   ]
+  },
+  {
+   "family": "mmWave radar (IWR6843, IWR6843AOP, AWR6843, IWRL6432, IWRL6432AOP, AWRL6432, AWR2944, AWR2544)",
+   "members": [
+    {
+     "part": "IWR6843 / IWR6443",
+     "partnum": "unknown (no ID register read)",
+     "jtag_idcode": "unknown",
+     "core": "Cortex-R4F (MSS) + C674x DSP + radar subsystem",
+     "flash": "external QSPI serial flash (user application loaded into RAM at boot)",
+     "boards": [
+      "IWR6843ISK",
+      "IWR6843AOPEVM"
+     ]
+    },
+    {
+     "part": "IWR6843AOP",
+     "partnum": "unknown",
+     "jtag_idcode": "unknown",
+     "core": "Cortex-R4F + C674x",
+     "flash": "external QSPI",
+     "boards": [
+      "IWR6843AOPEVM"
+     ]
+    },
+    {
+     "part": "AWR6843 / AWR6843AOP",
+     "partnum": "unknown",
+     "jtag_idcode": "unknown",
+     "core": "Cortex-R4F + C674x",
+     "flash": "external QSPI",
+     "boards": []
+    },
+    {
+     "part": "IWRL6432 / IWRL6432AOP / AWRL6432",
+     "partnum": "unknown (dedicated ID register address is not in the TRM text, per iwrl6432boost/README.md)",
+     "jtag_idcode": "0x2BB8902F (CFGAP IDCODE, silicon ES2.0, measured on IWRL6432BOOST); DPIDR 0x5BA00477",
+     "core": "Cortex-M4F (APPSS, CPUID 0x410FC241 r0p1) + radar subsystem",
+     "flash": "external QSPI serial flash (16 Mbit on the BOOST)",
+     "boards": [
+      "IWRL6432BOOST (measured)",
+      "IWRL6432AOPEVM"
+     ]
+    },
+    {
+     "part": "AWR2944 / AWR2x44P / AWR2544",
+     "partnum": "unknown",
+     "jtag_idcode": "unknown",
+     "core": "Cortex-R5F (+ M4F and C66x on AWR2x44P/AWR2944)",
+     "flash": "external QSPI",
+     "boards": []
+    }
+   ],
+   "members_note": "Families and cores from CCStudio targetdb (iwr6843.xml: DEBUGSSM then Cortex_R4 and ICEPick-M then C674x; iwrl6432.xml: DEBUGSSM then Cortex_M4; awr2944, awr2544, awr2x44p: Cortex_R5, M4, C66xx; also iwr/awr 1243, 1443, 1642, 1843, 2243, awrl1432, awrl6844 family 'l68xx') and datasheets SWRS219F, SWRS248E (AWR6843), SWRS237C (IWR6843AOP), SWRS298B, SWRS323B. Boards: iwrl6432boost/ in this repo; IWR6843ISK and IWR6843AOPEVM are named in older repo research notes only. IWRL6432 partial-ID facts are from iwrl6432boost/README.md (2026-10-09, DSLite, probe RI32RI32).",
+   "debug_port": {
+    "protocol": "JTAG (4-pin) into a CoreSight DAP (CFGAP, DPIDR) behind the OneMCU debug subsystem; xWR68xx also an ICEPick-M for the C674x",
+    "access": "XDS110 on the BOOST/EVM; bare chip needs a JTAG header and SOP straps for debug mode. CCStudio sets 'Use Software Reset Only' and, for IWRL6432, 'autoResetOnConnectByDefault'. A reset-and-halt after an ID read failed on the IWRL6432BOOST (-2063, -2062) and left both serial ports silent until S2 (NRST).",
+    "notes": "Debug mode on SOP pins halts the CPU with the bootloader bypassed (R4F on 68xx, M4F on L6432). Programming is not done over JTAG: UniFlash lists these parts as 'Flash Only' serial targets.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/iwr6843.xml, iwrl6432.xml; ccs_base/DebugServer/bin/FlashDLLDB.xml (FlashPython, interface 'Flash Only', part numbers beginning AWR, IWR, AR, IR); iwrl6432boost/README.md and FAQ.md"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "CFGAP IDCODE (JTAG, SOP debug mode)",
+     "field": "IWRL6432: version 2, part 0xBB89, manufacturer TI",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0BB8902F for IWRL6432 (measured 0x2BB8902F on ES2.0). IWR6843, AWR6843, AWR2944: not read.",
+     "source": "iwrl6432boost/README.md and AGENTS.md (DSLite, 2026-10-09)"
+    },
+    {
+     "method": "uart_rom",
+     "addr": "ROM bootloader on the first UART in flashing mode (SOP 101 on 68xx, 00 on L6432), 115200 baud",
+     "field": "Sync pattern 0xAA, PING opcode 0x20 answered by ACK 0xCC; GET_VERSION_INFO opcode 0x2F returns a 4-byte version (examples 07000600 and 01000601 for xWR12/14 PG1/PG2, 08000602 for xWR16 PG1); the ROM family is told by the part-number string chosen in UniFlash, not read from the chip",
+     "mask": "",
+     "source": "UniFlash 9.6.0 mmWave/gen1/mmWaveProgFlash.py (AWR_BOOTLDR_OPCODE_*, AWR_VERSION_*), gen3 and gen4 copies; xWRL64xx constant 08000103 is commented out in gen4"
+    },
+    {
+     "method": "uart_rom",
+     "addr": "Application mode: the shipped demo streams TLV frames on the data port",
+     "field": "frame magic 02 01 04 03 06 05 08 07, platform field 0x000A6432 on the IWRL6432BOOST",
+     "mask": "",
+     "source": "iwrl6432boost/AGENTS.md"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "other",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 'Flash Only' serial programmer (FlashPython), selected by part-number prefix AWR, IWR, AR, IR. Four Python generations are bundled: gen1 for xWR12, xWR14, xWR16, xWR18, xWR68 (IWR6843, IWR6843AOP, AWR6843): meta images 1 to 4 in .bin; gen3 for xWRL64 and xWRL14 (IWRL6432, AWRL6432): .appimage or .bin; gen4 for xWRL68 (IWRL6844, AWRL6844); gen2 for the SBL-plus-app parts (AWR2944, AWR2x44P, AWR2544: SBL image and app image, sbl_uart_uniflash.release.tiimage, app offset 0xA0000; gen2 mapping is inferred from the matching image types and offset). Protocol: SOP pins to flashing mode, serial 115200, sync 0xAA, START_DOWNLOAD 0x21, SEND_DATA 0x24, FILE_CLOSE 0x22, ERASE 0x28 (storages SDRAM 0, FLASH 1, SFLASH 2, EEPROM 3, SRAM 4). Option 'Format' or erase-before-download wipes the whole SFLASH. UniFlash adds a CONFIG file (ar1xxx_config.bin) to xWR68 downloads automatically. No opcode reads flash back.",
+     "erase": "whole serial flash (erase_storage) or per-file",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 ccs_base/mmWave/gen1..gen4/FlashPython.py and mmWaveProgFlash.py; FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/common/targetdb/devices/iwr6843.xml, iwrl6432.xml, awr2944.xml, awr2544.xml"
+    },
+    {
+     "tool": "other",
+     "status": "TI supported",
+     "detail": "arprog_cmdline.py from Radar Toolbox (command: `python3 arprog_cmdline.py -p <port> -f <image>.appimage -s SFLASH -t META_IMAGE1`). Prepared by iwrl6432boost/tools/flash_arprog.py, which refuses to start unless the data port has been silent for 2 seconds. Not run on a board here.",
+     "erase": "per-file",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "iwrl6432boost/AGENTS.md; iwrl6432boost/FAQ.md"
+    },
+    {
+     "tool": "openocd",
+     "status": "community",
+     "detail": "No target or flash driver for any mmWave part in the xPack or TI scripts.",
+     "erase": "none",
+     "platforms": [],
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target and TI OpenOCD fork ~/ti/ti-openocd scripts/target listings (no mmWave file)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "On-chip ROM bootloader",
+     "range": "ROM",
+     "why": "Not writable; it is the way back in.",
+     "source": "IWR6843 datasheet SWRS219F section 8.5; IWRL6432 SWRS298B section 8.6"
+    },
+    {
+     "region": "Device firmware patch (service pack) in the serial flash",
+     "range": "location inside the meta images not read",
+     "why": "The datasheet says flashing mode writes the user application and the device firmware patch supplied by TI. A flash format (erase of the whole serial flash, UniFlash 'Format' or `erase_storage`) removes both; write both back before leaving flashing mode.",
+     "source": "SWRS219F section 8.5.1; UniFlash 9.6.0 mmWave/gen1/FlashPython.py and mmWaveProgFlash.py (erase_storage)"
+    }
+   ],
+   "boot_mode": {
+    "pins": "xWR68xx (IWR6843, IWR6843AOP, AWR6843): SOP2:SOP1:SOP0 = 001 functional (loads the application from QSPI flash into RAM), 101 flashing (UART), 011 debug (R4F halted). xWRL64xx (IWRL6432): SOP1:SOP0 = 01 functional, 00 flashing, 11 debug (M4F halted). IWRL6432BOOST S1: positions 1 and 2 are SOP0 and SOP1; SOP0 ON and SOP1 OFF is application mode; S1 position 1 OFF plus S2 (NRST) is flashing. Pins are shared with TDO (SOP0), SYNC_OUT (SOP1), PMIC_CLKOUT (SOP2) on 68xx and with TDO and PMIC_CLKOUT on L6432.",
+    "source": "SWRS219F Table 8-1; SWRS248E Table 8-1; SWRS237C Table 8-1; SWRS298B Table 8-3, Table 6-3, Table 6-7; SWRS323B Table 8-3; iwrl6432boost/AGENTS.md"
+   },
+   "recovery": [
+    {
+     "symptom": "Both serial ports silent after a JTAG reset-and-halt failure (-2063, -2062)",
+     "fix": "Press S2 (NRST); frames resume.",
+     "source": "iwrl6432boost/AGENTS.md, FAQ.md"
+    },
+    {
+     "symptom": "arprog says connected but writes nothing (it saw a 0xCC byte in the streaming frames)",
+     "fix": "Put the board in flashing mode first (S1 position 1 OFF, press S2) and wait for 2 s of silence.",
+     "source": "iwrl6432boost/AGENTS.md"
+    },
+    {
+     "symptom": "'Initial response from the device was not received. Please power cycle device before re-flashing.'",
+     "fix": "Power cycle with the SOP straps in flashing mode, run again.",
+     "source": "UniFlash mmWaveProgFlash.py message text"
+    },
+    {
+     "symptom": "Application will not run after a failed or partial flash",
+     "fix": "The ROM bootloader is untouched: set flashing mode and write the meta images (application and firmware patch) again.",
+     "source": "SWRS219F section 8.5.1; SWRS298B Table 8-3"
+    }
+   ],
+   "backup_restore": "No tested backup. The serial bootloader has no read command, and no tool was found that reads the radar's serial flash back, so the shipped image cannot be saved (iwrl6432boost/AGENTS.md, RD1). The cycle for these parts is therefore: record the image you flash, write it, check by running it (demo output on the data port, or the ROM's per-file status), and restore by writing the known-good .appimage or meta images again. A factory restore uses TI's prebuilt image from Radar Toolbox (a candidate for the BOOST: Motion and Presence 2D image; whether it equals the shipped one is unknown).",
+   "probe": {
+    "board": "Onboard XDS110 gives two serial ports (data port ends in 1, config port in 4) plus JTAG; boot straps are switches (IWRL6432BOOST S1).",
+    "bare_chip": "UART RX/TX and nRESET plus the SOP straps (resistors or a header) for flashing; a JTAG header only for debug."
+   },
+   "ccs_device_files": [
+    "iwr6843",
+    "iwr6843AOP",
+    "awr6843",
+    "awr6843AOP",
+    "iwrl6432",
+    "awrl6432",
+    "awrl1432",
+    "iwrl1432",
+    "iwrl68xx",
+    "awrl68xx",
+    "awr2944",
+    "awr2944LC",
+    "awr2x44p",
+    "awr2544",
+    "awr2243",
+    "awr1243/1443/1642/1843",
+    "iwr1243/1443/1642/1843/1843AOP"
+   ],
+   "unknowns": [
+    "JTAG IDCODE and a chip-ID register for IWR6843, IWR6843AOP, AWR6843, AWR2944, AWR2544 (no table in the datasheets read).",
+    "IWRL6432 PARTNUM (dedicated ID register address not in the TRM text).",
+    "Whether gen2 maps to AWR2944, AWR2x44P and AWR2544 (inferred from images and offset).",
+    "Any read-back of the QSPI flash: no bootloader opcode; a JTAG read in debug mode was not tried.",
+    "Where the device firmware patch sits inside the meta images.",
+    "Mac host for building mmWave images (TI's build route needs Windows or Ubuntu per iwrl6432boost/AGENTS.md); flashing prebuilt images on Mac not run.",
+    "IWR6843ISK and IWR6843AOPEVM were not on the bench; their switch layouts were not read."
+   ]
+  }
+ ]
+}

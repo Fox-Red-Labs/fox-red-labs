@@ -1,0 +1,239 @@
+{
+    "id": "f28p65x",
+    "board": "LAUNCHXL-F28P65X",
+    "part": "TMS320F28P650DK9",
+    "family": "C2000",
+    "title": "Is the TI LAUNCHXL-F28P65X the right board for my project?",
+    "short": "A LaunchPad development kit for TI's TMS320F28P650DK9, a 200 MHz dual-core C28x control chip with 1.28 MB of flash and 248 kB of RAM, almost seven times the RAM of the smaller LAUNCHXL-F2800137. Per cycle, the core behaves exactly like the F2800137's: CoreMark lands at the same 1.294 iterations per MHz from RAM, and the same room-occupancy neural nets pass all 20 test vectors with no source changes. Only one CPU and no CLA have been tried so far; this chip's dual-core side is still untouched.",
+    "meet": {
+        "what": "A LaunchPad development kit for TI's TMS320F28P650DK9 control microcontroller, with the XDS110 debug probe built in: one USB cable powers it, flashes it and carries a serial port. Back up the flash before loading the first program if you want the out-of-box factory demo back; no copy of it is saved here.",
+        "facts": [
+            [
+                "Chip",
+                "TMS320F28P650DK9"
+            ],
+            [
+                "CPU",
+                "Dual-core C28x at 200 MHz, each core with its own CLA (control law accelerator). Not Arm. Only CPU1 has run; CPU2 and both CLAs are not used"
+            ],
+            [
+                "Flash",
+                "1.28 MB"
+            ],
+            [
+                "RAM",
+                "248 kB"
+            ],
+            [
+                "Radios",
+                "None"
+            ],
+            [
+                "On the chip",
+                "CAN-FD, SCI (TI's UART), SPI, FSI, EtherCAT, two eQEP encoder inputs, 12-bit and 16-bit ADC headers; no camera interface, no video hardware"
+            ],
+            [
+                "Debug probe",
+                "XDS110, on the board. Debug link is 4-pin JTAG by default; probe firmware 3.0.0.43 for CCStudio 21.0.1. A hand-written connection file needs a line this chip's dual-core, CLA-equipped design adds (see the FAQ)"
+            ],
+            [
+                "Headers",
+                "Two 80-pin BoosterPack XL sites, a 12-bit/16-bit differential ADC header, two eQEP connectors, an FSI connector, a CAN connector, EtherCAT RJ45 connectors"
+            ],
+            [
+                "Software",
+                "TI C2000Ware and the C2000 compiler; TI Arm tools do not apply"
+            ],
+            [
+                "Board price",
+                "US$47.19 on TI.com (read 2026-10-08)"
+            ]
+        ],
+        "source": "c2000-launchpad/README.md"
+    },
+    "projects": [
+        {
+            "t": "Blink an LED with TI's SDK",
+            "st": "works",
+            "result": "TI's `led_ex1_blinky` built in 8.6 s from a terminal and was written to flash; the LED pin (GPIO12, LED4) toggled every 500 ms, confirmed by eye. Box to blink: not stopwatched end to end",
+            "source": "c2000-launchpad/tools/c2kbuild_f28p65x.sh"
+        },
+        {
+            "t": "Room-occupancy neural nets (500 to 30k weights)",
+            "st": "works",
+            "result": "Same model source as the LAUNCHXL-F2800137 and the MSPM0 boards, ported with no source changes: 0.893 / 2.365 / 8.380 / 47.907 ms per inference, 20 of 20 test vectors right in every build, faster in wall-clock time than the F2800137's own figures at every size. The 30k model's 67 kB of weights did not fit this session's RAM layout and ran from flash instead; not a chip-capacity limit (248 kB total RAM against the F2800137's 36 kB), a linker-layout one we did not chase further",
+            "source": "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        },
+        {
+            "t": "CoreMark",
+            "st": "partial",
+            "result": "Unmodified it does not validate (16-bit byte, same as every C28x). With the same three-change patch used on the F2800137, every check matches the standard run: 211.79 per second (1.059 per MHz) from flash, 258.86 (1.294 per MHz) from RAM, an exact match to the F2800137's own RAM figure. Unofficial",
+            "source": "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        },
+        {
+            "t": "Dhrystone 2.1",
+            "st": "works",
+            "result": "Unmodified source (the same files used on the MSPM0 boards), rules followed (-O3, no automatic inlining): 0.444 DMIPS per MHz from RAM, 0.279 from flash, matching the F2800137's own 0.442 almost exactly",
+            "source": "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        },
+        {
+            "t": "GPIO toggle and interrupt latency",
+            "st": "works",
+            "result": "1.56 cycles per register write, clock-independent, identical to the F2800137. Interrupt latency through the PIE: 30 cycles from RAM, 36 from flash, zero jitter, matching the F2800137's own 30-cycle figure. Porting the F2800137's own test here first failed silently (0 samples) because this chip's INT_FREERTOS line is PIE 12.12, not 12.6 like the F2800137; see the FAQ",
+            "source": "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        },
+        {
+            "t": "SCI (TI's UART) at speed",
+            "st": "partial",
+            "result": "Clean to 12.5 Mbaud (200 MHz divided by 16, the SCI's hardware ceiling at this clock) using the SCI's own internal loopback, zero errors across all 20 speeds tried. A true wire loop, like the one run on the F2800137, still needs a jumper on the SCI pins and has not been tried",
+            "source": "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        }
+    ],
+    "chains": [
+        {
+            "t": "TI C2000Ware and compiler, from a terminal",
+            "st": "works",
+            "verdict": "Yes",
+            "why": "A build script retargets TI's SysConfig output to the LAUNCHXL-F28P65X and the exact TMS320F28P650DK9 part. SysConfig otherwise defaults to a different C2000 board and chip variant. The script then compiles, links and loads with the same scripting runner used on the F2800137",
+            "source": "c2000-launchpad/tools/c2kbuild_f28p65x.sh"
+        },
+        {
+            "t": "A connection file built the way the F2800137's was",
+            "st": "no",
+            "verdict": "No",
+            "why": "Fails every operation, including a plain probe identify, with \"An invalid processor ID has been found\": this chip's dual-core, CLA-equipped design needs a driver line and a narrower connection the single-core template never carried. Start from TI's own targetConfigs file for this chip instead",
+            "source": "c2000-launchpad/FAQ-f28p65x.md",
+            "why_not": "tool"
+        },
+        {
+            "t": "Code running from flash",
+            "st": "works",
+            "verdict": "Yes",
+            "why": "2 wait states with prefetch and cache cost 18 to 37% more cycles than RAM, depending on the program. CoreMark costs 18% and Dhrystone 37%, a bigger hit than on the F2800137, where the same two tests cost 10 to 22%",
+            "source": "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        },
+        {
+            "t": "A radio or wireless connectivity demo",
+            "st": "no",
+            "verdict": "Not possible",
+            "why": "This chip has no radio hardware: CAN-FD, SPI, SCI, FSI and EtherCAT only. The BLE, Zigbee and Thread demos that run on TI's radio boards (the LP-EM-CC2340R5 and LP-CC1354P10-1) need silicon this chip does not have",
+            "source": "c2000-launchpad/bench/RESULTS-f28p65x.md",
+            "why_not": "chip"
+        }
+    ],
+    "combine_title": "Radio, checked and ruled out",
+    "combine_lede": "Checked against the vendor's documentation before anything was tried on the bench.",
+    "benchmarks": [
+        [
+            "CoreMark (patched, unofficial), RAM",
+            "258.86/s (1.294/MHz)",
+            "211.79/s (1.059/MHz) from flash"
+        ],
+        [
+            "Dhrystone 2.1, RAM",
+            "0.444 DMIPS/MHz",
+            "0.279 DMIPS/MHz from flash"
+        ],
+        [
+            "GPIO register toggle",
+            "1.56 cycles/write",
+            "Same from RAM and flash"
+        ],
+        [
+            "Interrupt latency through the PIE",
+            "30 cycles (RAM)",
+            "36 cycles (flash), zero jitter"
+        ],
+        [
+            "SCI internal loopback, fastest clean speed",
+            "12.5 Mbaud",
+            "0 errors across 20 speeds tried"
+        ],
+        [
+            "Occupancy model, 500 weights",
+            "0.893 ms",
+            "20 of 20 test vectors right"
+        ],
+        [
+            "Occupancy model, 30k weights",
+            "47.907 ms (flash)",
+            "Did not fit the RAM layout built"
+        ]
+    ],
+    "benchmarks_source": "c2000-launchpad/bench/RESULTS-f28p65x.md",
+    "glance": [
+        [
+            "1.294",
+            "CoreMark per MHz",
+            "Patched for the 16-bit byte, unofficial, from RAM; an exact match to the LAUNCHXL-F2800137's own figure",
+            "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        ],
+        [
+            "248 kB",
+            "RAM",
+            "Almost seven times the F2800137's 36 kB; the largest room-occupancy model still needed a wider linker layout than the one built",
+            "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        ],
+        [
+            "12.5 Mbaud",
+            "Fastest clean SCI speed",
+            "200 MHz divided by 16, the SCI's hardware ceiling at this clock; zero errors in internal loopback",
+            "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        ],
+        [
+            "30 cycles",
+            "Interrupt latency through the PIE",
+            "Zero jitter; matches the F2800137's own RAM figure once the chip's own interrupt-line number is used",
+            "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        ],
+        [
+            "0.893 ms",
+            "Smallest occupancy model",
+            "500 weights, plain C, 20 of 20 right; faster than the same model on the F2800137",
+            "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        ],
+        [
+            "2",
+            "CPUs on one chip",
+            "Dual-core C28x, each with its own CLA; neither the second CPU nor either CLA has been used yet",
+            "c2000-launchpad/bench/RESULTS-f28p65x.md"
+        ]
+    ],
+    "good_for": [
+        "Anyone already comfortable with the LAUNCHXL-F2800137 who needs more RAM or flash: the core behaves exactly the same per cycle, so existing C2000 code and knowledge carries straight over",
+        "Big buffers and bigger neural nets: 248 kB of RAM fit every room-occupancy model we tried without needing flash, except where our linker layout ran out of contiguous room first",
+        "Building and running from a Mac terminal with TI's own tools, the same workflow proven on the F2800137"
+    ],
+    "not_for": [
+        "Anything with a radio: this chip has no wireless hardware at all, only CAN-FD, SPI, SCI, FSI and EtherCAT",
+        "Video decode of any kind: no camera interface, no video DMA, no codec hardware",
+        "A first C2000 board if you want the cheapest start: the LAUNCHXL-F28P55X ($31.90) is less expensive, and the LAUNCHXL-F2800137 ($35.09) has the fuller test history so far",
+        "Projects that need the dual-core or CLA story proven today: both are present on this chip but untouched by any test run so far"
+    ],
+    "buy": "US$47.19 on TI.com (ti.com/tool/LAUNCHXL-F28P65X, read 2026-10-08). The debug probe is on the board, so one USB cable does power, flashing and the serial port.",
+    "gotchas": [
+        [
+            "A hand-written connection file fails every operation with \"An invalid processor ID has been found\"",
+            "This chip's dual-core, CLA-equipped design needs a driver line and a narrower connection a single-core board's template does not carry. Start from TI's own `targetConfigs/TMS320F28P650DK9.ccxml` in C2000Ware instead. **Tag: Tool or docs.**"
+        ],
+        [
+            "A test ported from another C2000 chip runs with no error but never measures anything",
+            "If the test pends an interrupt by writing a specific bit number, reread this chip's own `hw_ints.h` first. The same interrupt can sit on a different PIE line on a different C2000 chip, and no compiler error catches the mismatch. **Tag: Chip limit.**"
+        ]
+    ],
+    "faq_page": "faq-f28p65x.html",
+    "faq_source": "c2000-launchpad/FAQ-f28p65x.md",
+    "updated": "2026-10-08",
+    "measured_on": "Measured 2026-10-08 on an Intel Mac (macOS 15.7.9) with CCStudio 21.0.1, C2000 compiler 25.11.1.LTS and C2000Ware 26.02.00.00 LTS. Code from RAM and from flash (2 wait states), 200 MHz.",
+    "next": {
+        "title": "What do I do first with the LAUNCHXL-F28P65X?",
+        "steps": [
+            "If the probe's firmware is below 3.0.0.43, update it with TI's `xdsdfu`, the same tool and steps as the LAUNCHXL-F2800137",
+            "Build a connection file from C2000Ware's own `device_support/f28p65x/common/targetConfigs/TMS320F28P650DK9.ccxml`, not from a single-core board's file; add only the probe's serial number",
+            "Build and load TI's `led_ex1_blinky` from a terminal: `c2000-launchpad/tools/c2kbuild_f28p65x.sh <folder> FLASH`, then the scripting runner `c2000-launchpad/tools/c2krun_f28p65x.js`",
+            "Read this board's FAQ for the two problems specific to this chip, and the LAUNCHXL-F2800137's FAQ for problems common to C2000 LaunchPad development kits in general"
+        ],
+        "source": "c2000-launchpad/bench/RESULTS-f28p65x.md"
+    },
+    "line": "Two cores, each with a control law accelerator, plus EtherCAT and CAN-FD. Only the first core has run."
+}

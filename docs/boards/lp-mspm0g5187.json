@@ -1,0 +1,77 @@
+{
+ "name": "LP-MSPM0G5187 LaunchPad development kit",
+ "sources": "MSPM0G5187 data sheet SLVSJB5B (rev. March 2026, read 2026-10-07: features, NPU, memories, peripherals); LaunchPad user guide SLAU967 (November 2025, read 2026-10-07: kit contents, Table 2-1 jumpers J6 to J25, J101 isolation block, Figure 2-3 BoosterPack pinout, PCM1809 audio ADC and ICS-40720 microphone in the schematic); MSPM0 SDK 2.11.00.07 example READMEs (pins)",
+ "columns": [
+  {
+   "head": "The chip: MSPM0G5187",
+   "items": [
+    [
+     "Processor: Arm Cortex-M0+",
+     "Runs the program, up to 80 million steps a second (80 MHz). No floating-point unit"
+    ],
+    [
+     "Neural accelerator (NPU)",
+     "TinyEngine: runs small neural nets in hardware, 2.56 billion operations a second at 80 MHz"
+    ],
+    [
+     "Flash: 128 kB / RAM: 32 kB",
+     "Same as the LP-MSPM0G3507. Plus 8 kB of data flash"
+    ],
+    [
+     "Power: 3.3 V on this board",
+     "The chip accepts 1.62 to 3.6 V, so 5 V parts need care"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "USB 2.0 full speed",
+     "The chip itself can be a USB device (keyboard, sound card, serial port) or a USB host"
+    ],
+    [
+     "I2S audio",
+     "The digital audio bus for microphones, DACs and amplifiers. The only MSPM0 family with it"
+    ],
+    [
+     "UART, I2C, SPI: 4 shared ports",
+     "Each port is set to one job; one SPI runs to 32 Mbit/s"
+    ],
+    [
+     "ADC: 1",
+     "12-bit voltmeter at 1.6 million samples a second. No 12-bit DAC to make a voltage"
+    ],
+    [
+     "AES, CRC",
+     "Hardware encryption and checksums. No random-number source or math accelerator listed"
+    ],
+    [
+     "Timers: 4",
+     "Timing and PWM, up to 14 channels"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "Debug probe with EnergyTrace, microphone into a PCM1809 audio ADC, microSD slot, RGB and red LEDs, 3 buttons"
+    ],
+    [
+     "Two USB-C ports",
+     "Top: the debug probe. Bottom right: the chip's own USB"
+    ],
+    [
+     "Headers",
+     "40 pins in four rows (J1 to J4), plus unlabeled extension headers on the underside"
+    ],
+    [
+     "Watch out",
+     "J6 powers the microphone, audio ADC and SD slot. TI's wake-word example listens on header pin 6, not on the onboard microphone"
+    ]
+   ]
+  }
+ ]
+}

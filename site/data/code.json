@@ -1,0 +1,129 @@
+{
+ "note": "One entry per board page id (the id in site/data/spectrum.json and projects.json): the folder in this repo that holds the board's code and notes, its README (the ten-minute path), FAQ (every error we hit, with the fix), AGENTS.md (the AI context file to copy into your own project) and the stopwatch. build is the one command from the README where the folder has a single one; otherwise the README's build section is the command. tools/site_out.py code_index() reads this and drops any path that does not exist, so a page never links to a missing file. Boards with no folder (nothing has run on them) have no entry. The clone command and the canonical site URL come from tools/site_out.py.",
+ "boards": {
+  "mspm0g3507": {
+   "folder": "mspm0g3507",
+   "readme": "mspm0g3507/README.md",
+   "faq": "mspm0g3507/FAQ.md",
+   "agents": "mspm0g3507/AGENTS.md",
+   "stopwatch": "mspm0g3507/STOPWATCH.md"
+  },
+  "mspm0l1306": {
+   "folder": "mspm0l1306",
+   "readme": "mspm0l1306/README.md",
+   "faq": "mspm0l1306/FAQ.md",
+   "agents": "mspm0l1306/AGENTS.md",
+   "stopwatch": "mspm0l1306/STOPWATCH.md"
+  },
+  "cc2340r5": {
+   "folder": "cc2340r5",
+   "readme": "cc2340r5/README.md",
+   "faq": "cc2340r5/FAQ.md",
+   "agents": "cc2340r5/AGENTS.md",
+   "stopwatch": "cc2340r5/STOPWATCH.md"
+  },
+  "cc1354p10": {
+   "folder": "cc1354p10",
+   "readme": "cc1354p10/README.md",
+   "faq": "cc1354p10/FAQ.md",
+   "agents": "cc1354p10/AGENTS.md",
+   "stopwatch": "cc1354p10/STOPWATCH.md"
+  },
+  "f2800137": {
+   "folder": "c2000-launchpad",
+   "readme": "c2000-launchpad/README.md",
+   "faq": "c2000-launchpad/FAQ.md",
+   "agents": "c2000-launchpad/AGENTS.md",
+   "stopwatch": "c2000-launchpad/STOPWATCH.md"
+  },
+  "f28p65x": {
+   "folder": "c2000-launchpad",
+   "readme": "c2000-launchpad/README.md",
+   "faq": "c2000-launchpad/FAQ-f28p65x.md",
+   "agents": "c2000-launchpad/AGENTS.md",
+   "stopwatch": "c2000-launchpad/STOPWATCH.md"
+  },
+  "cc2755p10": {
+   "folder": "cc2755p10",
+   "readme": "cc2755p10/README.md",
+   "faq": "cc2755p10/FAQ.md",
+   "agents": "cc2755p10/AGENTS.md",
+   "stopwatch": "cc2755p10/STOPWATCH.md"
+  },
+  "mspm33c321a": {
+   "folder": "mspm33c321a",
+   "readme": "mspm33c321a/README.md",
+   "faq": "mspm33c321a/FAQ.md",
+   "agents": "mspm33c321a/AGENTS.md",
+   "stopwatch": "mspm33c321a/STOPWATCH.md"
+  },
+  "mspm0c1104": {
+   "folder": "mspm0c1104",
+   "readme": "mspm0c1104/README.md",
+   "faq": "mspm0c1104/FAQ.md",
+   "agents": "mspm0c1104/AGENTS.md",
+   "stopwatch": "mspm0c1104/STOPWATCH.md"
+  },
+  "am13e230": {
+   "folder": "am13e230",
+   "readme": "am13e230/README.md",
+   "faq": "am13e230/FAQ.md",
+   "agents": "am13e230/AGENTS.md",
+   "stopwatch": "am13e230/STOPWATCH.md"
+  },
+  "am263p": {
+   "folder": "am263p",
+   "readme": "am263p/README.md",
+   "faq": "am263p/FAQ.md",
+   "agents": "am263p/AGENTS.md",
+   "stopwatch": "am263p/STOPWATCH.md"
+  },
+  "mspm0g5187": {
+   "folder": "mspm0g5187",
+   "readme": "mspm0g5187/README.md",
+   "faq": "mspm0g5187/FAQ.md",
+   "agents": "mspm0g5187/AGENTS.md",
+   "stopwatch": "mspm0g5187/STOPWATCH.md"
+  },
+  "mspm0g3519": {
+   "folder": "mspm0g3519",
+   "readme": "mspm0g3519/README.md",
+   "faq": "mspm0g3519/FAQ.md",
+   "agents": "mspm0g3519/AGENTS.md",
+   "stopwatch": "mspm0g3519/STOPWATCH.md"
+  },
+  "cc3551e": {
+   "folder": "cc35x1",
+   "readme": "cc35x1/README.md",
+   "faq": "cc35x1/FAQ.md",
+   "agents": "cc35x1/AGENTS.md",
+   "stopwatch": "cc35x1/STOPWATCH.md"
+  },
+  "am62l-evm": {
+   "folder": "am62l-evm",
+   "readme": "am62l-evm/README.md",
+   "faq": "am62l-evm/FAQ.md",
+   "agents": "am62l-evm/AGENTS.md"
+  },
+  "beagley-ai": {
+   "folder": "beagley-ai",
+   "readme": "beagley-ai/README.md",
+   "faq": "beagley-ai/FAQ.md",
+   "agents": "beagley-ai/AGENTS.md"
+  },
+  "tda4": {
+   "folder": "tda4",
+   "readme": "tda4/README.md",
+   "faq": "tda4/FAQ.md",
+   "agents": "tda4/AGENTS.md",
+   "stopwatch": "tda4/STOPWATCH.md"
+  },
+  "iwrl6432aop": {
+   "folder": "iwrl6432boost",
+   "readme": "iwrl6432boost/README.md",
+   "faq": "iwrl6432boost/FAQ.md",
+   "agents": "iwrl6432boost/AGENTS.md",
+   "stopwatch": "iwrl6432boost/STOPWATCH.md"
+  }
+ }
+}

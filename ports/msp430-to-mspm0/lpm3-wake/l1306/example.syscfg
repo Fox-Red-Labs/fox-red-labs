@@ -1,0 +1,37 @@
+// @cliArgs --board /ti/boards/LP_MSPM0L1306 --rtos nortos
+//@cliArgs --device "MSPM0L130X" --package "VQFN-32(RHB)" --part "Default"
+//@v2CliArgs --device "MSPM0L1306" --package "VQFN-32(RHB)"
+// Port of msp430fr243x_LPM3_01: a 1 s interval timer from the 32 kHz clock wakes the chip from deep sleep and toggles an LED.
+// WWDT0 in interval mode is the closest part to the MSP430 watchdog in interval mode; it runs from LFCLK in STANDBY.
+const Board  = scripting.addModule("/ti/driverlib/Board", {}, false);
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const WWDT   = scripting.addModule("/ti/driverlib/WWDT", {}, false);
+const WWDT1  = WWDT.addInstance();
+
+Board.configureUnused = true;
+
+GPIO1.$name                         = "GPIO_LEDS";
+GPIO1.associatedPins[0].$name       = "USER_LED_1";
+GPIO1.associatedPins[0].assignedPort = "PORTA";
+GPIO1.associatedPins[0].assignedPin  = "0";
+GPIO1.associatedPins[0].initialValue = "CLEARED";
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.txPin.$assign = "PA8";
+UART1.peripheral.rxPin.$assign = "PA9";
+UART1.targetBaudRate           = 115200;
+
+SYSCTL.powerPolicy = "STANDBY0";
+SYSCTL.clockTreeEn = true;
+
+WWDT1.$name              = "WWDT0";
+WWDT1.sleepMode          = true;
+WWDT1.enabledInterrupts  = true;
+WWDT1.wwdtMode           = "INTERVAL";
+WWDT1.clockDivider       = "1";
+WWDT1.periodCount        = "15";

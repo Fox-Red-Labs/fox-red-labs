@@ -1,0 +1,1065 @@
+{
+ "note": "Vendor-neutral names for what code is trying to do. Each idiom says what a check must confirm. Entries in apis/ map a vendor call into an idiom; entries in impl/ say how a target does that idiom, with proof.",
+ "idioms": {
+  "system.init": {
+   "means": "one call at start that brings the chip and its clocks and pins to a known state",
+   "check": "program reaches main loop; a pin toggles"
+  },
+  "clock.system_config": {
+   "means": "choose the CPU and bus clock tree at start",
+   "check": "measure a timer or a baud rate against the clock the code assumes"
+  },
+  "clock.peripheral_enable": {
+   "means": "turn on the bus clock or power of a peripheral before touching its registers",
+   "check": "read back a register of the peripheral; zero after power-up means it was not enabled"
+  },
+  "time.delay_ms": {
+   "means": "blocking wait of N milliseconds",
+   "check": "scope or logic analyzer on a toggling pin against the period the source states"
+  },
+  "time.delay_us": {
+   "means": "blocking wait of N microseconds",
+   "check": "pin pulse width"
+  },
+  "time.delay_cycles": {
+   "means": "blocking wait of N CPU cycles",
+   "check": "pin pulse width at the clock in use"
+  },
+  "time.tick_ms": {
+   "means": "millisecond counter since start",
+   "check": "two reads 1 s apart differ by 1000"
+  },
+  "time.tick_us": {
+   "means": "microsecond counter since start",
+   "check": "two reads 1 s apart differ by 1,000,000"
+  },
+  "time.periodic_irq": {
+   "means": "interrupt at a fixed period (system tick or timer)",
+   "check": "count of interrupts in 10 s"
+  },
+  "irq.enable": {
+   "means": "enable one interrupt line in the core's interrupt controller",
+   "check": "handler runs once"
+  },
+  "irq.priority": {
+   "means": "set the preemption priority of one interrupt",
+   "check": "two handlers that must not preempt each other do not"
+  },
+  "irq.global_disable": {
+   "means": "mask all interrupts around a critical section and restore the previous mask",
+   "check": "shared state stays consistent under load"
+  },
+  "irq.vector_name": {
+   "means": "the name of the interrupt handler function the startup file binds to a vector",
+   "check": "the handler runs; a missing name falls into the default endless loop"
+  },
+  "gpio.config_pin": {
+   "means": "set a pin as output, input, pull-up or pull-down, or alternate function",
+   "check": "read the pin level with and without a load"
+  },
+  "gpio.write": {
+   "means": "drive an output pin high or low",
+   "check": "pin level on a meter or logic analyzer"
+  },
+  "gpio.toggle": {
+   "means": "invert an output pin",
+   "check": "pin changes on every call"
+  },
+  "gpio.read": {
+   "means": "read an input pin level",
+   "check": "read with the input driven both ways"
+  },
+  "gpio.input_irq_edge": {
+   "means": "interrupt on a pin edge, with the pull and edge the button needs",
+   "check": "press the button (or drive the pin) and see one handler run per press"
+  },
+  "gpio.irq_callback": {
+   "means": "application function called from the pin interrupt",
+   "check": "one call per edge, not two"
+  },
+  "board.led_button": {
+   "means": "the LED and button pins and their active level on the target board",
+   "check": "LED on when the code says on; button press reads as pressed"
+  },
+  "uart.init_8n1": {
+   "means": "open a UART at a baud rate, 8 data bits, no parity, one stop bit",
+   "check": "host terminal at that baud shows the text"
+  },
+  "uart.fifo_config": {
+   "means": "UART FIFO enable and threshold levels",
+   "check": "no lost bytes at the line rate; check the FIFO depth in the data sheet"
+  },
+  "uart.tx_blocking": {
+   "means": "send a buffer and wait until it has left",
+   "check": "host reads the exact bytes"
+  },
+  "uart.tx_byte_blocking": {
+   "means": "send one byte after the transmit register is free",
+   "check": "host reads the exact bytes"
+  },
+  "uart.rx_byte_blocking": {
+   "means": "wait for and read one received byte",
+   "check": "send one byte from the host and see it in code"
+  },
+  "uart.tx_dma": {
+   "means": "transmit a buffer by DMA and learn when it is done",
+   "check": "host reads the exact bytes while the CPU does other work; done interrupt fires once per buffer"
+  },
+  "uart.dma_trigger": {
+   "means": "tie the UART receive or transmit request to a DMA channel",
+   "check": "bytes reach memory with no CPU read"
+  },
+  "uart.rx_circular_dma": {
+   "means": "receive into a ring buffer by DMA with half and full transfer events",
+   "check": "burst of packets at the line rate with none lost"
+  },
+  "uart.rx_until_idle": {
+   "means": "know when the sender went quiet (idle-line event) so a partial buffer can be handed on",
+   "check": "a one-packet message is answered without a following packet; round trip against the original"
+  },
+  "analog.comparator": {
+   "means": "analog comparator with a reference and an output pin or interrupt",
+   "check": "output follows the input crossing the reference; with nothing driven the program only loops"
+  },
+  "analog.opamp": {
+   "means": "on-chip operational amplifier",
+   "check": "output equals gain times input on a known input"
+  },
+  "system.reset": {
+   "means": "software reset and the reset-cause flags read after boot",
+   "check": "cause flag differs after a software reset from after power-up"
+  },
+  "uart.driver_api": {
+   "means": "the vendor's open/read/write/close UART driver (blocking or callback), not registers",
+   "check": "same text and same echo as the original driver example"
+  },
+  "config.generated_names": {
+   "means": "the port, pin and instance names a vendor's config tool writes into its header and the application uses",
+   "check": "application compiles with no edit; the names point at the same pins"
+  },
+  "console.print": {
+   "means": "text output to the serial console",
+   "check": "same text on the host terminal"
+  },
+  "dma.config_channel": {
+   "means": "set a DMA channel's direction, increment modes, data widths and mode",
+   "check": "memory holds the expected bytes after one transfer"
+  },
+  "dma.set_addr_len": {
+   "means": "set source, destination and transfer length for the next DMA transfer",
+   "check": "length moved equals the length asked"
+  },
+  "dma.channel_enable": {
+   "means": "start or stop a DMA channel",
+   "check": "transfer starts when armed"
+  },
+  "dma.remaining_count": {
+   "means": "bytes the DMA has still to move, used as a write position",
+   "check": "position equals the bytes sent so far"
+  },
+  "dma.complete_irq": {
+   "means": "interrupt when a DMA transfer is done, and clearing its flag",
+   "check": "one interrupt per transfer"
+  },
+  "dma.circular_halfcomplete": {
+   "means": "a DMA that wraps by itself and interrupts at half and full",
+   "check": "no byte lost across the wrap at the line rate"
+  },
+  "adc.config_channel": {
+   "means": "choose ADC channels, resolution, sampling time and trigger",
+   "check": "known input voltage reads the expected counts"
+  },
+  "adc.start_conversion": {
+   "means": "start a conversion and read the result",
+   "check": "known input voltage reads the expected counts"
+  },
+  "adc.multichannel_dma": {
+   "means": "convert a sequence of channels and move all results to memory by DMA",
+   "check": "buffer holds one fresh result per channel after each start; the next start works too"
+  },
+  "adc.done_callback": {
+   "means": "application function when the conversion buffer is full",
+   "check": "callback runs once per sequence"
+  },
+  "pwm.config_channel": {
+   "means": "set period, duty and polarity of a PWM channel",
+   "check": "duty and frequency on a logic analyzer"
+  },
+  "pwm.start_channel": {
+   "means": "start a PWM output",
+   "check": "pin shows the duty cycle the source set"
+  },
+  "power.sleep": {
+   "means": "stop the CPU until an interrupt, in a sleep or deep sleep state",
+   "check": "current drops; the wake interrupt runs"
+  },
+  "wdt.watchdog": {
+   "means": "reset the chip if the program stops feeding the watchdog",
+   "check": "unfed watchdog resets; fed one does not; check the window rules"
+  },
+  "crc.compute": {
+   "means": "hardware CRC of a block",
+   "check": "same value as a host script for the same bytes"
+  },
+  "flash.write": {
+   "means": "erase and program the chip's own flash",
+   "check": "read back equals what was written; neighbours intact"
+  },
+  "rtos.task_create": {
+   "means": "create a task or thread",
+   "check": "task runs and shares the CPU with the others"
+  },
+  "rtos.delay": {
+   "means": "sleep the calling task for N ticks",
+   "check": "period on a pin"
+  },
+  "atomic.c11": {
+   "means": "C11 atomics used by a portable library (ring buffers)",
+   "check": "library test passes; no atomic library call in the link map"
+  },
+  "vendor.no_equivalent": {
+   "means": "a call that configures something only the source chip has",
+   "check": "behavior that the call served is checked by name"
+  },
+  "hid.report_descriptor_pack": {
+   "means": "build a HID report descriptor and pack an input report from button and axis state",
+   "check": "descriptor and reports equal the original's bytes on the same call sequence"
+  },
+  "bytes.pack_8bit": {
+   "means": "store bytes in a buffer that goes to a byte-oriented radio or host",
+   "check": "printed bytes equal the original's"
+  },
+  "ble.stack_init": {
+   "means": "start the Bluetooth LE host and controller",
+   "check": "device advertises"
+  },
+  "ble.gatt_server": {
+   "means": "create a GATT server and register services",
+   "check": "services listed by a client"
+  },
+  "ble.gatt_characteristic": {
+   "means": "define a service, characteristic or descriptor with UUID, properties and permissions",
+   "check": "client reads and writes it; properties match"
+  },
+  "ble.hid_service": {
+   "means": "HID over GATT service: information, report map, control point, protocol mode, report with report reference",
+   "check": "host OS lists the device as HID and reads the report map"
+  },
+  "ble.hid_report_notify": {
+   "means": "set an input report value and notify the subscribed host",
+   "check": "host receives the report bytes when subscribed"
+  },
+  "ble.advertise": {
+   "means": "advertising data, appearance, name, service UUIDs, restart after disconnect",
+   "check": "scanner sees name, appearance and UUIDs; advertises again after a disconnect"
+  },
+  "ble.device_info": {
+   "means": "Device Information service fields (manufacturer, model, serial, revisions, PnP ID)",
+   "check": "client reads the same strings as the original"
+  },
+  "ble.battery_service": {
+   "means": "Battery service level",
+   "check": "client reads the level"
+  },
+  "ble.conn_callbacks": {
+   "means": "application callbacks for connect, disconnect, subscribe, pairing",
+   "check": "each event reaches the application once"
+  },
+  "ble.security_bonding": {
+   "means": "pairing method, encryption of attribute reads, bonding",
+   "check": "host pairs and the link is encrypted; reconnect works"
+  },
+  "ble.conn_params": {
+   "means": "request connection interval and latency",
+   "check": "interval seen by the host"
+  },
+  "boot.jump_to_app": {
+   "means": "a bootloader starts another program image whose vector table sits elsewhere in flash",
+   "check": "the application's own interrupts run after the jump, and a reset with a stored image jumps again"
+  },
+  "uart.recover_after_error": {
+   "means": "make the UART usable again after a timeout, an overrun or an aborted transfer",
+   "check": "after an aborted transfer a good one still works"
+  },
+  "gpio.open_drain_soft_i2c": {
+   "means": "open-drain pin emulated with output enable and a read-back, for bit-banged I2C",
+   "check": "read an I2C device ID through the bit-banged bus"
+  },
+  "adc.single_channel_runtime_select": {
+   "means": "read one ADC channel chosen at run time, one conversion at a time",
+   "check": "counts at rest match the expected mid-scale or zero"
+  },
+  "adc.button_on_analog_only_pin": {
+   "means": "a button read through an ADC channel because the pin has no GPIO function",
+   "check": "released reads near full scale; pressed reads near zero"
+  },
+  "uart.tx_only_console": {
+   "means": "print console that claims only the transmit pin",
+   "check": "the receive pin still works as a button or other input"
+  },
+  "spi.display_stream_dma": {
+   "means": "stream a block of display bytes over SPI by DMA with a done flag",
+   "check": "frame time equals bytes times 8 over the clock, plus start-up"
+  },
+  "time.cycle_stamp": {
+   "means": "free-running counter for timing a frame, from the cycle counter or the system tick",
+   "check": "two stamps around a delay differ by the delay"
+  },
+  "sysconfig.generate_from_pin_table": {
+   "means": "write the pin-configuration file and the C header from one table",
+   "check": "generated files build for every board in the table"
+  },
+  "display.frl_platform_adapter": {
+   "means": "connect a portable game layer to a board display, stick and buzzer through one small adapter",
+   "check": "the game draws and the stick moves it"
+  },
+  "spi.frame_whole_word": {
+   "means": "a converter write that must arrive as one 16-bit frame with chip select held low",
+   "check": "the converter output changes; split transfers leave it unchanged"
+  },
+  "gpio.shutdown_active_high": {
+   "means": "an amplifier shutdown input that is active high whatever the header calls it",
+   "check": "sound plays with the line low and not with it high"
+  },
+  "adc.software_triggered_single": {
+   "means": "one software-started conversion of one channel",
+   "check": "a known voltage reads the expected counts"
+  },
+  "timer.periodic_tick_8khz": {
+   "means": "periodic tick at a fixed rate derived from the real core clock",
+   "check": "the capture rate matches the tone bins in a DFT"
+  },
+  "build.sdk_example_frame_extra_sources": {
+   "means": "reuse a vendor example makefile and add the repository sources to it",
+   "check": "the image builds and the stale generated header is gone"
+  },
+  "i2c.controller_poll": {
+   "means": "polled I2C controller transfer",
+   "check": "a device ID reads back"
+  },
+  "i2c.bus_recover": {
+   "means": "free a bus held low by a sensor after a reset: nine clocks and a stop on the pins as GPIO",
+   "check": "the bus reads idle high and the next transfer succeeds"
+  },
+  "gpio.power_switch_pin": {
+   "means": "a header pin that switches the supply of a sensor, with its own polarity",
+   "check": "the sensor answers only when the pin is in its on state"
+  },
+  "sysconfig.pin_missing": {
+   "means": "a pin the board file names but the SysConfig device data does not offer",
+   "check": "SysConfig runs without error for the chosen pin set"
+  },
+  "imu.bmi160_stream": {
+   "means": "burst read of motion data at a fixed rate with sensor timestamps",
+   "check": "100 Hz with no missing sample over a minute"
+  },
+  "serial.csv_stream_100hz": {
+   "means": "text lines streamed at 100 per second over a UART",
+   "check": "line count and rate over a minute"
+  },
+  "mem.progmem_read": {
+   "means": "read constant data placed in program memory on a chip with split address spaces",
+   "check": "strings and tables print correctly"
+  },
+  "audio.square_tone": {
+   "means": "start a square-wave tone of a frequency and duration",
+   "check": "dominant frequency from a microphone or capture"
+  },
+  "storage.eeprom_bytes": {
+   "means": "byte-addressed non-volatile settings store",
+   "check": "a value survives power-off"
+  },
+  "display.page_buffer_1bit": {
+   "means": "a one-bit page-format frame buffer streamed to a different panel",
+   "check": "the same picture on the panel as on the host"
+  },
+  "input.stick_to_dpad": {
+   "means": "two-axis analog stick turned into four directions with a dead band",
+   "check": "each direction fires once and rest fires none"
+  },
+  "time.frame_pacing": {
+   "means": "fixed frame rate loop over a millisecond clock",
+   "check": "one frame per period over a run"
+  },
+  "build.arduino_sketch": {
+   "means": "build an .ino sketch with a plain C++ compiler",
+   "check": "the sketch builds and runs"
+  },
+  "lib.rand_arduino": {
+   "means": "random numbers with a seed from an entropy source or the clock",
+   "check": "two power-ups differ"
+  },
+  "udp.server_bind": {
+   "means": "bind a UDP port and answer each datagram",
+   "check": "a query gets an answer"
+  },
+  "net.wifi_join_static": {
+   "means": "join a Wi-Fi network with credentials fixed at build time",
+   "check": "the board gets an address"
+  },
+  "rodata.table_in_flash": {
+   "means": "a large constant table linked into execute-in-place flash",
+   "check": "table bytes read back from the mapped address"
+  },
+  "http.status_page": {
+   "means": "serve one small status page over TCP",
+   "check": "a browser or curl gets the page"
+  },
+  "lcd.fill_rect_push_pixels": {
+   "means": "fill a rectangle and push pixel data to a 16-bit SPI screen",
+   "check": "measured full-screen fill time and picture on the panel"
+  },
+  "lcd.full_frame_buffer": {
+   "means": "a full-screen frame buffer in RAM",
+   "check": "the panel shows the picture without the buffer"
+  },
+  "touch.read_point": {
+   "means": "read one touch point from the touch controller",
+   "check": "finger coordinates, or no failed reads over many polls"
+  },
+  "touch.gesture": {
+   "means": "turn touch points into tap, long press and swipe",
+   "check": "scripted gestures give the expected events"
+  },
+  "time.millis_micros": {
+   "means": "millisecond and microsecond clocks from the system tick",
+   "check": "two reads one second apart differ by 1000 ms"
+  },
+  "data.pgm_table": {
+   "means": "constant tables for fonts and sprites",
+   "check": "the glyphs draw correctly"
+  },
+  "math.random": {
+   "means": "small pseudo-random generator",
+   "check": "identical seeds give identical runs"
+  },
+  "dsp.fir_block": {
+   "means": "block FIR filter",
+   "check": "output equals the integer reference"
+  },
+  "dsp.filter_bank": {
+   "means": "bank of filters, one per band",
+   "check": "each band equals the reference"
+  },
+  "dsp.decimate_fir": {
+   "means": "FIR followed by decimation",
+   "check": "output equals the reference"
+  },
+  "dsp.block_peak": {
+   "means": "peak of each block",
+   "check": "peak equals the reference"
+  },
+  "dsp.threshold_compare": {
+   "means": "per-channel comparison against a threshold",
+   "check": "trip flags equal the reference"
+  },
+  "dsp.dft_matrix": {
+   "means": "DFT as a matrix multiply",
+   "check": "bins equal the reference"
+  },
+  "npu.skip_normalize": {
+   "means": "feed int8 data to a compiled model without the float input scaling",
+   "check": "no CPU layer in the compile log"
+  },
+  "clock.pll_80mhz_checked": {
+   "means": "start the PLL and verify its frequency with the counter before switching to it",
+   "check": "frequency counter reads the target within tolerance"
+  },
+  "gpio.pin_by_name": {
+   "means": "address a pin by port and bit name through a generated table",
+   "check": "the named pin toggles"
+  },
+  "gpio.open_drain_emulated": {
+   "means": "open-drain from an input with pull-up and an output enabled only to pull low",
+   "check": "a bit-banged bus reads idle and scans"
+  },
+  "bus.soft_i2c_spi": {
+   "means": "bit-banged I2C and SPI",
+   "check": "a scan or transfer on idle pins behaves as expected"
+  },
+  "memory.ecc_sram_prime": {
+   "means": "write every word of an error-corrected RAM before byte stores",
+   "check": "no ECC fault at boot"
+  },
+  "gc.heap_from_linker": {
+   "means": "size the managed heap from linker symbols",
+   "check": "free heap reads as expected after boot"
+  },
+  "build.vendor_startup_reuse": {
+   "means": "compile the vendor start-up file unchanged and match its symbols in the linker file",
+   "check": "the image reaches main"
+  },
+  "runtime.python_console_uart": {
+   "means": "Python REPL on a UART with an interrupt-fed ring",
+   "check": "banner and prompt on the UART"
+  },
+  "display.frame_out_direct": {
+   "means": "hand each rendered frame to the platform without an output buffer",
+   "check": "the platform receives the frame"
+  },
+  "render.screen_melt_off": {
+   "means": "compile out a transition effect that needs extra screens",
+   "check": "RAM peak drops"
+  },
+  "storage.wad_lump_read": {
+   "means": "read a large data file in pieces or in place",
+   "check": "the file hashes to the expected SHA-1"
+  },
+  "libc.no_files_no_stdio": {
+   "means": "run code that uses files and stdio on a target with neither",
+   "check": "the program starts and logs without stopping"
+  },
+  "memory.zone_static": {
+   "means": "a fixed-size static pool in place of a large malloc",
+   "check": "the program allocates from it"
+  },
+  "rodata.state_tables_const": {
+   "means": "keep large read-only tables in flash",
+   "check": "map shows the data section shrink"
+  },
+  "render.static_limits_trimmed": {
+   "means": "compile-time limits sized to the data actually used",
+   "check": "no limit hit on the test demos"
+  },
+  "test.arm_binary_in_emulator": {
+   "means": "run the target image in a CPU emulator when the board is not on the bench",
+   "check": "frame checksums equal the host build"
+  },
+  "memory.place_big_array": {
+   "means": "place a named large array first in a chosen RAM region by linker section",
+   "check": "the map shows the section at the address"
+  },
+  "memory.use_code_ram_for_data": {
+   "means": "use a code RAM block as ordinary data",
+   "check": "data in the block reads back"
+  },
+  "flash.application_slot_size": {
+   "means": "size the application slot to hold a large image",
+   "check": "the signed image builds and boots"
+  },
+  "rtos.big_thread_stack": {
+   "means": "give an RTOS thread a larger stack",
+   "check": "the deepest use is below the size"
+  },
+  "spi.byte_order_lsb_first": {
+   "means": "a peripheral that wants the least significant bit first on an MSB-first SPI",
+   "check": "the panel shows the right pixels"
+  },
+  "time.ms_tick_no_systick": {
+   "means": "millisecond tick from a timer when the system tick is not available",
+   "check": "a counter rises once per millisecond"
+  },
+  "display.no_framebuffer_bands": {
+   "means": "draw a scene in bands and send each band as its own update",
+   "check": "the picture is right with a buffer of a few lines"
+  },
+  "fs.fat_read_small_ram": {
+   "means": "read a FAT file system with no sector buffer",
+   "check": "file bytes equal the image"
+  },
+  "sd.spi_mode_shared_bus": {
+   "means": "a microSD card in SPI mode on a bus shared with a panel",
+   "check": "card reads work and the panel stays right"
+  },
+  "rtos.none_stack_painting": {
+   "means": "measure stack use by painting the unused stack",
+   "check": "free bytes read after the run"
+  },
+  "debug.attach_resets_target": {
+   "means": "read results in the same debugger session that flashed, since a second attach resets the chip",
+   "check": "the struct read shows the running state"
+  },
+  "display.spi_panel_init": {
+   "means": "start a small SPI panel from devicetree",
+   "check": "the picture is the right way up and in place"
+  },
+  "gpio.header_nexus": {
+   "means": "BoosterPack header as a GPIO map with a mask",
+   "check": "a pin reference with flags resolves"
+  },
+  "devicetree.label_order": {
+   "means": "order of overlay includes when a shield uses the board connector",
+   "check": "no undefined label error"
+  },
+  "spi.pin_mux_missing": {
+   "means": "declare a pin function the HAL pinctrl file does not list",
+   "check": "the clock appears on the pin"
+  },
+  "spi.bitbang_fallback": {
+   "means": "SPI by GPIO toggling when no SPI driver exists",
+   "check": "the same display node works on it"
+  },
+  "gpio.port_tables": {
+   "means": "pins in a port the driver tables do not name",
+   "check": "no undeclared-table build error"
+  },
+  "display.memory_lcd": {
+   "means": "memory LCD with a periodic polarity flip sent in the serial data",
+   "check": "no image fade over minutes"
+  },
+  "dac.spi_dac_audio": {
+   "means": "SPI DAC and amplifier audio output",
+   "check": "the right frequency from a microphone"
+  },
+  "build.lvgl_options": {
+   "means": "graphics library option names that change between releases",
+   "check": "Kconfig has no warning"
+  },
+  "display.scale_to_square": {
+   "means": "scale a picture to a square panel with packed shades and ordered dither",
+   "check": "picture compared by eye with the source"
+  },
+  "input.dpad_two_buttons": {
+   "means": "stick and two buttons as a D-pad with chords for the missing buttons",
+   "check": "menus reach the game"
+  },
+  "storage.rom_in_place": {
+   "means": "read a ROM image where it sits in flash",
+   "check": "ROM links and reads"
+  },
+  "storage.cart_ram": {
+   "means": "static buffer for cartridge RAM",
+   "check": "saved values read back"
+  },
+  "build.single_header_c": {
+   "means": "single-header library included once",
+   "check": "builds with both compilers"
+  },
+  "time.benchmark_cpu": {
+   "means": "benchmark by process CPU time on a loaded host",
+   "check": "median of runs within a few percent"
+  },
+  "safety.rom_indexed_arrays": {
+   "means": "array indexes taken from untrusted file bytes",
+   "check": "crafted input fails the unpatched build and passes the patched one"
+  },
+  "adc.single_channel_mv": {
+   "means": "read one analog sensor output on a fixed ADC channel and convert to millivolts",
+   "check": "a known sensor output reads the expected voltage"
+  },
+  "emulator.frontend_present_hook": {
+   "means": "connect an emulator or game layer to a board display through one present call, so only setup and loop are new",
+   "check": "the title screen of the game is drawn"
+  },
+  "dsp.pitch_yin_fixed": {
+   "means": "monophonic pitch in cents from integer arithmetic",
+   "check": "error against a double-precision reference on sine, guitar-like and noisy tones"
+  },
+  "dsp.fft_q15_block_float": {
+   "means": "spectrum bars from a 16-bit fixed-point FFT with a shared exponent",
+   "check": "bar heights within a pixel or two of a double-precision DFT"
+  },
+  "dsp.goertzel_dtmf": {
+   "means": "keypad tone decoding with eight Goertzel filters and a decision rule",
+   "check": "decoded digits against the sent digits across a noise sweep"
+  },
+  "audio.noise_gate_echo": {
+   "means": "a noise gate and an echo in integer arithmetic",
+   "check": "attenuation when closed and impulse response of the delay line"
+  },
+  "build.cycle_counter_dwt": {
+   "means": "cycle counter that a board without the Cortex-M33 trace unit can still link against",
+   "check": "the app links on both boards and reads zero where there is no counter"
+  },
+  "mem.mmap_weights": {
+   "means": "model weights read in place from a file mapping",
+   "check": "weights sit at an aligned address in flash and the first token matches"
+  },
+  "mem.static_runstate": {
+   "means": "run-time buffers sized at build time instead of allocated",
+   "check": "the program has no malloc and the image fits RAM"
+  },
+  "mem.lazy_dequant_row": {
+   "means": "convert only the row of a large table that the current step needs",
+   "check": "output bytes equal the full-table version"
+  },
+  "quant.group_size_divides_all": {
+   "means": "quantization group size that divides every vector length",
+   "check": "the size divides every dimension; greedy output matches the float build"
+  },
+  "ml.torch_free_export": {
+   "means": "model export without the training framework",
+   "check": "the unmodified runner loads the file and matches the float model at temperature 0"
+  },
+  "libc.sscanf_byte_token": {
+   "means": "hand-parsed byte token in place of sscanf",
+   "check": "output equal to the sscanf build"
+  },
+  "libc.sprintf_concat": {
+   "means": "string concatenation without the printf family",
+   "check": "output equal to the sprintf build"
+  },
+  "math.libm_float": {
+   "means": "single-precision math functions from the target C library",
+   "check": "greedy output equal; logit drift measured"
+  },
+  "host.emulator_run_to_symbol": {
+   "means": "run firmware in an emulator until a named symbol, then read a result block in RAM",
+   "check": "the emulator stops at the symbol and the block holds the expected values"
+  },
+  "runtime.wasm_interpreter_fixed_heap": {
+   "means": "a bytecode interpreter whose heap is one static array",
+   "check": "no malloc is linked and the heap high-water mark is read"
+  },
+  "runtime.native_stack_budget": {
+   "means": "limit on the native stack an interpreter may use",
+   "check": "deep recursion traps instead of corrupting memory"
+  },
+  "runtime.wasm_call_ref_stack_check": {
+   "means": "native stack guard on indirect calls of an interpreter",
+   "check": "a recursive module traps patched and crashes unpatched"
+  },
+  "bind.host_function_raw": {
+   "means": "host functions linked into an interpreter by name and signature",
+   "check": "each import is called from the module and returns the expected value"
+  },
+  "build.wasm_without_toolchain": {
+   "means": "a small WebAssembly module made from text without a compiler target",
+   "check": "the module runs and gives the C answers"
+  },
+  "gpio.output_inverted_led": {
+   "means": "a pin driven low to light an LED, with the inversion set once on the pin",
+   "check": "the pin check sees the pin change and the LED level is the intended one"
+  },
+  "time.async_timer_delay": {
+   "means": "a delay that yields to an async executor instead of a busy loop",
+   "check": "the pin toggles at the requested period"
+  },
+  "uart.blocking_write_new": {
+   "means": "blocking serial write with the transmit and receive pins named in the order the driver wants",
+   "check": "the console shows the banner"
+  },
+  "debug.text_without_rtt": {
+   "means": "debug text printed on the UART when the flash path cannot read RTT",
+   "check": "the console shows the text with no probe-rs session"
+  },
+  "build.hal_git_dependency": {
+   "means": "a hardware layer taken from a pinned git commit when the package registry entry is empty",
+   "check": "the build resolves the same sources twice"
+  },
+  "build.link_interrupt_group": {
+   "means": "interrupt symbols supplied to the linker when the runtime feature is on",
+   "check": "the image links with every vector defined"
+  },
+  "storage.data_file_in_flash_xip": {
+   "means": "a large data file included in the image and read in place from external flash",
+   "check": "SHA of the data matches and the first frames match the reference"
+  },
+  "memory.short_pointer_window": {
+   "means": "16-bit pointers into a fixed 256 kB RAM window",
+   "check": "the zone and every statically pointed object lie inside the window"
+  },
+  "memory.bss_all_in_dram": {
+   "means": "all zero-initialised data placed in one RAM region by the linker file",
+   "check": "the map shows the sections in that region and the engine runs"
+  },
+  "time.virtual_game_clock": {
+   "means": "a clock that advances a fixed step per read, so output does not depend on speed",
+   "check": "frame checksums equal between a fast and a slow host"
+  },
+  "test.demo_end_report": {
+   "means": "firmware reports the end of each recorded demo on the console",
+   "check": "one DEMOEND line per demo"
+  },
+  "video.frame_sink_crc": {
+   "means": "a CRC over each frame in place of a display",
+   "check": "checksums equal a reference run frame for frame"
+  },
+  "memory.persistent_variable": {
+   "means": "a variable that keeps its value across reset and power-off (FRAM-resident, PERSISTENT or NOINIT in the source)",
+   "check": "value read after a software reset and after a power cycle equals the last one written"
+  },
+  "storage.append_log_counter": {
+   "means": "a counter kept as an append-only log of small records in one erase block, newest valid record wins, erase only when the block is full",
+   "check": "count after N resets is N more; the log wraps once without losing the count; erases equal N divided by the slots per block"
+  },
+  "memory.nvm_write_unprotect": {
+   "means": "open and close the write protection of the program non-volatile memory around a write",
+   "check": "a write outside the opened window is refused or ignored; inside it succeeds and reads back"
+  },
+  "memory.nvm_wait_states": {
+   "means": "set non-volatile memory wait states before raising the CPU clock above the memory's rated speed",
+   "check": "the program runs at the top clock with no fault and the same results as at the low clock"
+  },
+  "power.deep_sleep_timer_wake": {
+   "means": "deep sleep with only a low-frequency timer running; the timer interrupt wakes the CPU",
+   "check": "CPU-clock ticks counted across the sleep are a tiny fraction of the sleep time; the wake period matches a wall clock"
+  },
+  "power.shutdown_pin_wake": {
+   "means": "lowest power state: RAM and registers are lost, a pin or reset wakes the chip into a fresh start",
+   "check": "reset cause says wake from shutdown; RAM is cleared; non-volatile state is kept"
+  },
+  "uart.rx_wake_deep_sleep": {
+   "means": "a UART receive interrupt wakes the CPU from deep sleep, which echoes the byte",
+   "check": "a typed byte echoes from deep sleep; a back-to-back burst shows what the deep-sleep clock can sustain"
+  },
+  "clock.low_freq_aclk": {
+   "means": "choose the low-frequency clock that keeps running in deep sleep (crystal or internal 32 kHz)",
+   "check": "an interval timer on that clock measured against a wall clock over 30 s"
+  },
+  "clock.fll_dco_trim": {
+   "means": "tune the internal oscillator to a target frequency with a software trim loop at start",
+   "check": "measured clock against the target; the program needs no trim loop where the oscillator is factory-trimmed"
+  },
+  "gpio.release_after_lowpower_reset": {
+   "means": "release the pins held by the low-power reset state after they are configured",
+   "check": "pin state after wake equals the state set before sleep"
+  },
+  "gpio.unused_pins_safe": {
+   "means": "park unused pins as outputs driven low or as pulled inputs so they do not float or leak in sleep",
+   "check": "pin levels read back as set; sleep current needs a meter"
+  },
+  "timer.interval_watchdog_as_timer": {
+   "means": "use the watchdog in interval mode as a periodic timer that runs in deep sleep",
+   "check": "one interrupt per period, no reset"
+  },
+  "timer.capture_compare_pwm": {
+   "means": "timer capture/compare channels used for PWM, output compare or input capture",
+   "check": "frequency and duty (or captured period) on a logic analyzer against the source's numbers"
+  },
+  "spi.controller_init": {
+   "means": "open a SPI controller with mode (polarity and phase), bit order and clock rate",
+   "check": "a loopback or a known device returns the bytes sent"
+  },
+  "i2c.controller_init": {
+   "means": "open an I2C controller at 100 or 400 kHz with the pull-ups and addressing the source used",
+   "check": "a device ID reads back"
+  },
+  "display.scale_while_drawing": {
+   "means": "a frame scaled to the panel's size while each line is drawn, with no frame copy",
+   "check": "the scaled picture equals the unscaled one in shape on the panel and the instruction count per frame fell"
+  },
+  "display.stream_rows_dma": {
+   "means": "a frame sent to a panel as one window with rows queued by DMA instead of a blocking write per call",
+   "check": "one window per frame and the screen time per frame equals the wire time"
+  },
+  "perf.line_buffer_clear": {
+   "means": "a small buffer cleared a word at a time instead of through a library loop that clears a byte per pass",
+   "check": "instructions per frame before and after, same picture"
+  },
+  "clock.mspm33_160mhz": {
+   "means": "CPU clock raised from the default tree to the chip's top speed",
+   "check": "the clock the firmware reports equals the target and the wait states are set"
+  },
+  "perf.frame_skip": {
+   "means": "an emulator told to skip drawing every second frame while its logic still runs",
+   "check": "emulated frames keep the console's rate and the screen shows every second one"
+  },
+  "memory.fast_ram_for_hot_data": {
+   "means": "hot statics, working zone and stack placed in the fastest RAM, big buffers in slower RAM",
+   "check": "load cycles per memory are measured first and the frame rate follows"
+  },
+  "storage.lump_ram_cache": {
+   "means": "game data read in place from slow flash is copied to a RAM arena on first use",
+   "check": "frame checksums equal the reference and the frame rate rose"
+  },
+  "emu.interpreter_core_portable": {
+   "means": "an emulated machine's CPU as one C file with its state in a struct, no allocation and no hardware calls",
+   "check": "the same ROM gives the same screen on the host and on the board"
+  },
+  "emu.display_wait_vblank": {
+   "means": "a draw instruction that waits for the next 60 Hz frame, as the original machine did",
+   "check": "a text-heavy ROM draws one glyph per frame and shows after the expected frame count"
+  },
+  "gfx.scaled_dirty_rows": {
+   "means": "a small bitmap scaled up to a panel with only the changed rows sent",
+   "check": "full redraw time on the board and rows sent per frame"
+  },
+  "input.touch_keypad": {
+   "means": "a touch panel drawn as the key pad of the original machine",
+   "check": "a touch changes the key state the program reads"
+  },
+  "test.automation_byte_0x1ff": {
+   "means": "a test ROM told its platform through a byte in memory so it skips its menu",
+   "check": "the quirks screen equals the host's"
+  },
+  "emu.cpu_tick_pin_model": {
+   "means": "a CPU emulator that advances one clock per call and returns a pin word the machine decodes",
+   "check": "the screen memory after a fixed frame count equals the host machine's"
+  },
+  "emu.core_in_sram": {
+   "means": "an emulator's hot core and tick loop copied to SRAM at boot so its fetches skip the slow flash",
+   "check": "emulated speed before and after, measured by the firmware's timers"
+  },
+  "build.opt_level_for_emulators": {
+   "means": "the optimisation level picked by measuring the emulator, not by the usual default",
+   "check": "speed at each level on the same workload"
+  },
+  "gfx.band_dirty_shadow": {
+   "means": "an interleaved screen layout compared with a shadow copy in bands and only changed bands sent",
+   "check": "screen cost per frame at idle and under change"
+  },
+  "input.matrix_from_touch": {
+   "means": "a keyboard matrix read by the program built from a touch keyboard",
+   "check": "a touch changes the half-row bytes the program reads"
+  },
+  "legal.reader_supplies_rom": {
+   "means": "a copyrighted firmware image supplied by the reader at build time and kept out of the repository",
+   "check": "a ROM-less image still builds and runs"
+  },
+  "audio.mp3_decode_float": {
+   "means": "an MP3 decoded frame by frame from a byte array with no file or heap",
+   "check": "a checksum per frame equals the host decode"
+  },
+  "audio.mp3_stack_budget": {
+   "means": "stack reserved for a decoder whose one call keeps a large frame on the stack",
+   "check": "the image runs with the reserve and the frame size matches the disassembly"
+  },
+  "time.dwt_cycles_around_call": {
+   "means": "cycles of one call read from the core's cycle counter before and after it",
+   "check": "cycle counts repeat between runs"
+  },
+  "float.soft_float_cost": {
+   "means": "the price of float code on a core with no float unit",
+   "check": "cycles per frame on the core with and without the unit"
+  },
+  "float.fpu_check": {
+   "means": "a count of float-unit instructions and float-library calls in the disassembly",
+   "check": "the count shows the unit in use"
+  },
+  "fixed_point.none": {
+   "means": "a library that has only a float path and so no fixed-point alternative for a core without a float unit",
+   "check": "the library's source has no integer path"
+  },
+  "arduino.sketch_board_list": {
+   "means": "a one-file Arduino sketch that lists the boards it supports and stops with an error for any other",
+   "check": "the build copy compiles and boots with the unmodified original untouched"
+  },
+  "arduino.auto_prototypes": {
+   "means": "function prototypes written the way the Arduino IDE writes them for a sketch built outside it",
+   "check": "the sketch compiles with no undeclared function"
+  },
+  "arduino.serial_console": {
+   "means": "the Arduino Serial calls over a UART with polled transmit and an interrupt receive ring",
+   "check": "typed characters reach the prompt once each"
+  },
+  "arduino.time_millis_micros": {
+   "means": "millis, micros and delay from the system tick",
+   "check": "uLisp's own (time ...) matches a stopwatch and repeats between runs"
+  },
+  "arduino.digital_pins": {
+   "means": "pinMode, digitalWrite and digitalRead on pin numbers mapped to the board's LEDs",
+   "check": "a pin read shows the level written"
+  },
+  "arduino.analog_tone_spi_i2c_stubs": {
+   "means": "empty Arduino calls that return 0 or an error so a program's own commands compile and fail politely",
+   "check": "the program builds and the missing feature errors, not crashes"
+  },
+  "mcu.uart_instance_name": {
+   "means": "a UART block that carries a different instance name on another chip of the family",
+   "check": "the handler runs: a typed character reaches the program"
+  },
+  "lisp.autoexec_for_debug_check": {
+   "means": "a build option that feeds a line to an interpreter after reset so a debugger check has something to observe",
+   "check": "the observed pin or output changes without typing"
+  },
+  "perf.cycle_counter_without_dwt": {
+   "means": "a cycle count built from the RTOS tick and the SysTick reload and count on a core whose DWT counter reads 0",
+   "check": "the profile shows non-zero cycles"
+  },
+  "tooling.uninitialized_stack_array": {
+   "means": "an engine function that reads a stack array it never fully writes, so a different optimisation level changes the output",
+   "check": "frame checksums equal across optimisation levels after the array is zeroed"
+  },
+  "audio.lc3_codec_float": {
+   "means": "encode and decode 10 ms audio frames with the LC3 codec in single-precision float, state in static buffers, no heap",
+   "check": "encoded bytes and decoded samples equal a host build frame by frame (CRC-32 per frame)"
+  },
+  "codec.arm_dsp_path_guard": {
+   "means": "turn on a library's Arm DSP code paths that sit behind a compiler-version test the build's compiler does not meet",
+   "check": "the faster path is really compiled in (cycles fall) and the output bytes stay equal"
+  },
+  "float.fastmath_changes_bytes": {
+   "means": "a fast-math build writes different bytes from a strict build of the same code",
+   "check": "compare bytes across machines only between strict builds (no fast-math, no fused multiply-add contraction)"
+  },
+  "float.soft_float_link": {
+   "means": "link a soft-float program on a part whose vendor archive is built hard float",
+   "check": "the link succeeds and the float code runs without float-unit instructions"
+  },
+  "size.codec_feature_switch_off": {
+   "means": "drop the optional modes of a codec at build time to cut flash and stack",
+   "check": "output equal to the full build for the modes kept; flash and peak stack read from the map"
+  },
+  "test.integer_signal_generator": {
+   "means": "a test signal made only with integer arithmetic so a host and a board feed a codec identical samples",
+   "check": "the host and board streams are byte-identical"
+  },
+  "debug.dslite_memory_scale": {
+   "means": "read a block of target memory through the debugger's command line, whose size argument is in words not bytes",
+   "check": "the file holds the bytes asked for and the first bytes equal a known value"
+  },
+  "sensor.fixed_rate_slow_sensors": {
+   "means": "slow I2C sensors read inside a fixed 100 Hz sample loop without breaking the rate",
+   "check": "the capture shows the requested rate and no missing rows over a minute"
+  },
+  "time.grid_without_64bit_divide": {
+   "means": "a fixed-rate sample grid kept in 32-bit multiples of the period, since a Cortex-M0+ has no 64-bit divide",
+   "check": "no overrun or drift over a long capture; overruns are printed"
+  },
+  "display.indexed_to_rgb565_bands": {
+   "means": "an 8-bit palette frame converted to 16-bit colour in bands of rows while the previous band is on the wire by DMA",
+   "check": "a known test frame shows the right colours; the frame checksum is taken before conversion"
+  },
+  "spi.cs_gpio_between_commands": {
+   "means": "chip select driven as a GPIO so it can stay high for a few microseconds between panel commands",
+   "check": "the panel accepts every command through a level translator"
+  },
+  "audio.synth_voice_block_render": {
+   "means": "render a synthesizer voice in small fixed-size blocks into a RAM buffer, one call per block, no heap and no output device",
+   "check": "every engine's block checksums equal a host build; the engine index really changes the output (24 engines must not give one checksum)"
+  },
+  "cpp.tiarmclang_cxx_embedded": {
+   "means": "build a C++11 code base with virtual functions and static objects with the vendor Clang, exceptions and RTTI off",
+   "check": "the image links with libc++ and runs; output equal to the host build"
+  },
+  "build.test_macro_collision": {
+   "means": "a library's -D flag has the same name as a field in the vendor SDK header, so the flag is passed to the library files only",
+   "check": "the build compiles and the flag is absent from the files that include the SDK"
+  },
+  "float.strict_equals_host": {
+   "means": "compare float output across machines only between strict builds: same flags, no fast-math, no fused multiply-add contraction",
+   "check": "per-block or per-frame checksums equal between the host and the board"
+  },
+  "test.per_block_crc_reference": {
+   "means": "a CRC-32 per block on the host and on the board, read back as arrays, so a mismatch names the first block and the engine",
+   "check": "the first differing block index is printed, not only pass or fail"
+  },
+  "audio.opus_codec_fixed": {
+   "means": "encode and decode Opus with the fixed-point build, state in static buffers sized from the library's size calls, no heap",
+   "check": "packets and decoded PCM CRC-32 equal a host build made with the same multiply macros"
+  },
+  "int.opus_fast_int64": {
+   "means": "a library picks its 32 or 64-bit multiply macros from the host word size, so a 64-bit Mac and a 32-bit core run different arithmetic",
+   "check": "the host reference is built with the macro set to match the target before a mismatch is called a bug"
+  },
+  "audio.opus_arm_edsp": {
+   "means": "turn on a codec's inline Arm DSP multiply code with a build flag",
+   "check": "cycles fall and the output is compared with both host references"
+  },
+  "float.double_in_codec": {
+   "means": "a float build of a codec that calls double-precision routines on a single-precision FPU",
+   "check": "the image listing counts the soft-double call sites before a float build is chosen"
+  },
+  "audio.opus_mode_select": {
+   "means": "steer an Opus encoder to SILK or CELT with application, signal and bandwidth settings, not one mode switch",
+   "check": "the first byte of each packet shows the intended mode"
+  },
+  "size.opus_os": {
+   "means": "build a codec with the size flag when it costs no cycles",
+   "check": "flash from the size tool and cycles equal to the speed build"
+  },
+  "test.per_frame_crc": {
+   "means": "an array of per-frame packet and decoded-frame CRC-32 values read back with the results",
+   "check": "a mismatch names the frame and the side (encoder or decoder)"
+  },
+  "time.systick_overflow_32bit": {
+   "means": "time calls longer than a 24-bit counter wraps by counting SysTick overflows in the interrupt on a core with no DWT",
+   "check": "the clock agrees with a known delay and a host clock"
+  },
+  "debug.read_ram_without_reset": {
+   "means": "read a running target's RAM through the debugger without a reset",
+   "check": "the image keeps running and the results appear once"
+  }
+ }
+}

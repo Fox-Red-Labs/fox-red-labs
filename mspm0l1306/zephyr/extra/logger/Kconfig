@@ -1,0 +1,1 @@
+source "$(ZEPHYR_BASE)/samples/subsys/logging/logger/Kconfig"

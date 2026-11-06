@@ -1,0 +1,390 @@
+{
+ "id": "mspm0l1306",
+ "board": "LP-MSPM0L1306",
+ "part": "MSPM0L1306",
+ "family": "MSPM0",
+ "title": "Is the TI LP-MSPM0L1306 the right board for my project?",
+ "short": "A LaunchPad development kit for TI's MSPM0L1306: a 32 MHz Arm Cortex-M0+ with 64 kB of flash, 4 kB of RAM, two op-amps, and a light sensor and thermistor on the board. Per MHz it is as fast as the bigger MSPM0G3507; RAM is what limits it, so every program has to be sized for 4 kB first.",
+ "meet": {
+  "what": "A LaunchPad development kit for TI's MSPM0L1306 microcontroller, with the XDS110 debug probe built in: one USB cable powers it, flashes it and carries its serial port. It has three buttons (one is reset), a red LED, an RGB LED, a light sensor wired through op-amp 0, and a thermistor.",
+  "facts": [
+   [
+    "Chip",
+    "MSPM0L1306 (32-pin VQFN)"
+   ],
+   [
+    "CPU",
+    "Arm Cortex-M0+, 32 MHz from the internal oscillator (measured 32.16 MHz)"
+   ],
+   [
+    "Flash",
+    "64 kB"
+   ],
+   [
+    "RAM",
+    "4 kB"
+   ],
+   [
+    "Radios",
+    "None"
+   ],
+   [
+    "On the chip",
+    "12-bit ADC, 2 op-amps, 1 general-purpose amplifier, a comparator with an 8-bit DAC, CRC, 3 DMA channels"
+   ],
+   [
+    "Debug probe",
+    "XDS110, on the board"
+   ],
+   [
+    "Software",
+    "TI MSPM0 SDK: DriverLib examples only (no FreeRTOS or TI Drivers examples for this chip)"
+   ],
+   [
+    "Upstream Zephyr",
+    "Chip yes, board no (Zephyr 4.4.2); the test board file works"
+   ],
+   [
+    "Board price",
+    "$20.56 at TI.com (2026-10-08)"
+   ],
+   [
+    "Chip price",
+    "$0.65 in 1,000s"
+   ]
+  ],
+  "source": "mspm0l1306/README.md"
+ },
+ "projects": [
+  {
+   "t": "Blink an LED with TI's SDK",
+   "st": "works",
+   "result": "Build 3.3 s, flash 0.6 s with OpenOCD (15.0 s with TI's UniFlash)",
+   "source": "mspm0l1306/README.md"
+  },
+  {
+   "t": "Blink an LED with Zephyr",
+   "st": "works",
+   "result": "On an out-of-tree board file; Zephyr has none for this LaunchPad. 94% of RAM used by hello_world",
+   "source": "mspm0l1306/zephyr/README.md"
+  },
+  {
+   "t": "Read the light sensor and thermistor from a terminal",
+   "st": "works",
+   "result": "TI's out-of-box demo answers MessagePack commands: light 339 to 343 counts at the desk, 435 to 445 on a later check; board 21.9 to 22.8 °C",
+   "source": "mspm0l1306/data/restore-check.txt"
+  },
+  {
+   "t": "Small AI model in 4 kB of RAM",
+   "st": "works",
+   "result": "8k-parameter room-occupancy model, 20 of 20 test vectors right, 84 to 100 ms; the 30k model does not fit",
+   "source": "mspm0l1306/bench/RESULTS-mspm0l1306.md"
+  },
+  {
+   "t": "Signal processing: FFT and filters",
+   "st": "works",
+   "result": "CMSIS-DSP from TI's SDK: 256-point FFT in 2.25 ms, 32-tap FIR on 64 samples in 1.0 ms, answers checked against the Mac",
+   "source": "mspm0l1306/bench/dsp/README.md"
+  },
+  {
+   "t": "FreeRTOS",
+   "st": "works",
+   "result": "Blink, 11 tasks, task switch 12 to 16 µs; TI offers no example for this chip",
+   "source": "mspm0l1306/freertos/README.md"
+  },
+  {
+   "t": "Internal temperature sensor",
+   "st": "partial",
+   "result": "Reads -165 °C with this chip's factory calibration; about 21.7 °C with the manual's typical value",
+   "source": "mspm0l1306/bench/RESULTS-mspm0l1306.md"
+  },
+  {
+   "t": "Open-source benchmarks (Embench-IoT)",
+   "st": "partial",
+   "result": "14 of 19 fit and run, 13 pass their own check; 5 need more RAM than the chip has",
+   "source": "mspm0l1306/third-party/README.md"
+  },
+  {
+   "t": "P-256 signatures in software",
+   "st": "works",
+   "result": "micro-ecc signs in 0.50 s and verifies in 0.57 s; no AES or crypto hardware",
+   "source": "mspm0l1306/third-party/README.md"
+  },
+  {
+   "t": "Every TI example, flashed and run by a script",
+   "st": "works",
+   "result": "All 148 safe examples, low-power ones included: no crash, the debugger never lost the board",
+   "source": "mspm0l1306/sweep/RUNS.md"
+  }
+ ],
+ "chains": [
+  {
+   "t": "TI's MSPM0 SDK, no operating system",
+   "st": "works",
+   "verdict": "Yes",
+   "why": "167 of 170 examples build from a terminal, and all 148 that are safe to run ran with no crash",
+   "source": "mspm0l1306/sweep/RUNS.md"
+  },
+  {
+   "t": "Zephyr",
+   "st": "partial",
+   "verdict": "Partly",
+   "why": "No board upstream. With the test board file, hello_world, blinky, standard CoreMark, a minimal shell, logging and Thread-Metric run, some with under 64 bytes of RAM left; Zephyr's samples as shipped need 6 to 17 kB",
+   "source": "mspm0l1306/zephyr/README.md"
+  },
+  {
+   "t": "FreeRTOS",
+   "st": "works",
+   "verdict": "Yes, with our settings",
+   "why": "TI ships no example and its settings file for this board asks for 5.4 kB of RAM. With static allocation a blink uses 1 kB, 11 small tasks fit, and a task switch takes 12 to 16 microseconds",
+   "source": "mspm0l1306/freertos/README.md"
+  },
+  {
+   "t": "TI Drivers",
+   "st": "no",
+   "verdict": "Not offered",
+   "why": "TI's SDK has no TI Drivers for this chip, only DriverLib",
+   "source": "mspm0l1306/sweep/README.md",
+   "why_not": "no-software"
+  },
+  {
+   "t": "Code written for the MSPM0G3507",
+   "st": "partial",
+   "verdict": "Partly",
+   "why": "Plain C and the G3507's AI model libraries ran unchanged; only 22 of 270 G3507 SDK examples build after changing the device, most stopped by one SysConfig setting",
+   "source": "mspm0l1306/sweep/README.md"
+  },
+  {
+   "t": "Code written for the MSPM0C1104",
+   "st": "partial",
+   "verdict": "Partly",
+   "why": "40 of 91 C1104 examples build after changing the device, 57 with pins unlocked; the 51 that passed the safety check ran with no crash, but none lit an LED: they toggle the C1104 board's LED pin, which here is the light sensor",
+   "source": "mspm0l1306/sweep/RUNS.md"
+  }
+ ],
+ "combine_title": "Software paths that work on this board",
+ "combine_lede": "SDKs, operating systems and code from other TI chips we tried, and what stopped the ones that did not work.",
+ "benchmarks": [
+  [
+   "CoreMark, TI Arm Clang -O3, bare metal",
+   "78.27",
+   "2.446 per MHz, same as the MSPM0G3507 at 32 MHz"
+  ],
+  [
+   "CoreMark, TI Arm Clang -Oz (smallest code)",
+   "41.63",
+   "1.30 per MHz; 13.5 kB of flash against 22.7 kB at -O3"
+  ],
+  [
+   "CoreMark per MHz at 4 MHz",
+   "2.631",
+   "No flash wait state below 24 MHz; the one at 32 MHz costs 7%"
+  ],
+  [
+   "CoreMark, Zephyr 4.4.2, GCC -O2 with loop unrolling",
+   "59.70",
+   "1.87 per MHz; standard 2 kB data, 16 bytes of RAM left"
+  ],
+  [
+   "Interrupt latency, bare metal",
+   "25 to 28 cycles",
+   "About 0.8 microseconds at 32 MHz"
+  ],
+  [
+   "Interrupt latency, through Zephyr",
+   "119 to 137 cycles",
+   "Includes one timer read"
+  ],
+  [
+   "FreeRTOS task switch round trip",
+   "397 to 499 cycles",
+   "12 to 16 microseconds; TI's FreeRTOS V11.2.0, static allocation"
+  ],
+  [
+   "Dhrystone 2.1, TI Arm Clang -O3",
+   "0.73 DMIPS/MHz",
+   "23.4 DMIPS at 32 MHz, following the rules; 0.88 at 4 MHz"
+  ],
+  [
+   "FFT, 256 points, q15 (CMSIS-DSP)",
+   "2.25 ms",
+   "72k cycles; 512 points 5.2 ms"
+  ],
+  [
+   "GPIO pin toggle, one register write",
+   "1 cycle",
+   "Up to 16 MHz on a pin, not checked with a scope"
+  ],
+  [
+   "ADC top rate, TI's DMA example",
+   "1.45 Msps",
+   "TI's example; 1.99 Msps with a shorter window, but readings sag up to 10% on a sensor"
+  ],
+  [
+   "UART loop, one jumper wire",
+   "up to 10.67 Mbaud",
+   "Every byte right except 5 to 6 Mbaud, the same dead band as the MSPM0G3507"
+  ],
+  [
+   "8k-parameter AI model, whole call",
+   "84 to 100 ms",
+   "-O3 and -Os model libraries; 20 of 20 right"
+  ],
+  [
+   "Handwritten digit, BitNetMCU 99.55% model",
+   "82.8 ms",
+   "10 of 10 test digits in 4 kB of RAM; 3.2% fewer cycles than the WCH chip it was written for"
+  ],
+  [
+   "Hardware CRC-32 against a table",
+   "10.9 times faster",
+   "1 kB in 1.1k cycles"
+  ],
+  [
+   "P-256 signature, micro-ecc assembly",
+   "0.50 s",
+   "Verify 0.57 s"
+  ],
+  [
+   "Internal oscillator",
+   "32.16 MHz",
+   "0.5% fast; data sheet allows 1.2%"
+  ]
+ ],
+ "benchmarks_source": "mspm0l1306/bench/RESULTS-mspm0l1306.md",
+ "glance": [
+  [
+   "78.3",
+   "CoreMark score",
+   "Speed test, TI Arm Clang, 32 MHz",
+   "mspm0l1306/bench/RESULTS-mspm0l1306.md"
+  ],
+  [
+   "4 kB",
+   "RAM",
+   "Working memory; this is what runs out first",
+   "mspm0l1306/fit-check.md"
+  ],
+  [
+   "64 kB",
+   "Flash",
+   "Program storage; never the limit in our tests",
+   "mspm0l1306/zephyr/README.md"
+  ],
+  [
+   "25 cycles",
+   "Reaction time",
+   "Interrupt to handler, bare metal",
+   "mspm0l1306/bench/RESULTS-mspm0l1306.md"
+  ],
+  [
+   "84 ms",
+   "Small AI model",
+   "8k parameters, 20 of 20 right",
+   "mspm0l1306/bench/RESULTS-mspm0l1306.md"
+  ]
+ ],
+ "good_for": [
+  "Small sensors and controllers that read light, temperature or a voltage with the analog parts on the chip",
+  "Learning bare-metal C with TI's examples: 156 build from a terminal and every safe one ran",
+  "Very small AI models in software: an 8k-parameter model ran; 30k did not link (suspected RAM limit)",
+  "Cost-sensitive designs: the chip is $0.65 in thousands"
+ ],
+ "not_for": [
+  "Anything with a radio: it has none",
+  "Bigger Zephyr apps: no board upstream, and Zephyr's samples as shipped need 6 to 17 kB of RAM; trimmed, a shell fits with 48 bytes left",
+  "Fast encryption: no AES hardware; a P-256 signature takes 0.5 s in software",
+  "Programs with logging, float printf or big buffers: 4 kB of RAM goes fast",
+  "Arduino or PlatformIO: no MSPM0 core exists"
+ ],
+ "instead": [
+  {
+   "match": "Bigger Zephyr apps",
+   "try": "LP-MSPM0G3507",
+   "why": "32 kB of RAM and a board in upstream Zephyr; Zephyr's blinky runs on it",
+   "source": "mspm0g3507/zephyr/README.md"
+  },
+  {
+   "match": "big buffers",
+   "try": "LP-MSPM0G3507",
+   "why": "32 kB of RAM; the 33k-weight model that does not fit here runs on it, 20 of 20 right",
+   "source": "mspm0g3507/mcu-bench/RESULTS-2.md"
+  }
+ ],
+ "buy": "$20.56 at TI.com for one board (2026-10-08). The debug probe is on the board, so one USB cable does power, flashing and the serial port.",
+ "gotchas": [
+  [
+   "The chip's temperature sensor reads about -165 °C",
+   "Suspected: an early-sample factory calibration that is wrong; not confirmed on this chip. **Tag: Unknown (suspected: wrong factory trim).** Use the board's thermistor"
+  ],
+  [
+   "The out-of-box demo is silent on the serial port",
+   "It waits for MessagePack commands that end in a newline, and its GUI needs a request to TI sales. **Tag: Tool or docs.** The commands are in the FAQ"
+  ],
+  [
+   "A program passes its checks, then prints garbage or faults",
+   "TI's examples reserve 256 bytes of stack, and printf with %f alone needs over 400. **Tag: TI example default.** Raise the stack in the linker file"
+  ],
+  [
+   "Every Zephyr image that fills RAM stops at boot with `***** HARD FAULT *****`",
+   "Zephyr's default C library heap writes past the end of RAM when only a few bytes are left. **Tag: Third-party behavior.** Set CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=0"
+  ],
+  [
+   "An interrupt never fires",
+   "Only 13 of the 32 interrupt lines exist on this chip, and pending any other does nothing. **Tag: Chip limit.** Borrow an unused peripheral's line"
+  ]
+ ],
+ "faq_page": "faq-mspm0l1306.html",
+ "faq_source": "mspm0l1306/FAQ.md",
+ "memory_source": "mspm0l1306/memory-breakdown.json",
+ "ai_cost": {
+  "headline": "One AI-assisted run, with ten parallel helpers, brought this board up, ran every test on this page and wrote it up. It took one day in three sittings and about $114 to $129 of AI use at list price. The only hands-on steps after plugging it in were one jumper wire and two jumper moves for the UART test, and one power cycle.",
+  "rows": [
+   [
+    "Claude Opus 5.5, main session (board work and write-up)",
+    "11 h wall clock, with idle time",
+    "584",
+    "$78.14 to $83.55"
+   ],
+   [
+    "Claude Opus 5.5, two helpers (Zephyr board, FreeRTOS)",
+    "in parallel",
+    "243",
+    "$19.97 to $23.69"
+   ],
+   [
+    "Claude Sonnet 5.5, eight helpers and reviews",
+    "in parallel",
+    "315",
+    "$16.31 to $21.45"
+   ]
+  ],
+  "source": "docs/token-usage.md",
+  "per_project": {
+   "intro": "Other jobs, each given to three fresh Claude Sonnet 5.5 agents with this repo's docs on 2026-10-06, and each result checked independently.",
+   "rows": [
+    [
+     "Build TI's blink example, flash it, confirm an LED blinks",
+     "3 of 3",
+     "1.3 to 1.7 min",
+     "$0.46 to $0.52"
+    ],
+    [
+     "Build and run the CoreMark speed test, read the score",
+     "3 of 3",
+     "1.3 to 1.6 min",
+     "$0.43 to $0.54"
+    ],
+    [
+     "Answer: can I run Zephyr on it, and how much RAM is left? (no board needed; the right answer is not out of the box, with the test board files and the free-RAM numbers)",
+     "3 of 3",
+     "under 0.5 min",
+     "$0.24 to $0.30"
+    ]
+   ],
+   "source": "docs/model-comparison.md"
+  }
+ },
+ "updated": "2026-10-06",
+ "fit_default": "out_of_box"
+}

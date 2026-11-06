@@ -1,0 +1,3 @@
+board,test,variant,status,value,value_hi,runs,clock_mhz,conditions,date,source,checked,note
+cc35x1,port_fps_demo,doom-whx-xip-fast-ram-o2,measured,39.2,,1,160,"rp2040-doom WHX design, TCM statics and lump cache, render files -O2, stack-array fix applied; 3,481 frames after frame 400, three attract demos; virtual game clock",2026-10-21,docs/experiments/2026-10-20-doom-smallest-ti-chip.md,console,"section 16; chain fe183649 c6686ada fc7b6c2d equal to the emulator; new default"
+cc35x1,port_checksum_demo,doom-whx-o2-all-frames,measured,1,,1,160,"frame chain after demo 3 fc7b6c2d, equal to the emulator with the fix, at -O2 and at -Os",2026-10-21,ports/doom/target-cc35x1-whx/results/run-o2-crcall.txt,console,"the earlier e9db8f1d was the unfixed engine"

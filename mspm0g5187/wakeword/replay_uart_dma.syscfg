@@ -1,0 +1,12 @@
+
+/* replay build only: UART receive by DMA into a ring (frl_report.c) */
+UART1.enableFIFO                         = true;
+UART1.enabledDMARXTriggers               = "DL_UART_DMA_INTERRUPT_RX";
+UART1.enableDMARX                        = true;
+UART1.DMA_CHANNEL_RX.$name               = "DMA_CH1";
+UART1.DMA_CHANNEL_RX.peripheral.$assign  = "DMA_CH1";
+UART1.DMA_CHANNEL_RX.addressMode         = "f2b";
+UART1.DMA_CHANNEL_RX.dstIncDec           = "INCREMENT";
+UART1.DMA_CHANNEL_RX.dstLength           = "BYTE";
+UART1.DMA_CHANNEL_RX.srcLength           = "BYTE";
+UART1.DMA_CHANNEL_RX.transferMode        = "FULL_CH_REPEAT_SINGLE";

@@ -1,0 +1,37 @@
+--- a/app/app_main.c
++++ b/app/app_main.c
+@@ -52,6 +52,13 @@
+ #include "ti/ble/app_util/menu/menu_module.h"
+ #include <app_main.h>
+ 
++/* Fox Red Labs: a visible difference between OAD image v1 and v2.
++ * frl_version.h is written by build.sh and sets FRL_LED and FRL_BLINK_MS. */
++#include <ti/drivers/GPIO.h>
++#include "ti_drivers_config.h"
++#include "ti/ble/app_util/common/util.h"
++#include "frl_version.h"
++
+ //*****************************************************************************
+ //! Defines
+ //*****************************************************************************
+@@ -121,10 +128,20 @@
+  *
+  * @return  none
+  */
++static Clock_Struct frlBlinkClock;
++
++static void frlBlink(uint32_t arg)
++{
++    GPIO_toggle(FRL_LED);
++}
++
+ void App_StackInitDoneHandler(gapDeviceInitDoneEvent_t *deviceInitDoneData)
+ {
+     bStatus_t status = SUCCESS;
+ 
++    // Fox Red Labs: blink one LED at a rate that shows which image is running
++    Util_constructClock(&frlBlinkClock, frlBlink, FRL_BLINK_MS, FRL_BLINK_MS, true, 0);
++
+     // Menu
+     Menu_start();
+ 

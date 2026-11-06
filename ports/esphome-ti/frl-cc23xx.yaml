@@ -1,0 +1,30 @@
+# E192: the same device as frl-esphome-fit.yaml, on our own ESPHome platform `cc23xx` instead of the nrf52 template.
+# `esphome compile frl-cc23xx.yaml` builds it with TI's compiler; `esphome upload frl-cc23xx.yaml` flashes it.
+# Zigbee end device only (the router does not fit in 36 kB of RAM). DIO14 is the red LED on the LP-EM-CC2340R5.
+esphome:
+  name: frl-cc23xx
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [cc27xx, cc23xx, die_temperature]
+
+cc23xx:
+  board: LP_EM_CC2340R5
+  # probe_serial: XXXXXXXX      # your debug probe's serial (xdsdfu -e lists it); or pass --device <serial> to upload
+
+zigbee:
+  router: false
+  model: "FRL cc23xx"
+
+switch:
+  - platform: gpio
+    name: "LED"
+    pin: DIO14
+    restore_mode: ALWAYS_OFF
+
+sensor:
+  - platform: die_temperature
+    name: "Chip temperature"
+    update_interval: 30s

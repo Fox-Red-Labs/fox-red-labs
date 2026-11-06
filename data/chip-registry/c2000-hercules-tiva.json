@@ -1,0 +1,1830 @@
+{
+ "generated": "2026-10-24",
+ "scope": "C2000 real-time MCUs, Hercules safety MCUs (TMS570, RM4x, RM5x) and Tiva TM4C. Research only: no board was touched, no DSLite, UniFlash or OpenOCD ran against hardware. Values marked 'measured' were read on our boards (c2000-launchpad/). Everything else is from the cited file on this Mac (CCStudio 21.0.1 targetdb, UniFlash 9.6.0, C2000Ware 26.02.00.00, xPack OpenOCD 0.12.0-7, TI's OpenOCD fork) or the cited TI data sheet or TRM. A null jtag_idcode means TI does not print the value in the document read; unknown is never filled by guess.",
+ "families": [
+  {
+   "family": "F2800x (F280013x)",
+   "members": [
+    {
+     "part": "TMS320F2800137",
+     "partid": "0x06FF0500",
+     "jtag_idcode": null,
+     "core": "C28x+FPU32+TMU",
+     "flash_kb": 256,
+     "launchpads": [
+      "LAUNCHXL-F2800137"
+     ],
+     "measured": true,
+     "partid_source": "SPRSP63B Table 7-4; measured PARTIDH 0x06FF0500, REVID 0x00000003 on our LaunchPad (c2000-launchpad/data/chip-id-0x5D008.bin)"
+    },
+    {
+     "part": "TMS320F2800135",
+     "partid": "0x06FD0500",
+     "jtag_idcode": null,
+     "core": "C28x+FPU32+TMU",
+     "flash_kb": 128,
+     "launchpads": [],
+     "partid_source": "SPRSP63B Table 7-4; flash SPRSP63B Table 4-1"
+    },
+    {
+     "part": "TMS320F2800133",
+     "partid": "0x06FB0500",
+     "jtag_idcode": null,
+     "core": "C28x+FPU32+TMU",
+     "flash_kb": 64,
+     "launchpads": [],
+     "partid_source": "SPRSP63B Table 7-4"
+    },
+    {
+     "part": "TMS320F2800132",
+     "partid": "0x06FA0500",
+     "jtag_idcode": null,
+     "core": "C28x+FPU32+TMU",
+     "flash_kb": 64,
+     "launchpads": [],
+     "partid_source": "SPRSP63B Table 7-4"
+    },
+    {
+     "part": "TMS320F2800135VPM",
+     "partid": "0x06F90500",
+     "jtag_idcode": null,
+     "core": "C28x+FPU32+TMU",
+     "flash_kb": 128,
+     "launchpads": [],
+     "partid_source": "SPRSP63B Table 7-4 (VPM package)"
+    }
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router; C28x CPU on port 0x10, AJSM/JTAGLOCK module (JLM) on port 0x13",
+    "notes": "cJTAG 2-pin (TMS, TCK) is the device default in targetdb ('SWD Mode Settings' = 4, XDS110 aux port 1); 4-pin JTAG is also on the chip, with TDI and TDO muxed on GPIO35 and GPIO37. The LAUNCHXL-F2800137 is wired for 2-pin only (R44, R45 unfitted). A hand-written ccxml without 'SWD Mode Settings'=4 failed with error -2131 (measured).",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f2800137.xml; SPRSP63B section 6.11.7; c2000-launchpad/FAQ.md; SPRUJ32 section 3.2.1"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick-C TAP IDCODE",
+     "field": "whole 32-bit IDCODE",
+     "mask": null,
+     "source": "Value not published in SPRSP63B or SPRUIX1B (grep of both for IDCODE: none). TI publishes BSDL files on the device page (e2e thread 914647); not fetched."
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00A (PARTIDH, 32-bit, two 16-bit words)",
+     "field": "PARTIDH",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP63B Table 7-4; measured with DSLite memory -r 0x5D008,8 -s 16"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00C (REVID, 32-bit)",
+     "field": "REVID: 1=rev 0, 2=A, 3=B, 4=C",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP63B Table 7-4"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D008 (PARTIDL, 32-bit)",
+     "field": "PIN_COUNT bits 10:8, QUAL bits 7:6 (0=TMX, 1=TMP, 2=TMS), flash size code bits 18:16 (6 on our F2800137)",
+     "mask": "0x00070700 / 0xC0",
+     "source": "SPRSP63B Table 7-4; measured PARTIDL 0x00064200; nowFlash comment 'bits 18 to 16 ... in OTP PARTIDL'"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x711C2 / 0x711C4 (TI OTP copy of PARTIDL / PARTIDH)",
+     "field": "same values, readable without DEVCFG loaded",
+     "mask": null,
+     "source": "CCStudio ccs_base/emulation/gel/f2800137.gel (TI_OTP_PARTID_L, TI_OTP_PARTID_H)"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads libFlashC2000F021 (partnum contains 'F28001') for this part (FlashDLLDB.xml). Flash is one bank, 128 sectors of 1K words at 0x80000-0x9FFFF on the F2800137 (SPRSP63B Table 7-2). DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28001x_FlashProperties.xml; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')",
+     "measured": "2026-10-06: DSLite read PARTIDH, PARTIDL and REVID (memory -r 0x5D008,8); CCStudio scripting wrote a 256 kB image (flash-as-received.bin) in 18.6 s and 20.9 s, verified it and read it back with the same SHA-256 (c2000-launchpad/data/flash-restore-2026-10-06.txt). DSLite flash itself was run on the F28P65x, not here"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f280013x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: driverlib/f280013x/examples/flash/flash_kernel_ex3_*.c (project flash_ex3_sci_flash_kernel.projectspec). Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Default boot pins GPIO24 (pin 1) and GPIO32 (pin 0): SCI/Wait = 0,1; flash = 1,1 (SPRSP63B Table 7-6). SCI option 0: TX GPIO29, RX GPIO28 (Table 7-11). No prebuilt kernel ships for this device in C2000Ware; build the project with the C2000 compiler (hex2000 exists on Mac in ti-cgt-c2000_25.11.1.LTS). Not run on our bench.",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 driverlib/f280013x/examples/flash/flash_kernel_ex3_*.c (project flash_ex3_sci_flash_kernel.projectspec)"
+    },
+    {
+     "tool": "other",
+     "status": "TI supported",
+     "detail": "CCStudio 21.0.1 scripting (run.sh with loadBinaryProgram, verifyBinaryProgram, saveBinary): the path our c2k scripts use; same flash engine as DSLite.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "measured": "2026-10-06 on the F2800137 (tools/c2kflashback.js)",
+     "source": "c2000-launchpad/tools/c2kflashback.js; c2000-launchpad/data/flash-restore-2026-10-06.txt"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "User DCSM OTP, zone 1 and zone 2 (link pointers, passwords, JTAGLOCK, CMAC key)",
+     "range": "0x78000-0x783FF (Z1 base 0x78000, Z2 base 0x78200); zone select blocks start at 0x78020",
+     "why": "One-time programmable and ECC protected. A wrong ECC value blocks the device permanently. An all-0 password makes the zone permanently secure; an all-1 password loads as the BLOCKED state. TI pre-programs bits of every CSMPSWD1 word (Table 5-3), so a user may only flip 1 to 0 in the other bits.",
+     "source": "SPRUIX1B sections 5.2.1, 5.2.6, 5.2.7, Table 5-3 and the CAUTION after Figure 5-2; SPRSP63B Table 7-2; driverlib hw_dcsm.h offsets"
+    },
+    {
+     "region": "TI OTP",
+     "range": "0x71000-0x715FF (0x715F0-0x715FF secure)",
+     "why": "TI factory data (PARTID copy, trim, calibration); not for user programming.",
+     "source": "SPRSP63B Tables 7-1 and 7-2"
+    },
+    {
+     "region": "DSLite security operations",
+     "range": "operations Z1/Z2 PasswordProgram, LINKPOINTERProgram, JTAGLOCKProgram, OTPSECLOCKProgram, JTAGPSWDH/LProgram, CMACKEYProgram, GPREGProgram, AllProgram, SecurityAutoFill, GRABEXEONLYProgram",
+     "why": "Each one burns OTP bits. A frontend must never call them for a plain image write.",
+     "source": "strings of libFlashC2000F021.dylib operation lists; TMS320F28001x_FlashProperties.xml property ids"
+    },
+    {
+     "region": "Any image section placed in 0x78000-0x783FF",
+     "range": "e.g. C2000Ware dcsm/dcsm_security_tool writes 0x78000-0x78220",
+     "why": "The flash plugin would program those OTP words for good. Check the link map before loading (our sweep skipped it).",
+     "source": "c2000-launchpad/FAQ.md; c2000-launchpad/AGENTS.md trap 2"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "DSLite: Error -2131 'Unable to access device register' from IcePick_C_0",
+     "fix": "Set property 'SWD Mode Settings' = 4 (cJTAG 2-pin) in the ccxml connection section, or start from C2000Ware's TMS320F2800137_LaunchPad.ccxml.",
+     "source": "c2000-launchpad/FAQ.md (measured 2026-10-06)"
+    },
+    {
+     "symptom": "'A firmware update is required for the XDS110 probe' then 'Timed out after 45 seconds'",
+     "fix": "Update the probe with xdsdfu (ccs_base/common/uscif/xds110) to 3.0.0.43; DSLite has no Update button.",
+     "source": "c2000-launchpad/FAQ.md (measured)"
+    },
+    {
+     "symptom": "Flash operations fail with 'Flash registers are not writable. Please check whether the device is unsecured or not.'",
+     "fix": "Zone is locked. Set Z1CSMPSWD0-3 / Z2CSMPSWD0-3 and run the Z1Unlock / Z2Unlock operation with the real password. A blank part unlocks itself: BOOTROM writes the default password into the KEY registers at start.",
+     "source": "libFlashC2000F021.dylib strings; SPRUIX1B section 5.2.1"
+    },
+    {
+     "symptom": "Zone password programmed as all zeros, or wrong ECC in User OTP",
+     "fix": "None documented. TI states the zone is permanently secure, or the device must be replaced.",
+     "source": "SPRUIX1B section 5.2.1 and CAUTION after Figure 5-2"
+    },
+    {
+     "symptom": "JTAGLOCK enabled, no debug access",
+     "fix": "Unlock with the 128-bit JTAG password through the CCStudio integrated tool; targetdb carries the 'JLM' (AJSM) subpath on port 0x13 with four unlock-key words.",
+     "source": "SPRUIX1B section 5.2.6; f2800137.xml Subpath_1"
+    },
+    {
+     "symptom": "'Operation was aborted on C28xx_CPU1' on a low-power example",
+     "fix": "Chip is asleep: press the wake button or reset, then reconnect.",
+     "source": "c2000-launchpad/AGENTS.md (measured)"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL-F2800137: on-board XDS110 (connection TIXDS110_Connection), cJTAG 2-pin. Boot switch S3: GPIO24 left, GPIO32 right; S2 SEL1 = 0 routes SCIA (GPIO28/29) to the XDS110 serial port (SPRUJ32 tables 3-3, 3-4).",
+    "bare_chip": "Any XDS110 (a LaunchPad kit's with its debug-out header, or a standalone probe) on TMS and TCK for cJTAG, or TMS/TCK/TDI/TDO for 4-pin JTAG. 14-pin or 20-pin header per SPRSP63B section 6.11.7; EMU0/EMU1 pulled up; nRS reset line."
+   },
+   "unknowns": [
+    "JTAG IDCODE of the F280013x ICEPick-C and C28x TAPs: not in the data sheet or TRM text. Read it on the bench with the probe's scan, or take it from TI's BSDL file.",
+    "nowFlash TMS320F280013x.xml defines parts only for flash-size codes 4 (64KB) and 5 (128KB), at most 0x80000-0x8FFFF. Our F2800137 reads code 6 (256 kB, 0x80000-0x9FFFF). The writes verified anyway, but how DSLite picked a part, and whether the top 128 kB was erased by it, is not confirmed (the image there may have been blank).",
+    "DSLite on Linux and Windows was not run here; the Mac install is the only one read.",
+    "Whether DSLite can connect with a generic C28x ccxml for a different part (to read PARTIDH first): the F28P65x refused a single-core-style file with 'invalid processor ID'."
+   ]
+  },
+  {
+   "family": "F28003x",
+   "members": [
+    {
+     "part": "TMS320F280039C",
+     "partid": "0x05FF0500",
+     "jtag_idcode": null,
+     "core": "C28x+FPU32+TMU",
+     "flash_kb": 384,
+     "launchpads": [
+      "LAUNCHXL-F280039C"
+     ],
+     "partid_source": "SPRSP61C Table 7-5; flash 'up to 384KB' and Table 4-1"
+    },
+    {
+     "part": "TMS320F280039",
+     "partid": "0x05FF0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": 384,
+     "launchpads": [],
+     "partid_source": "SPRSP61C Table 7-5 (same PARTIDH as the C part)"
+    },
+    {
+     "part": "TMS320F280038C",
+     "partid": "0x05FE0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP61C Table 7-5"
+    },
+    {
+     "part": "TMS320F280037C",
+     "partid": "0x05FD0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP61C Table 7-5"
+    },
+    {
+     "part": "TMS320F280036C",
+     "partid": "0x05FC0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP61C Table 7-5"
+    },
+    {
+     "part": "TMS320F280034",
+     "partid": "0x05FA0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP61C Table 7-5"
+    },
+    {
+     "part": "TMS320F280033",
+     "partid": "0x05F90500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP61C Table 7-5"
+    }
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router; C28x CPU port 0x10, JLM/AJSM port 0x13 (F280039C)",
+    "notes": "cJTAG 2-pin and 4-pin JTAG both in the data sheet (14 'cJTAG' mentions in SPRSP61C). targetdb f280039c.xml carries the cJTAG choice and the AJSM/JLM subpath.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f280039c.xml; SPRSP61C"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick-C TAP IDCODE",
+     "field": "whole IDCODE",
+     "mask": null,
+     "source": "Not published in SPRSP61C (grep: no IDCODE)."
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00A (PARTIDH)",
+     "field": "PARTIDH",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP61C Table 7-5; nowFlash TMS320F28003x.xml DeviceId 0x771860"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00C (REVID)",
+     "field": "REVID (0 = rev 0)",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP61C Table 7-5"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x70241",
+     "field": "flash-size code, mask 0x7: 5 = 128KB, 6 = 256KB",
+     "mask": "0x0007",
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/c2000/nowFlash/configs/TMS320F28003x.xml RegisterId (UniFlash's own part match)"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads libFlashC2000F021 (partnum contains 'F28003') for this part (FlashDLLDB.xml). Sectors are 4K words; two banks of 0x80000-0x8FFFF and 0x90000-0x9FFFF for the 256KB part (nowFlash), three banks at 0x80000, 0x90000, 0xA0000 for the 384KB part (SPRSP61C Table 7-3, Addresses of Flash Sectors). DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28003x_128KB_FlashProperties.xml, _256KB_ and _384KB_; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f28003x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: driverlib/f28003x/examples/flash/flash_kernel_ex3_* (RAM, or flash with LDFU). Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Default boot pins GPIO24/GPIO32 (SPRSP61C Table 7-8); SCI option 0: TX GPIO29, RX GPIO28 (Table 7-12). No prebuilt kernel ships for this device in C2000Ware; build the project with the C2000 compiler (hex2000 exists on Mac in ti-cgt-c2000_25.11.1.LTS).",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 driverlib/f28003x/examples/flash/flash_kernel_ex3_* (RAM, or flash with LDFU)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "User DCSM OTP (zone 1 and zone 2)",
+     "range": "0x78000-0x787FF (User OTP 3K x16 is 0x78000-0x78BFF)",
+     "why": "OTP and ECC protected; password and link-pointer rules as on the F280013x. Boot options (Z1-OTP-BOOTPIN-CONFIG, BOOTDEF) also live here.",
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/c2000/nowFlash/configs/TMS320F28003x.xml ProgramFlashOtp; SPRSP61C Table 7-1 and section 7.6"
+    },
+    {
+     "region": "DSLite security operations",
+     "range": "Z1/Z2 *Program, *Lock operations",
+     "why": "Burn OTP bits.",
+     "source": "libFlashC2000F021.dylib operation lists"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Locked zone: flash operations fail",
+     "fix": "Z1Unlock / Z2Unlock with the password (Z1CSMPSWD0-3 settings); the SCI kernel also has CPU1_UNLOCK_Z1 / Z2 commands (0x000A, 0x000B).",
+     "source": "libFlashC2000F021.dylib; flash_kernel_ex3_commands.h"
+    },
+    {
+     "symptom": "SCI kernel does not download",
+     "fix": "Check boot pins, that the SCI option pins are not used for something else, flash sections aligned to 128 bits (ALIGN(8)), a lower baud on long cables.",
+     "source": "SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 7.1"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL-F280039C: on-board XDS110 (lpList TIXDS110_Connection).",
+    "bare_chip": "XDS110 on cJTAG TMS/TCK or 4-pin JTAG; boot pins GPIO24/GPIO32; SCIA GPIO28/29 to a 3.3 V USB-UART."
+   },
+   "unknowns": [
+    "JTAG IDCODE not published in the data sheet.",
+    "Flash size of each non-F280039 part (Table 4-1 columns not mapped).",
+    "TRM (not fetched) sections for DCSM layout; the F280013x text was used as the model, not confirmed for the F28003x."
+   ]
+  },
+  {
+   "family": "F28004x",
+   "members": [
+    {
+     "part": "TMS320F280049C",
+     "partid": "0x01FF0500",
+     "jtag_idcode": null,
+     "core": "C28x+FPU32+TMU",
+     "flash_kb": 256,
+     "launchpads": [
+      "LAUNCHXL-F280049C"
+     ],
+     "partid_source": "SPRS945H Table 7-8; flash from the SPRS945H device comparison table, first column"
+    },
+    {
+     "part": "TMS320F280049",
+     "partid": "0x01FF0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": 256,
+     "launchpads": [],
+     "partid_source": "SPRS945H Table 7-8"
+    },
+    {
+     "part": "TMS320F280048C",
+     "partid": "0x01FE0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRS945H Table 7-8"
+    },
+    {
+     "part": "TMS320F280045",
+     "partid": "0x01FB0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRS945H Table 7-8"
+    },
+    {
+     "part": "TMS320F280041C",
+     "partid": "0x01F70500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRS945H Table 7-8"
+    },
+    {
+     "part": "TMS320F280040C",
+     "partid": "0x01F60500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRS945H Table 7-8"
+    }
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router; C28x CPU port 0x10; no AJSM/JLM subpath in targetdb",
+    "notes": "cJTAG and 4-pin JTAG; the data sheet lists JTAGLOCK among features but targetdb has no JLM entry.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f280049c.xml; SPRS945H"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick-C TAP IDCODE",
+     "field": "whole IDCODE",
+     "mask": null,
+     "source": "Not published in SPRS945H."
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00A (PARTIDH)",
+     "field": "PARTIDH",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRS945H Table 7-8; nowFlash TMS320F28004x.xml DeviceId 0x771968"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00C (REVID)",
+     "field": "REVID: 0, 1=A, 2=B, 4=D",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRS945H Table 7-8"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x70201",
+     "field": "flash-size code, mask 0x7 (5 = 128KB per UniFlash)",
+     "mask": "0x0007",
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/c2000/nowFlash/configs/TMS320F28004x.xml"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads libFlashC2000F021 (partnum contains 'F28004') for this part (FlashDLLDB.xml). Two banks, sectors of 4K words at 0x80000 and 0x90000 (SPRS945H section 7.3.3). DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28004x_128KB_FlashProperties.xml and _256KB_; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f28004x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: driverlib/f28004x/examples/flash/flashapi_ex2_sci_kernel.c (prebuilt flashapi_ex2_sci_kernel.txt and led_ex1_blinky.txt ship in f28004x_fw_upgrade_example). Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Default boot pins GPIO24/GPIO32 (SPRS945H Table 7-13); SCI option 0: TX GPIO29, RX GPIO28 (Table 7-18). This is the only device here with a prebuilt kernel beside the host.",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 driverlib/f28004x/examples/flash/flashapi_ex2_sci_kernel.c (prebuilt flashapi_ex2_sci_kernel.txt and led_ex1_blinky.txt ship in f28004x_fw_upgrade_example)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "User-configurable DCSM OTP, zone 1 and zone 2",
+     "range": "0x78000-0x783FF (Z1) and 0x78400-0x787FF (Z2)",
+     "why": "OTP; passwords, link pointers and boot configuration (BOOTDEF, BOOTPIN) live here; DCSM OTP programming must be 128-bit aligned.",
+     "source": "SPRS945H section 7.3.3 and DCSM text; libFlashC2000F021 operations"
+    },
+    {
+     "region": "DSLite security operations",
+     "range": "Z1/Z2 CSMProgram, CSMLock, ECSLProgram, GRABProgram, EXEONLYProgram, OTPProgram",
+     "why": "Burn OTP bits.",
+     "source": "libFlashC2000F021.dylib operation list for this family"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Locked zone",
+     "fix": "Z1Unlock / Z2Unlock with password; the kernel offers CPU1_UNLOCK_Z1/Z2; the app note also says a locked device can still be flashed by loading the kernel into unsecure RAM and calling CsmUnlock() first.",
+     "source": "SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 4; libFlashC2000F021.dylib"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL-F280049C: on-board XDS110.",
+    "bare_chip": "XDS110, cJTAG or 4-pin JTAG; boot pins GPIO24/GPIO32; SCIA on GPIO28/29."
+   },
+   "unknowns": [
+    "JTAG IDCODE not published.",
+    "Flash KB of F280048C, F280045, F280040C, and which part SPRS945H lists at 256 KB beyond F280049.",
+    "Which DSLite part file matches a 384KB-class F28003x versus F28004x was inferred from file names only."
+   ]
+  },
+  {
+   "family": "F28P55x",
+   "members": [
+    {
+     "part": "TMS320F28P550SJ9",
+     "partid": "0x09FF0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": 1088,
+     "launchpads": [
+      "LAUNCHXL-F28P55X"
+     ],
+     "partid_source": "SPRSP85D Table 7-5; flash from nowFlash F28P55x_1088KB (1024KB main plus a 64KB bank 4)"
+    },
+    {
+     "part": "TMS320F28P550SJ6",
+     "partid": "0x09FC0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP85D Table 7-5"
+    },
+    {
+     "part": "TMS320F28P550SJ2",
+     "partid": "0x09F80500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP85D Table 7-5"
+    },
+    {
+     "part": "TMS320F28P550SG9",
+     "partid": "0x09F50500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP85D Table 7-5"
+    },
+    {
+     "part": "TMS320F28P550SG8",
+     "partid": "0x09F40500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP85D Table 7-5"
+    },
+    {
+     "part": "TMS320F28P550SG2",
+     "partid": "0x09EE0500",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP85D Table 7-5"
+    }
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router; C28x CPU port 0x10, JLM/AJSM port 0x13",
+    "notes": "cJTAG and 4-pin JTAG.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f28p550sj9.xml; SPRSP85D"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick-C TAP IDCODE",
+     "field": "whole IDCODE",
+     "mask": null,
+     "source": "Not published in SPRSP85D or SPRUJ53D (grep: none)."
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00A (PARTIDH)",
+     "field": "PARTIDH",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP85D Table 7-5; nowFlash TMS320F28P55x.xml DeviceId 0x771851"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00C (REVID)",
+     "field": "REVID: 1 = rev 0, 2 = A",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP85D Table 7-5"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D008 (PARTIDL) and 0x721F7",
+     "field": "PIN_COUNT bits 10:8, QUAL 7:6, INSTASPIN 14:13; flash code at 0x721F7 mask 0xF (5=128KB, 6=256KB, 7=512KB/576KB, 8=1024KB, 0xF=1088KB)",
+     "mask": "0x000F",
+     "source": "SPRSP85D Table 7-5; UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/c2000/nowFlash/configs/TMS320F28P55x.xml"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads libFlashC2000v2 (partnum contains 'F28P55') for this part (FlashDLLDB.xml). Sectors are 1K words, up to five banks (0x80000, 0xA0000, 0xC0000, 0xE0000, 0x100000); the F28P551x flash is also in the F28P55 pattern (libFlashC2000v2 'contains F28P55'). DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28P55x_*KB_FlashProperties.xml and TMS320F28P551x_*KB_; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f28p55x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: driverlib/f28p55x/examples/flash/f28p55x_flash_ex3_sci_flash_kernel.c. Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Default boot pins GPIO24/GPIO32; SCI option 0 TX GPIO29, RX GPIO28 (SPRSP85D Tables 7-8 and 7-12). Flash sections must align to 512 bits (ALIGN(32)) for this kernel (SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 7.1). No prebuilt kernel ships for this device in C2000Ware; build the project with the C2000 compiler (hex2000 exists on Mac in ti-cgt-c2000_25.11.1.LTS).",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 driverlib/f28p55x/examples/flash/f28p55x_flash_ex3_sci_flash_kernel.c"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "User DCSM OTP and the four extra user OTP banks",
+     "range": "0x78000-0x7A3FF (DCSM OTP 0x78000-0x783FF, User OTP banks at 0x78800, 0x79000, 0x79800, 0x7A000 depending on part)",
+     "why": "OTP; DCSM password rules as on the F280013x (SPRUJ53D section 5.2.1: all-1 gives BLOCKED, all-0 gives permanent secure).",
+     "source": "SPRUJ53D section 5.2.1; SPRSP85D Table 7-3; nowFlash TMS320F28P55x.xml"
+    },
+    {
+     "region": "TI OTP",
+     "range": "bank at 0x72000 (TI use)",
+     "why": "TI factory data; PARTID copy at 0x721F7.",
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/c2000/nowFlash/configs/TMS320F28P55x.xml RegisterId"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Locked zone or BLOCKED state",
+     "fix": "Unlock with Z1/Z2 password through DSLite or the kernel; BLOCKED from an all-1 password or all-0 permanent state has no documented recovery.",
+     "source": "SPRUJ53D section 5.2.1"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL-F28P55X: on-board XDS110.",
+    "bare_chip": "XDS110 cJTAG or 4-pin JTAG; boot pins GPIO24/GPIO32."
+   },
+   "unknowns": [
+    "JTAG IDCODE not published.",
+    "Flash KB for all but the SJ9 part.",
+    "Which F28P551x parts have a different PARTIDH (data sheet SPRUJF8 era, not fetched)."
+   ]
+  },
+  {
+   "family": "F28P65x",
+   "members": [
+    {
+     "part": "TMS320F28P650DK9",
+     "partid": "0x08FF0800",
+     "jtag_idcode": null,
+     "core": "2x C28x+FPU+TMU+CLA",
+     "flash_kb": 1280,
+     "launchpads": [
+      "LAUNCHXL-F28P65X"
+     ],
+     "measured": true,
+     "partid_source": "SPRSP69D Table 7-9; flash nowFlash F28P65x_1280KB (5 banks)"
+    },
+    {
+     "part": "TMS320F28P650DK8 / F28P659DK8",
+     "partid": "0x08FD0800",
+     "jtag_idcode": null,
+     "core": "2x C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP69D Table 7-9 (both share this PARTIDH)"
+    },
+    {
+     "part": "TMS320F28P650DK7",
+     "partid": "0x08FE0800",
+     "jtag_idcode": null,
+     "core": "2x C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP69D Table 7-9"
+    },
+    {
+     "part": "TMS320F28P650DK6",
+     "partid": "0x08FB0800",
+     "jtag_idcode": null,
+     "core": "2x C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP69D Table 7-9"
+    },
+    {
+     "part": "TMS320F28P650SK7",
+     "partid": "0x08FC0800",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP69D Table 7-9"
+    },
+    {
+     "part": "TMS320F28P650SK6",
+     "partid": "0x08FA0800",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP69D Table 7-9"
+    },
+    {
+     "part": "TMS320F28P650DH6 / F28P650SH6 / F28P659SH6 / F28P659DH8 / F28P650SH7",
+     "partid": "0x08F70800 (DH6), 0x08F80800 (SH6 and 659SH6), 0x08F90800 (659DH8), 0x08F60800 (SH7)",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": 768,
+     "launchpads": [],
+     "partid_source": "SPRSP69D Table 7-9; flash from nowFlash F28P650DHx_768KB and F28P650SHx_768KB"
+    }
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router; CPU1 port 0x10, CPU2 port 0x11, JLM/AJSM port 0x13",
+    "notes": "cJTAG and 4-pin JTAG. A single-core-style ccxml fails with 'An invalid processor ID has been found.'; start from C2000Ware device_support/f28p65x/common/targetConfigs/TMS320F28P650DK9.ccxml (measured).",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f28p650dk9.xml; c2000-launchpad/FAQ-f28p65x.md; SPRSP69D"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick-C TAP IDCODE",
+     "field": "whole IDCODE",
+     "mask": null,
+     "source": "Not published in SPRSP69D (grep: none)."
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00A (PARTIDH)",
+     "field": "PARTIDH",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP69D Table 7-9; nowFlash TMS320F28P65x.xml DeviceId 0x771745"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00C (REVID)",
+     "field": "REVID: 1 = rev 0, 2 = A",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP69D Table 7-9"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x72203",
+     "field": "flash code, mask 0x7 (5 = 768KB DHx/SHx parts)",
+     "mask": "0x0007",
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/c2000/nowFlash/configs/TMS320F28P65x.CPU1.xml"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads libFlashC2000v1 (partnum contains 'F28P65') for this part (FlashDLLDB.xml). Five banks of 128 sectors of 1K words (0x80000, 0xA0000, 0xC0000, 0xE0000, 0x100000); CPU1 and CPU2 each have their own flash plugin and bank map (SPRSP69D Table 7-3). DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28P65x_1280KB_FlashProperties.xml, TMS320F28P650DHx_768KB_, TMS320F28P650SHx_768KB_; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')",
+     "measured": "2026-10-08: 'DSLite flash --config=F28P650DK9_CL650001.ccxml -n 0' completed with no errors on our LaunchPad (timing not captured; c2000-launchpad/tools, data/results/f28p65x.csv blink_flash)"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f28p65x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: driverlib/f28p65x/examples/c28x_dual/flash_kernel (CPU1 and CPU2 kernels). Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Default boot pins GPIO72/GPIO84 (SPRSP69D Table 7-15). On the LAUNCHXL-F28P65X the kernel must be rebuilt with the _LAUNCHXL_F28P65X symbol and SCI_BOOT_ALT3 (GPIO42/GPIO43, BOOTDEF 0x61), S2 position 1 OFF, S3 position 1 = 0 and position 2 = 1; the BOOTDEF-LOW value is then set through a debugger (0xD00 emulation boot RAM or Z1-OTP-BOOTDEF-LOW at 0x7800C) per SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 7.4.",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 driverlib/f28p65x/examples/c28x_dual/flash_kernel (CPU1 and CPU2 kernels)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "User DCSM OTP and user OTP banks 1-4",
+     "range": "0x78000-0x783FF (DCSM OTP), 0x78800, 0x79000, 0x79800, 0x7A000 (1K words each)",
+     "why": "OTP; DCSM password rules as on the F280013x family; Z1-OTP-BOOTDEF-LOW sits at 0x7800C.",
+     "source": "SPRSP69D Table 7-3; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 7.4"
+    },
+    {
+     "region": "TI OTP banks 0-4",
+     "range": "0x72000, 0x73000, 0x74000, 0x75000, 0x76000 (1536 words each)",
+     "why": "TI use only.",
+     "source": "SPRSP69D Table 7-3"
+    },
+    {
+     "region": "DSLite security operations",
+     "range": "Z1/Z2 *Program, *Lock",
+     "why": "Burn OTP bits.",
+     "source": "libFlashC2000v1.dylib operation lists"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "'An invalid processor ID has been found.'",
+     "fix": "Use C2000Ware's TMS320F28P650DK9.ccxml and add only the probe serial.",
+     "source": "c2000-launchpad/FAQ-f28p65x.md (measured 2026-10-08)"
+    },
+    {
+     "symptom": "Locked zone",
+     "fix": "Z1/Z2 unlock with the password (DSLite or kernel); no documented recovery for a lost or all-0 password.",
+     "source": "libFlashC2000v1.dylib; SPRUJ53D section 5.2.1 (F28P55x text; the F28P65x TRM was not fetched)"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL-F28P65X: on-board XDS110; SCI boot needs the S2/S3 positions above.",
+    "bare_chip": "XDS110, cJTAG or 4-pin JTAG, CPU1 and CPU2 on the ICEPick; boot pins GPIO72/GPIO84."
+   },
+   "unknowns": [
+    "JTAG IDCODE not published.",
+    "F28P65x TRM was not fetched, so the DCSM layout is taken from the F28P55x and F280013x TRMs.",
+    "Flash KB of the K/H/S variants other than DK9 and the 768KB DHx/SHx parts.",
+    "Erase scope of 'Entire Flash' on a dual-core part when CPU2 owns banks."
+   ]
+  },
+  {
+   "family": "F2837xD / F2837xS",
+   "members": [
+    {
+     "part": "TMS320F28379D",
+     "partid": "0x00F90300 or 0x02F90300",
+     "jtag_idcode": "0x0B99C02F",
+     "core": "2x C28x+FPU+TMU+VCU-II, 2x CLA",
+     "flash_kb": 1024,
+     "launchpads": [
+      "LAUNCHXL-F28379D"
+     ],
+     "partid_source": "SPRS880P Table 7-9 (the top byte is 0x00 or 0x02); flash from Table 3 columns in descending part order",
+     "jtag_source": "SPRS880P Table 7-9 'JTAG ID'"
+    },
+    {
+     "part": "TMS320F28378D / F28377D",
+     "partid": "0x**FA0300 / 0x**FF0300",
+     "jtag_idcode": "0x0B99C02F",
+     "core": "2x C28x",
+     "flash_kb": 1024,
+     "launchpads": [],
+     "partid_source": "SPRS880P Table 7-9"
+    },
+    {
+     "part": "TMS320F28376D / F28375D / F28374D",
+     "partid": "0x**FE0300 / 0x**FD0300 / 0x**FC0300",
+     "jtag_idcode": "0x0B99C02F",
+     "core": "2x C28x",
+     "flash_kb": 512,
+     "launchpads": [],
+     "partid_source": "SPRS880P Table 7-9"
+    },
+    {
+     "part": "TMS320F28379S / F28378S / F28377S / F28376S / F28375S / F28374S",
+     "partid": "0x**F90400 / FA / FF / FE / FD / FC (0400 low half)",
+     "jtag_idcode": "0x0B99C02F",
+     "core": "C28x+FPU+TMU+VCU-II, CLA",
+     "flash_kb": null,
+     "launchpads": [
+      "LAUNCHXL-F28377S"
+     ],
+     "partid_source": "SPRS881K section 7.4 identification table"
+    }
+   ],
+   "debug_port": {
+    "protocol": "JTAG",
+    "access": "ICEPick-C router; CPU1 port 0x10 (CPU2 port 0x11 on D parts)",
+    "notes": "4-pin JTAG; no cJTAG text in SPRS880P and none in the targetdb device file. LaunchPad kits use an on-board XDS100v2 (FTDI), not an XDS110.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f28379d.xml; SPRS880P; UniFlash 9.6.0 uniflash/public/target_setup/data/lpList.json"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "TAP IDCODE",
+     "field": "0x0B99C02F (same value for D and S, and for the F2807x)",
+     "mask": "0x0FFFFFFF (version nibble masked, an assumption)",
+     "source": "SPRS880P Table 7-9; SPRS881K section 7.4; SPRS902K Table 7-7"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00A (PARTIDH); CPU2 view at 0x70202",
+     "field": "PARTIDH: low half 0x0300 = D, 0x0400 = S; top byte 0x00 or 0x02",
+     "mask": "0x00FFFFFF",
+     "source": "SPRS880P Table 7-9"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00C (REVID)",
+     "field": "REVID: 0 and A share 0, B = 2, C = 3",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRS880P Table 7-9"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x70201",
+     "field": "flash code mask 0xF (nowFlash F2837xS_512KB = 7; F28376D = 6 with mask 7)",
+     "mask": "0x000F",
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/c2000/nowFlash/configs/F2837xD.CPU1.xml, TMS320F2837xS.xml"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads libFlashC2000F021 (partnum contains 'F2837') for this part (FlashDLLDB.xml). Sectors A to N: four 8K-word, then 32K-word sectors (0x80000-0xBFFFF region per CPU; nowFlash F2837xS_512KB: 8 sectors of 0x2000 and 6 of 0x8000). Each CPU has its own flash plugin (F2837xD.CPU1.xml, .CPU2.xml). DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28379D_FlashProperties.xml (one per part); ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f2837xD'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: device_support/f2837xd/examples/dual/F2837xD_sci_flash_kernels (prebuilt F2837xD_sci_flash_kernels_cpu01.txt ships in the package), device_support/f2837xs/examples/cpu1/F2837xS_sci_flash_kernel. Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Default boot pins GPIO72/GPIO84; SCIA options GPIO28/29 and GPIO84/85. The LAUNCHXL-F28379D does not support SCI boot, so this path is for controlCARD or custom boards (SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 7.3.3).",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 device_support/f2837xd/examples/dual/F2837xD_sci_flash_kernels (prebuilt F2837xD_sci_flash_kernels_cpu01.txt ships in the package), device_support/f2837xs/examples/cpu1/F2837xS_sci_flash_kernel"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "User-configurable DCSM OTP",
+     "range": "0x78000-0x783FF (zone 1 and zone 2 inside)",
+     "why": "OTP; passwords, BOOTCTRL (Z1-BOOTCTRL at 0x7801E), link pointers.",
+     "source": "SPRS880P section 7.3.2 and DCSM text; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 7.3.2"
+    },
+    {
+     "region": "TI OTP",
+     "range": "0x70000-0x703FF",
+     "why": "TI use (PARTID copy at 0x70201).",
+     "source": "SPRS880P section 7.3.2; nowFlash RegisterId"
+    },
+    {
+     "region": "DSLite security operations",
+     "range": "Z1/Z2 *Program, *Lock",
+     "why": "Burn OTP bits.",
+     "source": "libFlashC2000F021.dylib operation list"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "No command window after the kernel loads (F2837xS)",
+     "fix": "Use the right SCIA option (GPIO28/29 or GPIO84/85) and align flash sections to 128 bits.",
+     "source": "SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 7.3.1"
+    },
+    {
+     "symptom": "controlCARD: kernel does not load in SCI boot",
+     "fix": "Build with SCI_BOOT_ALTERNATE, set SW1 positions, set EMUBOOTCTRL 0xD00 to 0x815A through a debugger.",
+     "source": "SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 7.3.2"
+    },
+    {
+     "symptom": "Locked zone",
+     "fix": "Unlock with password via DSLite Z1Unlock or the kernel's unlock command.",
+     "source": "libFlashC2000F021.dylib"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL-F28379D and LAUNCHXL-F28377S: on-board XDS100v2 (lpList TIXDS100v2_Connection), no SCI boot on the F28379D board.",
+    "bare_chip": "Any TI JTAG probe, 4-pin JTAG; XDS110 works on the standard 14/20-pin header."
+   },
+   "unknowns": [
+    "Whether DSLite's XDS100v2 driver runs on macOS: not tested; targetdb has the connection, libjioserdesusb.dylib is in uscif.",
+    "Per-part flash KB for S parts and the column order of SPRS880P Table 3 (descending part order assumed).",
+    "F2837xD.CPU2 flash-plugin interplay when CPU1 owns the banks (ConfigureBanks operation)."
+   ]
+  },
+  {
+   "family": "F2807x",
+   "members": [
+    {
+     "part": "TMS320F28075",
+     "partid": "0x**FF0500",
+     "jtag_idcode": "0x0B99C02F",
+     "core": "C28x+FPU+VCU-II, CLA",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRS902K Table 7-7",
+     "jtag_source": "SPRS902K Table 7-7"
+    },
+    {
+     "part": "TMS320F28076",
+     "partid": "0x**FC0500",
+     "jtag_idcode": "0x0B99C02F",
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRS902K Table 7-7"
+    }
+   ],
+   "debug_port": {
+    "protocol": "JTAG",
+    "access": "ICEPick-C, CPU port 0x10 (f28076.xml)",
+    "notes": "4-pin JTAG.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f28076.xml; SPRS902K"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "TAP IDCODE",
+     "field": "0x0B99C02F",
+     "mask": null,
+     "source": "SPRS902K Table 7-7"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00A (PARTIDH)",
+     "field": "PARTIDH, top byte 0x00 or 0x02",
+     "mask": "0x00FFFFFF",
+     "source": "SPRS902K Table 7-7"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads libFlashC2000F021 (partnum contains 'F2807') for this part (FlashDLLDB.xml). No nowFlash config file for this family was found in the UniFlash tree; the flash database for it is in the .nfl libraries (not read). DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28075_FlashProperties.xml; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f2807x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: device_support/f2807x/examples/cpu1/F2807x_sci_flash_kernel. Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Listed in the app note's kernel table (section 7.1).",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 device_support/f2807x/examples/cpu1/F2807x_sci_flash_kernel"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "User DCSM OTP",
+     "range": "0x78000-0x783FF (assumed, as on F2837x)",
+     "why": "OTP.",
+     "source": "not read for this family"
+    }
+   ],
+   "recovery": [],
+   "probe": {
+    "launchpad": "none in lpList (controlCARD only).",
+    "bare_chip": "4-pin JTAG probe."
+   },
+   "unknowns": [
+    "Flash size, sector map, DCSM OTP range: not read for this family.",
+    "No LaunchPad in UniFlash's list."
+   ]
+  },
+  {
+   "family": "F2838x",
+   "members": [
+    {
+     "part": "TMS320F28388D",
+     "partid": "0x03FF0300",
+     "jtag_idcode": "0x0BB4002F",
+     "core": "2x C28x + CM (Cortex-M4)",
+     "flash_kb": 1024,
+     "launchpads": [],
+     "partid_source": "SPRSP14E Table 8-10",
+     "jtag_source": "SPRSP14E Table 8-10 'JTAGID'"
+    },
+    {
+     "part": "TMS320F28386D",
+     "partid": "0x03FD0300",
+     "jtag_idcode": "0x0BB4002F",
+     "core": "2x C28x + CM",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP14E Table 8-10"
+    },
+    {
+     "part": "TMS320F28384D",
+     "partid": "0x03FB0300",
+     "jtag_idcode": "0x0BB4002F",
+     "core": "2x C28x + CM",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP14E Table 8-10"
+    },
+    {
+     "part": "TMS320F28388S / F28386S / F28384S",
+     "partid": "0x03FF0400 / 0x03FD0400 / 0x03FB0400",
+     "jtag_idcode": "0x0BB4002F",
+     "core": "C28x + CM",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRSP14E Table 8-10"
+    }
+   ],
+   "debug_port": {
+    "protocol": "JTAG",
+    "access": "ICEPick-C router with CS_DAP for the Cortex-M4 CM; CPU1 port 0x10, CPU2 0x11, DAP port 0x0, JLM port 0x13",
+    "notes": "No cJTAG text in SPRSP14E.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f28388d.xml; SPRSP14E"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "TAP IDCODE",
+     "field": "0x0BB4002F",
+     "mask": null,
+     "source": "SPRSP14E Table 8-10"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00A (PARTIDH); CPU ID at 0x70223 (CPU1 = 0xXX01, CPU2 = 0xXX02), CM ID at 0x380446",
+     "field": "PARTIDH",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP14E Table 8-10; nowFlash F2838xD.CPU1.xml DeviceId 0x771682"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x5D00C (REVID)",
+     "field": "REVID: 0 = rev 0, 1 = A",
+     "mask": "0xFFFFFFFF",
+     "source": "SPRSP14E Table 8-10"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads libFlashC2000F021 (partnum contains 'F2838'); separate plugins for CPU1, CPU2 and the CM (F2838xD.CM.xml) for this part (FlashDLLDB.xml). The nowFlash CPU1 file lists one 256KB part of four 8K-word and three 32K-word sectors; the CM has its own flash (F2838xD.CM.xml, f021_m3 library). DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F2838x_FlashProperties.xml; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f2838x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: driverlib/f2838x/examples/c28x_dual/flash_kernel and c28x_cm/flash_kernel. Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Default boot pins GPIO72/GPIO84 (SPRSP14E Table 8-18); SCI option 0 TX GPIO29, RX GPIO28 (Table 8-21). The CM kernel is loaded in 8-bit ASCII GPIO boot format ('-o' and '-r' options).",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 driverlib/f2838x/examples/c28x_dual/flash_kernel and c28x_cm/flash_kernel"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "User OTP (CPU1 DCSM; CPU2 user OTP is non-secure)",
+     "range": "0x78000-0x783FF",
+     "why": "CPU1 User OTP carries the security configuration.",
+     "source": "SPRSP14E Table 8-1 notes"
+    },
+    {
+     "region": "DSLite security operations",
+     "range": "Z1/Z2 *Program, *Lock",
+     "why": "Burn OTP bits.",
+     "source": "libFlashC2000F021.dylib"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Locked zone",
+     "fix": "Unlock with password through DSLite or the kernel; the CM and each CPU unlock separately.",
+     "source": "libFlashC2000F021.dylib; flash kernel command tables in SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025)"
+    }
+   ],
+   "probe": {
+    "launchpad": "none in lpList (TMDSCNCD28388D controlCARD only).",
+    "bare_chip": "JTAG probe, 4-pin JTAG; three cores on the ICEPick."
+   },
+   "unknowns": [
+    "Per-part flash KB for the D and S variants other than the 28388D.",
+    "controlCARD probe type not read."
+   ]
+  },
+  {
+   "family": "F2806x (Piccolo)",
+   "members": [
+    {
+     "part": "TMS320F28069 (PZP/PZ)",
+     "partid": "0x009E (UPZP 0x009F)",
+     "jtag_idcode": null,
+     "core": "C28x+FPU+VCU, CLA",
+     "flash_kb": 256,
+     "launchpads": [
+      "LAUNCHXL-F28069M"
+     ],
+     "partid_source": "SPRS698J Table 8-10 (PARTID, one 16-bit word at 0x3D7E80)"
+    },
+    {
+     "part": "TMS320F28069 (PFP/PN)",
+     "partid": "0x009C (UPFP 0x009D)",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": 256,
+     "launchpads": [],
+     "partid_source": "SPRS698J Table 8-10"
+    },
+    {
+     "part": "TMS320F28068 / F28067 / F28066",
+     "partid": "0x008F/0x008E/0x008D/0x008C ; 0x008A/0x008B/0x0088/0x0089 ; 0x0086/0x0087/0x0084/0x0085",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": 256,
+     "launchpads": [],
+     "partid_source": "SPRS698J Table 8-10"
+    },
+    {
+     "part": "TMS320F28065 / F28064 / F28063 / F28062",
+     "partid": "0x007E/0x007F (F28065); 0x006F (F28064, F28063, F28062 families)",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": 128,
+     "launchpads": [],
+     "partid_source": "SPRS698J Table 8-10; flash Table 8-4"
+    }
+   ],
+   "debug_port": {
+    "protocol": "JTAG",
+    "access": "direct C28x TAP, no ICEPick (targetdb f28069.xml has no router)",
+    "notes": "4-pin JTAG; wait-boot mode is the way to connect to a secured part (no hardware wait-in-reset).",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/f28069.xml; SPRS698J section on CSM"
+   },
+   "identify": [
+    {
+     "method": "mem_read",
+     "addr": "0x3D7E80 (PARTID, 16-bit)",
+     "field": "PARTID",
+     "mask": "0xFFFF",
+     "source": "SPRS698J Table 8-10"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x0883 (REVID, 16-bit)",
+     "field": "0 = rev 0 (TMX), 1 = A, 2 = B",
+     "mask": "0xFFFF",
+     "source": "SPRS698J Table 8-10"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x3D7FBE (InstaSPIN)",
+     "field": "0xFFFF normal, 0xFF7F F part, 0xFF3F M part",
+     "mask": "0xFFFF",
+     "source": "SPRS698J Table 8-10"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads Flash28xx (partnum begins 'TMS320F'; algorithm FlashAPIInterface2806xV1_00.out in c2000/flashAlgorithms) for this part (FlashDLLDB.xml). Eight sectors H to A (16K words each on F28069/68/67/66; 8K words on F28065 to F28062); supported operations include ProgramPassword, Lock, Unlock, DepletionRecovery, FrequencyTest. DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28069_FlashProperties.xml; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f2806x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: device_support/f2806x/examples/c28/f28069_sci_flash_kernel. Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Flash Kernel A: erases the whole flash, then programs; application load only (SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) section 4). Boot SCI on GPIO28 (RX) and GPIO29 (TX).",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 device_support/f2806x/examples/c28/f28069_sci_flash_kernel"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CSM password",
+     "range": "0x3F7FF8-0x3F7FFF (128-bit, inside Sector A)",
+     "why": "Never program to all zeros: the device is locked permanently.",
+     "source": "SPRS698J Table 8-3 and CSM note"
+    },
+    {
+     "region": "Reserved and security words",
+     "range": "0x3F7F80-0x3F7FF5 (must be 0x0000 when passwords are programmed; 0x3F7FF0-0x3F7FF5 reserved for data); boot entry 0x3F7FF6-0x3F7FF7",
+     "why": "Part of the code security module layout.",
+     "source": "SPRS698J CSM notes, Table 8-3"
+    },
+    {
+     "region": "OTP and TI calibration",
+     "range": "User OTP 0x3D7800-0x3D7BF9; calibration at 0x3D7C80-0x3D7CC0; PARTID at 0x3D7E80",
+     "why": "One-time, and TI trim.",
+     "source": "SPRS698J memory map text"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Secured part drops the JTAG link (ECSL trips)",
+     "fix": "Put the part in Wait boot at power-up, connect, unlock with the password. The board must allow Wait boot (boot pins).",
+     "source": "SPRS698J security text"
+    },
+    {
+     "symptom": "Password lost",
+     "fix": "libFlash28xx prints 'To clear the programmed password, please erase Sector A of Flash memory'; whether that works on a locked part with no password is not stated.",
+     "source": "libFlash28xx.dylib strings"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL-F28069M: on-board XDS100v2 (lpList).",
+    "bare_chip": "4-pin JTAG probe. Boot pins GPIO37/TDO and GPIO34: SCI = 0,1; Wait = 1,0 (SPRS698J Table 8-1); with a probe attached the ROM uses the debug-boot words instead."
+   },
+   "unknowns": [
+    "JTAG IDCODE for the F2806x: not in the data sheet; no boundary scan text found.",
+    "XDS100v2 on macOS.",
+    "Lost-password recovery on a locked F2806x.",
+    "TI claims 'still sold' status: not checked."
+   ]
+  },
+  {
+   "family": "F2802x (Piccolo 28027)",
+   "members": [
+    {
+     "part": "TMS320F28027 (PT / DA)",
+     "partid": "0x00CF (PT), 0x00CE (DA)",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": 64,
+     "launchpads": [
+      "LAUNCHXL-F28027"
+     ],
+     "partid_source": "SPRS523P Table 9-11 (PARTID at 0x3D7FFF)"
+    },
+    {
+     "part": "TMS320F28026 / F28023 / F28022 / F28021 / F28020 / F280200",
+     "partid": "0x00C7/0x00C6 ; 0x00CD/0x00CC ; 0x00C5/0x00C4 ; 0x00CB/0x00CA ; 0x00C3/0x00C2 ; 0x00C1/0x00C0",
+     "jtag_idcode": null,
+     "core": "C28x",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "SPRS523P Table 9-11; flash 8K/16K/32K words in section 9.1.5"
+    }
+   ],
+   "debug_port": {
+    "protocol": "JTAG",
+    "access": "direct C28x TAP; no boundary scan, but IDCODE and BYPASS exist after a manual IR/DR sequence",
+    "notes": "SPRS523P: 'The IDCODE does not come by default.'",
+    "source": "SPRS523P section 9.1.4; f28027.xml has no router"
+   },
+   "identify": [
+    {
+     "method": "mem_read",
+     "addr": "0x3D7FFF (PARTID, 16-bit)",
+     "field": "PARTID",
+     "mask": "0xFFFF",
+     "source": "SPRS523P Table 9-11"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x0882 (CLASSID), 0x0883 (REVID)",
+     "field": "CLASSID, REVID (0 = rev 0, 1 = A, 2 = B)",
+     "mask": "0xFFFF",
+     "source": "SPRS523P Table 9-11"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite (UniFlash 9.6.0 command line, 'dslite flash --config=<ccxml> [-s id=value] <image>') loads Flash28xx (algorithm FlashAPIInterface2802xV2_00.out) for this part (FlashDLLDB.xml). Four 8K-word sectors on the 32K-word parts, four 4K-word on 16K-word parts, two 4K-word on the F280200. DSLite settings are real ids in the property file: FlashEraseSelection ('Entire Flash' default, or 'Necessary Sectors Only (for Program Load)'), FlashDownloadSetting ('Erase and Program' default, 'Program Only', 'Verify Only'), FlashVerifySetting (default on), FlashBlankCheckToggle (default off), Z1CSMPSWD0-3 / Z2CSMPSWD0-3 (default FFFFFFFF) and the Z1Unlock / Z2Unlock operations. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; CCStudio 21.0.1 ccs_base/DebugServer/propertyDB/TMS320F28027_FlashProperties.xml; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM SCI bootloader loads a RAM flash kernel (hex2000 -boot -sci8 -a), then the kernel erases, programs, verifies and unlocks over UART. Host side: C2000Ware serial_flash_programmer ('-d f2802x'), source in C++ with Win32 calls; SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) says the host application is Windows only. Kernel source: device_support/f2802x/examples/structs/f28027_flash_kernel. Packet: E4 1B | len | cmd | data | checksum | 1B E4, ACK 0x2D, NAK 0xA5, autobaud 'A'. Flash Kernel A: erases all flash, then programs.",
+     "erase": "sector",
+     "platforms": [
+      "windows"
+     ],
+     "source": "C2000Ware 26.02.00.00 utilities/flash_programmers/serial_flash_programmer (README.txt, serial_flash_programmer/source/*.cpp); SPRABV4I (Serial Flash Programming of C2000 Microcontrollers, Aug 2025) sections 1, 3-6; C2000Ware 26.02.00.00 device_support/f2802x/examples/structs/f28027_flash_kernel"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CSM password",
+     "range": "0x3F7FF8-0x3F7FFF",
+     "why": "Never program to zeros: permanent lock.",
+     "source": "SPRS523P CSM note"
+    },
+    {
+     "region": "User OTP",
+     "range": "0x3D7800-0x3D7BFF",
+     "why": "One-time.",
+     "source": "SPRS523P section 9.1.5"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "ECSL trips and drops the debug link on a secured part",
+     "fix": "Wait boot at power-up, connect, unlock with the password.",
+     "source": "SPRS523P lines on ECSL (section 9.1)"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL-F28027: on-board XDS100v2 (lpList).",
+    "bare_chip": "4-pin JTAG."
+   },
+   "unknowns": [
+    "JTAG IDCODE value: needs the manual shift sequence on a part.",
+    "XDS100v2 on macOS.",
+    "Whether the family is still sold."
+   ]
+  },
+  {
+   "family": "Hercules TMS570LS / RM4x (Cortex-R4F)",
+   "members": [
+    {
+     "part": "TMS570LS0232 / LS0332 / LS0432, RM41L232, RM42L432",
+     "partid": "DEVID 0x8048AD05 (rev 0), 0x8048AD0D (A), 0x8048AD15 (B)",
+     "jtag_idcode": "0x0B97102F (initial), 0x1B97102F (A), 0x2B97102F (B)",
+     "core": "Cortex-R4F",
+     "flash_kb": null,
+     "flash_note": "128KB LS023x and RM41L232, 256KB LS033x, 384KB LS043x and RM42L432",
+     "launchpads": [
+      "LAUNCHXL-TMS57004",
+      "LAUNCHXL-RM42"
+     ],
+     "partid_source": "SPNS186C section 8 (DEVID); nowFlash RM42Lxxx.xml, TMS570LS0x32.xml DeviceId 0x8048AD05",
+     "jtag_source": "SPNS186C Table 6-29 (LS0432); flash 128KB LS023x, 256KB LS033x, 384KB LS043x in targetdb"
+    },
+    {
+     "part": "TMS570LS0714 / LS0914 / LS0812, RM44L520/522/920/922",
+     "partid": "DEVID 0x8052AD05",
+     "jtag_idcode": null,
+     "core": "Cortex-R4F",
+     "flash_kb": null,
+     "flash_note": "768KB (LS0714, LS0812, RM44L520/522), 1MB (LS0914, RM44L920/922)",
+     "launchpads": [],
+     "partid_source": "UniFlash TMS570LS0x14.xml and RM44Lxxx.xml DeviceId only (no data sheet fetched)"
+    },
+    {
+     "part": "TMS570LS1114/1115/1224/1225/1227, RM46L430/440/450/830/840/850/852",
+     "partid": "DEVID 0x8046AD05 (rev A), 0x8046AD15 (B), 0x8046AD1D (C)",
+     "jtag_idcode": "0x0B95502F (A), 0x2B95502F (B), 0x3B95502F (C)",
+     "core": "Cortex-R4F",
+     "flash_kb": null,
+     "flash_note": "1MB LS11x and RM46L4x, 1.25MB LS12x and RM46L8x",
+     "launchpads": [
+      "LAUNCHXL2-TMS57012",
+      "LAUNCHXL2-RM46"
+     ],
+     "partid_source": "SPNS190B section 8.6.1 and the DEVID text of SPNS185C; nowFlash RM46Lxxx.xml, TMS570LS1xxx.xml",
+     "jtag_source": "SPNS190B Table 6-38, SPNS185C Table 6-39; flash LS12x/RM46L8x 1.25MB, LS11x/RM46L4x 1MB"
+    },
+    {
+     "part": "TMS570LS2124/2125/2134/2135/3134/3135/3137, RM48L530-950",
+     "partid": "DEVID 0x802AAD05 (A), 0x802AAD15 (B), 0x802AAD1D (C), 0x802AAD25 (D, LS3137)",
+     "jtag_idcode": "0x0B8A002F (A), 0x2B8A002F (B), 0x3B8A002F (C), 0x4B8A002F (D)",
+     "core": "Cortex-R4F",
+     "flash_kb": null,
+     "flash_note": "2MB LS21x and RM48L5/7xx, 3MB LS31x and RM48L9xx",
+     "launchpads": [],
+     "partid_source": "SPNS162C DEVID text; nowFlash TMS570LSx1xx.xml, RM48Lxxx.xml",
+     "jtag_source": "SPNS162C Table 6-38 (LS3137); flash 2MB LS21x/RM48L5/7, 3MB LS31x/RM48L9 in targetdb"
+    }
+   ],
+   "debug_port": {
+    "protocol": "JTAG",
+    "access": "ICEPick-C router; Port 16 reaches the CS_DAP and the Cortex-R4F (DAP port 0); AJSM security tap on ICEPick secondary tap 2",
+    "notes": "4-pin JTAG; no cJTAG text in the data sheets. The JTAG ID is the ICEPick ID. Big-endian (TMS570) and little-endian (RM4x) variants share the debug IDs.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/tms570ls1224.xml, rm46l852.xml; SPNS190B section 6.21.3"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick-C TAP IDCODE",
+     "field": "bits 27:12 part, 31:28 silicon rev; use the table by DEVID group",
+     "mask": "0x0FFFFFFF",
+     "source": "SPNS190B Table 6-38; SPNS185C Table 6-39; SPNS162C Table 6-38; SPNS186C Table 6-29; OpenOCD ti_tms570.cfg expects 0x0B7B302F, 0x0B95502F, 0x0B97102F, 0x0D8A002F, 0x0B8A002F"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0xFFFFFFF0 (DEVID)",
+     "field": "bits 30:17 UNIQUE ID, 7:3 REVISION, low 3 bits 101",
+     "mask": "0xFFFFFFFF with revision bits 7:3 masked to group",
+     "source": "SPNS190B section 8.6.1; SPNS195C section 9.6.1"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0xF008015C (RM46/LS11/LS12 part number, mask 0xFFFF = 0x0400 for 1MB), 0xF0080148 (LS02/03, RM41 family)",
+     "field": "flash size code UniFlash matches on",
+     "mask": "0x0000FFFF",
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/hercules/flash/configs/TMS570LS1xxx.xml, RM46Lxxx.xml, TMS570LS0x32.xml RegisterId"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite loads libFlashHercules (partnum begins 'TMS570', 'RM' or 'TMS470M'; interface JTAG). Operations: Erase, BlankCheck, Profile, ProfileAndCompare; settings FlashEraseSelection (sector), FlashProgramVerifyOnly, FlashVerifySetting, FlashBlankCheckToggle. Algorithms blankw.alg, erasew.alg, verifyw.alg, fverifyw.alg load into RAM. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; libFlashHercules.dylib strings; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "Debug only. xPack OpenOCD 0.12.0-7 and TI's fork carry ti_tms570.cfg, ti_tms570ls1x.cfg, ti_tms570ls3137.cfg, ti_tms570lc43xx.cfg, ti_tms570ls20xxx.cfg, ti_rm4x.cfg and board/ti/launchxl2-tms57012.cfg (XDS110, JTAG): a Cortex-R4 with ICEPick-C reset. None declares a flash bank, and neither binary has an F021 flash driver string, so it can load RAM but not write the part.",
+     "erase": "none",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "~/zephyr-toolchain/xpack-openocd-0.12.0-7/openocd/scripts/target/ti_tms570*.cfg, ti_rm4x.cfg; ~/ti/ti-openocd/share/openocd/scripts/target; strings of both openocd binaries"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "Customer OTP: visible unlock code (AJSM)",
+     "range": "0xF0000000 (128-bit visible unlock code), customer OTP 0xF0000000-0xF0001FFF (bank 0) and 0xF000E000-0xF000FFFF (bank 7)",
+     "why": "Changing any bit 1 to 0 secures the device. All 128 bits zero secures it permanently. Only an unlock-by-scan value recovers a merely secured part.",
+     "source": "SPNS190B AJSM text (Figure 6-21 and the text after it) and memory map table; SPNS195C (same text)"
+    },
+    {
+     "region": "TI OTP",
+     "range": "0xF0080000-0xF0081FFF and 0xF008E000-0xF008FFFF",
+     "why": "TI use.",
+     "source": "SPNS190B memory map"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Secured part: only the AJSM tap answers",
+     "fix": "Scan the correct value into the Unlock-By-Scan register (AJSM IR 0b1011) so that XOR with the OTP word gives the original visible unlock code; the register resets only at nPORRST.",
+     "source": "SPNS190B AJSM text after Figure 6-21; targetdb Port 17"
+    },
+    {
+     "symptom": "All 128 bits of the visible unlock code are zero",
+     "fix": "No recovery: the device is permanently secure.",
+     "source": "SPNS190B"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL2-TMS57012 and LAUNCHXL2-RM46: on-board XDS110 (JTAG). LAUNCHXL-TMS57004 and LAUNCHXL-RM42: on-board XDS100v2.",
+    "bare_chip": "XDS110 on 4-pin JTAG plus nRST (ICEPick warm reset); TI's OpenOCD board file launchxl2-tms57012.cfg shows the setup."
+   },
+   "unknowns": [
+    "JTAG IDs for RM41, RM42 and RM48 were not read; the values shown are from the TMS570 part with the same DEVID group.",
+    "JTAG IDCODE of the LS09/LS08/RM44 group and the LS20/LS21 group (OpenOCD lists 0x0B7B302F for LS20xxx; the LS21 data sheet was not fetched).",
+    "Whether DSLite ships a ready unlock-by-scan for Hercules (targetdb Port 17 is empty here).",
+    "Any ROM serial boot for these parts: none found.",
+    "XDS100v2 on macOS."
+   ]
+  },
+  {
+   "family": "Hercules TMS570LC43x / RM57Lx (Cortex-R5F)",
+   "members": [
+    {
+     "part": "TMS570LC4357 / LC4356 / LC4337",
+     "partid": "DEVID 0x8044AD05 (rev A), 0x8044AD0D (B)",
+     "jtag_idcode": "0x0B95A02F (A), 0x1B95A02F (B)",
+     "core": "Cortex-R5F (lockstep)",
+     "flash_kb": 4096,
+     "launchpads": [
+      "LAUNCHXL2-570LC43"
+     ],
+     "partid_source": "SPNS195C section 9.6.1 (memory-mapped at FFFF FFF0h)",
+     "jtag_source": "SPNS195C Table 6-52"
+    },
+    {
+     "part": "RM57L843 / RM57Lx",
+     "partid": "DEVID 0x8044AD05 (A), 0x8044AD0D (B)",
+     "jtag_idcode": "0x0B95A02F (A), 0x1B95A02F (B)",
+     "core": "Cortex-R5F",
+     "flash_kb": 4096,
+     "launchpads": [
+      "LAUNCHXL2-RM57L"
+     ],
+     "partid_source": "SPNS215C",
+     "jtag_source": "SPNS215C Table 6-52"
+    }
+   ],
+   "debug_port": {
+    "protocol": "JTAG",
+    "access": "ICEPick-C router, CS_DAP, Cortex-R5 at DAP address 0x80001000",
+    "notes": "No cJTAG text. Debug ROM table lists Cortex-R5F, ETM-R5, TPIU.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/tms570lc43xx.xml, rm57l8xx.xml; SPNS195C section 6.22.4-5"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick-C TAP IDCODE",
+     "field": "part 0xB95A",
+     "mask": "0x0FFFFFFF",
+     "source": "SPNS195C Table 6-52; OpenOCD ti_tms570lc43xx.cfg (0x0B95A02F)"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0xFFFFFFF0 (DEVID)",
+     "field": "DEVID",
+     "mask": "0xFFFFFFFF with revision bits masked",
+     "source": "SPNS195C section 9.6.1"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite loads libFlashHercules (partnum begins 'TMS570', 'RM' or 'TMS470M'; interface JTAG). Operations: Erase, BlankCheck, Profile, ProfileAndCompare; settings FlashEraseSelection (sector), FlashProgramVerifyOnly, FlashVerifySetting, FlashBlankCheckToggle. Algorithms blankw.alg, erasew.alg, verifyw.alg, fverifyw.alg load into RAM. The same engine runs in CCStudio and UniFlash on Windows, Linux and macOS.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; libFlashHercules.dylib strings; ti.com/tool/UNIFLASH ('downloaded and used on Windows, Linux and macOS computers'; 'macOS is not supported for mmWave, AMx, K2G and J7 devices')"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "Debug only. xPack OpenOCD 0.12.0-7 and TI's fork carry ti_tms570.cfg, ti_tms570ls1x.cfg, ti_tms570ls3137.cfg, ti_tms570lc43xx.cfg, ti_tms570ls20xxx.cfg, ti_rm4x.cfg and board/ti/launchxl2-tms57012.cfg (XDS110, JTAG): a Cortex-R4 with ICEPick-C reset. None declares a flash bank, and neither binary has an F021 flash driver string, so it can load RAM but not write the part.",
+     "erase": "none",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "~/zephyr-toolchain/xpack-openocd-0.12.0-7/openocd/scripts/target/ti_tms570*.cfg, ti_rm4x.cfg; ~/ti/ti-openocd/share/openocd/scripts/target; strings of both openocd binaries"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "Customer OTP: visible unlock code (AJSM)",
+     "range": "0xF0000000 (bank 0 customer OTP 0xF0000000-0xF0001FFF, bank 1 0xF0002000-0xF0003FFF)",
+     "why": "Same rule as the R4 parts: a 1-to-0 flip secures the part, all zeros is permanent.",
+     "source": "SPNS195C section 6.22 (Unlock By Scan text); memory map"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Secured part",
+     "fix": "Unlock-By-Scan through the AJSM tap, as on the R4 parts.",
+     "source": "SPNS195C"
+    }
+   ],
+   "probe": {
+    "launchpad": "LAUNCHXL2-570LC43 and LAUNCHXL2-RM57L: on-board XDS110.",
+    "bare_chip": "XDS110 on 4-pin JTAG and nRST."
+   },
+   "unknowns": [
+    "Per-part flash sector table: SPNS195C Table 6-xx not mapped into the JSON (bank 0 is 2 MB with 16K/32K/128K/256K sectors; bank 1 is 2 MB; bank 7 128 KB).",
+    "IDCODE of the other LC43 variants (LC4357 and RM57L843 share one table)."
+   ]
+  },
+  {
+   "family": "Tiva TM4C123 / TM4C129",
+   "members": [
+    {
+     "part": "TM4C123GH6PM",
+     "partid": "DID0 CLASS 0x05, DID1 PARTNO 0xA1 (DID1 reset 0x10A1606E)",
+     "jtag_idcode": "0x4BA00477 (Cortex-M4 JTAG-DP)",
+     "core": "Cortex-M4F",
+     "flash_kb": 256,
+     "launchpads": [
+      "EK-TM4C123GXL"
+     ],
+     "partid_source": "TM4C123GH6PM data sheet (June 12, 2014) DID0 and DID1 registers",
+     "jtag_source": "same data sheet, JTAG chapter ('the IDCODE instruction outputs a value of 0x4BA0.0477')"
+    },
+    {
+     "part": "TM4C1294NCPDT",
+     "partid": "DID0 CLASS 0x0A, DID1 PARTNO 0x1F (DID1 reset 0x101FC06E)",
+     "jtag_idcode": "0x4BA00477",
+     "core": "Cortex-M4F",
+     "flash_kb": 1024,
+     "launchpads": [
+      "EK-TM4C1294XL"
+     ],
+     "partid_source": "TM4C1294NCPDT data sheet DID0 and DID1 registers"
+    },
+    {
+     "part": "TM4C129ENCPDT",
+     "partid": "CLASS 0x0A, PARTNO not read",
+     "jtag_idcode": "0x4BA00477",
+     "core": "Cortex-M4F",
+     "flash_kb": 1024,
+     "launchpads": [
+      "EK-TM4C129EXL"
+     ],
+     "partid_source": "UniFlash lpList.json and targetdb tm4c129encpdt.xml"
+    },
+    {
+     "part": "other TM4C123x (about 55 targetdb files) and TM4C129x (about 20)",
+     "partid": "PARTNO not read",
+     "jtag_idcode": "0x4BA00477",
+     "core": "Cortex-M4F",
+     "flash_kb": null,
+     "launchpads": [],
+     "partid_source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/tm4c*.xml"
+    }
+   ],
+   "debug_port": {
+    "protocol": "JTAG",
+    "access": "ARM CS_DAP (port 16), no ICEPick; SWD is also available (JTAG-to-SWD switch sequences in the data sheet)",
+    "notes": "JTAG and SWD pins are PC0..PC3; they come up as JTAG at reset and can be reassigned to GPIO, which locks the debugger out (see recovery).",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/tm4c123gh6pm.xml; TM4C123GH6PM data sheet chapter 4"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "TAP IDCODE",
+     "field": "0x4BA00477 (OpenOCD stellaris.cfg also accepts 0x1BA00477 to 0x4BA00477 by ignoring the version nibble)",
+     "mask": "0x0FFFFFFF",
+     "source": "TM4C123GH6PM data sheet JTAG chapter (IDCODE text); openocd target/stellaris.cfg"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x400FE000 (DID0) and 0x400FE004 (DID1)",
+     "field": "DID0 CLASS bits 23:16 (0x05 = TM4C123x, 0x0A = TM4C129x); DID1 PARTNO bits 23:16",
+     "mask": "0x00FF0000",
+     "source": "TM4C123GH6PM and TM4C1294NCPDT data sheets; openocd stellaris.cfg reads 0x400fe000"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "DSLite loads libFlashStellaris (partnum begins 'TM4C', 'LM', 'TM4E'). Operations: Erase, BlankCheck, CalculateChecksum, ProgramUserRegister0/1, ReadUserRegister0/1, ProgramMACAddress, ReadMACAddress. Settings FlashEraseType (mass or by address range) and FlashEraseStartAddr/EndAddr. The LaunchPad kits use the ICDI connection (libicdi_emu.dylib ships for macOS).",
+     "erase": "mass",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/FlashDLLDB.xml; libFlashStellaris.dylib strings; UniFlash 9.6.0 uniflash/public/target_setup/data/lpList.json"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "xPack OpenOCD 0.12.0-7 and TI's fork: 'flash bank ... stellaris' (autodetect), board files ti_ek-tm4c123gxl.cfg and ti_ek-tm4c1294xl.cfg with interface ti-icdi, transport jtag. Both binaries list TM4C123 (Blizzard) and TM4C129 (Snowflake) part names. Includes stellaris mass_erase and recover commands. Not run on our bench (no Tiva board).",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "~/zephyr-toolchain/xpack-openocd-0.12.0-7/openocd/scripts/target/stellaris.cfg, board/ti_ek-tm4c123gxl.cfg; strings of the openocd binaries"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM Boot Loader (UART, and per device SSI, I2C, Ethernet, USB DFU) runs when flash word 0x00000004 is 0xFFFFFFFF, or when the BOOTCFG-selected GPIO matches. Documented in the TivaWare Boot Loader user's guide SPMU301; UniFlash has libFlashSerialStellaris for it.",
+     "erase": "sector",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "TM4C123GH6PM data sheet ROM and reset sections; FlashDLLDB.xml entries FlashSerialStellaris, FlashEthernetStellaris, FlashDFUStellaris"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "Flash-resident non-volatile registers",
+     "range": "BOOTCFG (0x400FD1D0), FMPRE0-3 / FMPPE0-3 (0x400FD200 and 0x400FD400 ranges), USER_REG0-3",
+     "why": "Committed once; not touched by erase or mass erase. BOOTCFG needs a power-on reset. A bad BOOTCFG or protection mask can lock the debug path; UniFlash's ProgramMACAddress operation writes USER_REG0/1.",
+     "source": "TM4C123GH6PM data sheet section 8.2.3.10, Table 8-2"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Debugger cannot connect after the program reassigned the JTAG/SWD pins to GPIO, or the part is 'locked'",
+     "fix": "Debug-port unlock sequence: hold RST, power up, do ten JTAG-to-SWD and SWD-to-JTAG switch sequences. This mass erases flash and the EEPROM and restores the non-volatile registers to factory defaults. OpenOCD's stellaris driver has a 'recover' command for it.",
+     "source": "TM4C123GH6PM data sheet section 4.3.4.3; openocd strings stellaris_handle_recover_command"
+    }
+   ],
+   "probe": {
+    "launchpad": "EK-TM4C123GXL, EK-TM4C1294XL, EK-TM4C129EXL: on-board ICDI (Stellaris ICDI, connection class 31040).",
+    "bare_chip": "Any JTAG or SWD probe on PC0 (TCK/SWCLK), PC1 (TMS/SWDIO), PC2 (TDI), PC3 (TDO)."
+   },
+   "unknowns": [
+    "PARTNO values of every TM4C part other than GH6PM and 1294NCPDT.",
+    "Document numbers of the two data sheets (only titles and dates were in the extracted text).",
+    "Whether UniFlash's ICDI driver and OpenOCD's ti-icdi interface work on current macOS: not run here.",
+    "Whether TI still sells TM4C parts: not checked (the family is mature)."
+   ]
+  }
+ ]
+}

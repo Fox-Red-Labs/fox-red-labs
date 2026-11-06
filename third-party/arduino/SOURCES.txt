@@ -1,0 +1,7 @@
+Unmodified upstream sources, pinned. Cloned 2026-10-06. No file in these folders was edited.
+Check with:  cd libraries && shasum -a 256 -c CHECKSUMS.sha256
+
+Arduino_GFX              https://github.com/moononournation/Arduino_GFX.git              tag v1.6.8   2685a776495be1f9eaf8c572cf876469bcc56585   BSD (license.txt), license.txt added 2026-10-13 from the same commit
+Adafruit_FT6206_Library  https://github.com/adafruit/Adafruit_FT6206_Library.git        tag 1.1.1    32955bbde0019647556b27c6fdd35b602414fcb9   MIT (stated in the source headers; the repo has no license file)
+Adafruit_BusIO           https://github.com/adafruit/Adafruit_BusIO.git                  tag 1.17.4   3b8364267c3ee6e16bad91bc2101aefbd5b5915f   MIT (LICENSE)
+ArduinoCore-API          https://github.com/arduino/ArduinoCore-API.git                 tag 1.5.2    cd91833d90b4fe50e428021ba5051e2b7ceafc84   LGPL-2.1 (LICENSE)

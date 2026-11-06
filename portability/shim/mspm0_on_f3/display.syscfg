@@ -1,0 +1,4 @@
+/* Board overlay, appended to an F3 example's .syscfg when the MSPM0 app prints through the UART display and the example has none. */
+var FR_Display = scripting.addModule("/ti/display/Display");
+var fr_display = FR_Display.addInstance();
+fr_display.$hardware = system.deviceData.board.components.XDS110UART;

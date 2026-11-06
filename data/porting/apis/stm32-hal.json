@@ -1,0 +1,244 @@
+{
+ "api": "stm32-hal",
+ "vendor": "ST",
+ "detect": "stm32\\w{2}xx_hal|\\bHAL_\\w+",
+ "symbol_re": "\\b(?:HAL|BSP)_[A-Za-z0-9_]+",
+ "calls_only": true,
+ "note": "HAL_SPI_*, HAL_I2C_*, HAL_CAN_*, HAL_RTC_* and the USB, SD and Ethernet drivers have no entry on purpose: no port here has run them.",
+ "entries": [
+  {
+   "match": "HAL_Init|HAL_DeInit|HAL_MspInit|HAL_\\w+_Msp\\w*",
+   "idiom": "system.init",
+   "note": "SYSCFG_DL_init() in the SysConfig-generated file does the clock, pin and peripheral set-up; the Msp callbacks (clock, pin, interrupt set-up per peripheral) go away",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_Delay",
+   "idiom": "time.delay_ms",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_GetTick|HAL_IncTick",
+   "idiom": "time.tick_ms",
+   "note": "HAL_IncTick in the SysTick handler has no counterpart: the target keeps its own counter",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_RCC_\\w+|HAL_PWREx_ControlVoltageScaling|HAL_RCCEx_\\w+",
+   "idiom": "clock.system_config",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_NVIC_SetPriority",
+   "idiom": "irq.priority",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_NVIC_EnableIRQ|HAL_NVIC_DisableIRQ",
+   "idiom": "irq.enable",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_GPIO_Init|HAL_GPIO_DeInit",
+   "idiom": "gpio.config_pin",
+   "note": "mode, pull and speed fields become SysConfig pin settings; an EXTI mode also sets edge and pull for gpio.input_irq_edge",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_GPIO_WritePin",
+   "idiom": "gpio.write",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_GPIO_ReadPin",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "HAL_GPIO_TogglePin",
+   "idiom": "gpio.toggle",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_GPIO_EXTI_\\w*Callback",
+   "idiom": "gpio.irq_callback",
+   "note": "the Rising and Falling variants are separate callbacks on STM32G0; one handler on the target reads the edge",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "BSP_LED_\\w+|BSP_PB_\\w+",
+   "idiom": "board.led_button",
+   "note": "BSP pins and polarity come from the board file; without it the port guesses",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_ADC_Init|HAL_ADC_ConfigChannel|HAL_ADCEx_\\w+",
+   "idiom": "adc.config_channel",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_ADC_Start|HAL_ADC_Stop|HAL_ADC_PollForConversion|HAL_ADC_GetValue",
+   "idiom": "adc.start_conversion",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_ADC_Start_DMA",
+   "idiom": [
+    "adc.multichannel_dma",
+    "adc.done_callback"
+   ],
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_ADC_ConvCpltCallback|HAL_ADC_ConvHalfCpltCallback|HAL_ADC_ErrorCallback",
+   "idiom": "adc.done_callback",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_ADC_IRQHandler|HAL_GPIO_EXTI_IRQHandler|HAL_TIM_IRQHandler|HAL_UART_IRQHandler",
+   "idiom": "irq.vector_name",
+   "note": "the HAL dispatcher reads flags and calls the callbacks; on the target the handler reads the pending flag itself",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_SYSCFG_\\w+",
+   "idiom": "vendor.no_equivalent",
+   "note": "USB power-delivery dead-battery pin strobes exist only on STM32 parts with a UCPD block",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_TIM_PWM_ConfigChannel|HAL_TIM_PWM_Init|HAL_TIM_PWM_MspInit|HAL_TIM_Base_Init|HAL_TIMEx_\\w+",
+   "idiom": "pwm.config_channel",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_TIM_PWM_Start|HAL_TIM_PWM_Stop|HAL_TIM_Base_Start\\w*",
+   "idiom": "pwm.start_channel",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "HAL_TIM_PeriodElapsedCallback",
+   "idiom": "time.periodic_irq",
+   "note": "",
+   "from": "STM32 HAL reference"
+  },
+  {
+   "match": "HAL_UART_Init|HAL_UART_MspInit|HAL_UART_DeInit|HAL_UARTEx_\\w*Init\\w*",
+   "idiom": "uart.init_8n1",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "HAL_UART_Transmit|HAL_UART_Transmit_IT",
+   "idiom": "uart.tx_blocking",
+   "note": "the _IT form needs an interrupt-driven sender; see uart.tx_dma for the DMA form",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "HAL_UART_Receive",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "HAL_UART_Transmit_DMA",
+   "idiom": [
+    "uart.tx_dma",
+    "uart.dma_trigger"
+   ],
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "HAL_UART_Receive_DMA",
+   "idiom": [
+    "uart.rx_circular_dma",
+    "uart.dma_trigger"
+   ],
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "HAL_UARTEx_ReceiveToIdle_DMA|HAL_UARTEx_RxEventCallback|HAL_UARTEx_ReceiveToIdle\\w*",
+   "idiom": [
+    "uart.rx_until_idle",
+    "uart.rx_circular_dma"
+   ],
+   "note": "the HAL form hides the idle-line flag the LL form shows",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "HAL_DMA_Init|HAL_DMA_DeInit|HAL_DMA_Start\\w*|HAL_DMA_Abort\\w*",
+   "idiom": "dma.config_channel",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "HAL_DMA_IRQHandler|HAL_DMA_GetState",
+   "idiom": "dma.complete_irq",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "HAL_PWR_Enter\\w+|HAL_PWREx_Enter\\w+",
+   "idiom": "power.sleep",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "HAL_IWDG_\\w+|HAL_WWDG_\\w+",
+   "idiom": "wdt.watchdog",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "HAL_CRC_\\w+",
+   "idiom": "crc.compute",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "HAL_FLASH_\\w+|HAL_FLASHEx_\\w+",
+   "idiom": "flash.write",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "HAL_SYSTICK_Config|HAL_SYSTICK_CLKSourceConfig",
+   "idiom": "time.tick_ms",
+   "note": "HAL_SYSTICK_Config(HCLK/1000) loads the SysTick reload and starts it; the clock-source call is the CLKSOURCE bit: SysTick->LOAD = CPUCLK_FREQ/1000 - 1, VAL = 0, CTRL = CLKSOURCE | ENABLE (CPUCLK_FREQ comes from the SysConfig output)",
+   "from": "port stm32-bootloader source"
+  },
+  {
+   "match": "HAL_SYSTICK_IRQHandler",
+   "idiom": "time.tick_ms",
+   "note": "dispatches the SysTick callback from SysTick_Handler; not needed when the timebase is polled on COUNTFLAG",
+   "from": "port stm32-bootloader source"
+  },
+  {
+   "match": "HAL_UART_GetState|HAL_UART_Abort",
+   "idiom": "uart.recover_after_error",
+   "note": "polled blocking code keeps no transfer state, so both calls go; clear the latched error flags after each received byte instead",
+   "from": "port stm32-bootloader source"
+  },
+  {
+   "match": "HAL_NVIC_SetPriorityGrouping",
+   "idiom": "irq.priority",
+   "note": "Cortex-M0+ has two priority bits and no grouping: drop the call; HAL_NVIC_SetPriority(irq, pre, sub) becomes NVIC_SetPriority(irq, pre)",
+   "from": "port stm32-bootloader source"
+  }
+ ]
+}

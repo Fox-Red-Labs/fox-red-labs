@@ -1,0 +1,523 @@
+{
+ "updated": "2026-10-09",
+ "intro": "Demonstrated end to end on the LP-CC1354P10-1: ML-KEM-768 key agreement with a Mac over USB serial, then one AES-128-GCM line decrypted on the board. This is a demonstration and a set of measurements, not an assurance of security. Boards with 32 kB of RAM or more are expected to fit; the LP-MSPM0C1104 and LP-MSPM0L1306 do not.",
+ "why_now": [
+  {
+   "date": "2024-04-11",
+   "event": "European Commission Recommendation on a coordinated roadmap for the move to post-quantum cryptography",
+   "source": "https://digital-strategy.ec.europa.eu/en/library/coordinated-implementation-roadmap-transition-post-quantum-cryptography"
+  },
+  {
+   "date": "2024-08-13",
+   "event": "NIST publishes the final FIPS 203 (ML-KEM), FIPS 204 (ML-DSA) and FIPS 205 (SLH-DSA), ready for immediate use",
+   "source": "https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards"
+  },
+  {
+   "date": "2024-11-12",
+   "event": "NIST IR 8547 draft: 112-bit ECDSA, ECDH and RSA deprecated after 2030; all quantum-vulnerable public-key algorithms, P-256 included, disallowed after 2035 (still a draft)",
+   "source": "https://csrc.nist.gov/pubs/ir/8547/ipd"
+  },
+  {
+   "date": "2024-12",
+   "event": "NSA CNSA 2.0 FAQ version 2.1: ML-KEM-1024 and ML-DSA-87 for U.S. national security systems",
+   "source": "https://media.defense.gov/2022/Sep/07/2003071836/-1/-1/0/CSI_CNSA_2.0_FAQ_.PDF"
+  },
+  {
+   "date": "2025-06-23",
+   "event": "EU member states' roadmap: start by the end of 2026, high-risk uses by the end of 2030 with quantum-safe firmware upgrades on by default, everything by the end of 2035",
+   "source": "https://digital-strategy.ec.europa.eu/en/news/eu-reinforces-its-cybersecurity-post-quantum-cryptography"
+  },
+  {
+   "date": "2027",
+   "event": "NSA: from 2027 all new commercial national security systems must support quantum-resistant algorithms; legacy systems that cannot are phased out by 2030",
+   "source": "https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/Article/4615285/nsa-announces-post-quantum-cryptography-measures-to-safeguard-national-security/"
+  },
+  {
+   "date": "2030 to 2033",
+   "event": "CNSA 2.0: firmware and software signing exclusively post-quantum by 2030; constrained devices support and prefer by 2030, exclusively by 2033",
+   "source": "https://media.defense.gov/2025/May/30/2003728741/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS.PDF"
+  }
+ ],
+ "algorithms": [
+  {
+   "name": "ML-KEM-512",
+   "what": "Post-quantum key exchange, NIST category 1 (the lowest of five strength levels)",
+   "sizes": {
+    "public_key_B": 800,
+    "ciphertext_or_sig_B": 768
+   },
+   "source": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf"
+  },
+  {
+   "name": "ML-KEM-768",
+   "what": "Post-quantum key exchange, NIST category 3; NIST's recommended default",
+   "sizes": {
+    "public_key_B": 1184,
+    "ciphertext_or_sig_B": 1088
+   },
+   "source": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf"
+  },
+  {
+   "name": "ML-KEM-1024",
+   "what": "Post-quantum key exchange, NIST category 5; the size CNSA 2.0 requires",
+   "sizes": {
+    "public_key_B": 1568,
+    "ciphertext_or_sig_B": 1568
+   },
+   "source": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf"
+  },
+  {
+   "name": "ML-DSA-44",
+   "what": "Post-quantum signature, NIST category 2",
+   "sizes": {
+    "public_key_B": 1312,
+    "ciphertext_or_sig_B": 2420
+   },
+   "source": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf"
+  },
+  {
+   "name": "ML-DSA-65",
+   "what": "Post-quantum signature, NIST category 3",
+   "sizes": {
+    "public_key_B": 1952,
+    "ciphertext_or_sig_B": 3309
+   },
+   "source": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf"
+  },
+  {
+   "name": "ML-DSA-87",
+   "what": "Post-quantum signature, NIST category 5; the size CNSA 2.0 requires",
+   "sizes": {
+    "public_key_B": 2592,
+    "ciphertext_or_sig_B": 4627
+   },
+   "source": "https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf"
+  },
+  {
+   "name": "X25519",
+   "what": "Classical key exchange it replaces (the other side's public key is the reply)",
+   "sizes": {
+    "public_key_B": 32,
+    "ciphertext_or_sig_B": 32
+   },
+   "source": "MSPM0 SDK 2.11.00.07 source/ti/crypto/include/curve25519/curve25519.h (X25519_KEY_LENGTH)"
+  },
+  {
+   "name": "ECDSA P-256",
+   "what": "Classical signature it replaces (public key as x and y coordinates)",
+   "sizes": {
+    "public_key_B": 64,
+    "ciphertext_or_sig_B": 64
+   },
+   "source": "MSPM0 SDK 2.11.00.07 source/ti/crypto/include/ec/ec.h (32-byte coordinates and r, s)"
+  }
+ ],
+ "published": [
+  {
+   "who": "TI",
+   "chip": "MSPM0G3519 (Cortex-M0+)",
+   "clock_mhz": 80,
+   "code": "MSP Crypto Library 0.33.00.07",
+   "test": "ML-KEM-768 keygen / encaps / decaps",
+   "value": "2,162 / 2,514 / 2,864 kcycles (27 / 31 / 36 ms)",
+   "source": "MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput"
+  },
+  {
+   "who": "TI",
+   "chip": "MSPM0G3519 (Cortex-M0+)",
+   "clock_mhz": 80,
+   "code": "MSP Crypto Library 0.33.00.07",
+   "test": "ML-DSA-44 keygen / sign (mean of 16) / verify",
+   "value": "6,688 / 33,871 / 7,825 kcycles (84 / 423 / 98 ms)",
+   "source": "MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput"
+  },
+  {
+   "who": "TI",
+   "chip": "MSPM0G3519 (Cortex-M0+)",
+   "clock_mhz": 80,
+   "code": "MSP Crypto Library 0.33.00.07, software",
+   "test": "ECDSA P-256 sign / verify",
+   "value": "31,390 / 57,261 kcycles (392 / 716 ms)",
+   "source": "MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput"
+  },
+  {
+   "who": "TI",
+   "chip": "MSPM33C321A (Cortex-M33)",
+   "clock_mhz": 160,
+   "code": "MSP Crypto Library 0.33.00.07",
+   "test": "ML-KEM-768 keygen / encaps / decaps",
+   "value": "1,756 / 1,958 / 2,221 kcycles (11 / 12 / 14 ms)",
+   "source": "MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput"
+  },
+  {
+   "who": "TI",
+   "chip": "MSPM33C321A (Cortex-M33)",
+   "clock_mhz": 160,
+   "code": "MSP Crypto Library 0.33.00.07",
+   "test": "ML-DSA-44 keygen / sign (mean of 16) / verify",
+   "value": "3,575 / 21,278 / 3,660 kcycles (22 / 133 / 23 ms)",
+   "source": "MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput"
+  },
+  {
+   "who": "TI",
+   "chip": "MSPM33C321A (Cortex-M33)",
+   "clock_mhz": 160,
+   "code": "MSP Crypto Library 0.33.00.07, PKA",
+   "test": "ECDSA P-256 sign / verify",
+   "value": "10,440 / 20,975 kcycles (65 / 131 ms)",
+   "source": "MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput"
+  },
+  {
+   "who": "pqm4 project",
+   "chip": "STMicroelectronics STM32L4R5 (Cortex-M4)",
+   "clock_mhz": 24,
+   "code": "reference C (clean)",
+   "test": "ML-KEM-768 keygen / encaps / decaps",
+   "value": "989k / 1.14M / 1.39M cycles",
+   "source": "https://github.com/mupq/pqm4/blob/master/benchmarks.md"
+  },
+  {
+   "who": "pqm4 project",
+   "chip": "STMicroelectronics STM32L4R5 (Cortex-M4)",
+   "clock_mhz": 24,
+   "code": "Cortex-M4 assembly (m4fspeed)",
+   "test": "ML-KEM-768 keygen / encaps / decaps",
+   "value": "642k / 659k / 708k cycles",
+   "source": "https://github.com/mupq/pqm4/blob/master/benchmarks.md"
+  },
+  {
+   "who": "Chhetri, arXiv 2603.19340",
+   "chip": "Raspberry Pi RP2040 (Cortex-M0+)",
+   "clock_mhz": 133,
+   "code": "PQClean reference C, GCC -Os",
+   "test": "ML-KEM-768 keygen / encaps / decaps",
+   "value": "2.13M / 2.47M / 2.93M cycles (16.0 / 18.6 / 22.0 ms)",
+   "source": "https://arxiv.org/html/2603.19340v2"
+  },
+  {
+   "who": "Chhetri, arXiv 2603.19340",
+   "chip": "Raspberry Pi RP2040 (Cortex-M0+)",
+   "clock_mhz": 133,
+   "code": "PQClean reference C, GCC -Os",
+   "test": "ML-DSA-44 keygen / sign (mean) / verify",
+   "value": "39.8 / 158.9 / 44.0 ms (21.1 million cycles to sign; sign time varies 66 to 73 percent between runs)",
+   "source": "https://arxiv.org/html/2603.19340v2"
+  },
+  {
+   "who": "wolfSSL",
+   "chip": "STMicroelectronics STM32F439 (Cortex-M4)",
+   "clock_mhz": 168,
+   "code": "wolfCrypt with Thumb-2 assembly",
+   "test": "ML-KEM-768 keygen / encaps / decaps",
+   "value": "6.5 / 6.6 / 8.3 ms",
+   "source": "https://www.wolfssl.com/updated-post-quantum-benchmarks-for-ml-kem-and-ml-dsa-on-stm32/"
+  },
+  {
+   "who": "Karcz et al., PLOS One 2026",
+   "chip": "Espressif ESP32-C6 (RISC-V)",
+   "clock_mhz": 160,
+   "code": "liboqs on ESP-IDF 5.5.1",
+   "test": "ML-KEM-768 keygen / encaps / decaps",
+   "value": "171 / 171 / 205 ms",
+   "source": "https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0355179"
+  }
+ ],
+ "rows": [
+  {
+   "board": "cc1354p10",
+   "test": "pqc_mlkem768_keygen",
+   "variant": "mlkem-native-ticlang-o3-flash",
+   "status": "measured",
+   "value": 996527,
+   "unit": "cycles",
+   "clock_mhz": 48,
+   "source": "cc1354p10/pqc-join/README.md",
+   "note": "20.8 ms at 48 MHz, median of 3 loads"
+  },
+  {
+   "board": "cc1354p10",
+   "test": "pqc_mlkem768_encaps",
+   "variant": "mlkem-native-ticlang-o3-flash",
+   "status": "measured",
+   "value": 1152209,
+   "unit": "cycles",
+   "clock_mhz": 48,
+   "source": "cc1354p10/pqc-join/README.md",
+   "note": "24.0 ms at 48 MHz, median of 3 loads, NIST known-answer tests pass first; mlkem-native 2.0.0, TI Arm Clang -O3, code in flash"
+  },
+  {
+   "board": "cc1354p10",
+   "test": "pqc_mlkem768_decaps",
+   "variant": "mlkem-native-ticlang-o3-flash",
+   "status": "measured",
+   "value": 1398195,
+   "unit": "cycles",
+   "clock_mhz": 48,
+   "source": "cc1354p10/pqc-join/README.md",
+   "note": "29.1 ms at 48 MHz, median of 3 loads"
+  },
+  {
+   "board": "cc1354p10",
+   "test": "pqc_stack_peak",
+   "variant": "mlkem768-keygen-mlkem-native-ticlang-o3",
+   "status": "measured",
+   "value": 15096,
+   "unit": "B",
+   "clock_mhz": 48,
+   "source": "cc1354p10/pqc-join/README.md",
+   "note": "stack painted before the call; key buffers not counted"
+  },
+  {
+   "board": "cc1354p10",
+   "test": "pqc_stack_peak",
+   "variant": "mlkem768-encaps-mlkem-native-ticlang-o3",
+   "status": "measured",
+   "value": 20472,
+   "unit": "B",
+   "clock_mhz": 48,
+   "source": "cc1354p10/pqc-join/README.md",
+   "note": "stack painted before the call; key buffers not counted"
+  },
+  {
+   "board": "cc1354p10",
+   "test": "pqc_stack_peak",
+   "variant": "mlkem768-decaps-mlkem-native-ticlang-o3",
+   "status": "measured",
+   "value": 19192,
+   "unit": "B",
+   "clock_mhz": 48,
+   "source": "cc1354p10/pqc-join/README.md",
+   "note": "stack painted before the call; key buffers not counted"
+  },
+  {
+   "board": "cc1354p10",
+   "test": "pqc_flash_bytes",
+   "variant": "mlkem768-mlkem-native-ticlang-o3",
+   "status": "measured",
+   "value": 82428,
+   "unit": "B",
+   "clock_mhz": null,
+   "source": "cc1354p10/pqc-join/README.md",
+   "note": "from the linker map; 9.4 kB built for size (-Os)"
+  },
+  {
+   "board": "cc1354p10",
+   "test": "pqc_mldsa44_sign",
+   "variant": "mldsa-native",
+   "status": "measured",
+   "value": 7406767,
+   "unit": "cycles",
+   "clock_mhz": 48,
+   "source": "cc1354p10/pqc-join/README.md",
+   "note": "154 ms mean at 48 MHz over 16 messages (77 to 361 ms, because signing retries a random number of times). Verify 50.5 ms, key generation 49.5 ms. 50.1 kB of stack to sign. NIST known-answer tests pass first. mldsa-native 2.0.0, TI Arm Clang -O3, code in flash"
+  },
+  {
+   "board": "cc2340r5",
+   "test": "pqc_mlkem768_encaps",
+   "variant": "mlkem-native-with-ble",
+   "status": "does_not_fit",
+   "value": null,
+   "unit": "cycles",
+   "clock_mhz": 48,
+   "source": "data/results/cc2340r5.csv",
+   "note": "about 19 kB needed (an estimate, same basis as the LP-MSPM0G3507 figure). 5.1 kB of RAM left with TI's basic BLE example (data/results/cc2340r5.csv)"
+  },
+  {
+   "board": "mspm0l1306",
+   "test": "pqc_mlkem768_encaps",
+   "variant": "any",
+   "status": "does_not_fit",
+   "value": null,
+   "unit": "cycles",
+   "clock_mhz": 32,
+   "source": "docs/research/post-quantum-2026-10-08.md",
+   "note": "4 kB of RAM. The smallest portable ML-KEM-768 found needs about 14 kB (PQClean, arXiv 2603.19340: 14.2 kB peak stack). Even pqm4's Cortex-M4-only assembly low-stack build plus one ciphertext is about 3.9 kB (an estimate)"
+  },
+  {
+   "board": "mspm0l1306",
+   "test": "pqc_mldsa44_sign",
+   "variant": "any",
+   "status": "does_not_fit",
+   "value": null,
+   "unit": "cycles",
+   "clock_mhz": 32,
+   "source": "docs/research/post-quantum-2026-10-08.md",
+   "note": "4 kB of RAM; the signature alone is 2.4 kB"
+  },
+  {
+   "board": "mspm0c1104",
+   "test": "pqc_mlkem768_encaps",
+   "variant": "any",
+   "status": "does_not_fit",
+   "value": null,
+   "unit": "cycles",
+   "clock_mhz": 24,
+   "source": "docs/research/post-quantum-2026-10-08.md",
+   "note": "1 kB of RAM. One 1.2 kB encapsulation key exceeds it, and about 14 kB of working RAM is needed (PQClean, arXiv 2603.19340: 14.2 kB peak stack)"
+  },
+  {
+   "board": "mspm0c1104",
+   "test": "pqc_mldsa44_sign",
+   "variant": "any",
+   "status": "does_not_fit",
+   "value": null,
+   "unit": "cycles",
+   "clock_mhz": 24,
+   "source": "docs/research/post-quantum-2026-10-08.md",
+   "note": "1 kB of RAM"
+  }
+ ],
+ "sources_page": "docs/research/post-quantum-2026-10-08.md",
+ "demonstration": {
+  "board": "cc1354p10",
+  "board_name": "LP-CC1354P10-1",
+  "date": "2026-10-08",
+  "catalog_anchor": "lp-cc1354p10-1-launchpad-development-kit",
+  "what": "ML-KEM-768 key agreement between the board and a Mac, then one line the Mac encrypted with AES-128-GCM under the agreed key, decrypted and authenticated on the board.",
+  "transport": "USB serial through the board's built-in XDS110 debugger (its backchannel UART), 115,200 baud, 8N1. Every byte is sent as two hex characters, so 2,381 bytes of payload in all (the 2.2 kB of key material plus the encrypted message) took 4,864 characters on the wire. Frame format: @PK, @CT, @KEY, @MSG, @DONE lines, each with a CRC-32 (portability/pqc-join/core/pqc_join.h).",
+  "mac_side": "tools/pqc_join/mac_side.py with OpenSSL 3.5 or newer (the Mac's built-in /usr/bin/openssl is LibreSSL and cannot do ML-KEM)",
+  "transcript": [
+   "   board> I,results,kat pass",
+   "   board> join: making an ML-KEM-768 key pair",
+   "   board> R,pqc,join_trng_64_bytes,967756,ok,64 random bytes for the key pair",
+   "   board> R,pqc,join_keygen,1002199,ok,ML-KEM-768 key pair from the random bytes",
+   "   board> join: key pair ready, offering the public key",
+   "   board> R,pqc,join_decaps_kdf,1430503,ok,decapsulate, HKDF-SHA256 to the AES key, key check",
+   "   key check  Mac d01a2f61  board d01a2f61  MATCH",
+   "   board> R,pqc,join_decrypt,119689,ok,AES-128-GCM, 76 bytes",
+   "   board> DECRYPTED (76 bytes, tag ok): Hello from the Mac: this line was encrypted with a key agreed by ML-KEM-768."
+  ],
+  "transcript_source": "cc1354p10/pqc-join/results/load4-join.txt",
+  "transcript_note": "Lines 54 to 62 of the saved result file, unedited. Board lines start with board>. The key check line is the Mac's. The hex frames are not in this file; the exchange as JSON is in cc1354p10/pqc-join/results/load4-join.json.",
+  "exchange_steps": [
+   "The board makes an ML-KEM-768 key pair from 64 bytes of its hardware random-number generator (20 ms for the bytes, 21 ms for the key pair); the 2,400-byte private key stays on the chip",
+   "The board sends its 1,184-byte public key (2,389 characters as hex, about 207 ms at 115,200 baud, computed)",
+   "The Mac wraps a fresh secret with that key (58.6 ms, including starting OpenSSL) and sends back the 1,088-byte ciphertext",
+   "The board unwraps it and turns the secret into an AES-128 key with HKDF-SHA-256 (29.8 ms on the board); both sides show the first 4 bytes of a hash of that key, and they match",
+   "The Mac sends one 76-byte line encrypted with AES-128-GCM; the board decrypts it in software (2.5 ms), checks the tag and prints it"
+  ],
+  "shows": [
+   "The two sides derived the same AES-128 key: the key check is d01a2f61 on the Mac and on the board, and the line reads MATCH.",
+   "The board decrypted one message and its tag verified under the agreed key. Neither side is authenticated, so anyone in the middle of the exchange would hold that key too. This does not say who sent it.",
+   "NIST known-answer vectors for ML-KEM-768 and ML-DSA-44 passed on the board before the exchange. See the \"kat pass\" line in the same file."
+  ],
+  "does_not_show": [
+   "No protection against power-analysis or fault attacks is claimed by the libraries or by the demo code.",
+   "It is a demonstration of the math and its cost, not a hardened product. Do not use the keys for anything real, and do not reuse them.",
+   "It ran once over one wired transport, with no radio link. The join has no signature step, so neither side is authenticated. It has not been reviewed or tested for side channels.",
+   "The known-answer vectors check the arithmetic against NIST's fixed inputs. They do not show the code is safe to ship."
+  ],
+  "evidence_kinds": [
+   [
+    "Demonstration",
+    "ran end to end",
+    "The exchange above, on one board, once, on 2026-10-08."
+   ],
+   [
+    "Known-answer check",
+    "NIST vectors passed",
+    "ML-KEM-768 and ML-DSA-44 outputs match NIST's fixed inputs byte for byte, on the board, before timing."
+   ],
+   [
+    "Measurement",
+    "cycles and stack",
+    "Times from the CPU cycle counter and stack from painting it, in the Measured by us table above."
+   ],
+   [
+    "Assurance",
+    "none claimed",
+    "No side-channel testing, no certification (such as FIPS 140-3), no review. Nothing here says the project is secure."
+   ]
+  ],
+  "recommended": {
+   "board_name": "LP-CC1354P10-1 LaunchPad development kit",
+   "why": "It is the only board that has run the whole path: {ram} of RAM and a {core} at {clock} MHz. One USB cable.",
+   "setup": "A Mac with a C compiler, Python 3 with the cryptography package, OpenSSL 3.5 or newer, CCStudio and the SimpleLink CC13xx/CC26xx SDK 8.33.00.16 for the build, and uhubctl with a USB hub whose ports it can power-switch for the load (this board's debugger connects only just after power-on; see cc1354p10/FAQ.md).",
+   "also_need": "Beyond the board: a USB hub whose ports uhubctl can power-switch (the hub model used on 2026-10-08 was not recorded), and the cc1354p10/pqc-join folder of the repository."
+  },
+  "run_path": [
+   {
+    "do": "Run the host test. It needs no board; it builds the board code for the Mac and runs both known-answer sets and the whole exchange against mac_side.py.",
+    "cmd": "portability/pqc-join/test/run.sh",
+    "see": "pqc-join host test: OK",
+    "if_stuck": ""
+   },
+   {
+    "do": "Build the board image. It touches no hardware. It took 19.5 s on 2026-10-08 with the SysConfig output already generated, and longer the first time.",
+    "cmd": "cc1354p10/pqc-join/build.sh -O3",
+    "see": "a .out file; 272,999 B for the whole -O3 image",
+    "if_stuck": ""
+   },
+   {
+    "do": "Load and run it. run.sh power-cycles the USB port, backs up flash and the boot-settings page, and loads the image. It runs mac_side.py on the UART, then restores the image you name and reads flash back. Replace the UHUB value with your hub and port from uhubctl.",
+    "cmd": "UHUB=<hub:port from uhubctl> RESTORE_IMG=<path to the .out to leave running> cc1354p10/pqc-join/run.sh -O3",
+    "see": "the transcript above, then READBACK MATCHES BACKUP (2 minutes 22 seconds on 2026-10-08)",
+    "if_stuck": "If the board stops at \"join: making an ML-KEM-768 key pair\" with the CPU in an exception handler, call TRNG_init() before TRNG_open(). Stop with a message if TRNG_open() returns NULL. The debugger showed PC 0x100006f4 and LR 0xfffffff9. This was observed on 2026-10-08 and not saved. The SDK's Board_init() starts only the power and GPIO drivers, so the image has to start the TRNG itself; cc1354p10/pqc-join/README.md, the TRNG section, has the fix."
+   }
+  ],
+  "implications": {
+   "memory": "Stack is the limit. ML-KEM-768 needs {en} of stack at its peak (key generation {kg}, encapsulation {en}, decapsulation {de}) and ML-DSA-44 signing {sign}. Key buffers are extra. Flash at -O3 is {fkem} for ML-KEM-768 and {fdsa} for ML-DSA-44; built for size (-Os, built, not run) it is {fkem_s} and {fdsa_s}. For key agreement, plan for 32 kB of RAM or more; for signing, the default mode needs far more, so 32 kB parts need mldsa-native's low-RAM mode (not built). See the fit list in the evidence section.",
+   "latency": "The board's own work for the whole join was about 73 ms at 48 MHz. The wire took about 420 ms, computed at 115,200 baud with the data sent as hex text (twice the bytes), so the link set the pace. A radio link will add its own cost, not measured here.",
+   "wire": "2.2 kB crosses the wire (1,184 B public key plus 1,088 B ciphertext) against 64 B for X25519 (32 B each way). Over a radio with small packets that is many more packets: about 10 Bluetooth LE packets of 244 B against 2 (computed, not measured).",
+   "integration": "Initialize the TRNG driver yourself; the SDK's Board_init() does not. The libraries (mlkem-native 2.0.0, mldsa-native 2.0.0) are unmodified portable C and keep their working buffers on the stack by default. ML-DSA signing time varies from message to message (77 to 361 ms over 16 messages, mean 154 ms) because it retries until a check passes.",
+   "threat_model": "What ran is key agreement plus one encrypted message. The join has no signature step, so neither side is authenticated: someone who can change bytes on the wire could substitute their own key; a real design signs or pins the keys. Neither library nor the demo code claims protection against power or fault attacks. Never reuse a key from the demonstration."
+  },
+  "excerpt": [
+   "   board> join: key pair ready, offering the public key",
+   "   key check  Mac d01a2f61  board d01a2f61  MATCH",
+   "   board> R,pqc,join_decrypt,119689,ok,AES-128-GCM, 76 bytes",
+   "   board> DECRYPTED (76 bytes, tag ok): Hello from the Mac: this line was encrypted with a key agreed by ML-KEM-768."
+  ],
+  "excerpt_note": "Excerpt of 4 lines from the saved run of 2026-10-08, unedited. The complete transcript is the whole file.",
+  "transcript_url": "../cc1354p10/pqc-join/results/load4-join.txt",
+  "prerequisites": [
+   [
+    "Board",
+    "LP-CC1354P10-1 LaunchPad development kit with a CC1354P10, a Cortex-M33 at 48 MHz. One USB cable to the Mac."
+   ],
+   [
+    "Board tools",
+    "CCStudio 21.0.1, TI Arm Clang 5.1.1.LTS and the SimpleLink CC13xx/CC26xx SDK 8.33.00.16 (NoRTOS), for the build and the load."
+   ],
+   [
+    "Repository",
+    "The cc1354p10/pqc-join folder of the repository."
+   ],
+   [
+    "Mac",
+    "A Mac. The scripts use macOS paths and CCStudio's command-line scripting; the run was on macOS 15.7 (Intel)."
+   ],
+   [
+    "Host tools",
+    "A C compiler, Python 3 with the cryptography package, and OpenSSL 3.5 or newer first on your PATH. Install the package with pip install cryptography. The Mac's built-in /usr/bin/openssl is LibreSSL and cannot do ML-KEM, so check openssl version. The run used OpenSSL 3.6.4. The host test needs only these, no board."
+   ],
+   [
+    "USB hub",
+    "A USB hub whose ports uhubctl can power-switch, because this board's debugger connects only just after power-on. **Setup or handling.** run.sh cuts power to the port for 6 s just before each load, as cc1354p10/FAQ.md describes. On the test setup that was the USB-A port of Apple's USB-C Digital AV Multiport Adapter, as cc1354p10/FAQ.md describes. No manual unplug and replug was done in place of the hub."
+   ],
+   [
+    "Your board's name",
+    "run.sh and the CCStudio target file cc1354p10/CC1354P10.ccxml name the test board by its debug-probe serial number. Edit both for yours."
+   ],
+   [
+    "Flash is rewritten",
+    "run.sh backs up the board's flash and boot settings, loads the demo, then restores the image named in RESTORE_IMG and reads flash back. Name an image you want left on the board before you run it."
+   ]
+  ],
+  "takeaways": {
+   "memory": [
+    "Key agreement fits in about 20 kB of stack on a part with room to spare.",
+    "On this 296 kB board, ML-KEM-768 peaked at {kg} of stack for key generation, {en} for encapsulation and {de} for decapsulation. That is mlkem-native in portable C at -O3. ML-DSA-44 signing peaked at {sign}. A 32 kB board should fit key agreement but was not tested. Signing there needs mldsa-native's low-RAM mode."
+   ],
+   "speed": [
+    "The wire set the pace.",
+    "The board's own work for the whole join was about 73 ms at 48 MHz. The wire took about 420 ms at 115,200 baud (computed, not measured). That time is long because the host and board exchange the keys, ciphertext and message as hex text, which doubles the bytes on the wire. A radio would add its own cost."
+   ],
+   "more_work": [
+    "A product needs signatures and a review.",
+    "This join has no signature step, so neither side is authenticated. The code has had no side-channel or fault testing, review or certification. A product would sign or pin the keys, test for those attacks and have the design reviewed."
+   ]
+  },
+  "hero_text": "A Mac and an LP-CC1354P10-1 LaunchPad board agree a key, then the board decrypts a message sent over USB. The key exchange is ML-KEM-768, a post-quantum algorithm. The message is AES-128-GCM. The key check line shows the first 4 bytes of a hash of the agreed key. They match, so both sides hold the same key."
+ }
+}

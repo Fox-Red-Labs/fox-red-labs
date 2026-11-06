@@ -1,0 +1,13 @@
+--- a/src/doom/g_game.c
++++ b/src/doom/g_game.c
+@@ -2591,8 +2591,10 @@
+ =================== 
+ */ 
+  
++void fox_demo_end(void);
+ boolean G_CheckDemoStatus (void) 
+ { 
++    fox_demo_end();
+ 
+     if (timingdemo)
+     { 

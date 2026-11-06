@@ -1,0 +1,39 @@
+//@cliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)" --part "Default"
+//@v2CliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)"
+// @cliArgs --board /ti/boards/LP_MSPM33C321A --rtos nortos
+// BOOSTXL-SHARP128 on the LP-MSPM33C321A (site 1). Pins from SLAU969 and SLAU786 Tables 1 to 3:
+//   2 PA18 power (BSL button: pull J3)   5 PA21 DISP   6 PA22 LCD select   7 PB31 SPI clock   15 PB8 SPI data out
+//   8 PB30 SD select   14 PB14 SPI data in   17 PC23 card detect
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const SPI    = scripting.addModule("/ti/driverlib/SPI", {}, false);
+const SPI1   = SPI.addInstance();
+const g_pwr = GPIO.addInstance();
+g_pwr.$name                         = "GP_PWR";
+g_pwr.associatedPins[0].$name       = "PIN_PWR";
+g_pwr.associatedPins[0].pin.$assign = "PA18";
+const g_disp = GPIO.addInstance();
+g_disp.$name                         = "GP_DISP";
+g_disp.associatedPins[0].$name       = "PIN_DISP";
+g_disp.associatedPins[0].pin.$assign = "PA21";
+const g_lcs = GPIO.addInstance();
+g_lcs.$name                         = "GP_LCD_CS";
+g_lcs.associatedPins[0].$name       = "PIN_LCD_CS";
+g_lcs.associatedPins[0].pin.$assign = "PA22";
+const g_scs = GPIO.addInstance();
+g_scs.$name                         = "GP_SD_CS";
+g_scs.associatedPins[0].$name       = "PIN_SD_CS";
+g_scs.associatedPins[0].pin.$assign = "PB30";
+g_scs.associatedPins[0].initialValue = "SET";
+const g_det = GPIO.addInstance();
+g_det.$name                         = "GP_SD_DET";
+g_det.associatedPins[0].$name       = "PIN_SD_DET";
+g_det.associatedPins[0].pin.$assign = "PC23";
+g_det.associatedPins[0].direction = "INPUT";
+g_det.associatedPins[0].internalResistor = "PULL_UP";
+
+SPI1.$name                      = "SHARP_SPI";
+SPI1.targetBitRate              = 1000000;
+SPI1.frameFormat                = "MOTO3";
+SPI1.peripheral.sclkPin.$assign = "PB31";
+SPI1.peripheral.mosiPin.$assign = "PB8";
+SPI1.peripheral.misoPin.$assign = "PB14";

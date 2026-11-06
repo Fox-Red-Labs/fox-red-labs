@@ -1,0 +1,65 @@
+--- ../../libraries/Adafruit_FT6206_Library/examples/CapTouchPaint/CapTouchPaint.ino	2026-10-06 20:34:50
++++ CapTouchPaint.ino	2026-10-06 20:42:09
+@@ -14,19 +14,33 @@
+  ****************************************************/
+ 
+ 
+-#include <Adafruit_GFX.h>    // Core graphics library
++#include <Arduino_GFX_Library.h>    // MSPM0 port: Arduino_GFX instead of Adafruit_GFX + Adafruit_ILI9341
+ #include <SPI.h>       // this is needed for display
+-#include <Adafruit_ILI9341.h>
+ #include <Wire.h>      // this is needed for FT6206
+ #include <Adafruit_FT6206.h>
+ 
+ // The FT6206 uses hardware I2C (SCL/SDA)
+ Adafruit_FT6206 ctp = Adafruit_FT6206();
+ 
+-// The display also uses hardware SPI, plus #9 & #10
+-#define TFT_CS 10
+-#define TFT_DC 9
+-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
++// MSPM0 port: the display (ST7796S 320x480 on the Waveshare module) through Arduino_GFX.
++// Rotation 4 makes the pixel and touch coordinates agree. SPI mode 0 as in display-test.
++class Arduino_ST7796_Mode0 : public Arduino_ST7796
++{
++public:
++  using Arduino_ST7796::Arduino_ST7796;
++  bool begin(int32_t speed = GFX_NOT_DEFINED) override { return Arduino_ST7796::begin(speed, SPI_MODE0); }
++};
++Arduino_DataBus *bus = new Arduino_HWSPI(PIN_LCD_DC, PIN_LCD_CS);
++Arduino_GFX *gfx = new Arduino_ST7796_Mode0(bus, PIN_LCD_RST, 4 /* rotation */, true /* IPS */);
++Arduino_GFX &tft = *gfx;   // the rest of the sketch keeps its tft.xxx() calls
++#define ILI9341_BLACK RGB565_BLACK
++#define ILI9341_WHITE RGB565_WHITE
++#define ILI9341_RED RGB565_RED
++#define ILI9341_YELLOW RGB565_YELLOW
++#define ILI9341_GREEN RGB565_GREEN
++#define ILI9341_CYAN RGB565_CYAN
++#define ILI9341_BLUE RGB565_BLUE
++#define ILI9341_MAGENTA RGB565_MAGENTA
+ 
+ // Size of the color selection boxes and the paintbrush size
+ #define BOXSIZE 40
+@@ -40,6 +54,11 @@
+   Serial.println(F("Cap Touch Paint!"));
+   
+   tft.begin();
++  pinMode(PIN_LCD_BL, OUTPUT);          // MSPM0 port: backlight on
++  digitalWrite(PIN_LCD_BL, HIGH);
++  pinMode(PIN_TP_RST, OUTPUT);          // MSPM0 port: reset the touch chip first
++  digitalWrite(PIN_TP_RST, LOW); delay(10);
++  digitalWrite(PIN_TP_RST, HIGH); delay(300);
+ 
+   if (! ctp.begin(40, &Wire)) {  // pass in 'sensitivity' coefficient and I2C bus
+     Serial.println("Couldn't start FT6206 touchscreen controller");
+@@ -79,9 +98,7 @@
+   Serial.print(" -> ");
+  */
+ 
+-  // flip it around to match the screen.
+-  p.x = map(p.x, 0, 240, 240, 0);
+-  p.y = map(p.y, 0, 320, 320, 0);
++  // MSPM0 port: no flip, with rotation 4 the touch chip reports screen coordinates directly.
+ 
+   // Print out the remapped (rotated) coordinates
+   Serial.print("("); Serial.print(p.x);

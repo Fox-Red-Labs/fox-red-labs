@@ -1,0 +1,31 @@
+# E192: the same device as frl-esphome-fit.yaml, on our own ESPHome platform `cc23xx` instead of the nrf52 template.
+# `esphome compile frl-cc23xx-router.yaml` builds it with TI's compiler; `esphome upload frl-cc23xx-router.yaml` flashes it.
+# Zigbee router on the 36 kB CC2340R5: fits only with a smaller heap (heap_size), which then runs out. See E192.
+esphome:
+  name: frl-cc23xx-router
+
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [cc27xx, cc23xx, die_temperature]
+
+cc23xx:
+  board: LP_EM_CC2340R5
+  heap_size: 0x23BC   # 2 kB less heap than the default 0x2BBC: the only way a router fits in 36 kB of RAM, with no heap left over (E192)
+  # probe_serial: XXXXXXXX      # your debug probe's serial (xdsdfu -e lists it); or pass --device <serial> to upload
+
+zigbee:
+  router: true
+  model: "FRL cc23xx"
+
+switch:
+  - platform: gpio
+    name: "LED"
+    pin: DIO14
+    restore_mode: ALWAYS_OFF
+
+sensor:
+  - platform: die_temperature
+    name: "Chip temperature"
+    update_interval: 30s

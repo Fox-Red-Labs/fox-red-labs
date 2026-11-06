@@ -1,0 +1,456 @@
+{
+  "board": "LP-EM-CC2340R5",
+  "chip": "CC2340R52",
+  "flash_total": 524288,
+  "ram_total": 36864,
+  "units": "bytes",
+  "generated": "2026-10-06",
+  "method": "Each object and library in the linker map was put in one component (TI maps: MODULE SUMMARY totals, placed by memory region from the SECTION ALLOCATION MAP; Zephyr GNU maps: input sections by address), with the FreeRTOS heap array ucHeap, .sysmem, .stack and RTOS task stacks moved to Heap and stacks, and linker startup tables and alignment padding counted as Other, so each build's components add up exactly to the linker's FLASH and SRAM used totals, with CCFG listed apart.",
+  "flash_total_note": "512 KB main flash (FLASH length 0x80000 in the maps that reserve nothing); some builds reserve part of it for settings storage or a bootloader, see check.flash_region.",
+  "builds": [
+    {
+      "id": "empty_nortos",
+      "label": "Empty project, no RTOS (TI empty)",
+      "sdk": "F3 SDK 9.21.00.36, no RTOS, TI Arm Clang 5.1.1",
+      "source": "matrix/empty_nortos/ticlang/empty.map",
+      "flash": {
+        "RTOS": 0,
+        "Radio stack": 0,
+        "TI drivers and device library": 5085,
+        "C library and compiler runtime": 514,
+        "Your app (the example's own code)": 54,
+        "Heap and stacks": 0,
+        "Other": 88,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 0,
+        "Radio stack": 0,
+        "TI drivers and device library": 910,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 0,
+        "Heap and stacks": 9216,
+        "Other": 3
+      },
+      "check": {
+        "flash_used_in_map": 5741,
+        "flash_sum_without_ccfg": 5741,
+        "ram_used_in_map": 10129,
+        "ram_sum": 10129,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 524288
+        },
+        "flash_reserved_for_settings": 0,
+        "other_flash_startup_tables": 78,
+        "other_flash_padding": 10,
+        "other_ram_padding": 3,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "empty_rtos",
+      "label": "Empty project, FreeRTOS (TI empty)",
+      "sdk": "F3 SDK 9.21.00.36, FreeRTOS, TI Arm Clang 5.1.1",
+      "source": "matrix/empty_rtos/freertos/ticlang/empty.map",
+      "flash": {
+        "RTOS": 7924,
+        "Radio stack": 0,
+        "TI drivers and device library": 3254,
+        "C library and compiler runtime": 618,
+        "Your app (the example's own code)": 126,
+        "Heap and stacks": 0,
+        "Other": 100,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 1318,
+        "Radio stack": 0,
+        "TI drivers and device library": 729,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 0,
+        "Heap and stacks": 11264,
+        "Other": 5
+      },
+      "check": {
+        "flash_used_in_map": 12022,
+        "flash_sum_without_ccfg": 12022,
+        "ram_used_in_map": 13316,
+        "ram_sum": 13316,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 524288
+        },
+        "flash_reserved_for_settings": 0,
+        "other_flash_startup_tables": 80,
+        "other_flash_padding": 20,
+        "other_ram_padding": 5,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "basic_ble",
+      "label": "Bluetooth (TI basic_ble)",
+      "sdk": "F3 SDK 9.21.00.36, FreeRTOS, TI Arm Clang 5.1.1",
+      "source": "matrix/basic_ble/freertos/ticlang/basic_ble.map",
+      "flash": {
+        "RTOS": 12631,
+        "Radio stack": 136770,
+        "TI drivers and device library": 34763,
+        "C library and compiler runtime": 2236,
+        "Your app (the example's own code)": 4286,
+        "Heap and stacks": 0,
+        "Other": 1248,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 1318,
+        "Radio stack": 4821,
+        "TI drivers and device library": 3852,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 178,
+        "Heap and stacks": 21520,
+        "Other": 0
+      },
+      "check": {
+        "flash_used_in_map": 191934,
+        "flash_sum_without_ccfg": 191934,
+        "ram_used_in_map": 31689,
+        "ram_sum": 31689,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 512000
+        },
+        "flash_reserved_for_settings": 12288,
+        "other_flash_startup_tables": 1245,
+        "other_flash_padding": 3,
+        "other_ram_padding": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "data_stream",
+      "label": "Bluetooth (TI data_stream)",
+      "sdk": "F3 SDK 9.21.00.36, FreeRTOS, TI Arm Clang 5.1.1",
+      "source": "matrix/data_stream/freertos/ticlang/data_stream.map",
+      "flash": {
+        "RTOS": 12631,
+        "Radio stack": 136120,
+        "TI drivers and device library": 34779,
+        "C library and compiler runtime": 2236,
+        "Your app (the example's own code)": 3455,
+        "Heap and stacks": 0,
+        "Other": 1172,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 1318,
+        "Radio stack": 4613,
+        "TI drivers and device library": 3852,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 153,
+        "Heap and stacks": 21520,
+        "Other": 0
+      },
+      "check": {
+        "flash_used_in_map": 190393,
+        "flash_sum_without_ccfg": 190393,
+        "ram_used_in_map": 31456,
+        "ram_sum": 31456,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 512000
+        },
+        "flash_reserved_for_settings": 12288,
+        "other_flash_startup_tables": 1172,
+        "other_flash_padding": 0,
+        "other_ram_padding": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "rfPacketTx",
+      "label": "Proprietary radio packet sender (TI rfPacketTx)",
+      "sdk": "F3 SDK 9.21.00.36, FreeRTOS, TI Arm Clang 5.1.1",
+      "source": "matrix/rfPacketTx/freertos/ticlang/rfPacketTx.map",
+      "flash": {
+        "RTOS": 8952,
+        "Radio stack": 18667,
+        "TI drivers and device library": 4518,
+        "C library and compiler runtime": 676,
+        "Your app (the example's own code)": 290,
+        "Heap and stacks": 0,
+        "Other": 193,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 1318,
+        "Radio stack": 339,
+        "TI drivers and device library": 832,
+        "C library and compiler runtime": 12,
+        "Your app (the example's own code)": 200,
+        "Heap and stacks": 11264,
+        "Other": 3
+      },
+      "check": {
+        "flash_used_in_map": 33296,
+        "flash_sum_without_ccfg": 33296,
+        "ram_used_in_map": 13968,
+        "ram_sum": 13968,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 524288
+        },
+        "flash_reserved_for_settings": 0,
+        "other_flash_startup_tables": 177,
+        "other_flash_padding": 16,
+        "other_ram_padding": 3,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "onoff_switch_zed",
+      "label": "Zigbee end device (TI onoff_switch), logging on",
+      "sdk": "F3 SDK 9.21.00.36, FreeRTOS, TI Arm Clang 5.1.1",
+      "source": "matrix/onoff_switch_zed/freertos/ticlang/onoff_switch.map",
+      "flash": {
+        "RTOS": 9524,
+        "Radio stack": 188358,
+        "TI drivers and device library": 13476,
+        "C library and compiler runtime": 976,
+        "Your app (the example's own code)": 7396,
+        "Heap and stacks": 0,
+        "Other": 614,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 957,
+        "Radio stack": 14773,
+        "TI drivers and device library": 5560,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 295,
+        "Heap and stacks": 8892,
+        "Other": 1
+      },
+      "check": {
+        "flash_used_in_map": 220344,
+        "flash_sum_without_ccfg": 220344,
+        "ram_used_in_map": 30478,
+        "ram_sum": 30478,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 520192
+        },
+        "flash_reserved_for_settings": 4096,
+        "other_flash_startup_tables": 537,
+        "other_flash_padding": 77,
+        "other_ram_padding": 1,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0,
+        "zigbee_pools_moved_from_app_to_radio_stack": 5808
+      }
+    },
+    {
+      "id": "onoff_light",
+      "label": "Zigbee router (TI onoff_light), logging on",
+      "sdk": "F3 SDK 9.21.00.36, FreeRTOS, TI Arm Clang 5.1.1",
+      "source": "zigbee/onoff_light/freertos/ticlang/onoff_light.map",
+      "flash": {
+        "RTOS": 9532,
+        "Radio stack": 249314,
+        "TI drivers and device library": 13476,
+        "C library and compiler runtime": 1008,
+        "Your app (the example's own code)": 8152,
+        "Heap and stacks": 0,
+        "Other": 792,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 957,
+        "Radio stack": 20295,
+        "TI drivers and device library": 5560,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 361,
+        "Heap and stacks": 8892,
+        "Other": 0
+      },
+      "check": {
+        "flash_used_in_map": 282274,
+        "flash_sum_without_ccfg": 282274,
+        "ram_used_in_map": 36065,
+        "ram_sum": 36065,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 516096
+        },
+        "flash_reserved_for_settings": 8192,
+        "other_flash_startup_tables": 713,
+        "other_flash_padding": 79,
+        "other_ram_padding": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0,
+        "zigbee_pools_moved_from_app_to_radio_stack": 9036
+      }
+    },
+    {
+      "id": "ota_on_v1",
+      "label": "Zigbee OTA client (TI onoff_switch_ota_client_onchip), receiver always on",
+      "sdk": "F3 SDK 9.21.00.36, FreeRTOS, TI Arm Clang 5.1.1",
+      "source": "matrix/ota_on_v1/freertos/ticlang/onoff_switch_ota_client_onchip.map",
+      "flash": {
+        "RTOS": 9516,
+        "Radio stack": 193434,
+        "TI drivers and device library": 8713,
+        "C library and compiler runtime": 992,
+        "Your app (the example's own code)": 8574,
+        "Heap and stacks": 0,
+        "Other": 775,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 957,
+        "Radio stack": 13830,
+        "TI drivers and device library": 1643,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 630,
+        "Heap and stacks": 8892,
+        "Other": 0
+      },
+      "check": {
+        "flash_used_in_map": 222004,
+        "flash_sum_without_ccfg": 222004,
+        "ram_used_in_map": 25952,
+        "ram_sum": 25952,
+        "flash_region": {
+          "origin": "0x7100",
+          "length": 284880
+        },
+        "flash_reserved_for_settings": 4096,
+        "other_flash_startup_tables": 696,
+        "other_flash_padding": 79,
+        "other_ram_padding": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0,
+        "zigbee_pools_moved_from_app_to_radio_stack": 5744
+      }
+    },
+    {
+      "id": "coremark_O3",
+      "label": "CoreMark bare metal, -O3",
+      "sdk": "F3 SDK 9.21.00.36, no RTOS, TI Arm Clang 5.1.1",
+      "source": "baremetal/build-O3/bench.map",
+      "flash": {
+        "RTOS": 0,
+        "Radio stack": 0,
+        "TI drivers and device library": 8925,
+        "C library and compiler runtime": 8061,
+        "Your app (the example's own code)": 20280,
+        "Heap and stacks": 0,
+        "Other": 178,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 0,
+        "Radio stack": 0,
+        "TI drivers and device library": 1403,
+        "C library and compiler runtime": 4,
+        "Your app (the example's own code)": 2432,
+        "Heap and stacks": 12288,
+        "Other": 3
+      },
+      "check": {
+        "flash_used_in_map": 37444,
+        "flash_sum_without_ccfg": 37444,
+        "ram_used_in_map": 16130,
+        "ram_sum": 16130,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 524288
+        },
+        "flash_reserved_for_settings": 0,
+        "other_flash_startup_tables": 132,
+        "other_flash_padding": 46,
+        "other_ram_padding": 3,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "zephyr_blinky",
+      "label": "Zephyr blink, upstream Zephyr 4.4.2",
+      "sdk": "Upstream Zephyr 4.4.2, Zephyr kernel, GCC 12.2",
+      "source": "~/zephyrproject/build-cc2340-blinky/zephyr/zephyr.map",
+      "flash": {
+        "RTOS": 5787,
+        "Radio stack": 0,
+        "TI drivers and device library": 1701,
+        "C library and compiler runtime": 2477,
+        "Your app (the example's own code)": 138,
+        "Heap and stacks": 0,
+        "Other": 5,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 706,
+        "Radio stack": 0,
+        "TI drivers and device library": 40,
+        "C library and compiler runtime": 32,
+        "Your app (the example's own code)": 0,
+        "Heap and stacks": 3328,
+        "Other": 6
+      },
+      "check": {
+        "flash_used_in_map": 10108,
+        "flash_sum_without_ccfg": 10108,
+        "ram_used_in_map": 4112,
+        "ram_sum": 4112,
+        "used_totals_from": "map section ends, equal to the build's own report (zephyr/logs/build.txt)",
+        "other_flash_padding": 5,
+        "other_ram_padding": 6,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "zephyr_ti_peripheral",
+      "label": "Bluetooth peripheral, TI's Zephyr fork (runs with the C library heap set; the beacon sample faults)",
+      "sdk": "TI Zephyr fork v3.7.0-ti-1.00.01_ga (Zephyr 3.7.0 base), Zephyr kernel, GCC 12.2",
+      "source": "~/zephyr-ti/build-peripheral/zephyr/zephyr.map",
+      "flash": {
+        "RTOS": 27063,
+        "Radio stack": 150070,
+        "TI drivers and device library": 26641,
+        "C library and compiler runtime": 1273,
+        "Your app (the example's own code)": 2589,
+        "Heap and stacks": 0,
+        "Other": 20,
+        "Boot configuration (CCFG)": 2048
+      },
+      "ram": {
+        "RTOS": 3501,
+        "Radio stack": 10889,
+        "TI drivers and device library": 1664,
+        "C library and compiler runtime": 4,
+        "Your app (the example's own code)": 357,
+        "Heap and stacks": 18688,
+        "Other": 19
+      },
+      "check": {
+        "flash_used_in_map": 207656,
+        "flash_sum_without_ccfg": 207656,
+        "ram_used_in_map": 35122,
+        "ram_sum": 35122,
+        "used_totals_from": "map section ends, equal to the build's own report (zephyr-ti/README.md)",
+        "other_flash_padding": 20,
+        "other_ram_padding": 19,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    }
+  ]
+}

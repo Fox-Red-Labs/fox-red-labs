@@ -1,0 +1,60 @@
+/*
+ * BoosterPack site 1 (J1 to J4) of the LP-MSPM33C321A, pins 1 to 40.
+ * Pin map: LP-MSPM33C321A user guide SLAU969 (BoosterPack header table).
+ * Pins 27 and 28 are not resolved (I2S word and bit clock, see the schematic).
+ * Pins 33 and 34 are the XDS110 backchannel UART until J101 is changed.
+ * Pin 2 is the BSL button S1 (J3), pin 40 is S2 (J4).
+ *
+ * Zephyr's board file for this LaunchPad defines no GPIO, SPI, ADC or UART
+ * node yet, so the labels below do not exist and the build stops here.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	boosterpack_header: connector {
+		compatible = "ti,boosterpack-header";
+		#gpio-cells = <2>;
+		gpio-map-mask = <0xffffffff 0xffffffc0>;
+		gpio-map-pass-thru = <0 0x3f>;
+		gpio-map = <2 0 &gpioa 18 0>,
+			   <3 0 &gpiob 11 0>,
+			   <4 0 &gpiob 10 0>,
+			   <5 0 &gpioa 21 0>,
+			   <6 0 &gpioa 22 0>,
+			   <7 0 &gpiob 31 0>,
+			   <8 0 &gpiob 30 0>,
+			   <9 0 &gpiob 13 0>,
+			   <10 0 &gpiob 12 0>,
+			   <11 0 &gpioc 16 0>,
+			   <12 0 &gpiob 29 0>,
+			   <13 0 &gpiob 28 0>,
+			   <14 0 &gpiob 14 0>,
+			   <15 0 &gpiob 8 0>,
+			   <17 0 &gpioc 23 0>,
+			   <18 0 &gpioc 24 0>,
+			   <19 0 &gpiob 9 0>,
+			   <23 0 &gpioa 17 0>,
+			   <24 0 &gpioa 16 0>,
+			   <25 0 &gpioa 15 0>,
+			   <26 0 &gpiob 27 0>,
+			   <29 0 &gpioc 3 0>,
+			   <30 0 &gpioc 2 0>,
+			   <31 0 &gpioc 22 0>,
+			   <32 0 &gpioc 21 0>,
+			   <33 0 &gpioa 11 0>,
+			   <34 0 &gpioa 10 0>,
+			   <35 0 &gpiob 7 0>,
+			   <36 0 &gpiob 6 0>,
+			   <37 0 &gpioc 19 0>,
+			   <38 0 &gpioc 18 0>,
+			   <39 0 &gpioc 29 0>,
+			   <40 0 &gpioc 17 0>;
+	};
+};
+
+boosterpack_spi: &spi1 {
+	status = "okay";
+};

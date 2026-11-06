@@ -1,0 +1,12 @@
+/* Image F (core1-rpmsg): the 1 MB shared window for the Linux link, 0xEFF00000 to 0xEFFFFFFF minus the console ring page, mapped Normal
+ * non-cacheable (attr 0, as the ring page) so that Linux's write-combined mapping and this core see each other's stores with no cache
+ * maintenance. Apply after core1-ddr.overlay. */
+#include <zephyr/dt-bindings/memory-attr/memory-attr.h>
+/ {
+	frl_shm: memory@eff00000 {
+		compatible = "zephyr,memory-region";
+		reg = <0xeff00000 0xff000>;
+		zephyr,memory-region = "FRL_SHM";
+		zephyr,memory-attr = <0>;
+	};
+};

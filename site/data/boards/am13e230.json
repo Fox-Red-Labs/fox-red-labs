@@ -1,0 +1,358 @@
+{
+    "id": "am13e230",
+    "board": "LP-AM13E230",
+    "part": "AM13E230",
+    "family": "AM13",
+    "title": "Is the TI LP-AM13E230 the right board for my project?",
+    "short": "A LaunchPad development kit for TI's AM13E23019, a 200 MHz Cortex-M33 motor-control chip with a trig math unit (TMU) and a neural accelerator (NPU). One motor-control step takes 117 cycles with the TMU, 3.1 times faster in time than the C2000 LAUNCHXL-F2800137 on the same code. CoreMark is 872 at 200 MHz. The neural accelerator runs TI's compiled room-occupancy models 4.7 to 8.8 times faster than the CPU on three of four sizes. The whole trigger, ADC, step and PWM-write loop takes 1.33 us with the TMU and 4.74 us in plain software. Power was not measured. Prototype silicon, Rev E2 board.",
+    "meet": {
+        "what": "A LaunchPad development kit for TI's AM13E23019 motor-control chip, with an isolated XDS110 probe on the board: one USB-C cable powers it, flashes it and carries a serial port. Rev E2 boards carry prototype silicon (the part and user ID fields read zero) and ship with blank flash, so there is no factory demo to restore. There is no motor driver on the board; the motor tests use a DRV8376EVM driver board wired to its headers.",
+        "facts": [
+            [
+                "Chip",
+                "AM13E23019 (prototype silicon on the test board)"
+            ],
+            [
+                "CPU",
+                "Arm Cortex-M33 with FPU. TI's product page says up to 250 MHz or 200 MHz; the board and every number here run at 200 MHz (TI product page, read 2026-10-09)"
+            ],
+            [
+                "Flash",
+                "512 kB, two banks (TI product page)"
+            ],
+            [
+                "RAM",
+                "128 kB (TI product page: up to 128 kB, 0-wait-state)"
+            ],
+            [
+                "Radios",
+                "None"
+            ],
+            [
+                "On the chip",
+                "TMU (trig math unit, reached as custom instructions); TinyEngine NPU; three 12-bit ADCs at 7.81 million samples a second; five motor PWM modules; one CAN-FD controller (TI product page)"
+            ],
+            [
+                "Debug probe",
+                "XDS110, isolated, on the board. Probe firmware 3.0.0.41. Two serial ports"
+            ],
+            [
+                "Headers",
+                "40-pin BoosterPack, 5 V encoder header, power-measurement header J10, CAN-FD transceiver, red and green LEDs"
+            ],
+            [
+                "Software",
+                "AM13E2x SDK 26.01.00.03 (short-term support), CCStudio 21.0.1, TI Arm Clang 5.1.1.LTS"
+            ],
+            [
+                "Board price",
+                "US$19.79 on TI.com (read 2026-10-04)"
+            ]
+        ],
+        "source": "docs/arrivals/am13e230.md"
+    },
+    "projects": [
+        {
+            "t": "Blink an LED with TI's SDK",
+            "st": "works",
+            "result": "22 s from the command to a verified faster blink (build 2.7 s, flash 3.3 s), board already plugged in and backed up. Pin PA5 toggled across 6 reads and the faster blink was seen by eye. Through CCStudio's AI tools: 60 s, plus a USB replug after a restart sent while the program ran",
+            "source": "data/results/am13e230.csv"
+        },
+        {
+            "t": "One motor-control step, with and without the TMU",
+            "st": "works",
+            "result": "The C2000 bench's own foc.c, unchanged: 117 cycles (0.585 us) with the TMU, 655.6 cycles (3.28 us) with the C library. The F2800137 takes 1.84 us, so this is 3.1 times faster in time. TI's ACI chain: 555 cycles in the control ISR, PASS",
+            "source": "docs/experiments/2026-10-08-am13e230-foc-step.md"
+        },
+        {
+            "t": "CoreMark",
+            "st": "works",
+            "result": "872.4 per second at -O3 (4.36 per MHz), 3 runs, validated. TI's data sheet says 870. TI's own port gives 871.6. -O2 is 612.7, -Os 477.1, -Oz 438.1",
+            "source": "data/results/am13e230.csv"
+        },
+        {
+            "t": "Room-occupancy neural nets (500 to 30k weights), plain C",
+            "st": "works",
+            "result": "0.489 / 1.25 / 5.06 / 18.7 ms per inference at -O3, 20 of 20 test vectors right on every build. On the NPU the same models take 0.107 / 0.205 / 0.630 / 9.53 ms (TI's compiler, 20 of 20 right)",
+            "source": "data/results/am13e230.csv"
+        },
+        {
+            "t": "UART at speed",
+            "st": "works",
+            "result": "Clean up to 6.25 Mbaud between two of the chip's UARTs over a wire, 128 bytes per speed, zero errors.",
+            "source": "data/results/am13e230.csv"
+        },
+        {
+            "t": "DAC read back by the ADC",
+            "st": "partial",
+            "result": "Works, but reads 4.4 to 9.4 percent high at the four mid-scale points, the same on two runs. TI's own example reports 3 errors of 5 at plus or minus 5 percent. Cause unexplained",
+            "source": "data/results/am13e230.csv"
+        }
+    ],
+    "chains": [
+        {
+            "t": "TI's SDK and compiler, from a terminal",
+            "st": "works",
+            "verdict": "Yes",
+            "why": "SysConfig, TI Arm Clang and DSLite run from a Mac terminal with no GUI. The SDK's own make files assume Linux paths and CMake, which CCStudio does not include; this repo's scripts pass the Mac paths",
+            "source": "am13e230/FAQ.md"
+        },
+        {
+            "t": "The neural accelerator (NPU)",
+            "st": "works",
+            "verdict": "Yes",
+            "why": "TI's compiler has no Intel-Mac build, so it ran on GitHub's Linux machines. On the NPU the four room-occupancy models take 0.107, 0.205, 0.630 and 9.53 ms; the same models compiled by TI for the Cortex-M33 alone take 0.499, 1.376, 5.544 and 22.91 ms, so the NPU is 4.7, 6.7, 8.8 and 2.4 times faster at 200 MHz. 20 of 20 test vectors were right on every run. The CDE build compiles but halts on a bus error. Energy per inference is not measured",
+            "source": "data/results/am13e230.csv"
+        },
+        {
+            "t": "Every SDK example",
+            "st": "waiting",
+            "verdict": "Not run",
+            "why": "CMake is not installed, so the SDK's build-all did not run. Six examples were built one at a time instead",
+            "source": "data/results/am13e230.csv"
+        },
+        {
+            "t": "Power numbers",
+            "st": "waiting",
+            "verdict": "Not run",
+            "why": "Needs the J10 shunt lifted and a meter, and nobody was at the bench. Run current, sleep, shutdown and the energy rows are waiting",
+            "source": "data/results/am13e230.csv"
+        },
+        {
+            "t": "A sub-1 GHz radio from another board as a SPI radio",
+            "st": "builds",
+            "verdict": "Builds",
+            "why": "TI's host driver for the CC1407P (the sub-1 GHz radio chip on the BP-CC1407P BoosterPack) builds for this chip: 10.3 kB of flash and 5.1 kB of RAM. Not run on a radio",
+            "source": "data/results/am13e230.csv"
+        },
+        {
+            "t": "A radio or wireless demo on the chip",
+            "st": "no",
+            "verdict": "Not possible",
+            "why_not": "no-radio",
+            "why": "The chip has no radio. Radio demos need a separate radio board",
+            "source": "docs/arrivals/am13e230.md"
+        }
+    ],
+    "combine_title": "What else we tried, and how it went",
+    "combine_lede": "Each row is something we tried beyond the standard list. A row that did not work is recorded with its reason, not left out.",
+    "benchmarks": [
+        [
+            "CoreMark, TI Arm Clang -O3, 200 MHz",
+            "872.4/s (4.36/MHz)",
+            "3 runs; data sheet 870"
+        ],
+        [
+            "CoreMark, -O2 / -Os / -Oz",
+            "612.7 / 477.1 / 438.1 per s",
+            "Same files"
+        ],
+        [
+            "CoreMark at 100 MHz, -O3",
+            "442.3/s (4.42/MHz)",
+            "1 flash wait state"
+        ],
+        [
+            "sinf plus cosf, TMU / C library",
+            "11.6 / 512.7 cycles",
+            "44 times fewer with the TMU"
+        ],
+        [
+            "Float divide, TMU / FPU",
+            "7.9 / 15.1 cycles",
+            ""
+        ],
+        [
+            "One FOC step, TMU / C library",
+            "117.0 / 655.6 cycles",
+            "0.585 / 3.28 us at 200 MHz"
+        ],
+        [
+            "TI's ACI chain, control ISR",
+            "555 cycles, PASS",
+            "Full chain 637"
+        ],
+        [
+            "Occupancy model, 500 weights",
+            "0.489 ms (-O3)",
+            "0.681 ms at -Os"
+        ],
+        [
+            "Occupancy model, 2k weights",
+            "1.25 ms (-O3)",
+            "1.859 ms at -Os"
+        ],
+        [
+            "Occupancy model, 8k weights",
+            "5.055 ms (-O3)",
+            "7.608 ms at -Os"
+        ],
+        [
+            "Occupancy model, 30k weights",
+            "18.71 ms (-O3)",
+            "28.63 ms at -Os; 20 of 20 right on all"
+        ],
+        [
+            "UART, two UARTs over a wire",
+            "6.25 Mbaud clean",
+            "0 errors, 128 bytes per speed"
+        ],
+        [
+            "Blink build / flash",
+            "2.7 s / 3.3 s",
+            "DSLite, over the on-board probe"
+        ],
+        [
+            "Blink image size",
+            "7 kB flash, 9 kB RAM",
+            "TI gpio_toggle_output"
+        ]
+    ],
+    "benchmarks_source": "am13e230/RESULTS-am13e230.md",
+    "glance": [
+        [
+            "117 cycles",
+            "One motor-control step with the TMU",
+            "0.585 us at 200 MHz, 3.1 times faster in time than the C2000 F2800137 on the same code",
+            "am13e230/RESULTS-am13e230.md"
+        ],
+        [
+            "4.36",
+            "CoreMark per MHz",
+            "872 per second at 200 MHz, -O3; TI's data sheet says 870",
+            "data/results/am13e230.csv"
+        ],
+        [
+            "22 s",
+            "Blink, from the command",
+            "Board plugged in and backed up; build 2.7 s, flash 3.3 s",
+            "data/results/am13e230.csv"
+        ],
+        [
+            "44x",
+            "Fewer cycles for sine and cosine",
+            "TMU 11.6 cycles against 512.7 for the C library",
+            "data/results/am13e230.csv"
+        ],
+        [
+            "0.489 ms",
+            "Smallest occupancy model",
+            "500 weights, plain C, 20 of 20 right; 0.107 ms on the NPU",
+            "data/results/am13e230.csv"
+        ],
+        [
+            "6.25 Mbaud",
+            "Fastest clean UART speed tried",
+            "Zero errors over a wire; faster was not run",
+            "data/results/am13e230.csv"
+        ]
+    ],
+    "good_for": [
+        "Motor control and anything that is mostly sine, cosine and divide: the TMU does the pair in 11.6 cycles",
+        "Comparing an Arm chip with a C2000 on the same control code",
+        "Fast Cortex-M33 work on a low budget: 200 MHz and CoreMark 4.36 per MHz for US$19.79",
+        "Building and flashing from a Mac terminal with TI's own tools"
+    ],
+    "not_for": [
+        "Anything with a radio: the chip has none",
+        "Anyone who needs a settled chip: the test board is prototype silicon on a short-term-support SDK",
+        "Projects that need the CDE build or energy per inference: neither works or ran yet",
+        "Projects that need power numbers: none were measured"
+    ],
+    "buy": "US$19.79 on TI.com (ti.com/tool/LP-AM13E230, read 2026-10-04), sold in limited quantity. The probe is on the board, so one USB-C cable does power, flashing and the serial port. There is no motor driver on it.",
+    "gotchas": [
+        [
+            "A new board lights only its power LEDs and prints nothing",
+            "The flash ships blank (all 0xFF on our Rev E2 board). Load any program and it runs. **Tag: Setup or handling.**"
+        ],
+        [
+            "Every read fails with error -614 after a restart",
+            "Unplug the USB cable and plug it back in. It happens if `restart` is sent while the program is still running; pause first. **Tag: Tool or docs.**"
+        ],
+        [
+            "A DSLite memory read sometimes leaves the core halted",
+            "Flash with a system reset and run, then read once after the program should be done. **Tag: Unknown.**"
+        ],
+        [
+            "CoreMark drops 30 percent from -O3 to -O2",
+            "Expected: 872.4 against 612.7 on the same files, and TI's own port agrees. Quote the flag with the score. **Tag: Chip limit.**"
+        ],
+        [
+            "The DAC reads 4 to 9 percent high through the ADC",
+            "Same on two runs; the cause is not known. **Tag: Unknown.**"
+        ],
+        [
+            "A Rev E1 board has different pins from everything here",
+            "Check the back of the board: `MCU178E1` means E1. An E2 board reads `MCU178E2`. **Tag: Setup or handling.**"
+        ]
+    ],
+    "faq_page": "faq-am13e230.html",
+    "faq_source": "am13e230/FAQ.md",
+    "updated": "2026-10-09",
+    "measured_on": "Measured 2026-10-08 on an Intel Mac (macOS 15.7.9) with CCStudio 21.0.1, AM13E2x SDK 26.01.00.03.STS and TI Arm Clang 5.1.1.LTS. Rev E2 board, prototype silicon. Code runs from flash with 3 wait states and the cache on, 200 MHz, cycles counted on the chip.",
+    "next": {
+        "title": "What do I do first with the LP-AM13E230?",
+        "steps": [
+            "Check the back of the board for `MCU178E2`. An E1 board has different pins.",
+            "Plug in the USB-C cable, then run `am13e230/tools/identify.sh <serial>` to identify the chip and read the flash.",
+            "Build and flash TI's blink with your own period: `am13e230/blink.sh 250`. LED4 (red) blinks.",
+            "Read the FAQ before your first CCStudio debug session."
+        ],
+        "source": "am13e230/README.md"
+    },
+    "ai_cost": {
+        "headline": "Eighteen fresh AI agents (Claude Sonnet 5.5, clean start, one at a time) did three jobs on this board on 2026-10-10. Each job ran three times with this repo's notes and three without. Total: $20.96 at list price. Every result was checked independently. With this repo's notes the two board jobs went 3 of 3 in 2 to 10 minutes for 55 cents to $1.44 a run; without them 2 of 3 in 7 to 12 minutes for $1.53 to $2.42.",
+        "rows": [
+            [
+                "Claude Sonnet 5.5, 18 fresh-agent runs (blink, CoreMark and a pin question, each with and without this repo's notes)",
+                "2.2 to 11.7 min per run",
+                "548",
+                "$20.96"
+            ]
+        ],
+        "source": "docs/model-comparison.md",
+        "per_project": {
+            "intro": "Each job given to three fresh Claude Sonnet 5.5 agents, with this repo's notes and then without (only TI's public documents, the SDK on the Mac and the web), 2026-10-10. Blink and CoreMark ran on the board and were checked by reading the pin or the score ourselves; the question needed no board.",
+            "rows": [
+                [
+                    "Change TI's blink so LED4 toggles every 400 ms, flash it, prove the rate (with this repo's notes)",
+                    "3 of 3",
+                    "3.4 to 9.9 min",
+                    "$0.70 to $1.44"
+                ],
+                [
+                    "The same blink job without this repo's notes (one agent never connected: SWD error -615 on its own connection file)",
+                    "2 of 3",
+                    "7.2 to 11.3 min",
+                    "$1.53 to $2.38"
+                ],
+                [
+                    "Build and run TI's CoreMark, read the score and whether it was valid (with this repo's notes)",
+                    "3 of 3",
+                    "2.2 to 4.5 min",
+                    "$0.55 to $0.81"
+                ],
+                [
+                    "The same CoreMark job without this repo's notes (one agent used an older compiler and reported 777 instead of 872)",
+                    "2 of 3",
+                    "7.9 to 11.7 min",
+                    "$1.73 to $2.42"
+                ],
+                [
+                    "Which header pins carry the six MCPWM4 motor PWM outputs? (with this repo's notes; no board needed)",
+                    "3 of 3",
+                    "1.2 to 3.1 min",
+                    "$0.37 to $1.13"
+                ],
+                [
+                    "The same question without this repo's notes",
+                    "3 of 3",
+                    "1.2 to 2.8 min",
+                    "$0.36 to $0.52"
+                ]
+            ],
+            "source": "docs/model-comparison.md"
+        }
+    },
+    "line": "Motor control on an Arm core, with a trig math unit, a neural accelerator and five motor PWM modules."
+}

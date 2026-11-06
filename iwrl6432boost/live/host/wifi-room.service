@@ -1,0 +1,14 @@
+[Unit]
+Description=Wi-Fi presence (LP-EM-CC35X1): live page, all-day log, Home Assistant
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+EnvironmentFile=/etc/room-sensors.env
+WorkingDirectory=/opt/room-sensors/cc35x1/csi/lab
+ExecStart=/opt/room-sensors/iwrl6432boost/live/host/run.sh wifi
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

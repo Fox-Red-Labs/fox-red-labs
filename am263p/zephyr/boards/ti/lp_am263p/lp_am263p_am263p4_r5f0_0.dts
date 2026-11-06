@@ -1,0 +1,19 @@
+/* Fox Red Labs: LP-AM263P, R5FSS0-0. UART0 reaches the Mac through the board's XDS110 (first serial port).
+ * Pin mux and the UART0 clock are not set here: a TI SDK program run first leaves them configured (see README). */
+/dts-v1/;
+#include <ti/am263p4_r5f.dtsi>
+
+/ {
+	model = "TI LP-AM263P R5FSS0-0 (Fox Red Labs port)";
+	compatible = "frl,lp-am263p-r5f0-0";
+
+	chosen {
+		zephyr,sram = &sram;
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
+	};
+};
+
+&uart0 {
+	status = "okay";
+};

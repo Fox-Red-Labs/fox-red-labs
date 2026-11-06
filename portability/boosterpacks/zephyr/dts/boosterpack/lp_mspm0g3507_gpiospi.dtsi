@@ -1,0 +1,21 @@
+/*
+ * LP-MSPM0G3507 BoosterPack header with the SPI bus built from GPIO pins
+ * (Zephyr's zephyr,spi-bitbang). For Zephyr releases that have no MSPM0 SPI
+ * driver (4.4.2). Clock is BoosterPack pin 7 (PB9), data out pin 15 (PB8).
+ * Slow: the CPU toggles every edge.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include "lp_mspm0g3507_header.dtsi"
+
+/ {
+	boosterpack_spi: spi_bitbang {
+		compatible = "zephyr,spi-bitbang";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clk-gpios = <&boosterpack_header 7 GPIO_ACTIVE_HIGH>;
+		mosi-gpios = <&boosterpack_header 15 GPIO_ACTIVE_HIGH>;
+		miso-gpios = <&boosterpack_header 14 GPIO_ACTIVE_HIGH>;
+	};
+};

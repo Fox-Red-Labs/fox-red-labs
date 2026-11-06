@@ -1,0 +1,36 @@
+/* Image E (build-ddr-core1): Zephyr in DDR beside Linux, started on core 1 by PSCI CPU_ON from the non-secure world.
+ * Linux runs with mem=1536M, so it never touches 0xE0000000 and up; Zephyr owns 0xE0000000 to 0xEFFFFFFF (256 MB), no on-chip SRAM at all.
+ * The 4 KB console ring is the top page, 0xEFFFF000, mapped Normal non-cacheable (same method as core1-ring-map.overlay).
+ * cpu@1 is the only CPU node in use (the boot core); cpu@0 belongs to Linux. Use with core1-ns.conf, core1.conf, core1-ring.conf, core1-ddr.conf. */
+#include <zephyr/dt-bindings/memory-attr/memory-attr.h>
+/ {
+	ddr_core1: memory@e0000000 {
+		compatible = "mmio-sram";
+		reg = <0xe0000000 0x10000000>;
+	};
+	frl_ring: memory@effff000 {
+		compatible = "zephyr,memory-region";
+		reg = <0xeffff000 0x1000>;
+		zephyr,memory-region = "FRL_RING";
+		zephyr,memory-attr = <0>;
+	};
+	chosen {
+		zephyr,sram = &ddr_core1;
+		/delete-property/ zephyr,flash;
+		/delete-property/ zephyr,flash-controller;
+		/delete-property/ zephyr,console;
+		/delete-property/ zephyr,shell-uart;
+	};
+	cpus {
+		cpu@0 { status = "disabled"; };
+		cpu@1 { status = "okay"; };
+	};
+	firmware {
+		psci { status = "disabled"; };
+		scmi { status = "disabled"; };
+	};
+};
+&oc_sram { status = "disabled"; };
+&ddr0 { status = "disabled"; };
+&main_uart0 { status = "disabled"; };
+&main_uart1 { status = "disabled"; };

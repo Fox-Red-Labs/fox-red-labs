@@ -1,0 +1,71 @@
+From eb64315eca15a42beb3c07da9cc5241a0dcdea11 Mon Sep 17 00:00:00 2001
+From: Contributor Name <contributor@example.invalid>
+Date: Sun, 25 Oct 2026 10:10:09 -0400
+Subject: [PATCH 3/4] tests: drivers: flash: common: add lp_mspm0g3507,
+ lp_mspm0l2228 overlays
+
+Both board files use all of flash0 for mcuboot, slot0 and slot1. For
+the common flash test only, delete slot1_partition and put
+storage_partition in its place. The test image runs from slot0, so
+slot1 is not needed. The board files are not changed.
+
+Assisted-by: Claude:claude-sonnet-5-5
+---
+ .../flash/common/boards/lp_mspm0g3507.overlay | 20 +++++++++++++++++++
+ .../flash/common/boards/lp_mspm0l2228.overlay | 20 +++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+ create mode 100644 tests/drivers/flash/common/boards/lp_mspm0g3507.overlay
+ create mode 100644 tests/drivers/flash/common/boards/lp_mspm0l2228.overlay
+
+diff --git a/tests/drivers/flash/common/boards/lp_mspm0g3507.overlay b/tests/drivers/flash/common/boards/lp_mspm0g3507.overlay
+new file mode 100644
+index 000000000..4845461aa
+--- /dev/null
++++ b/tests/drivers/flash/common/boards/lp_mspm0g3507.overlay
+@@ -0,0 +1,20 @@
++/*
++ * Copyright (c) 2026 Texas Instruments
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/* The common flash test works on storage_partition. The board file has no free flash,
++ * so the test replaces slot1 (not used by this test) with the partition it needs.
++ */
++/delete-node/ &slot1_partition;
++
++&flash0 {
++	partitions {
++		storage_partition: partition@14000 {
++			compatible = "zephyr,mapped-partition";
++			label = "storage";
++			reg = <0x14000 DT_SIZE_K(48)>;
++		};
++	};
++};
+diff --git a/tests/drivers/flash/common/boards/lp_mspm0l2228.overlay b/tests/drivers/flash/common/boards/lp_mspm0l2228.overlay
+new file mode 100644
+index 000000000..852b518bc
+--- /dev/null
++++ b/tests/drivers/flash/common/boards/lp_mspm0l2228.overlay
+@@ -0,0 +1,20 @@
++/*
++ * Copyright (c) 2026 Texas Instruments
++ *
++ * SPDX-License-Identifier: Apache-2.0
++ */
++
++/* The common flash test works on storage_partition. The board file has no free flash,
++ * so the test replaces slot1 (not used by this test) with the partition it needs.
++ */
++/delete-node/ &slot1_partition;
++
++&flash0 {
++	partitions {
++		storage_partition: partition@24000 {
++			compatible = "zephyr,mapped-partition";
++			label = "storage";
++			reg = <0x24000 DT_SIZE_K(112)>;
++		};
++	};
++};

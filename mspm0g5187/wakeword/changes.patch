@@ -1,0 +1,178 @@
+--- a/wakeword_detection_ai_npu.c
++++ b/wakeword_detection_ai_npu.c
+@@ -60,6 +60,9 @@
+ 
+ #define REUSE_DEPTH (4)
+ 
++/* ---- Fox Red Labs additions: serial report, detection events, hold LED (marked FRL) ---- */
++#include "frl_report.h"
++
+ /* LPC coefficients buffer */
+ extern int16_t lpc[LPC_BANKS];
+ 
+@@ -78,6 +81,7 @@
+ struct tvmgen_default_inputs inputs = {(void *)&audio_features[0]};
+ struct tvmgen_default_outputs outputs = {(void *)&output};
+ 
++#if INPUT_ADC
+ /* Global counter for SysTick timer rollovers */
+ uint32_t systick_rollOver_counter = 0;
+ 
+@@ -102,6 +106,7 @@
+ {
+     systick_rollOver_counter++;
+ }
++#endif
+ 
+ /**
+  * @brief Main application entry point
+@@ -119,8 +124,11 @@
+     /* Initialize SPI microphone or BOOSTXL audio microphone peripherals */
+     mic_init();
+ 
++#if INPUT_ADC
+     /* Initialize SysTick timer for system timing */
+     SYSCFG_DL_SYSTICK_init();
++#endif
++    frl_init();
+ 
+     /* Reset and power up the Neural Processing Unit (NPU) */
+     DL_NPU_reset(NPU);
+@@ -142,11 +150,16 @@
+     /* Delay to allow system stabilization */
+     delay_cycles(5000000);
+ 
++#if INPUT_ADC
+     /* Start timer to begin audio sampling */
+     DL_TimerG_startCounter(TIMER_0_INST);
++#endif
+ 
++#if INPUT_ADC
+     /* Configure low-power mode (STANDBY0) */
+     DL_SYSCTL_setPowerPolicySTANDBY0();
++#endif
++    frl_ready();
+ 
+     /**
+      * Main processing loop:
+@@ -155,13 +168,18 @@
+      * - Runs inference when new features are ready
+      * - Processes inference results for wakeword detection
+      */
++#if INPUT_ADC
++    /* the shipped loop, unchanged apart from the FRL hooks */
+     while (1)
+     {
++        frl_poll();  /* FRL: replay input and hold LED */
+         /* Check if enough audio samples have been collected */
+         if (samples_count >= NUM_AUDIO_SAMPLES)
+         {
+             /* Extract features using Linear Predictive Coding */
++            frl_l0();  /* FRL */
+             extract_features_lpc();
++            frl_l1();  /* FRL */
+ 
+ 
+             /* Increment count of newly extracted features */
+@@ -175,17 +193,48 @@
+         if (new_features_extracted == 1)
+         {
+             /* Run neural network inference on the NPU */
++            frl_t0();  /* FRL */
+             (void)tvmgen_default_run(&inputs, &outputs);
+ 
+             /* Wait for inference to complete */
+             while (!tvmgen_default_finished)
+                 ;
++            frl_t1();  /* FRL */
+ 
+             /* Process inference output for wakeword detection */
+             post_inference_ww(output);
++            frl_after_inference(output[0][0], output[0][1]);  /* FRL */
+ 
+             /* Reset feature extraction counter */
+             new_features_extracted = 0;
+         }
+     }
++#else
++    /**
++     * FRL: pipelined loop for the microphone builds. The shipped loop does LPC (8.6 ms) and then the NPU
++     * (11.2 ms) one after the other and takes 24.4 ms per 20 ms frame at 80 MHz, so it falls behind a
++     * real-time microphone. Here the NPU starts on the window as it stands (frames up to the previous one)
++     * and the CPU computes the new frame's LPC features while it runs; the new frame joins the window
++     * when the NPU is done. Same model, same features, same window, one frame (20 ms) later.
++     */
++    while (1)
++    {
++        frl_poll();
++        if (samples_count >= NUM_AUDIO_SAMPLES)
++        {
++            frl_t0();
++            (void)tvmgen_default_run(&inputs, &outputs);     /* returns at once; the NPU runs */
++            frl_l0();
++            frl_lpc_only();                                  /* LPC of the new frame into lpc[] */
++            frl_l1();
++            samples_count -= NUM_AUDIO_SAMPLES;
++            while (!tvmgen_default_finished)
++                ;
++            frl_t1();
++            post_inference_ww(output);
++            frl_after_inference(output[0][0], output[0][1]);
++            frl_window_add();                                /* new frame joins the window */
++        }
++    }
++#endif
+ }
+--- a/ticlang/makefile
++++ b/ticlang/makefile
+@@ -20,14 +20,14 @@
+   V :=
+ endif
+ 
+-OBJECTS = wakeword_detection_ai_npu.obj buffer_manager.obj data_collection.obj feature_extraction.obj post_inference.obj lpc_float_lpc.obj ti_edgeAI_npu_npu.obj $(patsubst %.c,%.obj,$(notdir $(SYSCFG_C_FILES)))
++OBJECTS = frl_report.obj wakeword_detection_ai_npu.obj buffer_manager.obj data_collection.obj feature_extraction.obj post_inference.obj lpc_float_lpc.obj ti_edgeAI_npu_npu.obj $(patsubst %.c,%.obj,$(notdir $(SYSCFG_C_FILES)))
+ 
+ NAME = wakeword_detection_ai_npu
+ 
+ 
+ DFLAGS += -gdwarf-3
+ 
+-CFLAGS += -I.. \
++CFLAGS += -DINPUT_I2S=1 -DMIC_GAIN=1 -O2 -I.. \
+     -I. \
+     $(addprefix @,$(SYSCFG_OPT_FILES)) \
+     -DARM_MATH_CM0 \
+@@ -40,7 +40,7 @@
+     -march=thumbv6m \
+     -mfloat-abi=soft \
+     -mthumb \
+-    -Wall
++    -Wall -Wno-incompatible-pointer-types
+ 
+ 
+ ifneq ($(CONFIG),RELEASE)
+@@ -48,7 +48,7 @@
+ CFLAGS += $(DFLAGS)
+ endif
+ 
+-LFLAGS += -lmodel/model.a \
++LFLAGS += $(MSPM0_SDK_INSTALL_DIR)/source/third_party/CMSIS/DSP/lib/ticlang/m0p/arm_cortexM0l_math.a -lmodel/model.a \
+     -ldevice.cmd.genlibs \
+     "-L$(MSPM0_SDK_INSTALL_DIR)/source" \
+     -L.. \
+@@ -114,10 +114,14 @@
+ 	@ echo Building $@
+ 	$(V) $(CC) $(CFLAGS) -c $< -o $@
+ 
+-ti_edgeAI_npu_npu.obj: /home/developer/.cache/bazel/_bazel_developer/2ca1f4ebdc59348ffdc31d97a51a98d5/sandbox/processwrapper-sandbox/6620/execroot/__main__/source/ti/edgeAI/npu/npu.c $(SYSCFG_H_FILES)
++frl_report.obj: ../frl_report.c $(SYSCFG_H_FILES)
+ 	@ echo Building $@
+ 	$(V) $(CC) $(CFLAGS) -c $< -o $@
+ 
++ti_edgeAI_npu_npu.obj: $(MSPM0_SDK_INSTALL_DIR)/source/ti/edgeAI/npu/npu.c $(SYSCFG_H_FILES)
++	@ echo Building $@
++	$(V) $(CC) $(CFLAGS) -c $< -o $@
++
+ $(NAME).out: $(OBJECTS)
+ 	@ echo linking $@
+ 	$(V) $(LNK) -Wl,-u,_c_int00 $(OBJECTS)  $(LFLAGS) -o $(NAME).out

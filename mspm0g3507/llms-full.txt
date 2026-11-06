@@ -1,0 +1,1110 @@
+# Fox Red Labs: mspm0g3507
+
+Every reader page concatenated, for AI assistants. 7 files. Each starts with a line giving its path and heading. Links inside keep the paths they have in the repo.
+
+==============================================================================
+FILE: mspm0g3507/README.md | LP-MSPM0G3507 LaunchPad: first blink with an AI assistant in 2 min 29 s, and what else it measures
+==============================================================================
+
+# LP-MSPM0G3507 LaunchPad: first blink with an AI assistant in 2 min 29 s, and what else it measures
+
+> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+
+Let Claude Code do it: paste the prompt in `START.md`, or run `./start.sh mspm0g3507 blink` from a clone. Either one has the assistant build TI's blink example for the LP-MSPM0G3507, flash it, and change the pattern to what you ask for. The folder is `mspm0g3507/`.
+
+Measured on one borrowed LP-MSPM0G3507 (not a sealed box, software already installed): the blink was running 2 min 29 s after the board was in hand, with an agent driving CCStudio, about 1 minute of hands-on and 2 of waiting (`data/results/mspm0g3507.csv`, test `time_to_blink`). That is one run of the CCStudio route (`./start.sh ... --ccs`). The default terminal route has no time on this board. `START.md` and `start.sh` have not been timed on this board; `start.sh` was timed on an LP-MSPM0L1306 (1 min 15 s).
+
+Terms: [vocab](../docs/vocab.md) and the [FAQ](FAQ.md). **CCStudio** is TI's IDE; **XDS110** is the debug probe on the board; **SDK** is TI's code library for the chip; **Claude Code** is Anthropic's coding assistant; **DSLite** is TI's command-line flasher; **Zephyr** is an open-source real-time operating system; **Rosetta 2** is Apple's translator for Intel apps on Apple Silicon; **NONMAIN** is the flash area that holds the chip's boot settings; **CoreMark** is a standard CPU speed test. 1 kB = 1,024 bytes.
+
+## What is in this folder
+
+<!-- folder-contents -->
+**In this folder:** this README; `AGENTS.md` (notes for an AI assistant, every line from a run); `FAQ.md` (every error hit, with its exact text and the fix). Folders: `arduino-core-test/` Arduino core tests, `display-test/` display tests, `lvgl-g3507/` LVGL on this board, `mcu-bench/` the shared benchmark suite, `src-g3507/` the blink example's `.c` and `.syscfg` for this board with TI's license headers kept (`src/` holds the LP-MSPM0C1104 version), `stm32-port-eval/` ST examples moved to this chip, `third-party-bench/` third-party benchmarks, `tools/` helper scripts for this board, `zephyr/` Zephyr builds. Results are rows in `data/results/mspm0g3507.csv` at the top of the repository, not in this folder.
+
+**Not in this folder:** TI's SDK, CCStudio, SysConfig and the compilers (you install them; the versions are under "Where these facts come from"); built images (`.out`, `.hex`, `.bin`, `.elf`), which are not cleared for redistribution, so you build them with the command below.
+
+**Taking this folder alone:** the commands in this README run from the top of a clone and call `tools/` and `data/`; the benchmarks also borrow sources from folders that several boards share. A sparse clone fetches only those, about 10 to 60 MB, instead of the whole repository (about 500 MB):
+
+```bash
+git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git
+cd fox-red-labs
+git sparse-checkout add mspm0g3507 tools data third-party/lvgl
+```
+
+`docs/` is left out on purpose (236 MB, mostly pictures). Read a page a link points to there with `git show HEAD:docs/<file>`, for example `git show HEAD:docs/vocab.md`.
+
+
+## The board
+
+| Part | Fact | Read from |
+|---|---|---|
+| Chip | MSPM0G3507: Arm Cortex-M0+, 80 MHz, 128 kB flash, 32 kB RAM | `data/boards.csv` |
+| Kit | LP-MSPM0G3507 LaunchPad | `data/boards.csv` |
+| Debugger | XDS110 on the board; a Mac sees a probe and two serial ports with no driver (macOS 15, Intel); probe serial <probe serial> | `AGENTS.md` |
+| LEDs | An RGB LED; TI's blink already sets up all three colors | `AGENTS.md` |
+| Serial | UART0 on PA10 and PA11 through the probe, 115200 8N1 | `AGENTS.md` |
+| Not on the chip | No floating-point unit and no neural accelerator | `AGENTS.md` |
+
+## Ten-minute path
+
+You need an LP-MSPM0G3507 LaunchPad, a USB data cable (a charge-only cable looks like a dead probe), a Mac, and a Claude subscription. TI's tools take about 30 minutes to install once and about 13 GB of disk: CCStudio about 10 GB and the MSPM0 SDK about 2.6 GB (`mac-setup/README.md`). Measured once, with the tools already installed: 2 min 29 s (see What was measured).
+
+1. **Pick a route (browser or terminal).**
+   - No terminal: paste the one prompt from `START.md` (at the repository root) into Claude Code. It fetches only this board's folder, then asks before installing anything or writing to the board.
+   - Terminal, from the repository root:
+
+     ```
+     ./start.sh mspm0g3507 blink
+     ```
+
+     Add `--probe <serial>` if more than one board is plugged in, `--ccs` to have the assistant use CCStudio's servers, `--dry-run` to print what would run. `./start.sh` with no arguments prints its options.
+2. **Install the tools once (browser).** CCStudio 21.0.1 and the MSPM0 SDK 2.11 from TI's download pages, as your user (not sudo). Versions and disk sizes are in `mac-setup/README.md`. All runs were on an Intel Mac, where TI's tools run natively. Apple Silicon is untested here; TI's tools are x86_64, so expect to need Rosetta 2:
+
+   ```
+   softwareupdate --install-rosetta --agree-to-license
+   ```
+3. **Plug in the board (bench, then terminal).** You should see the on-board XDS110 as a probe and two serial ports, with no driver. If the Mac sees nothing, try another cable: a charge-only cable looks the same (`FAQ.md`). This prints the probe serial:
+
+   ```
+   /Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e
+   ```
+4. **Ask for what you want (Claude Code).** "Make the red LED flash twice, then pause." The assistant builds TI's `gpio_toggle_output` for this board, flashes it, and tells you what to look for.
+5. **Check it (bench).** Look at the LED; that is the check that has been done on this board. Or read the pin through the debugger. Its pin list comes from TI's blink example and it has not been run on this board:
+
+   ```
+   python3 tools/check/blink.py --board mspm0g3507 --probe <serial>
+   ```
+
+## One-command build
+
+The default route is `./start.sh mspm0g3507 blink` (step 1 above). It builds TI's blink example for this board, flashes it and changes the pattern to what you ask for. `START.md` and `start.sh` have not been timed on this board; `start.sh` was timed on an LP-MSPM0L1306 (1 min 15 s). The default terminal route has no time on this board; the one timed run used the CCStudio route (`./start.sh ... --ccs`).
+
+The commands the assistant uses are in `AGENTS.md`, section "Start here" (the board's tools, probe serial, build, flash, check). To run the steps yourself:
+
+- **TI's blink with CCStudio's tools:** copy `/Applications/ti/mspm0_sdk_2_11_00_07/examples/nortos/LP_MSPM0G3507/driverlib/gpio_toggle_output`, then:
+
+  ```
+  mspm0g3507/mcu-bench/sdk-common/sdkmake.sh gpio_toggle_output/ticlang
+  ```
+
+  In CCStudio with Claude Code driving, build took 6 s and flash plus start 38 s.
+- **Zephyr instead:** `mspm0g3507/zephyr/setup-intel-mac.sh` installs Zephyr 4.4.2, builds blinky and flashes it. 3 min 0 s and 3 min 6 s from clean on two runs; the first, unscripted run took about 9.5 minutes (`zephyr/README.md`). Intel Mac, no Homebrew needed.
+- **Back up first.** There is no tested backup command for this board. Read the whole flash with DSLite (`/Applications/ti/uniflash_9.6.0/dslite.sh`) before the first write. Do not write NONMAIN.
+
+It does not back up or restore the board, and no restore has been tested.
+
+## What was measured
+
+One borrowed LP-MSPM0G3507 (not a sealed box), Intel Mac, macOS 15.7.9.
+
+| What | Number | Conditions | Level | Source |
+|---|---|---|---|---|
+| Board in hand to a changed blink, CCStudio route | 2 min 29 s (about 1 min hands-on, 2 waiting) | 1 run; software already installed; agent in VS Code driving CCStudio | measured | `data/results/mspm0g3507.csv`, test `time_to_blink` (ccs-mcp) |
+| Nothing installed to Zephyr blinking | about 9.5 min | 1 run, one prompt, includes finding the toolchain workaround | measured | `data/results/mspm0g3507.csv`, test `time_to_blink` (zephyr) |
+| Zephyr from clean with the saved script | 3 min 0 s and 3 min 6 s | 2 clean runs of `zephyr/setup-intel-mac.sh` | measured | `data/results/mspm0g3507.csv`, test `time_to_blink` (zephyr-script) |
+| Build of `gpio_toggle_output` | 6 s | CCStudio MCP build | measured | `data/results/mspm0g3507.csv`, test `blink_build` (ccs-mcp) |
+| Flash and start | 38 s | CCStudio route | measured | `data/results/mspm0g3507.csv`, test `blink_flash` (ccs-mcp) |
+| Zephyr blinky build | 62 s | `west build`, 1,102 build steps | measured | `data/results/mspm0g3507.csv`, test `blink_build` (zephyr) |
+| Zephyr blinky flash | 6 s | `west flash` with xPack OpenOCD, 11.7 kB written | measured | `data/results/mspm0g3507.csv`, test `blink_flash` (west) |
+| Zephyr blinky size | 11.7 kB flash, 3.9 kB RAM | Zephyr 4.4.2 | measured | `data/results/mspm0g3507.csv`, tests `blink_flash_bytes`, `blink_ram_bytes` |
+| CoreMark | 183.61 (2.3 per MHz) | bare metal, TI Arm Clang 5.1.1, `-O3`, 80 MHz; repeat run 183.67 | measured | `data/results/mspm0g3507.csv`, test `coremark` (ticlang-bare-o3) |
+| Probe on the board | yes, no driver install | probe <probe serial> | measured | `data/results/mspm0g3507.csv`, test `probe_included` |
+| Chip: 80 MHz, 128 kB flash, 32 kB RAM | as listed | vendor figures | claim | `data/boards.csv` |
+
+The rest of this board's benchmark rows (interrupt latency, GPIO toggle, math accelerator, AES, CRC, ADC rate, Embench) are in `data/results/mspm0g3507.csv`.
+
+## If you see this
+
+- If you see `fatal error: 'main.h' file not found` (ported STM32 project), add `-I"${PROJECT_ROOT}/Inc"`: the initializer does not put `Inc/` on the include path.
+- If you see `error: unknown type name 'uint32_t'` in `Src/system_stm32g0xx.c`, add `#include <stdint.h>`: the port removed ST's header that pulled in `stdint.h`.
+- If you see `make` in `Debug/` stop with `invalid option -- O`, use `ccs/utils/bin/gmake -B all` from CCStudio: Apple's `make` is too old for the generated makefile.
+
+The rest, with causes, are in [FAQ.md](FAQ.md); then `AGENTS.md`, then `TRAPS.md` at the top of the repository.
+
+## Limits
+
+- The default terminal route (`./start.sh mspm0g3507 blink`) has no time on this board.
+- `tools/check/blink.py` has not been run on this board.
+- No backup or restore command is tested for this board.
+- The Path A run (CCStudio with Claude Code inside it) is still to do.
+
+## Where these facts come from
+
+Checked 2026-10-05 and 2026-10-06 on an Intel MacBook (Core i7-8750H, 16 GB), macOS 15.7.9, on one borrowed LP-MSPM0G3507 (probe <probe serial>). Tools: CCStudio 21.0.1, MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, SysConfig 1.26.3, xPack OpenOCD 0.12.0-7, Zephyr 4.4.2, DSLite from UniFlash 9.6.0.
+
+Sources: `data/results/mspm0g3507.csv`, `AGENTS.md`, `FAQ.md`, `mac-setup/README.md`.
+
+Public sources:
+
+- CCStudio AI chapter: <https://software-dl.ti.com/ccs/esd/documents/users_guide/index_ai.html>
+- CCStudio download: <https://www.ti.com/tool/download/CCSTUDIO>
+- MSPM0 SDK download: <https://www.ti.com/tool/download/MSPM0-SDK>
+- MSPM0 SDK on GitHub: <https://github.com/TexasInstruments/mspm0-sdk>
+
+==============================================================================
+FILE: mspm0g3507/FAQ.md | LP-MSPM0G3507 FAQ: STM32 and Arduino ports, touch display, Zephyr and benchmarks
+==============================================================================
+
+# LP-MSPM0G3507 FAQ: STM32 and Arduino ports, touch display, Zephyr and benchmarks
+
+Four topics on this page: (1) porting STM32 code to MSPM0 with TI's migration skill, (2) running Arduino code and libraries on the LP-MSPM0G3507, (3) driving the Waveshare 3.5inch Capacitive Touch LCD (screen, touch chip, LVGL graphics library, jumper wires) from the LP-MSPM0G3507, and (4) writing one app with DriverLib, TI Drivers and Zephyr.
+
+Every problem seen moving STM32CubeG0 examples to the TI LP-MSPM0G3507 LaunchPad development kit with TI's migration skill, running Arduino libraries on it, and driving the Waveshare 3.5inch Capacitive Touch LCD (ST7796S screen driver, FT6336U touch chip) from it, on 2026-10-06. Apple Silicon was not tested. Each answer starts with the fix, names the cause, and quotes the exact error text where it was saved. Versions: Intel Mac, macOS 15.7, CCStudio 21.0.1.00010, MSPM0 SDK 2.11.00.07, SysConfig 1.28.1 for the STM32 ports (1.26.3 for the Arduino layer), TI Arm Clang 5.1.1.LTS. 1 kB = 1,024 bytes on this page.
+
+The write-ups behind these answers: [STM32 port evaluation](stm32-port-eval/README.md) and [Arduino compatibility layer](../portability/arduino/README.md), with its pin map and library versions in [arduino-compat/DETAILS.md](../portability/arduino/DETAILS.md). Words used here are in [docs/vocab.md](../docs/vocab.md). Display and LVGL write-ups: [display-test](display-test/README.md) and [LVGL on the G3507](lvgl-g3507/README.md). The display module carries a TXS0108E level translator (a chip that converts signal voltages) between its header and the screen.
+
+**What caused it**, one tag per answer:
+
+| Tag | Meaning |
+|---|---|
+| Our mistake | A mistake made during these runs. Listed so you do not repeat it |
+| Setup or handling | How the hardware or the workspace was set up |
+| TI example default | A TI example's default works on TI's bench but not for this job |
+| Tool or docs | A TI tool bug, a missing tool, or a missing or wrong instruction |
+| Chip limit | The silicon cannot do it |
+| Third-party behavior | ST code, Arduino libraries, OpenOCD, Claude Code, macOS: software that is not TI's |
+| Unknown | Not found. "Unknown (suspected: ...)" names the lead |
+
+Numbers seen on the board over the debugger or the serial port on 2026-10-06 were not saved to a file unless an entry names one. Button presses in those tests were made by the debugger driving the button pin, not by a finger.
+
+Contents: [Running TI's migration skill](#running-tis-migration-skill), [What the skill changes in your code](#what-the-skill-changes-in-your-code), [Building and running the ported projects](#building-and-running-the-ported-projects), [The Arduino layer](#the-arduino-layer), [Display: wiring and power](#wiring-and-power), [The screen](#the-screen), [The touch chip](#the-touch-chip), [LVGL](#lvgl), [Flashing and the Mac](#flashing-and-the-mac), [DriverLib, TI Drivers and Zephyr](#driverlib-ti-drivers-and-zephyr), [Checks that mislead](#checks-that-mislead).
+
+## Getting started: the first blink
+
+### Which Claude plan is enough for the blink steps, and what does it cost?
+
+Not tested: no plan was compared. **Tag: Unknown.** The steps use Claude Code's ordinary chat and tool calls, nothing plan-specific; Anthropic's own pricing page is the place to read current plans and prices, and CCStudio's AI panel also accepts an API key instead of a subscription (TI's CCStudio AI guide, read 2026-10-09).
+
+### Can you blink the LP-MSPM0G3507 without an AI assistant, or with an assistant other than Claude Code?
+
+Yes without one: in CCStudio, import TI's `gpio_toggle_output` example, build it and press Debug, then Resume, as TI's own guide says; or from a terminal, build it with the SDK makefile and flash it with OpenOCD, the route timed on the LP-MSPM0L1306 (3.3 s build, 0.6 s flash). **Tag: Unknown.** Only Claude Code was tried; TI's guide names Codex as the other assistant it tested, and Codex was not run. Source: `mspm0l1306/README.md`, "First blink from a terminal".
+
+### Does the blink recipe work on an Apple Silicon Mac, on Windows or on Linux?
+
+Every step was timed on one Intel MacBook on macOS 15.7.9. **Tag: Unknown.** TI's download page offers CCStudio 21.0.1 for all three systems and the MSPM0 SDK for each; on Apple Silicon CCStudio runs through Rosetta 2, which Apple says it stops supporting fully after macOS 27 (`mspm0g3507/README.md`). The paths in step 6's server file are macOS paths and change on the other two. Source: `site/data/start-here.json`, "also needed".
+
+### The Mac sees nothing after the LP-MSPM0G3507 is plugged in. Is the cable charge-only?
+
+Try another micro-USB cable: a charge-only cable looks the same and the board will not appear. **Tag: Setup or handling.** With a data cable the Mac shows an XDS110 debug probe and two serial ports with no driver to install; `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e` lists the probe. A USB-C-only Mac also needs an adapter: an LP-MSPM0G3507 box held a cable with a USB-A plug on the computer end.
+
+### The LP-MSPM0G3507 started blinking as soon as it was plugged in, before anything was done. Why?
+
+That is the program already on the board: TI's out-of-box demo on a new board, or a previous owner's program on a used one. **Tag: Setup or handling.** It shows the board has power, not that your tools work, which is why the recipe's first prompt changes the blink instead of only loading one. A used board can be blinking another user's program on plug-in.
+
+## Running TI's migration skill
+
+### Where is TI's STM32 to MSPM0 migration skill, and why is it not in the CCStudio AI docs?
+
+It is in the CCStudio install at `/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/ai/skills.alpha/ti-ccstudio-migrate-to-ti`. Copy that folder into `<CCStudio workspace>/.claude/skills/`. **Tag: Tool or docs.** The skill is marked "EVALUATION USE ONLY". Checked 2026-10-06 on CCStudio 21.0.1.
+
+### A headless run stops with "Claude requested permissions to use mcp__ccs-project__changeSysConfigVersion, but you haven't granted it."
+
+Leave CCStudio's `.claude/settings.local.json` out of the run, or run the skill in an interactive run and approve the prompt. **Tag: Tool or docs.** CCStudio writes that settings file with the tool on the "ask" list, while the skill's own instructions say to call it without asking for a fresh project. A headless run treats "ask" as denied, even in bypass mode.
+
+### The skill's SysConfig step fails on `<<<<<<< HEAD` in its own instructions
+
+Delete that line. It is line 92 of `skills.alpha/ti-ccstudio-migrate-to-ti/agents/sysconfig-configurator.md`. **Tag: Tool or docs.** The file ships with a git merge-conflict marker and no partner marker. In the run, the orchestrator edited its copy and retried; the file in the CCStudio install is unchanged.
+
+### A run ended with `[Request interrupted by user]` and nobody pressed anything
+
+Resume it with the skill's resume prompt: `/ti-ccstudio-migrate-to-ti Resume the migration of <path> to MSPM0G3507 ...`, with CCStudio open. **Tag: Unknown.** A chained unattended script that is killed or times out ends a delegated run this way. Resuming built both interrupted projects, one in 8.1 minutes and one in 33.4 minutes.
+
+### A resumed run says the plan belongs to a different migration
+
+Point it at the backup named `migration-plan-before-<next run>.md`, which holds the earlier plan. **Tag: Setup or handling.** The skill keeps one active `migration-plan.md` at the workspace root, and a later migration overwrites it. A resume can find the right plan in a backup file, use it, and put the root plan back. Keep one workspace per migration.
+
+### The skill's project-initializer step sits for minutes waiting for generated files
+
+Check that CCStudio is responsive, and resume the run if it stops. **Tag: Unknown.** In one run the initializer's second tool call took 3.7 minutes, and it then polled for 5 minutes for a file that never appeared, before the run was interrupted. The resumed run imported the project without trouble. Two other runs finished the whole import in 5.5 and 4.4 minutes. Whether CCStudio was busy or stuck was not checked. Source: `stm32-port-eval/03-gpio-exti/README.md`.
+
+## What the skill changes in your code
+
+### The port moved the pins: PA4 became PA27, PA11 became PA12, the LED moved from PA5 to PA0
+
+Read the report's pin table and rewire. **Tag: Tool or docs.** The skill chooses pins instead of translating them, and logs the change in the report. In port 04 the ADC input moved from PA4 to PA27 with no prompt. In port 05 channel 4 moved from PA11 to PA12 because PA11 cannot carry that timer output on this package. In port 02 the plan said to keep PA2 and PA3 for the serial port, but neither is a valid UART pin on the LQFP-64(PM) package, so the configurator used the kit's USB-serial pins PA10 and PA11.
+
+### A ported button interrupt never fires on the LaunchPad
+
+Check which way your button pulls. **Tag: Tool or docs.** The skill copied ST's active-low setup (internal pull-up, falling edge) onto S1 (PA18), which on the LP-MSPM0G3507 is active-high, so the pin already rests high and a press cannot make a falling edge. In port 03, driving S1 low toggled LED1 each time, and driving it high toggled nothing. Port 04 kept the same logic. The fix, tested in both ports: set PA18 to pull-down and rising edge in SysConfig (`stm32-port-eval/03-gpio-exti/fixed/fix.diff`); after it, each active-high press toggled LED1. S2 (PB21) is active-low and matches ST's setup, which is why port 02's button worked. Seen 2026-10-06 over the debugger, not saved.
+
+### The CPU clock changed from 56 MHz to 32 MHz, or differs from port to port
+
+Set the clock yourself in SysConfig if timing matters. **Tag: Tool or docs.** Port 01's planner removed the clock setup under a rule of "don't configure the clock unless the source needs a specific frequency", so the chip ran at its 32 MHz default instead of 56 MHz. Ports 02 to 05 reproduced 56 MHz. Each reason is written down, but the rule is not the same from port to port.
+
+### The skill dropped part of the program, and the report says "None identified"
+
+Read the end-of-run summary and diff the source. **Tag: Tool or docs.** The skill only makes one-to-one API swaps. In port 04 it deleted the code that turns counts into millivolts and degrees. In port 05 it deleted the error LED. In port 02 a fixed 100 microsecond delay replaced the wait on the transmit-empty flag. The report's "Unsupported features" table says "None identified" for all three.
+
+### A ported button handler would fire several times for one press of S2
+
+Add a software debounce of 200 to 300 ms: ignore further edges for that time after the first. **Tag: Tool or docs.** The port 02 report says S2 bounces and needs that debounce, and says it was not implemented, because the skill allows only one-to-one API replacements. ST's source has none either, so the port adds none. Nobody pressed S2 with a finger, so no double messages were seen. Source: `stm32-port-eval/02-usart-tx-vcp/migration-report.md`.
+
+### A ported ADC reads the supply, not ST's internal reference (`VREFINT`)
+
+Treat that channel as a supply reading, and add a real reference measurement yourself if you need one. **Tag: Unknown (suspected: Chip limit).** The skill found no one-to-one MSPM0 channel for ST's `VREFINT` (an internal reference of about 1.2 V), so it used channel 15, the supply monitor, with a 1.4 V reference (SysConfig's default), and flagged this for review in the report. That channel measures VDD / 3, so counts are not comparable with ST's. Port 04 read 3,210 counts, which is 3.29 V by 3,210 / 4,095 x 1.4 V x 3. Not checked: the data sheet's channel list. Seen 2026-10-06, not saved.
+
+### The ported file still has STM32 comments, and the report contradicts itself
+
+Ignore them or delete them. **Tag: Tool or docs.** Port 01 keeps ST's comment "STM32G0xx HAL library initialization ... Systick timer is configured by default" above `SYSCFG_DL_init()`, which does neither. The report's memory row reads "RAM | 36 KB | 32 KB | 🔴 Low" for a program that uses 512 bytes, because it compares the two chips' totals. Port 04's report says in one row that the build "will fail" and in another that it passed.
+
+### The report says "hardware testing pending". Does the port work?
+
+Not known until you run it. **Tag: Tool or docs.** The skill ends at "build verified" and never flashes. Its companion skill `ti-ccstudio-test-migration` would test on hardware; it was not run, and the ports were tested by hand instead.
+
+### TI's driver header says the 56 MHz bus clock "should always remain under 40MHz". Is the generated clock setup out of spec?
+
+Not shown either way. **Tag: Unknown (suspected: Tool or docs).** Ports 02, 03, 04 and 05 set `DL_SYSCTL_setULPCLKDivider(DL_SYSCTL_ULPCLK_DIV_1)` at a 56 MHz CPU clock, which puts the UART and timer bus clock at 56 MHz. The port 02 UART printed correctly at 115,200 baud, and the port 05 channel 4 duty cycle measured near the expected value (a duty cycle does not show the frequency). That is partial evidence, not proof. Not checked: the data sheet limit for those peripherals, or a measured frequency.
+
+### The skill could not read the LED and button pins
+
+Clone the ST repository with its submodules. **Tag: Our mistake.** The run cloned only the examples, without `Drivers/BSP/STM32G0xx_Nucleo/`, so the analyzer could not read ST's `LED4_PIN` and button definitions and fell back to defaults (LED1 on PA0, S1 on PA18). Ports 03, 04 and 05 were affected.
+
+## Building and running the ported projects
+
+### The first build fails with `fatal error: 'main.h' file not found`
+
+Add `-I"${PROJECT_ROOT}/Inc"` to the compiler's include path. **Tag: Tool or docs.** The project initializer copies the whole ST project, including ST's interrupt, clock and C-library stubs, and does not put `Inc/` on the include path. The build agent fixed this in every port, so on an STM32CubeIDE project the first build always fails. Seen in ports 01 to 05.
+
+### The build fails with `error: unknown type name 'uint32_t'` in `Src/system_stm32g0xx.c`
+
+Add `#include <stdint.h>` to that file. **Tag: Tool or docs.** The skill removes ST's `stm32g0xx.h` include, which had pulled in `stdint.h` indirectly, and does not add the standard header back. The port 03 build verifier made this fix on its second attempt. Source: `stm32-port-eval/03-gpio-exti/migration-report.md`.
+
+### `make` in `Debug/` stops with `invalid option -- O`
+
+Use the `gmake` that ships with CCStudio, at `ccs/utils/bin/gmake`. **Tag: Tool or docs.** The generated makefile needs GNU make 4, and Apple's `make` is older. `gmake -B all` built ports 04 and 05 from a terminal with the same output as the IDE build.
+
+### The ADC port converts once, then stalls: DMA never moves the results and later button presses do nothing. What is the fix?
+
+Make three corrections to the skill's output in `main.c` and the SysConfig file. **Tag: Tool or docs.** All three came from what the skill generated. (1) The DMA source was the ADC's FIFO address (`DL_ADC12_getFIFOAddress`), but FIFO mode is never enabled, so nothing is written there. Use the result registers: `DL_DMA_setSrcAddr(DMA, DMA_CH0_CHAN_ID, (uint32_t) DL_ADC12_getMemResultAddress(ADC12_0_INST, ADC12_0_ADCMEM_0))`, and in SysConfig set the DMA address mode to block-to-block (`b2b`, so the source address steps up), source width WORD (the result registers are 32 bits) and destination width HALF_WORD. (2) The generated start-up code calls `DL_ADC12_setDMASamplesCnt(ADC12_0_INST, 0)`, which is zero results per DMA trigger, so DMA moved nothing. Call `DL_ADC12_setDMASamplesCnt(ADC12_0_INST, 1)` before starting the DMA channel; TI's own SDK examples use 1 or 6 (MSPM0 SDK 2.11.00.07, `examples/nortos/LP_MSPM0G3507/driverlib/adc12_14bit_resolution` and `adc12_max_freq_dma`). (3) The skill kept ST's active-low button logic on S1 (PA18), which is active-high on this LaunchPad. Set PA18 to pull-down with a rising-edge interrupt (see the button question above). What the skill's version did: at start-up the ADC converted all three channels once, as its result registers (`MEMRES`) showed over the debugger, because the DMA buffer in RAM stayed at its starting fill value. The supply-monitor register read 3,210 counts, which is 3.29 V by 3,210 / 4,095 x 1.4 V x 3 (that channel measures VDD / 3). After that the DMA and ADC interrupts never fired (checked with breakpoints), and the ADC stayed disabled (`CTL0` = 0, the ADC's control register). That run was observed 2026-10-06 and not saved. With the three corrections the project builds (2.9 kB of code, 16 more than the skill's 2,904) and, with the debugger simulating presses (PA18 driven high for 40 ms, then released), the DMA buffer held 0x0000, 0x0330 and 0x0c86: channel 0 (PA27) 0 counts (what is wired to the pin was not checked), the temperature sensor 816 counts, and the supply monitor 3,206 counts, which is 3.29 V by the same arithmetic. A hardware breakpoint on `HAL_ADC_ConvCpltCallback` was hit, so the DMA done callback runs. One difference from ST's example remains: the MSPM0 sequence converts all three channels every time it starts, where ST's example converts one channel per button press in discontinuous mode. The count-to-millivolt and count-to-degrees code is still deleted, and nobody pressed S1 by hand. Source: `stm32-port-eval/04-adc-multichannel/fixed/fix.diff` (against the skill's version).
+
+### The PWM port and a serial program both want PA10. Can they run together?
+
+No, not as ported. **Tag: Setup or handling.** Port 05 puts PWM channel 2 on PA10, which on the LP-MSPM0G3507 is also the USB-serial transmit path (jumper J21, the jumper that routes PA10 to the XDS110 serial chip, was up during the test), so anything on PA10 reaches the serial bridge. Port 02's serial port (UART0 on PA10 and PA11) uses the same pin. Move one of them to another pin in SysConfig; this was not run. Source: `stm32-port-eval/05-tim-pwm/README.md`.
+
+### The report gives the PWM frequency as 24390.24 Hz. Is that exact?
+
+Treat it as about 24,390 Hz, possibly 24,380 Hz, until it is measured. **Tag: Unknown (suspected: Tool or docs).** The report divides 56 MHz by 2296, the SysConfig field. The `LOAD` register read 2295 on the board, and a down-counting timer from 2295 to zero is 2,296 ticks, which matches. If the hardware spends one more tick at the reload, the period is 2,297 ticks. The difference is 0.04%. Not checked: the TI reference manual, or a frequency measured with a scope or logic analyzer.
+
+## The Arduino layer
+
+### `fatal error: 'Print.h' file not found` when building Arduino_GFX
+
+Add ArduinoCore-API's `api/deprecated/` folder to the include path, and `api/deprecated-avr-comp/` for `<avr/pgmspace.h>`. **Tag: Third-party behavior.** `Arduino_GFX.h` includes `<Print.h>`, a legacy top-level header that only old cores provide. ArduinoCore-API ships wrappers in those two folders.
+
+### The compiler says an exception specification does not match for `atexit`
+
+Build with `-DHOST`. **Tag: Third-party behavior.** `api/Common.h` declares `int atexit(void (*)()) __attribute__((weak))`, and TI's `stdlib.h` declares it with a C++14 exception specification. `-DHOST` makes the header skip its own declaration. The exact compiler text was not saved.
+
+### A warning about `main` being declared `extern "C"`
+
+Build with `-Wno-main`. **Tag: Third-party behavior.** The same ArduinoCore-API header declares `main` that way. As a side effect `main` is weak, which changes nothing here.
+
+### `SPIClass` is ambiguous
+
+Name your class something else and derive from `HardwareSPI`. **Tag: Our mistake.** The first `SPI.h` defined its own `SPIClass`, and ArduinoCore-API already has `typedef HardwareSPI SPIClass` in namespace `arduino`. The class is now `MspSPI`. Deriving from `HardwareSPI` forces four interrupt methods this layer does not support; they stop at a breakpoint (`compat_unsupported`) instead of pretending to work.
+
+### Adafruit_BusIO does not compile: no `digitalPinToPort`, `portOutputRegister`
+
+Define the AVR-style port macros in `Arduino.h`. **Tag: Third-party behavior.** `Adafruit_BusIO`'s software-SPI file expects them on any ARM board. The layer's macros are backed by `DOUT31_0` and `DIN31_0`. Neither sketch uses that code path, so the macros have not run.
+
+### A function in a sketch is "not declared" although the Arduino IDE accepts it
+
+Generate the prototypes from the preprocessed sketch. **Tag: Our mistake.** Arduino sketches rely on the IDE adding function prototypes. The first `tools/ino2cpp.py` read the raw text and missed `serialOut()`, whose signature sits inside an `#ifdef`. It now runs the preprocessor first, as the IDE does.
+
+### The link fails on the compiler builtins, or the program runs out of stack or heap
+
+Link with `-llibclang_rt.builtins.a`, and give the program a 2 kB stack and a 4 kB heap. **Tag: Tool or docs.** The TI linker takes `-l` plus a file name, so `-lclang_rt.builtins` does not find it. SysConfig's generated linker file asks for only a 512-byte stack and no heap, too small for C++ and `new`. `build.sh` copies the file to `out/linker.cmd` with the larger sizes.
+
+### The screen shows noise, or nothing, with Arduino_GFX's default SPI mode
+
+Ask for SPI mode 0, as the sketch's display header does. **Tag: Unknown (suspected: Third-party behavior).** For a board it does not know, `Arduino_HWSPI` picks SPI mode 2, and `Arduino_ST7796::begin` sets a mode only for a few boards. The module's ST7796S is specified for modes 0 and 3. `pdqgfx_libmode`, the build that keeps mode 2, was not run, so it is not known whether mode 2 fails on this module.
+
+### Arduino_GFX starts at 24 MHz SPI, faster than the panel allows
+
+Define `F_CPU` in `variant.h`. **Tag: Third-party behavior.** `SPI_DEFAULT_FREQ` is 24 MHz on unknown boards unless `F_CPU` is defined, and the panel's limit is 15 MHz. With `F_CPU` set to 32000000UL the library uses `F_CPU / 4`, 8 MHz.
+
+### OpenOCD reports a CRC mismatch after `program <file> verify`, but the program runs
+
+Leave `verify` off the command. **Tag: Unknown (suspected: Third-party behavior).** On these images `program ... verify` reported a CRC mismatch (exact text not saved), while programming without it and running worked. OpenOCD's quick checksum check also fails on other MSPM0 images, then falls back to a full read-back that passes; see the OpenOCD entry in [mspm0l1306/FAQ.md](../mspm0l1306/FAQ.md). These images were not read back, so a real mismatch is not ruled out.
+
+### `micros()` is 1,725 microseconds ahead of `millis()` in `shimcheck`
+
+Probably nothing: read both counters together before you print. **Tag: Unknown (suspected: Our mistake).** One reading, not saved, printed `millis=1000 micros=1001725`, a 0.17% gap. The sketch reads `millis()`, then prints about 19 characters before it reads `micros()`. At 115,200 baud that print takes about 1.65 ms, close to the gap. Not checked: both counters read back to back, or against an outside clock.
+
+### Holding S1 does not stop the LED blinking in `shimcheck`
+
+No fix was run, and the sketch as written cannot show an S1 press. **Tag: Our mistake.** S1 is active-high on this LaunchPad, but the sketch sets S1 to `INPUT_PULLUP` and toggles the LED only while S1 reads HIGH, so it stops only if S1 reads low. Unpressed reads high (pull-up), and pressed should also read high, so the LED keeps toggling either way. Measured: the unpressed readings were `S1=1 S2=1`. Not measured: S1 pressed. A fix to try, not run: set S1 as a pull-down input and stop the LED when it reads high, or test S2 (active-low) instead.
+
+### Arduino_GFX fills the screen in 0.51 s, and the hand-written driver does it in 0.365 s
+
+Not fixed. **Tag: Unknown (suspected: Our mistake).** Five fills took 2.55 s at 8 MHz SPI. The suspected cause is the layer's `SPI.transfer` loop, which runs full duplex for every byte. No version with that loop changed was compared.
+
+### `analogRead`, `analogWrite`, `tone`, `attachInterrupt` or `Serial1` will not compile or link
+
+Write that part with TI's DriverLib. **Tag: Our mistake.** These calls were not written, a scope choice, and whether the chip can support each was not checked. From reading the headers, not from a saved build: `analogRead`, `analogWrite`, `tone` and `attachInterrupt` are declared in ArduinoCore-API's `api/Common.h` and defined nowhere in this core, so a sketch that calls one should compile and then fail at link with an undefined reference. `Serial1` is declared nowhere, so it should fail at compile. The exact error text was not saved. The SPI class's `usingInterrupt`, `notUsingInterrupt`, `attachInterrupt` and `detachInterrupt` methods compile and stop the program at a breakpoint (`compat_unsupported`), and a pin number that does not exist stops at `compat_bad_pin`.
+
+### `Serial.printf` does not compile
+
+Use `Serial.print` and `Serial.println`, or `snprintf` into a buffer. **Tag: Third-party behavior.** ArduinoCore-API's `Print` does not define `printf`, and this layer does not add one.
+
+### Why is a screen-drawing sketch 75.6 kB?
+
+Expect that from Arduino_GFX. **Tag: Third-party behavior.** The library's classes keep every drawing method alive through their virtual tables, so 47.4 kB of `pdqgfx` is the library. The linker map shows `Arduino_GFX.cpp` and `Arduino_TFT.cpp` each carry their own copy of the 1.2 kB default font, about 1.25 kB wasted. `-Os` gave 49.7 kB. `LITTLE_FOOT_PRINT` was not run.
+
+## Wiring and power
+
+### Which Waveshare 3.5 inch screen is this: the capacitive touch one or the resistive one?
+
+The capacitive one, sold as the "3.5inch Capacitive Touch LCD". **Tag: Setup or handling.** Its touch chip is a FocalTech FT6336U on I2C address 0x38: the registers read vendor `0x11`, chip `0x64`, firmware `0x12` from registers A8, A3 and A6 (observed 2026-10-06; not saved). Waveshare's listing has a resistive sibling; the resistive model was not tested and is a different touch chip. `mspm0g3507/display-test/README.md`.
+
+### Why does the picture say 3.3 V and not 5 V for the screen's VCC?
+
+Because the kit's pins are 3.3 V, and Waveshare says the supply and signal voltage must match. **Tag: Setup or handling.** The module's VCC pin takes 3.3 V or 5 V. The schematic puts the translator's chip-side voltage on a 3.3 V rail the module makes from VCC, so wiring VCC to the kit's 3V3 (J1 pin 1) keeps both sides the same. 5 V was not run, so what it does is not known.
+
+### Which /dev/cu device is the board's serial port?
+
+The one whose name ends in 1, for example `/dev/cu.usbmodemMG3500011` for a probe with serial `MG350001`. **Tag: Setup or handling.** The kit's debug probe shows up as two serial ports. The one ending in 1 is the chip's UART (UART0, 115200 8N1); the one ending in 4 is not used here. List them with `ls /dev/cu.usbmodem*`. Source: `mspm0l1306/FAQ.md` for the same probe family.
+
+### Which jumper wire goes where?
+
+Use the numbered picture: display-g3507-wiring.png shows all 12 wires (13 with MISO) on the board drawing, with pin names and header pin numbers. **Tag: Setup or handling.** Unplug USB before moving any wire. The two loop tests that need one wire each are DAC to ADC and the UART loopback; the PWM check loop is PA12 to PA13.
+
+## The screen
+
+### The screen stays dark or shows static, even though every wire is right. What is wrong?
+
+Wait about 10 µs after chip select goes high before the next command. **Tag: Unknown (suspected: Third-party behavior).** Measured: each command sent alone took effect, but the second of two back-to-back commands was lost, and "display on" was always the second one. A 10 µs gap fixed it, and a slower SPI clock did not. The suspect is the module's TXS0108E not passing the few-hundred-nanosecond chip-select pulse; no scope was used to check. To see it yourself, wire MISO (J2 pin 14, PB7) and read the power-mode register `0x0A` after each command: `0x9C` means awake with the display on. `cs_gap()` in `mspm0g3507/display-test/display_test.c`.
+
+### The colors are inverted, black shows as white. How do you fix it?
+
+Send command `0x21` (display inversion on) after sleep out. **Tag: Unknown (suspected: Third-party behavior).** The init sends it, and its comment says this IPS panel needs it. No picture of the screen without it was saved, so the inverted state is not recorded. `CMD(0x21)` in `display_test.c` and `port.c`.
+
+### 16-bit SPI frames are silently ignored and the picture is garbled. Why?
+
+Switch the SPI block off, set the frame size, then switch it back on. **Tag: Tool or docs.** Calling `DL_SPI_setDataSize` while SPI is enabled does nothing and returns no error, and the documentation does not say it needs the block disabled. 16-bit frames are what make the full-screen fill about 8% faster than 8-bit frames (168.1 ms against 182.5 ms at 16 MHz). `frames16()` in `lvgl-g3507/src/port.c`.
+
+### A SysConfig clock line is ignored and the chip stays at 32 MHz when 80 MHz is requested. Why?
+
+Remove `SYSCTL.forceDefaultClkConfig` and set the clocks through the clock tree. **Tag: Tool or docs.** With that line left in, SysConfig accepted every clock setting without a warning and generated 32 MHz code. The fix used a copy of TI's `sysctl_mclk_syspll` clock tree (`display80.syscfg`), then read `CPUCLK_FREQ` in the generated `ti_msp_dl_config.h` to confirm.
+
+### Is 40 MHz SPI safe for this panel?
+
+It worked here, but the margin is not known. **Tag: Unknown (suspected: Setup or handling).** The panel's data sheet allows about 15 MHz writes (66 ns minimum cycle), so 40 MHz is about 2.7 times that. 64 of 64 pixels read back correctly at 40 MHz SPI with an 80 MHz CPU clock. Only one row was read back, the screen was not checked by eye at 40 MHz, and longer wires and a second module were not run. If the screen shows noise, use 20 MHz.
+
+### The screen takes 370 ms to be ready after power-up. Can that be shorter?
+
+Yes: 12 ms with the shortest waits the ST7796S data sheet allows. **Tag: Setup or handling.** The usual init waits 120 ms after reset, after the software reset and after sleep out, copied from common drivers; that was 370.2 ms to a ready screen. The fast option (`-DFAST_BOOT` in `display_test.c`) measured 12.2 ms, and the power-mode register read `0x9C` (awake, display on) after it too. A first full frame then took 180 ms at 16 MHz SPI against 538 ms with the usual init. The chip itself starts in 0.26 to 0.31 ms (data sheet SLASEX6C).
+
+## The touch chip
+
+### The touch chip does not answer on I2C1 at address 0x38. Is it dead?
+
+No. Drive the two pins as software I2C instead. **Tag: Unknown (suspected: Third-party behavior).** With the I2C1 block every read of 0x38 failed: first not acknowledged, later the controller reported the bus busy. The same pins as plain open-drain GPIO at about 100 kHz got an acknowledgement and correct registers every time. The suspect is the module's translator on an open-drain bus. `display-test/README.md`, trap 2.
+
+### Adding a pull-up to the I2C pin leaves the line never going low. What happened?
+
+Call `DL_GPIO_enableHiZ` again after `DL_GPIO_initPeripheralInputFunctionFeatures`. **Tag: Our mistake.** That function rewrites the whole pin register and clears the open-drain setting SysConfig's code had set with `DL_GPIO_enableHiZ`. Fixing it alone did not make the I2C block work on this module.
+
+## LVGL
+
+### LVGL on a 2 kB stack shows `stack_free=0` or behaves oddly. What stack does it need?
+
+Use 6 kB. **Tag: Our mistake.** The first build used 2 kB and the paint check read `stack_free=0`. The firmware paints the stack with `0xA5A5A5A5` at boot and counts the untouched bytes. With 6 kB, 2.1 kB stayed untouched on both builds, so the measured peak is 3.9 kB. Nobody used the touch screen in those runs, so the peak does not cover the button, slider and full-redraw paths.
+
+### Does LVGL fit in 32 kB of RAM?
+
+Yes, trimmed: 25.1 kB of RAM with a 12 kB heap, 6 kB stack and a 6.2 kB draw buffer. **Tag: Unknown (suspected: Chip limit).** Flash is the tight resource: the demo uses 125.4 kB of 128 kB at 32 MHz (126 kB at 80 MHz) after removing a font and several drawing features, and the same demo with a second font needs 146.7 kB. Other trims and an older LVGL were not run. `lvgl-g3507/README.md`.
+
+### What had to be cut for LVGL to fit in the 128 kB flash?
+
+A second font and several drawing paths. **Tag: Unknown (suspected: Chip limit).** The full demo with Montserrat 20 added is 146.7 kB against 128 kB of flash. Dropping Montserrat 20 saves 21.3 kB. The size patch (`size-patch.diff`, switched on by `LV_DRAW_SW_SLIM` in `lv_conf.h`) removes shadow, blur, layer, triangle, mask-rectangle and image drawing and the image decoder, and saves 19.7 kB with the font in both builds. Anything that draws an image, a shadow or a layer draws nothing for that part. An older LVGL, other trims and another graphics library were not run. `lvgl-g3507/README.md`, "What did not fit".
+
+### The serial stats line from the LVGL demo is cut off in the middle. Is the serial link dropping characters?
+
+No, the demo's own code cut it. **Tag: Our mistake.** The firmware built each line in a 160-byte buffer (`static char line[160]` in `lvgl-g3507/src/app.c`) and the line is 176 to 179 characters. The buffer is now 256 bytes, and the two runs with the full line (32 MHz and 80 MHz) hold 19 complete lines each. The older logs without it are cut at the end of each line.
+
+### The LVGL stats show the CPU busy at 101 to 105%. How can it be above 100%?
+
+Read it as "the CPU is saturated". **Tag: Unknown (suspected: Our mistake).** `busy` is refreshes per second times the average refresh time, divided by a fixed 1,000 ms: 7 x 145.0 ms is 1,015 ms, shown as 101%. That arithmetic matches `busy` within 1 point on all 38 saved lines. Seven refreshes of 145 ms cannot fit in 1,000 ms, so the real stats window was a little over one second. The suspected cause is that the once-a-second timer runs after a refresh that is already under way; the `t=` counter skips a second twice in the 32 MHz log. The window length was not logged. A refresh is one LVGL pass that redraws only the changed areas, about 12,000 to 25,000 pixels of the screen's 153,600, so refreshes per second are not full-screen frames per second.
+
+### Can code run from external memory to get past the 128 kB flash limit?
+
+No. **Tag: Chip limit.** The MSPM0G3507 data sheet lists no external memory bus or quad-SPI interface, so code must fit in its 128 kB of flash. External SPI flash or the display's SD slot can hold pictures, fonts and logs, streamed in over SPI. The LP-MSPM0G3519 has 512 kB of flash and 128 kB of RAM. `display-test/README.md`.
+
+### The touch chip reports ID 0 instead of 0x11, and every touch reads as zero. Why?
+
+The two touch pins are still assigned to the I2C1 block, so software I2C toggles nothing and reads zeros. Switch them to plain GPIO with pull-ups first (`DL_GPIO_initDigitalOutput`, then `DL_GPIO_initDigitalInputFeatures` with `DL_GPIO_RESISTOR_PULL_UP`, then `DL_GPIO_clearPins`), as `display-test/display_test.c` does before it reads touch. **Tag: Our mistake.** The BitNetMCU touch demo (`fox-red-labs/ports/bitnetmcu/touch/`) copied the driver but not that setup, and read ID 0 until it was added.
+
+### Is BitNetMCU faster on the LP-MSPM0G3507 with its inner loops in SRAM?
+
+No, keep them in flash: 2.95M against 2.64M cycles per digit at 32 MHz, and 2.96M against 2.75M at 80 MHz. **Tag: Unknown (suspected: the Cortex-M0+ fetches instructions and data over one bus, so code in SRAM competes with its data).** The BitNetMCU author runs them from SRAM on WCH's CH32V002 to avoid flash wait states. Source: `fox-red-labs/ports/bitnetmcu/README.md`.
+
+## Flashing and the Mac
+
+### OpenOCD's `program ... verify` fails about every other time on the LP-MSPM0G3507. What do you do?
+
+Run it again; the next attempt passes. **Tag: Unknown (suspected: Third-party behavior).** Flashing BitNetMCU images on 2026-10-06, about every second `program` ended in `** Verify Failed **` and the next one gave `** Verified OK **`; `fox-red-labs/ports/bitnetmcu/mspm0/run.sh` retries up to three times. Not traced further.
+
+### OpenOCD prints "Error: checksum mismatch - attempting binary compare" while flashing the LVGL image. Did it fail?
+
+Not necessarily: read the next line. **Tag: Unknown (suspected: Third-party behavior).** On the MSPM0L1306 and G3507, OpenOCD's quick checksum fails on the images flashed here and it falls back to reading the image back, which prints `** Verified OK **` when it passes (`mspm0l1306/FAQ.md`). Another page here suspects padding between sections (`portability/arduino/README.md`). The LVGL images were flashed without `verify` and ran, but the verify output was not saved for them, so padding is not confirmed.
+
+## DriverLib, TI Drivers and Zephyr
+
+These come from building one small app (ADC reading, serial line, LED) three ways on this board and the LP-MSPM0L1306 on 2026-10-07: [portability/three-ways/README.md](../portability/three-ways/README.md). MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, Zephyr 4.4.2. The four G3507 images were built, not run on the board.
+
+### A TI Drivers image on the G3507 carries the DMA driver, and the app never uses DMA. Why?
+
+TI builds the G3507 driver library with UART DMA support, so the UART driver brings the DMA driver in: 1.3 kB of code, 56 bytes of constants and 77 bytes of RAM in the no-RTOS build. **Tag: Unknown (suspected: Tool or docs).** The L1306's library (`drivers_mspm0l11xx_l13xx.a`) is built with `-DUART_NO_DMA` in its `.mak` file under `source/ti/drivers/lib/ticlang/m0p/` and carries no DMA driver; the G3507's `.mak` file has no such flag. Rebuilding the G3507 library without DMA was not run. Numbers from the module summary in `portability/three-ways/maps/tidrivers-g3507-nortos.map`.
+
+### A TI Drivers program sends binary on the serial port instead of text. Why?
+
+This was seen on the LP-MSPM0L1306, not on this board; the answer is in the [LP-MSPM0L1306 FAQ](../mspm0l1306/FAQ.md), "My TI Drivers program on the L1306 sends binary at 115200 instead of text". **Tag: Unknown (suspected: Our mistake).** The suspect there is the hand-ported configuration, since TI ships no TI Drivers example for that chip. The same build on the G3507, where TI's own UART examples exist, is the check still to run; it has not been run.
+
+### Does Zephyr have an ADC driver for the MSPM0G3507?
+
+Not in Zephyr 4.4.2: its `drivers/adc` folder has no MSPM0 file, so call DriverLib for the ADC from your Zephyr app. **Tag: Third-party behavior.** Add `dl_adc12.c` and `dl_vref.c` to your `CMakeLists.txt` yourself, because Zephyr's MSPM0 Kconfig only switches on the GPIO, UART, timer and CAN parts of DriverLib. In the test app that DriverLib code is 30 of the 68 glue lines. Details in the [LP-MSPM0L1306 FAQ](../mspm0l1306/FAQ.md), "Does Zephyr have an ADC driver for the MSPM0?".
+
+### Do you need to call `UART_init()` before `UART_open` with MSPM0 TI Drivers?
+
+No: the MSPM0 SDK's UART driver has no `UART_init()`; it sets up its buffers inside `UART_open`. **Tag: Our mistake.** A missing `UART_init()` was suspected while chasing the L1306's unreadable output; `source/ti/drivers` of SDK 2.11.00.07 has no such function, so the suspicion was withdrawn.
+
+### Can you drop the C library heap from a no-RTOS TI Drivers build?
+
+No: keep a heap. **Tag: Our mistake.** The first note called the 2 kB heap unused, but `GPIO_init` (`source/ti/drivers/gpio/GPIOMSPM0.c`) creates a semaphore with `SemaphoreP_createBinary`, and the no-RTOS driver porting layer allocates it with `malloc` (`kernel/nortos/dpl/SemaphoreP_nortos.c`). How small the heap can go was not measured.
+
+### A TI Drivers GPIO table entry without a pin-mux index sets up PA0. Is that expected?
+
+Give every entry its pin-mux index, or mark it `GPIO_DO_NOT_CONFIG`. **Tag: Unknown (suspected: TI example default).** Read from the source, not run: `GPIO_init` takes the pin-mux index from each entry's low byte (`pincm = pinConfig & 0xFF`), and 0 is PA0's pin control register. TI's G3507 `adc_singlechannel` table has four entries without one (two ADC pins and the two UART pins). The first table copied that pattern for the LED and ADC entries; it was replaced before anything ran.
+
+### Moving a TI Drivers build from the G3507 to the L1306: which startup file does it need?
+
+`startup_mspm0l130x_ticlang.c` from the SDK's `source/ti/devices/msp/m0p/startup_system_files/ticlang/`, not the G3507's. **Tag: Our mistake.** The first L1306 no-RTOS build linked the G3507 startup file through a bug in the build script. Check the linker map: it names the startup file it used (`startup_mspm0l130x_ticlang.o` after the fix).
+
+## Checks that mislead
+
+### Does a PWM output show up on the board's USB serial port?
+
+No. Test it with a jumper and the debugger instead. **Tag: Chip limit.** A 24 kHz square wave is not valid serial data, and the USB serial bridge shows zero bytes (it likely discards malformed bytes instead of reporting them). A jumper from PA12 to PA13 gave a valid test: with the port running, PA13 read high in 88 of 600 debugger samples, 14.7% (plus or minus 2.8% at 95% confidence), against 12.5% duty for that channel on channel 4. Channels 1 to 3 were not measured.
+
+### The OpenOCD flash command reports a verify mismatch on a good image. Is the flash bad?
+
+Leave `verify` off the `program` command. **Tag: Tool or docs.** `program <file> verify` reported a false alarm on these images. Read the flash back another way if you need proof.
+
+### Holding S1 does not print `S1=0`. Why?
+
+S1 on this LaunchPad is active-high, so a held button reads 1. **Tag: Chip limit.** Check which way a button pulls before predicting what it reads. Switch outputs off before reading a pin, or two wires can look wrong.
+
+### How big a heap does LVGL need on the LP-MSPM0G3507?
+
+12 kB (10.3 kB usable) is enough for the touch demo. **Tag: Setup or handling.** The measured heap peak on the board is 8.5 kB. A 64-bit Mac run overstates it. `lvgl-g3507/README.md`.
+
+## Benchmark programs
+
+### Why does the LP-MSPM0G3507 drop triggers when it runs the C2000's FOC loop at 50 kHz?
+
+One float FOC step takes longer than a 50 kHz period on this chip, so the loop cannot run at that rate. Measured on the board with no missed period in 1,000, the highest rate is 4.26 kHz in software float, 10.94 kHz with MATHACL doing sine and cosine, and 70.80 kHz with the step rewritten in TI's IQmath fixed point on MATHACL (38.11 kHz in IQmath without MATHACL). **Tag: Chip limit.** The Cortex-M0+ has no floating-point unit, so every float operation in `foc.c` is a C library call. A dropped trigger is a PWM period that gets no new duty: the motor runs on the old value for that period. The program drops triggers that arrive while an interrupt runs and times each interrupt from a fresh trigger. If you write a motor loop for this chip, use IQmath with the MATHACL library: one step is 918 cycles against 14k in software float. TI Arm Clang 5.1.1 -O2, 80 MHz, code in flash, measured 2026-10-08. Page: `mspm0g3507/mcu-bench/ctrl/README.md`.
+
+### Why is the LP-MSPM0G3507's software-float FOC loop slower above 7 radians?
+
+The C library's `sinf` and `cosf` take a longer path for angles above 9π/4 (7.07 rad): about 3.8k instructions a call against about 2.3k below it, so the whole step costs about 30 percent more there. **Tag: Tool or docs.** This is how TI Arm Clang's C library is written, not the chip. Keep the angle wrapped to one turn (0 to 2π) before calling them, as a real motor loop does; `foc.c` passes the raw angle because it is a fixed benchmark. A test that stops before the angle gets there reports the faster figure, so time a loop over a full sweep of angles. Counted by emulating the image's own code.
+
+### Can the LP-MSPM0G3507 run a float PID power loop at 100 kHz?
+
+No: use Q15 fixed point, which holds 190.9 kHz with no missed period in 1,000 and takes 41.4 percent of a 100 kHz period of CPU time. **Tag: Chip limit.** The Cortex-M0+ has no floating-point unit, so the float PID takes 1.8k cycles on average (2026-10-07), more than two 800-cycle periods at 80 MHz; it holds 39.70 kHz. Q15 reaches its duty write in 315 cycles at worst (3.9 µs, 2026-10-08 image). MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1 -O2, code in flash, measured 2026-10-08. Page: `mspm0g3507/mcu-bench/power-loop/README.md`.
+
+### The LP-MSPM0G3507 power-loop test shows one ADC overflow flag at 100 kHz. Is the loop too slow?
+
+No. Every one of the 1,000 duty writes landed in its period, and the rate sweep, which counts an overwritten ADC result as a missed period, passed at 190.9 kHz with no overflow. **Tag: Unknown (suspected: the first trigger arrived before the interrupt was armed).** The sweep reads and clears the ADC before each trial, which fits that suspicion; no test isolated it.
+
+### Why is the LP-MSPM0G3507's in-spec SPI speed 13.3 MHz in these tests, when the data sheet says 32 MHz?
+
+Use the high-speed pins (PA9, PA12 to PA14, PA19) with a bus clock of 64 MHz or more if you need over 16 MHz. **Tag: Chip limit.** The data sheet SLASEX6C (Table 7.21.1 and note 1 of section 8.25) allows 32 Mbit/s only on those pins and 16 MHz on the others. The test used the display pins PB7 to PB9. With an 80 MHz bus clock the SPI clock steps are 40, 20 and 13.3 MHz, so 13.3 MHz is the fastest at or under 16: 1,488 kB/s with 16-bit frames. Page `mspm0g3507/third-party-bench/README.md`.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+How it locks up:
+
+- TI low-power examples (sysctl_power_policy_sleep_to_standby, timx_timer_mode_pwm_x_trig_stop_restore) cut the debug link (`mspm0g3507/AGENTS.md`, `mspm0l1306/FAQ.md`)
+
+Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
+
+| Method | Remote or hands | Status | Evidence |
+|---|---|---|---|
+| Unplug and replug USB (xdsdfu -e lists the probe again) | hands | proven | `mspm0g3507/AGENTS.md`, date not recorded |
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: mspm0g3507/AGENTS.md | AGENTS.md for the TI LP-MSPM0G3507 LaunchPad: what an AI coding assistant needs to know
+==============================================================================
+
+# AGENTS.md for the TI LP-MSPM0G3507 LaunchPad: what an AI coding assistant needs to know
+
+Know this first: the chip has no floating-point unit and no neural accelerator, TI's examples end in a breakpoint that crashes a board with no debugger attached, and Zephyr, Arduino and display work on it each have a few silent traps. This file is the short list, each item from runs on one borrowed board unless it says otherwise.
+
+Terms: [docs/vocab.md](../docs/vocab.md) and the [LP-MSPM0G3507 FAQ](FAQ.md) in the Fox Red Labs repo. In short: **SysConfig** is TI's tool that writes a chip's pin and clock setup code; **DriverLib** is TI's C library for the chip's parts; **MATHACL** is the chip's math accelerator; **CoreMark** is a standard CPU speed test; **LVGL** is a graphics library for small screens; **west** is Zephyr's build and flash tool; **NONMAIN** is the flash area that holds the chip's boot settings. 1 kB = 1,024 bytes. Checked 2026-10-05 and 2026-10-06 on an Intel Mac, macOS 15.7, with MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, SysConfig 1.26.3, CCStudio 21.0.1, xPack OpenOCD 0.12.0-7 and Zephyr 4.4.2, on one borrowed LP-MSPM0G3507 (probe <probe serial>).
+
+**How to use it.** Copy this file into the top folder of your own project as `AGENTS.md`. Most coding assistants read that name; for one that reads `CLAUDE.md`, copy it under that name or add the line `@AGENTS.md` to your `CLAUDE.md`. Paths below in backticks starting `mspm0g3507/` are in the Fox Red Labs repo, where the evidence for each line lives; they are not in your copy, and links in this file only work inside that repo.
+
+## The board
+
+| Part | Fact |
+|---|---|
+| Chip | MSPM0G3507: Arm Cortex-M0+, 80 MHz, 128 kB flash, 32 kB RAM (`mspm0g3507/mcu-bench/README.md`) |
+| On the chip | Math accelerator, hardware AES and CRC, DAC; no floating-point unit (one float multiply-add costs about 290 cycles) and no neural accelerator (`mspm0g3507/mcu-bench/README.md`) |
+| LEDs | An RGB LED; TI's blink already sets up all three colors |
+| Buttons | S1 on PA18, active-high (`mspm0g3507/FAQ.md`) |
+| Serial | UART0 on PA10 and PA11 through the probe; PA10 also reaches the serial bridge via jumper J21. The port ending in 1 (`/dev/cu.usbmodemMG3500011`) is the chip's UART at 115200 8N1 (`mspm0g3507/FAQ.md`) |
+| Test wires | PWM check PA12 to PA13 (J4 pins 32 and 31) |
+| Debugger | XDS110 on the board; a Mac sees a probe and two serial ports with no driver. Check it with `xdsdfu -e` (`mspm0g3507/FAQ.md`) |
+
+## Start here
+
+| Step | This board |
+|---|---|
+| Tools | MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, SysConfig 1.26.3, CCStudio 21.0.1, xPack OpenOCD 0.12.0-7, Zephyr 4.4.2 |
+| Probe serial | `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e` |
+| Back up | No tested backup command; read the whole flash with DSLite before the first write. No `backup.py` recipe exists for this board |
+| Build TI's blink | `cp -R <SDK>/examples/nortos/LP_MSPM0G3507/driverlib/gpio_toggle_output .` then `mspm0g3507/mcu-bench/sdk-common/sdkmake.sh gpio_toggle_output/ticlang` (TI's makefile with the default macOS paths). Or the scripted Zephyr route below |
+| Flash | OpenOCD with the Zephyr tree's board file: `openocd -s <OCD>/openocd/scripts -f boards/ti/lp_mspm0g3507/support/openocd.cfg -c "adapter serial <serial>" -c init -c "reset halt" -c "program <file>.out verify" -c mspm0_board_reset -c shutdown` |
+| Zephyr route | `west build -p always -b lp_mspm0g3507 samples/basic/blinky -d ../build-blinky`, then `west flash -d ../build-blinky --openocd "$OCD/bin/openocd" --openocd-search "$OCD/openocd/scripts"`, then `mspm0_board_reset` (`mspm0g3507/zephyr/setup-intel-mac.sh`; about 3 min from clean) |
+| Check | `python3 tools/check/blink.py --board mspm0g3507 --probe <serial>` (pins from TI's blink example; not run on this board) |
+| Restore | Not tested |
+
+In CCStudio with Claude Code driving, the blink was running 149 s after the board was seen (`data/results/mspm0g3507.csv`).
+
+## If you see this
+
+| What you see | Cause | Do this | Check |
+|---|---|---|---|
+| `west sdk install` prints an empty list on an Intel Mac | Zephyr SDK 1.0.1 has no Intel macOS build | Use the Arm compiler from SDK 0.17.4 with `ZEPHYR_TOOLCHAIN_VARIANT=cross-compile` and the prebuilt xPack OpenOCD (`mspm0g3507/zephyr/README.md`) | `west build` finds the compiler |
+| Zephyr blinky does not blink after a debugger soft reset | The chip sits in the NMI handler | Run `mspm0_board_reset`, or press reset | LED blinks |
+| An `aes_*`, `crc_*`, `dma_*`, `mathacl_*` or `adc12_*_dma` example HardFaults with no debugger | TI ends them with `__BKPT(0)` | Attach the debugger with halting on, or ignore the end state | No fault after the work is done |
+| Board gone after `sysctl_power_policy_sleep_to_standby` or `timx_timer_mode_pwm_x_trig_stop_restore` | The low-power example cuts the debug link | Unplug and replug USB | `xdsdfu -e` lists the probe |
+| `fatal error: 'main.h' file not found` (ported STM32 project) | The initializer does not put `Inc/` on the include path | Add `-I"${PROJECT_ROOT}/Inc"` | Build proceeds |
+| `error: unknown type name 'uint32_t'` in `Src/system_stm32g0xx.c` | The port removed ST's header that pulled in `stdint.h` | Add `#include <stdint.h>` | Build proceeds |
+| `make` in `Debug/` stops with `invalid option -- O` | Apple's `make` is too old for the generated makefile | Use `ccs/utils/bin/gmake -B all` from CCStudio | Build finishes |
+| `Claude requested permissions to use mcp__ccs-project__changeSysConfigVersion, but you haven't granted it yet.` | A headless run treats the "ask" list as denied | Leave CCStudio's `.claude/settings.local.json` out of the run, or run the skill interactively and approve | The step runs |
+| `fatal error: 'Print.h' file not found` (Arduino_GFX) | Only old Arduino cores ship that header | Add ArduinoCore-API's `api/deprecated/` and `api/deprecated-avr-comp/` to the include path | Sketch builds |
+| `stack_free=0` in the LVGL stats line | A 2 kB stack is too small | Use 6 kB; the measured peak was 3.9 kB | `stack_free` stays above 0 |
+
+Traps shared with other boards: TRAPS.md.
+
+## What fits and what does not
+
+| Program | Result | Source |
+|---|---|---|
+| Zephyr blinky | 11.7 kB flash, 3.9 kB RAM | `data/results/mspm0g3507.csv` |
+| LVGL demo, trimmed | 125.4 kB of 128 kB flash at 32 MHz; 25.1 kB RAM (12 kB heap, 6 kB stack, 6.2 kB draw buffer) | `mspm0g3507/FAQ.md` |
+| Same LVGL demo with a second font | 146.7 kB: does not fit | `mspm0g3507/FAQ.md` |
+| Arduino_GFX screen sketch | 75.6 kB | `mspm0g3507/FAQ.md` |
+| Code from outside flash | not possible: the data sheet lists no external memory bus | `mspm0g3507/FAQ.md` |
+
+## Traps
+
+1. **SysConfig stays at 32 MHz when you ask for 80.** A leftover `SYSCTL.forceDefaultClkConfig` is accepted without a warning. Remove it, use the clock tree, and read `CPUCLK_FREQ` in `ti_msp_dl_config.h` (`mspm0g3507/FAQ.md`).
+2. **A ported button never fires.** S1 is active-high; ST's active-low setup (pull-up, falling edge) cannot trigger. Use pull-down and rising edge (`mspm0g3507/FAQ.md`).
+3. **PWM on PA10 and the serial port collide.** PA10 is also the USB-serial transmit pin (`mspm0g3507/FAQ.md`).
+4. **`DL_SPI_setDataSize` does nothing and returns no error while SPI is enabled.** Disable SPI, set the size, enable it. SPI above 16 MHz needs the high-speed pins PA9, PA12 to PA14 and PA19 (`mspm0g3507/FAQ.md`).
+5. **The touch chip never answers on the I2C1 block.** Software I2C on the same pins got correct registers every time. Switch the pins to plain GPIO first, or the ID reads 0 (`mspm0g3507/FAQ.md`).
+6. **A float FOC or PID loop cannot hold 50 or 100 kHz.** Float FOC tops out at 4.26 kHz, 70.80 kHz with IQmath on MATHACL; Q15 PID held 190.9 kHz (`mspm0g3507/FAQ.md`).
+
+## What ran here
+
+- Blink changed and rebuilt: 2 min 29 s from board plug-in, tools installed (`data/results/mspm0g3507.csv`).
+- CoreMark 183.61 per second at -O3 and 80 MHz (2.30 per MHz); 78.82 at 32 MHz (`data/results/mspm0g3507.csv`).
+- Sine and cosine in 116 cycles with MATHACL against about 9,900 in software (`mspm0g3507/mcu-bench/README.md`).
+- Embench-IoT: 18 of 19 pass; AES 20.3 times and CRC 13.5 times faster than software (`data/results/mspm0g3507.csv`).
+- SDK sweep: 222 of 270 examples build; 213 ran, none crashed (`data/results/mspm0g3507.csv`).
+- Waveshare 3.5 inch touch display and LVGL: 12 wires, full-screen fill 168 ms at 16 MHz SPI with the CPU at 32 MHz (`mspm0g3507/display-test/README.md`).
+- Not run: sleep current (no meter), FreeRTOS, FFT. Dhrystone was left out on purpose (`data/results/mspm0g3507.csv`).
+
+## Check a blink without looking
+
+After a flash, prove the LED pin is toggling through the debugger: `python3 tools/check/blink.py --board mspm0g3507 --probe <your probe serial>` from the repository root (xPack OpenOCD; it reads the GPIO registers for 3 s and never writes). PASS means an LED pin enabled as an output changed state; its pins come from TI's blink example for this board; it has not run on this board. A camera over the bench is optional; this is the check to paste into a report.
+
+<!-- ports:start (tools/render_ports.py) -->
+## Ports that ran here
+
+Code written for other chips and tools, brought to this board. The files to copy, the command and what you see for each are in `docs/ports.md`; the method and a prompt to port your own are there too. Works ran and did what it should; Could work ran in part.
+
+| Port | Status | Result | Evidence |
+|---|---|---|---|
+| 2048 and Minesweeper on the LP-MSPM0G3519 with a 3.5 inch touch display | Works | 2048 and Minesweeper run on the LP-MSPM0G3519 with a 3.5 inch touch display. | `ports/touch-games/README.md` |
+| Arduino display libraries on the LP-MSPM0G3507 | Works | Arduino_GFX's graphics test draws on an ST7796S screen on the LP-MSPM0G3507, through a 649-line Arduino API layer under the unmodified libraries. | `portability/arduino/README.md` |
+| BitNetMCU handwriting AI on MSPM0 | Works | BitNetMCU handwriting models read all 10 test digits right on the LP-MSPM0G3507 and LP-MSPM0L1306, the same answers as on a Mac. | `ports/bitnetmcu/README.md` |
+| Five STM32CubeG0 examples through TI's migration skill on the LP-MSPM0G3507: 3 ran as written, 2 after fixes | Works | TI's migration skill (a tool inside CCStudio that rewrites ST code for a TI chip) moved five STM32CubeG0 examples to the LP-MSPM0G3507: 3 ran as written, 2 after fixes. | `mspm0g3507/stm32-port-eval/README.md` |
+| MicroPython 1.29.0 on the LP-MSPM0G3519 and LP-MSPM0G3507 | Works | A new MicroPython port boots on the LP-MSPM0G3519 with the MicroPython banner and drives a 3.5 inch touch screen from Python. | `ports/micropython/README.md` |
+| minmea GPS sentence parser on MSPM0 | Works | minmea, an NMEA GPS parser, runs on the LP-MSPM0G3519 with its files unchanged and a 21-line shim for one missing call. | `ports/minmea/run-g3519.txt` |
+| MSPM0 examples moved up and down the family | Works | MSPM0 examples move between family members with only the SysConfig device changed (SysConfig is TI's pin and peripheral setup tool): all 133 images that built and write nothing outside main flash and SRAM ran on the LP-MSPM0L1306. | `portability/README.md` |
+| Peanut-GB Game Boy emulator on MSPM0 and MSPM33 | Works | Peanut-GB plays Tobu Tobu Girl on the LP-MSPM33C321A with the Educational BoosterPack screen at the console's own speed. | `ports/peanut-gb/README.md` |
+| TI's MSPM0 DriverLib examples built and run with GCC | Works | TI's MSPM0 DriverLib examples build and run with GCC from a terminal: all 224 no-RTOS examples with a GCC makefile built unchanged. | `portability/toolchains/gcc-mspm0/README.md` |
+| uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507 and LP-MSPM0G3519 | Works | uLisp, an Arduino sketch, gives a Lisp prompt on the LP-MSPM0G5187's serial port: 19 of 19 REPL (type-and-run loop) checks pass. | `ports/ulisp/README.md` |
+| wasm3 (WebAssembly interpreter) on the LP-MSPM0G3519, LP-MSPM0G3507 and LP-MSPM33C321A | Works | wasm3 runs a WebAssembly module on the LP-MSPM0G3519 and prints PASS on the serial line. | `ports/wasm3/README.md` |
+| Arduboy2-compatible layer and three open-source games on MSPM0 and MSPM33 | Could work | Snake, TileWorld and Crate Confusion build unchanged against an Arduboy2-compatible layer for four kits, and Snake draws on the LP-MSPM33C321A's Educational BoosterPack screen. | `ports/arduboy/FIT.md` |
+| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
+| MSPM0 code on the CC2340R5 and CC1354P10 radio chips | Could work | MSPM0 driver examples build for the CC2340R5 with a 47-line shim, the first 5 ran with the same pin states as TI's own build, and 4 of 4 ran on the CC1354P10. | `portability/README.md` |
+| One app, three ways: DriverLib, TI Drivers and Zephyr | Could work | The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings. | `portability/three-ways/README.md` |
+<!-- ports:end -->
+
+## Where the evidence lives
+
+Start at `mspm0g3507/FAQ.md` for each problem, then `mspm0g3507/mcu-bench/README.md` for numbers and `data/results/mspm0g3507.csv` for every row. If this file gets something wrong on your board, correct the FAQ first.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+How it locks up:
+
+- TI low-power examples (sysctl_power_policy_sleep_to_standby, timx_timer_mode_pwm_x_trig_stop_restore) cut the debug link (`mspm0g3507/AGENTS.md`, `mspm0l1306/FAQ.md`)
+
+Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
+
+| Method | Remote or hands | Status | Evidence |
+|---|---|---|---|
+| Unplug and replug USB (xdsdfu -e lists the probe again) | hands | proven | `mspm0g3507/AGENTS.md`, date not recorded |
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: mspm0g3507/arduino-core-test/README.md | Community Arduino core for TI MSPM0 on the LP-MSPM0G3507
+==============================================================================
+
+# Community Arduino core for TI MSPM0 on the LP-MSPM0G3507
+
+Partly. The core (`tako0910/arduino-mspm0` 0.1.3) installs through Arduino's normal Boards Manager, and a serial sketch and the unmodified Arduino_GFX graphics benchmark ran on the board. But its default build drops the C library's system calls, `analogRead` does not link, and ArduinoJson does not compile, so a beginner hits a wall on three common sketches.
+
+Terms: [vocab](../../docs/vocab.md). Questions and fixes: [FAQ](../FAQ.md). Checked 2026-10-06 on an Intel Mac, macOS 15.7, arduino-cli 1.5.1 (Homebrew), core `ti:mspm0` 0.1.3 with its own GCC 15.2.1 (arm-none-eabi). Board: LP-MSPM0G3507 with the Waveshare 3.5inch Capacitive Touch LCD wired as in [display-test](../display-test/README.md). 1 kB = 1,024 bytes.
+
+## How to install it
+
+The core's Boards Manager URL:
+
+```text
+https://raw.githubusercontent.com/tako0910/arduino-mspm0/master/package_ti_mspm0_index.json
+```
+
+Add it under Arduino IDE Settings, "Additional boards manager URLs", then install "Texas Instruments MSPM0 Arduino Core" in Boards Manager. From a terminal:
+
+```text
+arduino-cli core update-index --additional-urls https://raw.githubusercontent.com/tako0910/arduino-mspm0/master/package_ti_mspm0_index.json
+```
+
+```text
+arduino-cli core install ti:mspm0 --additional-urls https://raw.githubusercontent.com/tako0910/arduino-mspm0/master/package_ti_mspm0_index.json
+```
+
+Board name: `ti:mspm0:lp_mspm0g3507` (the LP-MSPM0C1104 is also listed). The core with its compiler took 1.1 GB on disk. Install time was not measured.
+
+## What compiled and what ran
+
+| Sketch | Compiles | Flash, RAM | On the board |
+|---|---|---|---|
+| `serial_hello` (this repo's) | Yes | 4.8 kB, 112 B | **Runs**: printed a line every second, `millis` steps of about 1,002 ms per line (includes print time) |
+| Blink (core example) | Yes | not recorded | Not flashed |
+| `light_sensor` (this repo's, `analogRead`) | **No**, link error | | |
+| ArduinoJson 7.4.3 JsonParserExample, JsonGeneratorExample | **No** | | |
+| OneButton SimpleOneButton | **No** (example has no pin for this board) | | |
+| Adafruit FT6206 CapTouchPaint (with Adafruit ILI9341) | Yes | 15.2 kB | Not flashed (ILI9341 screen, not the one used here) |
+| Adafruit GFX GFXcanvas | Yes | 16.7 kB | Not flashed |
+| Adafruit ILI9341 graphicstest | Yes | 23.1 kB | Not flashed |
+| Arduino_GFX PDQgraphicstest, ST7796 pins (this repo's: `sketches/pdqgfx_st7796`) | **Only with LTO off** | 61.3 kB, 784 B | **Runs, unmodified library**: drew on the screen and printed timings |
+
+The benchmark was still running when the 70 s serial capture ended, so these lines finished: screen fill 10.32 s (five fills, so about 2.06 s each), text 0.51 s, pixels 11.7 s, lines 11.4 s. This repo's Arduino layer ran the same benchmark's screen fill in 2.55 s (0.51 s each, see [Arduino layer](../../portability/arduino/README.md)). **Unknown (suspected: Third-party behavior).** The core's SPI clock or transfer loop is likely slower. Not checked: which.
+
+## Problems, with their causes
+
+**The default build fails to link anything that uses stdio.** **Third-party behavior.** The core builds with `-flto`, and link-time optimization discards the core's own `_read`, `_write`, `_close`, `_fstat`, `_isatty` and `_lseek` (in `variants/LP_MSPM0G3507/variant_syscalls.c`). The link then fails with `undefined reference to '_write'` and `dangerous relocation: unsupported relocation`. Fix that worked: build with LTO off by passing the core's own flags without `-flto`:
+
+```text
+arduino-cli compile --fqbn ti:mspm0:lp_mspm0g3507 --build-property "build.flags.common=<the core's flags without -flto>" --build-property "build.flags.ld=<the core's link flags without -flto>" <sketch>
+```
+
+Copy the two flag lines from the core's `platform.txt` (`build.flags.common` and `build.flags.ld`) and delete `-flto`. Adding system-call stubs of this repo's to the sketch instead failed with `multiple definition of '_read'` once LTO stopped dropping the core's, so do not add stubs.
+
+**`analogRead` does not link.** **Third-party behavior.** The error is `undefined reference to 'DL_ADC12_setClockConfig'` from the core's `MspM0Platform.c`, with or without LTO. The core wraps TI's DriverLib for I2C, SPI, UART, timers and others (`cores/arduino/dl_*_wrap.c`) but has no ADC wrapper, so TI's ADC driver is never built. Not fixed here.
+
+**ArduinoJson does not compile.** **Third-party behavior.** `error: 'Printable' in namespace '::' does not name a type`: the core's Arduino API does not provide the `Printable` class that ArduinoJson expects.
+
+**OneButton's example does not compile.** **Setup or handling.** `error: 'PIN_INPUT' was not declared in this scope`: the example defines its button pin only for boards it lists. Adding `-DPIN_INPUT` through `compiler.cpp.extra_flags` did not reach the sketch with this core. The right property was not found. Editing the example to define `PIN_INPUT 18` (S1, PA18) is the expected user step.
+
+## How this compares with this repo's Arduino layer
+
+The [Arduino layer](../../portability/arduino/README.md) of this repo is built with TI's compiler and ran the same Arduino_GFX benchmark about four times faster on screen fill, but it is a project folder, not something a user installs from Boards Manager. The community core is the real Arduino experience, and with the LTO fix it ran an unmodified popular graphics library on a TI chip.
+
+==============================================================================
+FILE: mspm0g3507/display-test/README.md | Waveshare 3.5inch Capacitive Touch LCD on the TI LP-MSPM0G3507
+==============================================================================
+
+# Waveshare 3.5inch Capacitive Touch LCD on the TI LP-MSPM0G3507
+
+It works: 12 jumper wires (13 if you read the screen back), a 7.4 kB program, a full-screen redraw in 0.36 s at 8 MHz SPI and 67 ms at 40 MHz SPI (that speed needs an 80 MHz CPU clock set with a SysConfig clock-tree change and 16-bit frames, and only 64 pixels of one row were read back), and touch read from the FT6336U touch chip. Two traps cost most of the time. Chip select needs a pause between commands, because the module's level translator loses short pulses. And the touch chip answered only to software I2C, not the chip's I2C block.
+
+Terms: [vocab](../../docs/vocab.md) and [FAQ](../FAQ.md). The screen's driver chip is the ST7796S, the touch chip is the FT6336U, and the level translator is the TXS0108E, all on the Waveshare module. Checked 2026-10-06 on an Intel Mac, macOS 15.7, MSPM0 SDK 2.11.00.07, SysConfig 1.26.3, TI Arm Clang 5.1.1, OpenOCD xPack 0.12.0. Apple Silicon was not tested. Sizes in kB, 1 kB = 1,024 bytes.
+
+Contents: [You need](#what-you-need), [Wiring](#wiring), [Build, flash and read results](#build-flash-and-read-results), [Results](#results), [Performance](#performance-how-fast-it-can-go), [Start-up time](#start-up-time), [Trap 1](#trap-1-the-screen-stays-dark-or-shows-static-even-though-every-wire-is-right), [Trap 2](#trap-2-the-touch-chip-does-not-answer-the-i2c-block-but-does-answer-software-i2c), [Mistakes to avoid](#mistakes-to-avoid).
+
+## What you need
+
+- A TI LP-MSPM0G3507 LaunchPad development kit. The one used here has probe serial `MG350001`; yours will differ.
+- The Waveshare 3.5inch Capacitive Touch LCD (320x480) and 13 female-to-female jumper wires.
+- MSPM0 SDK, SysConfig and TI Arm Clang installed where `build.sh` expects them (the `SDK`, `CC` and `SYSCFG` lines at its top; change them if yours are elsewhere).
+- OpenOCD with a connection file for the board. This repo uses Zephyr's `boards/ti/lp_mspm0g3507/support/openocd.cfg`.
+- Python 3 to decode the speed results.
+
+## Wiring
+
+12 wires, no jumpers moved. MISO is an optional 13th wire (J2 pin 14, PB7): wire it only if you want to read the screen's status back, which is how trap 1 was found. Power goes to the 3.3 V pin. Waveshare says supply and signal voltage must match, and this chip's pins are 3.3 V. 5 V was not run.
+
+| Panel pin | LaunchPad header pin (chip pin) | Note |
+|---|---|---|
+| VCC | 3V3 | 3.3 V supply |
+| GND | any GND | |
+| SCLK | J1 pin 7 (PB9, SPI1 clock) | Standard-drive pin, so SPI1 here is capped at 16 Mbit/s by the data sheet |
+| MOSI | J2 pin 15 (PB8, SPI1 data out) | |
+| MISO | J2 pin 14 (PB7, SPI1 data in) | Optional, read-back only |
+| LCD_CS | J2 pin 13 (PB6, SPI1 chip select 0) | |
+| LCD_DC | J4 pin 39 (PB1) | Plain GPIO |
+| LCD_RST | J4 pin 40 (PB4) | Plain GPIO |
+| LCD_BL | J4 pin 38 (PA28) | Backlight, GPIO high or PWM |
+| TP_SDA | J1 pin 10 (PB3, I2C1 data) | Used as software I2C, see trap 2 |
+| TP_SCL | J1 pin 9 (PB2, I2C1 clock) | |
+| TP_INT | J2 pin 11 (PB16) | GPIO input |
+| TP_RST | J2 pin 12 (PB0) | GPIO output |
+
+Pins to avoid: PA0 (red LED), PB22, PB26 and PB27 (RGB LED), PA18, PB23 and PA9 (buttons), PB24 (thermistor), PA10 and PA11 (backchannel UART). The board's I2C pull-ups for PB2 and PB3 (R59, R60) are not fitted; the software I2C here uses the chip's internal pull-ups. SPI1 and I2C1 use the same pins as TI's own `spi_controller_multibyte_fifo_poll` and `i2c_controller_rw_multibyte_fifo_poll` examples.
+
+## Build, flash and read results
+
+Build every variant into `out/`. Run this in this folder:
+
+```bash
+./build.sh
+```
+
+It prints, for each build, the address of the `res` results struct (from `tiarmnm`) and the program size. Flash the demo:
+
+```bash
+openocd -s <openocd-scripts-folder> -f <openocd.cfg> -c "adapter serial <probe-serial>" -c init -c "reset halt" -c "program out/display_8mhz/display_8mhz.out verify" -c "reset run" -c shutdown
+```
+
+Replace `<openocd-scripts-folder>` with OpenOCD's `scripts` folder, `<openocd.cfg>` with the connection file path, and `<probe-serial>` with your kit's probe serial (the text after `usbmodem` in `ls /dev/cu.usbmodem*`, minus the last digit). On this bench they were `~/zephyr-toolchain/xpack-openocd-0.12.0-7/openocd/scripts`, `~/zephyrproject/zephyr/boards/ti/lp_mspm0g3507/support/openocd.cfg` and `MG350001`. `show.sh` in this folder is a working example for the picture screens.
+
+The demo fills the screen red, green, blue, white and black, draws eight color bars, then paints a white dot wherever you touch and toggles the red LED.
+
+To read the speed results, flash `out/perf/perf.out` the same way, then dump its `res` struct after it has run. The `res` address and size come from `tiarmnm -S out/perf/perf.out` (here: `0x20200280`, 520 B). Reading restarts the program, so do it in one OpenOCD connection with a pause:
+
+```bash
+openocd -s <openocd-scripts-folder> -f <openocd.cfg> -c "adapter serial <probe-serial>" -c init -c "reset halt" -c "reset run" -c "sleep 10000" -c halt -c "dump_image mine.bin <res-address> <res-size>" -c shutdown
+```
+
+Decode it:
+
+```bash
+python3 perf.py mine.bin
+```
+
+For the 80 MHz build (`out/perf80/perf80.out`) add the two SPI speeds: `python3 perf.py mine.bin 20,40`. This read command is assembled from the flash command above and the `dump_image` form used elsewhere in this repo; it was not re-run as written.
+
+| File | What it is |
+|---|---|
+| `display.syscfg`, `gen/` | SysConfig pins: SPI1 3-wire at 8 MHz, I2C1 100 kHz, GPIO for DC, reset, CS, backlight, touch reset and interrupt |
+| `display80.syscfg`, `gen80/` | The same at an 80 MHz CPU clock |
+| `display_test.c` | The demo, plus the `-DREADBACK`, `-DEXPERIMENT` and `-DDIAG` diagnostics |
+| `perf.c`, `perf.py` | Speed test and its decoder |
+| `probe.c` | Wire check: each pin read with the chip's pull-up, then pull-down. A loose wire follows the pull |
+| `bltest.c`, `bloff.c` | Backlight blink and backlight off |
+| `photo.py`, `show.sh` | Turn an image into a screen build and flash a saved one |
+
+## Results
+
+| What | Measured | Source |
+|---|---|---|
+| Full-screen fill, 300 kB, 8 MHz SPI | 364.9 ms, 84% of the 307 ms the clock allows | perf results struct (32 MHz CPU) |
+| Same at 16 MHz | 182.5 ms, 84% of 154 ms | perf results struct (32 MHz CPU) |
+| Same at 1 MHz | 2.92 s | observed 2026-10-06; not saved |
+| Screen ID read back | `0x7796` (ST7796S), register D3 over MISO | observed 2026-10-06; not saved |
+| Touch chip | vendor `0x11` (FocalTech), chip `0x64` (FT6336U), firmware `0x12`, registers A8, A3, A6 | observed 2026-10-06; not saved |
+| Touch | dots drawn under the finger, LED toggles per touch | observed 2026-10-06 by the person at the board; not saved |
+| Program size | 7.4 kB of flash, 648 B of RAM | `tiarmsize` on the built `display_8mhz.out` |
+
+Colors were not checked by eye at 16 MHz or faster; the panel's data sheet allows about 15 MHz.
+
+## Performance: how fast it can go
+
+Measured 2026-10-06 with `perf.c` in three builds: 32 MHz CPU, 32 MHz CPU with short start-up waits, and 80 MHz CPU. `perf.py` decodes each results struct. Every speed was checked by reading back 64 pixels of one row from the screen's own memory over MISO: 64 of 64 matched at every speed below. That is a spot check, not the whole screen.
+
+| CPU clock | SPI clock | Method | Full screen | Full screens per second | 100x100 box |
+|---|---|---|--:|--:|--:|
+| 32 MHz | 8 MHz | CPU, 8-bit frames | 364.9 ms | 2.7 | 23.8 ms |
+| 32 MHz | 16 MHz | CPU, 8-bit frames | 182.5 ms | 5.5 | 11.9 ms |
+| 32 MHz | 16 MHz | CPU or DMA, 16-bit frames | 168.1 ms | 6.0 | 11.0 ms |
+| 80 MHz | 20 MHz | CPU or DMA, 16-bit frames | 134.4 ms | 7.4 | 8.8 ms |
+| 80 MHz | 40 MHz | CPU or DMA, 16-bit frames | 67.2 ms | 14.9 | 4.4 ms |
+
+- **The wire is the limit.** Every method reaches 84 to 92% of what the SPI clock allows. DMA (a block that copies data without the CPU) is no faster than the CPU loop, but it leaves the CPU free while the screen fills. The free-time measure over-counts, so no percentage is given.
+- **40 MHz worked on the standard pins** (with an 80 MHz CPU clock, 16-bit frames and the clock-tree change below). The chip's data sheet promises more than 16 Mbit/s only on its high-speed pins, and the panel's data sheet (ST7796S, 66 ns minimum write cycle) allows about 15 MHz writes. 40 MHz is about 2.7 times that. **Tag: Unknown (suspected: Setup or handling).** Only 64 pixels of one row were read back at 40 MHz. Not checked: every pixel, the screen by eye at 40 MHz, longer wires and a second module. So the margin may not hold elsewhere.
+- **16-bit frames need the SPI block switched off to change.** Setting the frame size while SPI is enabled did nothing, silently. **Tag: Tool or docs.** The `DL_SPI_setDataSize` documentation does not say so.
+- **80 MHz needs the clock tree, not the default line.** `display80.syscfg` is a copy of TI's `sysctl_mclk_syspll` clock tree. With `SYSCTL.forceDefaultClkConfig` left in, SysConfig ignored every clock setting and stayed at 32 MHz. **Tag: Tool or docs.** SysConfig gave no warning.
+
+### Start-up time
+
+| | Power-up to screen ready | To first full frame |
+|---|--:|--:|
+| Usual init (120 ms waits after reset, software reset and sleep out) | 370 ms | 538 ms at 16 MHz; 461 ms seen once, not saved |
+| Shortest waits the ST7796S data sheet allows (`-DFAST_BOOT`) | 12 ms | 180 ms at 16 MHz, 79 ms at 40 MHz SPI with the 80 MHz CPU clock |
+
+The chip itself starts in 0.26 to 0.31 ms (data sheet SLASEX6C, cold start-up). Almost all of the usual 370 ms is waits copied from common drivers. The screen's power-mode register read `0x9C` (awake, display on) after the fast init too.
+
+### Running code from external memory
+
+Not possible on this chip. **Tag: Chip limit.** The MSPM0G3507 data sheet lists no external memory bus or quad-SPI interface, so code must fit in its 128 kB of flash. External SPI flash or the display's SD slot can hold pictures, fonts and logs, streamed in over SPI. The LP-MSPM0G3519 has 512 kB of flash and 128 kB of RAM.
+
+### LVGL on this screen
+
+Yes, trimmed. LVGL (an open-source graphics library) runs on this chip with this screen: 25.1 kB of RAM, 125.4 kB of flash at 32 MHz (126 kB at 80 MHz), and 7 refreshes per second at 32 MHz and 15 to 19 at 80 MHz. A refresh redraws only the changed areas (about 12,000 to 25,000 pixels), so it is not a full-screen update; the full-screen figures above are for filling all 153,600 pixels. Details: [lvgl-g3507](../lvgl-g3507/README.md).
+
+## Trap 1: the screen stays dark or shows static, even though every wire is right
+
+Measured: each command sent alone took effect; sent back to back, the second was lost. The code raised chip select for a few hundred nanoseconds between two commands, and "display on" was always the second one, so the screen never turned on. Status reads over MISO showed it. A 10 µs pause after chip select goes high fixed it (`cs_gap()` in `display_test.c`). Slowing the SPI clock does not help, because the pulse is between bytes, not in them.
+
+**Tag: Unknown (suspected: Third-party behavior).** The module puts a TXS0108E level translator between the header and the screen, and the suspect is that it does not pass a pulse that short, so the screen saw two commands as one. Not checked: the pulse on a scope, and a module without the translator.
+
+## Trap 2: the touch chip does not answer the I2C block, but does answer software I2C
+
+**Tag: Unknown (suspected: Third-party behavior).** With the chip's I2C1 block, every read of address 0x38 failed: first not acknowledged, later the controller reported the bus busy. The same two pins driven as plain open-drain GPIO, bit by bit at about 100 kHz, got an acknowledgement and correct registers every time, so the demo uses software I2C. The suspect is the same level translator on an open-drain bus.
+
+## Mistakes to avoid
+
+- **Tag: Third-party behavior.** Calling `DL_GPIO_initPeripheralInputFunctionFeatures` to add a pull-up rewrites the whole pin register and clears the open-drain setting that SysConfig's code sets next with `DL_GPIO_enableHiZ`. Call `DL_GPIO_enableHiZ` again after it. Fixing that alone did not make the I2C block work here.
+- Switch an output pin off before reading it back in a wire check, or a good wire looks wrong (`probe.c` does).
+
+How the faults were found without a scope: the probe showed every display wire connected and the unwired control pin floating; the backlight test gave a yes or no a person can see; and wiring MISO let the chip read the screen's ID and power-mode register after every step (`-DEXPERIMENT`), which isolated the dropped commands in one run.
+
+==============================================================================
+FILE: mspm0g3507/lvgl-g3507/README.md | LVGL on the TI LP-MSPM0G3507 with 32 kB of RAM
+==============================================================================
+
+# LVGL on the TI LP-MSPM0G3507 with 32 kB of RAM
+
+**Status: Works (serial numbers).** Built and run on the board 2026-10-06. The screen picture and touch were not checked by eye in this run, so only the serial numbers are claimed.
+
+Yes, trimmed. LVGL 9.6 with a button, slider, switch, arc, chart and one font runs on the LP-MSPM0G3507 using 25.1 kB of its 32 kB of RAM and 125.4 kB (32 MHz build) or 126 kB (80 MHz build) of its 128 kB of flash. It refreshes 7 times a second at 32 MHz with the CPU about 100% busy, and 15 to 19 times a second at 80 MHz with 40 MHz SPI and the CPU about 60% busy. A refresh redraws only the parts of the screen that changed, not the whole screen. RAM is not the problem; flash is. The second font and a few LVGL drawing paths had to be cut to fit.
+
+Terms: [vocab](../../docs/vocab.md) and [FAQ](../FAQ.md). LVGL is an open-source C graphics library for small screens. A refresh is one pass in which LVGL redraws only the areas that changed and sends them to the screen; in these logs that is about 12,000 to 25,000 pixels, against 153,600 pixels in the full 320 x 480 screen. The heap is the pool LVGL takes its memory from. The draw buffer holds the strip of pixels being drawn. The stack is the RAM for function calls. Built and run 2026-10-06 on an Intel Mac with TI Arm Clang 5.1.1, MSPM0 SDK 2.11.00.07 and SysConfig 1.26.3. Sizes are bytes unless marked kB; 1 kB = 1,024 bytes. The screen is the Waveshare 3.5inch Capacitive Touch LCD wired as in [display-test](../display-test/README.md) (the pin table is there).
+
+Contents: [Results](#results-on-the-board), [Build and flash](#build-and-flash), [On the LP-MSPM0G3519](#on-the-lp-mspm0g3519), [Sizes](#sizes), [Choices](#the-choices-and-why), [What did not fit](#what-did-not-fit-and-what-was-cut), [What was not checked](#what-was-not-checked).
+
+## Results on the board
+
+Each build was read for 19 complete stats lines over about 21 seconds. The first 32 MHz line has three stray characters in front, and the last 80 MHz line is cut where the capture stopped. Defaults: 12 kB heap, 6 kB stack, 6.2 kB draw buffer. Flash and RAM are the `tiarmsize` totals of the 2026-10-06 builds.
+
+| Build | Refreshes per second | CPU busy | Refresh (one pass) | Flush (SPI send) |
+|---|--:|--:|--:|--:|
+| 32 MHz CPU, 16 MHz SPI | 7 | 96 to 105% | 137 to 150 ms | 27.5 to 27.8 ms |
+| 80 MHz CPU, 40 MHz SPI | 15 to 19 | 58 to 62% | 32 to 39 ms | 5.6 to 7.1 ms |
+
+- **Heap:** peak 8.5 kB used at both 32 and 80 MHz, in a pool LVGL reports as 10.3 kB usable (a 12 kB pool). That leaves about 1.8 kB of headroom over the peak in these runs.
+- **Stack:** `port.c` paints the stack with `0xA5A5A5A5` at boot. After the demo had run about 20 seconds, 2.1 kB of 6 kB were untouched on both builds, so the peak was 3.9 kB. The peak covers the idle demo's redraws; nobody used the touch screen, so the button, slider and full-redraw paths are not covered.
+- **RAM total** with 6 kB stack and 12 kB heap: 25.1 of 32 kB.
+- **What a refresh covers:** the `px` field is pixels sent to the screen per second: 172,086 to 174,381 at 32 MHz (about 24,600 to 24,900 per refresh) and 233,674 to 237,037 at 80 MHz (about 12,400 to 15,600 per refresh). A full screen is 153,600 pixels, so one refresh is a fraction of the screen. Refreshes per second are not full-screen frames per second; [display-test](../display-test/README.md) measured full-screen fills at 6.0 and 14.9 a second.
+- **Busy above 100%:** `busy` is exactly refreshes per second times the average refresh time, divided by a fixed 1,000 ms (`app.c`). In all 38 lines `fps` times `refr_ms` divided by 10 matches `busy` within 1 point (for example 7 x 145.0 ms = 1,015 ms, shown as 101%). Seven refreshes of 145 ms cannot fit in 1,000 ms, so the real window was a little longer than one second. **Tag: Unknown (suspected: Our mistake).** The one-second stats window probably runs late: the stats timer runs after a 145 ms refresh, and the `t=` counter skips a second twice in the 32 MHz file (no `t=5s`, `t=22s`) and once in the 80 MHz file (no `t=6s`), which fits a window longer than 1 s. The window length was not logged. Read the 32 MHz result as "the CPU is saturated", not as a number above 100%.
+- **Serial line length:** a stats line is about 180 characters, so by arithmetic about 15 ms to send at 115,200 baud, and sending blocks the main loop.
+
+Each 80 MHz refresh also sends only 50 to 63% of the pixels of a 32 MHz refresh, so refresh and flush times are not like for like. Per pixel, flush is about 2.5 times faster (about 1.1 µs at 32 MHz, about 0.45 µs at 80 MHz), which matches the change from 16 MHz to 40 MHz SPI. The CPU clock was not read back.
+
+## Build and flash
+
+What is here: `lv_conf.h` (the trimmed LVGL settings), `src/port.c` (1 ms tick, ST7796S flush over SPI1 with DMA, FT6336U touch over software I2C, UART text, stack paint), `src/app.c` (the demo), `syscfg/` (SysConfig for 32 MHz and 80 MHz, same pins as `display-test` plus UART0), `build.sh`, `tools/mapsize.py` (flash and RAM split from the map) and `tools/host_check.sh` (renders the screen on the Mac). LVGL v9.6.0, commit `80ca777e37a2b176770726a02e07a6fb79ef0b39`, MIT license (`third-party/lvgl/LICENCE.txt`), is vendored once for every board in `third-party/lvgl/` with unused parts removed. Three small size patches (12 added lines in three files) are in `size-patch.diff`. `host-render.png` is the screen as rendered on the Mac by the same `app.c`; it is not a photo of the board.
+
+Build the three flashable variants. Run this in this folder:
+
+```bash
+./build.sh
+```
+
+| Build | CPU | SPI clock | `.out` |
+|---|---|---|---|
+| `lvgl_32mhz` | 32 MHz | 16 MHz | `out/lvgl_32mhz/lvgl_32mhz.out` |
+| `lvgl_80mhz_spi40` | 80 MHz | 40 MHz | `out/lvgl_80mhz_spi40/lvgl_80mhz_spi40.out` |
+| `lvgl_80mhz_spi20` | 80 MHz | 20 MHz | `out/lvgl_80mhz_spi20/lvgl_80mhz_spi20.out` |
+
+Options go before the command, for example `OPT=-Os`, `ROWS=20` (draw buffer rows), `MEM_KB=12` (LVGL heap in kB), `STACK=6144` (bytes). The defaults are 12 kB heap and 6 kB of stack. LVGL compiles once per variant (about a minute), then each config links in seconds. `./build.sh oversize` builds the full-feature demo only to measure it; it does not fit and must not be flashed.
+
+The 40 MHz SPI clock is about 2.7 times the panel's write spec of about 15 MHz (ST7796S data sheet, 66 ns minimum write cycle). **Tag: Unknown (suspected: Setup or handling).** [display-test](../display-test/README.md) read back 64 pixels of one row correctly at 40 MHz, and the LVGL runs above sent data at that speed, but nobody looked at the screen. If it shows noise at 40 MHz, try `lvgl_80mhz_spi20`, which was built but not run.
+
+Flash one build. The values in angle brackets are this bench's examples, and you substitute yours. `<out>` is one of the `.out` paths above. `<openocd-scripts-folder>` was `~/zephyr-toolchain/xpack-openocd-0.12.0-7/openocd/scripts`, `<openocd.cfg>` was `~/zephyrproject/zephyr/boards/ti/lp_mspm0g3507/support/openocd.cfg`, and `<probe-serial>` was `MG350001`; yours is the text after `usbmodem` in `ls /dev/cu.usbmodem*`, minus the last digit.
+
+```bash
+openocd -s <openocd-scripts-folder> -c "gdb_port disabled" -c "tcl_port disabled" -c "telnet_port disabled" -f <openocd.cfg> -c "adapter serial <probe-serial>" -c init -c "reset halt" -c "program <out>" -c "reset run" -c shutdown
+```
+
+This programs without `verify`: on these images OpenOCD's verify reported a CRC mismatch ([FAQ](../FAQ.md)), and the programmed images ran.
+
+Read the serial output (UART0 through the probe, 115200 8N1) with any terminal program. The board's serial port is the `/dev/cu.usbmodem` device whose name ends in 1; the one ending in 4 is not used. For example:
+
+```text
+screen /dev/cu.usbmodem<probe-serial>1 115200
+```
+
+You get a boot banner `LVGL on LP-MSPM0G3507: starting`, then one line a second. A real line from the 32 MHz run:
+
+```text
+t=4s fps=7 busy=101% refr_ms=145.0 flush_ms=27.8 px=174381 full_ms=0.0 heap_used=7236 heap_total=10536 heap_peak=8712 heap_free=3300 frag=4% stack_free=2200 touch_err=0 presses=0
+```
+
+## What the screen is meant to show
+
+Portrait, dark theme, as in `host-render.png` (the Mac render; the board's screen was not checked by eye): a title, a **Press me** button with a counter, a slider that sets the red LED's brightness in 10 steps, a switch that turns the LED on and off, a **Full redraw** button that times one 320 x 480 redraw, an arc and a line chart fed by a made-up wave every 100 ms, and five stats lines refreshed once a second. The `full_ms` value stays `0.0` until someone presses **Full redraw**, so it was not measured.
+
+## On the LP-MSPM0G3519
+
+The same demo runs on the LP-MSPM0G3519 LaunchPad development kit (512 kB flash, 128 kB RAM, same Cortex-M0+ core), with the display wired like this: SPI1 on PB31, PB8 and PB7, chip select PB12, data/command PB9, backlight PC4, reset PC5, touch I2C2 on PC3 and PC2, touch interrupt PB14, touch reset PB11. Build it with:
+
+```text
+BOARD=mspm0g3519 ./build.sh
+```
+
+Only the board-specific parts are new, in `boards/mspm0g3519/`: `board_pins.h` (reset, backlight and touch pins that moved to port C) and `lvgl.syscfg` and `lvgl80.syscfg` (the display pins plus UART0 on PA10 and PA11, the same backchannel pins as the G3507). `src/`, `lv_conf.h` and the LVGL copy are shared. Output goes to `out/mspm0g3519/`. Checked 2026-10-09, same tools as above.
+
+Results, 3 runs each, 19 to 24 stats lines per run, read from UART0 through the probe at 115200. The 80 MHz build with 40 MHz SPI was seen on the screen; the other builds' screens were not looked at. Rows are in `data/results/mspm0g3519.csv`.
+
+| Build | Refreshes per second | CPU busy | Refresh | Flush | G3507 |
+|---|--:|--:|--:|--:|--:|
+| 32 MHz CPU, 16 MHz SPI | 7 | 96 to 105% | 138 to 151 ms | 27.5 to 27.8 ms | 7 |
+| 80 MHz CPU, 40 MHz SPI | 15 to 19 (mean 17.1) | 57 to 61% | 32 to 39 ms | 5.6 to 7.1 ms | 15 to 19 |
+| 80 MHz CPU, 20 MHz SPI (1 run) | 13 to 18 (mean 15.6) | 63 to 71% | 36 to 52 ms | 10.6 to 16 ms | not run |
+
+The runs of one build were identical line for line after the boot banner, so the demo is repeatable here. Flash is 125.5 kB at 32 MHz and 126.2 kB at 80 MHz, of 512 kB; RAM is 25.1 kB and 25.2 kB, of 128 kB. Heap peak is 8.5 kB and 2.1 kB of the 6 kB stack stayed untouched, as on the G3507.
+
+With the extra room (1 run each, `ROWS=40 BOARD=mspm0g3519 ./build.sh`): a 40-row draw buffer (25 kB) raises the 32 MHz build from 7 to 11.8 refreshes a second on average (10 to 13), because LVGL sends fewer, larger strips; at 80 MHz it stays at 15 to 19 and the CPU drops to 43% busy, so something other than drawing sets the rate there. The cause was not found. The full demo with the second font (`BOARD=mspm0g3519 ./build.sh oversize`, 146.8 kB of flash) also runs at 7 a second at 32 MHz. It is the stock demo with this repo's size cuts left in, not an unmodified LVGL.
+
+Two gotchas. The G3519's linker script sets a 256-byte stack, so `build.sh` now rewrites whatever stack size the script holds; the first build kept 256 bytes and its log showed `stack_free=0`. And the G3519 build prints `LVGL on LP-MSPM0G3519: starting` as its banner; a serial capture keeps everything the previous firmware printed before the reset, so cut the log at the banner.
+
+## Sizes
+
+| | 32 MHz build | 80 MHz, SPI 40 | 80 MHz, SPI 20 | Oversize (not flashable) |
+|---|--:|--:|--:|--:|
+| Flash used | 128,456 (125.4 kB) | 129,072 (126.0 kB) | 129,072 (126.0 kB) | 150,264 (146.7 kB) |
+| Flash free of 131,072 | 2,616 (2.6 kB) | 2,000 (2.0 kB) | 2,000 (2.0 kB) | -19,192 (-18.7 kB) |
+| RAM used (`.bss` + `.data` + stack) | 25,733 (25.1 kB) | 25,733 | 25,733 | 25,733 |
+| RAM free of 32,768 | 7,035 (6.9 kB) | 7,035 | 7,035 | 7,035 |
+
+All four are `tiarmsize` totals from builds made 2026-10-06 after the stats buffer grew from 160 to 256 bytes (96 bytes more RAM than the first builds, which were 25,637). Flash split for the 32 MHz build, from the map file (`tools/mapsize.py`):
+
+| Part | Flash | RAM |
+|---|--:|--:|
+| LVGL | 122,052 (119.2 kB), of which fonts 13,649 | 12,288 (the 12 kB heap, `LV_MEM_SIZE`) |
+| Port (`port.c`) | 1,744 | 6,417 (draw buffer 6,400, counters 17) |
+| App (`app.c`, `main.c`) | 2,107 | 348 (the 256-byte stats buffer is most of it) |
+| SysConfig and startup | 768 | 0 |
+| C library | 1,785 (what remains of the total) | 536 (rest of `.bss`) |
+| Stack (linker) | 0 | 6,144 |
+| Total | 128,456 | 25,733 |
+
+The 80 MHz builds are 616 bytes bigger in flash. The map shows 300 of them in the SysConfig and startup code, which holds the clock setup; the other 316 were not traced.
+
+## The choices, and why
+
+- **Heap 12 kB, draw buffer 320 x 10 rows (6.2 kB), stack 6 kB.** One partial buffer in RGB565, no double buffering. Ten rows is the size that was built and run; more rows mean fewer strips per redraw but more RAM. `ROWS=20` was not built; by arithmetic it adds 6.2 kB of RAM and leaves 635 bytes (0.6 kB) free. The heap peak is measured (8.5 kB); the stack peak is measured (3.9 kB).
+- **No byte swap.** The SPI block sends one 16-bit frame high byte first, which is the order the ST7796S wants, so LVGL's native RGB565 goes straight to DMA, as in `display-test/perf.c`.
+- **DMA with a blocking wait.** One buffer means the CPU cannot render the next strip while DMA sends this one. DMA is no faster than a CPU loop here (the wire is the limit, see display-test), so it is used to free the CPU bus, not for speed.
+- **16-bit frames need the SPI block off to change size.** `frames16()` disables SPI, sets the size, and enables it again around every strip. **Tag: Tool or docs.** The `DL_SPI_setDataSize` documentation does not say so.
+- **Chip select gap of 10 µs after every raise.** **Tag: Unknown (suspected: Third-party behavior).** The suspect is the module's level translator dropping shorter pulses ([display-test trap 1](../display-test/README.md#trap-1-the-screen-stays-dark-or-shows-static-even-though-every-wire-is-right)).
+- **Touch by software I2C at about 100 kHz,** polled every 20 ms, because the I2C block never got an answer ([display-test trap 2](../display-test/README.md#trap-2-the-touch-chip-does-not-answer-the-i2c-block-but-does-answer-software-i2c)). **Tag: Unknown (suspected: Third-party behavior).** A read that is not acknowledged keeps the last touch state and counts as a touch error.
+- **1 ms SysTick** feeds `lv_tick_set_cb`. The same interrupt runs a 10-step software PWM on the red LED (PA0, assumed active high, as in TI's `gpio_toggle_output`). The main loop is `lv_timer_handler()` then `__WFI()`.
+- **`-Oz`.** `-Os` was 8,544 bytes (8.3 kB) bigger than `-Oz` before the size patch, so only `-Oz` is known to fit. `-Oz` is slower than `-O2`; no speed was measured.
+- **LVGL config** (`lv_conf.h`): software renderer only, RGB565 only, no ARGB8888 or A8 destinations, no float, no OS, no log, no file system, no image decoders, no flex or grid, no sysmon, default theme (dark) only, 14 px Montserrat.
+
+## What did not fit, and what was cut
+
+**Tag: Unknown (suspected: Chip limit).** The 128 kB flash is where the full demo stops. LVGL is made of many small pieces, so no one function is large and there is no single thing to remove. The build got under the limit by removing a font and drawing features. So this says what fits in this build, not the most any build could fit.
+
+The builds, in the order they were made (flash in bytes, chart and arc in every one):
+
+| Build | Flash |
+|---|--:|
+| `-O2`, Montserrat 14 and 24, ARGB8888 and A8 drawing on, stock LVGL | 266,768 (260.5 kB) |
+| `-Os`, Montserrat 14 and 20, ARGB8888, A8 and other formats off in `lv_conf.h` | 178,976 (174.8 kB) |
+| `-Oz`, same | 170,432 (166.4 kB) |
+| `-Oz`, size patch (no shadow, blur, layer, triangle, mask-rectangle or image drawing, no image decoder), Montserrat 20 dropped | 133,504 (130.4 kB) |
+| Same, plus no image-format glyphs in `lv_draw_sw_letter.c` | 128,464 (125.5 kB) when measured; 128,456 in the final build (8 bytes less, from later small changes that were not isolated) |
+
+Montserrat 20 costs 21,808 bytes (21.3 kB): the oversize build below, 146.7 kB, is the final demo with that font added back. The size patch is worth 20,168 bytes (19.7 kB) with that font in both builds (166.4 kB down to 146.7 kB). The oversize build is 19,192 bytes (18.7 kB) over the chip's flash; it links only into a pretend 512 kB flash for measuring and must not be flashed.
+
+The patch assumes the demo draws no images, shadows or layers. A widget that needs one draws nothing for that part, and the image decoder is not initialized, so code that opens an image would misbehave. None of this demo's widgets do; the Mac render shows the screen drawing correctly. Rounded corners, the arc and the chart all stayed in. Other font sizes were not run.
+
+`-flto` was accepted and the output was byte for byte identical. **Tag: Unknown (suspected: Tool or docs).** TI Arm Clang may ignore `-flto` for this link. Its documentation was not checked.
+
+## What was not checked
+
+- The screen by eye: display init, colors, orientation. Only serial numbers were read.
+- Touch through LVGL: the saved runs show `touch_err=0` and `presses=0` on all 38 lines, which means the touch chip answered every read, but nobody touched the screen. Coordinates, orientation and what a finger does to the button and slider were not run by a person.
+- LED polarity (PA0 assumed active high) and the slider's effect on brightness.
+- DMA through LVGL's buffer: the flush time was measured, but the pixels were not compared.
+- The `lvgl_80mhz_spi20` build: built, not run.
+- Software I2C timing at 80 MHz: its delay scales with the CPU clock, so it should still be about 100 kHz; not measured.
+- `-Os` after the size patch: only `-Oz` was built with it.
+
+## Mistakes to avoid
+
+- **Tag: Our mistake.** Do not start with a 2 kB stack. Use 6 kB. A 2 kB stack ran out (`stack_free=0`, no untouched bytes), and a 4 kB stack left 152 bytes at the measured peak of 3.9 kB, so 2 kB was overrun by about 1.9 kB.
+- **Tag: Our mistake.** Do not size the heap from a 64-bit Mac run. The measured peak on the chip is 8.5 kB, so 12 kB is enough here.
+- **Tag: Our mistake.** Keep the serial stats buffer at 256 bytes. The stats line is 176 to 179 characters, so a 160-byte buffer cuts every line in the demo's own code (`static char line[256]` in `src/app.c`). The serial link is not the cause.
+
+==============================================================================
+FILE: mspm0g3507/zephyr/README.md | Zephyr blinky on the LP-MSPM0G3507 from an Intel Mac
+==============================================================================
+
+# Zephyr blinky on the LP-MSPM0G3507 from an Intel Mac
+
+Zephyr 4.4.2 `samples/basic/blinky` ran on the LP-MSPM0G3507 and the blue LED blinked. Checked 2026-10-05. The first run took about 9.5 minutes of machine time from nothing installed, with no hands-on time. A script now does the same install in about 3 minutes.
+
+Terms: [vocab](../../docs/vocab.md) and [FAQ](../FAQ.md). Sizes in kB, 1 kB = 1,024 bytes.
+
+![Build memory report and the start of the flash](../screenshots/z5-zephyr-build-memory-report-and-flash.png)
+
+Build size from the memory report: 11.7 kB of flash, 3.9 kB of RAM. `west flash` found the probe, detected the chip and wrote 11.7 kB. The LED pin read back as toggling three times, a second apart.
+
+## Official steps that did not work here
+
+Four places where the official instructions failed on this Intel Mac. Each one is a step a newcomer would have to work out alone.
+
+| # | The official way | What blocked it | What was done instead |
+|---|------------------|-----------------|-----------------------|
+| 1 | Install build tools with Homebrew | Homebrew builds from source on this Intel Mac | `pip install west cmake` in a Python 3.12 environment. `dtc` left out; the build does not need it. |
+| 2 | `west sdk install` for the compiler | Zephyr SDK 1.0.1 has no Intel macOS build, and Zephyr 4.4.2 requires SDK 1.0. The command fails with an empty list. | Arm compiler from SDK 0.17.4 via `ZEPHYR_TOOLCHAIN_VARIANT=cross-compile`, plus the `picolibc` module. Works. Not an officially supported pairing. |
+| 3 | Clone OpenOCD and build it from source | Needs a build toolchain this Mac does not have | Prebuilt xPack OpenOCD 0.12.0-7, which already supports the chip and the XDS110 probe. |
+| 4 | `west flash`, then watch it blink | After a debugger soft reset the chip sat in Zephyr's NMI handler, no blink | One board-level reset command. The reset button does the same. |
+
+Two safety checks to make before flashing a borrowed board, neither in any guide: confirm the fix for the December 2025 "bricked LaunchPad" bug (Zephyr PR 102668) is in the source, and confirm the image contains main flash addresses only.
+
+Done differently by choice, to save time and disk: a pinned release (v4.4.2), shallow clones, and only four modules instead of a full `west update`.
+
+## Repeat it
+
+`./setup.sh` is the cross-platform version: macOS on Intel or Apple silicon and Linux on x86_64 or arm64, every download pinned and checksummed, Python 3.12 from uv when the machine has none, a free-disk check first. From nothing installed, build only: 2 min 48 s on this Intel MacBook inside a sandbox that hides every installed tool, 56 s on an M4 Mac, 93 s in an Ubuntu 24.04 arm64 container on that Mac (all 2026-10-18). Linux x86_64 is pinned but not run. The flash leg on Apple silicon and on Linux is untested.
+
+`./setup-intel-mac.sh` is the exact sequence that worked on the Intel Mac, with checksums. It ran from clean twice on 2026-10-05, in a plain Terminal window: 3 minutes 00 seconds and 3 minutes 06 seconds, exit code 0 both times. The first run, while the workarounds were still being found, took 9.5 minutes.
+
+![Script finished in 3 minutes 6 seconds](../screenshots/z8-zephyr-script-finished-3m06s.png)
+
+## Red blink
+
+`red-blink/` is a copy of the blinky sample that lives in this repo instead of the Zephyr tree. Two changes: `boards/lp_mspm0g3507.overlay` points `led0` at the red channel of the RGB LED (PB26) instead of blue (PB22), and `SLEEP_TIME_MS` is 500, so the LED is on half a second and off half a second.
+
+Build and flash, with the environment from `setup-intel-mac.sh`:
+
+```text
+cd ~/zephyrproject/zephyr
+west build -p always -b lp_mspm0g3507 <this repo>/zephyr/red-blink -d ../build-red-blink
+west flash -d ../build-red-blink --openocd "$OCD/bin/openocd" --openocd-search "$OCD/openocd/scripts"
+```
+
+Then do the board-level reset from step 6 of the script. It took 85 seconds to build and 7 to flash and reset. CCStudio can stay open with no debug connection; it does not get in the way.

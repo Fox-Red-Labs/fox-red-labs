@@ -1,0 +1,36 @@
+/* Motion kit, shared by every page (tools/site_chrome.py links it). Ported from the Claude design canvas
+   "Fox Red Labs site review" (2026-10-14): reading content stays visible, bars grow from the left,
+   rank arcs draw to their place. Nothing loops except a blinking LED. No JS: everything is simply visible.
+   Reduced motion: everything is simply visible. */
+.js .m { opacity: 1; transform: none; transition: none; }
+.js .m.m-in { opacity: 1; transform: none; }
+.js .m-bars .rk-t > i:not(.rk-gl):not(.rk-ref), .js .m-bars .bar, .js .m-bars .lad-bar i { transform: scaleX(0); transform-origin: left center; transition: transform .8s cubic-bezier(.2,.8,.2,1); }
+.js .m-bars.m-in .rk-t > i:not(.rk-gl):not(.rk-ref), .js .m-bars.m-in .bar, .js .m-bars.m-in .lad-bar i { transform: none; }
+.js .m-bars.m-in .rk-rows > :nth-child(3n+2) i { transition-delay: calc(var(--i, 0) * 45ms); }
+.m-arc { stroke-dasharray: 252; stroke-dashoffset: 252; transition: stroke-dashoffset 1.1s .2s cubic-bezier(.2,.8,.2,1); }
+.m-in .m-arc { stroke-dashoffset: var(--dash, 0); }
+@keyframes frl-blink { 0%, 49% { opacity: 1 } 50%, 100% { opacity: .1 } }
+.m-led { animation: frl-blink .9s steps(1) infinite; }
+@media print, (prefers-reduced-motion: reduce) {
+  .js .m, .js .m-bars .rk-t > i:not(.rk-gl):not(.rk-ref), .js .m-bars .bar, .js .m-bars .lad-bar i { opacity: 1; transform: none; transition: none; }
+  .m-arc { stroke-dashoffset: var(--dash, 0); transition: none; }
+  .m-led { animation: none; }
+}
+
+/* Home page (tools/render_home.py). Reveal once as a block scrolls in, the rail lights chip by chip, numbers count up, the hero
+   title rises word by word. motion.js adds html.hm-js only when motion is allowed; without it, or under reduced motion, every
+   part is simply visible. Nothing here loops except the blinking LED (.m-led above). */
+@media (prefers-reduced-motion: no-preference) {
+  html.hm-js .hm-rv:not(.in) { opacity: 0; transform: translateY(18px); }
+  html.hm-js .hm-rv { transition: opacity .7s cubic-bezier(.2,.8,.2,1), transform .7s cubic-bezier(.2,.8,.2,1); }
+  html.hm-js .hm-stag:not(.in) > * { opacity: 0; transform: translateY(16px); }
+  html.hm-js .hm-stag > * { transition: opacity .6s cubic-bezier(.2,.8,.2,1), transform .6s cubic-bezier(.2,.8,.2,1), border-color .25s, box-shadow .25s; }
+  html.hm-js .hm-stag.in > :nth-child(2) { transition-delay: 70ms } html.hm-js .hm-stag.in > :nth-child(3) { transition-delay: 140ms }
+  html.hm-js .hm-stag.in > :nth-child(4) { transition-delay: 210ms } html.hm-js .hm-stag.in > :nth-child(5) { transition-delay: 280ms }
+  html.hm-js .hm-stag.in > :nth-child(6) { transition-delay: 350ms } html.hm-js .hm-stag.in > :nth-child(7) { transition-delay: 420ms }
+  html.hm-js .hm-stag.in > :nth-child(8) { transition-delay: 490ms }
+  html.hm-js .hm-w { display: inline-block; opacity: 0; transform: translateY(.35em); animation: hm-up .7s cubic-bezier(.2,.8,.2,1) forwards; }
+  html.hm-js .hm-w:nth-child(2) { animation-delay: .12s } html.hm-js .hm-w:nth-child(3) { animation-delay: .24s }
+}
+@keyframes hm-up { to { opacity: 1; transform: none; } }
+@media print { html.hm-js .hm-rv, html.hm-js .hm-stag > *, html.hm-js .hm-w { opacity: 1 !important; transform: none !important; animation: none !important; } }

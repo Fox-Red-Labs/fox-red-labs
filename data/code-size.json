@@ -1,0 +1,2493 @@
+{
+  "note": "Source of the Code size estimator (tools/code_size.py, tools/render_code_size.py). Every build names the rows it reads: data/results/<board>.csv (test, variant), a memory-breakdown.json build, or a table copied from a named README (manual). Sizes are never typed here; the module reads them and refuses a row that is not measured. 'none' lists the Builds projects with no build size on record; each gets the same reason unless it names its own.",
+  "ram_total_bytes": {
+    "cc2340r5": 36864,
+    "cc2755p10": 165888,
+    "cc1354p10": 262144,
+    "esp32c6": 452112,
+    "cc35x1": 520783
+  },
+  "ram_total_note": "Where a row states its own SRAM total the row wins. Otherwise: CC2340R5 36,864 B and CC2755P10 165,888 B (boards.csv KB x 1024), CC1354P10 262,144 B SRAM (its rows state it), ESP32-C6 452,112 B static DIRAM (its rows state it), CC35X1 520,783 B main DRAM (the ESPHome row: 445,030 B used plus 75,753 B free; the 128 kB TCM is separate).",
+  "projects": [
+    {
+      "slug": "blink",
+      "name": "Blink an LED",
+      "builds": [
+        {
+          "board": "mspm0c1104",
+          "label": "TI gpio_toggle_output",
+          "flash": [
+            "blink_flash_bytes",
+            "driverlib-bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "driverlib-bare"
+          ]
+        },
+        {
+          "board": "mspm0l1306",
+          "label": "TI gpio_toggle_output",
+          "flash": [
+            "blink_flash_bytes",
+            "bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare"
+          ]
+        },
+        {
+          "board": "mspm0g3507",
+          "label": "DriverLib, no OS (a small app)",
+          "breakdown": [
+            "mspm0g3507/memory-breakdown.json",
+            "driverlib"
+          ]
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "TI gpio_toggle_output",
+          "flash": [
+            "blink_flash_bytes",
+            "bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare"
+          ]
+        },
+        {
+          "board": "mspm33c321a",
+          "label": "TI gpio_toggle_output",
+          "flash": [
+            "blink_flash_bytes",
+            "bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare"
+          ]
+        },
+        {
+          "board": "am13e230",
+          "label": "TI gpio_toggle_output",
+          "flash": [
+            "blink_flash_bytes",
+            "bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare"
+          ]
+        },
+        {
+          "board": "f2800137",
+          "label": "TI driverlib led_ex1_blinky",
+          "flash": [
+            "blink_flash_bytes",
+            "bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "TI empty project, no RTOS",
+          "flash": [
+            "blink_flash_bytes",
+            "bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "TI empty project, no RTOS",
+          "flash": [
+            "blink_flash_bytes",
+            "bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare"
+          ]
+        },
+        {
+          "board": "cc1354p10",
+          "label": "TI empty project, no RTOS",
+          "flash": [
+            "blink_flash_bytes",
+            "bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare"
+          ]
+        },
+        {
+          "board": "frdm-mcxa153",
+          "label": "NXP led_blinky",
+          "flash": [
+            "blink_flash_bytes",
+            "mcux-bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "mcux-bare"
+          ]
+        },
+        {
+          "board": "nucleo-u083rc",
+          "label": "ST GPIO_IOToggle",
+          "flash": [
+            "blink_flash_bytes",
+            "st-hal-bare"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "st-hal-bare"
+          ]
+        },
+        {
+          "board": "pico2",
+          "label": "Pico SDK blink with USB serial output (Arm core)",
+          "flash": [
+            "blink_flash_bytes",
+            "bare-m33"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "bare-m33"
+          ]
+        },
+        {
+          "board": "esp32c6",
+          "label": "ESP-IDF blink example",
+          "flash": [
+            "blink_flash_bytes",
+            "esp-idf-v6.1-og"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "esp-idf-v6.1-og"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "run-freertos",
+      "name": "Run an RTOS: blink with FreeRTOS",
+      "builds": [
+        {
+          "board": "mspm0c1104",
+          "label": "Blink, one task",
+          "flash": [
+            "blink_flash_bytes",
+            "freertos"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "freertos"
+          ]
+        },
+        {
+          "board": "mspm0l1306",
+          "label": "Blink, one task plus idle",
+          "flash": [
+            "blink_flash_bytes",
+            "freertos"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "freertos"
+          ]
+        },
+        {
+          "board": "mspm0g3507",
+          "label": "TI Drivers on FreeRTOS",
+          "breakdown": [
+            "mspm0g3507/memory-breakdown.json",
+            "tidrivers_freertos"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "TI empty project on FreeRTOS",
+          "flash": [
+            "blink_flash_bytes",
+            "freertos"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "freertos"
+          ]
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Blink on FreeRTOS",
+          "flash": [
+            "blink_flash_bytes",
+            "freertos"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "freertos"
+          ]
+        },
+        {
+          "board": "cc35x1",
+          "label": "TI empty drivers project on FreeRTOS",
+          "flash": [
+            "blink_flash_bytes",
+            "freertos"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "freertos"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "run-zephyr",
+      "name": "Run Zephyr: blink",
+      "builds": [
+        {
+          "board": "mspm0l1306",
+          "label": "Zephyr blinky",
+          "flash": [
+            "blink_flash_bytes",
+            "zephyr"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "zephyr"
+          ]
+        },
+        {
+          "board": "mspm0g3507",
+          "label": "Zephyr blinky",
+          "flash": [
+            "blink_flash_bytes",
+            "zephyr"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "zephyr"
+          ]
+        },
+        {
+          "board": "mspm0g3519",
+          "label": "Zephyr blinky",
+          "flash": [
+            "blink_flash_bytes",
+            "zephyr"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "zephyr"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Zephyr blinky",
+          "flash": [
+            "blink_flash_bytes",
+            "zephyr"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "zephyr"
+          ]
+        },
+        {
+          "board": "frdm-mcxa153",
+          "label": "Zephyr blinky",
+          "flash": [
+            "blink_flash_bytes",
+            "zephyr"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "zephyr"
+          ]
+        },
+        {
+          "board": "nucleo-u083rc",
+          "label": "Zephyr blinky",
+          "flash": [
+            "blink_flash_bytes",
+            "zephyr"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "zephyr"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "arduino",
+      "name": "Blink with an Arduino sketch",
+      "builds": [
+        {
+          "board": "nucleo-u083rc",
+          "label": "Arduino Blink (STM32duino core)",
+          "flash": [
+            "blink_flash_bytes",
+            "arduino"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "arduino"
+          ]
+        },
+        {
+          "board": "pico2",
+          "label": "Arduino Blink (Pico core)",
+          "flash": [
+            "blink_flash_bytes",
+            "arduino"
+          ],
+          "ram": [
+            "blink_ram_bytes",
+            "arduino"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "print-a-message",
+      "name": "Print a message to the computer",
+      "builds": [
+        {
+          "board": "mspm0l1306",
+          "label": "Zephyr hello_world",
+          "breakdown": [
+            "mspm0l1306/memory-breakdown.json",
+            "zephyr_hello"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "speed-test",
+      "name": "Speed test: CoreMark",
+      "builds": [
+        {
+          "board": "mspm0l1306",
+          "label": "CoreMark, bare metal",
+          "breakdown": [
+            "mspm0l1306/memory-breakdown.json",
+            "coremark"
+          ]
+        },
+        {
+          "board": "mspm0l1306",
+          "label": "CoreMark on Zephyr",
+          "breakdown": [
+            "mspm0l1306/memory-breakdown.json",
+            "zephyr_coremark"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "CoreMark, bare metal, -O3",
+          "breakdown": [
+            "cc2340r5/matrix/memory-breakdown.json",
+            "coremark_O3"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "small-ai-model",
+      "name": "Run a small AI model: room occupancy",
+      "builds": [
+        {
+          "board": "mspm0l1306",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0l1306",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g3507",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g3507",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g3507",
+          "label": "Room-occupancy largest model (occ_cnn_30k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_30k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_30k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g3519",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g3519",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g3519",
+          "label": "Room-occupancy largest model (occ_cnn_30k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_30k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_30k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "Room-occupancy largest model (occ_cnn_30k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_30k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_30k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Room-occupancy largest model (occ_cnn_30k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_30k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_30k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Room-occupancy largest model (occ_cnn_30k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_30k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_30k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Room-occupancy largest model (occ_cnn_30k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_30k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_30k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "am13e230",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "am13e230",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "am13e230",
+          "label": "Room-occupancy largest model (occ_cnn_30k), plain C -O3",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_30k-c-o3"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_30k-c-o3"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "f2800137",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C, from flash",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o2-flash"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o2-flash"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "f2800137",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C, from flash",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o2-flash"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o2-flash"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "f28p65x",
+          "label": "Room-occupancy smallest model (occ_cnn_500), plain C, from RAM",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_500-c-o4s5-ram"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_500-c-o4s5-ram"
+          ],
+          "scope": "model"
+        },
+        {
+          "board": "f28p65x",
+          "label": "Room-occupancy mid-size model (occ_cnn_8k), plain C, from RAM",
+          "flash": [
+            "ai_model_flash",
+            "occ_cnn_8k-c-o4s5-ram"
+          ],
+          "ram": [
+            "ai_model_ram",
+            "occ_cnn_8k-c-o4s5-ram"
+          ],
+          "scope": "model"
+        }
+      ],
+      "note": "No build of the largest model is on record for the MSPM0L1306. The rows read here count the model alone, so the room left is not room for a whole program."
+    },
+    {
+      "slug": "handwritten-digits",
+      "name": "Read handwritten digits on the chip",
+      "builds": [
+        {
+          "board": "mspm0g3507",
+          "label": "Handwritten-digit demo with screen, touch and neural net",
+          "breakdown": [
+            "mspm0g3507/memory-breakdown.json",
+            "digit_touch"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "bluetooth-sensor",
+      "name": "Bluetooth sensor a phone can see",
+      "builds": [
+        {
+          "board": "cc2340r5",
+          "label": "Bluetooth beacon in the BTHome format",
+          "flash": [
+            "radio_flash_used",
+            "ble-bthome-broadcaster"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-bthome-broadcaster"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Bluetooth thermometer service",
+          "flash": [
+            "radio_flash_used",
+            "ble-thermometer-profile"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-thermometer-profile"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "TI basic_ble peripheral",
+          "flash": [
+            "radio_flash_used",
+            "ble-basic-ble"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-basic-ble"
+          ],
+          "nearest": true,
+          "ota": {
+            "use": "cc2340r5-ble-dual",
+            "base": "off",
+            "other": {
+              "label": "Bluetooth peripheral with the dual-image update service",
+              "flash": [
+                "radio_flash_used",
+                "ble-oad-dual-image"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "ble-oad-dual-image"
+              ]
+            }
+          }
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Bluetooth beacon, TI Zephyr fork",
+          "flash": [
+            "radio_flash_used",
+            "ble-zephyr-bthome"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-zephyr-bthome"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "TI basic_ble peripheral",
+          "flash": [
+            "radio_flash_used",
+            "ble-basic-ble"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-basic-ble"
+          ],
+          "nearest": true,
+          "ota": {
+            "use": "cc2755p10-ble-dual",
+            "base": "off",
+            "other": {
+              "label": "Bluetooth peripheral with the dual-image update service",
+              "flash": [
+                "radio_flash_used",
+                "ble-oad-dual-image"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "ble-oad-dual-image"
+              ]
+            }
+          }
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Bluetooth Blinky service (project_zero), generated code",
+          "flash": [
+            "radio_flash_used",
+            "ble-blinky-generated"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-blinky-generated"
+          ],
+          "nearest": true
+        },
+        {
+          "board": "esp32c6",
+          "label": "Bluetooth beacon in the BTHome format",
+          "flash": [
+            "radio_flash_used",
+            "ble-bthome"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-bthome"
+          ]
+        },
+        {
+          "board": "esp32c6",
+          "label": "NimBLE peripheral example",
+          "flash": [
+            "radio_flash_used",
+            "ble-nimble-peripheral"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-nimble-peripheral"
+          ],
+          "nearest": true
+        }
+      ]
+    },
+    {
+      "slug": "zigbee-light",
+      "name": "Zigbee light for Home Assistant",
+      "builds": [
+        {
+          "board": "cc2340r5",
+          "label": "Zigbee router, TI onoff_light, logging on",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Zigbee router, TI onoff_light, logging off",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router-ti-nolog"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router-ti-nolog"
+          ],
+          "ota": {
+            "use": "cc2340r5-zigbee-rtr",
+            "base": "off",
+            "other": {
+              "label": "Zigbee router with TI's update client (onoff_switch_ota_client_onchip built as a router)",
+              "flash": [
+                "radio_flash_used",
+                "zigbee-ota-client-router"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "zigbee-ota-client-router"
+              ]
+            }
+          }
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Zigbee router, TI onoff_light",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Zigbee router, TI onoff_light, logging off",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router-ti-nolog"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router-ti-nolog"
+          ]
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Zigbee router, TI zr_light",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router"
+          ]
+        },
+        {
+          "board": "esp32c6",
+          "label": "Zigbee router light (esp-zigbee-lib)",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "battery-sensor-home-assistant",
+      "name": "Battery sensor for Home Assistant (Zigbee)",
+      "builds": [
+        {
+          "board": "cc1354p10",
+          "label": "Zigbee end device with temperature, sleepy",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-zed-sleepy-temp"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-zed-sleepy-temp"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Zigbee end device, TI onoff_switch, logging on",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-end-device"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-end-device"
+          ],
+          "nearest": true
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Zigbee end device, TI onoff_light as end device, logging off",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-zed-ti-nolog"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-zed-ti-nolog"
+          ],
+          "nearest": true,
+          "ota": {
+            "use": "cc2340r5-zigbee-ed",
+            "base": "off",
+            "other": {
+              "label": "Zigbee end device with TI's update client (onoff_switch_ota_client_onchip)",
+              "flash": [
+                "radio_flash_used",
+                "zigbee-ota-client"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "zigbee-ota-client"
+              ]
+            }
+          }
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Zigbee end device, TI onoff_switch",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-end-device"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-end-device"
+          ],
+          "nearest": true,
+          "ota": {
+            "use": "cc2755p10-zigbee-ed",
+            "base": "off",
+            "other": {
+              "label": "Zigbee end device with TI's update client (onoff_switch_ota_client_onchip)",
+              "flash": [
+                "radio_flash_used",
+                "zigbee-ota-client"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "zigbee-ota-client"
+              ]
+            }
+          }
+        },
+        {
+          "board": "esp32c6",
+          "label": "Zigbee end device with ESPHome",
+          "flash": [
+            "radio_flash_used",
+            "esphome-zigbee-ed"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "esphome-zigbee-ed"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "esphome",
+      "name": "Describe a device in ESPHome",
+      "builds": [
+        {
+          "board": "cc2340r5",
+          "label": "ESPHome Zigbee end device",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-zed-esphome"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-zed-esphome"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "ESPHome Zigbee end device, cc23xx platform",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-zed-esphome-cc23xx"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-zed-esphome-cc23xx"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "ESPHome Zigbee router",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router-esphome"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router-esphome"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "ESPHome Zigbee router, cc23xx platform",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router-esphome-cc23xx"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router-esphome-cc23xx"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "ESPHome Zigbee end device",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-zed-esphome"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-zed-esphome"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "ESPHome Zigbee router",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router-esphome"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router-esphome"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "ESPHome Zigbee router, cc27xx platform",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-router-esphome-cc27xx"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-router-esphome-cc27xx"
+          ]
+        },
+        {
+          "board": "cc35x1",
+          "label": "ESPHome Wi-Fi device with native API",
+          "flash": [
+            "radio_flash_used",
+            "wifi-esphome-api"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "wifi-esphome-api"
+          ]
+        },
+        {
+          "board": "esp32c6",
+          "label": "ESPHome Wi-Fi device",
+          "flash": [
+            "radio_flash_used",
+            "esphome-minimal-wifi"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "esphome-minimal-wifi"
+          ],
+          "ota": {
+            "use": "esp32c6-esphome",
+            "base": "on"
+          }
+        },
+        {
+          "board": "esp32c6",
+          "label": "ESPHome Thread device",
+          "flash": [
+            "radio_flash_used",
+            "esphome-thread"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "esphome-thread"
+          ]
+        },
+        {
+          "board": "esp32c6",
+          "label": "ESPHome Bluetooth proxy",
+          "flash": [
+            "radio_flash_used",
+            "ble-esphome-proxy"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-esphome-proxy"
+          ],
+          "ota": {
+            "use": "esp32c6-esphome",
+            "base": "on"
+          }
+        },
+        {
+          "board": "esp32c6",
+          "label": "ESPHome Bluetooth proxy plus Zigbee end device",
+          "flash": [
+            "radio_flash_used",
+            "ble-proxy-zigbee-ed"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-proxy-zigbee-ed"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "wifi-sensor",
+      "name": "Wi-Fi sensor in Home Assistant",
+      "builds": [
+        {
+          "board": "cc35x1",
+          "label": "ESPHome Wi-Fi device with native API",
+          "flash": [
+            "radio_flash_used",
+            "wifi-esphome-api"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "wifi-esphome-api"
+          ]
+        },
+        {
+          "board": "esp32c6",
+          "label": "ESPHome Wi-Fi device",
+          "flash": [
+            "radio_flash_used",
+            "esphome-minimal-wifi"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "esphome-minimal-wifi"
+          ],
+          "ota": {
+            "use": "esp32c6-esphome",
+            "base": "on"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "ota-update",
+      "name": "Update firmware over the air",
+      "builds": [
+        {
+          "board": "cc2340r5",
+          "label": "Bluetooth update, dual-image example",
+          "flash": [
+            "radio_flash_used",
+            "ble-oad-dual-image"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-oad-dual-image"
+          ],
+          "ota": {
+            "use": "cc2340r5-ble-dual",
+            "base": "on",
+            "other": {
+              "label": "Bluetooth peripheral, TI basic_ble, no update",
+              "flash": [
+                "radio_flash_used",
+                "ble-basic-ble"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "ble-basic-ble"
+              ]
+            }
+          }
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Zigbee update client, end device",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-ota-client"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-ota-client"
+          ],
+          "ota": {
+            "use": "cc2340r5-zigbee-ed",
+            "base": "on",
+            "other": {
+              "label": "Zigbee end device, TI onoff_light as end device, logging off, no update",
+              "flash": [
+                "radio_flash_used",
+                "zigbee-zed-ti-nolog"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "zigbee-zed-ti-nolog"
+              ]
+            }
+          }
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Zigbee update client, router",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-ota-client-router"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-ota-client-router"
+          ],
+          "ota": {
+            "use": "cc2340r5-zigbee-rtr",
+            "base": "on",
+            "other": {
+              "label": "Zigbee router, TI onoff_light, logging off, no update",
+              "flash": [
+                "radio_flash_used",
+                "zigbee-router-ti-nolog"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "zigbee-router-ti-nolog"
+              ]
+            }
+          }
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Bluetooth update, dual-image example",
+          "flash": [
+            "radio_flash_used",
+            "ble-oad-dual-image"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-oad-dual-image"
+          ],
+          "ota": {
+            "use": "cc2755p10-ble-dual",
+            "base": "on",
+            "other": {
+              "label": "Bluetooth peripheral, TI basic_ble, no update",
+              "flash": [
+                "radio_flash_used",
+                "ble-basic-ble"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "ble-basic-ble"
+              ]
+            }
+          }
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Zigbee update client",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-ota-client"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-ota-client"
+          ],
+          "ota": {
+            "use": "cc2755p10-zigbee-ed",
+            "base": "on",
+            "other": {
+              "label": "Zigbee end device, TI onoff_switch, no update",
+              "flash": [
+                "radio_flash_used",
+                "zigbee-end-device"
+              ],
+              "ram": [
+                "radio_ram_left",
+                "zigbee-end-device"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "slug": "thread-device",
+      "name": "Thread device",
+      "builds": [
+        {
+          "board": "cc1354p10",
+          "label": "Thread radio co-processor (RCP)",
+          "flash": [
+            "radio_flash_used",
+            "thread-rcp"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-rcp"
+          ]
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Thread radio with command line",
+          "flash": [
+            "radio_flash_used",
+            "thread-radio-cli"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-radio-cli"
+          ]
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Thread command-line device, minimal (MTD)",
+          "flash": [
+            "radio_flash_used",
+            "thread-cli-mtd"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-cli-mtd"
+          ]
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Thread command-line device, full (FTD)",
+          "flash": [
+            "radio_flash_used",
+            "thread-cli-ftd"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-cli-ftd"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Thread radio co-processor (RCP)",
+          "flash": [
+            "radio_flash_used",
+            "thread-rcp"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-rcp"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Thread radio with command line",
+          "flash": [
+            "radio_flash_used",
+            "thread-radio-cli"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-radio-cli"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Thread command-line device, minimal (MTD)",
+          "flash": [
+            "radio_flash_used",
+            "thread-cli-mtd"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-cli-mtd"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Thread command-line device, full (FTD)",
+          "flash": [
+            "radio_flash_used",
+            "thread-cli-ftd"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-cli-ftd"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Thread radio co-processor (RCP)",
+          "flash": [
+            "radio_flash_used",
+            "thread-rcp"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-rcp"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Thread radio with command line",
+          "flash": [
+            "radio_flash_used",
+            "thread-radio-cli"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-radio-cli"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Thread command-line device, minimal (MTD)",
+          "flash": [
+            "radio_flash_used",
+            "thread-cli-mtd"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-cli-mtd"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Thread command-line device, full (FTD)",
+          "flash": [
+            "radio_flash_used",
+            "thread-cli-ftd"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-cli-ftd"
+          ]
+        },
+        {
+          "board": "esp32c6",
+          "label": "Thread command-line device (full)",
+          "flash": [
+            "radio_flash_used",
+            "thread-ftd"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "thread-ftd"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "two-radios",
+      "name": "Two radio stacks at once",
+      "builds": [
+        {
+          "board": "cc2755p10",
+          "label": "Bluetooth plus TI 15.4 sensor (dmm)",
+          "flash": [
+            "radio_flash_used",
+            "dmm-ble-ti154"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "dmm-ble-ti154"
+          ]
+        },
+        {
+          "board": "cc1354p10",
+          "label": "Zigbee plus Bluetooth light (dmm)",
+          "flash": [
+            "radio_flash_used",
+            "zigbee-ble-dmm-zr-light"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "zigbee-ble-dmm-zr-light"
+          ]
+        },
+        {
+          "board": "cc2340r5",
+          "label": "Bluetooth plus TI 15.4 sensor (dmm)",
+          "ram": [
+            "radio_ram_left",
+            "dmm-ble-ti154"
+          ],
+          "warn": "TI says CC23xx chips do not support two radio stacks at once. The build does not link: it is 2,170 B short of total free RAM before the heap, and 21,962 B short with TI's 19,792 B heap. Its flash figure is not recorded."
+        }
+      ],
+      "note": ""
+    },
+    {
+      "slug": "radio-range",
+      "name": "Measure how far the radio reaches",
+      "builds": [
+        {
+          "board": "cc2340r5",
+          "label": "TI rfPacketTx, proprietary packet sender",
+          "flash": [
+            "radio_flash_used",
+            "proprietary-rftx"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "proprietary-rftx"
+          ]
+        },
+        {
+          "board": "cc1354p10",
+          "label": "TI rfPacketTx, proprietary packet sender",
+          "flash": [
+            "radio_flash_used",
+            "proprietary-rftx"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "proprietary-rftx"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "tool-telemetry",
+      "name": "Track equipment over Bluetooth",
+      "builds": [
+        {
+          "board": "cc2340r5",
+          "label": "Bluetooth tag with a run-event classifier",
+          "flash": [
+            "radio_flash_used",
+            "ble-tooltag"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-tooltag"
+          ]
+        },
+        {
+          "board": "cc2755p10",
+          "label": "Bluetooth tag with a run-event classifier",
+          "flash": [
+            "radio_flash_used",
+            "ble-tooltag"
+          ],
+          "ram": [
+            "radio_ram_left",
+            "ble-tooltag"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "bldc-spin",
+      "name": "Spin a brushless motor",
+      "builds": [
+        {
+          "board": "am13e230",
+          "label": "Hall-sensored motor control with the bench guard, revision G (flashed, ran)",
+          "manual": {
+            "flash_used": 72960,
+            "flash_total": 262144,
+            "flash_region": "FLASH_BANK0, 256 KB",
+            "ram_used": 32473,
+            "ram_total": 131072,
+            "ram_region": "RAM_C 14,440 B plus RAM_S 18,033 B, of 32 KB plus 96 KB",
+            "tool": "TI Arm Clang (linker map totals)",
+            "source": "am13e230/foc-drv8376/results/guard-revH-20261019/README.md (region table, revision G column)",
+            "date": "2026-10-19"
+          }
+        },
+        {
+          "board": "am13e230",
+          "label": "The same with the capture ring, revision H (built, not flashed)",
+          "manual": {
+            "flash_used": 74816,
+            "flash_total": 262144,
+            "flash_region": "FLASH_BANK0, 256 KB",
+            "ram_used": 49897,
+            "ram_total": 131072,
+            "ram_region": "RAM_C 15,200 B plus RAM_S 34,697 B, of 32 KB plus 96 KB",
+            "tool": "TI Arm Clang (linker map totals)",
+            "source": "am13e230/foc-drv8376/results/guard-revH-20261019/README.md (region table, revision H column)",
+            "date": "2026-10-19"
+          }
+        }
+      ]
+    },
+    {
+      "slug": "read-a-voltage",
+      "name": "Read a knob or a voltage",
+      "builds": [
+        {
+          "board": "mspm0g3507",
+          "label": "TI adc12_monitor_supply, the chip reads its own supply",
+          "sweep": [
+            "mspm0g3507/example-sweep/data/sdk/builds.jsonl",
+            "nortos/LP_MSPM0G3507/driverlib/adc12_monitor_supply"
+          ],
+          "tool": "TI Arm Clang 5.1.1, MSPM0 SDK 2.11.00.07"
+        },
+        {
+          "board": "mspm0l1306",
+          "label": "TI adc12_monitor_supply, the chip reads its own supply",
+          "sweep": [
+            "mspm0l1306/sweep/data/builds-nortos-LP_MSPM0L1306.jsonl",
+            "nortos/LP_MSPM0L1306/driverlib/adc12_monitor_supply"
+          ],
+          "tool": "TI Arm Clang 5.1.1, MSPM0 SDK 2.11.00.07"
+        }
+      ],
+      "note": "TI's unmodified example. The bench copies that printed the readings add a results buffer, so they are a little larger."
+    },
+    {
+      "slug": "temperature",
+      "name": "Read a temperature sensor",
+      "builds": [
+        {
+          "board": "mspm0l1306",
+          "label": "TI out-of-box demo, board thermistor read over the serial port",
+          "sweep": [
+            "mspm0l1306/sweep/data/builds-nortos-LP_MSPM0L1306.jsonl",
+            "nortos/LP_MSPM0L1306/demos/out_of_box"
+          ],
+          "tool": "TI Arm Clang 5.1.1, MSPM0 SDK 2.11.00.07"
+        },
+        {
+          "board": "mspm0g3507",
+          "label": "TI adc12_internal_temp_sensor_mathacl, the chip's own sensor",
+          "sweep": [
+            "mspm0g3507/example-sweep/data/sdk/builds.jsonl",
+            "nortos/LP_MSPM0G3507/driverlib/adc12_internal_temp_sensor_mathacl"
+          ],
+          "tool": "TI Arm Clang 5.1.1, MSPM0 SDK 2.11.00.07"
+        }
+      ],
+      "note": "TI's unmodified examples, the ones that gave the readings on the project page."
+    },
+    {
+      "slug": "pwm-dim",
+      "name": "Dim an LED or move a servo",
+      "builds": [
+        {
+          "board": "mspm0g3507",
+          "label": "PWM program ported from ST's example, channel 4 read back",
+          "manual": {
+            "flash_used": 2408,
+            "flash_total": 131072,
+            "flash_region": "the chip's 128 kB of flash",
+            "ram_used": 700,
+            "ram_total": 32768,
+            "ram_region": "the chip's 32 kB of RAM, all of it zero-initialized data",
+            "tool": "TI Arm Clang 5.1.1, MSPM0 SDK 2.11.00.07",
+            "source": "mspm0g3507/stm32-port-eval/05-tim-pwm/README.md (program size row, tiarmsize on the rebuilt project)",
+            "date": "2026-10-06",
+            "checked": "readme",
+            "needle": "2,408 bytes code",
+            "extra": "The README records this size as read once with tiarmsize; the output was not saved."
+          }
+        }
+      ],
+      "note": "The one PWM program whose output was read back. TI's own PWM examples also run on two boards, and their pulses were not measured."
+    },
+    {
+      "slug": "small-screen",
+      "name": "Color and touch on a small screen",
+      "builds": [
+        {
+          "board": "mspm0g3507",
+          "label": "Fills, bars and touch dots on the 3.5 inch screen, 8 MHz SPI build",
+          "manual": {
+            "flash_used": 7592,
+            "flash_total": 131072,
+            "flash_region": "the chip's 128 kB of flash",
+            "ram_used": 648,
+            "ram_total": 32768,
+            "ram_region": "the chip's 32 kB of RAM",
+            "tool": "TI Arm Clang 5.1.1, MSPM0 SDK 2.11.00.07",
+            "source": "mspm0g3507/display-test/README.md (program size row, tiarmsize on display_8mhz.out)",
+            "date": "2026-10-06",
+            "checked": "build log",
+            "needle": "7.4 kB of flash, 648 B of RAM"
+          }
+        }
+      ],
+      "note": "The widget library build is a separate, larger program: 128,456 B of flash and 25,733 B of RAM at 32 MHz, as quoted in the display test README."
+    },
+    {
+      "slug": "alarm-listener",
+      "name": "Alarm listener",
+      "builds": [
+        {
+          "board": "mspm0g5187",
+          "label": "Alarm detector with the learning model, as flashed",
+          "manual": {
+            "flash_used": 80608,
+            "flash_total": 131072,
+            "flash_region": "the chip's 128 kB of flash",
+            "ram_used": 30417,
+            "ram_total": 32768,
+            "ram_region": "the chip's 32 kB of RAM; the figure includes the 2 kB stack",
+            "tool": "TI Arm Clang 5.1.1.LTS",
+            "source": "mspm0g5187/alarm/results/size-alarm_detect-2026-10-13.txt",
+            "date": "2026-10-13",
+            "checked": "build log",
+            "needles": [
+              "80608",
+              "30417"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "slug": "matter-device",
+      "name": "Matter device",
+      "builds": [
+        {
+          "board": "cc35x1",
+          "label": "Matter thermostat on TI's lighting example",
+          "flash": [
+            "host_fit",
+            "matter-thermostat-flash"
+          ],
+          "ram": [
+            "host_fit",
+            "matter-thermostat-ram"
+          ],
+          "tool": "GCC 12.3, Wi-Fi SDK 10.20.00.39 (Matter built in a Linux container)",
+          "own_ram_basis": true
+        }
+      ],
+      "note": "Built in a container and flashed to the board; Apple Home adds it. TI's Matter light on the same release is 1,794,112 B of flash."
+    },
+    {
+      "slug": "micropython",
+      "name": "MicroPython",
+      "builds": [
+        {
+          "board": "mspm0g3519",
+          "label": "MicroPython on Zephyr 4.4.2",
+          "manual": {
+            "flash_used": 296836,
+            "flash_total": 524288,
+            "flash_region": "the chip's 512 kB of flash",
+            "ram_used": 85144,
+            "ram_total": 131072,
+            "ram_region": "the chip's 128 kB of RAM",
+            "tool": "GCC 12.2, Zephyr 4.4.2",
+            "source": "portability/toolchains/micropython-zephyr/README.md (the linker reports flash over by 33.9 kB and RAM over by 19.1 kB)",
+            "date": "2026-10-17",
+            "checked": "build log",
+            "needles": [
+              "33.9 kB",
+              "19.1 kB",
+              "256 kB flash, 64 kB RAM"
+            ]
+          },
+          "warn": "Does not link with Zephyr's stock board file (the file that tells Zephyr how much memory the board has), which describes 256 kB of flash and 64 kB of RAM: the linker reports flash over by 33.9 kB and RAM over by 19.1 kB. The image would use about 57 percent of the chip's flash and 65 percent of its RAM. The chip is not the limit; the file is. No board file with the chip's full memory was built.",
+          "warn_word": "Does not link with the stock board file"
+        }
+      ],
+      "note": "Build only, nothing flashed. No TI port of MicroPython exists; this is the generic Zephyr port."
+    },
+    {
+      "slug": "jack-o-lantern-jukebox",
+      "name": "Jack-o'-Lantern Jukebox",
+      "builds": [
+        {
+          "board": "mspm33c321a",
+          "label": "The show with five recordings and the speaker EQ, TI Arm Clang -O2",
+          "flash": [
+            "audio_app_flash_bytes",
+            "halloween-v3-eq"
+          ],
+          "ram": [
+            "audio_app_ram_bytes",
+            "halloween-v3-eq"
+          ]
+        }
+      ]
+    }
+  ],
+  "others": [
+    {
+      "id": "minmea",
+      "name": "GPS sentence parser (minmea port)",
+      "builds": [
+        {
+          "board": "mspm0g3507",
+          "label": "minmea, unchanged plus a small time shim",
+          "flash": [
+            "port_flash_bytes",
+            "minmea"
+          ],
+          "ram": [
+            "port_ram_bytes",
+            "minmea"
+          ]
+        },
+        {
+          "board": "mspm0g3519",
+          "label": "minmea, unchanged plus a small time shim",
+          "flash": [
+            "port_flash_bytes",
+            "minmea"
+          ],
+          "ram": [
+            "port_ram_bytes",
+            "minmea"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wake-word",
+      "name": "Wake-word listener with the neural engine",
+      "builds": [
+        {
+          "board": "mspm0g5187",
+          "label": "TI wake-word example as shipped",
+          "flash": [
+            "ai_wakeword_image_bytes",
+            "flash-shipped"
+          ],
+          "ram": [
+            "ai_wakeword_image_bytes",
+            "ram-shipped"
+          ]
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "Onboard-microphone port, -O2",
+          "flash": [
+            "ai_wakeword_image_bytes",
+            "flash-i2s-o2"
+          ],
+          "ram": [
+            "ai_wakeword_image_bytes",
+            "ram-i2s-o2"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mlkem",
+      "name": "Post-quantum key exchange (ML-KEM-768)",
+      "builds": [
+        {
+          "board": "mspm0g3519",
+          "label": "ML-KEM-768, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "mspm0g3519",
+          "label": "ML-KEM-768, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-o3"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "ML-KEM-768, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "ML-KEM-768, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-o3"
+          ],
+          "scope": "algorithm",
+          "warn": "The row says the -O3 build needs 20.5 kB of stack for encapsulation, which this chip's 32 kB of RAM cannot give; the -Os build is the one that runs.",
+          "warn_word": "Will not run: not enough RAM"
+        },
+        {
+          "board": "mspm33c321a",
+          "label": "ML-KEM-768, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "mspm33c321a",
+          "label": "ML-KEM-768, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-o3"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "cc1354p10",
+          "label": "ML-KEM-768, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "cc1354p10",
+          "label": "ML-KEM-768, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-o3"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "cc2755p10",
+          "label": "ML-KEM-768, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "cc2755p10",
+          "label": "ML-KEM-768, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mlkem768-mlkem-native-ticlang-o3"
+          ],
+          "scope": "algorithm"
+        }
+      ]
+    },
+    {
+      "id": "mldsa",
+      "name": "Post-quantum signatures (ML-DSA-44)",
+      "builds": [
+        {
+          "board": "mspm0g3519",
+          "label": "ML-DSA-44, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "mspm0g3519",
+          "label": "ML-DSA-44, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-o3"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "ML-DSA-44, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-os"
+          ],
+          "scope": "algorithm",
+          "warn": "ML-DSA-44 does not fit in this chip's 32 kB of RAM, say the rows: signing is 25,628 B short, key generation 6,588 B and verification 4,828 B (stack measured on the LP-MSPM0G3519 with the same code, plus 6,624 B of buffers).",
+          "warn_word": "Will not run: not enough RAM"
+        },
+        {
+          "board": "mspm0g5187",
+          "label": "ML-DSA-44, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-o3-flash-overflow"
+          ],
+          "scope": "algorithm",
+          "warn": "ML-DSA-44 does not fit in this chip's 32 kB of RAM, say the rows: signing is 25,628 B short, key generation 6,588 B and verification 4,828 B (stack measured on the LP-MSPM0G3519 with the same code, plus 6,624 B of buffers).",
+          "warn_word": "Will not run: not enough RAM"
+        },
+        {
+          "board": "mspm33c321a",
+          "label": "ML-DSA-44, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "mspm33c321a",
+          "label": "ML-DSA-44, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-o3"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "cc1354p10",
+          "label": "ML-DSA-44, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "cc1354p10",
+          "label": "ML-DSA-44, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-o3"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "cc2755p10",
+          "label": "ML-DSA-44, smallest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-os"
+          ],
+          "scope": "algorithm"
+        },
+        {
+          "board": "cc2755p10",
+          "label": "ML-DSA-44, fastest code",
+          "flash": [
+            "pqc_flash_bytes",
+            "mldsa44-mldsa-native-ticlang-o3"
+          ],
+          "scope": "algorithm"
+        }
+      ]
+    },
+    {
+      "id": "h264",
+      "name": "H.264 video decoder in software",
+      "builds": [
+        {
+          "board": "am13e230",
+          "label": "Decoder buffers, 128 x 96 video",
+          "ram": [
+            "video_sw_decode_ram",
+            "h264-128x96-ref1-os"
+          ],
+          "scope": "buffers"
+        },
+        {
+          "board": "am13e230",
+          "label": "Decoder buffers, 176 x 144 video",
+          "ram": [
+            "video_sw_decode_ram",
+            "h264-176x144-ref1-os"
+          ],
+          "scope": "buffers"
+        }
+      ]
+    }
+  ],
+  "none": [
+    {
+      "slug": "build-from-terminal",
+      "name": "Build from the terminal, without the vendor app",
+      "kind": "method",
+      "reason": "Not a program. It is a way to build the other projects, so it has no size of its own. The sizes of what it builds are on Blink an LED and the radio projects."
+    },
+    {
+      "slug": "button-led",
+      "name": "Button turns the LED on",
+      "kind": "size not recorded",
+      "reason": "No map or size was recorded for a button program."
+    },
+    {
+      "slug": "ble-gamepad",
+      "name": "Make a Bluetooth game controller from a LaunchPad",
+      "kind": "size not recorded",
+      "reason": "The live image was built and flashed, but its size was not recorded. The default build of the same code is 193,995 B of flash and 34,575 B of 36,864 B static RAM on the LP-EM-CC2340R5 (ports/esp32-ble-gamepad/README.md)."
+    },
+    {
+      "slug": "sensor-boosterpack",
+      "name": "Read six sensors on a Sensors BoosterPack",
+      "kind": "size not recorded",
+      "reason": "Built and run on the LP-MSPM0G5187, but its size was never recorded and the build folder was not kept. The program is TI's I2C controller example with a reader in place of its main file."
+    },
+    {
+      "slug": "battery-life",
+      "name": "Measure battery life",
+      "kind": "measurement only",
+      "reason": "It measures current, not code. The runs used a CoreMark image and a power-profile image on the LAUNCHXL-F2800137, and the profile image's size was not recorded: only the object files were kept, not the map."
+    },
+    {
+      "slug": "reaction-time",
+      "name": "Measure how fast it reacts to a signal",
+      "kind": "shared image",
+      "reason": "No program of its own. The interrupt timing runs inside each board's shared benchmark image, next to CoreMark and the memory tests. On the CC2340R5 that image is 36.8 kB of flash (cc2340r5/baremetal/README.md); the other boards' images were not recorded as sizes."
+    },
+    {
+      "slug": "linux-vision",
+      "name": "Run a vision model on a Linux board",
+      "kind": "Linux board",
+      "reason": "No flash budget. The SK-TDA4VM runs Linux from an SD card or USB stick and has 4 GiB of RAM, of which Linux sees 2,170 MiB (tda4/RESULTS-tda4.md), so a flash and RAM gauge would say nothing."
+    },
+    {
+      "slug": "sub-ghz-link",
+      "name": "Send sensor readings over a sub-1 GHz radio",
+      "kind": "size not in results file",
+      "reason": "The sender is 20.4 kB of flash and 5.4 kB of RAM and the receiver 29.2 kB of flash (mspm0g5187/radio/size-radio_tx.txt, cc1354p10/radio-rx/size-rfrx.txt); the sizes are not result rows."
+    },
+    {
+      "slug": "radar-presence",
+      "name": "See whether a room is occupied with a 60 GHz radar",
+      "kind": "no build",
+      "reason": "Nothing is built: the board ships with TI Motion and Presence demo and the scripts only read its stream."
+    },
+    {
+      "slug": "hubble-satellite",
+      "name": "Send a message from a Bluetooth chip to a satellite",
+      "kind": "size not recorded",
+      "reason": "The satellite image is 63,051 B of text and 40,398 B of bss; no result rows were written (the build lives in a work folder)."
+    },
+    {
+      "slug": "wifi-presence",
+      "name": "Detect a person in a room with Wi-Fi",
+      "kind": "size not in results file",
+      "reason": "Sizes are in the CSI experiment page (E144, E188), not in result rows."
+    },
+    {
+      "slug": "thread-border-router",
+      "name": "Build a Thread border router from two chips, with no Linux",
+      "kind": "size not in results file",
+      "reason": "The host image is 467,648 B of flash and 128,916 B of RAM (border-router/README.md); not result rows."
+    },
+    {
+      "slug": "doom",
+      "name": "Doom",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "arcade",
+      "name": "Arcade",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "post-quantum",
+      "name": "Post-quantum on every board",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "dns-ad-blocker",
+      "name": "DNS ad blocker",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "ulisp",
+      "name": "uLisp",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "audio-boosterpack",
+      "name": "Audio BoosterPack on a LaunchPad",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "codecs",
+      "name": "Audio and video codecs on a LaunchPad",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "walkie-talkies",
+      "name": "Walkie-talkie over a 915 MHz radio",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "sub-ghz-demos",
+      "name": "Sub-1 GHz home radio demos",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    }
+  ],
+  "ram_fix": {
+    "cc35x1|wifi-esphome-api": {
+      "used": 445030,
+      "note": "RAM is the main DRAM region (445,030 B used, 75,753 B free). The 128 kB TCM is separate, 42,280 B used."
+    },
+    "cc35x1|freertos": {
+      "used": 2048,
+      "note": "RAM is the main DRAM region only (2,048 B used). The program also uses 35,788 B of the TCM, a separate 128 kB region."
+    },
+    "cc35x1|matter-thermostat-ram": {
+      "used": 585011,
+      "total": 652288,
+      "note": "RAM is the Matter image's two regions added: TCM 127.4 kB of 128 kB and main data RAM 443.9 kB of 509 kB, from the experiment's region table (to 0.1 kB). The row's 593,248 B is data plus bss from arm-none-eabi-size, which counts a different way. The FreeRTOS heap (324 kB) is inside the main data RAM. The TCM is the tight region: the thermostat alone leaves about 0.6 kB of it.",
+      "source": "docs/experiments/2026-10-12-cc35x1-matter-plus-wifi-presence.md",
+      "needles": [
+        "127.4 kB used",
+        "443.9 kB used"
+      ]
+    }
+  },
+  "flash_total_bytes": {
+    "am13e230": 262144
+  },
+  "flash_total_note": "Flash totals are the chip's flash from data/boards.csv, except where the row names a smaller region: an update slot (CC2340R5 OTA rows), FLASH_NON_SECURE (CC35X1 ESPHome row), the app partition (ESP32-C6 ESPHome rows) or the one bank the linker uses (AM13E230, FLASH_BANK0, 256 kB).",
+  "ram_basis": {
+    "cc35x1": "RAM is the main DRAM region, FreeRTOS heap included; the 128 kB TCM is separate.",
+    "esp32c6": "RAM is static data only (DIRAM); heap use at run time is extra."
+  },
+  "flash_basis": {
+    "esp32c6": "Flash is the 8 MB module flash. Two sibling ESPHome rows state a 3,932,160 B app partition, so the real limit for an app is likely smaller.",
+    "cc35x1": "Flash is the 8 MB external flash chip. The ESPHome row on this chip names a 2,751,488 B FLASH_NON_SECURE region for the application, so the limit for a larger image may be smaller."
+  },
+  "ota_templates": {
+    "cc2340r5-ble-dual": {
+      "layout": "Dual image on the chip. The app runs the update service and receives the new image into a second slot of the chip's own flash while it keeps running; the MCUboot bootloader then swaps it in. No external flash is used.",
+      "where": "The chip's own flash",
+      "boot": "The MCUboot bootloader area at the start of flash and a 12 kB settings area at the end are not counted in the image or in the slot. The slot includes a 256 B header and a 152 B signature area that the image figure leaves out.",
+      "slot": {
+        "bytes": 241664,
+        "needle": "241,664",
+        "source": "cc2340r5/oad/README.md"
+      },
+      "source": "cc2340r5/oad/README.md",
+      "source_needle": "0x3B000",
+      "also": "tool-telemetry/research/ota-headroom-2026-10-17.md",
+      "layouts": [
+        {
+          "name": "On-chip, single image with a persistent app",
+          "where": "The chip's own flash",
+          "slot": {
+            "bytes": 298752,
+            "needle": "298,752",
+            "source": "tool-telemetry/research/ota-headroom-2026-10-17.md"
+          },
+          "note": "The running app is erased during the download, so a second small app (about 184 kB of flash) stays on the chip to receive the new image. Only TI's stock example was built, not this project's app."
+        },
+        {
+          "name": "External flash",
+          "where": "A separate SPI flash chip",
+          "slot": {
+            "bytes": 487168,
+            "needle": "487,168",
+            "source": "tool-telemetry/research/ota-headroom-2026-10-17.md"
+          },
+          "note": "The new image waits in external SPI flash, so the running image can use almost the whole chip. The repo's notes disagree on whether the LP-EM-CC2340R5 has that flash fitted: oad/README.md says none, and a later map-based note found the pins and a part name from a forum post. Not confirmed on the board."
+        }
+      ],
+      "pair_note": "RAM left is for TI's stock examples. An app that already uses most of the RAM can lose the room: one app with 425 B free was 28 B short of the 453 B the update service needs. The update build is this repo's dual-image example with a blink patch, so it differs slightly from TI's stock build."
+    },
+    "cc2340r5-zigbee-ed": {
+      "layout": "Update client on the chip. The end device runs from an image slot, a second slot of the chip's own flash holds the received update, and the MCUboot bootloader installs it. TI pads the end device's update to the second slot's size, so it fits. No external flash is used. The update must also fit the second slot after compression, and the end-to-end update has not completed on the board: twelve transfers from Home Assistant started and the best reached 88.74%.",
+      "where": "The chip's own flash",
+      "boot": "The MCUboot bootloader area and a 4 kB settings region are not counted in the image or in the slot.",
+      "second_slot": {
+        "bytes": 204800,
+        "needle": "204,800",
+        "source": "cc2340r5/matrix/zigbee_ota.progress.md"
+      },
+      "source": "cc2340r5/matrix/zigbee_ota.progress.md",
+      "source_needle": "204,800",
+      "pair_note": "The two builds are different TI examples (onoff_light as an end device, and onoff_switch_ota_client_onchip), so the difference in size is more than the update client.",
+      "caveat": "The room left is not room to grow into: the compressed update must fit the second slot, and the end-to-end update has not completed on the board."
+    },
+    "cc2340r5-zigbee-rtr": {
+      "layout": "Update client on the chip, as for the end device, but this role keeps an 8 kB settings region that overlaps the second slot by 4 kB, and its compressed update is larger than the second slot. No router update has been sent: it cannot be signed.",
+      "where": "The chip's own flash",
+      "boot": "The MCUboot bootloader area and an 8 kB settings region are not counted in the image or in the slot.",
+      "second_slot": {
+        "bytes": 204800,
+        "needle": "204,800",
+        "source": "cc2340r5/matrix/zigbee_ota.progress.md"
+      },
+      "update_image": {
+        "bytes": 206065,
+        "needle": "206065",
+        "source": "data/results/cc2340r5.csv"
+      },
+      "source": "cc2340r5/matrix/zigbee_ota.progress.md",
+      "source_needle": "204,800",
+      "pair_note": "The two builds are different TI examples (onoff_light as a router, and onoff_switch_ota_client_onchip built as a router), so the difference in size is more than the update client."
+    },
+    "cc2755p10-ble-dual": {
+      "layout": "Dual image on the chip. The app downloads the new image into a second slot of the chip's own flash and the chip's ROM secure boot installs it. No external flash is used.",
+      "where": "The chip's own flash",
+      "boot": "The NVS settings slot is not counted. This chip boots from ROM, so there is no bootloader image to count.",
+      "slot": {
+        "bytes": 465216,
+        "needle": "465,216",
+        "source": "tool-telemetry/research/ota-headroom-2026-10-17.md"
+      },
+      "source": "tool-telemetry/research/ota-headroom-2026-10-17.md",
+      "source_needle": "0x71940",
+      "layouts": [
+        {
+          "name": "On-chip, single image with a persistent app",
+          "where": "The chip's own flash",
+          "slot": {
+            "bytes": 719168,
+            "needle": "719,168",
+            "source": "tool-telemetry/research/ota-headroom-2026-10-17.md"
+          },
+          "note": "The running app is erased during the download, so a second small app stays on the chip to receive the new image. Only TI's stock example was built, not this project's app."
+        }
+      ]
+    },
+    "cc2755p10-zigbee-ed": {
+      "layout": "Update client on the chip. The end device runs from a slot of the chip's own flash. Where the downloaded copy waits is not recorded in the repo for this chip.",
+      "where": "The chip's own flash",
+      "boot": "A 4 kB settings region is not counted in the image or in the slot.",
+      "source": "data/results/cc2755p10.csv",
+      "source_needle": "391 kB slot",
+      "pair_note": "The two builds are different TI examples (onoff_switch, and onoff_switch_ota_client_onchip), so the difference in size and RAM is more than the update client.",
+      "slot": {
+        "bytes": 391376,
+        "needle": "0005f8d0",
+        "source": "cc2755p10/radio-maps.txt"
+      }
+    },
+    "esp32c6-esphome": {
+      "layout": "ESP-IDF's update layout keeps at least two app partitions in the module's flash and writes the new image to the one that is not running. These ESPHome images were built against one app partition of the size the row names, on the 8 MB module. No external flash is used.",
+      "where": "The module's own flash",
+      "boot": "The bootloader, partition table and settings are not counted.",
+      "source": "data/results/esp32c6.csv",
+      "source_needle": "app partition 3932160 B",
+      "doc": "Espressif, ESP-IDF Programming Guide, Over The Air Updates (OTA): an update layout needs at least two OTA app slots and an OTA data partition."
+    }
+  }
+}

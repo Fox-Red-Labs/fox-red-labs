@@ -1,0 +1,83 @@
+# Danse macabre, the main theme
+# Composer: Camille Saint-Saens (1835-1921). Work: Danse macabre, Op. 40 (1874), public domain.
+# Arrangement: ours, for four chip voices, 2026-10-25. Written from the score's own material: the harp's twelve
+# strokes of midnight on D, the solo violin's tuning on A and E-flat (the tritone) and G and D, and the flute's main
+# waltz theme as printed in its published incipit (Mouvement modere de Valse, 3/4, G minor; the public-domain
+# thematic catalogue "Orchesterwerke Romantik Themen" on Wikimedia Commons, page 684). That incipit ends after
+# nine bars: the four-bar answer, the waltz chords, the xylophone break and the close are ours.
+# One row is an eighth note (tempo 180: quarter = 180, one 3/4 bar a second).
+# Columns: lead (pulse 25%) | harmony (pulse 50%) | bass (triangle) | drums (noise). Tokens as in fox_run.tune.
+vol 11 6 13 8
+tempo 180
+# midnight: twelve strokes on D
+D5 - - - . . | D4 - . . . . | G2 - - - - - | k - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | h - - - - -
+D5 - - - . . | D4 - . . . . | G2 - - - - - | k - - - - -
+# the violin: A and E-flat, the devil's tritone
+D#5 . D#5 . D#5 . | A4 . A4 . A4 . | G2 - - - - - | s - . . . .
+D5 . D5 . D5 . | G4 . G4 . G4 . | G2 - - - - - | s - . . . .
+D#5 . D#5 . D#5 . | A4 . A4 . A4 . | G2 - - - - - | s - . . . .
+D5 . D5 . D5 . | G4 . G4 . G4 . | G2 - - - - - | s - . . . .
+# theme on the flute, waltz accompaniment: the pickup D
+. . . . D5 . | . . . . . . | . . . . . . | . . . . . .
+G5 - - . G5 . | . . A#4 . D5 . | G2 . . . . . | . . . . . .
+F5 - - . F5 . | . . A4 . C5 . | F2 . . . . . | . . . . . .
+E5 - - . E5 . | . . A#4 . E4 . | C3 . . . . . | . . . . . .
+D#5 - - . D#5 . | . . G4 . A#4 . | D#2 . . . . . | . . . . . .
+D5 . E5 . G5 . | . . F#4 . C5 . | D2 . . . . . | . . . . . .
+F#5 . E5 . D5 . | . . F#4 . C5 . | D2 . . . . . | . . . . . .
+E5 - - . E5 . | . . A#4 . E4 . | C3 . . . . . | . . . . . .
+F#5 - - - - . | . . F#4 . C5 . | D2 . . . . . | . . . . . .
+G5 - - . G5 . | . . A#4 . D5 . | G2 . . . . . | . . . . . .
+A#5 - - . A5 . | . . D5 . G4 . | A#2 . . . . . | . . . . . .
+G5 - - . F#5 . | . . F#4 . C5 . | D2 . . . . . | . . . . . .
+G5 - - - - . | . . A#4 . D5 . | G2 . . . . . | . . . . . .
+# theme an octave lower, the xylophone joins (hats): the pickup D
+. . . . D4 . | . . . . . . | . . . . . . | . . . . h -
+G4 - - . G4 . | . . A#4 . D5 . | G2 . . . . . | k - h - h -
+F4 - - . F4 . | . . A4 . C5 . | F2 . . . . . | k - h - h -
+E4 - - . E4 . | . . A#4 . E4 . | C3 . . . . . | k - h - h -
+D#4 - - . D#4 . | . . G4 . A#4 . | D#2 . . . . . | k - h - h -
+D4 . E4 . G4 . | . . F#4 . C5 . | D2 . . . . . | k - h - h -
+F#4 . E4 . D4 . | . . F#4 . C5 . | D2 . . . . . | k - h - h -
+E4 - - . E4 . | . . A#4 . E4 . | C3 . . . . . | k - h - h -
+F#4 - - - - . | . . F#4 . C5 . | D2 . . . . . | k - h - h -
+G4 - - . G4 . | . . A#4 . D5 . | G2 . . . . . | k - h - h -
+A#4 - - . A4 . | . . D5 . G4 . | A#2 . . . . . | k - h - h -
+G4 - - . F#4 . | . . F#4 . C5 . | D2 . . . . . | k - h - h -
+G4 - - - - . | . . A#4 . D5 . | G2 . . . . . | k - h - h -
+# bones: our xylophone break
+G5 . D5 . A#4 . | . . A#4 . D5 . | G2 . . . . . | k h h h s h
+A5 . D5 . A4 . | . . F#4 . C5 . | D2 . . . . . | k h h h s h
+A#5 . G5 . D5 . | . . A#4 . D5 . | G2 . . . . . | k h h h s h
+F#5 . D5 . A4 . | . . F#4 . C5 . | D2 . . . . . | k h h h s h
+G5 . A#5 . D6 . | . . A#4 . D5 . | G2 . . . . . | k h h h s h
+C6 . A5 . F#5 . | . . F#4 . C5 . | D2 . . . . . | k h h h s h
+D6 . A#5 . G5 . | . . A#4 . D5 . | G2 . . . . . | k h h h s h
+F#5 . A5 . D5 . | . . F#4 . C5 . | D2 . . . . . | k h h h s h
+# theme again, full dance: the pickup D
+. . . . D5 . | . . . . . . | . . . . . . | . . . . h -
+G5 - - . G5 . | . . A#5 . D6 . | G2 . . . . . | k - h - s -
+F5 - - . F5 . | . . A5 . C6 . | F2 . . . . . | k - h - s -
+E5 - - . E5 . | . . A#5 . E5 . | C3 . . . . . | k - h - s -
+D#5 - - . D#5 . | . . G5 . A#5 . | D#2 . . . . . | k - h - s -
+D5 . E5 . G5 . | . . F#5 . C6 . | D2 . . . . . | k - h - s -
+F#5 . E5 . D5 . | . . F#5 . C6 . | D2 . . . . . | k - h - s -
+E5 - - . E5 . | . . A#5 . E5 . | C3 . . . . . | k - h - s -
+F#5 - - - - . | . . F#5 . C6 . | D2 . . . . . | k - h - s -
+G5 - - . G5 . | . . A#5 . D6 . | G2 . . . . . | k - h - s -
+A#5 - - . A5 . | . . D6 . G5 . | A#2 . . . . . | k - h - s -
+G5 - - . F#5 . | . . F#5 . C6 . | D2 . . . . . | k - h - s -
+G5 - - - - . | . . A#5 . D6 . | G2 . . . . . | k - h - s -
+# our close on G minor
+G5 - - - - . | D5 - - - - . | G2 - - - - . | k - - - - -
+G4 . . . . . | G3 . . . . . | G2 . . . . . | s - - - - -

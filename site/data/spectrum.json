@@ -1,0 +1,571 @@
+{
+ "note": "Plain-language stops for the Hardware options spectrum. Specs come from portfolio.json; this file adds the words. Needs: ble, zigbee, thread, matter, two_radios, ai, memory (64 kB RAM or more).",
+ "stops": [
+  {
+   "part": "MSP430FR2433",
+   "name": "MSP-EXP430FR2433",
+   "lane": "small",
+   "step": "Ultra-low power, 16-bit",
+   "plain": "A light or a sensor that sleeps most of the day.",
+   "needs": [],
+   "adds": [
+    "Debug probe on the board",
+    "FRAM memory: keeps data with no power"
+   ],
+   "drops": [
+    "16-bit, not Arm",
+    "No Zephyr"
+   ],
+   "line": "FRAM keeps its data with no power. For a light or a sensor that sleeps most of the day."
+  },
+  {
+   "part": "MSPM0C1104",
+   "name": "LP-MSPM0C1104",
+   "step": "The smallest Arm chip",
+   "plain": "Blink a light, read a button or a simple sensor. Too small for Zephyr.",
+   "needs": [],
+   "board": null,
+   "adds": [
+    "Arm Cortex-M0+ at 24 MHz",
+    "Debug probe built into the board"
+   ],
+   "drops": [
+    "Only 1 kB of RAM"
+   ],
+   "lane": "small",
+   "line": "The smallest Arm board here. Blink a light, read a button or a simple sensor; too small for Zephyr."
+  },
+  {
+   "part": "MSPM0L1306",
+   "name": "LP-MSPM0L1306",
+   "lane": "small",
+   "step": "Adds analog parts and room to grow",
+   "plain": "Read light, temperature and small signals with the amplifiers on the chip; small programs, even a tiny AI model.",
+   "needs": [],
+   "adds": [
+    "4 times the flash (64 kB) and RAM (4 kB)",
+    "Two op-amps and a comparator; a light sensor and a thermistor on the board",
+    "32 MHz"
+   ],
+   "drops": [
+    "Still only 4 kB of RAM: Zephyr fits only when trimmed",
+    "No Zephyr board upstream; a port runs it"
+   ],
+   "board": null,
+   "line": "The step up from the C1104 for analog: two op-amps and a comparator on the chip, a light sensor and a thermistor on the board. Room for a tiny AI model."
+  },
+  {
+   "part": "MSPM0L2228",
+   "name": "LP-MSPM0L2228",
+   "lane": "small",
+   "step": "Adds a built-in screen",
+   "plain": "Show numbers on a small LCD, like a meter.",
+   "needs": [
+    "display",
+    "zephyr"
+   ],
+   "adds": [
+    "8 times the RAM (32 kB) and 16 times the flash (256 kB)",
+    "Segment LCD on the board",
+    "Zephyr support"
+   ],
+   "drops": [],
+   "line": "The step up from the L1306 for a meter: a segment LCD on the board, and enough RAM for Zephyr."
+  },
+  {
+   "part": "MSPM0G3507",
+   "name": "LP-MSPM0G3507",
+   "step": "More speed and memory",
+   "plain": "Small control and sensing projects, Zephyr, and small AI models run in software.",
+   "needs": [
+    "zephyr"
+   ],
+   "board": null,
+   "adds": [
+    "2.5 times the speed: 80 MHz",
+    "2 times the flash (128 kB)",
+    "Math accelerator, CAN bus, more analog inputs"
+   ],
+   "drops": [],
+   "lane": "small",
+   "line": "The step up when the L1306 runs out of memory: screens, small AI models and Zephyr. A math accelerator roughly doubles the speed of control maths."
+  },
+  {
+   "part": "MSPM0G3519",
+   "name": "LP-MSPM0G3519",
+   "step": "More memory and connections",
+   "plain": "Bigger programs and more things plugged in at once.",
+   "needs": [
+    "memory",
+    "zephyr"
+   ],
+   "board": null,
+   "adds": [
+    "4 times the RAM (128 kB) and flash (512 kB)",
+    "More connections: 7 serial ports, 2 CAN buses",
+    "Two flash banks, for safer firmware updates"
+   ],
+   "drops": [],
+   "lane": "small",
+   "line": "The step up from the G3507 for bigger programs and more things plugged in: more serial ports, two CAN buses and two flash banks for safer updates."
+  },
+  {
+   "part": "MSPM0G5187",
+   "name": "LP-MSPM0G5187",
+   "step": "Adds an AI accelerator",
+   "plain": "Hear a sound or spot a pattern on the chip itself.",
+   "needs": [
+    "ai"
+   ],
+   "board": null,
+   "adds": [
+    "AI accelerator for small neural networks",
+    "USB and audio; a microphone on the board"
+   ],
+   "drops": [
+    "Back to 32 kB RAM and 128 kB flash"
+   ],
+   "lane": "small",
+   "line": "The G3507's memory with an AI accelerator and a microphone on the board. Hear a sound or spot a pattern on the chip itself."
+  },
+  {
+   "part": "CC2340R52",
+   "name": "LP-EM-CC2340R5",
+   "step": "Adds Bluetooth and Zigbee",
+   "plain": "Wireless sensors, buttons and lights, one radio at a time.",
+   "needs": [
+    "ble",
+    "zigbee",
+    "zephyr"
+   ],
+   "board": "cc2340r5",
+   "adds": [
+    "A 2.4 GHz radio: Bluetooth and Zigbee"
+   ],
+   "drops": [
+    "Slower: 48 MHz",
+    "36 kB RAM, and the radio software uses most of it",
+    "Debug probe sold separately",
+    "No longer sold on TI.com"
+   ],
+   "lane": "ble154",
+   "line": "Bluetooth and Zigbee, one radio at a time, for wireless sensors, buttons and lights. The radio software uses most of the RAM."
+  },
+  {
+   "part": "CC2340R53",
+   "name": "LP-EM-CC2340R53",
+   "step": "Same radio, almost twice the RAM",
+   "plain": "The kit TI sells now, with almost twice the RAM.",
+   "needs": [
+    "ble",
+    "zigbee",
+    "thread",
+    "memory"
+   ],
+   "board": null,
+   "adds": [
+    "Almost twice the RAM: 64 kB against 36 kB",
+    "Thread as a full device (evaluation status in the SDK release notes)"
+   ],
+   "drops": [
+    "Debug probe sold separately"
+   ],
+   "lane": "ble154",
+   "line": "The CC2340R5 with more RAM, and the kit TI sells now."
+  },
+  {
+   "part": "CC2755P10",
+   "name": "LP-EM-CC2755P10",
+   "step": "The big wireless chip",
+   "plain": "Room for big wireless apps and the newer smart-home standards.",
+   "needs": [
+    "ble",
+    "zigbee",
+    "thread",
+    "matter",
+    "two_radios",
+    "memory"
+   ],
+   "board": null,
+   "adds": [
+    "Faster Cortex-M33 core at 96 MHz",
+    "162 kB RAM and 1 MB flash",
+    "Matter over Thread (evaluation status in the SDK release notes)",
+    "Two radios at once: Bluetooth with Thread or TI 15.4",
+    "Stronger radio, up to +20 dBm"
+   ],
+   "drops": [
+    "Debug probe sold separately"
+   ],
+   "lane": "ble154",
+   "line": "Room for large wireless apps: Matter over Thread, Bluetooth with Thread at the same time, and a stronger radio."
+  },
+  {
+   "part": "CC3235SF",
+   "name": "LAUNCHXL-CC3235SF",
+   "lane": "wifi",
+   "step": "Adds Wi-Fi",
+   "plain": "Send data to your home network with one board and one cable.",
+   "needs": [
+    "wifi",
+    "memory",
+    "zephyr"
+   ],
+   "adds": [
+    "Wi-Fi on 2.4 and 5 GHz",
+    "Zephyr has a Wi-Fi driver for it",
+    "Debug probe on the board"
+   ],
+   "drops": [
+    "No Bluetooth",
+    "Older Wi-Fi 4"
+   ],
+   "line": "Wi-Fi on one board and one cable, for sending data to your home network. No Bluetooth."
+  },
+  {
+   "part": "CC3551E",
+   "name": "LP-EM-CC35X1",
+   "lane": "wifi",
+   "step": "Wi-Fi 6 and Matter",
+   "plain": "A smart-home device that joins Wi-Fi with no extra hub.",
+   "needs": [
+    "wifi",
+    "ble",
+    "matter",
+    "memory"
+   ],
+   "adds": [
+    "Wi-Fi 6 plus Bluetooth",
+    "Matter over Wi-Fi"
+   ],
+   "drops": [
+    "Debug probe sold separately",
+    "No Zephyr"
+   ],
+   "line": "Wi-Fi 6 with Bluetooth and Matter over Wi-Fi: a smart-home device that joins your network with no hub."
+  },
+  {
+   "part": "CC1354P10",
+   "name": "LP-CC1354P10-1",
+   "lane": "long",
+   "step": "Adds long range",
+   "plain": "Sensors far from the house, past where 2.4 GHz reaches.",
+   "needs": [
+    "long_range",
+    "ble",
+    "zigbee",
+    "thread",
+    "memory"
+   ],
+   "adds": [
+    "Sub-1 GHz plus 2.4 GHz",
+    "296 kB RAM"
+   ],
+   "drops": [
+    "TI's kit: debug probe sold separately",
+    "No Zephyr"
+   ],
+   "line": "Adds Sub-1 GHz for sensors far from the house, with room for Zigbee, Thread and Bluetooth."
+  },
+  {
+   "part": "CC1352P7",
+   "name": "LP-CC1352P7-1",
+   "lane": "long",
+   "step": "Long range with Zephyr",
+   "plain": "Long range, with the probe built in.",
+   "needs": [
+    "long_range",
+    "ble",
+    "zigbee",
+    "thread",
+    "memory",
+    "zephyr"
+   ],
+   "adds": [
+    "Debug probe on the board",
+    "Zephyr support"
+   ],
+   "drops": [
+    "Less RAM: 152 kB",
+    "Zephyr lists no Bluetooth for it"
+   ],
+   "line": "Long range with the debugger on the board and Zephyr support. Less RAM than the CC1354P10."
+  },
+  {
+   "part": "IWR6843AOP",
+   "name": "IWR6843AOPEVM",
+   "lane": "special",
+   "step": "Adds radar",
+   "plain": "Sense people in a room without a camera.",
+   "needs": [
+    "radar",
+    "memory"
+   ],
+   "adds": [
+    "60 GHz radar",
+    "Visualizer runs in a browser on a Mac"
+   ],
+   "drops": [
+    "No Zephyr"
+   ],
+   "line": "60 GHz radar that senses people in a room without a camera. The visualizer runs in a browser on a Mac."
+  },
+  {
+   "part": "IWRL6432AOP",
+   "name": "IWRL6432AOPEVM",
+   "lane": "special",
+   "step": "Low-power radar",
+   "plain": "Presence sensing on less power.",
+   "needs": [
+    "radar",
+    "memory"
+   ],
+   "adds": [
+    "Debug probe on the board",
+    "Lower power"
+   ],
+   "drops": [
+    "Tools for Windows and Linux only"
+   ],
+   "line": "Radar for presence sensing on less power, with the debugger on the board. The tools run on Windows and Linux only."
+  },
+  {
+   "part": "IWRL6432",
+   "name": "IWRL6432BOOST",
+   "lane": "special",
+   "step": "Low-power radar, tested here",
+   "plain": "Presence sensing on less power, with measured range.",
+   "needs": [
+    "radar",
+    "memory"
+   ],
+   "adds": [
+    "Debug probe on the board",
+    "Held a seated person at 4 m, no false flag in 6 h"
+   ],
+   "drops": [
+    "Tools for Windows and Linux only"
+   ],
+   "line": "Radar for presence sensing on less power, with the debugger on the board. It held a seated person at 4 m, the farthest distance tested, and raised no flag for the first 6 h overnight in a quiet room; the first flag came after about 6 h and was not checked against a person. The tools run on Windows and Linux only."
+  },
+  {
+   "part": "TMS320F2800137",
+   "name": "LAUNCHXL-F2800137",
+   "lane": "special",
+   "step": "Motor-control math in hardware",
+   "plain": "Spin a motor or run a power supply, with sine and divide done in a few cycles.",
+   "needs": [
+    "motor"
+   ],
+   "adds": [
+    "120 MHz control core with trig and divide hardware (TMU)",
+    "14 PWM outputs, 1 encoder input"
+   ],
+   "drops": [
+    "Not Arm: new tools to learn",
+    "No Zephyr",
+    "Less memory: 36 kB of RAM"
+   ],
+   "line": "A control chip, not Arm: trig and divide in hardware, for spinning a motor or running a power supply."
+  },
+  {
+   "part": "TMS320F28P550SJ",
+   "name": "LAUNCHXL-F28P55X",
+   "lane": "special",
+   "step": "Adds motor control",
+   "plain": "Spin a motor smoothly and precisely.",
+   "needs": [
+    "motor",
+    "memory"
+   ],
+   "adds": [
+    "150 MHz control core",
+    "24 PWM outputs, 3 encoder inputs"
+   ],
+   "drops": [
+    "Not Arm: new tools to learn",
+    "No Zephyr"
+   ],
+   "line": "The step up from the F2800137 for motor control: a faster core, more PWM outputs and three encoder inputs."
+  },
+  {
+   "part": "AM263P",
+   "name": "LP-AM263P",
+   "lane": "special",
+   "step": "Four real-time cores for control",
+   "plain": "Four fast real-time cores, lots of on-chip RAM and PWM for motor and power control, with two Ethernet ports on the board.",
+   "needs": [
+    "motor",
+    "memory"
+   ],
+   "adds": [
+    "Four 400 MHz Cortex-R5F cores",
+    "3 MB of on-chip RAM",
+    "32 PWM modules and 5 ADCs",
+    "Two Gigabit Ethernet ports on the board"
+   ],
+   "drops": [
+    "No radio",
+    "Needs a 5 V, 3 A USB-C supply"
+   ],
+   "line": "Four 400 MHz real-time cores with 3 MB of on-chip RAM, for motor and power control that outgrows one core."
+  },
+  {
+   "part": "AM6254-PB2",
+   "name": "PocketBeagle 2",
+   "lane": "linux",
+   "step": "Runs Linux, small",
+   "plain": "A tiny Linux computer for Python and scripts.",
+   "needs": [
+    "linux",
+    "zephyr",
+    "memory"
+   ],
+   "adds": [
+    "Four 1.4 GHz cores",
+    "512 MB RAM"
+   ],
+   "drops": [
+    "No radio",
+    "Not sold on TI.com"
+   ],
+   "maker": "BeagleBoard.org",
+   "zephyr_note": "Zephyr runs on its Cortex-M4F core, not on the Linux cores",
+   "line": "A tiny Linux computer for Python and scripts. No radio."
+  },
+  {
+   "part": "AM6254-BP",
+   "name": "BeaglePlay",
+   "lane": "linux",
+   "step": "Linux with Wi-Fi, Bluetooth, Zigbee and Sub-1 GHz",
+   "plain": "A home hub: Linux, Wi-Fi, Bluetooth, Zigbee and Sub-1 GHz.",
+   "needs": [
+    "linux",
+    "wifi",
+    "ble",
+    "zigbee",
+    "long_range",
+    "zephyr",
+    "memory"
+   ],
+   "adds": [
+    "2 GB RAM",
+    "HDMI and Ethernet"
+   ],
+   "drops": [
+    "Not sold on TI.com"
+   ],
+   "maker": "BeagleBoard.org",
+   "zephyr_note": "Zephyr runs on its Cortex-M4F core (target beagleplay/am6254/m4) or its CC1352P7 radio chip (beagleplay/cc1352p7), not on the Linux cores",
+   "line": "A home hub running Linux, with Wi-Fi, Bluetooth, Zigbee and Sub-1 GHz, HDMI and Ethernet."
+  },
+  {
+   "part": "AM62L32",
+   "name": "TMDS62LEVM",
+   "lane": "linux",
+   "step": "Linux on one core, real-time Zephyr on the other",
+   "plain": "A low-power Linux processor whose second core can run Zephyr as the real-time coprocessor, talking to Linux through shared memory.",
+   "needs": [
+    "linux",
+    "memory",
+    "zephyr"
+   ],
+   "adds": [
+    "Two 1.25 GHz Cortex-A53 cores",
+    "2 GB LPDDR4 and 32 GB eMMC on the board",
+    "Two Gigabit Ethernet ports",
+    "HDMI and DSI display"
+   ],
+   "drops": [
+    "No radio",
+    "Needs a 5 V to 15 V, 3 A USB-C supply"
+   ],
+   "maker": "TI",
+   "line": "Linux on one A53 core and Zephyr on the other, exchanging messages through shared DDR in about 6 microseconds."
+  },
+  {
+   "part": "TDA4VM",
+   "name": "SK-TDA4VM",
+   "lane": "linux",
+   "step": "Runs Linux and vision AI",
+   "plain": "A Linux computer with a deep-learning accelerator and video codecs, for camera and vision projects.",
+   "needs": [
+    "linux",
+    "ai",
+    "memory"
+   ],
+   "adds": [
+    "An 8 TOPS deep-learning accelerator",
+    "Hardware video decode and encode",
+    "4 GB RAM"
+   ],
+   "drops": [
+    "No radio",
+    "Needs a 20 V USB-C supply",
+    "Boots from a micro-SD card"
+   ],
+   "maker": "TI",
+   "line": "A Linux computer with a deep-learning accelerator and video codecs, for camera and vision projects."
+  }
+ ],
+ "need_labels": {
+  "ble": "Bluetooth",
+  "zigbee": "Zigbee",
+  "thread": "Thread",
+  "matter": "Matter",
+  "two_radios": "Two radios at once",
+  "wifi": "Wi-Fi",
+  "long_range": "Long range",
+  "ai": "AI accelerator",
+  "memory": "Lots of memory",
+  "zephyr": "Zephyr",
+  "linux": "Runs Linux",
+  "radar": "Radar sensing",
+  "motor": "Motor control",
+  "display": "Built-in screen"
+ },
+ "sources": [
+  "site/data/portfolio.json",
+  "docs/research/ti-portfolio-specs-2026-10-06.md",
+  "docs/research/ti-wireless-stack-matrix-2026-10-05.md",
+  "docs/research/ti-portfolio-gaps-2026-10-06.md"
+ ],
+ "lanes": [
+  {
+   "id": "small",
+   "name": "No radio: small chips",
+   "sub": "Each step adds speed, memory, connections or a special part.",
+   "radio": false
+  },
+  {
+   "id": "ble154",
+   "name": "Bluetooth, Zigbee and Thread",
+   "sub": "Adds a 2.4 GHz radio, then more memory for bigger wireless software.",
+   "radio": true
+  },
+  {
+   "id": "wifi",
+   "name": "Wi-Fi",
+   "sub": "Joins your home network directly, no hub needed.",
+   "radio": true
+  },
+  {
+   "id": "long",
+   "name": "Long range",
+   "sub": "Adds Sub-1 GHz, which reaches farther than 2.4 GHz, for sensors far from the house.",
+   "radio": true
+  },
+  {
+   "id": "special",
+   "name": "Special jobs: radar and motors",
+   "sub": "Chips built for one job: sensing people with radar, or spinning a motor smoothly.",
+   "radio": true
+  },
+  {
+   "id": "linux",
+   "name": "Runs Linux",
+   "sub": "A small computer, not a microcontroller. Made by BeagleBoard.org around TI chips; not sold on TI.com.",
+   "radio": false
+  }
+ ]
+}

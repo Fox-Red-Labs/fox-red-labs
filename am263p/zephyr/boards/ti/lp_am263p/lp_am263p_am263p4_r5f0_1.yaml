@@ -1,0 +1,7 @@
+identifier: lp_am263p/am263p4/r5f0_1
+name: TI LP-AM263P R5FSS0-1 (Fox Red Labs port)
+type: mcu
+arch: arm
+toolchain:
+  - zephyr
+ram: 1024

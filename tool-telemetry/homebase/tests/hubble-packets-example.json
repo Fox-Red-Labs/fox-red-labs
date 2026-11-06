@@ -1,0 +1,39 @@
+{
+ "_note": "An example in the shape of Hubble's Retrieve Organization Packets reply (made up for the test: the device, times and places are not real).",
+ "packets": [
+  {
+   "device": {
+    "id": "00000000-0000-4000-8000-000000000001",
+    "name": "Example tool tag",
+    "payload": "GhMBAAIACVv/5zlgyw==",
+    "rssi": -71,
+    "timestamp": 1792300000.0,
+    "sequence_number": 41,
+    "network_type": "TERRESTRIAL"
+   },
+   "location": {
+    "latitude": 40.713,
+    "longitude": -74.0055,
+    "altitude": 12,
+    "horizontal_accuracy": 15,
+    "timestamp": 1792299990.0
+   }
+  },
+  {
+   "device": {
+    "id": "00000000-0000-4000-8000-000000000001",
+    "name": "Example tool tag",
+    "payload": "GBkBAAIACVr/5zlgyw==",
+    "timestamp": 1792310000.0,
+    "sequence_number": 52,
+    "network_type": "SATELLITE"
+   },
+   "location": {
+    "latitude": 0,
+    "longitude": 0,
+    "altitude": 0,
+    "timestamp": 1792310000.0
+   }
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+# Tobu Tobu Girl: wait for the title (about frame 1700), press Start (A and B together), pick the first mode with A,
+# then hold RIGHT and tap A in the game.
+0 NONE
+2000 A+B
+2010 NONE
+2300 A
+2310 NONE
+2600 A
+2610 NONE
+3000 RIGHT
+3200 RIGHT+A
+3210 RIGHT
+3400 NONE

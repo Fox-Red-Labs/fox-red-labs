@@ -1,0 +1,7 @@
+shield:
+  name: boostxl_edumkii
+  full_name: BOOSTXL-EDUMKII Educational BoosterPack Mark II
+  vendor: ti
+  supported_features:
+    - display
+    - input

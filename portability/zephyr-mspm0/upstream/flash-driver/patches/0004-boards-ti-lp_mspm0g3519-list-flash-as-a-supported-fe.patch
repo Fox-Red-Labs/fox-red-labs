@@ -1,0 +1,23 @@
+From 5672ea45f604acbbf5e5d5239b67dd042a6583ce Mon Sep 17 00:00:00 2001
+From: Contributor Name <contributor@example.invalid>
+Date: Sun, 25 Oct 2026 10:10:10 -0400
+Subject: [PATCH 4/4] boards: ti: lp_mspm0g3519: list flash as a supported
+ feature
+
+The flash driver runs on this board.
+
+Assisted-by: Claude:claude-sonnet-5-5
+---
+ boards/ti/lp_mspm0g3519/lp_mspm0g3519.yaml | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/boards/ti/lp_mspm0g3519/lp_mspm0g3519.yaml b/boards/ti/lp_mspm0g3519/lp_mspm0g3519.yaml
+index faa456b02..f7b601e36 100644
+--- a/boards/ti/lp_mspm0g3519/lp_mspm0g3519.yaml
++++ b/boards/ti/lp_mspm0g3519/lp_mspm0g3519.yaml
+@@ -15,4 +15,5 @@ supported:
+   - dac
+   - spi
+   - vref
++  - flash
+ vendor: ti

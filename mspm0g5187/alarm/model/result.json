@@ -1,0 +1,85 @@
+{
+ "spec": [
+  [
+   16,
+   5,
+   true
+  ],
+  [
+   16,
+   5,
+   true
+  ],
+  [
+   32,
+   5,
+   true
+  ],
+  [
+   32,
+   5,
+   true
+  ],
+  [
+   32,
+   3,
+   false
+  ]
+ ],
+ "classes": [
+  "other",
+  "smoke",
+  "co"
+ ],
+ "streams_train": 2000,
+ "epochs": 25,
+ "qat_epochs": 8,
+ "real": null,
+ "window_acc_int8": 0.9430539223920712,
+ "confusion_int8": [
+  [
+   9567,
+   102,
+   141
+  ],
+  [
+   292,
+   3921,
+   33
+  ],
+  [
+   393,
+   56,
+   3354
+  ]
+ ],
+ "decision": {
+  "M": 8,
+  "K": 6,
+  "infer_hop_frames": 16
+ },
+ "false_trips": 7,
+ "alarm_free_hours": 1.98,
+ "trip_streams": [
+  186,
+  299,
+  337,
+  464,
+  515,
+  526,
+  586
+ ],
+ "alarms_caught": 388,
+ "alarms_missed": 29,
+ "alarms_wrong_class": 6,
+ "delay_after_first_positive_window_s": {
+  "median": 5.16096,
+  "max": 25.8048
+ },
+ "train_seconds": {
+  "float": 1339,
+  "qat": 593
+ },
+ "onnx_bytes": 69609,
+ "params": 13827
+}

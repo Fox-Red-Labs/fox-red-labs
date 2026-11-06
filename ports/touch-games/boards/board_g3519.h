@@ -1,0 +1,16 @@
+/* LP-MSPM0G3519 + Waveshare 3.5 inch (ST7796S + FT6336U). Wires: see the board page.
+ * SPI1: SCLK PB31, MOSI PB8, MISO PB7. CS PB12, DC PB9, RST PC5, BL PC4. Touch (software I2C): SDA PC3, SCL PC2, RST PB11. */
+#define BOARD_NAME "g3519"
+#define LCD_CS_PORT PB_PORT
+#define LCD_CS_PIN  PB_LCD_CS_PIN
+#define LCD_DC_PORT PB_PORT
+#define LCD_DC_PIN  PB_LCD_DC_PIN
+#define LCD_RST_PORT PC_PORT
+#define LCD_RST_PIN  PC_LCD_RST_PIN
+#define LCD_BL_PORT PC_PORT
+#define LCD_BL_PIN  PC_LCD_BL_PIN
+#define TP_RST_PORT PB_PORT
+#define TP_RST_PIN  PB_TP_RST_PIN
+#define TP_GPIO     GPIOC
+#define TP_SDA_MASK DL_GPIO_PIN_3
+#define TP_SCL_MASK DL_GPIO_PIN_2

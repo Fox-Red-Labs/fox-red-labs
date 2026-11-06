@@ -1,0 +1,17 @@
+# E242 image D: like run-ring.resc, but the core starts at the exception level TF-A hands over. $el2 = false (EL1, HCE clear) or true (EL2, HCE set).
+using sysbus
+$elf?=@zephyr.elf
+$el2?=false
+mach create "am62l"
+machine LoadPlatformDescription @am62l-sram.repl
+sysbus LoadELF $elf
+sysbus.cpu0 SetAvailableExceptionLevels $el2 false
+logLevel 3
+emulation RunFor "2"
+echo "RING magic/head/size:"
+sysbus ReadDoubleWord 0x70813000
+sysbus ReadDoubleWord 0x70813004
+sysbus ReadDoubleWord 0x70813008
+echo "RING bytes:"
+sysbus ReadBytes 0x70813010 240
+quit

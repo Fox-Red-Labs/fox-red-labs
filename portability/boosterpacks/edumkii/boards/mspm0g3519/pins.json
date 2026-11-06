@@ -1,0 +1,104 @@
+{
+ "board": "mspm0g3519",
+ "launchpad": "LP-MSPM0G3519",
+ "family": "mspm0",
+ "sysconfig_head": [
+  "--device \"MSPM0G351X\" --package \"LQFP-100(PZ)\" --part \"Default\"",
+  "--device \"MSPM0G3519\" --package \"LQFP-100(PZ)\""
+ ],
+ "lcd": true,
+ "gpio": {
+  "LCD_CS": "PB12",
+  "LCD_DC": "PA13",
+  "LCD_RST": "PA30",
+  "BL_RED": "PB9",
+  "LED_GREEN": "PC4",
+  "LED_BLUE": "PC5",
+  "BUZZER": "PB3",
+  "S1": "PA11",
+  "S2": "PA12",
+  "JOY_SEL": "PB29",
+  "I2C_SCL": "PC2",
+  "I2C_SDA": "PC3"
+ },
+ "spi": {
+  "peripheral": "SPI1",
+  "sclk": "PB31",
+  "mosi": "PB8",
+  "miso": "PB7",
+  "bitrate": 8000000
+ },
+ "uart": {
+  "peripheral": "UART0",
+  "tx": "PA10",
+  "baud": 115200
+ },
+ "adc": {
+  "kind": "adc12",
+  "map": {
+   "JOY_X": [
+    "ADC0",
+    12,
+    "PA14"
+   ],
+   "JOY_Y": [
+    "ADC0",
+    4,
+    "PB25"
+   ],
+   "MIC": [
+    "ADC0",
+    2,
+    "PA25"
+   ],
+   "ACC_X": [
+    "ADC0",
+    0,
+    "PA27"
+   ],
+   "ACC_Y": [
+    "ADC0",
+    1,
+    "PA26"
+   ],
+   "ACC_Z": [
+    "ADC0",
+    5,
+    "PB24"
+   ]
+  }
+ },
+ "bp": {
+  "2": "PA14",
+  "5": "PB29",
+  "6": "PA25",
+  "7": "PB31",
+  "9": "PC2",
+  "10": "PC3",
+  "13": "PB12",
+  "15": "PB8",
+  "17": "PA30",
+  "23": "PA27",
+  "24": "PA26",
+  "25": "PB24",
+  "26": "PB25",
+  "31": "PA13",
+  "32": "PA12",
+  "33": "PA11",
+  "34": "PA10",
+  "37": "PC5",
+  "38": "PC4",
+  "39": "PB9",
+  "40": "PB3"
+ },
+ "notes": {
+  "33": "PA11 reaches the XDS110 backchannel through J13 (default): move J13 to 1-2 to give S1 its own pin (the console then goes quiet)",
+  "34": "PA10 is the console TX (J12 default): the gator-clip pin carries the console",
+  "40": "PB3 is also button S2 through J23: pull J23",
+  "39": "pins 39 and 40 default to two halves of one timer channel; GPIO use is unaffected"
+ },
+ "sysctl": [
+  "forceDefaultClkConfig = true",
+  "clockTreeEn = true"
+ ]
+}

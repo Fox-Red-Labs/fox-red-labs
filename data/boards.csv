@@ -1,0 +1,25 @@
+board,name,vendor,line,core,clock_mhz,flash_kb,ram_kb,board_price_usd,classes,status
+mspm0g3507,LP-MSPM0G3507,TI,MSPM0,Cortex-M0+,80,128,32,23.36,setup core analog control ai sweep agent power display hobby security,borrowed
+mspm0l1306,LP-MSPM0L1306,TI,MSPM0,Cortex-M0+,32,64,4,20.56,setup core analog control ai sweep agent power hobby,bench
+mspm0c1104,LP-MSPM0C1104,TI,MSPM0,Cortex-M0+,24,16,1,6.59,setup core analog sweep agent power hobby,bench
+mspm0g3519,LP-MSPM0G3519,TI,MSPM0,Cortex-M0+,80,512,128,21.99,setup core analog control ai sweep agent power display hobby security,bench
+mspm0g5187,LP-MSPM0G5187,TI,MSPM0,Cortex-M0+ with NPU,80,128,32,24.20,setup core analog control ai sweep agent power hobby security,bench
+cc2340r5,LP-EM-CC2340R5,TI,Connectivity,Cortex-M0+,48,512,36,34.38,setup core analog control ai radio sweep agent power hobby security,bench
+cc1354p10,LP-CC1354P10-1,TI,Connectivity,Cortex-M33,48,1024,296,,setup core analog control ai radio sweep agent power hobby security,bench
+cc3200,CC3200-LAUNCHXL,TI,Connectivity,Cortex-M4,80,,,,setup radio,parked
+f2800137,LAUNCHXL-F2800137,TI,C2000,C28x,120,256,36,35.09,setup core analog control ai sweep agent hobby security,bench
+nucleo-g071rb,NUCLEO-G071RB,ST,STM32G0,Cortex-M0+,64,128,36,20.21,setup core analog control ai sweep agent power hobby security,bench
+nucleo-u083rc,NUCLEO-U083RC,ST,STM32U0,Cortex-M0+,56,256,40,13.57,setup core analog control ai sweep agent power hobby security,bench
+frdm-mcxa153,FRDM-MCXA153,NXP,MCX A,Cortex-M33,96,128,32,15.75,setup core analog control ai sweep agent power hobby security,bench
+pico2,Raspberry Pi Pico 2 H,Raspberry Pi,RP2350,Cortex-M33,150,4096,520,6.00,setup core analog control ai sweep agent power hobby security,bench
+esp32c6,ESP32-C6-DevKitC-1-N8,Espressif,ESP32-C6,RISC-V,160,8192,512,9.00,setup core analog ai radio sweep agent power hobby security,bench
+mspm33c321a,LP-MSPM33C321A,TI,MSPM33,Cortex-M33,160,1024,256,39.99,setup core analog control ai sweep agent power display hobby security,bench
+am13e230,LP-AM13E230,TI,AM13,Cortex-M33 with TMU and NPU,200,512,128,19.79,setup core analog control ai sweep agent power hobby security,bench
+cc2755p10,LP-EM-CC2755P10,TI,Connectivity,Cortex-M33,96,1024,162,53.90,setup core analog control ai radio sweep agent power hobby security,bench
+cc35x1,LP-EM-CC35X1,TI,Connectivity,Cortex-M33,160,8192,1126,54.99,setup core analog control ai radio sweep agent power hobby security,bench
+f28p65x,LAUNCHXL-F28P65X,TI,C2000,C28x,200,1280,248,47.19,setup core analog control sweep,bench
+iwrl6432boost,IWRL6432BOOST,TI,mmWave radar,Cortex-M4F,160,2048,1024,,setup core radar host power agent,bench
+am263p,LP-AM263P,TI,AM263P,4x Cortex-R5F with TMU,400,32768,3072,,setup core analog control sweep agent power security,bench
+tda4,SK-TDA4VM,TI,TDA4VM (J721E),2x Cortex-A72 + C7x/MMA + 2x C66x + 6x R5F,2000,65536,4194304,,setup core ai sweep agent power security linux,bench
+am62l-evm,TMDS62LEVM (AM62L EVM),TI,AM62L32,2x Cortex-A53,1250,0,2097152,,setup core linux,bench
+beagley-ai,BeagleY-AI,BeagleBoard.org,AM67A (J722S),4x Cortex-A53 + 2x C7x/MMA + R5F,1400,0,4194304,70,setup core ai linux,bench

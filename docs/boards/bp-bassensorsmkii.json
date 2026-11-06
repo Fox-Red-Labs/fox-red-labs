@@ -1,0 +1,73 @@
+{
+ "name": "BP-BASSENSORSMKII Sensors BoosterPack plug-in module",
+ "sources": "User guide SLAU829 (May 2020: Figure 2 drawing, section 2.1.2 addresses, Tables 1 to 6, Figure 9 schematic); F3 SDK 9.21 board file source/ti/boards/.meta/boosterpacks/BP-BASSENSORSMKII.syscfg.json; read 2026-10-07",
+ "columns": [
+  {
+   "head": "The sensors",
+   "items": [
+    [
+     "TMP117 temperature",
+     "Within 0.1 C, I2C 0x48. Sits on the break-away board, joined by the ribbon cable"
+    ],
+    [
+     "HDC2080 humidity",
+     "Humidity and temperature, I2C 0x40"
+    ],
+    [
+     "OPT3001 light",
+     "Light as the eye sees it, I2C 0x44"
+    ],
+    [
+     "Motion: BMI160 and BMM150",
+     "Accelerometer and gyro (0x69) with a compass chip behind it (0x13)"
+    ],
+    [
+     "DRV5055 magnet sensor",
+     "Analog voltage on pin 2 that rises with field strength"
+    ]
+   ]
+  },
+  {
+   "head": "Header pins it uses",
+   "items": [
+    [
+     "I2C: 9, 10",
+     "All five digital sensors share it; 10 kOhm pull-ups are on the board"
+    ],
+    [
+     "Power switches",
+     "Pin 27 powers the OPT3001 and 28 the TMP117 (high = on); 6 and 24 enable the HDC2080 and DRV5055 (low = on)"
+    ],
+    [
+     "GPIO: alert lines",
+     "5 and 13 motion, 8 compass, 23 humidity, 25 light, 26 temperature"
+    ],
+    [
+     "LEDs: 39 red, 40 green",
+     "Plain LEDs to the header"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "In the box",
+     "The board and a 3-inch ribbon cable; the TMP117 reads nothing until the cable is in"
+    ],
+    [
+     "Power",
+     "3.3 V only, from pin 1"
+    ],
+    [
+     "Not on the chip",
+     "No processor, no radio: it is sensors only"
+    ],
+    [
+     "Watch out",
+     "Heat and shade from a board stacked on top skew the readings (SLAU829 2.1.1)"
+    ]
+   ]
+  }
+ ]
+}

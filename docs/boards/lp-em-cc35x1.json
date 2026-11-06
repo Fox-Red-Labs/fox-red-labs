@@ -1,0 +1,69 @@
+{
+ "name": "LP-EM-CC35X1 LaunchPad development kit",
+ "sources": "CC3551E data sheet SWRS337B (June 2026; core, memory, radio, currents); LaunchPad user guide SWRU629C rev C, April 2026 (jumpers, LEDs, buttons, power, antenna, Figures 2-1, 2-17, 2-25); SimpleLink Wi-Fi SDK 10.20.00.39 release notes and board file LP_EM_CC35X1.syscfg.json; all read 2026-10-07",
+ "columns": [
+  {
+   "head": "The chip: CC3551E",
+   "items": [
+    [
+     "Processor: Arm Cortex-M33",
+     "Runs your program at up to 160 MHz, with a floating-point unit"
+    ],
+    [
+     "RAM: 1.1 MB",
+     "Shared by Wi-Fi, Bluetooth, the network stack and your program"
+    ],
+    [
+     "Flash: outside the chip",
+     "The program runs from an 8 MB QSPI flash chip through a 32 or 64 kB cache"
+    ],
+    [
+     "Radio: Wi-Fi 6 and Bluetooth LE 5.4",
+     "Wi-Fi on 2.4 and 5 GHz, up to 20.5 dBm; transmit draws up to 310 mA at 3.3 V"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "GPIO: up to 36",
+     "On/off pins; most go to the two 20-pin headers"
+    ],
+    [
+     "UART: 3",
+     "UART1 goes to the probe's serial port; UART0 is free on header pins 3 and 4"
+    ],
+    [
+     "SPI: 2 / I2C: 2 / CAN / SD",
+     "Displays, sensors, a car-style bus, a memory card"
+    ],
+    [
+     "ADC: 12-bit, 8 channels",
+     "Measures voltages; four go through buffers on this board"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "RGB LED, two buttons, reset, temperature sensor, accelerometer, USB-C for power"
+    ],
+    [
+     "Antenna",
+     "Chip antenna. The SMA (J1) and U.FL (J2) need a capacitor moved first"
+    ],
+    [
+     "Not on the board",
+     "No debug probe: it needs the LP-XDS110ET (or LP-XDS110) for flashing"
+    ],
+    [
+     "Watch out",
+     "Two USB cables to the same Mac: the probe's and the board's own USB-C"
+    ]
+   ]
+  }
+ ]
+}

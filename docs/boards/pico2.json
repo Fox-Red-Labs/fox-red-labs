@@ -1,0 +1,81 @@
+{
+ "name": "Raspberry Pi Pico 2 H (SC1632)",
+ "sources": "Raspberry Pi Pico 2 datasheet, release 5, build date 03/07/2026 (Figure 2 pinout, sections 3.1, 4.1, 5.1 to 5.8, ordering codes SC1631 and SC1632 at US$5.00 and US$6.00); RP2350 features as listed in that datasheet. Read 2026-10-07. Not measured on a board yet",
+ "columns": [
+  {
+   "head": "The chip: RP2350A",
+   "items": [
+    [
+     "Processor: 2 cores, Arm or RISC-V",
+     "Two Arm Cortex-M33 or two Hazard3 RISC-V cores: pick when you build. Up to 150 MHz. The M33s have a floating-point unit"
+    ],
+    [
+     "Flash: 4 MB",
+     "On a separate chip on the board (Winbond W25Q32RV), read through a 16 kB cache"
+    ],
+    [
+     "RAM: 520 kB",
+     "Working memory. Sixteen times the MSPM0G3507's 32 kB: every model and demo in this project fits"
+    ],
+    [
+     "Power: 1.8 to 5.5 V in",
+     "A switching regulator on the board makes the 3.3 V. Pins are 3.3 V only"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "GPIO: 26 on the headers",
+     "GP0 to GP22 and GP26 to GP28. GP25 is the green LED"
+    ],
+    [
+     "UART: 2",
+     "Serial text. No USB serial chip on the board: the RP2350 does USB itself"
+    ],
+    [
+     "I2C: 2 / SPI: 2",
+     "Sensor bus / fast bus for displays"
+    ],
+    [
+     "ADC: 1",
+     "12-bit, 500,000 samples a second, three pins (GP26 to GP28). Its reference is the 3.3 V supply"
+    ],
+    [
+     "PWM: 16 channels",
+     "Dimming LEDs, servos and motors"
+    ],
+    [
+     "PIO: 3 blocks",
+     "Twelve tiny programmable state machines that make any timing protocol: WS2812 LEDs, VGA"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "Micro-USB, BOOTSEL button, green LED, 3-pin SWD debug header, 4 MB flash"
+    ],
+    [
+     "Headers",
+     "40 pins, fitted on the H version, breadboard friendly"
+    ],
+    [
+     "Not fitted",
+     "No debug probe and no reset button: programs load by drag and drop while BOOTSEL is held"
+    ],
+    [
+     "Not on the chip",
+     "No AES block and no radio. It has SHA-256 hardware, a random-number generator and 8 kB of one-time memory"
+    ],
+    [
+     "Watch out",
+     "The one-time memory (OTP) cannot be undone: skip every example that writes it"
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+
+if SHIELD_BOOSTXL_EDUMKII
+
+# The screen backlight is a regulator-fixed on BoosterPack pin 39.
+# LVGL settings differ between Zephyr releases, so none are set here; the
+# README lists the ones to add for a 1-bit or 16-bit LVGL build.
+# The header pins are driven through the GPIO API.
+config GPIO
+	default y
+
+config REGULATOR
+	default y if DISPLAY
+
+endif # SHIELD_BOOSTXL_EDUMKII

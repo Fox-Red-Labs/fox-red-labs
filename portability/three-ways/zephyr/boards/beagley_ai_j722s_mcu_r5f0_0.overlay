@@ -1,0 +1,26 @@
+/* BeagleY-AI MCU-domain R5F (remoteproc2, 79000000.r5f), loaded from Linux.
+ * Upstream board beagley_ai/j722s/mcu_r5f0_0 already matches the Linux carveouts
+ * (mcu-r5fss-dma-memory-region a1000000/1M, mcu-r5fss-memory-region a1100000/15M).
+ * The last 64 KB of the carveout becomes the RAM console that Linux reads as a remoteproc trace buffer. */
+/ {
+	chosen {
+		zephyr,sram = &ddr1;
+		zephyr,ram-console = &trace_mem;
+		/delete-property/ zephyr,console;
+		/delete-property/ zephyr,shell-uart;
+	};
+
+	trace_mem: memory@a1f00000 {
+		compatible = "zephyr,memory-region", "mmio-sram";
+		reg = <0xa1f00000 DT_SIZE_K(64)>;
+		zephyr,memory-region = "TRACE";
+	};
+};
+
+&ddr1 {
+	reg = <0xa1200000 DT_SIZE_M(13)>;
+};
+
+&uart1 {
+	status = "disabled";
+};

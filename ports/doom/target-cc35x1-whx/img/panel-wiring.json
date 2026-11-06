@@ -1,0 +1,265 @@
+{
+ "image": "../../../../docs/arrivals/img/source-cc35x1-swru629c.png",
+ "margin_left": 1000,
+ "margin_right": 1000,
+ "label_gap": 140,
+ "title": "Panel on the LP-EM-CC35X1: 9 wires",
+ "warning": "Unplug both USB cables before every wire. VCC goes to 3.3 V, not 5 V.",
+ "credit": "Board drawing: TI SWRU629C",
+ "tag_size": 24,
+ "board": "../../../../docs/boards/lp-em-cc35x1.json",
+ "steps": [
+  {
+   "label": [
+    "Unplug USB. Power: 2 wires",
+    [
+     [
+      220,
+      30,
+      30
+     ],
+     "red (VCC) to BP.1 (3V3), top-left pin of P1"
+    ],
+    [
+     [
+      25,
+      25,
+      25
+     ],
+     "black (GND) to BP.22 (GND), next to the 5V pin"
+    ],
+    "• Use 3.3 V: the module's level translator sits on",
+    "   a 3.3 V rail; 5 V was not tried",
+    "• Leave loose: 3V3 (orange), SD_CS (white) and",
+    "   the 4 touch wires (not used by this image)",
+    "• The silkscreen prints the chip ball number, not",
+    "   the GPIO: BP.7 reads P18, BP.14 P17, BP.15 P16"
+   ],
+   "side": "left",
+   "label_y": 330,
+   "marks": [
+    {
+     "pin": [
+      168,
+      507
+     ],
+     "r": 18,
+     "tag": "VCC <- panel VCC",
+     "tag_side": "left",
+     "color": [
+      220,
+      30,
+      30
+     ]
+    },
+    {
+     "pin": [
+      228,
+      567
+     ],
+     "r": 18,
+     "tag": "GND <- panel GND",
+     "tag_side": "right",
+     "color": [
+      25,
+      25,
+      25
+     ]
+    }
+   ]
+  },
+  {
+   "label": [
+    "Pixels: 3 wires (SPI0)",
+    [
+     [
+      0,
+      155,
+      80
+     ],
+     "green (SCLK) to BP.7 (GPIO27, P18): the clock"
+    ],
+    [
+     [
+      40,
+      100,
+      235
+     ],
+     "blue (MOSI) to BP.15 (GPIO29, P16): pixel data"
+    ],
+    [
+     [
+      250,
+      210,
+      0
+     ],
+     "yellow (MISO) to BP.14 (GPIO28, P17): optional"
+    ],
+    "• MISO only lets a program read the screen back;",
+    "   the Doom image does not use it"
+   ],
+   "side": "left",
+   "label_y": 1000,
+   "marks": [
+    {
+     "pin": [
+      168,
+      867
+     ],
+     "r": 18,
+     "tag": "BP.7 GPIO27 <- SCLK",
+     "tag_side": "left",
+     "color": [
+      0,
+      155,
+      80
+     ]
+    },
+    {
+     "pin": [
+      1250,
+      807
+     ],
+     "r": 18,
+     "tag": "MOSI -> BP.15 GPIO29",
+     "tag_side": "right",
+     "color": [
+      40,
+      100,
+      235
+     ]
+    },
+    {
+     "pin": [
+      1250,
+      867
+     ],
+     "r": 18,
+     "tag": "MISO -> BP.14 GPIO28",
+     "tag_side": "right",
+     "color": [
+      250,
+      210,
+      0
+     ]
+    }
+   ]
+  },
+  {
+   "label": [
+    "Control: 4 wires (GPIO)",
+    [
+     [
+      135,
+      65,
+      190
+     ],
+     "purple (LCD_CS) to BP.18 (GPIO26, P19)"
+    ],
+    [
+     [
+      125,
+      65,
+      30
+     ],
+     "brown (LCD_DC) to BP.37 (GPIO16, P30)"
+    ],
+    [
+     [
+      150,
+      150,
+      150
+     ],
+     "grey (LCD_RST) to BP.38 (GPIO19, P27)"
+    ],
+    [
+     [
+      40,
+      100,
+      235
+     ],
+     "2nd blue (LCD_BL) to BP.30 (GPIO31, P13)"
+    ],
+    "• CS, DC, RST: \"listen\", command or pixels, restart",
+    "• Screen dark? Move LCD_BL to BP.1 (3V3)"
+   ],
+   "side": "right",
+   "label_y": 560,
+   "marks": [
+    {
+     "pin": [
+      1250,
+      627
+     ],
+     "r": 18,
+     "tag": "LCD_CS -> BP.18 GPIO26",
+     "tag_side": "right",
+     "color": [
+      135,
+      65,
+      190
+     ]
+    },
+    {
+     "pin": [
+      1190,
+      687
+     ],
+     "r": 18,
+     "tag": "BP.37 GPIO16 <- LCD_DC",
+     "tag_side": "left",
+     "color": [
+      125,
+      65,
+      30
+     ]
+    },
+    {
+     "pin": [
+      1190,
+      627
+     ],
+     "r": 18,
+     "tag": "BP.38 GPIO19 <- LCD_RST",
+     "tag_side": "left",
+     "color": [
+      150,
+      150,
+      150
+     ]
+    },
+    {
+     "pin": [
+      228,
+      1047
+     ],
+     "r": 18,
+     "tag": "BP.30 GPIO31 <- LCD_BL",
+     "tag_side": "right",
+     "color": [
+      40,
+      100,
+      235
+     ]
+    }
+   ]
+  }
+ ],
+ "task_facts": {
+  "head": "For this panel",
+  "items": [
+   [
+    "Uses",
+    "SPI0 (SCLK, MOSI), 4 GPIO outputs, 3V3 and GND: 9 wires. MISO is an optional 10th"
+   ],
+   [
+    "Expect",
+    "Doom's three demos in 320 x 168 pixels, one to one, in the top 168 of 480 rows (no scaling)"
+   ],
+   [
+    "Limit",
+    "No keys, no sound; the touch chip is not read. The SPI clock is 16 MHz by default"
+   ]
+  ]
+ }
+}

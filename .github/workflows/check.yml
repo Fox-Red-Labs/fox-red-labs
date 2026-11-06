@@ -1,0 +1,18 @@
+# On every push and pull request: the results store is valid, and a scan of the tree for files that do not belong.
+name: Check
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Results store
+        run: python3 tools/results/check.py
+      - name: Nothing private
+        run: |
+          ! git grep -n -I -i -E 'itg\.ti\.com|sps\.ti\.com|bitbucket\.itg|/Users/[a-z]+/|Network ?Key: *[0-9a-f]{32}' -- . ':!tools/publish/**' ':!SECURITY.md' ':!.github/**'

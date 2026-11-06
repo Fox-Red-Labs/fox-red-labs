@@ -1,0 +1,1838 @@
+{
+ "target": "any target",
+ "impl": [
+  {
+   "idiom": "hid.report_descriptor_pack",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Plain C descriptor builder and report packer, no Arduino or NimBLE include. Rewritten once and carried unchanged.",
+   "trap": "The job text said start and select are on by default; the library code sets every special button false, so the report is 19 bytes and the descriptor 96. Read the defaults in the code, not in a description of it.",
+   "check": "descriptor and four fixed reports equal the original's bytes (check/golden.txt in the port)",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "5 of 5 lines equal the library's output; 10,112 B flash",
+     "path": "ports/esp32-ble-gamepad/boards/mspm0g3519/frl_gamepad.c"
+    },
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "f2800137",
+     "level": "ran",
+     "what": "5 of 5 lines equal",
+     "path": "ports/esp32-ble-gamepad/boards/f2800137/gp_core.c"
+    },
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "5 of 5 lines equal; image advertises",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/core/frl_gamepad.c"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:hid.report_descriptor_pack/default"
+  },
+  {
+   "idiom": "data.pgm_table",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Plain const arrays; flash is memory mapped.",
+   "trap": "None found.",
+   "check": "glyphs draw",
+   "proof": [
+    {
+     "port": "touch-games",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "src/font5x7.c",
+     "path": "ports/touch-games/src/font5x7.c"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:data.pgm_table/default"
+  },
+  {
+   "idiom": "math.random",
+   "families": [
+    "*"
+   ],
+   "variant": "xorshift32",
+   "difficulty": "direct",
+   "replace": "xorshift32 seeded from the microsecond clock at the first tap.",
+   "trap": "A fixed seed per game in the measurement keeps runs identical cycle for cycle.",
+   "check": "three identical runs",
+   "proof": [
+    {
+     "port": "touch-games",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "three identical runs",
+     "path": "ports/touch-games/results/g3519-spi40-run1.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:math.random/xorshift32"
+  },
+  {
+   "idiom": "mem.progmem_read",
+   "families": [
+    "*"
+   ],
+   "variant": "flat-memory",
+   "difficulty": "direct",
+   "replace": "Flat memory: const data already sits in flash on Arm; macros read through a pointer, with memcpy for the 16 and 32 bit forms.",
+   "trap": "Data declared PROGMEM without const lands in RAM.",
+   "check": "three games run on the host",
+   "proof": [
+    {
+     "port": "arduboy",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "include/avr/pgmspace.h; linked for four boards",
+     "path": "ports/arduboy/include/avr/pgmspace.h"
+    }
+   ],
+   "status": "built",
+   "id": "portable:mem.progmem_read/flat-memory"
+  },
+  {
+   "idiom": "audio.square_tone",
+   "families": [
+    "*"
+   ],
+   "variant": "frl",
+   "difficulty": "adapter",
+   "replace": "frl_audio_t.tone(hz, ms); the layer turns the timer count back into hertz and a frame count into milliseconds.",
+   "trap": "The duration is counted in frames, so the layer needs the frame period; BeepPin1::freq(hz) returns a timer count, not hertz.",
+   "check": "tone events on the host",
+   "proof": [
+    {
+     "port": "arduboy",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "tone events on the host for Snake and Crate Confusion",
+     "path": "ports/arduboy/prove_host.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:audio.square_tone/frl"
+  },
+  {
+   "idiom": "storage.eeprom_bytes",
+   "families": [
+    "*"
+   ],
+   "variant": "ram-image",
+   "difficulty": "adapter",
+   "replace": "1 kB RAM image erased to 0xFF.",
+   "trap": "Nothing survives power-off; games read back 0xFF as no high score. Next step is one flash page written on change.",
+   "check": "compiles and links with every game",
+   "proof": [
+    {
+     "port": "arduboy",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "include/EEPROM.h",
+     "path": "ports/arduboy/FIT.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:storage.eeprom_bytes/ram-image",
+   "degrades": "no persistence across power-off"
+  },
+  {
+   "idiom": "display.page_buffer_1bit",
+   "families": [
+    "*"
+   ],
+   "variant": "stream-lines",
+   "difficulty": "redesign",
+   "replace": "Keep the 1 kB buffer; stream it to a 128 x 128 screen 4 RGB565 lines (or 8 one-bit lines) at a time with write_lines.",
+   "trap": "A 128 x 128 RGB565 frame is 32 kB, all of a 32 kB chip RAM; line streaming needs 1 kB. Sharp panels want the leftmost pixel in bit 0.",
+   "check": "same picture on host in both formats",
+   "proof": [
+    {
+     "port": "arduboy",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "host proof in both formats; linked for four boards",
+     "path": "ports/arduboy/prove_host.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:display.page_buffer_1bit/stream-lines"
+  },
+  {
+   "idiom": "input.stick_to_dpad",
+   "families": [
+    "*"
+   ],
+   "variant": "dead-band",
+   "difficulty": "adapter",
+   "replace": "Counts to four directions with a dead band (700 on, 400 off) and a centre learned at start; two buttons to A and B.",
+   "trap": "The EDUMKII stick rests off centre (X 1816, Y 2159 in an earlier run); a fixed 2048 centre makes a direction stick on.",
+   "check": "host run with the off-centre rest",
+   "proof": [
+    {
+     "port": "arduboy",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "host backend rests at the off-centre values",
+     "path": "ports/arduboy/prove_host.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:input.stick_to_dpad/dead-band"
+  },
+  {
+   "idiom": "time.frame_pacing",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Same logic over a platform millis; the host drives a virtual clock of one millisecond per loop() call.",
+   "trap": "nextFrame() compares a uint8_t copy of millis(): a clock that skips more than 255 ms breaks it.",
+   "check": "60 fps games present one frame per 16 calls",
+   "proof": [
+    {
+     "port": "arduboy",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "host: one frame per 16 calls",
+     "path": "ports/arduboy/prove_host.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:time.frame_pacing/default"
+  },
+  {
+   "idiom": "build.arduino_sketch",
+   "families": [
+    "*"
+   ],
+   "variant": "ino-protos",
+   "difficulty": "adapter",
+   "replace": "tools/ino_protos.py writes the prototypes the Arduino IDE would add.",
+   "trap": "The prototype block must come after the sketch type definitions, so it goes in front of the first function.",
+   "check": "Snake and Crate Confusion build",
+   "proof": [
+    {
+     "port": "arduboy",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "Snake and Crate Confusion",
+     "path": "ports/arduboy/tools/ino_protos.py"
+    }
+   ],
+   "status": "built",
+   "id": "portable:build.arduino_sketch/ino-protos"
+  },
+  {
+   "idiom": "lib.rand_arduino",
+   "families": [
+    "*"
+   ],
+   "variant": "xorshift32",
+   "difficulty": "direct",
+   "replace": "xorshift32 seeded from the platform entropy hook or the clock.",
+   "trap": "The original seeds from ADC noise; a target with no entropy source seeds from millis() and every power-up plays the same.",
+   "check": "two power-ups differ",
+   "proof": [
+    {
+     "port": "arduboy",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "built and ran on the host",
+     "path": "ports/arduboy/FIT.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:lib.rand_arduino/xorshift32"
+  },
+  {
+   "idiom": "display.scale_to_square",
+   "families": [
+    "*"
+   ],
+   "variant": "pack-and-average",
+   "difficulty": "redesign",
+   "replace": "Keep 2-bit shades packed four to a byte (5.6 kB), average the source pixels each of 128 x 128 outputs covers, 4 x 4 ordered dither for one-bit panels.",
+   "trap": "An unpacked byte per pixel is 23 kB, most of a 32 kB chip. Per-pixel divisions are slow on a Cortex-M0+; work column ranges out once and row ranges once per line. Averaging cost 57 to 60 percent of the frame time on the Mac.",
+   "check": "picture by eye in RGB565 and one-bit",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "host proof in both formats; built for four boards",
+     "path": "ports/peanut-gb/prove_host.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:display.scale_to_square/pack-and-average"
+  },
+  {
+   "idiom": "input.dpad_two_buttons",
+   "families": [
+    "*"
+   ],
+   "variant": "chord",
+   "difficulty": "adapter",
+   "replace": "Stick is the D-pad, buttons are A and B, both together is Start, both with the stick down is Select.",
+   "trap": "Two buttons are not enough for Start and Select; the chord is a choice, and a game that uses A and B together breaks.",
+   "check": "menu reached with the chord",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "Tobu Tobu Girl menu reached on the host",
+     "path": "ports/peanut-gb/prove_host.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:input.dpad_two_buttons/chord"
+  },
+  {
+   "idiom": "storage.rom_in_place",
+   "families": [
+    "*"
+   ],
+   "variant": "flash-array",
+   "difficulty": "direct",
+   "replace": "gb_rom_read(addr) reads the ROM where it sits in flash; no copy to RAM.",
+   "trap": "A ROM linked into flash must fit: a 256 kB ROM into 128 kB flash fails at link (140.4 kB short).",
+   "check": "ROM links",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "linked on the G3519 and M33; refused on the G3507 and G5187",
+     "path": "ports/peanut-gb/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:storage.rom_in_place/flash-array"
+  },
+  {
+   "idiom": "storage.cart_ram",
+   "families": [
+    "*"
+   ],
+   "variant": "static",
+   "difficulty": "direct",
+   "replace": "A static buffer sized for the ROM save size (8 kB for Tobu Tobu Girl); init fills 0xFF.",
+   "trap": "8 kB of RAM that a ROM without battery RAM does not need; on 32 kB chips that is the margin.",
+   "check": "builds",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "built",
+     "path": "ports/peanut-gb/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:storage.cart_ram/static"
+  },
+  {
+   "idiom": "build.single_header_c",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Include peanut_gb.h once in one C file, unmodified, with ENABLE_SOUND 0.",
+   "trap": "Compile it as C; the front end is C and the shared layer is C++ with extern C entry points.",
+   "check": "builds with Apple clang and TI Arm Clang",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "both compilers",
+     "path": "ports/peanut-gb/build_host.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:build.single_header_c/default"
+  },
+  {
+   "idiom": "time.benchmark_cpu",
+   "families": [
+    "*"
+   ],
+   "variant": "process-time",
+   "difficulty": "direct",
+   "replace": "Process CPU time, not wall time, repeated and the median taken.",
+   "trap": "The Mac was at a load average of 80 to 110: wall-clock runs varied from 291 to 1,808 frames per second, CPU time held within 8 percent.",
+   "check": "median of runs",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "about 4,180 frames per second emulator alone, CPU time",
+     "path": "ports/peanut-gb/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:time.benchmark_cpu/process-time"
+  },
+  {
+   "idiom": "safety.rom_indexed_arrays",
+   "families": [
+    "*"
+   ],
+   "variant": "patched-copy",
+   "difficulty": "adapter",
+   "replace": "Patch the build copy and validate header bytes in the front end before gb_init.",
+   "trap": "Intra-struct overflows are invisible to AddressSanitizer; UBSan bounds check finds them. A test must include a ROM that selects bank 0x0D to 0xFF.",
+   "check": "crafted ROM tests",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "host tests fail on the unpatched copy and pass on the patched one",
+     "path": "ports/peanut-gb/tests/run_tests.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:safety.rom_indexed_arrays/patched-copy"
+  },
+  {
+   "idiom": "display.frame_out_direct",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Patch I_FinishUpdate to hand the 320 x 200 8-bit frame and the 256-entry palette to DG_DrawFrame8; the platform converts and scales while it sends.",
+   "trap": "The stock layer mallocs the output buffer at the panel size x 4 B, so a smaller panel does not shrink the work: the engine always renders 320 x 200 (62.5 kB).",
+   "check": "check in the row",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "320 x 200 and 128 x 128 frames from the same demo; M33 build links with no buffer",
+     "path": "ports/doom/host/dg_headless.c"
+    }
+   ],
+   "status": "built",
+   "id": "portable:display.frame_out_direct/default"
+  },
+  {
+   "idiom": "render.screen_melt_off",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Compile the wipe out (FOX_NOWIPE).",
+   "trap": "The wipe holds three 62.5 kB screens.",
+   "check": "check in the row",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "156 kB less at the zone peak on the Mac",
+     "path": "ports/doom/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:render.screen_melt_off/default"
+  },
+  {
+   "idiom": "storage.wad_lump_read",
+   "families": [
+    "*"
+   ],
+   "variant": "copy",
+   "difficulty": "adapter",
+   "replace": "w_file_mem.c: Read calls fox_wad_read(offset, buf, len); the platform fills it from QSPI NOR.",
+   "trap": "No memory-mapped window exists on that chip QSPI in SDK 1.04.00.00, so lumps must be copied; on the Mac the mapped shortcut cut the zone peak by 107 kB.",
+   "check": "check in the row",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "Mac mmap stand-in against copy mode",
+     "path": "ports/doom/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:storage.wad_lump_read/copy"
+  },
+  {
+   "idiom": "libc.no_files_no_stdio",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Force-included header: fopen returns NULL, printf and fprintf go to a log hook with a 128-byte stack buffer; three empty POSIX headers; a system stub.",
+   "trap": "TI's C library has no fcntl.h or unistd.h, and a call to fopen brings in the file-system layer.",
+   "check": "check in the row",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "image links; emulator prints the start-up text",
+     "path": "ports/doom/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:libc.no_files_no_stdio/default"
+  },
+  {
+   "idiom": "memory.zone_static",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "A fixed byte array in .bss sized by FOX_ZONE_STATIC; the heap shrinks to 4 to 6 KB.",
+   "trap": "The engine also callocs its lump directory (34.6 kB) outside the zone; with a 2 kB heap the first WAD open fails with Couldnt realloc lumpinfo.",
+   "check": "check in the row",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "emulator reproduced the failure and the fix",
+     "path": "ports/doom/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:memory.zone_static/default"
+  },
+  {
+   "idiom": "rodata.state_tables_const",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "FOX_CONST_TABLES makes states[] and mobjinfo[] const so they stay in flash.",
+   "trap": ".data falls from 58.9 kB to 20.2 kB; cost: Nightmare no longer speeds monsters up.",
+   "check": "check in the row",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "map sizes of both builds",
+     "path": "ports/doom/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:rodata.state_tables_const/default"
+  },
+  {
+   "idiom": "render.static_limits_trimmed",
+   "families": [
+    "*"
+   ],
+   "variant": "default",
+   "difficulty": "direct",
+   "replace": "Compile-time knobs set to 64, 5,120, 128, 100 and 16 (99 kB of .bss back).",
+   "trap": "Tuned on three demos, not proven for every map; vanilla Doom stops with an error when one is exceeded.",
+   "check": "check in the row",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "LIMITS report line at the end of each demo",
+     "path": "ports/doom/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:render.static_limits_trimmed/default"
+  },
+  {
+   "idiom": "test.arm_binary_in_emulator",
+   "families": [
+    "*"
+   ],
+   "variant": "unicorn",
+   "difficulty": "adapter",
+   "replace": "Run the real firmware in a Unicorn Cortex-M33 model (host/emu_m33.py): registers for time and console, the WAD mapped at an address, a hook on the frame function.",
+   "trap": "The start-up code reads CPACR, so the system control page must be mapped. Frame checksums agree with the Mac only for the first 400 frames.",
+   "check": "check in the row",
+   "proof": [
+    {
+     "port": "doom",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "400-frame checksum 8ceeaad8 equal on the Mac, in the emulator and then on the CC35X1",
+     "path": "ports/doom/host/emu_m33.py"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:test.arm_binary_in_emulator/unicorn"
+  },
+  {
+   "idiom": "emulator.frontend_present_hook",
+   "families": [
+    "*"
+   ],
+   "variant": "shades2",
+   "difficulty": "adapter",
+   "replace": "Peanut-GB front end draws each line through frl_present_shades2, the display hook the Arduboy layer uses; only setup() and loop() (examples/gameboy/gb_app.cpp) are new.",
+   "trap": "The test ROM's intro takes about 1,700 frames, four minutes at 7 frames a second, so scripted Start taps are needed to see anything past the logo.",
+   "check": "the title screen is drawn",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "Tobu Tobu Girl at 6.7 frames a second (4.7 to 7.9)",
+     "path": "portability/boosterpacks/edumkii/RUN-LOG.md",
+     "results": "mspm33c321a:gui_fps"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:emulator.frontend_present_hook/shades2",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "dsp.pitch_yin_fixed",
+   "families": [
+    "*"
+   ],
+   "variant": "q8-1-256hz",
+   "difficulty": "adapter",
+   "replace": "64-bit difference sums, one common right shift to keep the normalised difference in 32 bits, parabolic interpolation on the raw difference, frequency in 1/256 Hz.",
+   "trap": "Interpolating on the normalised difference gave up to 3.6 cents at 200 to 500 Hz and 13 cents near 1 kHz; the raw difference gives 0.6 and 2.3. A frequency in 1/16 Hz quantises to 1.3 cents at 82 Hz.",
+   "check": "error against a double-precision YIN reference",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "built",
+     "what": "host test: 0.22 cents at 82 to 200 Hz, 2.30 at 500 to 1000 Hz; builds for the AM13E230 and the MSPM33C321A",
+     "path": "portability/boosterpacks/audio/results/host-algos-20261020.log"
+    }
+   ],
+   "status": "built",
+   "id": "portable:dsp.pitch_yin_fixed/q8-1-256hz",
+   "boards": [
+    "am13e230",
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "dsp.fft_q15_block_float",
+   "families": [
+    "*"
+   ],
+   "variant": "radix2-q15",
+   "difficulty": "adapter",
+   "replace": "128-point radix-2 in Q15, divide by 2 each stage, input shifted up to 14 bits before the window and the shift taken out of the magnitudes.",
+   "trap": "Without the input shift the 16-bit rounding floor sat at 18 to 20 pixels and bars below 30 pixels were wrong by up to 16; with it, bars above 30 pixels are within 1.3.",
+   "check": "bars against a double-precision DFT",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "built",
+     "what": "host test: 1.31 pixel error, 53 of 53 frames with the peak in the right bar",
+     "path": "portability/boosterpacks/audio/results/host-algos-20261020.log"
+    }
+   ],
+   "status": "built",
+   "id": "portable:dsp.fft_q15_block_float/radix2-q15",
+   "boards": [
+    "am13e230",
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "dsp.goertzel_dtmf",
+   "families": [
+    "*"
+   ],
+   "variant": "q14-eight-filters",
+   "difficulty": "direct",
+   "replace": "Eight Goertzel filters in Q14 with 64-bit products, 205-sample blocks, a rule on energy share, runner-up ratio and twist, two agreeing blocks to emit.",
+   "trap": "The decision rule, not the filters, sets the noise limit: half the block energy in the two tones breaks at 1 dB SNR, a quarter at -1 dB. A debounce that re-arms on any block repeats a held digit.",
+   "check": "digits against the sent digits across a noise sweep",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "built",
+     "what": "host test: 200 sequences of 16 digits per SNR step",
+     "path": "portability/boosterpacks/audio/results/host-algos-20261020.log"
+    }
+   ],
+   "status": "built",
+   "id": "portable:dsp.goertzel_dtmf/q14-eight-filters",
+   "boards": [
+    "am13e230",
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "audio.noise_gate_echo",
+   "families": [
+    "*"
+   ],
+   "variant": "peak-follower",
+   "difficulty": "direct",
+   "replace": "Peak follower with fast attack and slow release, hold counter, Q15 gain ramp, one delay line with Q15 feedback and wet level.",
+   "trap": "A follower that falls by env >> 8 stalls at 255, so the close threshold must sit above that or the fall needs a minimum step of one.",
+   "check": "attenuation when closed and the impulse response",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "built",
+     "what": "host test: 125.5 dB closed, echo impulse error 0 LSB, 3 LSB through a DAC8311 model",
+     "path": "portability/boosterpacks/audio/results/host-algos-20261020.log"
+    }
+   ],
+   "status": "built",
+   "id": "portable:audio.noise_gate_echo/peak-follower",
+   "boards": [
+    "am13e230",
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "build.cycle_counter_dwt",
+   "families": [
+    "*"
+   ],
+   "variant": "weak-board-cycles",
+   "difficulty": "direct",
+   "replace": "CoreDebug->DEMCR TRCENA, DWT->CTRL CYCCNTENA, read DWT->CYCCNT; the app declares a weak board_cycles() that returns 0 so a board without the counter still links.",
+   "trap": "None found; compiles on both. A C comment holding a path with */ ends the comment and the compiler reports unrelated errors in system headers.",
+   "check": "links on both boards",
+   "proof": [
+    {
+     "port": "boosterpack-cores",
+     "board": "am13e230",
+     "level": "built",
+     "what": "algos build on the AM13E230 and the MSPM33C321A",
+     "path": "portability/boosterpacks/audio/boards/am13e230/build.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:build.cycle_counter_dwt/weak-board-cycles",
+   "boards": [
+    "am13e230",
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "mem.mmap_weights",
+   "families": [
+    "*"
+   ],
+   "variant": "const-array-in-flash",
+   "difficulty": "direct",
+   "replace": "A const array with 4-byte alignment in flash, generated from the file by tools/embed.py; pointers are computed the same way as after mmap.",
+   "trap": "Scales are read as float *, so the blob must be 4-byte aligned and the quantized tensors multiples of 4 bytes; ll_init checks the address.",
+   "check": "first token and story match",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "story generated from flash-resident weights",
+     "path": "ports/llama2c/results/ids-m33-board.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:mem.mmap_weights/const-array-in-flash",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "mem.static_runstate",
+   "families": [
+    "*"
+   ],
+   "variant": "sized-to-steps",
+   "difficulty": "adapter",
+   "replace": "Static arrays sized from macros; ll_init refuses a checkpoint whose header does not match.",
+   "trap": "The key and value cache is layers x seq_len x kv_dim x 4 B x 2: 655 kB at the model's 512 steps, more than the RAM. Size it to the steps you will run (128 steps is 160 kB); attention results do not depend on it.",
+   "check": "no malloc and the image fits RAM",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "197,216 B RAM",
+     "path": "ports/llama2c/README.md",
+     "results": "mspm33c321a:port_ram_bytes"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:mem.static_runstate/sized-to-steps",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "mem.lazy_dequant_row",
+   "families": [
+    "*"
+   ],
+   "variant": "embedding-row",
+   "difficulty": "adapter",
+   "replace": "Dequantize only the row for the current token, with the same multiply (saves 128 kB).",
+   "trap": "None. The product is the same float, so the output is unchanged.",
+   "check": "output byte for byte equal to runq.c",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "byte-identical output on the Mac, 15 of 15 runs",
+     "path": "ports/llama2c/tools/check_host.sh"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:mem.lazy_dequant_row/embedding-row",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "quant.group_size_divides_all",
+   "families": [
+    "*"
+   ],
+   "variant": "largest-common-divisor",
+   "difficulty": "redesign",
+   "replace": "Choose the group size as the largest divisor of both dim and hidden_dim.",
+   "trap": "260K has hidden_dim 172. runq.c computes n / GS groups and drops the remainder, so the last 44 values of every feed-forward vector are not quantized and the text is plausible but wrong, with no error. export.py backs off only for dim.",
+   "check": "greedy match against the float32 build",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "quantize_q80.py refuses a size that does not divide both; greedy ids match",
+     "path": "ports/llama2c/tools/quantize_q80.py"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:quant.group_size_divides_all/largest-common-divisor",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "ml.torch_free_export",
+   "families": [
+    "*"
+   ],
+   "variant": "numpy-q80",
+   "difficulty": "direct",
+   "replace": "Numpy port of quantize_q80 and the version 2 layout, reading the float checkpoint directly.",
+   "trap": "torch.round and np.round both round half to even; float32 division by the scale must stay float32.",
+   "check": "the unmodified runq.c loads the file and matches the float model at temperature 0",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "unmodified runq.c loads the exported file",
+     "path": "ports/llama2c/tools/quantize_q80.py"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:ml.torch_free_export/numpy-q80",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "libc.sscanf_byte_token",
+   "families": [
+    "*"
+   ],
+   "variant": "hand-parse",
+   "difficulty": "direct",
+   "replace": "Hand parse of the six characters <0xNN>.",
+   "trap": "sscanf pulls the formatted-input code of the C library into a bare-metal image.",
+   "check": "output equal to the sscanf build",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "byte-identical output",
+     "path": "ports/llama2c/tools/check_host.sh"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:libc.sscanf_byte_token/hand-parse",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "libc.sprintf_concat",
+   "families": [
+    "*"
+   ],
+   "variant": "two-memcpy",
+   "difficulty": "direct",
+   "replace": "Two memcpy calls into a fixed buffer, skipping pairs that would not fit.",
+   "trap": "sprintf links the whole printf family into a bare-metal image.",
+   "check": "output equal to the sprintf build",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "byte-identical output",
+     "path": "ports/llama2c/tools/check_host.sh"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:libc.sprintf_concat/two-memcpy",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "math.libm_float",
+   "families": [
+    "*"
+   ],
+   "variant": "ticlang-libc",
+   "difficulty": "direct",
+   "replace": "expf, powf, sinf, cosf and sqrtf under the same names from the TI Arm Clang C library (libc.a holds the math functions; there is no libm.a).",
+   "trap": "Results differ from the Mac's in the last bits, and re-quantizing activations to int8 turns that into logit differences up to 0.12 by token 38. Greedy output is identical over 128 tokens; sampled output splits at token 39. Compare greedy first.",
+   "check": "greedy ids equal; logit drift measured",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "logits at positions 0, 4, 38; first 39 token ids equal the Mac",
+     "path": "ports/llama2c/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:math.libm_float/ticlang-libc",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "host.emulator_run_to_symbol",
+   "families": [
+    "*"
+   ],
+   "variant": "result-block",
+   "difficulty": "adapter",
+   "replace": "Result block in RAM plus a ll_halt() symbol; the Unicorn harness stops there and reads the block; on the board run_image.py reads the same block over the probe.",
+   "trap": "Unicorn has no DWT, so the emulator build compiles the cycle reads out.",
+   "check": "emulator ids equal board ids",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "128 of 128 token ids equal between the emulator and the board",
+     "path": "ports/llama2c/results/ids-m33-board.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:host.emulator_run_to_symbol/result-block",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "time.cycle_stamp",
+   "families": [
+    "*"
+   ],
+   "variant": "dwt-per-pass",
+   "difficulty": "direct",
+   "replace": "DWT CYCCNT summed per forward pass into a 64-bit total.",
+   "trap": "The 32-bit counter wraps in 26.8 s at 160 MHz; sum per pass, not per run.",
+   "check": "two stamps around a delay differ by the delay",
+   "proof": [
+    {
+     "port": "llama2c",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "7.47 million cycles per token read from the counter",
+     "path": "ports/llama2c/README.md",
+     "results": "mspm33c321a:llm_tokens_per_s"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:time.cycle_stamp/dwt-per-pass",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "runtime.wasm_interpreter_fixed_heap",
+   "families": [
+    "*"
+   ],
+   "variant": "d_m3FixedHeap",
+   "difficulty": "direct",
+   "replace": "-Dd_m3FixedHeap=N puts wasm3's allocator in a static array in .bss, so no malloc or _sbrk; the Wasm value stack is a separate argument to m3_NewRuntime.",
+   "trap": "The default 4 kB code page (d_m3CodePageAlignSize) failed to link imports in a 16 kB heap on v0.9.0; set it to 1024. The heap fill level is a static in m3_core.c, so a port file that includes m3_core.c reads it.",
+   "check": "heap high water read after the run",
+   "proof": [
+    {
+     "port": "wasm3",
+     "board": "mspm0g3507",
+     "level": "built",
+     "what": "tiny configuration used 5.9 kB of its heap",
+     "path": "ports/wasm3/results/emu-g3507-tiny.txt"
+    }
+   ],
+   "status": "built",
+   "id": "portable:runtime.wasm_interpreter_fixed_heap/d_m3FixedHeap",
+   "boards": [
+    "mspm0g3507",
+    "mspm0g3519",
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "runtime.native_stack_budget",
+   "families": [
+    "*"
+   ],
+   "variant": "d_m3MaxNativeStack",
+   "difficulty": "adapter",
+   "replace": "Set the budget to the linker stack minus 512 bytes.",
+   "trap": "The default is about 8 MB and never trips on a part with a 4 to 8 kB stack, so recursion runs into the heap. Each Wasm call nests about 190 bytes of native frames on a Cortex-M0+; fib(20) needs 4 kB.",
+   "check": "recursion traps at the budget",
+   "proof": [
+    {
+     "port": "wasm3",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "emulator trapped stack overflow at a 3.5 kB budget and passed at 4 kB",
+     "path": "ports/wasm3/results/emu-g3519.txt"
+    }
+   ],
+   "status": "built",
+   "id": "portable:runtime.native_stack_budget/d_m3MaxNativeStack",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "runtime.wasm_call_ref_stack_check",
+   "families": [
+    "*"
+   ],
+   "variant": "build-copy-patch",
+   "difficulty": "adapter",
+   "replace": "Patches applied to a build copy: a native stack check in call_ref and a 64-bit page sum in memory.grow.",
+   "trap": "call_ref (off by default) had no native stack check; a recursive module crashed the process.",
+   "check": "sanitizer host test fails unpatched and passes patched",
+   "proof": [
+    {
+     "port": "wasm3",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "host test run_security_tests.sh: unpatched segfault, patched trap",
+     "path": "ports/wasm3/tests/run_security_tests.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:runtime.wasm_call_ref_stack_check/build-copy-patch",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "bind.host_function_raw",
+   "families": [
+    "*"
+   ],
+   "variant": "m3_LinkRawFunction",
+   "difficulty": "direct",
+   "replace": "Four imports (putc, led, delay_ms, print_i32) with signature strings such as \"v(i)\" calling the board layer.",
+   "trap": "A signature mismatch only fails at link time with a message; keep the string in step with the .wat import.",
+   "check": "the emulator calls each import",
+   "proof": [
+    {
+     "port": "wasm3",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "common/frl_wasm.c; each import called in the emulator",
+     "path": "ports/wasm3/common/frl_wasm.c"
+    }
+   ],
+   "status": "built",
+   "id": "portable:bind.host_function_raw/m3_LinkRawFunction",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "build.wasm_without_toolchain",
+   "families": [
+    "*"
+   ],
+   "variant": "wat-and-wabt",
+   "difficulty": "direct",
+   "replace": "The installed clang has no WebAssembly target: write the app as .wat and convert it with the npm package wabt (5 MB).",
+   "trap": "None; no LLVM install needed.",
+   "check": "the module gives the C answers",
+   "proof": [
+    {
+     "port": "wasm3",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "app/build_app.js produces the 346-byte file",
+     "path": "ports/wasm3/app/build_app.js"
+    }
+   ],
+   "status": "built",
+   "id": "portable:build.wasm_without_toolchain/wat-and-wabt",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "display.scale_while_drawing",
+   "families": [
+    "*"
+   ],
+   "variant": "line-callback-table",
+   "difficulty": "redesign",
+   "replace": "Scale inside the line callback: 5 source pixels make 4 with weights in eighths, rows blended in eighths vertically, one table lookup of RGB565 per output pixel; two 128-byte rows kept, no frame copy.",
+   "trap": "The first scaler averaged source pixels after the frame and was 69 percent of the instructions (1.98 million of 2.85 million a frame); the table scaler is about 0.26 million.",
+   "check": "instructions per frame from an emulator before and after; frames late on the board",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "0 frames late of 8,167 with the table scaler, DMA rows and frame skip at 160 MHz",
+     "path": "ports/peanut-gb/README.md",
+     "results": "mspm33c321a:gui_fps"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:display.scale_while_drawing/line-callback-table",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "display.stream_rows_dma",
+   "families": [
+    "*"
+   ],
+   "variant": "window-once-rows-queued",
+   "difficulty": "adapter",
+   "replace": "Optional stream_begin, stream_row and stream_end on the display interface: one window a frame, 256-byte rows queued by DMA, two row buffers rotate, panel byte order made in the table.",
+   "trap": "The old path set the window and swapped bytes for every call: 32 calls a frame took 29.6 ms against 19.5 ms for one block.",
+   "check": "screen time per frame against the wire time",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "screen frames every 33.8 ms on the paced image (one frame in two drawn)",
+     "path": "ports/peanut-gb/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:display.stream_rows_dma/window-once-rows-queued",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "perf.line_buffer_clear",
+   "families": [
+    "*"
+   ],
+   "variant": "word-loop-asm-barrier",
+   "difficulty": "direct",
+   "replace": "Patch 0002: clear 40 words in a loop the compiler cannot turn back into memclr (an empty asm on the zero).",
+   "trap": "Arm Clang's C library clears the 160-byte line with a byte loop: 110k of 2.85M instructions a frame (4 percent, 12 percent after the scaler was fixed).",
+   "check": "instruction count per frame before and after",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm33c321a",
+     "level": "built",
+     "what": "emulator counts before and after the patch",
+     "path": "ports/peanut-gb/README.md"
+    }
+   ],
+   "status": "built",
+   "id": "portable:perf.line_buffer_clear/word-loop-asm-barrier",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "perf.frame_skip",
+   "families": [
+    "*"
+   ],
+   "variant": "skip-one-in-two",
+   "difficulty": "direct",
+   "replace": "Set gb->direct.frame_skip; the front end sends nothing on a skipped frame and the present call only ends a drawn one.",
+   "trap": "The line callback is not called at all on a skipped frame, so the end of the picture is detected on line 143, not in the present call.",
+   "check": "late frames against the console's frame period",
+   "proof": [
+    {
+     "port": "peanut-gb",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "0 late frames of 8,167 emulated, 3,897 sent to the screen",
+     "path": "ports/peanut-gb/README.md",
+     "results": "mspm33c321a:emu_late_frames"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:perf.frame_skip/skip-one-in-two",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "emu.interpreter_core_portable",
+   "families": [
+    "*"
+   ],
+   "variant": "struct-state-quirks-as-fields",
+   "difficulty": "direct",
+   "replace": "One C file with all state in a struct, quirks as fields, no allocation; the front end calls c8_frame(steps) at 60 Hz.",
+   "trap": "VF must be written after the result so that 8xy4 with VX = VF ends with the flag, not the sum (the flags test row 'vF as vX').",
+   "check": "frame buffer on the board equals the host interpreter's for the same ROM",
+   "proof": [
+    {
+     "port": "chip8",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "frame buffer equal to the host on five test ROMs",
+     "path": "ports/chip8/src/chip8.c",
+     "results": "mspm0g3519:conformance"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:emu.interpreter_core_portable/struct-state-quirks-as-fields",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "emu.display_wait_vblank",
+   "families": [
+    "*"
+   ],
+   "variant": "vblank-flag-retry",
+   "difficulty": "direct",
+   "replace": "A vblank flag is set at the frame tick and cleared by the first draw; a second draw rewinds the program counter and retries next frame.",
+   "trap": "A text-heavy ROM (the keypad menu draws one glyph per frame) needs 150 frames or more before it shows; a host script that pressed a key at frame 10 pressed before the menu existed.",
+   "check": "the keypad menu is reached on the host with a key at frame 150",
+   "proof": [
+    {
+     "port": "chip8",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "keypad menu reached on the host with a key at frame 150",
+     "path": "ports/chip8/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:emu.display_wait_vblank/vblank-flag-retry",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "gfx.scaled_dirty_rows",
+   "families": [
+    "*"
+   ],
+   "variant": "row-bitmask-5x-blit",
+   "difficulty": "adapter",
+   "replace": "Dirty-row bitmask in the core; each dirty row becomes one 320 x 5 blit in the shared 1,600-pixel buffer.",
+   "trap": "The shared draw buffer was 1,536 pixels and a row at 5x is 1,600, so the build raises GFX_BUF_PX.",
+   "check": "full redraw time and frame buffer equal to the host",
+   "proof": [
+    {
+     "port": "chip8",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "14.2 ms full redraw of 51,200 pixels at 40 MHz SPI",
+     "path": "ports/chip8/README.md",
+     "results": "mspm0g3519:gui_full_redraw_us"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:gfx.scaled_dirty_rows/row-bitmask-5x-blit",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "input.touch_keypad",
+   "families": [
+    "*"
+   ],
+   "variant": "4x4-cosmac-rectangles",
+   "difficulty": "adapter",
+   "replace": "Sixteen rectangles in the COSMAC layout; one touch point; a key is held while touched; a ROM bar changes ROM.",
+   "trap": "Single touch only; a failed touch read must keep the last state or a key drops.",
+   "check": "a touch on a key changes the key state; counters in c8_stats",
+   "proof": [
+    {
+     "port": "chip8",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "pad and ROM bar drawn and polled; no finger on the panel yet",
+     "path": "ports/chip8/src/app.c"
+    }
+   ],
+   "status": "built",
+   "id": "portable:input.touch_keypad/4x4-cosmac-rectangles",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "test.automation_byte_0x1ff",
+   "families": [
+    "*"
+   ],
+   "variant": "platform-byte-before-run",
+   "difficulty": "direct",
+   "replace": "Write the platform byte to memory 0x1FF before running to skip the test ROM's menu.",
+   "trap": "None; the suite documents it.",
+   "check": "the quirks screen equals the host's",
+   "proof": [
+    {
+     "port": "chip8",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "quirks screen equal to the host",
+     "path": "ports/chip8/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:test.automation_byte_0x1ff/platform-byte-before-run",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "emu.cpu_tick_pin_model",
+   "families": [
+    "*"
+   ],
+   "variant": "pin-word-decode-per-tick",
+   "difficulty": "adapter",
+   "replace": "The machine decodes MREQ, IORQ, RD, WR and M1 from the pin word each tick; ROM reads come from a const array, RAM from an array.",
+   "trap": "The 64-bit pin mask probably costs the M0+ several instructions per tick (32-bit registers only; not profiled): the core reaches 16 to 19 percent of real time, not the 20 percent CoreMark scaling predicted.",
+   "check": "screen memory after 400 frames equals the host machine's",
+   "proof": [
+    {
+     "port": "zx-spectrum",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "screen memory equal to the host after 400 frames, two images",
+     "path": "ports/zx-spectrum/src/zx.c",
+     "results": "mspm0g3519:conformance"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:emu.cpu_tick_pin_model/pin-word-decode-per-tick",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "build.opt_level_for_emulators",
+   "families": [
+    "*"
+   ],
+   "variant": "measure-o2-against-o3",
+   "difficulty": "direct",
+   "replace": "Build at -O2 and -O3 and keep the faster: -O2 gave 15.9 percent against 14.0.",
+   "trap": "Higher optimisation grew the code (74 kB against 64 kB) and slowed the flash-resident core.",
+   "check": "speed at each level on the same workload",
+   "proof": [
+    {
+     "port": "zx-spectrum",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "15.9 percent at -O2, 14.0 at -O3, core in flash",
+     "path": "ports/zx-spectrum/README.md",
+     "results": "mspm0g3519:emu_speed_pct_x10"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:build.opt_level_for_emulators/measure-o2-against-o3",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "gfx.band_dirty_shadow",
+   "families": [
+    "*"
+   ],
+   "variant": "shadow-compare-8-line-bands",
+   "difficulty": "adapter",
+   "replace": "Compare each 8-line band's bitmap and attribute bytes with a shadow copy and send only changed bands as one 256 x 8 blit; FLASH-bit bands are redrawn every 16 frames.",
+   "trap": "The bitmap is interleaved (address bits 7 to 5 of the line, not the line order), so a band is eight scattered 32-byte rows.",
+   "check": "screen cost per frame at BASIC idle (1.1 ms) and under full change (35 ms)",
+   "proof": [
+    {
+     "port": "zx-spectrum",
+     "board": "mspm0g3519",
+     "level": "measured",
+     "what": "1.1 ms per frame at BASIC idle",
+     "path": "ports/zx-spectrum/README.md",
+     "results": "mspm0g3519:emu_speed_pct_x10"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:gfx.band_dirty_shadow/shadow-compare-8-line-bands",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "input.matrix_from_touch",
+   "families": [
+    "*"
+   ],
+   "variant": "half-row-bytes-latched-shift",
+   "difficulty": "adapter",
+   "replace": "Eight half-row bytes for IN A,(C); keys at the Spectrum layout; CAP and SYM latch for the next key because the panel gives one touch.",
+   "trap": "One touch point means no shifted keys without latching.",
+   "check": "a touch changes the half-row bytes",
+   "proof": [
+    {
+     "port": "zx-spectrum",
+     "board": "mspm0g3519",
+     "level": "built",
+     "what": "keyboard drawn and polled; no finger on the panel yet",
+     "path": "ports/zx-spectrum/src/app.c"
+    }
+   ],
+   "status": "built",
+   "id": "portable:input.matrix_from_touch/half-row-bytes-latched-shift",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "legal.reader_supplies_rom",
+   "families": [
+    "*"
+   ],
+   "variant": "zx-rom-at-build",
+   "difficulty": "direct",
+   "replace": "ZX_ROM=<file> at build; a ROM-less test image otherwise.",
+   "trap": "A free replacement ROM can still carry the original's banner and rights questions; keep it out of the repository.",
+   "check": "both the ROM-less image and a reader's ROM build and run",
+   "proof": [
+    {
+     "port": "zx-spectrum",
+     "board": "mspm0g3519",
+     "level": "ran",
+     "what": "ran with a ROM-less image and with OpenSE BASIC",
+     "path": "ports/zx-spectrum/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:legal.reader_supplies_rom/zx-rom-at-build",
+   "boards": [
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "audio.mp3_decode_float",
+   "families": [
+    "*"
+   ],
+   "variant": "decode-frame-from-flash-array",
+   "difficulty": "direct",
+   "replace": "Call mp3dec_decode_frame per frame from a byte array in flash; PCM goes to a 1152 x 2 buffer; no stdio, no malloc (decoder state is one 6.6 kB struct).",
+   "trap": "The header needs no port at all; the work is build flags: keep SIMD off (MINIMP3_NO_SIMD) so the Mac reference is the scalar path, and use -ffp-contract=off on the Mac if the target emits no fused multiply-add.",
+   "check": "one 32-bit checksum per frame equals the Mac's",
+   "proof": [
+    {
+     "port": "minimp3",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "194 of 194 frame checksums equal, maximum sample error 0",
+     "path": "ports/minimp3/results/m33-board-run.txt",
+     "results": "mspm33c321a:mp3_max_sample_error"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:audio.mp3_decode_float/decode-frame-from-flash-array",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "audio.mp3_stack_budget",
+   "families": [
+    "*"
+   ],
+   "variant": "reserve-32kb",
+   "difficulty": "adapter",
+   "replace": "Reserve 32 kB of stack.",
+   "trap": "One decode call keeps a 17.3 kB frame on the stack; the 4 kB stack of the earlier ports overflows silently.",
+   "check": "frame size from the disassembly and a clean run",
+   "proof": [
+    {
+     "port": "minimp3",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "frame size from the disassembly (sub sp, #0x4380); decode ran clean",
+     "path": "ports/minimp3/README.md",
+     "results": "mspm33c321a:port_ram_bytes"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:audio.mp3_stack_budget/reserve-32kb",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "fixed_point.none",
+   "families": [
+    "*"
+   ],
+   "variant": "float-only-library",
+   "difficulty": "none",
+   "replace": "minimp3 has no fixed-point path; MINIMP3_FLOAT_OUTPUT only changes the output type.",
+   "trap": "MINIMP3_FLOAT_OUTPUT looks like a float or fixed switch and is not.",
+   "check": "the library source has no integer path",
+   "instead": "Use the float path on a part with a float unit; for a part without one the choice is soft float, priced by emulator, or another decoder.",
+   "proof": [
+    {
+     "port": "minimp3",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "no fixed-point row is possible; the float path ran",
+     "path": "ports/minimp3/README.md"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:fixed_point.none/float-only-library",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "arduino.sketch_board_list",
+   "families": [
+    "*"
+   ],
+   "variant": "build-copy-board-block",
+   "difficulty": "adapter",
+   "replace": "A build copy gets one FRL_MSPM0 block before the sketch's #error and a CPU_MSPM0 block of pin-mode keywords; the workspace comes from -DFRL_WORKSPACE.",
+   "trap": "The keyword table is also chosen by a CPU tag; without one the sketch builds but :input and :output do not exist.",
+   "check": "the sketch boots and the original file hash is unchanged",
+   "proof": [
+    {
+     "port": "ulisp",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "19 of 19 REPL checks pass on the build copy",
+     "path": "ports/ulisp/patches/apply.py",
+     "results": "mspm0g5187:port_repl_checks"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:arduino.sketch_board_list/build-copy-board-block",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "arduino.auto_prototypes",
+   "families": [
+    "*"
+   ],
+   "variant": "regex-over-top-level-definitions",
+   "difficulty": "adapter",
+   "replace": "A regular expression over top-level definitions writes about 490 prototypes into the build copy; helpers that take an SD-card File are skipped.",
+   "trap": "None once the SD helpers are skipped (their type exists only with sdcardsupport).",
+   "check": "the sketch compiles with no undeclared function",
+   "proof": [
+    {
+     "port": "ulisp",
+     "board": "mspm0g5187",
+     "level": "built",
+     "what": "built for three kits",
+     "path": "ports/ulisp/build.sh"
+    }
+   ],
+   "status": "built",
+   "id": "portable:arduino.auto_prototypes/regex-over-top-level-definitions",
+   "boards": [
+    "mspm0g5187",
+    "mspm0g3507",
+    "mspm0g3519"
+   ]
+  },
+  {
+   "idiom": "arduino.analog_tone_spi_i2c_stubs",
+   "families": [
+    "*"
+   ],
+   "variant": "empty-functions",
+   "difficulty": "direct",
+   "replace": "Empty functions that return 0 or an error, so the interpreter's own commands compile and fail politely.",
+   "trap": "tone is empty on purpose during quiet hours.",
+   "check": "the program builds and the missing feature errors",
+   "proof": [
+    {
+     "port": "ulisp",
+     "board": "mspm0g5187",
+     "level": "built",
+     "what": "the stubs build; analogread, tone, SPI and I2C were not run",
+     "path": "ports/ulisp/shim/arduino_shim.cpp"
+    }
+   ],
+   "status": "built",
+   "id": "portable:arduino.analog_tone_spi_i2c_stubs/empty-functions",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "lisp.autoexec_for_debug_check",
+   "families": [
+    "*"
+   ],
+   "variant": "feed-line-500ms-after-reset",
+   "difficulty": "direct",
+   "replace": "A build option feeds a Lisp line to the REPL 500 ms after reset.",
+   "trap": "uLisp empties its input once at start-up and ate the text when it was fed at once.",
+   "check": "the LED pin changes while nobody types",
+   "proof": [
+    {
+     "port": "ulisp",
+     "board": "mspm0g5187",
+     "level": "ran",
+     "what": "6 pin changes in 16 samples from an AUTOEXEC image",
+     "path": "ports/ulisp/results/blink-check-g5187.txt",
+     "results": "mspm0g5187:led_toggle_blink_check"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:lisp.autoexec_for_debug_check/feed-line-500ms-after-reset",
+   "boards": [
+    "mspm0g5187"
+   ]
+  },
+  {
+   "idiom": "test.integer_signal_generator",
+   "families": [
+    "*"
+   ],
+   "variant": "phase-accumulator-lcg",
+   "difficulty": "direct",
+   "replace": "Phase accumulator with a parabolic sine, an LCG for noise and a one-pole filter, all integer.",
+   "trap": "Any sinf call makes the host and board inputs differ in the last bit.",
+   "check": "host and board input streams are byte-identical",
+   "proof": [
+    {
+     "port": "lc3",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "Mac and board streams identical",
+     "path": "ports/lc3/common/lc3run.c"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:test.integer_signal_generator/phase-accumulator-lcg"
+  },
+  {
+   "idiom": "float.strict_equals_host",
+   "families": [
+    "*"
+   ],
+   "variant": "same-flags-no-contract",
+   "difficulty": "direct",
+   "replace": "Build the Mac reference and the board the same way (no fast-math, -ffp-contract=off) and compare CRC-32 per block.",
+   "trap": "With the FPU on the TI compiler fused nothing here, so the flag was not needed; with the FPU off the soft-float library moved samples in 20 of 24 engines.",
+   "check": "per-block checksums equal",
+   "proof": [
+    {
+     "port": "plaits",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "24 of 24 at -O2, -O3, -Os and -ffp-contract=on; 4 of 24 with the FPU off",
+     "path": "ports/plaits/results/boards/plaits-O2-hard-strict.json"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:float.strict_equals_host/same-flags-no-contract",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "test.per_block_crc_reference",
+   "families": [
+    "*"
+   ],
+   "variant": "crc-array-read-back",
+   "difficulty": "direct",
+   "replace": "CRC-32 of each 12 stereo frames on the Mac and on the board, arrays read over the probe.",
+   "trap": "A whole-run CRC cannot tell which block differs first; the per-block list names it (soft-float runs named blocks 15 to 244).",
+   "check": "the first differing block is printed",
+   "proof": [
+    {
+     "port": "plaits",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "per-block CRC list compared for 24 engines",
+     "path": "ports/plaits/run_board.py"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:test.per_block_crc_reference/crc-array-read-back",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "int.opus_fast_int64",
+   "families": [
+    "*"
+   ],
+   "variant": "match-host-macro-to-target",
+   "difficulty": "adapter",
+   "replace": "Build the Mac reference from a copy of the library with OPUS_FAST_INT64 set to 0, or the board from a copy with it set to 1.",
+   "trap": "The macro follows the host word size, so a 64-bit Mac and a 32-bit core run different arithmetic and differ from CELT complexity 5 up; SILK and complexity 0 match, which hides it.",
+   "check": "12 of 12 runs equal with matching macros",
+   "proof": [
+    {
+     "port": "opus",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "equal with matching macros, differs from complexity 5 with the stock Mac build",
+     "path": "ports/opus/results/boards/opus-fixed-O2.json"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:int.opus_fast_int64/match-host-macro-to-target",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "audio.opus_mode_select",
+   "families": [
+    "*"
+   ],
+   "variant": "application-signal-bandwidth",
+   "difficulty": "direct",
+   "replace": "VOIP, wideband and voice for SILK; AUDIO, full band and music for CELT; RESTRICTED_LOWDELAY for CELT at 16 kHz; read the configuration bits of the first packet byte.",
+   "trap": "The mode is not one API setting.",
+   "check": "packet mode counts match the intended mode",
+   "proof": [
+    {
+     "port": "opus",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "packet mode counts in the results JSON",
+     "path": "ports/opus/results/boards/opus-fixed-O2.json"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:audio.opus_mode_select/application-signal-bandwidth",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "size.opus_os",
+   "families": [
+    "*"
+   ],
+   "variant": "os-halves-flash",
+   "difficulty": "direct",
+   "replace": "Build with -Os.",
+   "trap": "Flash halves (331.4 to 164.7 kB) and cycles do not change.",
+   "check": "size tool and cycle counts",
+   "proof": [
+    {
+     "port": "opus",
+     "board": "mspm33c321a",
+     "level": "measured",
+     "what": "164.7 kB against 331.4 kB at the same speed",
+     "path": "ports/opus/results/sizes.json"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:size.opus_os/os-halves-flash",
+   "boards": [
+    "mspm33c321a"
+   ]
+  },
+  {
+   "idiom": "test.per_frame_crc",
+   "families": [
+    "*"
+   ],
+   "variant": "packet-and-pcm-crc-arrays",
+   "difficulty": "direct",
+   "replace": "An array of packet CRCs and decoded-frame CRCs read back with the results.",
+   "trap": "Whole-run CRCs say a run differs; the arrays say from which frame and which side, and showed the float decoder differs while the packets match.",
+   "check": "a mismatch names a frame",
+   "proof": [
+    {
+     "port": "opus",
+     "board": "mspm33c321a",
+     "level": "ran",
+     "what": "float decoder difference located by frame",
+     "path": "ports/opus/run_board.py"
+    }
+   ],
+   "status": "proven",
+   "id": "portable:test.per_frame_crc/packet-and-pcm-crc-arrays",
+   "boards": [
+    "mspm33c321a"
+   ]
+  }
+ ]
+}

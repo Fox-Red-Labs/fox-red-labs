@@ -1,0 +1,77 @@
+{
+ "name": "LP-MSPM0G3507 LaunchPad development kit",
+ "sources": "MSPM0G350x datasheet SLASEX6C (features list); LaunchPad user guide SLAU873E (board parts, header silkscreen; R59/R60 not fitted on schematic page 20)",
+ "columns": [
+  {
+   "head": "The chip: MSPM0G3507",
+   "items": [
+    [
+     "Processor: Arm Cortex-M0+",
+     "Runs the program, up to 80 million steps a second (80 MHz)"
+    ],
+    [
+     "Flash: 128 kB",
+     "Holds the program. Kept when the power is off"
+    ],
+    [
+     "RAM: 32 kB",
+     "Working memory while it runs. Cleared at power off"
+    ],
+    [
+     "Power: 3.3 V on this board",
+     "The chip accepts 1.62 to 3.6 V, so 5 V parts need care"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "GPIO: up to 60 pins",
+     "Plain on/off pins: LEDs, buttons, control lines. 35 reach the board's headers"
+    ],
+    [
+     "SPI: 2",
+     "Fast bus with a clock and data wires: displays, SD cards, memory chips"
+    ],
+    [
+     "I2C: 2",
+     "Two-wire shared bus: sensors and touch chips, each with its own address"
+    ],
+    [
+     "UART: 4",
+     "Simple serial text, one wire each way: GPS, the computer's terminal"
+    ],
+    [
+     "ADC: 2 / DAC: 1",
+     "Measure a voltage / make a voltage, 0 to 4095 steps (12-bit)"
+    ],
+    [
+     "Timers: 7, CAN-FD: 1",
+     "Timing and PWM for dimming and motors / the car and factory network bus"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "USB debug probe, red LED, color LED, 2 buttons plus reset, light sensor, temperature sensor"
+    ],
+    [
+     "Headers",
+     "40 pins in four rows (J1 to J4), the standard BoosterPack layout"
+    ],
+    [
+     "Not on the chip",
+     "No Wi-Fi or Bluetooth. No USB port of its own: the USB plug talks to the debug probe"
+    ],
+    [
+     "Not fitted",
+     "Pull-up resistors for I2C (R59, R60). With the chip's internal pull-ups, software I2C works and the I2C block did not; external resistors were not tried"
+    ]
+   ]
+  }
+ ]
+}

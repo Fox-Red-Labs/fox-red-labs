@@ -1,0 +1,771 @@
+{
+ "title": "Which radio and which software should I pick for an MSPM0 or CC23xx board?",
+ "short": "For a battery sensor that talks to a phone, pick Bluetooth LE. For a smart home you already run with a hub, pick Zigbee or Thread. For Apple Home, Google Home or Alexa, pick Matter, which runs over Thread or Wi-Fi. Pick Wi-Fi when the device is plugged in, and Sub-1 GHz when it is far from the house. For software, TI's SDK has the radio stacks and TI's compiler. On CoreMark at -O3 that compiler was 26 percent faster than GCC: 2.30 against 1.82 per MHz on the LP-MSPM0G3507. Zephyr lets the same code move between chips and vendors. With the same GCC compiler it cost us 4 to 8 percent on one LP-MSPM0G3507. The C library also differs.",
+  "lede": ["For a battery sensor that talks to a phone, pick Bluetooth LE. For a smart home you already run with a hub, pick Zigbee or Thread. For Apple Home, Google Home or Alexa, pick Matter, which runs over Thread or Wi-Fi. Pick Wi-Fi when the device is plugged in, and Sub-1 GHz when it is far from the house.", "For software, TI's SDK has the radio stacks and TI's compiler. On CoreMark at -O3 that compiler was 26 percent faster than GCC: 2.30 against 1.82 per MHz on the LP-MSPM0G3507. Zephyr lets the same code move between chips and vendors. With the same GCC compiler it cost us 4 to 8 percent on one LP-MSPM0G3507. The C library also differs."],
+ "quiz": {
+  "questions": [
+   {
+    "q": "What should it talk to?",
+    "answers": [
+     {
+      "t": "A phone app, directly",
+      "score": {
+       "ble": 5
+      }
+     },
+     {
+      "t": "Home Assistant",
+      "score": {
+       "zigbee": 1,
+       "ble": 1,
+       "wifi": 1,
+       "thread": 1
+      }
+     },
+     {
+      "t": "Apple Home, Google Home or Alexa",
+      "score": {
+       "matter": 5
+      }
+     },
+     {
+      "t": "Something far away: a garden, barn or field",
+      "score": {
+       "long": 6
+      }
+     }
+    ]
+   },
+   {
+    "q": "How is it powered?",
+    "answers": [
+     {
+      "t": "A battery",
+      "score": {
+       "ble": 2,
+       "zigbee": 2,
+       "thread": 2,
+       "long": 1
+      }
+     },
+     {
+      "t": "Plugged in",
+      "score": {
+       "wifi": 2,
+       "zigbee": 1,
+       "thread": 1,
+       "matter": 1
+      }
+     }
+    ]
+   },
+   {
+    "q": "What is already in your house?",
+    "answers": [
+     {
+      "t": "A Zigbee hub or a USB Zigbee radio",
+      "score": {
+       "zigbee": 2
+      }
+     },
+     {
+      "t": "A Thread border router, listed below",
+      "score": {
+       "thread": 2,
+       "matter": 2
+      }
+     },
+     {
+      "t": "Just Wi-Fi",
+      "score": {
+       "wifi": 2,
+       "ble": 1
+      }
+     },
+     {
+      "t": "Nothing in particular",
+      "score": {
+       "ble": 1,
+       "wifi": 1
+      }
+     }
+    ]
+   }
+  ],
+  "results": {
+   "ble": {
+    "name": "Bluetooth LE",
+    "need": "ble",
+    "why": "It sleeps on very little power and talks to a phone directly, or to Home Assistant through a Bluetooth adapter or an ESPHome Bluetooth proxy."
+   },
+   "zigbee": {
+    "name": "Zigbee",
+    "need": "zigbee",
+    "why": "Your hub already speaks it, and battery sensors last on it."
+   },
+   "thread": {
+    "name": "Thread",
+    "need": "thread",
+    "why": "Low power like Zigbee, with internet-style addresses, through the border router you have."
+   },
+   "matter": {
+    "name": "Matter, over Thread or Wi-Fi",
+    "need": "matter",
+    "why": "One device works in Apple Home, Google Home, Alexa and Home Assistant at once. On a battery that means Matter over Thread, which needs a Thread border router; plugged in, Matter over Wi-Fi needs no extra box."
+   },
+   "wifi": {
+    "name": "Wi-Fi",
+    "need": "wifi",
+    "why": "Plugged in, it joins your network directly with no extra box."
+   },
+   "long": {
+    "name": "Sub-1 GHz long range",
+    "need": "long_range",
+    "why": "It reaches farther and gets through walls better than 2.4 GHz radios."
+   }
+  },
+  "priority": [
+   "long",
+   "matter",
+   "ble",
+   "thread",
+   "zigbee",
+   "wifi"
+  ]
+ },
+ "glance_intro": "Matter is not on this table because it is not a radio. It runs over Thread or Wi-Fi, covered in the next section. Power figures come from data sheets at different voltages and power levels, so compare sizes and ignore exact ratios. Range depends on your walls more than the radio. 1 kB = 1,024 bytes.",
+ "glance": {
+  "cols": [
+   "Bluetooth LE",
+   "Zigbee",
+   "Thread",
+   "Wi-Fi",
+   "Sub-1 GHz"
+  ],
+  "rows": [
+   [
+    "What else you need",
+    "A phone, or a Bluetooth adapter or proxy for Home Assistant",
+    "A Zigbee hub, such as a USB coordinator radio on Home Assistant",
+    "A Thread border router",
+    "Your Wi-Fi router",
+    "A second Sub-1 GHz radio to receive it"
+   ],
+   [
+    "On a battery",
+    "Yes: a CC2340R5 sleeps at 0.71 µA",
+    "Yes, as an end device",
+    "Yes, as a sleepy end device",
+    "Hard: about 0.4 to 1 mA just to stay connected. CC3235SF 710 µA; CC3551E 430 to 975 µA, target values",
+    "Yes, for small readings"
+   ],
+   [
+    "Sending, current",
+    "5.1 to 10.7 mA (CC2340R5)",
+    "Same 2.4 GHz chips as Bluetooth",
+    "Same 2.4 GHz chips as Bluetooth",
+    "217 to 286 mA (CC3235SF)",
+    "Not compared"
+   ],
+   [
+    "Devices relay for each other",
+    "Not by default",
+    "Yes: mains-powered devices route",
+    "Yes: routers stay on, so they are mains powered",
+    "No: everything goes through your router",
+    "Depends on the protocol"
+   ],
+   [
+    "Gets an IP address",
+    "No",
+    "No: the hub translates",
+    "Yes, IPv6",
+    "Yes: IPv4, and IPv6 if your network has it",
+    "Depends on the protocol"
+   ],
+   [
+    "Apple Home, Google Home, Alexa",
+    "Not checked for a home-made board; Matter is the standard path",
+    "Through a hub",
+    "Through Matter",
+    "Through Matter or the maker's app",
+    "No"
+   ],
+   [
+    "Home Assistant",
+    "Bluetooth integration, BTHome",
+    "ZHA or Zigbee2MQTT",
+    "Thread integration, usually with Matter",
+    "MQTT, ESPHome and others",
+    "Through your own bridge"
+   ],
+   [
+    "What was measured",
+    "45 ms round trip on LP-EM-CC2340R5",
+    "95 ms per command from Home Assistant at first pairing; about 5 s after a re-pairing on LP-EM-CC2340R5",
+    "Thread device builds did not fit 36 kB of RAM; they build completely for 64 kB and were not run",
+    "LP-EM-CC35X1 joined Wi-Fi and its ESPHome API answered 20 of 20 commands; Home Assistant adoption not run",
+    "Not measured"
+   ]
+  ]
+ },
+ "matter_explainer": "Matter is not a radio. It is a common language for smart-home devices, from the Connectivity Standards Alliance, that runs on IP networks: Wi-Fi, Thread or Ethernet. Bluetooth LE only sets a new device up. So you choose between Matter over Thread, which is low power and needs a border router, and Matter over Wi-Fi, which needs no extra box and uses more power. One Matter device can sit in Apple Home, Google Home, Alexa and Home Assistant at once. Matter needs a big part. TI marks Matter over Thread on the CC2755P10 as evaluation, and Matter over Wi-Fi on the CC3551E as production. The CC3551E board is the LP-EM-CC35X1. TI offers no Matter build for the CC2340R5.",
+ "radios": [
+  {
+   "id": "ble",
+   "name": "Bluetooth LE",
+   "need": "ble",
+   "one": "Talks straight to a phone or computer, no hub. A CC2340R5 sleeps at 0.71 µA between radio events (data sheet).",
+   "pick_when": [
+    "A phone app should talk to it directly",
+    "It runs for a long time on a coin cell",
+    "You want readings in Home Assistant through a Bluetooth adapter or an ESPHome Bluetooth proxy (BTHome is an open format it reads)"
+   ],
+   "skip_when": [
+    "Messages need to hop across the house through other devices: Zigbee and Thread do that by default",
+    "It should appear in Apple Home or Google Home on its own: use Matter"
+   ],
+   "facts": [
+    [
+     "Power",
+     "5.1 to 10.7 mA sending, 0.71 µA asleep (CC2340R5 data sheet, 3.0 V)"
+    ],
+    [
+     "Address",
+     "No IP address; a phone or hub talks to it"
+    ]
+   ],
+   "measured": "LP-EM-CC2340R5: on air 1.40 s after flashing, connects to a Mac in 0.55 s, 45 ms round trip for 20 bytes."
+  },
+  {
+   "id": "zigbee",
+   "name": "Zigbee",
+   "need": "zigbee",
+   "one": "A low-power mesh for lights, plugs and sensors, run by a hub. Mains-powered devices relay messages for the others.",
+   "pick_when": [
+    "You already have a Zigbee hub, such as Home Assistant with a USB Zigbee radio",
+    "Battery sensors spread across a house",
+    "You want it in Home Assistant through ZHA or Zigbee2MQTT"
+   ],
+   "skip_when": [
+    "You have no hub and do not want one",
+    "It should appear in Apple Home or Google Home without a bridge: use Matter"
+   ],
+   "facts": [
+    [
+     "Channels",
+     "Home Assistant suggests Zigbee channel 15, 20 or 25 \"to avoid interoperability problems with Zigbee devices\". Zigbee shares 2.4 GHz with Wi-Fi. Wi-Fi channels 1, 6 and 11 overlap Zigbee channels 11 to 14, 16 to 19 and 21 to 24 (from the channel frequencies), and 15, 20 and 25 sit in the gaps. That is the US Wi-Fi plan; in Europe, Wi-Fi channel 13 overlaps Zigbee 22 to 26"
+    ],
+    [
+     "Address",
+     "No IP address; the hub translates"
+    ],
+    [
+     "Words",
+     "A coordinator is the hub's radio. Mains powered means plugged into the wall. Zigbee2MQTT and ZHA are the two ways Home Assistant runs a Zigbee network"
+    ]
+   ],
+   "measured": "LP-EM-CC2340R5 as a Zigbee light in Home Assistant: 20 of 20 commands, 95 ms median at first pairing (2026-10-05); about 5 s per command after a re-pairing two hours later; the 2026-10-16 repeat did not join. **Tag: Unknown.** Suspected: the radio environment. TI's example listened on channel 11 only until all channels were set. **Tag: TI example default.** That default suits a bench, not a home."
+  },
+  {
+   "id": "thread",
+   "name": "Thread",
+   "need": "thread",
+   "one": "A low-power mesh like Zigbee, but every device gets an IPv6 address. It reaches your network through a border router.",
+   "pick_when": [
+    "You have a border router already: Apple TV 4K (2nd generation, or 3rd generation Wi-Fi + Ethernet; not the Wi-Fi-only model), HomePod mini, HomePod (2nd generation), Nest Hub (2nd gen), Nest Hub Max, Nest Wifi Pro, Google TV Streamer (4K), or Home Assistant with a Connect ZBT-1 (formerly SkyConnect) or ZBT-2 running the OpenThread Border Router app",
+    "You plan to use Matter on battery devices",
+    "Battery sensors that sleep: sleepy end devices keep the radio off most of the time"
+   ],
+   "skip_when": [
+    "There is no border router in the house and you do not want one",
+    "Your chip is the 36 kB CC2340R52: TI's Thread device builds did not fit it, while its Bluetooth and Zigbee examples did"
+   ],
+   "facts": [
+    [
+     "Routers",
+     "Keep the radio on all the time, so in practice they are mains powered (plugged in). A sleepy end device keeps its radio off most of the time"
+    ],
+    [
+     "Address",
+     "IPv6, inside and outside the mesh"
+    ],
+    [
+     "On TI chips",
+     "TI lists Thread device roles on the CC2340R53 (evaluation) and the CC27xx chips (production). On the CC2340R5 TI lists only the radio co-processor role, marked evaluation"
+    ]
+   ],
+   "measured": "Thread device builds for the LP-EM-CC2340R5 (36 kB of RAM) needed 7.5 to 23.8 kB more RAM. **Tag: Unknown.** Suspected: a chip limit. Only TI's configurations were built; a trimmed build might fit. They link for the 64 kB CC2340R53 and were not run."
+  },
+  {
+   "id": "matter",
+   "name": "Matter",
+   "need": "matter",
+   "one": "Not a radio. A common language over Thread, Wi-Fi or Ethernet, so one device works with Apple Home, Google Home, Alexa, SmartThings and Home Assistant at once.",
+   "pick_when": [
+    "It should work in any smart-home app, or several at once",
+    "Other people, who may not run Home Assistant, will use it"
+   ],
+   "skip_when": [
+    "Only you will use it, with Home Assistant: Zigbee or Bluetooth is simpler",
+    "The chip is small. TI offers Matter only on bigger wireless parts, such as the CC2755P10 (Thread, evaluation) and the CC3551E on the LP-EM-CC35X1 board (Wi-Fi, production)"
+   ],
+   "facts": [
+    [
+     "Runs over",
+     "Thread or Wi-Fi (or Ethernet); Bluetooth LE only to set it up"
+    ],
+    [
+     "What else you need",
+     "A Matter controller (Apple Home, Google Home, Alexa or Home Assistant), and a border router for Thread devices"
+    ]
+   ],
+   "measured": "Not measured. TI offers no Matter build for the CC2340R5."
+  },
+  {
+   "id": "wifi",
+   "name": "Wi-Fi",
+   "need": "wifi",
+   "one": "Joins your home network directly. No hub and plenty of speed, at much more power.",
+   "pick_when": [
+    "It is plugged into the wall",
+    "It sends a lot of data, or talks to a web service",
+    "You want it on the network today with no hub, for example over MQTT into Home Assistant"
+   ],
+   "skip_when": [
+    "It runs on a small battery: staying connected alone costs about 0.4 to 1 mA"
+   ],
+   "facts": [
+    [
+     "Power",
+     "217 to 286 mA sending, 53 to 74 mA receiving, 710 µA staying connected (CC3235SF data sheet, 3.6 V). The newer CC3551E lists 430 to 975 µA connected, as target values"
+    ],
+    [
+     "Band",
+     "2.4 GHz and often 5 GHz"
+    ],
+    [
+     "TI boards",
+     "LAUNCHXL-CC3235SF (Wi-Fi 4), LP-EM-CC35X1 (Wi-Fi 6 with Bluetooth)"
+    ]
+   ],
+   "measured": "Ran on the LP-EM-CC35X1: it joins Wi-Fi and its ESPHome API answered 20 of 20 commands from a client on the board. Home Assistant adoption is not run because the test network keeps clients apart. Evidence: docs/experiments/2026-10-13-esphome-cc35xx-platform.md."
+  },
+  {
+   "id": "long",
+   "name": "Sub-1 GHz long range",
+   "need": "long_range",
+   "one": "A lower frequency that reaches farther and passes walls better, for sensors at the far end of a garden or a farm.",
+   "pick_when": [
+    "The sensor sits past where 2.4 GHz reaches. In TI's example, the same radio performance gives 292 m at 868 MHz against 233 m at 2.4 GHz, and about twice the range through an 8-inch concrete wall",
+    "It sends small readings, not much data"
+   ],
+   "skip_when": [
+    "A phone or a standard smart-home app should hear it directly: phones have no Sub-1 GHz radio",
+    "You read about 100 km records. Those need a slow long-range mode, high antennas and a clear line of sight"
+   ],
+   "facts": [
+    [
+     "What else you need",
+     "A second Sub-1 GHz radio at home to receive it, such as another TI board or a BeaglePlay"
+    ],
+    [
+     "TI boards",
+     "LP-CC1354P10-1, LP-CC1352P7-1"
+    ]
+   ],
+   "measured": "Not measured. An LP-CC1354P10-1 is on this bench."
+  }
+ ],
+ "all_of_them": "Yes, with limits. A bigger chip can run two radio stacks at once: TI lists Bluetooth together with TI 15.4 as shipping on the CC2755P10. TI's release notes say the CC23xx chips do not support two stacks at once. TI's two-radio example for the CC2755P10, Bluetooth with TI 15.4, was moved to the 36 kB CC2340R52. It did not link: 2.1 kB of RAM short even before its heap. **Tag: Unknown.** Suspected: a chip limit. Only TI's example was moved. A board can also carry two radio chips: the BeaglePlay has Wi-Fi plus a CC1352P7 for Bluetooth, Zigbee and Sub-1 GHz. Or let a hub join them: Home Assistant takes Zigbee, Thread, Bluetooth and Wi-Fi devices into one place. A CC2340R5 can also run Bluetooth or Zigbee, one at a time, by flashing different firmware.",
+ "software_intro": "You can write code for a TI board with TI's own SDK or with Zephyr. On 2026-10-06, PlatformIO's board list and MicroPython's download page did not list the MSPM0 or CC23xx boards. The checks ran on an Intel Mac running macOS 15.7.9, with Zephyr 4.4.2 and GCC 12.2, TI Arm Clang 5.1.1, SimpleLink Low Power F3 SDK 9.21.00.36 and MSPM0 SDK 2.11.00.07. The speed gap is mostly the compiler. With the same GCC compiler, Zephyr cost 4 to 8 percent on CoreMark, on one LP-MSPM0G3507. The C library also differs. The time-to-blink numbers below are not like for like.",
+ "software_glance": {
+  "cols": [
+   "TI's SDK",
+   "Zephyr"
+  ],
+  "rows": [
+   [
+    "What it is",
+    "TI's drivers, examples and radio stacks, set up with SysConfig, TI's point-and-click tool",
+    "An open-source operating system, a Linux Foundation project, with one build tool (west) and one driver model across more than 1,000 boards"
+   ],
+   [
+    "Boards on the Hardware page",
+    "All have a TI SDK",
+    "{zephyr_count} are in upstream Zephyr, the main Zephyr project (2026-10-06)"
+   ],
+   [
+    "Radios",
+    "Bluetooth LE, Zigbee and proprietary 2.4 GHz, which is TI's own packet format, in the Low Power F3 SDK; Thread and Matter as separate downloads",
+    "Upstream Zephyr has no Bluetooth for the CC2340R5. **Tag: Third-party behavior.** TI's fork, its own copy of Zephyr, adds it, but on the test board its samples flashed and printed nothing. **Tag: Unknown.** The cause is not known.§Suspected cause: tool or docs. One boot setting differs from upstream, and the fork is an older Zephyr (3.7), so it is one difference among several, not proven."
+   ],
+   [
+    "Speed, CoreMark per MHz, LP-MSPM0G3507",
+    "2.30 with TI Arm Clang, no operating system",
+    "1.82 with GCC, the compiler Zephyr uses, no operating system, -O3 with loop unrolling"
+   ],
+   [
+    "Same compiler, GCC 12.2 -O2, LP-MSPM0G3507",
+    "1.76, no operating system",
+    "1.63 under Zephyr: 7.9 percent slower.§The C library also differs."
+   ],
+   [
+    "Interrupt response, the time to react to a signal, LP-MSPM0G3507",
+    "29 to 36 CPU cycles, about 0.4 µs at 80 MHz, no operating system, TI Arm Clang",
+    "About 55 to 65 cycles net, roughly twice bare metal.§163 to 181 cycles under Zephyr with GCC, 99 to 126 of them Zephyr's slower timer read."
+   ],
+   [
+    "Moving to another vendor's chip",
+    "Start again with that vendor's tools",
+    "In the good case, change the board file, which describes the board's pins"
+   ],
+   [
+    "Learning first",
+    "SysConfig is point and click",
+    "Devicetree, Kconfig and west; one training firm budgets two to four weeks for an experienced developer"
+   ],
+   [
+    "On an Intel Mac",
+    "Works",
+    "Zephyr's guide says x86-64 macOS is not supported. **Tag: Third-party behavior.**§The runs worked with workarounds, written up in mspm0g3507/zephyr/README.md"
+   ]
+  ]
+ },
+ "software": [
+  {
+   "id": "sdk",
+   "name": "TI's SDK",
+   "one": "TI's drivers, examples and radio stacks, set up with SysConfig.",
+   "pick_when": [
+    "You need a radio stack: Bluetooth, Zigbee, Thread and Matter come from TI",
+    "You want TI's examples and its graphical setup",
+    "Speed or a quick interrupt response matters: the fastest results came from TI's compiler with no operating system"
+   ],
+   "skip_when": [
+    "You plan to move the same code to another vendor's chips",
+    "You want one way of working across many vendors' boards"
+   ],
+   "measured": "LP-EM-CC2340R5: builds in 22 s with make and flashes in 7 s. Not like for like with the Zephyr times."
+  },
+  {
+   "id": "zephyr",
+   "name": "Zephyr",
+   "need": "zephyr",
+   "one": "An open-source operating system that runs the same way on many vendors' chips.",
+   "pick_when": [
+    "You may switch chips or vendors later",
+    "You want one tool and one way of working across boards",
+    "You want open source with a large community"
+   ],
+   "skip_when": [
+    "You need Bluetooth on the CC2340R5 today",
+    "Your board is not in upstream Zephyr: see each board's page",
+    "You need the fastest code: TI's compiler, which Zephyr does not use, was 26 percent faster than GCC at -O3 on CoreMark (LP-MSPM0G3507) and was the bigger part of the speed gap"
+   ],
+   "measured": "LP-MSPM0G3507: 3 minutes from clean to blinking with this repo's script; 9.5 minutes the first time, while the workarounds were found. LP-EM-CC2340R5: blinking 82 s after the first command, with Zephyr installed. Not like for like with the TI SDK times."
+  }
+ ],
+ "sources": [
+  "Fact check with every quote, URL and date: docs/research/radio-and-software-choice-sources-2026-10-06.md",
+  "Matter 1.4.1 core specification (CSA): https://csa-iot.org/wp-content/uploads/2025/05/23-27349-007_matter-1-4-1-core-specification.pdf",
+  "Home Assistant Matter, Thread, ZHA and Bluetooth integrations: https://www.home-assistant.io/integrations/matter/, https://www.home-assistant.io/integrations/thread/, https://www.home-assistant.io/integrations/zha/, https://www.home-assistant.io/integrations/bluetooth/",
+  "Apple Thread devices: https://support.apple.com/en-us/102078; Google hubs: https://support.google.com/googlenest/answer/12391458",
+  "OpenThread node roles: https://openthread.io/guides/thread-primer/node-roles-and-types; BTHome: https://bthome.io/",
+  "TI white paper SWAY034 (protocols compared): https://www.ti.com/lit/wp/sway034/sway034.pdf; TI app note SWRA479A (Sub-1 GHz range): https://www.ti.com/lit/an/swra479a/swra479a.pdf",
+  "Data sheets: CC3235SF https://www.ti.com/lit/ds/symlink/cc3235sf.pdf, CC2340R5 https://www.ti.com/lit/ds/symlink/cc2340r5.pdf",
+  "Zephyr: https://www.zephyrproject.org/, https://docs.zephyrproject.org/latest/develop/getting_started/index.html; Ac6 Training on Zephyr: https://www.ac6-training.com/en/articles/freertos-or-zephyr-choosing-an-rtos",
+  "TI SDKs: https://github.com/TexasInstruments/simplelink-lowpower-f3-sdk, https://github.com/TexasInstruments/simplelink-zephyr",
+  "CC3551E data sheet: https://www.ti.com/lit/ds/symlink/cc3551e.pdf; TI app note SWRA584 (Sub-1 GHz long-range mode): https://www.ti.com/lit/an/swra584/swra584.pdf",
+  "TI on Matter, Thread and two radios per chip: docs/research/matter-on-ti-2026-10-06.md, docs/research/ti-wireless-stack-matrix-2026-10-05.md, docs/research/ti-portfolio-specs-2026-10-06.md; https://github.com/TexasInstruments/matter",
+  "BeaglePlay and other boards: docs/research/ti-portfolio-gaps-2026-10-06.md; PlatformIO and MicroPython lists: docs/research/hobbyist-project-list-2026-10-06.md",
+  "Measurements: mspm0g3507/mcu-bench/RESULTS-2.md, mspm0g3507/mcu-bench/RESULTS-cc2340r5.md, mspm0g3507/STOPWATCH.md, mspm0g3507/zephyr/README.md, cc2340r5/baremetal/README.md, cc2340r5/matrix/benchmarks.md, cc2340r5/zigbee/README.md, cc2340r5/zephyr/README.md, cc2340r5/zephyr-ti/README.md, docs/experiments/",
+  "Zigbee and Wi-Fi channel frequencies: Zigbee channel n is centered at 2405 + 5 x (n - 11) MHz (IEEE 802.15.4); Wi-Fi channels 1, 6 and 11 are centered at 2412, 2437 and 2462 MHz and about 22 MHz wide"
+ ],
+ "zigbee_or_thread": "Both are low-power meshes on 2.4 GHz, good for battery sensors, and both work with Home Assistant. Pick Zigbee if you have a Zigbee hub or USB radio already. Pick Thread if you have a Thread border router, or want Matter on battery devices. Many Apple and Google home hubs are border routers, and Matter's low-power path is over Thread. Thread devices get IPv6 addresses; Zigbee devices need the hub to translate. On TI chips, Thread needs more memory in TI's builds: on the 36 kB CC2340R52 Thread device builds did not fit and Zigbee did.",
+ "next": "Pick a board: open the [Hardware options page](hardware.html?need=zigbee) and press the need you chose. Hit an error: the LP-EM-CC2340R5 FAQ lists each one with its cause. Not measured: Wi-Fi, Sub-1 GHz, Matter, indoor range and battery life.",
+ "answers_intro": "Three common questions. Each answer gives the requirement, a configuration that ran, what limits it, and what no row establishes. Every number in the tables is read from the results store when the page is built. A constraint that is not measured names the experiment that would decide it, and until then the answer is a candidate. Terms: ZHA is Home Assistant's Zigbee integration. LQI and RSSI are the link quality and signal strength a radio reports. NNC is TI's neural network compiler. EnergyTrace is the current meter in TI's debug probe. FOC is field-oriented control, the usual motor-control math. The TMU is the C2000's hardware for sine, cosine and division.",
+ "answers": [
+  {
+   "id": "wa-zigbee",
+   "question": "A Zigbee light or switch in Home Assistant: which TI board, and whether it responds fast enough",
+   "bottom_line": "LP-EM-CC2340R5 with TI's onoff_light example: 20 of 20 commands landed at a 95 ms median on first pairing (2026-10-05), but about 5 s after a re-pairing, and the 2026-10-16 repeat did not join Home Assistant at all (cause open). RAM is tight, 799 B free in the router build.",
+   "requirement": "A device that joins an existing Zigbee network run by Home Assistant (ZHA) and acts on a command within about a second.",
+   "candidate": "LP-EM-CC2340R5 with TI's onoff_light example from the SimpleLink Low Power F3 SDK, built as a router, plus the LP-XDS110ET debugger to program it.",
+   "why": "It joined ZHA (Home Assistant's own Zigbee integration) 37 s after the flash finished, and 20 of 20 on/off commands from Home Assistant landed, median 95 ms, read from Home Assistant's own state. That meets the requirement on the first pairing. After a re-pairing two hours later the median was about 5 s, which does not, so the one-second part is met once and missed once. A repeat on 2026-10-16 did not join Home Assistant in four tries; until a new run passes, this is a record of one run, not a tested route.",
+   "limit": "RAM, and the link. The router image leaves 799 B of the chip's 36 kB free, so there is almost no room for your own code in that build; the end-device image leaves 6.4 kB. The 5 s medians came with a weaker link (LQI, the link quality the radio reports, 36 to 48 against 60 at first). Cause unknown (suspected: radio environment).",
+   "facts": [
+    {
+     "label": "Join time, flash finished to listed in ZHA",
+     "csv": "data/results/cc2340r5.csv",
+     "test": "radio_join",
+     "variant": "zigbee-router",
+     "unit": "s"
+    },
+    {
+     "label": "Command latency from Home Assistant, first pairing",
+     "csv": "data/results/cc2340r5.csv",
+     "test": "radio_cmd_latency",
+     "variant": "zigbee-home-assistant",
+     "unit": "ms",
+     "note": "median of 20 commands; the slowest was 292 ms"
+    },
+    {
+     "label": "Commands that landed, first pairing",
+     "csv": "data/results/cc2340r5.csv",
+     "test": "radio_cmd_success",
+     "variant": "zigbee-home-assistant",
+     "unit": "%"
+    },
+    {
+     "label": "Command latency after a re-pairing two hours later",
+     "csv": "data/results/cc2340r5.csv",
+     "test": "radio_cmd_latency",
+     "variant": "zigbee-home-assistant-repaired",
+     "unit": "ms",
+     "note": "median of 30 commands with a weaker link; the slowest was 7 s"
+    },
+    {
+     "label": "RAM left in the router image",
+     "csv": "data/results/cc2340r5.csv",
+     "test": "radio_ram_left",
+     "variant": "zigbee-router",
+     "unit": "B",
+     "note": "linker map, logging on"
+    },
+    {
+     "label": "Flash used by the router image",
+     "csv": "data/results/cc2340r5.csv",
+     "test": "radio_flash_used",
+     "variant": "zigbee-router",
+     "unit": "B"
+    }
+   ],
+   "constraints": [
+    {
+     "what": "Joins Home Assistant and takes commands",
+     "status": "measured",
+     "result": "yes, 20 of 20 at 95 ms median on the first pairing"
+    },
+    {
+     "what": "Stays joined and responsive for days",
+     "status": "unmeasured",
+     "experiment": "leave it paired for 72 hours with a command every minute and log the misses and the latency; the re-pairing figure (about 5 s) says the link can degrade, and no long run exists"
+    },
+    {
+     "what": "Battery life as a sleepy device",
+     "status": "unmeasured",
+     "experiment": "build the end-device image, measure sleep current and energy per command with the EnergyTrace probe at a stated voltage, then compute days from a named cell; nothing here was measured on a battery"
+    },
+    {
+     "what": "Room for your own code",
+     "status": "measured",
+     "result": "799 B of RAM free in the router build and 6.4 kB in the end-device build (linker map); a real product needs the end-device build or a 64 kB part"
+    }
+   ],
+   "estimates": [],
+   "conditions": [
+    "SimpleLink Low Power F3 SDK 9.21.00.36, TI Arm Clang 5.1.1, FreeRTOS, the SDK makefile's default flags",
+    "LP-EM-CC2340R5, board revision not recorded, probe firmware 3.0.0.43; a previous owner's board",
+    "Home Assistant with ZHA and a ZBT-2 coordinator on a Mac mini; LQI 60, RSSI -85 dBm at the first pairing",
+    "measured 2026-10-05 from an Intel Mac, macOS 15.7.9"
+   ],
+   "not_established": [
+    "long-term reliability (one evening, two pairings)",
+    "any battery figure",
+    "behavior on the LP-EM-CC2340R53 TI sells now (64 kB RAM; the board tested is no longer listed)",
+    "Apple Home, Google Home or Alexa: Zigbee reaches Home Assistant only; Matter is the route to those"
+   ],
+   "next": "Build the end-device image for your own code, keep the router build for a mains-powered light, and run the 72-hour test before promising reliability.",
+   "reproduce": "project-zigbee-light.html",
+   "faq": "faq-cc2340r5.html#how-much-ram-is-left-for-your-code-after-the-radio-stack",
+   "faq_text": "LP-EM-CC2340R5 FAQ: RAM left after the radio stack"
+  },
+  {
+   "id": "wa-npu",
+   "question": "A small on-chip classifier under 5 ms per answer on a coin-cell budget: whether the MSPM0G5187's NPU reaches it",
+   "bottom_line": "LP-MSPM0G5187: 2.12 ms per answer on the NPU against a 5 ms budget, model call only. Accuracy on a new day is 40.2 percent balanced, and coin-cell life is unmeasured.",
+   "requirement": "A 4-class classifier on 4 sensor channels by 32 samples, answered in under 5 ms, in a few kB of flash and RAM, with the model's accuracy known.",
+   "candidate": "LP-MSPM0G5187 with the 8.5k-parameter occupancy model compiled by TI's NNC for the NPU, at 80 MHz.",
+   "why": "The answer takes 2.12 ms on the NPU (the chip's neural processing unit) at 80 MHz, so the 5 ms budget is met twice over. The model objects take 14.0 kB of flash and 1.4 kB of RAM. The 20 stored test vectors give the same class on the board as on the Mac, so the port is right. For scale: TI's own CPU build of the same model (NNC, TI's neural network compiler) takes 45.64 ms, 21.6 times longer, and the fastest plain C build 35.27 ms; that last pair is not like for like because the plain C time also includes input quantization.",
+   "limit": "What the model knows, not the chip. Balanced accuracy is the average of how often each class is caught. On a day the model never trained on it is 87.7 percent accurate overall but calls 159 of 170 three-person windows empty, a balanced accuracy of 40.2 percent; the 90.9 percent figure comes from a same-day split. And the time is the model call only: no sensor read, no sleep or wake, so it is not a pipeline latency.",
+   "facts": [
+    {
+     "label": "Model call on the NPU, 80 MHz",
+     "csv": "data/results/mspm0g5187.csv",
+     "test": "ai_occ_latency",
+     "variant": "occ_cnn_8k-nnc-npu",
+     "unit": "ms",
+     "note": "fastest of 20 vectors, best of 5 calls (best case); value_hi is the slowest vector; model call only"
+    },
+    {
+     "label": "The same model, TI's CPU build (NNC), 80 MHz",
+     "csv": "data/results/mspm0g5187.csv",
+     "test": "ai_occ_latency",
+     "variant": "occ_cnn_8k-nnc-cpu",
+     "unit": "ms",
+     "note": "the like-for-like baseline"
+    },
+    {
+     "label": "Fastest plain C build, 80 MHz",
+     "csv": "data/results/mspm0g5187.csv",
+     "test": "ai_occ_latency",
+     "variant": "occ_cnn_8k-c-o3",
+     "unit": "ms",
+     "note": "includes input quantization; not like for like"
+    },
+    {
+     "label": "Model flash, NPU build",
+     "csv": "data/results/mspm0g5187.csv",
+     "test": "ai_model_flash",
+     "variant": "occ_cnn_8k-nnc-npu",
+     "unit": "B",
+     "note": "model objects from the linker map; the image around them is extra"
+    },
+    {
+     "label": "Model RAM, NPU build",
+     "csv": "data/results/mspm0g5187.csv",
+     "test": "ai_model_ram",
+     "variant": "occ_cnn_8k-nnc-npu",
+     "unit": "B"
+    },
+    {
+     "label": "Energy above idle per inference, NPU",
+     "csv": "data/results/mspm0g5187.csv",
+     "test": "energy_inference",
+     "variant": "occ_cnn_8k-nnc-npu-energytrace-net",
+     "unit": "uJ",
+     "note": "steady loop, current above the board's idle reading times the best-case time; spreads 7 to 32 percent between runs"
+    }
+   ],
+   "constraints": [
+    {
+     "what": "Under 5 ms per answer",
+     "status": "measured",
+     "result": "2.12 ms best case, 2.16 ms slowest vector, model call only"
+    },
+    {
+     "what": "Accuracy on data it did not train on",
+     "status": "measured",
+     "result": "90.9% on a same-day block split; 87.7% overall and 40.2% balanced with whole days held out (tools/dataset/eval_occupancy.py); one room only"
+    },
+    {
+     "what": "Coin-cell life",
+     "status": "unmeasured",
+     "experiment": "measure the sleep current with the board's isolation shunts changed and the chip in STANDBY, then energy per wake-infer-sleep cycle with EnergyTrace at a stated voltage; today only a steady loop above a 16.4 mA board floor was measured, which says nothing about a sleeping product"
+    },
+    {
+     "what": "Works on your own sensor data",
+     "status": "unmeasured",
+     "experiment": "record your own sessions with tools/dataset/capture.py, train with the same recipe, and run the day-held-out evaluation; the model here learned one room"
+    }
+   ],
+   "estimates": [
+    "The model's 14.4 kB of flash and 1.4 kB of RAM are the model objects only; TI's NPU example image around them, clock setup and startup included, is a separate measured image. Adding your sensor driver and a sleep loop is an estimate until it is one built image."
+   ],
+   "conditions": [
+    "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS at -O2, TI NNC 2.1.2 for the NPU and CPU builds, int8",
+    "LP-MSPM0G5187 Rev. A, 80 MHz from the SysConfig of TI's motor_bearing_fault_detection_ai_npu example",
+    "three runs, each a full erase and flash, agreeing to the cycle; 2026-10-09; Intel Mac, macOS 15.7.9"
+   ],
+   "not_established": [
+    "any pipeline time (sensor to decision)",
+    "any sleep or wake figure, so any battery life",
+    "accuracy in another room"
+   ],
+   "next": "Wire the sensor, time sensor to decision, and measure the sleep current before quoting a battery life.",
+   "reproduce": "project-small-ai-model.html",
+   "faq": "../mspm0g5187/FAQ.md#the-occupancy-model-scores-909-percent-on-its-test-set-but-much-less-on-a-new-day-why",
+   "faq_text": "LP-MSPM0G5187 FAQ: why the accuracy drops on a new day, and what the NPU does not accelerate"
+  },
+  {
+   "id": "wa-control",
+   "question": "A 50 kHz motor-control loop: which board keeps up, and how much of the period is left",
+   "bottom_line": "LAUNCHXL-F2800137: one field-oriented control step takes 2.4 us, about 12 percent of the 20 us period at 50 kHz. It is one step on a fixed input; it does not drive a motor.",
+   "requirement": "A PWM-triggered loop (ADC sample, one field-oriented control step, new PWM value) that completes well inside a 20 us period, with the CPU time it takes known.",
+   "candidate": "LAUNCHXL-F2800137 (TMS320F2800137 at 120 MHz) with the TMU build of a control-loop harness, code in RAM.",
+   "why": "Trigger to new PWM value takes 2.4 us mean (2.33 to 2.42 us over 1,000 interrupts) with the TMU, the chip's hardware for sine, cosine and division, in one field-oriented control (FOC) step. At 50 kHz the period is 20 us, so the loop uses about 12 percent of it. The loop still updates every period up to 336 kHz, and at 100 kHz it takes 26.4 percent of the CPU.",
+   "limit": "This is one FOC step on a fixed input, not a motor: no current sensing chain, no observer, no fault handling, no communications. The 336 kHz figure is where the harness stops updating in time; your loop has more in it.",
+   "facts": [
+    {
+     "label": "Trigger to new PWM value, TMU, code in RAM",
+     "csv": "data/results/f2800137.csv",
+     "test": "control_loop",
+     "variant": "hw",
+     "unit": "us",
+     "note": "mean of 1,000 interrupts; 279 to 290 cycles"
+    },
+    {
+     "label": "Worst case as a share of a 10 us period (the 100 kHz benchmark period; halve it for 50 kHz)",
+     "csv": "data/results/f2800137.csv",
+     "test": "control_loop_worst_pct",
+     "variant": "hw",
+     "unit": "%"
+    },
+    {
+     "label": "Jitter, worst minus best",
+     "csv": "data/results/f2800137.csv",
+     "test": "control_loop_jitter",
+     "variant": "hw",
+     "unit": "us"
+    },
+    {
+     "label": "Highest rate that never misses a period",
+     "csv": "data/results/f2800137.csv",
+     "test": "control_loop_max_rate",
+     "variant": "hw",
+     "unit": "kHz",
+     "note": "measured on the board, 3 trials"
+    },
+    {
+     "label": "CPU load at 100 kHz",
+     "csv": "data/results/f2800137.csv",
+     "test": "control_loop_cpu_load",
+     "variant": "hw",
+     "unit": "%",
+     "note": "value_hi keeps the timing checks in"
+    },
+    {
+     "label": "The same loop without the TMU (C library math)",
+     "csv": "data/results/f2800137.csv",
+     "test": "control_loop",
+     "variant": "sw",
+     "unit": "us",
+     "note": "two compiler flags differ, not isolated"
+    }
+   ],
+   "constraints": [
+    {
+     "what": "Completes inside a 20 us period",
+     "status": "measured",
+     "result": "2.4 us mean, about 12 percent of the 20 us period; the benchmark row says 24.2 percent of its 10 us period"
+    },
+    {
+     "what": "Behaves with a real motor, current sensors and an observer",
+     "status": "unmeasured",
+     "experiment": "run TI's motor-control kit example with a motor and current sensing on this board and time the same trigger-to-PWM path inside it; the harness here is one FOC step on a fixed input"
+    },
+    {
+     "what": "Code in flash instead of RAM",
+     "status": "measured",
+     "result": "2.58 us mean with the end-of-conversion interrupt from flash, 2.32 us with the loop copied to RAM at startup"
+    }
+   ],
+   "estimates": [],
+   "conditions": [
+    "TI C2000 compiler 25.11.1.LTS at -O2, C2000Ware 26.02.00.00 LTS, --tmu_support=tmu0 and --fp_mode=relaxed for the TMU build",
+    "LAUNCHXL-F2800137, board MCU109A, chip TMS320F2800137 silicon revision B, probe firmware 3.0.0.43; a used board",
+    "ePWM1 50 kHz trigger, 9-cycle sample window, 1,000 interrupts; the rate sweep and CPU load on 2026-10-08; the loop times 2026-10-06; Intel Mac, macOS 15.7.9"
+   ],
+   "not_established": [
+    "anything with a motor attached",
+    "the F28P65x or other C2000 parts (the LAUNCHXL-F28P65X has its own rows)",
+    "the loop with communications or a second interrupt running"
+   ],
+   "next": "Fit the loop inside TI's motor-control example with a motor and current sensing, and time it again there.",
+   "reproduce": "benchmarks.html#control",
+   "faq": "faq-f2800137.html#how-fast-can-a-control-loop-run-on-the-f2800137",
+   "faq_text": "LAUNCHXL-F2800137 FAQ: how fast the control loop can run"
+  }
+ ]
+}

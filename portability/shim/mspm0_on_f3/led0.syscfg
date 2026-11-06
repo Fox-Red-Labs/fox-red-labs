@@ -1,0 +1,5 @@
+/* Board overlay, appended to an F3 example's .syscfg when the example has no LED 0 and the MSPM0 app drives one. */
+var FR_GPIO = scripting.addModule("/ti/drivers/GPIO");
+var fr_led0 = FR_GPIO.addInstance();
+fr_led0.$hardware = system.deviceData.board.components.LED0;
+fr_led0.$name = "CONFIG_GPIO_LED_0";

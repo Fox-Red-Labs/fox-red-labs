@@ -1,0 +1,882 @@
+{
+ "generated": "2026-10-06",
+ "parts": [
+  {
+   "part": "CC2340R52",
+   "family": "CC23xx",
+   "board": "LP-EM-CC2340R5",
+   "board_note": "TI tool and buy pages return 404 on 2026-10-06; data sheet lists only LP-EM-CC2340R53; DigiKey lists LP-EM-CC2340R5",
+   "core": "Cortex-M0+",
+   "mhz": 48,
+   "flash_kb": 512,
+   "ram_kb": 36,
+   "radios": [
+    "BLE 5.x (qualified against Core 5.4)",
+    "Zigbee",
+    "Thread",
+    "IEEE 802.15.4 PHY/MAC",
+    "proprietary 2.4 GHz"
+   ],
+   "sw_ships": {
+    "ble": "yes",
+    "zigbee": "yes",
+    "thread": "rcp only (evaluation only; row mapping is our reading)",
+    "matter": "no",
+    "dmm": "no",
+    "zephyr": "ble only (GA)"
+   },
+   "extras": [
+    "AES-128 accelerator",
+    "random number generator",
+    "12-bit ADC 1.2 Msps (ext ref), up to 12 inputs",
+    "1 comparator",
+    "OTA upgrade supported",
+    "max TX +8 dBm"
+   ],
+   "standby": "< 710 nA (RTC on, full RAM retention)",
+   "chip_price_1k": "$1.241 (CC2340R52E0RKPR QFN40); $1.211 (CC2340R52E0RGER QFN24)",
+   "board_price": "$34.38 (DigiKey, 2026-10-06; no TI.com page)",
+   "probe": "separate LP-XDS110ET",
+   "sources": [
+    "https://www.ti.com/product/CC2340R5",
+    "https://www.ti.com/lit/ds/symlink/cc2340r5.pdf",
+    "https://www.ti.com/product/CC2340R5/part-details/CC2340R52E0RKPR",
+    "https://www.ti.com/product/CC2340R5/part-details/CC2340R52E0RGER",
+    "https://www.digikey.com/en/products/result?keywords=LP-EM-CC2340R5"
+   ],
+   "zephyr": "lp_em_cc2340r5"
+  },
+  {
+   "part": "CC2340R53",
+   "family": "CC23xx",
+   "board": "LP-EM-CC2340R53",
+   "board_note": null,
+   "core": "Cortex-M0+",
+   "mhz": 48,
+   "flash_kb": 512,
+   "ram_kb": 64,
+   "radios": [
+    "BLE 5.x (qualified against Core 5.4)",
+    "Zigbee",
+    "Thread",
+    "IEEE 802.15.4 PHY/MAC",
+    "proprietary 2.4 GHz"
+   ],
+   "sw_ships": {
+    "ble": "yes",
+    "zigbee": "yes",
+    "thread": "rcp, mtd, ftd, ncp (evaluation only)",
+    "matter": "no",
+    "dmm": "no",
+    "zephyr": "ble only (GA)"
+   },
+   "extras": [
+    "AES-128 accelerator",
+    "random number generator",
+    "12-bit ADC 1.2 Msps (ext ref), up to 12 inputs",
+    "1 comparator",
+    "OTA upgrade supported",
+    "max TX +8 dBm"
+   ],
+   "standby": null,
+   "standby_note": "Data sheet headline (< 710 nA) is stated for CC2340R52; R53 not given separately",
+   "chip_price_1k": "$1.291 (CC2340R53E0RKPR QFN40)",
+   "board_price": "$27.50",
+   "probe": "separate LP-XDS110ET",
+   "sources": [
+    "https://www.ti.com/product/CC2340R5",
+    "https://www.ti.com/lit/ds/symlink/cc2340r5.pdf",
+    "https://www.ti.com/product/CC2340R5/part-details/CC2340R53E0RKPR",
+    "https://www.ti.com/tool/LP-EM-CC2340R53",
+    "https://www.ti.com/product/LP-EM-CC2340R53/part-details/LP-EM-CC2340R53"
+   ]
+  },
+  {
+   "part": "CC2745R10-Q1",
+   "family": "CC27xx",
+   "board": "LP-EM-CC2745R10-Q1",
+   "board_note": "Also TI's listed kit for CC2755R10",
+   "core": "Cortex-M33 + FPU, TrustZone-M",
+   "mhz": 96,
+   "flash_kb": 1024,
+   "ram_kb": 162,
+   "radios": [
+    "BLE 6.0 (qualified, Channel Sounding)"
+   ],
+   "sw_ships": {
+    "ble": "yes",
+    "zigbee": "no example folder",
+    "thread": "not in ot-ti table",
+    "matter": "Matter repo lists CC2745R10 as Thread, evaluation only; conflicts with data sheet (BLE only), unknown",
+    "dmm": "no example folder",
+    "zephyr": "ble only (GA)"
+   },
+   "extras": [
+    "HSM (AES-256, ECC-521, RSA-3072, SHA-2-512)",
+    "96 kB flash reserved for HSM firmware",
+    "CDE + APU math accelerator",
+    "CAN-FD controller",
+    "AEC-Q100 Grade 2",
+    "ISO21434 compliant",
+    "12-bit ADC 1.2 Msps, 8 inputs",
+    "max TX +10 dBm",
+    "board page says BLE 5.3 and upcoming; data sheet says Core 6.0 qualified"
+   ],
+   "standby": "0.9 uA (RTC on, full SRAM retention)",
+   "chip_price_1k": "$3.340 (CC2745R10E0WRHARQ1 QFN40)",
+   "board_price": "$53.90",
+   "probe": "separate LP-XDS110ET",
+   "sources": [
+    "https://www.ti.com/product/CC2745R10-Q1",
+    "https://www.ti.com/lit/ds/symlink/cc2745r10-q1.pdf",
+    "https://www.ti.com/product/CC2745R10-Q1/part-details/CC2745R10E0WRHARQ1",
+    "https://www.ti.com/tool/LP-EM-CC2745R10-Q1",
+    "https://www.ti.com/product/LP-EM-CC2745R10-Q1/part-details/LP-EM-CC2745R10-Q1",
+    "https://api.github.com/repos/TexasInstruments/matter/releases/tags/matter-v1.5-ti-1.2-ea.2"
+   ]
+  },
+  {
+   "part": "CC2755P10",
+   "family": "CC27xx",
+   "board": "LP-EM-CC2755P10",
+   "board_note": null,
+   "core": "Cortex-M33 + FPU, TrustZone-M",
+   "mhz": 96,
+   "flash_kb": 1024,
+   "ram_kb": 162,
+   "radios": [
+    "BLE 6.0 (qualified, Channel Sounding)",
+    "Zigbee 3.0 (certified)",
+    "Thread",
+    "Matter",
+    "proprietary 2.4 GHz",
+    "multi-protocol"
+   ],
+   "sw_ships": {
+    "ble": "yes",
+    "zigbee": "yes",
+    "thread": "rcp, mtd, ftd, ncp, rcp+ble (production)",
+    "matter": "evaluation only (Thread)",
+    "dmm": "BLE + TI 15.4 ships; BLE + Zigbee unknown",
+    "zephyr": "ble only (GA)"
+   },
+   "extras": [
+    "HSM (AES-256, ECC-521, RSA-3072, SHA-2-512)",
+    "96 kB flash reserved for HSM firmware",
+    "CDE + APU math accelerator",
+    "+20 dBm PA (143 mA at +20 dBm)",
+    "12-bit ADC 1.2 Msps, 8 inputs",
+    "2 UART, 2 SPI, I2C, I2S"
+   ],
+   "standby": "0.9 uA (RTC on, full SRAM retention)",
+   "chip_price_1k": "$2.299 (CC2755P105E0WRHAR QFN40)",
+   "board_price": "$53.90",
+   "probe": "separate LP-XDS110ET",
+   "sources": [
+    "https://www.ti.com/product/CC2755P10",
+    "https://www.ti.com/lit/ds/symlink/cc2755p10.pdf",
+    "https://www.ti.com/product/CC2755P10/part-details/CC2755P105E0WRHAR",
+    "https://www.ti.com/tool/LP-EM-CC2755P10",
+    "https://www.ti.com/product/LP-EM-CC2755P10/part-details/LP-EM-CC2755P10",
+    "https://api.github.com/repos/TexasInstruments/ot-ti/releases/tags/thread-v1.4-ti-2.1"
+   ]
+  },
+  {
+   "part": "CC2755R10",
+   "family": "CC27xx",
+   "board": null,
+   "board_note": "No board of its own. TI lists LP-EM-CC2745R10-Q1 as its kit (product page, SDK release notes, Zephyr table). SDK has an example folder LP_EM_CC2755R10_BG but TI sells no such kit.",
+   "core": "Cortex-M33 + FPU, TrustZone-M",
+   "mhz": 96,
+   "flash_kb": 1024,
+   "ram_kb": 162,
+   "radios": [
+    "BLE 6.0 (qualified)",
+    "Zigbee 3.0 (certified)",
+    "Thread 1.3 (product page)",
+    "Matter 1.2 (product page)",
+    "proprietary 2.4 GHz"
+   ],
+   "sw_ships": {
+    "ble": "yes",
+    "zigbee": "yes",
+    "thread": "rcp, mtd, ftd, ncp, rcp+ble (production)",
+    "matter": "evaluation only (Thread)",
+    "dmm": "unknown",
+    "zephyr": "ble only (GA, via LP_EM_CC2745R10_Q1)"
+   },
+   "extras": [
+    "HSM",
+    "96 kB flash reserved for HSM firmware",
+    "CDE + APU math accelerator",
+    "max TX +10 dBm (24.5 mA)",
+    "12-bit ADC 1.2 Msps, 8 inputs"
+   ],
+   "standby": "0.9 uA (RTC on, full SRAM retention)",
+   "chip_price_1k": "$2.189 (CC2755R105E0WRHAR QFN40)",
+   "board_price": null,
+   "probe": "separate LP-XDS110ET",
+   "sources": [
+    "https://www.ti.com/product/CC2755R10",
+    "https://www.ti.com/lit/ds/symlink/cc2755p10.pdf",
+    "https://www.ti.com/product/CC2755R10/part-details/CC2755R105E0WRHAR",
+    "https://api.github.com/repos/TexasInstruments/simplelink-zephyr/releases/tags/v3.7.0-ti-1.00.01_ga",
+    "https://api.github.com/repos/TexasInstruments/ot-ti/releases/tags/thread-v1.4-ti-2.1"
+   ]
+  },
+  {
+   "part": "MSPM0C1104",
+   "family": "MSPM0",
+   "board": "LP-MSPM0C1104",
+   "board_note": null,
+   "core": "Cortex-M0+",
+   "mhz": 24,
+   "flash_kb": 16,
+   "ram_kb": 1,
+   "radios": [],
+   "sw_ships": null,
+   "extras": [
+    "12-bit ADC 1.5 Msps, up to 10 external channels",
+    "1 UART with LIN, 1 SPI, 1 I2C",
+    "3 x 16-bit timers, up to 14 PWM",
+    "8 to 20 pin packages",
+    "87 µA/MHz run"
+   ],
+   "standby": "5 uA (SRAM retention)",
+   "chip_price_1k": "$0.248 (MSPM0C1104SDGS20R VSSOP-20)",
+   "board_price": "$6.59",
+   "probe": "onboard",
+   "sources": [
+    "https://www.ti.com/product/MSPM0C1104",
+    "https://www.ti.com/lit/ds/symlink/mspm0c1104.pdf",
+    "https://www.ti.com/product/MSPM0C1104/part-details/MSPM0C1104SDGS20R",
+    "https://www.ti.com/tool/LP-MSPM0C1104",
+    "https://www.ti.com/product/LP-MSPM0C1104/part-details/LP-MSPM0C1104"
+   ]
+  },
+  {
+   "part": "MSPM0L1306",
+   "family": "MSPM0",
+   "board": "LP-MSPM0L1306",
+   "board_note": null,
+   "core": "Cortex-M0+",
+   "mhz": 32,
+   "flash_kb": 64,
+   "ram_kb": 4,
+   "radios": [],
+   "sw_ships": null,
+   "extras": [
+    "12-bit ADC, 1.68 Msps (data sheet), up to 10 external channels",
+    "2 zero-drift op-amps, 1 general-purpose amplifier",
+    "1 comparator with 8-bit DAC",
+    "CRC-16 and CRC-32",
+    "3 DMA channels",
+    "2 UART, 2 I2C, 1 SPI",
+    "4 x 16-bit timers",
+    "71 µA/MHz run (data sheet)"
+   ],
+   "standby": "1.0 uA (STANDBY with 32 kHz timer, data sheet)",
+   "chip_price_1k": "$0.65 (MSPM0L1306SRHBR VQFN-32)",
+   "board_price": "$20.56",
+   "probe": "onboard",
+   "sources": [
+    "https://www.ti.com/product/MSPM0L1306",
+    "https://www.ti.com/lit/ds/symlink/mspm0l1306.pdf",
+    "https://www.ti.com/tool/LP-MSPM0L1306",
+    "https://www.ti.com/product/LP-MSPM0L1306/part-details/LP-MSPM0L1306",
+    "mspm0l1306/fit-check.md"
+   ]
+  },
+  {
+   "part": "MSPM0G3507",
+   "family": "MSPM0",
+   "board": "LP-MSPM0G3507",
+   "board_note": "On TI.com at $20.56 (read 2026-10-09 without a login; stock needs a myTI login, in stock on 2026-10-08).",
+   "core": "Cortex-M0+",
+   "mhz": 80,
+   "flash_kb": 128,
+   "ram_kb": 32,
+   "radios": [],
+   "sw_ships": null,
+   "extras": [
+    "2 x 12-bit 4 Msps ADC, up to 17 channels",
+    "12-bit 1 Msps DAC",
+    "2 zero-drift op-amps",
+    "3 comparators",
+    "math accelerator (DIV, SQRT, MAC, TRIG)",
+    "AES-128/256, TRNG",
+    "CAN-FD",
+    "4 UART, 2 I2C, 2 SPI",
+    "101 µA/MHz run"
+   ],
+   "standby": "1.5 uA (32 kHz LFXT, RTC)",
+   "chip_price_1k": "$1.081 (MSPM0G3507SPMR LQFP-64)",
+   "board_price": "$20.56 (TI.com, 2026-10-09; DigiKey $23.36 on 2026-10-06 with 0 in stock)",
+   "probe": "onboard",
+   "sources": [
+    "https://www.ti.com/product/MSPM0G3507",
+    "https://www.ti.com/lit/ds/symlink/mspm0g3507.pdf",
+    "https://www.ti.com/product/MSPM0G3507/part-details/MSPM0G3507SPMR",
+    "https://www.ti.com/tool/LP-MSPM0G3507",
+    "https://www.digikey.com/en/products/detail/texas-instruments/LP-MSPM0G3507/20512419"
+   ],
+   "zephyr": "lp_mspm0g3507"
+  },
+  {
+   "part": "MSPM0G3519",
+   "family": "MSPM0",
+   "board": "LP-MSPM0G3519",
+   "board_note": null,
+   "core": "Cortex-M0+",
+   "mhz": 80,
+   "flash_kb": 512,
+   "ram_kb": 128,
+   "radios": [],
+   "sw_ships": null,
+   "extras": [
+    "dual-bank flash for OTA, plus 16 kB data flash",
+    "2 x 12-bit 4 Msps ADC, up to 27 channels",
+    "12-bit DAC",
+    "3 comparators",
+    "math accelerator (DIV, SQRT, MAC, TRIG)",
+    "AES-128/256, secure key storage",
+    "2 CAN-FD, 7 UART, 3 I2C, 3 SPI",
+    "123 µA/MHz run"
+   ],
+   "standby": "1.7 uA (32 kHz, RTC, SRAM bank 0)",
+   "chip_price_1k": "$1.674 (MSPM0G3519SPNR LQFP-80)",
+   "board_price": "$21.99",
+   "probe": "onboard",
+   "sources": [
+    "https://www.ti.com/product/MSPM0G3519",
+    "https://www.ti.com/lit/ds/symlink/mspm0g3519.pdf",
+    "https://www.ti.com/product/MSPM0G3519/part-details/MSPM0G3519SPNR",
+    "https://www.ti.com/tool/LP-MSPM0G3519",
+    "https://www.ti.com/product/LP-MSPM0G3519/part-details/LP-MSPM0G3519"
+   ],
+   "zephyr": "lp_mspm0g3519"
+  },
+  {
+   "part": "MSPM0G5187",
+   "family": "MSPM0",
+   "board": "LP-MSPM0G5187",
+   "board_note": null,
+   "core": "Cortex-M0+",
+   "mhz": 80,
+   "flash_kb": 128,
+   "ram_kb": 32,
+   "radios": [],
+   "sw_ships": null,
+   "extras": [
+    "TinyEngine NPU, 2.56 GOPS at 80 MHz (CNN, 8/4/2-bit weights)",
+    "USB 2.0 full speed, crystal-less device mode",
+    "I2S/TDM audio",
+    "12-bit 1.6 Msps ADC, up to 26 channels",
+    "AES with GCM/CCM",
+    "board adds microphone, audio ADC, microSD slot",
+    "103 µA/MHz run"
+   ],
+   "standby": "1.5 uA (32 kHz, RTC, full retention)",
+   "chip_price_1k": "$1.060 (MSPM0G5187SPMR LQFP-64)",
+   "board_price": "$24.20",
+   "probe": "onboard",
+   "sources": [
+    "https://www.ti.com/product/MSPM0G5187",
+    "https://www.ti.com/lit/ds/symlink/mspm0g5187.pdf",
+    "https://www.ti.com/product/MSPM0G5187/part-details/MSPM0G5187SPMR",
+    "https://www.ti.com/tool/LP-MSPM0G5187",
+    "https://www.ti.com/product/LP-MSPM0G5187/part-details/LP-MSPM0G5187"
+   ]
+  },
+  {
+   "part": "MSP430FR2433",
+   "family": "MSP430",
+   "board": "MSP-EXP430FR2433",
+   "core": "MSP430 16-bit",
+   "mhz": 16,
+   "flash_kb": 15.5,
+   "ram_kb": 4,
+   "radios": [],
+   "extras": [
+    "FRAM instead of flash",
+    "126 µA/MHz run"
+   ],
+   "board_price": "$12.09",
+   "probe": "onboard",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/MSP-EXP430FR2433",
+    "https://www.ti.com/product/MSP430FR2433",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "MSPM0L2228",
+   "family": "MSPM0",
+   "board": "LP-MSPM0L2228",
+   "core": "Cortex-M0+",
+   "mhz": 32,
+   "flash_kb": 256,
+   "ram_kb": 32,
+   "radios": [],
+   "extras": [
+    "Segment LCD on the board",
+    "Battery backup pin (VBAT)",
+    "AES"
+   ],
+   "board_price": "$18.69",
+   "probe": "onboard",
+   "zephyr": "lp_mspm0l2228",
+   "sources": [
+    "https://www.ti.com/tool/LP-MSPM0L2228",
+    "https://www.ti.com/product/MSPM0L2228",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "CC3235SF",
+   "family": "CC32xx",
+   "board": "LAUNCHXL-CC3235SF",
+   "core": "Cortex-M4",
+   "mhz": 80,
+   "flash_kb": 1024,
+   "ram_kb": 256,
+   "radios": [
+    "Wi-Fi 4, 2.4 and 5 GHz"
+   ],
+   "extras": [
+    "Wi-Fi network processor on chip"
+   ],
+   "board_price": "$66.54",
+   "probe": "onboard",
+   "zephyr": "cc3235sf_launchxl",
+   "sources": [
+    "https://www.ti.com/tool/LAUNCHXL-CC3235SF",
+    "https://www.ti.com/product/CC3235SF",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "CC3551E",
+   "family": "CC35xx",
+   "board": "LP-EM-CC35X1",
+   "core": "Cortex-M33",
+   "mhz": 160,
+   "flash_kb": null,
+   "flash_label": "External",
+   "ram_kb": 1100,
+   "ram_label": "about 1.1 MB",
+   "radios": [
+    "Wi-Fi 6, 2.4 and 5 GHz",
+    "Bluetooth LE 5.4"
+   ],
+   "extras": [
+    "Matter over Wi-Fi (production-ready in the SDK release notes)",
+    "NPU"
+   ],
+   "board_price": "$54.99",
+   "probe": "separate LP-XDS110ET",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/LP-EM-CC35X1",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "CC1354P10",
+   "family": "CC13xx",
+   "board": "LP-CC1354P10-1",
+   "core": "Cortex-M33",
+   "mhz": 48,
+   "flash_kb": 1024,
+   "ram_kb": 296,
+   "radios": [
+    "Sub-1 GHz to +20 dBm",
+    "Bluetooth LE",
+    "Zigbee",
+    "Thread",
+    "Wi-SUN",
+    "TI 15.4"
+   ],
+   "extras": [
+    "Two bands: Sub-1 GHz and 2.4 GHz"
+   ],
+   "board_price": "$35.09",
+   "probe": "separate LP-XDS110ET",
+   "board_note": "TI lists no probe on this kit. The LP-CC1354P10-1 LaunchPad kit on this bench has an XDS110 on board",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/LP-EM-CC1354P10",
+    "https://www.ti.com/product/CC1354P10",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "CC1352P7",
+   "family": "CC13xx",
+   "board": "LP-CC1352P7-1",
+   "core": "Cortex-M4F",
+   "mhz": 48,
+   "flash_kb": 704,
+   "ram_kb": 152,
+   "radios": [
+    "Sub-1 GHz to +20 dBm",
+    "Bluetooth LE",
+    "Zigbee",
+    "Thread",
+    "TI 15.4"
+   ],
+   "extras": [
+    "Two bands: Sub-1 GHz and 2.4 GHz"
+   ],
+   "board_price": "$54.99",
+   "probe": "onboard",
+   "zephyr": "cc1352p7_lp",
+   "sources": [
+    "https://www.ti.com/tool/LP-CC1352P7",
+    "https://www.ti.com/product/CC1352P7",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "IWR6843AOP",
+   "family": "mmWave",
+   "board": "IWR6843AOPEVM",
+   "core": "Cortex-R4F plus C674x DSP",
+   "mhz": 200,
+   "flash_kb": null,
+   "flash_label": "External",
+   "ram_kb": 1792,
+   "radios": [
+    "60 to 64 GHz radar, 3 TX, 4 RX"
+   ],
+   "extras": [
+    "Antennas on the package",
+    "Visualizer runs in a browser on a Mac"
+   ],
+   "board_price": "$172.10",
+   "probe": "add-on board (MMWAVEICBOOST) for debugging",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/IWR6843AOPEVM",
+    "https://www.ti.com/product/IWR6843AOP",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "IWRL6432AOP",
+   "family": "mmWave",
+   "board": "IWRL6432AOPEVM",
+   "core": "Cortex-M4F",
+   "mhz": 160,
+   "flash_kb": null,
+   "flash_label": "External serial flash",
+   "ram_kb": 1024,
+   "radios": [
+    "57 to 64 GHz radar, 2 TX, 3 RX, low power"
+   ],
+   "extras": [
+    "Tools for Windows and Linux only"
+   ],
+   "board_price": "$159.50",
+   "probe": "onboard",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/IWRL6432AOPEVM",
+    "https://www.ti.com/product/IWRL6432AOP",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "IWRL6432",
+   "family": "mmWave",
+   "board": "IWRL6432BOOST",
+   "core": "Cortex-M4F",
+   "mhz": 160,
+   "flash_kb": 2048,
+   "ram_kb": 1024,
+   "radios": [
+    "57 to 64 GHz radar, 2 TX, 3 RX, low power"
+   ],
+   "extras": [
+    "Debug probe on the board"
+   ],
+   "board_price": null,
+   "probe": "onboard",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/IWRL6432BOOST",
+    "data/boards.csv",
+    "data/results/iwrl6432boost.csv"
+   ]
+  },
+  {
+   "part": "TMS320F2800137",
+   "family": "C2000",
+   "board": "LAUNCHXL-F2800137",
+   "core": "C28x with FPU and TMU (trig and divide hardware)",
+   "mhz": 120,
+   "flash_kb": 256,
+   "ram_kb": 36,
+   "radios": [],
+   "extras": [
+    "14 PWM channels",
+    "2 x 12-bit ADC",
+    "4 comparators",
+    "1 encoder input, 2 capture inputs",
+    "3 UART, 1 SPI, 2 I2C, 1 CAN",
+    "38 GPIO pins"
+   ],
+   "board_price": "$35.09",
+   "probe": "onboard",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/LAUNCHXL-F2800137",
+    "https://www.ti.com/product/TMS320F2800137",
+    "https://www.ti.com/lit/ug/spruj32/spruj32.pdf",
+    "c2000-launchpad/README.md",
+    "docs/boards/launchxl-f2800137.json"
+   ]
+  },
+  {
+   "part": "TMS320F28P550SJ",
+   "family": "C2000",
+   "board": "LAUNCHXL-F28P55X",
+   "core": "C28x DSP plus CLA",
+   "mhz": 150,
+   "flash_kb": 1088,
+   "ram_kb": 133,
+   "radios": [],
+   "extras": [
+    "24 PWM outputs",
+    "3 encoder inputs",
+    "NPU",
+    "USB",
+    "CAN-FD"
+   ],
+   "board_price": "$31.90",
+   "probe": "onboard",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/LAUNCHXL-F28P55X",
+    "https://www.ti.com/product/TMS320F28P550SJ",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ]
+  },
+  {
+   "part": "AM263P",
+   "family": "AM26x",
+   "board": "LP-AM263P",
+   "core": "4x Cortex-R5F",
+   "mhz": 400,
+   "flash_kb": 32768,
+   "ram_kb": 3072,
+   "radios": [],
+   "extras": [
+    "32 PWM modules",
+    "5 12-bit ADCs",
+    "8 CAN-FD",
+    "2 Gigabit Ethernet ports on the board",
+    "PRU-ICSS"
+   ],
+   "board_price": "not shown to a logged-out reader on TI.com (2026-10-24)",
+   "probe": "onboard",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/LP-AM263P",
+    "https://www.ti.com/product/AM263P4",
+    "am263p/README.md"
+   ]
+  },
+  {
+   "part": "AM62L32",
+   "family": "AM62L",
+   "board": "TMDS62LEVM (AM62L EVM)",
+   "core": "2x Cortex-A53 at 1.25 GHz",
+   "mhz": 1250,
+   "flash_kb": null,
+   "ram_kb": 2097152,
+   "radios": [],
+   "extras": [
+    "160 KB on-chip SRAM",
+    "2 Gigabit Ethernet ports on the board",
+    "HDMI and DSI display",
+    "32 GB eMMC",
+    "secure boot and TrustZone"
+   ],
+   "board_price": "not shown to a logged-out reader on TI.com (2026-10-24)",
+   "probe": "onboard",
+   "zephyr": null,
+   "sources": [
+    "https://www.ti.com/tool/TMDS62LEVM",
+    "https://www.ti.com/product/AM62L",
+    "am62l-evm/README.md"
+   ]
+  },
+  {
+   "part": "AM6254-PB2",
+   "family": "AM62x",
+   "board": "PocketBeagle 2",
+   "core": "4x Cortex-A53 at 1.4 GHz plus a Cortex-M4F at 400 MHz",
+   "mhz": 1400,
+   "flash_kb": null,
+   "flash_label": "microSD card",
+   "ram_kb": 524288,
+   "radios": [],
+   "extras": [],
+   "board_price": "$59.90 (Seeed Studio, 2026-10-06)",
+   "probe": "none; JTAG pads and a serial port",
+   "board_note": "Not sold on TI.com",
+   "zephyr": "pocketbeagle_2",
+   "sources": [
+    "https://www.beagleboard.org/boards/pocketbeagle-2",
+    "https://www.seeedstudio.com/BeagleBoard-PocketBeagle2-p-6371.html",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ],
+   "maker": "BeagleBoard.org"
+  },
+  {
+   "part": "AM6254-BP",
+   "family": "AM62x",
+   "board": "BeaglePlay",
+   "core": "4x Cortex-A53 at 1.4 GHz plus a Cortex-M4F at 400 MHz",
+   "mhz": 1400,
+   "flash_kb": 16777216,
+   "ram_kb": 2097152,
+   "radios": [
+    "Wi-Fi 2.4 and 5 GHz",
+    "Bluetooth LE",
+    "Zigbee",
+    "Sub-1 GHz"
+   ],
+   "extras": [
+    "A CC1352P7 radio chip beside the main chip",
+    "HDMI",
+    "Gigabit Ethernet"
+   ],
+   "board_price": "$99.00 (SparkFun, 2026-10-06)",
+   "probe": "none; JTAG pads and a serial port",
+   "board_note": "Not sold on TI.com",
+   "zephyr": "beagleplay",
+   "sources": [
+    "https://www.beagleboard.org/boards/beagleplay",
+    "https://www.sparkfun.com/beagleplay.html",
+    "docs/research/ti-portfolio-gaps-2026-10-06.md"
+   ],
+   "maker": "BeagleBoard.org"
+  },
+  {
+   "part": "TDA4VM",
+   "family": "Jacinto 7 (J721E)",
+   "board": "SK-TDA4VM",
+   "core": "2x Cortex-A72 at 2.0 GHz, C7x DSP with an 8 TOPS matrix accelerator (MMA), 2x C66x DSP, 6x Cortex-R5F",
+   "mhz": 2000,
+   "flash_kb": 65536,
+   "ram_kb": 4194304,
+   "radios": [],
+   "extras": [
+    "Deep-learning accelerator (C7x and MMA)",
+    "Hardware H.264 and H.265 decode, H.264 encode",
+    "Two CSI-2 camera ports",
+    "Gigabit Ethernet",
+    "HDMI and DisplayPort",
+    "Micro-SD boot"
+   ],
+   "board_price": "not shown to a logged-out reader on TI.com (2026-10-09)",
+   "probe": "none for the cores; a four-port serial console over micro-B (CP2108)",
+   "board_note": "Runs TI's Edge AI Linux from a micro-SD card; needs a 20 V USB-C PD supply, not in the box",
+   "sources": [
+    "https://www.ti.com/tool/SK-TDA4VM",
+    "https://www.ti.com/lit/ug/spruj21e/spruj21e.pdf",
+    "docs/arrivals/tda4.md"
+   ],
+   "maker": "TI"
+  }
+ ],
+ "probes": [
+  {
+   "part": "LP-XDS110ET",
+   "price": "$59.29",
+   "price_source": "TI.com buy page, 2026-10-06",
+   "notes": "USB-C, 20-pin LP-EM edge connector, 10-pin XDS110 out, UART, EnergyTrace++",
+   "sources": [
+    "https://www.ti.com/tool/LP-XDS110ET",
+    "https://www.ti.com/product/LP-XDS110ET/part-details/LP-XDS110ET"
+   ]
+  },
+  {
+   "part": "LP-XDS110",
+   "price": "$54.04",
+   "price_source": "DigiKey, 2026-10-06 (not sold on TI.com)",
+   "notes": "Same connectors and UART, no EnergyTrace",
+   "sources": [
+    "https://www.ti.com/tool/LP-XDS110",
+    "https://www.digikey.com/en/products/result?keywords=LP-XDS110"
+   ]
+  }
+ ],
+ "notes": [
+  "Prices are USD list prices read 2026-10-06. chip_price_1k is the 1,000+ tier of one orderable part number.",
+  "null means not found. Full detail and caveats: docs/research/ti-portfolio-specs-2026-10-06.md"
+ ],
+ "family_urls": {
+  "_note": "TI's public product-selection page per family, for a reader who wants more or less memory than the board on the page. Each URL fetched and found to exist 2026-10-07.",
+  "MSPM0": "https://www.ti.com/microcontrollers-mcus-processors/arm-based-microcontrollers/arm-cortex-m0-mcus/products.html",
+  "MSPM33": "https://www.ti.com/microcontrollers-mcus-processors/arm-based-microcontrollers/products.html",
+  "AM13": "https://www.ti.com/microcontrollers-mcus-processors/arm-based-microcontrollers/products.html",
+  "MSP430": "https://www.ti.com/microcontrollers-mcus-processors/msp430-microcontrollers/products.html",
+  "CC23xx": "https://www.ti.com/wireless-connectivity/low-power-2-4-ghz/products.html",
+  "CC27xx": "https://www.ti.com/wireless-connectivity/low-power-2-4-ghz/products.html",
+  "CC13xx": "https://www.ti.com/wireless-connectivity/sub-1-ghz/products.html",
+  "CC32xx": "https://www.ti.com/wireless-connectivity/wi-fi/products.html",
+  "CC35xx": "https://www.ti.com/wireless-connectivity/wi-fi/products.html",
+  "C2000": "https://www.ti.com/microcontrollers-mcus-processors/c2000-real-time-control-mcus/products.html",
+  "mmWave": "https://www.ti.com/sensors/mmwave-radar/products.html",
+  "AM62x": "https://www.ti.com/microcontrollers-mcus-processors/arm-based-processors/products.html"
+ },
+ "ladder_extra": [
+  {
+   "part": "MSPM33C321A",
+   "family": "MSPM33",
+   "board": "LP-MSPM33C321A",
+   "core": "Cortex-M33",
+   "mhz": 160,
+   "flash_kb": 1024,
+   "ram_kb": 256,
+   "board_price": "$39.99",
+   "lane": "small",
+   "after": "MSPM0G5187",
+   "buy": "https://www.ti.com/tool/LP-MSPM33C321A",
+   "source": "site/data/boards/mspm33c321a.json (TI product page, read 2026-10-09; TI.com price read 2026-10-04)"
+  },
+  {
+   "part": "AM13E230",
+   "family": "AM13",
+   "board": "LP-AM13E230",
+   "core": "Cortex-M33",
+   "mhz": 200,
+   "flash_kb": 512,
+   "ram_kb": 128,
+   "board_price": "$19.79",
+   "lane": "special",
+   "after": "TMS320F28P550SJ",
+   "buy": "https://www.ti.com/tool/LP-AM13E230",
+   "source": "site/data/boards/am13e230.json (TI product page, read 2026-10-09; TI.com price read 2026-10-04)"
+  },
+  {
+   "part": "TMS320F28P650DK9",
+   "family": "C2000",
+   "board": "LAUNCHXL-F28P65X",
+   "core": "C28x",
+   "mhz": 200,
+   "flash_kb": 1280,
+   "ram_kb": 248,
+   "board_price": "$47.19",
+   "lane": "special",
+   "after": "TMS320F28P550SJ",
+   "buy": "https://www.ti.com/tool/LAUNCHXL-F28P65X",
+   "source": "site/data/boards/f28p65x.json (TI.com price read 2026-10-08)"
+  }
+ ],
+ "ladder_extra_note": "Boards with a page here that the portfolio table does not profile. Speed, RAM and price come from each board's own data file; used only by tools/render_boards.py for the ladder card (lane and position after another part)."
+}

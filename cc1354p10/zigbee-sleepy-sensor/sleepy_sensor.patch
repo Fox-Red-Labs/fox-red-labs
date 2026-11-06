@@ -1,0 +1,309 @@
+diff -ruN -x README.html a/app/zcl_sampletemperaturesensor.c b/app/zcl_sampletemperaturesensor.c
+--- a/app/zcl_sampletemperaturesensor.c	2026-10-07 09:28:50
++++ b/app/zcl_sampletemperaturesensor.c	2026-10-07 09:28:50
+@@ -119,6 +119,8 @@
+ #include "zstackapi.h"
+ #include "util_timer.h"
+ #include "mac_util.h"
++/* Fox Red Labs: chip temperature from TI's Temperature driver */
++#include <ti/drivers/Temperature.h>
+ 
+ #if !defined (DISABLE_GREENPOWER_BASIC_PROXY) && (ZG_BUILD_RTR_TYPE)
+ #include "gp_common.h"
+@@ -161,13 +163,13 @@
+ 
+ #ifdef BDB_REPORTING
+ #if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 8
+-  uint8_t reportableChange[] = {0x2C, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; // 0x2C01 is 300 in int16_t
++  uint8_t reportableChange[] = {0x64, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; // Fox Red Labs: 100 = 1.00 C (TI: 300)
+ #endif
+ #if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 4
+-  uint8_t reportableChange[] = {0x2C, 0x01, 0x00, 0x00}; // 0x2C01 is 300 in int16_t
++  uint8_t reportableChange[] = {0x64, 0x00, 0x00, 0x00}; // Fox Red Labs: 100 = 1.00 C, the driver's step (TI: 300)
+ #endif
+ #if BDBREPORTING_MAX_ANALOG_ATTR_SIZE == 2
+-  uint8_t reportableChange[] = {0x2C, 0x01}; // 0x2C01 is 300 in int16_t
++  uint8_t reportableChange[] = {0x64, 0x00}; // Fox Red Labs: 100 = 1.00 C (TI: 300)
+ #endif
+ #endif
+ 
+@@ -185,6 +187,34 @@
+ #if ZG_BUILD_ENDDEVICE_TYPE
+ static ClockP_Handle EndDeviceRejoinClkHandle;
+ static ClockP_Struct EndDeviceRejoinClkStruct;
++
++/* Fox Red Labs: read the chip temperature every FRL_TEMP_PERIOD_MS, and retry joining every
++   FRL_STEER_RETRY_MS until a network lets us in. */
++#define FRL_TEMP_EVT          0x0004
++#define FRL_STEER_EVT         0x0008
++#define FRL_TEMP_PERIOD_MS    10000
++#define FRL_STEER_RETRY_MS    15000
++static ClockP_Struct frlTempClkStruct;
++static ClockP_Struct frlSteerClkStruct;
++static ClockP_Handle frlSteerClkHandle;
++static uint32_t frlSamples = 0;
++static uint32_t frlSteerTries = 0;
++static uint32_t frlPollMs = 0;
++static void frlClockCb(UArg a0)
++{
++    appServiceTaskEvents |= (uint32_t)a0;
++    Semaphore_post(appSemHandle);
++}
++static void frlReadTemperature(bool notify);
++
++/* Fox Red Labs: in this Z-Stack, zcl.c sends every Read Attributes request through the endpoint's read/write
++   callback and answers 0xC1 (SOFTWARE_FAILURE) when none is registered. TI's light example registers one that
++   returns success; this is the same, so reads use the attribute table's data pointers. */
++static ZStatus_t frlReadWriteAttrCB(uint16_t clusterId, uint16_t attrId, uint8_t oper, uint8_t *pValue, uint16_t *pLen)
++{
++    (void)clusterId; (void)attrId; (void)oper; (void)pValue; (void)pLen;
++    return ZCL_STATUS_SUCCESS;
++}
+ #endif
+ 
+ #ifndef CUI_DISABLE
+@@ -395,7 +425,13 @@
+   // Register the application's attribute list and reset to default values
+   zclSampleTemperatureSensor_ResetAttributesToDefaultValues();
+   zcl_registerAttrList( SAMPLETEMPERATURESENSOR_ENDPOINT, zclSampleTemperatureSensor_NumAttributes, zclSampleTemperatureSensor_Attrs );
++  zcl_registerReadWriteCB( SAMPLETEMPERATURESENSOR_ENDPOINT, frlReadWriteAttrCB, NULL );   /* Fox Red Labs */
+ 
++  /* Fox Red Labs: the measured value is the chip temperature (TI's example started at a fixed 17.00 C
++     and only changed it from the serial menu). Read it once now, then every FRL_TEMP_PERIOD_MS. */
++  Temperature_init();
++  frlReadTemperature(false);
++
+   // Register the Application to receive the unprocessed Foundation command/response messages
+   zclport_registerZclHandleExternal(SAMPLETEMPERATURESENSOR_ENDPOINT, zclSampleTemperatureSensor_ProcessIncomingMsg);
+ 
+@@ -415,13 +451,14 @@
+ 
+ #ifdef BDB_REPORTING
+   //Adds the default configuration values for the temperature attribute of the ZCL_CLUSTER_ID_MS_TEMPERATURE_MEASUREMENT cluster, for endpoint SAMPLETEMPERATURESENSOR_ENDPOINT
+-  //Default maxReportingInterval value is 10 seconds
++  //Fox Red Labs: maxReportingInterval 30 seconds (TI: 10)
+   //Default minReportingInterval value is 3 seconds
+-  //Default reportChange value is 300 (3 degrees)
++  //Fox Red Labs: reportChange 100 (1 degree; TI: 300, 3 degrees)
++  //A hub that configures reporting itself (Home Assistant's ZHA does) replaces these values.
+   Req.attrID = ATTRID_TEMPERATURE_MEASUREMENT_MEASURED_VALUE;
+   Req.cluster = ZCL_CLUSTER_ID_MS_TEMPERATURE_MEASUREMENT;
+   Req.endpoint = SAMPLETEMPERATURESENSOR_ENDPOINT;
+-  Req.maxReportInt = 10;
++  Req.maxReportInt = 30;
+   Req.minReportInt = 3;
+   OsalPort_memcpy(Req.reportableChange,reportableChange,BDBREPORTING_MAX_ANALOG_ATTR_SIZE);
+ 
+@@ -476,10 +513,48 @@
+   // Call BDB initialization. Should be called once from application at startup to restore
+   // previous network configuration, if applicable.
+   zstack_bdbStartCommissioningReq_t zstack_bdbStartCommissioningReq;
++  /* Mode 0: resume a saved network. Fox Red Labs: when there is none, the initialization notification
++     below starts joining, so no button press is needed (TI: BTN-1 or the serial menu). Asking for steering
++     here instead would also make an already joined device open the network for 180 s at every boot. */
+   zstack_bdbStartCommissioningReq.commissioning_mode = 0;
+   Zstackapi_bdbStartCommissioningReq(appServiceTaskId,&zstack_bdbStartCommissioningReq);
+ }
+ 
++/* Fox Red Labs: read the chip temperature (whole degrees C from TI's driver) into the ZCL attribute,
++   in hundredths of a degree, and tell the reporting engine when it changed. */
++static void frlReadTemperature(bool notify)
++{
++    int16_t c = Temperature_getTemperature();
++    int16_t v = (int16_t)(c * 100);
++    frlSamples++;
++    if (v != zclSampleTemperatureSensor_MeasuredValue)
++    {
++        zclSampleTemperatureSensor_MeasuredValue = v;
++#ifdef BDB_REPORTING
++        if (notify)
++        {
++            zstack_bdbRepChangedAttrValueReq_t Req;
++            Req.attrID = ATTRID_TEMPERATURE_MEASUREMENT_MEASURED_VALUE;
++            Req.cluster = ZCL_CLUSTER_ID_MS_TEMPERATURE_MEASUREMENT;
++            Req.endpoint = SAMPLETEMPERATURESENSOR_ENDPOINT;
++            Zstackapi_bdbRepChangedAttrValueReq(appServiceTaskId, &Req);
++        }
++#endif
++    }
++}
++
++/* Fox Red Labs: ask the stack which poll period it is using, for the status line */
++static void frlReadPollRate(void)
++{
++    zstack_sysConfigReadReq_t req = {0};
++    zstack_sysConfigReadRsp_t rsp = {0};
++    req.pollRate = true;
++    if (Zstackapi_sysConfigReadReq(appServiceTaskId, &req, &rsp) == zstack_ZStatusValues_ZSuccess && rsp.has_pollRate)
++    {
++        frlPollMs = rsp.CurrentPollRate;
++    }
++}
++
+ #ifndef CUI_DISABLE
+ /*********************************************************************
+  * @fn          zclSampleTemperatureSensor_RemoveAppNvmData
+@@ -538,6 +613,9 @@
+  */
+ static void zclSampleTemperatureSensor_initializeClocks(void)
+ {
++    /* Fox Red Labs: periodic temperature read, and a one-shot join retry */
++    UtilTimer_construct(&frlTempClkStruct, frlClockCb, FRL_TEMP_PERIOD_MS, FRL_TEMP_PERIOD_MS, true, FRL_TEMP_EVT);
++    frlSteerClkHandle = UtilTimer_construct(&frlSteerClkStruct, frlClockCb, FRL_STEER_RETRY_MS, 0, false, FRL_STEER_EVT);
+ #if ZG_BUILD_ENDDEVICE_TYPE
+     // Initialize the timers needed for this application
+     EndDeviceRejoinClkHandle = UtilTimer_construct(
+@@ -647,6 +725,21 @@
+             }
+ #endif
+ 
++            /* Fox Red Labs: periodic temperature read and join retry */
++            if (appServiceTaskEvents & FRL_TEMP_EVT)
++            {
++              appServiceTaskEvents &= ~FRL_TEMP_EVT;
++              frlReadTemperature(true);
++              frlReadPollRate();
++            }
++            if (appServiceTaskEvents & FRL_STEER_EVT)
++            {
++              zstack_bdbStartCommissioningReq_t steer;
++              appServiceTaskEvents &= ~FRL_STEER_EVT;
++              steer.commissioning_mode = BDB_COMMISSIONING_MODE_NWK_STEERING;
++              Zstackapi_bdbStartCommissioningReq(appServiceTaskId, &steer);
++            }
++
+ #ifndef CUI_DISABLE
+   //Update status line
+   zclSampleTemperatureSensor_UpdateStatusLine();
+@@ -932,6 +1025,7 @@
+         {
+           //YOUR JOB:
+           //We are on the nwk, what now?
++          frlReadPollRate();   /* Fox Red Labs */
+         }
+         else
+         {
+@@ -939,6 +1033,10 @@
+           //No suitable networks found
+           //Want to try other channels?
+           //try with bdb_setChannelAttribute
++          /* Fox Red Labs: no open network found; try again in FRL_STEER_RETRY_MS */
++          frlSteerTries++;
++          UtilTimer_setTimeout(frlSteerClkHandle, FRL_STEER_RETRY_MS);
++          UtilTimer_start(&frlSteerClkStruct);
+         }
+       break;
+       case BDB_COMMISSIONING_FINDING_BINDING:
+@@ -958,8 +1056,17 @@
+ 
+         //YOUR JOB:
+         //We are on a network, what now?
++        if(bdbCommissioningModeMsg->bdbCommissioningStatus == BDB_COMMISSIONING_SUCCESS)
++        {
++          frlReadPollRate();   /* Fox Red Labs */
++        }
++        else
++        {
++          /* Fox Red Labs: no saved network (factory new): start joining in 1 s */
++          UtilTimer_setTimeout(frlSteerClkHandle, 1000);
++          UtilTimer_start(&frlSteerClkStruct);
++        }
+ 
+-
+       break;
+ #if ZG_BUILD_ENDDEVICE_TYPE
+     case BDB_COMMISSIONING_PARENT_LOST:
+@@ -1338,9 +1445,11 @@
+ 
+   strcpy(lineFormat, "["CUI_COLOR_YELLOW"Local Temperature"CUI_COLOR_RESET"] ");
+ 
+-  strcat(lineFormat, "%dC");
++  /* Fox Red Labs: chip temperature, sample count, join retries and the poll period the stack reports */
++  strcat(lineFormat, "%dC FRL samples %d retries %d poll %dms");
+ 
+-  CUI_statusLinePrintf(gCuiHandle, gSampleTemperatureSensorInfoLine, lineFormat, (zclSampleTemperatureSensor_MeasuredValue / 100));
++  CUI_statusLinePrintf(gCuiHandle, gSampleTemperatureSensorInfoLine, lineFormat, (zclSampleTemperatureSensor_MeasuredValue / 100),
++                       (int)frlSamples, (int)frlSteerTries, (int)frlPollMs);
+ }
+ 
+ #endif
+diff -ruN -x README.html a/app/zcl_sampletemperaturesensor_data.c b/app/zcl_sampletemperaturesensor_data.c
+--- a/app/zcl_sampletemperaturesensor_data.c	2026-10-07 09:28:50
++++ b/app/zcl_sampletemperaturesensor_data.c	2026-10-07 09:28:50
+@@ -85,8 +85,8 @@
+ #define SAMPLETEMPERATURESENSOR_HWVERSION          1
+ #define SAMPLETEMPERATURESENSOR_ZCLVERSION         BASIC_ZCL_VERSION
+ 
+-#define SAMPLETEMPERATURESENSOR_MAX_MEASURED_VALUE  2700  // 27.00C
+-#define SAMPLETEMPERATURESENSOR_MIN_MEASURED_VALUE  1700  // 17.00C
++#define SAMPLETEMPERATURESENSOR_MAX_MEASURED_VALUE  12500 // 125.00C (Fox Red Labs: chip sensor range; TI's demo used 27.00C)
++#define SAMPLETEMPERATURESENSOR_MIN_MEASURED_VALUE  -4000 // -40.00C (Fox Red Labs: chip sensor range; TI's demo used 17.00C)
+ 
+ /*********************************************************************
+  * TYPEDEFS
+@@ -108,7 +108,9 @@
+ // Basic Cluster
+ const uint8_t zclSampleTemperatureSensor_HWRevision = SAMPLETEMPERATURESENSOR_HWVERSION;
+ const uint8_t zclSampleTemperatureSensor_ZCLVersion = SAMPLETEMPERATURESENSOR_ZCLVERSION;
+-const uint8_t zclSampleTemperatureSensor_ManufacturerName[] = { 16, 'T','e','x','a','s','I','n','s','t','r','u','m','e','n','t','s' };
++/* Fox Red Labs: our names, so Home Assistant shows "Fox Red Labs Temp Sensor" (TI's example has no model string) */
++const uint8_t zclSampleTemperatureSensor_ManufacturerName[] = { 12, 'F','o','x',' ','R','e','d',' ','L','a','b','s' };
++const uint8_t zclSampleTemperatureSensor_ModelId[] = { 11, 'T','e','m','p',' ','S','e','n','s','o','r' };
+ const uint8_t zclSampleTemperatureSensor_PowerSource = POWER_SOURCE_MAINS_1_PHASE;
+ uint8_t zclSampleTemperatureSensor_PhysicalEnvironment = PHY_UNSPECIFIED_ENV;
+ 
+@@ -155,6 +157,15 @@
+       ZCL_DATATYPE_CHAR_STR,
+       ACCESS_CONTROL_READ,
+       (void *)zclSampleTemperatureSensor_ManufacturerName
++    }
++  },
++  {
++    ZCL_CLUSTER_ID_GENERAL_BASIC,
++    { // Attribute record (Fox Red Labs: model identifier, attribute 0x0005)
++      ATTRID_BASIC_MODEL_IDENTIFIER,
++      ZCL_DATATYPE_CHAR_STR,
++      ACCESS_CONTROL_READ,
++      (void *)zclSampleTemperatureSensor_ModelId
+     }
+   },
+   {
+diff -ruN -x README.html a/tirtos7/ticlang/zed_temperaturesensor_LP_EM_CC1354P10_1_tirtos7_ticlang.projectspec b/tirtos7/ticlang/zed_temperaturesensor_LP_EM_CC1354P10_1_tirtos7_ticlang.projectspec
+--- a/tirtos7/ticlang/zed_temperaturesensor_LP_EM_CC1354P10_1_tirtos7_ticlang.projectspec	2026-10-07 09:28:50
++++ b/tirtos7/ticlang/zed_temperaturesensor_LP_EM_CC1354P10_1_tirtos7_ticlang.projectspec	2026-10-07 09:28:50
+@@ -166,11 +166,11 @@
+ 
+         <property name="buildProfile" value="release"/>
+         <property name="isHybrid" value="true"/>
+-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/zstack/apps/temperaturesensor/zcl_sampletemperaturesensor.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="Application">
++        <file path="../../app/zcl_sampletemperaturesensor.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="Application">
+         </file>
+-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/zstack/apps/temperaturesensor/zcl_sampletemperaturesensor.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="Application">
++        <file path="../../app/zcl_sampletemperaturesensor.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="Application">
+         </file>
+-        <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/zstack/apps/temperaturesensor/zcl_sampletemperaturesensor_data.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="Application">
++        <file path="../../app/zcl_sampletemperaturesensor_data.c" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="Application">
+         </file>
+         <file path="${COM_TI_SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR}/source/ti/zstack/apps/temperaturesensor/zcl_sample_app_def.h" openOnCreation="false" excludeFromBuild="false" action="link" targetDirectory="Application/ui">
+         </file>
+diff -ruN -x README.html a/tirtos7/zed_temperaturesensor.syscfg b/tirtos7/zed_temperaturesensor.syscfg
+--- a/tirtos7/zed_temperaturesensor.syscfg	2026-10-07 09:28:50
++++ b/tirtos7/zed_temperaturesensor.syscfg	2026-10-07 09:28:50
+@@ -52,6 +52,8 @@
+ var TRNG    = scripting.addModule("/ti/drivers/TRNG");
+ var Display = scripting.addModule("/ti/display/Display");
+ var zstack  = scripting.addModule("/ti/zstack/zstack");
++/* Fox Red Labs: TI's Temperature driver, for the chip temperature reported in the Temperature Measurement cluster */
++var Temperature = scripting.addModule("/ti/drivers/Temperature");
+ 
+ 
+ /* Instances */
+@@ -164,6 +166,8 @@
+ zstack.deviceType = "zed";
+ zstack.deviceTypeReadOnly = true;
+ zstack.rf.rfDesign = rfDesignSettings.rfDesign;
++/* Fox Red Labs: search all 16 channels (TI default is channel 11 only); the house network is on channel 20 */
++zstack.rf.primaryChannels = [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26];
+ 
+ /* ======== Do device specific settings ======== */
+ const deviceName = system.getScript("/ti/ti154stack/ti154stack_common.js").getLaunchPadFromDevice();

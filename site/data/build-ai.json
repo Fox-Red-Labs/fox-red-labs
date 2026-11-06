@@ -1,0 +1,176 @@
+{
+ "checked": "2026-10-09",
+ "ti_guide": {
+  "url": "https://software-dl.ti.com/ccs/esd/documents/users_guide/index_ai.html",
+  "page": "https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_ai.html",
+  "version": "CCStudio IDE 21.0.1",
+  "read": "2026-10-09",
+  "last_modified": "2026-08-26"
+ },
+ "mcp": [
+  {
+   "name": "ccs-project",
+   "does": "Import, copy, rename and build a CCStudio project; read and set compiler flags."
+  },
+  {
+   "name": "ccs-debug",
+   "does": "Connect to the chip, load a program, set breakpoints, step, read and write memory and variables, read the console output."
+  },
+  {
+   "name": "ccs-serial",
+   "does": "Find the board's USB serial port, connect, write to it and wait for a text pattern."
+  },
+  {
+   "name": "ccs-sysconfig",
+   "does": "Open a SysConfig file and change pins, clocks and peripherals through checked tools instead of hand edits."
+  }
+ ],
+ "mcp_source": "tools/ai_runs/mcp/ccs-mcp.json",
+ "ti_skills": [
+  {
+   "name": "ti-ccstudio-migrate-to-ti",
+   "does": "Port a non-TI project (we ran STM32 examples) to a TI chip in phases. Marked evaluation use only in CCStudio 21.0.1."
+  },
+  {
+   "name": "ti-ccstudio-check-bp-compatibility",
+   "does": "Check whether BoosterPack boards fit a LaunchPad kit and which pins clash."
+  },
+  {
+   "name": "ti-ccstudio-set-board-serial",
+   "does": "Pin a project to one debug probe when several boards are plugged in."
+  },
+  {
+   "name": "ti-ccstudio-test-migration",
+   "does": "Test a ported project."
+  },
+  {
+   "name": "ti-ccstudio-clang-code-coverage",
+   "does": "Code coverage with the TI Arm Clang compiler."
+  }
+ ],
+ "ti_skills_source": ".claude/skills",
+ "our_skills": [
+  {
+   "name": "benchmark",
+   "does": "Runs the standard benchmark suite on one board, with a backup first and a restore after, and writes each number as a row in data/results/<board>.csv."
+  },
+  {
+   "name": "board-arrival",
+   "does": "When a board that was on order shows up, runs its written plan end to end and stops at hardware steps."
+  },
+  {
+   "name": "ti-board-sweep",
+   "does": "Builds and runs every SDK example for one board it can."
+  }
+ ],
+ "other_tools": [
+  {
+   "name": "Claude Code",
+   "what": "Anthropic's coding agent for the terminal, IDEs, desktop and browser.",
+   "tried": "Yes. Terminal, VS Code, and inside CCStudio. Everything on this page was run with it.",
+   "url": "https://code.claude.com/docs/en/overview",
+   "kind": "yes"
+  }
+ ],
+ "terms": [
+  [
+   "AI coding assistant",
+   "A program that takes a plain-language request, writes or edits code, and can run the build and flash. Claude Code and Codex are two."
+  ],
+  [
+   "Agent",
+   "An assistant that takes many steps by itself. It calls tools, reads what came back and decides what to do next."
+  ],
+  [
+   "MCP server",
+   "A small program that gives an agent a set of tools through the Model Context Protocol, the standard way an agent calls tools. CCStudio starts four."
+  ],
+  [
+   "Skill",
+   "A folder of instructions an agent loads when a job matches, such as how to pick one debug probe out of three."
+  ]
+ ],
+ "sources": [
+  "tools/ai_runs/mcp/ccs-mcp.json",
+  "docs/frl.md",
+  "docs/ports.md",
+  "site/data/projects.json",
+  "mspm0l1306/AGENTS.md",
+  "mspm0g3507/AGENTS.md"
+ ],
+ "does_short": [
+  "Writes and changes code from a plain sentence.",
+  "Builds it, flashes the board and reads the errors.",
+  "Drives the debugger and the serial port through CCStudio."
+ ],
+ "does_not_short": [
+  "Read the data sheet for you. Pins and voltages are still on you.",
+  "Know when it is wrong. Check the board instead of the chat.",
+  "See the LED. You do."
+ ],
+ "steps_short": [
+  {
+   "app": "Browser",
+   "do": "Buy a LaunchPad kit and install CCStudio and the SDK. Parts, prices and the 12 GB you need: <a href=\"project-blink.html\">Blink an LED</a>."
+  },
+  {
+   "app": "CCStudio",
+   "do": "Help, then Get Started with AI. Pick Claude Code, sign in, and turn on CCStudio's MCP servers."
+  },
+  {
+   "app": "CCStudio",
+   "do": "Import TI's blink example for your board, then ask the chat: \"build it, flash it, and make the LED blink twice a second\"."
+  }
+ ],
+ "questions": [
+  [
+   "Do I need to know how to code?",
+   "No, but you do need to check the result. You still read the board's user guide for pins and power, and you look at the LED or the serial output yourself."
+  ],
+  [
+   "Which assistant did you use?",
+   "Claude Code. TI's guide names Claude Code and Codex as the two assistants it tested with CCStudio. The prompts above are plain text and work in any assistant that can read files and run a terminal."
+  ],
+  [
+   "Do I need an assistant at all?",
+   "No. <code>./start.sh mspm0l1306 blink</code> runs the same steps with no assistant. The steps are in docs/frl.md."
+  ]
+ ],
+ "prompts": [
+  {
+   "title": "Install the tools for a LaunchPad kit",
+   "points_at": "docs/frl.md and data/routes.json",
+   "prompt": "Read docs/frl.md. I have an LP-MSPM0L1306. Run `python3 tools/frl/frl.py doctor --board mspm0l1306`, tell me what is missing and where to download it, and install what needs no login. Do not flash anything yet."
+  },
+  {
+   "title": "Find which board is plugged in",
+   "points_at": "tools/frl",
+   "prompt": "Run `python3 tools/frl/frl.py detect` and tell me each probe's serial number and which board it is. If more than one board is plugged in, ask me which one to use before you touch any of them."
+  },
+  {
+   "title": "Build and flash the first blink",
+   "points_at": "mspm0l1306/AGENTS.md",
+   "prompt": "Read mspm0l1306/AGENTS.md first. Back up the board, then run `./start.sh mspm0l1306 blink --probe <serial> --pattern 150,150,150,900`. Report what the check printed and show me the pattern line in gpio_toggle_output.c. If it fails, give the exact FRL-E code and what docs/frl-errors.md says to do."
+  },
+  {
+   "title": "Run a named project",
+   "points_at": "docs/builds/run-zephyr.md",
+   "prompt": "Read docs/builds/run-zephyr.md and mspm0g3507/AGENTS.md. Run Zephyr blinky on my LP-MSPM0G3507 the way the build page says, with mspm0g3507/zephyr/setup-intel-mac.sh. Stop and tell me before each step that writes to the board, and tell me what I should see on the LED."
+  },
+  {
+   "title": "Port an example to another board",
+   "points_at": "docs/ports.md",
+   "prompt": "Port <project or library> to the <board, for example LP-MSPM0G3507>. Read AGENTS.md, docs/ports.md and that board folder's AGENTS.md and FAQ.md. Build the project unchanged for the TI chip and list every missing call, answer them in one shim file without editing the project's own files, build with TI's tools and report flash and RAM, then tell me the one thing I should see on the board. If it stops, give me the exact error and where it stopped. Start from ports/minmea/build.sh for a plain-C library."
+  },
+  {
+   "title": "Fix an error with the board's notes",
+   "points_at": "mspm0l1306/FAQ.md",
+   "prompt": "I get this error on my LP-MSPM0L1306: <paste the exact text>. Search mspm0l1306/FAQ.md and mspm0l1306/AGENTS.md for it, tell me the cause and the fix, and change nothing until I say so."
+  },
+  {
+   "title": "Use the notes in your own project",
+   "points_at": "the board folder's AGENTS.md",
+   "prompt": "Copy mspm0l1306/AGENTS.md to the top of my project as AGENTS.md (or add the line @AGENTS.md to my CLAUDE.md). Then read it and list the five things on this board most likely to break my project, each with the line that says so."
+  }
+ ]
+}

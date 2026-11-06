@@ -1,0 +1,66 @@
+/*
+ * Added on top of lp_mspm0g3519.overlay for the patched workspace (Zephyr main 1405adc9a plus the
+ * MSPM0 I2C pull request #117311). Pass both: OVERLAY="<base>;<this file>".
+ * Wire  = I2C2 on PC2 (SCL) and PC3 (SDA), BoosterPack pins 9 and 10, function 2 (PINCM76, PINCM77).
+ *         The Waveshare panel's FT6336U touch chip (0x38) sits on these two pins on this bench.
+ * SPI   = SPI0 on PB18 (SCLK), PB17 (PICO), PB19 (POCI), chip select D5 = PA8. SPI1, the board file's
+ *         other SPI, is on PB9/PB8/PB7, the panel's DC, MOSI and MISO wires, so it is left alone.
+ * PWM   = D0 (PB27, green LED) on TIMA1 compare 1, PINCM58 function 9 (SysConfig MSPM0G351X device data).
+ *         Zephyr's shared pin file says function 6 (tima1_ccp1_pb27), which is COMP2.OUT on this chip:
+ *         the timer then runs and the pin stays low. 500 us period.
+ * D4    = PB3, button S2 (to GND when pressed; the board file pulls it up).
+ */
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/pwm/pwm.h>
+#include <zephyr/dt-bindings/pinctrl/mspm0-pinctrl.h>
+
+&pinctrl {
+	tima1_ccp1_pb27_g351x: tima1_ccp1_pb27_g351x {
+		pinmux = <MSP_PINMUX(58, MSPM0_PIN_FUNCTION_9)>;
+	};
+
+	i2c2_scl_pc2: i2c2_scl_pc2 {
+		pinmux = <MSP_PINMUX(76, MSPM0_PIN_FUNCTION_2)>;
+		input-enable;
+		drive-open-drain;
+		bias-pull-up;
+	};
+
+	i2c2_sda_pc3: i2c2_sda_pc3 {
+		pinmux = <MSP_PINMUX(77, MSPM0_PIN_FUNCTION_2)>;
+		input-enable;
+		drive-open-drain;
+		bias-pull-up;
+	};
+};
+
+&i2c2 {
+	pinctrl-0 = <&i2c2_scl_pc2 &i2c2_sda_pc3>;
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	status = "okay";
+};
+
+&pwma1 {
+	status = "okay";
+	pinctrl-0 = <&tima1_ccp1_pb27_g351x>;
+	pinctrl-names = "default";
+	ti,cc-index = <1>;
+	ti,pwm-mode = "EDGE_ALIGN";
+	ti,period = <1000>;
+};
+
+/ {
+	zephyr,user {
+		digital-pin-gpios = <&gpiob 27 0>,	/* D0 green LED, PWM */
+				    <&gpiob 26 0>,	/* D1 red LED */
+				    <&gpiob 22 0>,	/* D2 blue LED */
+				    <&gpioa 25 0>,	/* D3 = A0 */
+				    <&gpiob 3 0>,	/* D4 button S2 */
+				    <&gpioa 8 0>;	/* D5 SPI chip select */
+		pwm-pin-gpios = <&gpiob 27 0>;
+		pwms = <&pwma1 0 PWM_USEC(500) PWM_POLARITY_NORMAL>;
+		i2cs = <&i2c2>;
+		spis = <&spi0>;
+	};
+};

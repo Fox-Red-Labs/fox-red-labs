@@ -1,0 +1,28 @@
+$ python3 tools/demo_flash.py list
+# run 2026-10-07 12:41 EDT on this Mac; reads the SDK folders only, touches no board
+
+LP_EM_CC2340R5  probe LS470GTU  UniFlash (dslite)
+  name                                                 stack         hex kB  note
+  basic_ble_app                                        ble              533  
+  data_stream_app                                      ble              528  
+  host_test_app                                        ble              680  
+  mcuboot_dual_image_LP_EM_CC2340R5_nortos_ticlang     ble               36  boot or update image: needs --allow-boot
+  mcuboot_multistep_oad_LP_EM_CC2340R5_nortos_ticlang  ble               42  boot or update image: needs --allow-boot
+  mcuboot_offchip_LP_EM_CC2340R5_nortos_ticlang        ble               40  boot or update image: needs --allow-boot
+  mcuboot_onchip_LP_EM_CC2340R5_nortos_ticlang         ble               33  boot or update image: needs --allow-boot
+
+LP_EM_CC1354P10_1  probe LS45013A  UniFlash (dslite)
+  name                                              stack         hex kB  note
+  host_test_app                                     ble5stack        580  
+  mcuboot_offchip_LP_EM_CC1354P10_1_nortos_ticlang  ble5stack         42  boot or update image: needs --allow-boot
+  mcuboot_onchip_LP_EM_CC1354P10_1_nortos_ticlang   ble5stack         32  boot or update image: needs --allow-boot
+  project_zero_app                                  ble5stack        508  
+  simple_central_app                                ble5stack        480  
+  simple_peripheral_app                             ble5stack        480  
+  mcuboot_LP_EM_CC1354P10_1                         prop_rf           40  boot or update image: needs --allow-boot
+  rfOADClient_LP_EM_CC1354P10_1_all_v1              prop_rf          171  boot or update image: needs --allow-boot
+  rfOADClient_LP_EM_CC1354P10_1_app_v1              prop_rf          125  boot or update image: needs --allow-boot
+  rfOADClient_LP_EM_CC1354P10_1_app_v2              prop_rf          125  boot or update image: needs --allow-boot
+
+LP_MSPM0G3507  probe MG350001  OpenOCD (not flashed by this tool)
+  no prebuilt hex files found in the installed SDKs

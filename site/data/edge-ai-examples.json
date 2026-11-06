@@ -1,0 +1,305 @@
+{
+ "about": "TI's own AI examples and the BitNetMCU digit models, for the Edge AI page (tools/render_edge_ai.py). Parameters, accuracy, flash, RAM and times in the 'ti' blocks are TI's published README figures; measured times are rows in data/results/*.csv (test ai_vendor_example, ai_mnist_cycles). Image totals are from linker maps and include TI's embedded test data, so they are not model sizes.",
+ "ti_source": "MSPM0 SDK 2.11.00.07, examples/nortos/LP_MSPM0G5187/edgeAI/<example>/README.md (read 2026-10-09)",
+ "examples": [
+  {
+   "id": "hello_world_ai",
+   "label": "Waveform hello world",
+   "task": "Classifies a synthetic waveform (a first-run check)",
+   "kind": "time series",
+   "params": 14124,
+   "params_npu": 14124,
+   "ti": {
+    "accuracy": null,
+    "cpu_ms": null,
+    "npu_ms": null,
+    "cpu_kb": null,
+    "npu_kb": null
+   },
+   "image": {
+    "cpu": [
+     24.4,
+     3.4
+    ],
+    "npu": [
+     24.6,
+     3.7
+    ]
+   }
+  },
+  {
+   "id": "waveform_classifier_ai",
+   "label": "Waveform classifier",
+   "task": "Classifies multichannel waveforms",
+   "kind": "time series",
+   "params": 14124,
+   "params_npu": 14124,
+   "ti": {
+    "accuracy": "100 (R square)",
+    "cpu_ms": 54.06,
+    "npu_ms": 5.84,
+    "cpu_kb": [
+     21.7,
+     3.1
+    ],
+    "npu_kb": [
+     21.5,
+     3.3
+    ]
+   },
+   "image": {
+    "cpu": [
+     109.0,
+     9.9
+    ],
+    "npu": [
+     109.3,
+     10.2
+    ]
+   }
+  },
+  {
+   "id": "gearbox_fault_diagnosis_ai",
+   "label": "Gearbox fault",
+   "task": "Finds a worn gearbox from vibration",
+   "kind": "vibration",
+   "params": 1410,
+   "params_npu": 2672,
+   "ti": {
+    "accuracy": "~99.9",
+    "cpu_ms": null,
+    "npu_ms": null,
+    "cpu_kb": [
+     10.1,
+     1.9
+    ],
+    "npu_kb": [
+     8.9,
+     2.2
+    ]
+   },
+   "image": {
+    "cpu": [
+     11.3,
+     3.0
+    ],
+    "npu": [
+     13.5,
+     2.2
+    ]
+   }
+  },
+  {
+   "id": "motor_bearing_fault_anomaly_detection_ai",
+   "label": "Motor bearing anomaly",
+   "task": "Tells a normal bearing from an abnormal one",
+   "kind": "vibration",
+   "params": 327,
+   "params_npu": 327,
+   "ti": {
+    "accuracy": "100",
+    "cpu_ms": 21.38,
+    "npu_ms": null,
+    "cpu_kb": [
+     3.24,
+     2.26
+    ],
+    "npu_kb": null
+   },
+   "image": {
+    "cpu": null,
+    "npu": null
+   }
+  },
+  {
+   "id": "motor_bearing_fault_detection_ai",
+   "label": "Motor bearing fault",
+   "task": "Names one of 6 bearing conditions from vibration",
+   "kind": "vibration",
+   "params": 3600,
+   "params_npu": 3600,
+   "ti": {
+    "accuracy": "~99",
+    "cpu_ms": 229.01,
+    "npu_ms": 1087.98,
+    "cpu_kb": [
+     6.39,
+     16.56
+    ],
+    "npu_kb": [
+     5.14,
+     12.68
+    ],
+    "note": "TI's times are for the whole pipeline with feature extraction; the measured times are the model call only"
+   },
+   "image": {
+    "cpu": [
+     117.0,
+     20.1
+    ],
+    "npu": [
+     116.2,
+     16.1
+    ]
+   }
+  },
+  {
+   "id": "motor_fan_blade_fault_ai",
+   "label": "Fan blade fault",
+   "task": "Spots a damaged fan blade from vibration",
+   "kind": "vibration",
+   "params": 5228,
+   "params_npu": 5228,
+   "ti": {
+    "accuracy": "~99",
+    "cpu_ms": 2.09,
+    "npu_ms": 0.163,
+    "cpu_kb": [
+     1.4,
+     1.0
+    ],
+    "npu_kb": [
+     2.18,
+     0.88
+    ]
+   },
+   "image": {
+    "cpu": [
+     89.2,
+     17.1
+    ],
+    "npu": [
+     90.3,
+     16.9
+    ]
+   }
+  },
+  {
+   "id": "fall_detection_ai",
+   "label": "Fall detection",
+   "task": "Tells a fall from normal movement, from an accelerometer",
+   "kind": "motion",
+   "params": 6000,
+   "params_npu": 6000,
+   "ti": {
+    "accuracy": "97.65",
+    "cpu_ms": 8.56,
+    "npu_ms": 0.67,
+    "cpu_kb": [
+     13,
+     0.96
+    ],
+    "npu_kb": [
+     14,
+     0.7
+    ]
+   },
+   "image": {
+    "cpu": [
+     103.1,
+     6.7
+    ],
+    "npu": [
+     104.6,
+     6.5
+    ]
+   }
+  },
+  {
+   "id": "ecg_anomaly_detection_ai",
+   "label": "ECG anomaly",
+   "task": "Flags an unusual heartbeat trace (autoencoder)",
+   "kind": "anomaly",
+   "params": 55000,
+   "params_npu": 55000,
+   "ti": {
+    "accuracy": "~97",
+    "cpu_ms": null,
+    "npu_ms": null,
+    "cpu_kb": [
+     64.8,
+     18.4
+    ],
+    "npu_kb": [
+     88,
+     13.2
+    ]
+   },
+   "image": {
+    "cpu": [
+     71.3,
+     26.7
+    ],
+    "npu": [
+     95.7,
+     21.5
+    ]
+   }
+  },
+  {
+   "id": "character_recognition",
+   "label": "Character recognition",
+   "task": "Reads a hand-drawn character from an image",
+   "kind": "image",
+   "params": 60000,
+   "params_npu": 60000,
+   "ti": {
+    "accuracy": "~99",
+    "cpu_ms": 89.81,
+    "npu_ms": 6.05,
+    "cpu_kb": [
+     68,
+     8.1
+    ],
+    "npu_kb": [
+     73,
+     10.9
+    ]
+   },
+   "image": {
+    "cpu": [
+     72.2,
+     11.7
+    ],
+    "npu": [
+     79.0,
+     14.5
+    ]
+   }
+  }
+ ],
+ "not_run": "Wake word: on the LP-MSPM0G5187 the unchanged model detected a synthetic \"OK Kilby\" in 20 of 20 tries for each of six voices (replayed audio, not the board's own microphone)",
+ "bitnetmcu": {
+  "source": "ports/bitnetmcu/README.md (author's accuracy on the MNIST test set; cycles are measured, rows in data/results)",
+  "models": [
+   {
+    "id": "1k",
+    "label": "1k fully connected",
+    "kb": 1.1,
+    "acc": 94.22,
+    "variant": "1k"
+   },
+   {
+    "id": "cnn16",
+    "label": "16-wide CNN",
+    "kb": 3.2,
+    "acc": 98.92,
+    "variant": "cnn16-small"
+   },
+   {
+    "id": "12k",
+    "label": "12k fully connected",
+    "kb": 12.3,
+    "acc": 99.02,
+    "variant": "12k"
+   },
+   {
+    "id": "cnn64",
+    "label": "64-wide CNN",
+    "kb": 11.0,
+    "acc": 99.55,
+    "variant": "cnn64"
+   }
+  ]
+ }
+}

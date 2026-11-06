@@ -1,0 +1,25 @@
+{
+ "image": "../../../../docs/arrivals/img/source-mspm33c321a-slau969.png",
+ "margin_left": 1250,
+ "margin_right": 1250,
+ "title": "Halloween show: from bench to porch in two minutes",
+ "warning": "Step 1 first: the swap happens with the board unpowered",
+ "credit": "Board image: TI SLAU969 Figure 1-1; buttons and header from its Figure 4-2",
+ "steps": [
+  {"label": ["Unplug the USB cable", "Everything else is done with no power on the board."],
+   "side": "left", "label_y": 120, "badge": [330, 90], "marks": [{"box": [150, 20, 300, 160]}]},
+  {"label": ["Pull off whatever BoosterPack is on top", "Lift it straight up from both header rows (J1/J3 left,", "J4/J2 right)."],
+   "side": "left", "label_y": 700, "badge": [110, 1300], "marks": [{"box": [140, 1060, 250, 1580]}, {"box": [960, 1060, 1110, 1580]}]},
+  {"label": ["Plug the BOOSTXL-AUDIO on the same rows", "Its pin 1 goes to J1 pin 1 (3V3, top left).", "On the pack, jumper J5 sits on SPI DAC (as shipped).", "The show drives its pins 7, 12, 13, 15, 5 and 6."],
+   "side": "right", "label_y": 700, "badge": [1170, 1300], "marks": [{"box": [140, 1060, 1110, 1580]}]},
+  {"label": ["Plug the power bank into the USB-C socket", "The show starts by itself and loops forever.", "If the bank turns off after a minute, it saw too", "little current: use one with an always-on mode."],
+   "side": "right", "label_y": 120, "badge": [330, 200], "marks": [{"box": [150, 20, 300, 160]}]},
+  {"label": ["Buttons: S2 (right) short = next song,", "long = next sound effect mode.", "S1 (left) short = next light theme, long = volume.", "Both together = shuffle on or off.", "Do not hold S1 while plugging in (bootloader)."],
+   "side": "right", "label_y": 1650, "badge": [1230, 1180], "marks": [{"pin": [1260, 1045], "r": 30, "tag": "S2", "tag_side": "right"}, {"pin": [90, 1045], "r": 30, "tag": "S1", "tag_side": "left"}]}
+ ],
+ "board": "../../../../docs/boards/lp-mspm33c321a.json",
+ "task_facts": {"head": "The show", "items": [
+   ["Plays", "Grieg's Mountain King, Bach's Toccata opening, Saint-Saens' Danse macabre, an original tune; shuffled, with scare sounds between songs"],
+   ["Lights", "The board's RGB LED: music, pumpkin, fire, lightning, ghost, heartbeat, witch; a candle glow between songs"],
+   ["If you hear nothing", "Check J5 on the pack sits on SPI DAC; turn the volume up with a long S1 press"]]}
+}

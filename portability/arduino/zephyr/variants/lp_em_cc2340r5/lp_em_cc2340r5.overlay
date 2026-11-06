@@ -1,0 +1,94 @@
+/*
+ * Arduino pin map for the LP-EM-CC2340R5 (ArduinoCore-zephyr static module).
+ * D0 = DIO15 green LED (LED_BUILTIN), D1 = DIO14 red LED, D2 = DIO10 (S1), D3 = DIO9 (S2),
+ * D4..D8 = A0..A4 = DIO5, DIO2, DIO1, DIO25, DIO23 (ADC channels 2, 3, 4, 6, 8).
+ * The board file already routes those five pins to the ADC (adc0_ch2 .. adc0_ch8) and uart0 to the XDS110 backchannel.
+ * PWM: D1 red LED = LGPT1 channel 2 (pinctrl DIO14_T1_C2N), D0 green LED = LGPT2 channel 0 (DIO15_T2_C0N).
+ * The cell after the controller is the LGPT channel (the driver writes CnCC for that n); the board file's
+ * pwm-leds node gives channel 0 for the red LED, which writes LGPT1 C0 while the pin is muxed to C2.
+ * Period 1,000,000 ns = 1 kHz: 48,000 timer cycles at 48 MHz, inside the 16-bit LGPT1 and LGPT2 counters.
+ * SPI and Wire: spi0 (SCLK DIO18 = BoosterPack pin 7, MOSI DIO13 = pin 15, MISO DIO12 = pin 14, CSn DIO11 = pin 18)
+ * and i2c0 (SCL DIO24 = pin 9, SDA DIO0 = pin 10), pin numbers from the board's boosterpack_connector.dtsi.
+ */
+#include <zephyr/dt-bindings/pwm/pwm.h>
+#include <zephyr/dt-bindings/adc/adc.h>
+
+/ {
+	zephyr,user {
+		digital-pin-gpios = <&gpio0 15 0>,
+				    <&gpio0 14 0>,
+				    <&gpio0 10 0>,
+				    <&gpio0 9 0>,
+				    <&gpio0 5 0>,	/* A0 */
+				    <&gpio0 2 0>,	/* A1 */
+				    <&gpio0 1 0>,	/* A2 */
+				    <&gpio0 25 0>,	/* A3 */
+				    <&gpio0 23 0>;	/* A4 */
+
+		builtin-led-gpios = <&gpio0 15 0>;
+
+		adc-pin-gpios = <&gpio0 5 0>,
+				<&gpio0 2 0>,
+				<&gpio0 1 0>,
+				<&gpio0 25 0>,
+				<&gpio0 23 0>;
+
+		io-channels = <&adc0 2>, <&adc0 3>, <&adc0 4>, <&adc0 6>, <&adc0 8>;
+
+		pwm-pin-gpios = <&gpio0 15 0>,	/* D0 green */
+				<&gpio0 14 0>;	/* D1 red */
+		pwms = <&pwm6 0 1000000 PWM_POLARITY_NORMAL>,
+		       <&pwm5 2 1000000 PWM_POLARITY_NORMAL>;
+
+		serials = <&uart0>;
+		i2cs = <&i2c0>;
+		spis = <&spi0>;
+	};
+};
+
+&adc0 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@2 {
+		reg = <2>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+	channel@3 {
+		reg = <3>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+	channel@4 {
+		reg = <4>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+	channel@6 {
+		reg = <6>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+	channel@8 {
+		reg = <8>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,vref-mv = <3300>;
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+};

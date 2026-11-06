@@ -1,0 +1,15 @@
+// @cliArgs --board /ti/boards/LP_EM_CC2340R5 --rtos freertos
+var Power = scripting.addModule("/ti/drivers/Power");
+system.getScript("kernel_config_release.syscfg.js");
+var GPIO = scripting.addModule("/ti/drivers/GPIO");
+var gpio = GPIO.addInstance();
+gpio.$hardware = system.deviceData.board.components.LED0;
+gpio.$name = "CONFIG_GPIO_LED_0";
+var UART2 = scripting.addModule("/ti/drivers/UART2");
+var uart2 = UART2.addInstance();
+uart2.$hardware = system.deviceData.board.components.XDS110UART;
+uart2.$name = "CONFIG_UART2_0";
+var ADC = scripting.addModule("/ti/drivers/ADC");
+var adc0 = ADC.addInstance();
+adc0.$name = "CONFIG_ADC_0";
+adc0.internalSignal = "Battery Channel";

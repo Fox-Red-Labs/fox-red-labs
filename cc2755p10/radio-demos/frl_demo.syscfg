@@ -1,0 +1,25 @@
+// @cliArgs --board /ti/boards/@BOARD@ --rtos nortos
+/* Fox Red Labs radio-board demos: both LEDs, both buttons and the XDS110 backchannel UART. Based on TI's drivers/empty, gpiointerrupt and uart2echo syscfg. */
+var Power = scripting.addModule("/ti/drivers/Power");
+system.getScript("kernel_config_release.syscfg.js");
+
+var GPIO = scripting.addModule("/ti/drivers/GPIO");
+var gpio0 = GPIO.addInstance();
+gpio0.$hardware = system.deviceData.board.components.LED0;
+gpio0.$name = "CONFIG_GPIO_LED_0";
+var gpio1 = GPIO.addInstance();
+gpio1.$hardware = system.deviceData.board.components.LED1;
+gpio1.$name = "CONFIG_GPIO_LED_1";
+var gpio2 = GPIO.addInstance();
+gpio2.$hardware = system.deviceData.board.components.BUTTON0;
+gpio2.$name = "CONFIG_GPIO_BUTTON_0";
+var gpio3 = GPIO.addInstance();
+gpio3.$hardware = system.deviceData.board.components.BUTTON1;
+gpio3.$name = "CONFIG_GPIO_BUTTON_1";
+
+var UART2 = scripting.addModule("/ti/drivers/UART2");
+var uart2 = UART2.addInstance();
+uart2.$hardware = system.deviceData.board.components.XDS110UART;
+uart2.$name = "CONFIG_UART2_0";
+uart2.txRingBufferSize = 128;   /* a line is up to 64 bytes; the 32-byte default clipped lines of 25 to 32 bytes */
+uart2.rxRingBufferSize = 32;

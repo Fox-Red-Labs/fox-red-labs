@@ -1,0 +1,15 @@
+{
+ "name": "rec_bald_mountain",
+ "title": "Night on Bald Mountain (Mussorgsky)",
+ "rate": 10000,
+ "nsamples": 300000,
+ "bytes": 150000,
+ "start_s": 3.0,
+ "length_s": 30.0,
+ "credit": "Musopen recording",
+ "license": "Public domain",
+ "source": "https://commons.wikimedia.org/wiki/File:Modest_Mussorgsky_-_night_on_bald_mountain.ogg",
+ "source_sha256": "f0c7f3cd9dc3b746fd8080860012ba152b99760021431f127070a2825d2cefc9",
+ "adpcm_rms_error": 383.2,
+ "filter": "highpass=f=120,lowpass=f=4500,acompressor=threshold=-24dB:ratio=3:attack=5:release=120:makeup=2, peak -1 dBFS, 0.3 s fades"
+}

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="A Wi-Fi access point and a board exchange packets across a room; a person crossing the path changes the signal">
+<style>
+  .arc { animation: arc 1.8s infinite; opacity:.15; } .a2 { animation-delay:.3s } .a3 { animation-delay:.6s }
+  @keyframes arc { 0%{opacity:.1} 40%{opacity:1} 100%{opacity:.1} }
+  .mv { animation: mv 5s ease-in-out infinite alternate; }
+  @keyframes mv { from{transform:translate(-40px,0)} to{transform:translate(40px,0)} }
+  @media (prefers-reduced-motion: reduce) { .arc,.pulse,.tw,.mv { animation: none; opacity: 1; } }
+</style>
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="50" y="110" width="90" height="70" rx="6" fill="#161312"/><text x="95" y="150" font-size="14" font-weight="700" text-anchor="middle" fill="#F4EFE9">Wi-Fi AP</text>
+<rect x="460" y="110" width="90" height="70" rx="6" fill="#161312"/><text x="505" y="150" font-size="14" font-weight="700" text-anchor="middle" fill="#F4EFE9">CC35X1</text>
+<g fill="none" stroke="#B42418" stroke-width="4" stroke-linecap="round"><path class="arc a1" d="M160 130 a24 24 0 0 1 0 30"/><path class="arc a2" d="M176 120 a40 40 0 0 1 0 50"/><path class="arc a3" d="M192 110 a56 56 0 0 1 0 70"/></g>
+<line x1="210" y1="145" x2="440" y2="145" stroke="#B42418" stroke-width="2" stroke-dasharray="3 7"/>
+<g class="mv"><circle cx="325" cy="95" r="14" fill="#161312"/><rect x="307" y="111" width="36" height="46" rx="8" fill="#161312"/></g>
+</svg>

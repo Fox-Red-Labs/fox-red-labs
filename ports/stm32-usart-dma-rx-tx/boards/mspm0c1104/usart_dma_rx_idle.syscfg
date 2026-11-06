@@ -1,0 +1,20 @@
+// @cliArgs --board /ti/boards/LP_MSPM0C1104 --rtos nortos
+//@cliArgs --device "MSPM0C110X" --package "VSSOP-20(DGS20)" --part "Default"
+//@v2CliArgs --device "MSPM0C1104" --package "VSSOP-20(DGS20)"
+
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+
+UART1.$name = "UART_0";
+UART1.profile = "CONFIG_PROFILE_1";
+UART1.peripheral.$assign = "UART0";
+UART1.targetBaudRate = 115200;   // overwritten at run time from USART_BAUD (usart_dma_rx_idle.c)
+UART1.enableInternalLoopback = false;
+UART1.enableFIFO = true;
+UART1.rxFifoThreshold = "DL_UART_RX_FIFO_LEVEL_1_2_FULL";
+UART1.rxTimeoutValue = 15;
+UART1.enabledInterrupts = ["RX", "RX_TIMEOUT_ERROR"];
+
+UART1.peripheral.txPin.$assign = "PA27";
+UART1.peripheral.rxPin.$assign = "PA26";
+

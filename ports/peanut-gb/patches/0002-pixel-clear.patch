@@ -1,0 +1,23 @@
+--- a/peanut_gb.h
++++ b/peanut_gb.h
+@@ -1461,7 +1461,19 @@
+ 
+ void __gb_draw_line(struct gb_s *gb)
+ {
+-	uint8_t pixels[160] = {0};
++	/* Zeroed a word at a time: "= {0}" becomes a call to the C library's memclr, which on Arm Clang's runtime stores one
++	 * byte per loop pass (about 800 instructions a line, 13 percent of a frame). The empty asm keeps the compiler from
++	 * turning the loop back into that call. */
++	uint32_t pixels_w[160 / 4];
++	uint8_t *const pixels = (uint8_t *)pixels_w;
++	{
++		uint32_t zero = 0;
++#if defined(__GNUC__)
++		__asm__ volatile("" : "+r"(zero));
++#endif
++		for(unsigned zi = 0; zi < 160 / 4; zi++)
++			pixels_w[zi] = zero;
++	}
+ 
+ 	/* If LCD not initialised by front-end, don't render anything. */
+ 	if(gb->display.lcd_draw_line == NULL)

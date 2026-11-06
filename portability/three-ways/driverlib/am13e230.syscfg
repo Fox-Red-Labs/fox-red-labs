@@ -1,0 +1,45 @@
+/**
+ * Three ways, DriverLib-style, LP-AM13E230: ADC sequencer 1, start of conversion 0 on PA16 (header pin, nothing connected)
+ * with the internal reference (3.3 V range), UART at 115200 on PA0/PA1 (backchannel, UC4), LED4 red on PA5.
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+const adc    = scripting.addModule("/drivers/adc", {}, false);
+const adc1   = adc.addInstance();
+const gpio   = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1  = gpio.addInstance();
+const uart   = scripting.addModule("/drivers/uart", {}, false);
+const uart1  = uart.addInstance();
+const sysctl = scripting.addModule("/drivers/sysctl");
+
+adc1.numberOfSOCs      = 1;
+adc1.enableSEQs        = true;
+adc1.numberOfSEQs      = 1;
+adc1.$name             = "APP_ADC";
+adc1.SOC0.channel      = "PA17";
+adc1.SEQ1.numberOfSOCs = 1;
+adc1.SOC0.peripheral.$suggestSolution = "ANALOG";
+
+gpio1.$name                         = "GPIO_LEDS";
+gpio1.associatedPins[0].$name       = "USER_LED";
+gpio1.associatedPins[0].pin.$assign = "PA5";
+
+uart1.$name                            = "UART_0";
+uart1.targetBaudRate                   = 115200;
+uart1.peripheral.$assign               = "UC4";
+uart1.peripheral.rxPin.$assign         = "PA1";
+uart1.peripheral.txPin.$assign         = "PA0";
+uart1.txPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig0";
+uart1.txPinConfig.direction            = scripting.forceWrite("OUTPUT");
+uart1.txPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.txPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.txPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+uart1.rxPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig1";
+uart1.rxPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.rxPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+
+sysctl.VREFSource   = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;

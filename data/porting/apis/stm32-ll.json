@@ -1,0 +1,172 @@
+{
+ "api": "stm32-ll",
+ "vendor": "ST",
+ "detect": "\\bLL_\\w+",
+ "symbol_re": "\\bLL_[A-Za-z0-9_]+",
+ "calls_only": true,
+ "note": "LL constants and structure types are not counted, only calls.",
+ "entries": [
+  {
+   "match": "LL_USART_(Init|DeInit|ConfigAsyncMode|Enable|Disable|SetBaudRate|SetOverSampling|SetPrescaler|IsActiveFlag_TEACK|IsActiveFlag_REACK|SetDataWidth|SetParity|SetStopBitsLength|SetTransferDirection|SetHWFlowCtrl)",
+   "idiom": "uart.init_8n1",
+   "note": "LL_USART_Enable is the last step on STM32; on the target the UART is disabled while the baud divisor is set",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_USART_(SetTXFIFOThreshold|SetRXFIFOThreshold|EnableFIFO|DisableFIFO|IsEnabledFIFO)",
+   "idiom": "uart.fifo_config",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_USART_(EnableIT_IDLE|DisableIT_IDLE|IsEnabledIT_IDLE|IsActiveFlag_IDLE|ClearFlag_IDLE)",
+   "idiom": "uart.rx_until_idle",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_USART_(EnableDMAReq_TX|DisableDMAReq_TX)",
+   "idiom": [
+    "uart.dma_trigger",
+    "uart.tx_dma"
+   ],
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_USART_(EnableDMAReq_RX|DisableDMAReq_RX)",
+   "idiom": [
+    "uart.dma_trigger",
+    "uart.rx_circular_dma"
+   ],
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_USART_(DMA_GetRegAddr)",
+   "idiom": "uart.dma_trigger",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_USART_(TransmitData8|TransmitData9|IsActiveFlag_TXE\\w*|IsActiveFlag_TC|ClearFlag_TC)",
+   "idiom": "uart.tx_byte_blocking",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "LL_USART_(ReceiveData8|IsActiveFlag_RXNE\\w*)",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "LL_DMA_(SetPeriphRequest|SetDataTransferDirection|SetMode|SetPeriphIncMode|SetMemoryIncMode|SetPeriphSize|SetMemorySize|SetChannelPriorityLevel|Init|ConfigTransfer|DeInit|StructInit)",
+   "idiom": "dma.config_channel",
+   "note": "SetMode with the circular constant is the circular case: see dma.circular_halfcomplete",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_DMA_(SetPeriphAddress|SetMemoryAddress|SetDataLength|ConfigAddresses)",
+   "idiom": "dma.set_addr_len",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_DMA_(EnableChannel|DisableChannel|IsEnabledChannel)",
+   "idiom": "dma.channel_enable",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_DMA_GetDataLength",
+   "idiom": "dma.remaining_count",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_DMA_(EnableIT_TC|DisableIT_TC|IsEnabledIT_TC|IsActiveFlag_TC\\d*|ClearFlag_TC\\d*|ClearFlag_TE\\d*|ClearFlag_GI\\d*|IsActiveFlag_TE\\d*|EnableIT_TE|DisableIT_TE)",
+   "idiom": "dma.complete_irq",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_DMA_(EnableIT_HT|DisableIT_HT|IsEnabledIT_HT|IsActiveFlag_HT\\d*|ClearFlag_HT\\d*)",
+   "idiom": "dma.circular_halfcomplete",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_RCC_\\w+|LL_FLASH_\\w+|LL_PWR_\\w+|LL_SetSystemCoreClock|LL_UTILS_\\w+",
+   "idiom": "clock.system_config",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_(APB\\d|AHB\\d|IOP|AHB\\d_GRP\\d)_GRP\\d_(EnableClock|ForceReset|ReleaseReset)",
+   "idiom": "clock.peripheral_enable",
+   "note": "the SysConfig power block does this; a hand-written init has to power the block first",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "LL_Init1msTick|LL_SYSTICK_(SetClkSource|EnableIT|DisableIT)",
+   "idiom": "time.periodic_irq",
+   "note": "",
+   "from": "port stm32-usart-dma-rx-tx source"
+  },
+  {
+   "match": "LL_SYSTICK_IsActiveCounterFlag|LL_mDelay",
+   "idiom": "time.delay_ms",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "LL_GPIO_(Init|StructInit|SetPinMode|SetPinPull|SetPinSpeed|SetPinOutputType|SetAFPin_\\w+|DeInit)",
+   "idiom": "gpio.config_pin",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "LL_GPIO_(SetOutputPin|ResetOutputPin|WriteOutputPort)",
+   "idiom": "gpio.write",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "LL_GPIO_TogglePin",
+   "idiom": "gpio.toggle",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "LL_GPIO_IsInputPinSet|LL_GPIO_ReadInputPort",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "port cmsemicon source"
+  },
+  {
+   "match": "LL_EXTI_\\w+",
+   "idiom": "gpio.input_irq_edge",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "LL_ADC_\\w+",
+   "idiom": "adc.config_channel",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "LL_TIM_\\w+",
+   "idiom": "pwm.config_channel",
+   "note": "",
+   "from": "port stm32cubeg0-migration source"
+  },
+  {
+   "match": "LL_SYSCFG_(UCPD\\w+|DisableDBATT|\\w*DBATT\\w*)",
+   "idiom": "vendor.no_equivalent",
+   "note": "USB power-delivery dead-battery pin handling exists only on STM32 parts with a UCPD block",
+   "from": "port stm32cubeg0-migration source"
+  }
+ ]
+}

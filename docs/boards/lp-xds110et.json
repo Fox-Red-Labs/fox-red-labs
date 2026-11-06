@@ -1,0 +1,33 @@
+{
+ "name": "LP-XDS110ET debug probe (LaunchPad development kit)",
+ "sources": "LP-XDS110ET quick start guide SPRUJ01 (2022; EnergyTrace range and rate, connectors, TGT VDD jumper), CC35xxE LaunchPad user guide SWRU629C rev C, April 2026 (Figure 2-25: the probe drawn as MCU101 Rev B, TGT VDD jumper positions EXT and XDS), XDS110 firmware file in CCStudio 21.0.1 (firmware_3.0.0.43.bin); all read 2026-10-07",
+ "columns": [
+  {
+   "head": "The probe: XDS110 with EnergyTrace",
+   "items": [
+    ["Debug probe: XDS110", "Flashes and debugs the LP-EM board over SWD (serial wire debug, two wires)"],
+    ["Serial port: one", "A second USB serial channel carries the board's text output to the Mac"],
+    ["Power: 3.3 V out", "Feeds the LP-EM board through the 20-pin edge when TGT VDD is on XDS"],
+    ["EnergyTrace: 700 nA to 400 mA", "Measures that supply's current, 256,000 samples a second per TI"]
+   ]
+  },
+  {
+   "head": "Connectors and switches",
+   "items": [
+    ["20-pin LP-EM edge", "Where the LP-EM radio board plugs in: debug, serial and power"],
+    ["TGT VDD jumper", "XDS: the probe powers the board (EnergyTrace works). EXT: the board powers itself"],
+    ["10-pin debug connector", "Arm 10-pin cable to a custom board (cable not in the box)"],
+    ["USB-C and reset switch", "USB-C to the Mac, cable in the box. Reset restarts the board"]
+   ]
+  },
+  {
+   "head": "What it has, and lacks",
+   "items": [
+    ["In the box", "The probe, a USB-A to USB-C cable, a quick start card"],
+    ["Not in it", "No target chip, nothing to flash on its own: it waits for an LP-EM board"],
+    ["Watch out", "EnergyTrace only sees what the probe supplies; on EXT it measures nothing"],
+    ["On a Mac", "TI's IDE turns EnergyTrace off on macOS; our script reads it without the IDE"]
+   ]
+  }
+ ]
+}

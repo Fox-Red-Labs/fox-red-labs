@@ -1,0 +1,22 @@
+// @cliArgs --board /ti/boards/LP_EM_CC2755P10 --rtos nortos
+var Power = scripting.addModule("/ti/drivers/Power");
+system.getScript("kernel_config_release.syscfg.js");
+
+var GPIO = scripting.addModule("/ti/drivers/GPIO");
+/* RESET_N of the radio: DIO16 (header 36, also the red LED), as in ports/cc1407p-zephyr/boards/lp_em_cc2755p10.overlay */
+var gRst = GPIO.addInstance(); gRst.$name = "CONFIG_RADIO_RESET"; gRst.$hardware = system.deviceData.board.components.LED0;
+/* chip select: DIO7 (header 18) driven by the driver */
+var gCs = GPIO.addInstance(); gCs.$name = "CONFIG_RADIO_CS"; gCs.gpioPin.$assign = "boosterpack.18"; gCs.mode = "Output";
+/* SPI_INT: DIO28 (header 10) */
+var gInt = GPIO.addInstance(); gInt.$name = "CONFIG_RADIO_INT"; gInt.gpioPin.$assign = "boosterpack.10"; gInt.mode = "Input"; gInt.interruptTrigger = "Falling Edge"; gInt.pull = "Pull Up";
+/* green LED: progress marker */
+var gLed = GPIO.addInstance(); gLed.$name = "CONFIG_GPIO_LED_1"; gLed.$hardware = system.deviceData.board.components.LED1;
+
+var SPI = scripting.addModule("/ti/drivers/SPI");
+var spi0 = SPI.addInstance(); spi0.$name = "CONFIG_SPI_0"; spi0.mode = "Three Pin";
+spi0.spi.sclkPin.$assign = "boosterpack.7";
+spi0.spi.pociPin.$assign = "boosterpack.14";
+spi0.spi.picoPin.$assign = "boosterpack.15";
+
+var UART2 = scripting.addModule("/ti/drivers/UART2");
+var uart2 = UART2.addInstance(); uart2.$hardware = system.deviceData.board.components.XDS110UART; uart2.$name = "CONFIG_UART2_0";

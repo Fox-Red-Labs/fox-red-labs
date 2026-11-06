@@ -1,0 +1,59 @@
+--- ~/ti/mcu_plus_sdk_am263px_26_01_00_08/examples/empty/am263px-lp/r5fss0-0_nortos/ti-arm-clang/makefile	2026-09-23 17:43:56
++++ <scratch>/-tmp-fox-red-labs/0b656d2f-7c5f-432a-9bb7-bd0b4513e760/scratchpad/am263fft/empty/am263px-lp/r5fss0-0_nortos/ti-arm-clang/makefile	2026-10-11 08:28:57
+@@ -37,7 +37,14 @@
+ 
+ FILES_common := \
+ 	empty.c \
+-	main.c \
++	arm_cfft_q15.c \
++	arm_sqrt_q15.c \
++	arm_cfft_radix4_q15.c \
++	arm_cmplx_mag_q15.c \
++	arm_max_q15.c \
++	arm_common_tables.c \
++	arm_const_structs.c \
++	arm_bitreversal2.c \
+ 	ti_drivers_config.c \
+ 	ti_drivers_open_close.c \
+ 	ti_board_config.c \
+@@ -47,16 +54,24 @@
+ 	ti_power_clock_config.c \
+ 
+ FILES_PATH_common = \
++	~/ti/mcu_plus_sdk_am263px_26_01_00_08/source/cmsis/DSP/Source/FastMathFunctions \
++	~/ti/mcu_plus_sdk_am263px_26_01_00_08/source/cmsis/DSP/Source/CommonTables \
++	~/ti/mcu_plus_sdk_am263px_26_01_00_08/source/cmsis/DSP/Source/ComplexMathFunctions \
++	~/ti/mcu_plus_sdk_am263px_26_01_00_08/source/cmsis/DSP/Source/StatisticsFunctions \
++	~/ti/mcu_plus_sdk_am263px_26_01_00_08/source/cmsis/DSP/Source/TransformFunctions \
+ 	.. \
+ 	../../.. \
+ 	generated \
+ 
+ INCLUDES_common := \
++	-I${MCU_PLUS_SDK_PATH}/source/cmsis/DSP/Include \
++	-I~/ti/mcu_plus_sdk_am263px_26_01_00_08/source/cmsis/Core/Include \
+ 	-I${CG_TOOL_ROOT}/include/c \
+ 	-I${MCU_PLUS_SDK_PATH}/source \
+ 	-Igenerated \
+ 
+ DEFINES_common := \
++	-DARM_MATH_LOOPUNROLL \
+ 	-DSOC_AM263PX \
+ 	-DOS_NORTOS \
+ 
+@@ -94,6 +109,7 @@
+ 	generated/linker.cmd \
+ 
+ LIBS_PATH_common = \
++	-Wl,-i${MCU_PLUS_SDK_PATH}/source/cmsis/lib \
+ 	-Wl,-i${MCU_PLUS_SDK_PATH}/source/kernel/nortos/lib \
+ 	-Wl,-i${MCU_PLUS_SDK_PATH}/source/drivers/lib \
+ 	-Wl,-i${CG_TOOL_ROOT}/lib \
+@@ -118,6 +134,7 @@
+ 	libsysbm.a \
+ 
+ LIBS_PATH_NAME = \
++	${MCU_PLUS_SDK_PATH}/source/cmsis/lib \
+ 	${MCU_PLUS_SDK_PATH}/source/kernel/nortos/lib \
+ 	${MCU_PLUS_SDK_PATH}/source/drivers/lib \
+ 	${CG_TOOL_ROOT}/lib \

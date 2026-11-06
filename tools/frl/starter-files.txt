@@ -1,0 +1,28 @@
+# The files a stranger needs for the guided LP-MSPM0L1306 route, and nothing else (CX14).
+# Use as a non-cone sparse checkout:
+#   git clone --filter=blob:none --no-checkout <repo url> fox-red-labs && cd fox-red-labs
+#   git sparse-checkout set --no-cone --stdin < tools/frl/starter-files.txt   (fetch this one file first, or paste the list)
+#   git checkout
+# tools/tests/test_frl.py (StarterClosure) copies exactly these files to an empty folder and runs the route there.
+/start.sh
+/start.py
+/.gitattributes
+/START.md
+/TRAPS.md
+/AGENTS.md
+/tools/frl/
+/tools/benchmark/backup.py
+/tools/benchmark/common.py
+/tools/benchmark/detect.py
+/tools/benchmark/recipes.json
+/data/routes.json
+/site/data/projects.json
+/site/data/code.json
+/site/data/spectrum.json
+/mspm0l1306/AGENTS.md
+/mspm0l1306/FAQ.md
+/mspm0l1306/README.md
+/mspm0l1306/tools/ocd.sh
+/docs/frl.md
+/docs/frl-errors.md
+/docs/frl-desktop-apps.md

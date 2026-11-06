@@ -1,0 +1,44 @@
+/**
+ * Three ways, DriverLib, LP-MSPM0C1104: ADC0 channel 2 on PA25 (nothing connected) against the internal
+ * 2.5 V reference, UART0 at 115200 on PA27 (TX) / PA26 (RX) (backchannel, shunts on J101), LED1 on PA22 (J7 on).
+ * 24 MHz-class SYSOSC, TI's default clock tree.
+ */
+//@cliArgs --device "MSPM0C110X" --package "VSSOP-20(DGS20)" --part "Default"
+//@v2CliArgs --device "MSPM0C1104" --package "VSSOP-20(DGS20)"
+// @cliArgs --board /ti/boards/LP_MSPM0C1104 --rtos nortos
+
+const Board  = scripting.addModule("/ti/driverlib/Board");
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const ADC12  = scripting.addModule("/ti/driverlib/ADC12", {}, false);
+const ADC121 = ADC12.addInstance();
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const VREF   = scripting.addModule("/ti/driverlib/VREF");
+
+ADC121.$name                      = "ADC12_0";
+ADC121.sampClkDiv                 = "DL_ADC12_CLOCK_DIVIDE_8";
+ADC121.adcMem0chansel             = "DL_ADC12_INPUT_CHAN_2";
+ADC121.sampleTime0                = "125 us";
+ADC121.adcMem0vref                = "VREF";
+ADC121.powerDownMode              = "DL_ADC12_POWER_DOWN_MODE_MANUAL";
+ADC121.peripheral.$assign         = "ADC0";
+ADC121.peripheral.adcPin2.$assign = "PA25";
+
+GPIO1.$name                         = "GPIO_LEDS";
+GPIO1.port                          = "PORTA";
+GPIO1.associatedPins[0].$name       = "USER_LED";
+GPIO1.associatedPins[0].assignedPin = "22";
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA26";
+UART1.peripheral.txPin.$assign = "PA27";
+UART1.targetBaudRate           = 115200;
+
+VREF.basicIntVolt         = "DL_VREF_BUFCONFIG_OUTPUT_2_5V";
+VREF.advClockConfigEnable = true;
+VREF.advClkSrc            = "DL_VREF_CLOCK_BUSCLK";
+
+SYSCTL.clockTreeEn = true;

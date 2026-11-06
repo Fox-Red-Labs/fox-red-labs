@@ -1,0 +1,56 @@
+/**
+ * Three ways, DriverLib, LP-MSPM33C321A: HSADC0 sequencer 1 start 0 on PA27 (header pin, nothing connected) against the
+ * internal 1.4 V reference (the MSPM33 has no ADC12, only the HSADC), UART at 115200 on PA10/PA11 (backchannel),
+ * blue LED on PA2. TI's default clock tree.
+ */
+//@cliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)" --part "Default"
+//@v2CliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)"
+// @cliArgs --board /ti/boards/LP_MSPM33C321A --rtos nortos
+
+const Board  = scripting.addModule("/ti/driverlib/Board");
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const HSADC  = scripting.addModule("/ti/driverlib/HSADC", {}, false);
+const HSADC1 = HSADC.addInstance();
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const VREF   = scripting.addModule("/ti/driverlib/VREF");
+const ProjectConfig = scripting.addModule("/ti/project_config/ProjectConfig");
+
+HSADC1.$name                      = "HSADC0";
+HSADC1.enabledSOCs                = ["ADC_SOC_NUMBER0"];
+HSADC1.enabledInts                = ["ADC_INT_NUMBER_1"];
+HSADC1.enableInterrupt1           = true;
+HSADC1.enabledSEQs                = ["ADC_SEQ_NUMBER1"];
+HSADC1.seq1SampleWindow           = 16;
+HSADC1.seq1Enable                 = true;
+HSADC1.peripheral.$assign         = "ADC0";
+HSADC1.peripheral.adcPin0.$assign = "PA27";
+
+GPIO1.$name                          = "GPIO_LEDS";
+GPIO1.port                           = "PORTA";
+GPIO1.associatedPins[0].$name        = "USER_LED";
+GPIO1.associatedPins[0].assignedPin  = "2";
+GPIO1.associatedPins[0].pin.$assign  = "PA2";
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UC12";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+UART1.targetBaudRate           = 115200;
+
+VREF.basicMode                     = "DL_VREF_ENABLE_ENABLE";
+VREF.basicIntVolt                  = "DL_VREF_BUFCONFIG_OUTPUT_1_4V";
+VREF.advClockConfigEnable          = true;
+VREF.advClkSrc                     = "DL_VREF_CLOCK_BUSCLK";
+VREF.peripheral.$assign            = "VREF";
+VREF.peripheral.vrefPosPin.$assign = "PA23";
+VREF.vrefPosPinConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric0";
+
+SYSCTL.forceDefaultClkConfig = true;
+
+ProjectConfig.genLinker  = true;
+ProjectConfig.genStartup = true;
+ProjectConfig.genOpts    = true;
+ProjectConfig.genLibs    = true;

@@ -1,0 +1,77 @@
+{
+ "name": "LP-AM13E230 LaunchPad development kit",
+ "sources": "AM13E230x data sheet SPRSPC3A (Rev. A, ADVANCE INFORMATION, revised August 2026; features, TMU, NPU, flash wait states); LaunchPad user guide SLVUDH9 (March 2026; Tables 2-1 to 2-11, Figure 1-1 board, Figure 2-9 header pinout, Rev E1 and E2 appendices); TI product and tool pages; AM13E2x SDK 26.01.00.03.STS on this Mac. All read 2026-10-07.",
+ "columns": [
+  {
+   "head": "The chip: AM13E23019",
+   "items": [
+    [
+     "Processor: Arm Cortex-M33",
+     "200 MHz on this board (data sheet allows 250 MHz), floating-point unit, DSP instructions, custom datapath extension"
+    ],
+    [
+     "Flash: 512 kB",
+     "Two 256 kB banks. 3 wait states at 200 MHz, with a prefetch buffer and cache"
+    ],
+    [
+     "RAM: 128 kB",
+     "96 kB for data plus 32 kB tuned for running code"
+    ],
+    [
+     "Power: 3.3 V",
+     "Data sheet: 225 µA per MHz running CoreMark, 196 µA in STANDBY"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "Math helpers: TMU and NPU",
+     "A trig unit (sin, cos, atan, divide, square root in a few cycles) and a TinyEngine neural accelerator, 600 to 1,200 million operations a second"
+    ],
+    [
+     "PWM: 5 motor PWM modules",
+     "6 outputs each, with dead band and trip inputs: built to drive a three-phase motor"
+    ],
+    [
+     "ADC: 3",
+     "Three 12-bit converters, 7.81 million samples a second, triggered by the PWM"
+    ],
+    [
+     "Op-amps: 3 PGAs",
+     "Programmable-gain amplifiers for current-shunt signals"
+    ],
+    [
+     "Comparators: 4 subsystems",
+     "Fast over-current trips; two have a DAC that can drive a pin"
+    ],
+    [
+     "Encoder input: 3 eQEP",
+     "Reads a motor's position encoder"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "Isolated XDS110 debug probe, CAN-FD transceiver, 5 V encoder header, red and green LEDs, wake and BSL buttons, 25 MHz crystal, power-measurement header J10"
+    ],
+    [
+     "Headers",
+     "40-pin BoosterPack (J1 to J4); motor BoosterPacks plug straight on"
+    ],
+    [
+     "Not on the board",
+     "No motor driver and no motor: the BoosterPack and motor were not bought. No EnergyTrace named in the user guide"
+    ],
+    [
+     "Watch out",
+     "Prototype silicon (XAM13E23019) and a pre-release SDK. Rev E1 boards have different pins: look for MCU178E1 on the back"
+    ]
+   ]
+  }
+ ]
+}

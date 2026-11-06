@@ -1,0 +1,226 @@
+{
+ "note": "written by tools/code_size_check.py. Self-test, break-it grid, mutants and two-record agreement for the code size estimator. The hash covers the engine, the map, the board table and this script; the result rows themselves are read live by the page renderer.",
+ "engine_sha": "fcda38a880b42b0b",
+ "pass": true,
+ "tolerance": "zero bytes, set before the run",
+ "selftest": [
+  {
+   "id": "1 RAM left 799 of 36864 gives 36065 used",
+   "pass": true
+  },
+  {
+   "id": "2 452112 B minus 183728 B used gives left 268384",
+   "pass": true
+  },
+  {
+   "id": "3 room -1380 of 36864 gives 38244 used, over",
+   "pass": true
+  },
+  {
+   "id": "4 flash room -65692 of 128 kB gives 196764 used, over",
+   "pass": true
+  },
+  {
+   "id": "5 blink 440 B of 65536 B, 256 B of 4096 B",
+   "pass": true
+  },
+  {
+   "id": "6 a not_run row gives no flash figure",
+   "pass": true
+  },
+  {
+   "id": "7 toolchain read from a row",
+   "pass": true
+  },
+  {
+   "id": "8 32768 of 65536 is 0 over, 32768 left",
+   "pass": true
+  },
+  {
+   "id": "9 a mapped row that does not exist is a problem",
+   "pass": true
+  },
+  {
+   "id": "10 70000 B of 65536 B flash is shown over, not clipped",
+   "pass": true
+  },
+  {
+   "id": "11 RAM left that disagrees with the row's own RAM used is a problem",
+   "pass": true
+  },
+  {
+   "id": "12 an unknown board is a problem",
+   "pass": true
+  },
+  {
+   "id": "13 an update slot named in the row is the flash total",
+   "pass": true
+  },
+  {
+   "id": "14 a region named in the row note is the flash total",
+   "pass": true
+  },
+  {
+   "id": "15 an app partition named in the row is the flash total",
+   "pass": true
+  },
+  {
+   "id": "16 AM13E230 flash is the 256 kB bank the linker uses",
+   "pass": true
+  },
+  {
+   "id": "17 a used size never prints the same as the chip total (1,008 of 1,024 B and similar)",
+   "pass": true
+  },
+  {
+   "id": "18 with updates the flash total is the slot (284880), without it is the chip (524288)",
+   "pass": true
+  },
+  {
+   "id": "19 an update image bigger than the second slot is blocked by 1265 B and the view carries the warning",
+   "pass": true
+  },
+  {
+   "id": "20 a typed slot size the source file does not contain is a problem",
+   "pass": true
+  },
+  {
+   "id": "21 an update build with no counterpart shows the same image against the whole chip",
+   "pass": true
+  },
+  {
+   "id": "22 an update build that names no slot is refused, never shown against the whole chip",
+   "pass": true
+  },
+  {
+   "id": "23 the L1306 gpio_toggle_output sweep build is 440 B flash and 256 B RAM, the same as the blink row",
+   "pass": true
+  },
+  {
+   "id": "24 a sweep example that does not exist is a problem",
+   "pass": true
+  },
+  {
+   "id": "25 CC2340R5 role without a client fits; with the on-chip client its update does not fit the second slot",
+   "pass": true
+  },
+  {
+   "id": "26 CC2340R5 Bluetooth dual image fits both ways and leaves 241664 B for the image",
+   "pass": true
+  }
+ ],
+ "mutants": [
+  {
+   "id": "flash room stored negative read as used",
+   "caught": true
+  },
+  {
+   "id": "RAM used taken as RAM left",
+   "caught": true
+  },
+  {
+   "id": "the left-versus-used consistency check removed",
+   "caught": true
+  },
+  {
+   "id": "update slot ignored (the whole chip shown with updates on)",
+   "caught": true
+  },
+  {
+   "id": "second-slot check removed",
+   "caught": true
+  },
+  {
+   "id": "row-named flash region ignored",
+   "caught": true
+  }
+ ],
+ "cases": [
+  {
+   "id": "mspm0l1306 blink",
+   "row_flash": 440,
+   "breakdown_flash": 440,
+   "row_ram": 256,
+   "breakdown_ram": 256,
+   "pass": true
+  },
+  {
+   "id": "mspm0l1306 zephyr_blinky",
+   "row_flash": 11364,
+   "breakdown_flash": 11364,
+   "row_ram": 3888,
+   "breakdown_ram": 3888,
+   "pass": true
+  },
+  {
+   "id": "cc2340r5 empty_nortos",
+   "row_flash": 5741,
+   "breakdown_flash": 5741,
+   "row_ram": 10129,
+   "breakdown_ram": 10129,
+   "pass": true
+  },
+  {
+   "id": "cc2340r5 empty_rtos",
+   "row_flash": 12022,
+   "breakdown_flash": 12022,
+   "row_ram": 13316,
+   "breakdown_ram": 13316,
+   "pass": true
+  },
+  {
+   "id": "cc2340r5 zephyr_blinky",
+   "row_flash": 10108,
+   "breakdown_flash": 10108,
+   "row_ram": 4112,
+   "breakdown_ram": 4112,
+   "pass": true
+  },
+  {
+   "id": "cc2340r5 basic_ble",
+   "row_flash": 191934,
+   "breakdown_flash": 191934,
+   "row_ram": 31689,
+   "breakdown_ram": 31689,
+   "pass": true
+  },
+  {
+   "id": "cc2340r5 data_stream",
+   "row_flash": 190393,
+   "breakdown_flash": 190393,
+   "row_ram": 31456,
+   "breakdown_ram": 31456,
+   "pass": true
+  },
+  {
+   "id": "cc2340r5 onoff_light",
+   "row_flash": 282274,
+   "breakdown_flash": 282274,
+   "row_ram": 36065,
+   "breakdown_ram": 36065,
+   "pass": true
+  },
+  {
+   "id": "cc2340r5 onoff_switch_zed",
+   "row_flash": 220344,
+   "breakdown_flash": 220344,
+   "row_ram": 30478,
+   "breakdown_ram": 30478,
+   "pass": true
+  },
+  {
+   "id": "cc2340r5 rfPacketTx",
+   "row_flash": 33296,
+   "breakdown_flash": 33296,
+   "row_ram": 13968,
+   "breakdown_ram": 13968,
+   "pass": true
+  }
+ ],
+ "plausibility": {
+  "id": "all builds plausible",
+  "problems": [],
+  "pass": true
+ },
+ "builds_checked": 156
+}

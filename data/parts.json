@@ -1,0 +1,1788 @@
+{
+  "_about": "Every board, kit, module and part the project uses, one entry each. Source for docs/parts-catalog.md (tools/render_parts.py). Add an entry when a part is bought, and add the demo to used_in when a demo uses it. Prices are what was paid or read on the date given; check before quoting. A buy entry's url is the seller's page, opened and read on that entry's date; no url means none was checked.",
+  "categories": [
+    [
+      "board",
+      "🧩",
+      "Boards (LaunchPad development kits)"
+    ],
+    [
+      "plugon",
+      "🔌",
+      "Plug-on boards (BoosterPack plug-in modules) and debuggers"
+    ],
+    [
+      "kit",
+      "🧰",
+      "Starter kits"
+    ],
+    [
+      "display",
+      "🖥️",
+      "Displays"
+    ],
+    [
+      "sensor",
+      "📏",
+      "Sensors"
+    ],
+    [
+      "motor",
+      "⚙️",
+      "Motors and motor drivers"
+    ],
+    [
+      "input",
+      "🎛️",
+      "Buttons, knobs and other inputs"
+    ],
+    [
+      "wiring",
+      "🪢",
+      "Cables and wiring"
+    ],
+    [
+      "gear",
+      "🛠️",
+      "Bench gear: hubs, power, cameras"
+    ],
+    [
+      "home",
+      "🏠",
+      "Smart home radio"
+    ],
+    [
+      "server",
+      "🖥️",
+      "Network and power equipment"
+    ]
+  ],
+  "parts": [
+    {
+      "id": "lp-mspm0g3507",
+      "cat": "board",
+      "name": "LP-MSPM0G3507 LaunchPad development kit",
+      "what": "TI's 80 MHz Arm Cortex-M0+ board with 128 kB flash and 32 kB RAM, a built-in debugger, three buttons, two LEDs (one RGB) and light and temperature sensors.",
+      "use_for": [
+        "Most demos here start here: plenty of RAM for displays and AI models",
+        "Touchscreen projects (with the Waveshare display)",
+        "Motor control and CAN bus"
+      ],
+      "connect": "One USB cable powers, programs and debugs it. 40-pin BoosterPack header, 3.3 V logic.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-MSPM0G3507",
+          "price": "$20.56",
+          "date": "2026-10-09",
+          "url": "https://www.ti.com/tool/LP-MSPM0G3507",
+          "note": "price shown without a login on 2026-10-09; stock and ordering need a myTI login (in stock on the 2026-10-08 logged-in read)"
+        },
+        {
+          "seller": "DigiKey",
+          "number": "LP-MSPM0G3507",
+          "price": "$23.36",
+          "date": "2026-10-06",
+          "note": "0 in stock that day"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "ports/bitnetmcu/",
+        "mspm0g3507/display-test/",
+        "mspm0g3507/example-sweep/JUMPERS.md",
+        "mspm0g3507/stm32-port-eval/05-tim-pwm/",
+        "mspm0g3507/lvgl-g3507/",
+        "portability/arduino/"
+      ],
+      "learn": "site/board-mspm0g3507.html",
+      "faq": "mspm0g3507/FAQ.md"
+    },
+    {
+      "id": "lp-mspm0l1306",
+      "cat": "board",
+      "name": "LP-MSPM0L1306 LaunchPad development kit",
+      "what": "TI's low-cost 32 MHz Cortex-M0+ board with 64 kB flash and only 4 kB RAM, a built-in debugger, LEDs, buttons, a light sensor and a thermistor.",
+      "use_for": [
+        "Showing what fits in a 65-cent chip (1,000-unit price)",
+        "Simple sensor and LED projects",
+        "Small AI models (handwritten digits, room occupancy)"
+      ],
+      "connect": "One USB cable. 40-pin header, 3.3 V logic. J16 and J17 choose whether the serial pins go to USB or to the header.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-MSPM0L1306",
+          "price": "$20.56",
+          "date": "2026-10-08",
+          "url": "https://www.ti.com/tool/LP-MSPM0L1306",
+          "note": "in stock that day"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "mspm0l1306/README.md",
+        "mspm0l1306/RUN-THE-TESTS.md",
+        "ports/bitnetmcu/",
+        "mspm0l1306/bench/uart_loop/"
+      ],
+      "learn": "mspm0l1306/img/board-tour.png",
+      "faq": "mspm0l1306/FAQ.md"
+    },
+    {
+      "id": "lp-mspm0c1104",
+      "cat": "board",
+      "name": "LP-MSPM0C1104 LaunchPad development kit",
+      "what": "TI's smallest MSPM0 board: a 24 MHz Cortex-M0+ chip with 16 kB flash and 1 kB RAM, a built-in debugger, one red LED and one button, on a 20-pin header with female sockets.",
+      "use_for": [
+        "The cheapest blink-to-sensor demos",
+        "Finding out which demos fit in 1 kB of RAM",
+        "Comparing with 10-cent chips from other makers"
+      ],
+      "connect": "One micro-USB cable, not in the box. 20-pin header with female sockets (use male-ended jumpers), 3.3 V logic, 2.2 kΩ I2C pull-ups already fitted on PA11 and PA0. J101's RXD and TXD shunts send the serial pins to USB or only to the header. The LED moved from PA4 (board version E2) to PA22 (E3).",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-MSPM0C1104",
+          "price": "$6.59",
+          "date": "2026-10-04"
+        }
+      ],
+      "status": "in hand (one of two; the second is sealed)",
+      "used_in": [
+        "mspm0c1104/",
+        "docs/arrivals/mspm0c1104.md"
+      ],
+      "learn": "docs/arrivals/img/mspm0c1104-uart-loop.png",
+      "faq": "mspm0c1104/FAQ.md",
+      "_merge_note": "update of the existing entry: connect text, used_in, learn, faq. Price confirmed from the order; TI.com page showed no price to a logged-out fetch on 2026-10-07 (inventory 3,464). data/boards.csv still says 5.99"
+    },
+    {
+      "id": "lp-em-cc2340r5",
+      "cat": "board",
+      "name": "LP-EM-CC2340R5 LaunchPad development kit",
+      "what": "TI's Bluetooth Low Energy and Zigbee board (CC2340R52 chip). Needs a separate XDS110 debugger to program it.",
+      "use_for": [
+        "Bluetooth sensors and beacons",
+        "Zigbee devices for Home Assistant",
+        "Thread radio for a border router"
+      ],
+      "connect": "Programs through an LP-XDS110ET or another LaunchPad kit's debugger. 40-pin header, 3.3 V.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "LP-EM-CC2340R5",
+          "price": "$34.38",
+          "date": "2026-10-08",
+          "url": "https://www.digikey.com/en/products/detail/texas-instruments/LP-EM-CC2340R5/19236289",
+          "note": "36 in stock that day; TI.com no longer lists it"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "cc2340r5/",
+        "border-router/",
+        "ports/bthome/",
+        "ports/phone-app-demos/",
+        "tool-telemetry/",
+        "ports/esp32-ble-gamepad/"
+      ],
+      "learn": "site/board-cc2340r5.html",
+      "faq": "cc2340r5/FAQ.md"
+    },
+    {
+      "id": "lp-cc1354p10-1",
+      "cat": "board",
+      "name": "LP-CC1354P10-1 LaunchPad development kit",
+      "what": "TI's sub-1 GHz plus 2.4 GHz radio board: Zigbee, Thread, Bluetooth and long-range sub-1 GHz.",
+      "use_for": [
+        "Zigbee coordinator",
+        "Thread border-router host (the LP-EM-CC2340R5 is its radio)",
+        "Long-range sub-1 GHz links"
+      ],
+      "connect": "One USB cable, built-in debugger. 40-pin header, 3.3 V.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-CC1354P10-1"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "cc1354p10/",
+        "border-router/",
+        "cc1354p10/zigbee-sleepy-sensor/",
+        "ports/phone-app-demos/",
+        "cc1354p10/radio-rx/",
+        "site/radio-demos.html"
+      ],
+      "learn": "site/board-cc1354p10.html"
+    },
+    {
+      "id": "launchxl-f2800137",
+      "cat": "board",
+      "name": "LAUNCHXL-F2800137 LaunchPad development kit",
+      "what": "TI's C2000 real-time control board: a 120 MHz chip built for motor control and power conversion, with a math unit for sine and cosine.",
+      "use_for": [
+        "Motor control demos",
+        "Fast control loops",
+        "Comparing control speed with other chips"
+      ],
+      "connect": "One USB cable, built-in debugger. Two BoosterPack sites; site 1 has no I2C on pins 9 and 10.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LAUNCHXL-F2800137",
+          "price": "$35.09",
+          "date": "2026-10-08",
+          "url": "https://www.ti.com/tool/LAUNCHXL-F2800137",
+          "note": "in stock that day"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "c2000-launchpad/"
+      ],
+      "learn": "site/board-f2800137.html",
+      "faq": "c2000-launchpad/FAQ.md"
+    },
+    {
+      "id": "lp-xds110et",
+      "cat": "plugon",
+      "name": "LP-XDS110ET debugger",
+      "what": "TI's stand-alone debug probe with EnergyTrace: powers, programs and measures the current of boards that have no built-in debugger, such as the LP-EM radio boards.",
+      "use_for": [
+        "Programming LP-EM-CC2340R5, CC2755 and CC35xx boards",
+        "Measuring a board's current with EnergyTrace (700 nA to 400 mA per TI's quick start guide)",
+        "A serial port to the Mac for the board's text output"
+      ],
+      "connect": "USB-C to the Mac (cable in the box). The LP-EM board's 20-pin edge goes into the probe's 20-pin socket. TGT VDD jumper on XDS when the probe powers the board (CC2340R5, CC2755P10, and needed for EnergyTrace); on EXT when the board powers itself (CC35X1). One LP-EM board at a time.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-XDS110ET",
+          "price": "$59.29",
+          "date": "2026-10-08",
+          "url": "https://www.ti.com/tool/LP-XDS110ET",
+          "note": "in stock that day (out of stock on 2026-10-07); TI.com order T07011659"
+        }
+      ],
+      "status": "ordered 2026-10-04",
+      "used_in": [
+        "cc2755p10/",
+        "cc35x1/",
+        "tool-telemetry/",
+        "ports/esp32-ble-gamepad/"
+      ],
+      "learn": "docs/arrivals/xds110et.md",
+      "faq": ""
+    },
+    {
+      "id": "boostxl-edumkii",
+      "cat": "plugon",
+      "name": "BOOSTXL-EDUMKII Educational BoosterPack MKII",
+      "what": "A plug-on board full of inputs and outputs: a 128 x 128 color screen, joystick, two buttons, buzzer, color LED, microphone, accelerometer, light sensor and a servo header.",
+      "use_for": [
+        "Games and menus on the color screen",
+        "Joystick and button demos",
+        "Sound and light demos"
+      ],
+      "connect": "Needs 3.3 V and 5 V. Plugs straight onto the LP-MSPM0G3507 (pull J8, J9, J16 to J18; J21 and J22 down) and nearly onto the G3519, CC1354P10, MSPM33C321A and AM13E230. The L1306, CC2340R5 and F2800137 lose parts and need a wire for the screen (pin 31). Does not fit the C1104. Jumper J5 on the board: 2-3 for the screen backlight.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "BOOSTXL-EDUMKII",
+          "price": "$36.29",
+          "date": "2026-10-06"
+        }
+      ],
+      "status": "in hand, stacked on the LP-MSPM33C321A",
+      "used_in": [
+        "mspm33c321a/bench/edumkii/",
+        "portability/boosterpacks/edumkii/",
+        "ports/arduboy/",
+        "ports/peanut-gb/",
+        "portability/boosterpacks/zephyr/",
+        "docs/arrivals/boostxl-edumkii.md"
+      ],
+      "learn": "docs/arrivals/boostxl-edumkii.md"
+    },
+    {
+      "id": "bp-bassensorsmkii",
+      "cat": "plugon",
+      "name": "BP-BASSENSORSMKII Sensors BoosterPack plug-in module",
+      "what": "A plug-on board of TI and Bosch sensors on one I2C bus. The TMP117 reads temperature and sits on a break-away board with a ribbon cable. The HDC2080 reads temperature and humidity, the OPT3001 light, the BMI160 motion, with a BMM150 compass behind it, and the DRV5055 a magnet. Red and green LEDs.",
+      "use_for": [
+        "Weather and room-comfort demos",
+        "Motion and tilt demos",
+        "The same sensor demo on every MSPM0 board"
+      ],
+      "connect": "Plugs on (I2C on pins 9, 10; pull-ups on the board). Plug the ribbon cable into J5 and J6 or the TMP117 reads nothing. All six sensors on the G3507 (five jumpers out), G3519 and CC1354P10; the L1306 needs two wires to power the OPT3001 and TMP117; the C1104 reads two of six; the CC2755P10 needs TI's three wires; the F2800137 has no I2C on these pins.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "BP-BASSENSORSMKII",
+          "price": "$27.50",
+          "date": "2026-10-06"
+        }
+      ],
+      "status": "in hand, stacked on the LP-MSPM0G5187: humidity and temperature, light and the magnet sensor read live; the BMI160 did not answer and the TMP117 needs its ribbon cable (see its guide)",
+      "used_in": [
+        "mspm0g5187/bench/bassens/README.md",
+        "mspm0g5187/bench/bassens/",
+        "docs/arrivals/bp-bassensorsmkii.md",
+        "docs/experiments/2026-10-10-mspm0g5187-npu-live-light.md",
+        "mspm0g5187/radio/",
+        "portability/boosterpacks/bassensorsmkii/"
+      ],
+      "learn": "docs/arrivals/bp-bassensorsmkii.md"
+    },
+    {
+      "id": "boostxl-sharp128",
+      "cat": "plugon",
+      "name": "BOOSTXL-SHARP128 display BoosterPack plug-in module",
+      "what": "A plug-on 128 x 128 black-and-white Sharp memory display with a microSD slot. It draws almost no power and keeps its image.",
+      "use_for": [
+        "The one display that plugs onto most boards here",
+        "Clocks, sensor readouts, battery-powered screens"
+      ],
+      "connect": "Uses pins 2, 5, 6, 7, 15 for the screen (8, 14, 17 for the SD card). Plugs on with no wires on the G3507, L1306, G3519, C1104, CC1354P10, MSPM33C321A and AM13E230; one wire on the F2800137 (6 to 13). The CC2340R5 and CC2755P10 need resistor work for the screen and one wire for the SD card. 3.3 V only. Pin 19 is not used as shipped.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "296-50808-ND",
+          "price": "$37.80",
+          "date": "2026-10-07"
+        },
+        {
+          "seller": "TI.com",
+          "number": "BOOSTXL-SHARP128",
+          "price": "$30.24",
+          "date": "2026-10-06"
+        }
+      ],
+      "status": "arrived 2026-10-14",
+      "used_in": [
+        "portability/boosterpacks/sharp128/",
+        "docs/experiments/2026-10-20-mspm0c1104-sharp128-1kb.md",
+        "portability/boosterpacks/zephyr/",
+        "docs/arrivals/boostxl-sharp128.md"
+      ],
+      "learn": "docs/arrivals/boostxl-sharp128.md"
+    },
+    {
+      "id": "boostxl-audio",
+      "cat": "plugon",
+      "name": "BOOSTXL-AUDIO audio BoosterPack plug-in module",
+      "what": "A plug-on speaker board: a DAC8311 16-bit DAC and a TPA301 amplifier driving a small speaker, plus an electret microphone with a preamp.",
+      "use_for": [
+        "Sound out from a board with no audio of its own",
+        "Chiptune, tones and voice prompts",
+        "Microphone input for level meters and wake words"
+      ],
+      "connect": "DAC8311 on SPI (pins 7, 15, 12), microphone on pin 6. Jumper J5 picks what drives the amplifier: the SPI DAC (default), the board's own DAC on pin 30, or PWM on pin 19. Plugs on with no clash on the MSPM33C321A and AM13E230; pin 6 clashes on the G3507, pins 13 and 30 on the L1306. Pins 12 and 13 are low confidence until measured.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "BOOSTXL-AUDIO",
+          "price": "$36.29",
+          "date": "2026-10-06"
+        }
+      ],
+      "status": "arrived 2026-10-20",
+      "used_in": [
+        "portability/boosterpacks/audio/",
+        "docs/experiments/2026-10-20-boostxl-audio-frame-and-amp.md",
+        "portability/boosterpacks/zephyr/",
+        "docs/arrivals/boostxl-audio.md"
+      ],
+      "learn": "docs/arrivals/boostxl-audio.md"
+    },
+    {
+      "id": "bp-cc1407p-9-fe",
+      "cat": "plugon",
+      "name": "BP-CC1407P-9-FE sub-1 GHz radio BoosterPack plug-in module",
+      "what": "A sub-1 GHz radio (CC1407P, 902 to 928 MHz on this board) on a plug-on board, with no processor of its own: a LaunchPad kit drives it over SPI. Up to +22 dBm, SMA antenna socket, red and green LEDs.",
+      "use_for": [
+        "Long-range radio links where 2.4 GHz does not reach",
+        "A radio for a host chip that has none (MSPM0, MSPM33)",
+        "Range tests at 915 MHz"
+      ],
+      "connect": "Plugs onto a LaunchPad kit (pins 1, 7, 14, 15, 18, 23, 36). TI supports the LP-CC1354P10-1 and four other CC13xx/CC26xx boards with its TRX plug-in, and the CC2745R10 with a Zephyr shield. On the LP-EM-CC2755P10: one wire (23 to 10) and its red LED jumper off. Needs a 915 MHz SMA antenna, not in the kit.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "BP-CC1407P-9-FE",
+          "price": "$39",
+          "date": "2026-10-04"
+        }
+      ],
+      "status": "in hand (first host: LP-CC1354P10-1)",
+      "used_in": [
+        "mspm0g5187/radio/",
+        "cc1354p10/radio-rx/",
+        "site/radio-demos.html"
+      ],
+      "learn": "docs/arrivals/bp-cc1407p-9-fe.md"
+    },
+    {
+      "id": "freenove-fnk0058",
+      "cat": "kit",
+      "name": "Freenove Ultimate Starter Kit for Raspberry Pi Pico, board not included (FNK0058)",
+      "what": "A box of the classic hobby parts with a breadboard and wires. Made for the Pico, and most parts work at 3.3 V. The HC-SR04 and the L293D need 5 V; the LED module and LCD1602 were not checked.",
+      "use_for": [
+        "IR remote control",
+        "7-segment counters and an 8 x 8 LED matrix",
+        "Keypad lock, servo, DC motor and stepper",
+        "DHT11 temperature and humidity, the most popular hobby demo",
+        "RFID, PIR motion, ultrasonic distance, LCD1602 screen"
+      ],
+      "contents": "I2C LCD1602, IR remote and receiver, 4-digit and 1-digit 7-segment displays with two 74HC595, 8 x 8 LED matrix, 8-LED WS2812-type module, 4 x 4 keypad, active and passive buzzers, L293D, DC motor, servo, stepper with driver board, DHT11, thermistor, photoresistor, joystick, PIR, HC-SR04, MPU6050, RFID, relay, breadboard power module, breadboard, jumper wires (Freenove's parts list).",
+      "connect": "Breadboard and jumper wires. Motors and the LED module run from the breadboard power module or the LaunchPad kit's 5 V pin, grounds tied together. The HC-SR04 is a 5 V part: use the RCWL-1601 instead.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "B09H2SV5XB",
+          "price": "$44.95",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09 (box reads 'Freenove Ultimate Starter Kit without Pico', FNK0058 B)",
+      "used_in": [
+        "am13e230/stepper-uln2003/README.md",
+        "am13e230/motor-l293d/README.md"
+      ],
+      "learn": "docs/research/hobby-addons-buy-list-2026-10-06.md",
+      "photo": "arrivals/img/parts/freenove-kit-contents.jpg"
+    },
+    {
+      "id": "waveshare-35-touch",
+      "cat": "display",
+      "name": "Waveshare 3.5 inch capacitive touch LCD (ST7796S screen, FT6336U touch)",
+      "what": "A 320 x 480 color screen with a finger-touch panel, wired to the board by hand.",
+      "use_for": [
+        "Touchscreen demos: draw a digit and the board reads it",
+        "Photo and graphics demos",
+        "LVGL user interfaces"
+      ],
+      "connect": "12 jumper wires (13 with MISO) to the LP-MSPM0G3507 (SPI for the screen, software I2C for touch on PB3 and PB2). Chip select needs 10 microseconds high between commands.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "B0DNQJD7BV",
+          "price": "$27.99",
+          "date": "2026-10-04"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "ports/bitnetmcu/touch/",
+        "mspm0g3507/display-test/",
+        "mspm0g3507/lvgl-g3507/",
+        "portability/arduino/",
+        "mspm0g3507/arduino-core-test/",
+        "thermostat-system/",
+        "iwrl6432boost/eval/",
+        "ports/touch-games/"
+      ],
+      "learn": "mspm0g3507/display-test/README.md"
+    },
+    {
+      "id": "freenove-ws2812-8led",
+      "cat": "display",
+      "name": "Freenove 8-LED RGB ring module, WS2812 type (from the Freenove kit)",
+      "what": "Eight color LEDs in a ring on one data wire, labelled D1 to D8 on the board. Each LED is set to any color from software.",
+      "use_for": [
+        "Color status light",
+        "Spinner and progress ring",
+        "Testing a WS2812 driver on a chip with no library for it"
+      ],
+      "connect": "3 pins: 5 V power, GND, data in. Read the pin names on the board before wiring. Whether its data pin accepts 3.3 V logic on a 5 V supply is unknown.",
+      "buy": [
+        {
+          "seller": "Amazon (inside the Freenove kit)",
+          "number": "B09H2SV5XB"
+        }
+      ],
+      "status": "arrived 2026-10-09 (in the Freenove kit)",
+      "used_in": [],
+      "learn": "",
+      "photo": "arrivals/img/parts/freenove-ws2812-module.jpg"
+    },
+    {
+      "id": "elegoo-ssd1306",
+      "cat": "display",
+      "name": "ELEGOO 0.96 inch OLED, 128 x 64, SSD1306, 3 pack",
+      "what": "The most-used small hobby screen: sharp white-on-black text and graphics.",
+      "use_for": [
+        "Sensor readouts",
+        "Tiny games",
+        "Status screens on any board"
+      ],
+      "connect": "4 wires, pins as printed on the board in this order: GND, VCC, SCL, SDA. Power it from 3.3 V (I2C address 0x3C). The order differs between makers, so wire by the printed names.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "B0D2RMQQHR",
+          "price": "$8.49",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09",
+      "used_in": [],
+      "learn": "",
+      "photo": "arrivals/img/parts/oled-ssd1306.jpg"
+    },
+    {
+      "id": "diyables-tm1637",
+      "cat": "display",
+      "name": "DIYables TM1637 4-digit 7-segment display with colon, 2 pack",
+      "what": "Four big LED digits with a colon, driven over two wires.",
+      "use_for": [
+        "Clocks",
+        "Timers and countdowns",
+        "Counters and scoreboards"
+      ],
+      "connect": "4 wires: power, GND, CLK, DIO (2-wire protocol of its own, not I2C). The pin names are not readable in the photo; read them on the board before wiring. Power it from 3.3 V: the TM1637 datasheet only tests 4.5 to 5.5 V, but Seeed rates its TM1637 module for 3.3 to 5.5 V.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "B0BXKLZJMV",
+          "price": "$5.99",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09",
+      "used_in": [],
+      "learn": "",
+      "photo": "arrivals/img/parts/tm1637.jpg"
+    },
+    {
+      "id": "hc-sr501-pir",
+      "cat": "sensor",
+      "name": "PIR motion sensor module, HC-SR501 type (from the Freenove kit)",
+      "what": "Sees warm bodies move in front of it with a clear dome lens. Two trim pots set how far it sees and how long its output stays high. Made for 5 V power; its output pin is 3.3 V.",
+      "use_for": [
+        "Motion-triggered light or alarm",
+        "Presence detection to compare against the mmWave radar",
+        "Wake-on-motion for a battery project"
+      ],
+      "connect": "3 pins: power, OUT, GND. The pin names are not readable in the photo; read them on the board before wiring. Power from 5 V (the LaunchPad kit's 5 V pin or the breadboard power module); the output pin swings to 3.3 V, safe for the LaunchPad. Give it about a minute to settle after power-up.",
+      "buy": [
+        {
+          "seller": "Amazon (inside the Freenove kit)",
+          "number": "B09H2SV5XB"
+        }
+      ],
+      "status": "arrived 2026-10-09 (in the Freenove kit)",
+      "used_in": [
+        "mspm0g3519/pir-uart/"
+      ],
+      "learn": "",
+      "photo": "arrivals/img/parts/pir-hc-sr501.jpg"
+    },
+    {
+      "id": "adafruit-vl53l1x",
+      "cat": "sensor",
+      "name": "Adafruit VL53L1X laser distance sensor, STEMMA QT (Adafruit 3967)",
+      "what": "Measures distance with an invisible laser, about 3 cm to 4 m.",
+      "use_for": [
+        "Presence and proximity",
+        "Gesture and hand-wave demos",
+        "A laser ruler"
+      ],
+      "connect": "Qwiic cable (I2C, address 0x29). Works from 3.3 V.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "1528-3967-ND",
+          "price": "$14.95",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "adafruit-rcwl1601",
+      "cat": "sensor",
+      "name": "Adafruit RCWL-1601 ultrasonic distance sensor (Adafruit 4007)",
+      "what": "Bounces sound off things to measure distance; a 3.3 V-safe version of the classic HC-SR04.",
+      "use_for": [
+        "Parking sensor",
+        "Robot obstacle detection",
+        "The HC-SR04 projects, on a 3.3 V board"
+      ],
+      "connect": "4 pins, as printed left to right (photo, front): VCC, Trig/Rx, Echo/Tx, Gnd. The board also prints SCL and SDA beside Trig/Rx and Echo/Tx for its I2C and serial modes; for the HC-SR04 style use Trig and Echo. Works at 3 V or 5 V.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "1528-2832-ND",
+          "price": "$3.95",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09 (board reads RCWL-1601 with a 4-pin header fitted)",
+      "used_in": [],
+      "learn": "",
+      "photo": "arrivals/img/parts/rcwl-1601.jpg"
+    },
+    {
+      "id": "hiletgo-drv8833",
+      "cat": "motor",
+      "name": "HiLetgo DRV8833 dual motor driver, 3 pack (TI DRV8833 chip)",
+      "what": "Lets a LaunchPad kit's pin run a DC motor forward, backward and at any speed.",
+      "use_for": [
+        "Spinning the kit's DC motor",
+        "Small robots and fans"
+      ],
+      "connect": "Two pins per motor from the LaunchPad kit (3.3 V logic). Motor power from the breadboard power module, grounds tied together. Two rows of 8 holes with no header fitted; the pin names are on the back of the board, which is not in the photo: read them before wiring.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "B00UYIFYCW",
+          "price": "$7.99",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09 (header pins loose, not soldered)",
+      "used_in": [],
+      "learn": "",
+      "photo": "arrivals/img/parts/drv8833.jpg"
+    },
+    {
+      "id": "taiss-ky040",
+      "cat": "input",
+      "name": "Taiss KY-040 rotary encoder with push button, 5 pack",
+      "what": "A clicky knob that turns forever: the board counts clicks and direction, and the knob also pushes like a button.",
+      "use_for": [
+        "Menus and volume knobs",
+        "Setting a timer or a motor speed",
+        "The G3507's hardware knob-counting input (QEI)"
+      ],
+      "connect": "5 pins, as printed top to bottom: GND, + (power), SW (push switch), DT, CLK. Power it from 3.3 V. The knob presses onto the shaft.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "B07F26CT6B",
+          "price": "$8.99",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09 (knob separate)",
+      "used_in": [],
+      "learn": "",
+      "photo": "arrivals/img/parts/ky040.jpg"
+    },
+    {
+      "id": "adafruit-qwiic-female",
+      "cat": "wiring",
+      "name": "Adafruit STEMMA QT / Qwiic cable to female sockets, 150 mm (Adafruit 4397)",
+      "what": "Plugs any Qwiic sensor onto a LaunchPad kit's header pins with no soldering.",
+      "use_for": [
+        "Adding Qwiic sensors to any board here"
+      ],
+      "connect": "Black GND, red 3.3 V, blue SDA, yellow SCL, onto the LaunchPad kit's I2C header pins.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "1528-4397-ND",
+          "price": "$0.95 each, bought 4",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "adafruit-qwiic-male",
+      "cat": "wiring",
+      "name": "Adafruit STEMMA QT / Qwiic cable to male pins, 150 mm (Adafruit 4209)",
+      "what": "The same cable with pins instead of sockets, for the C1104's socket header or a breadboard.",
+      "use_for": [
+        "Qwiic sensors on the LP-MSPM0C1104",
+        "Qwiic sensors on a breadboard"
+      ],
+      "connect": "Same colors as above.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "1528-4209-ND",
+          "price": "$0.95 each, bought 2",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "arrived 2026-10-09",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "elegoo-jumpers",
+      "cat": "wiring",
+      "name": "ELEGOO jumper wires (120-piece pack)",
+      "what": "Male and female breadboard wires for connecting anything to anything.",
+      "use_for": [
+        "Wiring displays and modules",
+        "Loop tests that wire a board's pins to each other"
+      ],
+      "connect": "Push onto header pins or into a breadboard.",
+      "buy": [
+        {
+          "seller": "Amazon"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "mspm0l1306/bench/uart_loop/",
+        "mspm0g3507/display-test/",
+        "mspm0g3507/example-sweep/JUMPERS.md",
+        "mspm0g3507/stm32-port-eval/05-tim-pwm/",
+        "border-router/",
+        "thermostat-system/",
+        "iwrl6432boost/eval/"
+      ],
+      "learn": ""
+    },
+    {
+      "id": "esp32c6-devkitc-1",
+      "cat": "board",
+      "name": "ESP32-C6-DevKitC-1-N8 (Espressif)",
+      "what": "Espressif's entry board for the ESP32-C6: one 160 MHz RISC-V core, 512 kB RAM, 8 MB flash in the module, Wi-Fi 6, Bluetooth LE 5, Zigbee and Thread on one antenna. Two USB-C ports, no separate debugger needed.",
+      "use_for": [
+        "ESPHome Bluetooth proxy, so Home Assistant in Docker hears BTHome sensors",
+        "The comparison board for the LP-EM-CC2340R5 and LP-EM-CC2755P10: the same tests side by side",
+        "Zigbee and Thread devices for Home Assistant with Espressif's SDKs",
+        "The yardstick for ESPHome on TI chips"
+      ],
+      "connect": "One USB-C data cable (not in the bag) into the port marked USB: flashing, serial log and debugging in one. The port marked UART is a USB-to-UART chip on GPIO16 and GPIO17. 32 header pins, 3.3 V logic. J5 is the current-measurement jumper.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "ESP32-C6-DEVKITC-1-N8",
+          "price": "$9.00",
+          "date": "2026-10-06",
+          "note": "two bought; price from the staged cart, order page not read back"
+        }
+      ],
+      "status": "one in hand (the Bluetooth proxy board), one sealed",
+      "used_in": [
+        "esp32c6/",
+        "ports/bthome/",
+        "docs/guides/debug-over-the-network.md"
+      ],
+      "learn": "docs/arrivals/img/esp32c6-usb-port.png",
+      "faq": "esp32c6/FAQ.md"
+    },
+    {
+      "id": "lp-mspm0g3519",
+      "cat": "board",
+      "name": "LP-MSPM0G3519 LaunchPad development kit",
+      "what": "TI's 80 MHz Cortex-M0+ board with 512 kB flash and 128 kB RAM, two fast ADCs, a DAC, a math accelerator, AES, true random numbers, two CAN-FD ports and a debugger that measures current (EnergyTrace).",
+      "use_for": [
+        "The main MSPM0 board: everything that ran on the LP-MSPM0G3507, with four times the memory",
+        "Zephyr (upstream board lp_mspm0g3519)",
+        "Hosting BoosterPacks: sensors, displays, the CC1407P sub-1 GHz radio",
+        "Post-quantum crypto examples (ML-KEM, ML-DSA)"
+      ],
+      "connect": "One USB cable (USB-A to micro-B, in the box). 80-pin BoosterPack header (two sites), 3.3 V logic. J12 and J13 switch PA10 and PA11 between the USB serial port and the header. 4.7 kΩ I2C pull-ups on PC2 and PC3 (J14, J15).",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-MSPM0G3519",
+          "price": "$21.99",
+          "date": "2026-10-04"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "mspm0g3519/",
+        "docs/arrivals/mspm0g3519.md",
+        "thermostat-system/",
+        "iwrl6432boost/eval/",
+        "docs/guides/debug-over-the-network.md"
+      ],
+      "learn": "docs/arrivals/img/mspm0g3519-loops.png",
+      "faq": "mspm0g3519/FAQ.md"
+    },
+    {
+      "id": "sk-tda4vm",
+      "cat": "board",
+      "name": "SK-TDA4VM starter kit (TDA4VM Jacinto 7 vision processor, J721EXSKG01EVM)",
+      "what": "TI's Linux vision board: two Cortex-A72 cores, a C7x DSP with an 8 TOPS matrix accelerator for neural networks, a GPU, an image signal processor and hardware H.264 and H.265 video decode (H.264 encode), with 4 GB of memory. Comes with a micro-SD card and a serial cable. No power supply, camera or Wi-Fi card in the box. Kit name still to confirm from a photo.",
+      "use_for": [
+        "Neural-network speed on a real accelerator, against TI's published numbers and against the CPU",
+        "Video decode and encode speed, and GStreamer camera pipelines",
+        "The CPU, memory and boot-time tests on a Linux board",
+        "Rebuilding NVIDIA Holoscan demos' operator graphs on TI parts"
+      ],
+      "connect": "Power through the USB-C port J14 from a 20 V supply (5 V can reset it). Serial console on the micro-B port J4 (four ports, the Linux console is the third, 115200). Ethernet for SSH. Boot from the micro-SD card with switch SW1 all OFF. USB webcam on any USB-A port; the CSI ports take a Raspberry Pi Camera Module v2 (IMX219).",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "SK-TDA4VM (J721EXSKG01EVM)",
+          "price": "not shown to a logged-out reader",
+          "date": "2026-10-09"
+        }
+      ],
+      "status": "no longer on the bench (2026-10-31); results kept",
+      "used_in": [
+        "tda4/",
+        "portability/everywhere/host-radar/"
+      ],
+      "learn": "docs/arrivals/tda4.md"
+    },
+    {
+      "id": "beagley-ai",
+      "cat": "board",
+      "name": "BeagleY-AI (TI AM67A vision processor)",
+      "what": "A credit-card Linux board on TI's AM67A: four Arm Cortex-A53 cores at 1.4 GHz, a GPU, a 4 TOPS neural accelerator, H.264 and H.265 video, Wi-Fi and Bluetooth, HDMI out and a Raspberry Pi style 40-pin header.",
+      "use_for": [
+        "Camera demos: object detection and body pose (replaces the SK-TDA4VM)",
+        "Motion games for kids on a TV",
+        "An emulator box at the TV"
+      ],
+      "connect": "USB-C power, microSD card for the system, HDMI out, USB for cameras and controllers, 40-pin header at 3.3 V.",
+      "buy": [
+        {
+          "seller": "Seeed",
+          "number": "BeagleY-AI",
+          "price": "$70.00",
+          "date": "2026-10-07",
+          "url": "https://www.seeedstudio.com/BeagleY-AI-p-6262.html",
+          "note": "price on the 2026-10-07 check; the order's own seller and price not recorded"
+        }
+      ],
+      "status": "in hand, arrived 2026-11-03; on the bench",
+      "used_in": [
+        "E294",
+        "P63",
+        "P64",
+        "beagley-ai/"
+      ]
+    },
+    {
+      "id": "usb-c-pd-20v-supply",
+      "cat": "wiring",
+      "name": "USB-C power supply that gives 20 V at 3 A or more (60 W class), for the SK-TDA4VM",
+      "what": "A USB Power Delivery wall charger that can negotiate 20 V. TI's user guide lists two tested models: GlobTek TR9CZ3000USBCG2R6BF2 and Qualtek QADC-65-20-08CB (65 W). A 5 V charger can reset the board during boot.",
+      "use_for": [
+        "Powering the SK-TDA4VM"
+      ],
+      "connect": "Charger to the board's USB-C power port J14 (its status LED is LD3). Do not use the USB-C data port J12 for power.",
+      "buy": [
+        {
+          "seller": "DigiKey (TI's tested part)",
+          "number": "Qualtek QADC-65-20-08CB",
+          "price": "not read",
+          "date": "2026-10-09"
+        }
+      ],
+      "status": "to order only if you have no 20 V USB-C charger",
+      "used_in": [
+        "tda4/"
+      ],
+      "learn": "docs/arrivals/tda4.md"
+    },
+    {
+      "id": "lp-mspm0g5187",
+      "cat": "board",
+      "name": "LP-MSPM0G5187 LaunchPad development kit",
+      "what": "TI's 80 MHz Cortex-M0+ board with a TinyEngine neural accelerator, 128 kB flash and 32 kB RAM. The chip has USB and I2S audio. The board adds a microphone, an audio ADC, a microSD slot and a debugger that measures current.",
+      "use_for": [
+        "Neural nets in hardware: CPU against NPU on the same model",
+        "Wake-word and gesture demos",
+        "USB microphone and first sound through an I2S DAC"
+      ],
+      "connect": "One USB-C cable for the debugger (USB-A to USB-C in the box); a second USB-C port for the chip's own USB. 40-pin header, 3.3 V logic. I2S on header pins 27 to 30. J6 powers the microphone, audio ADC and SD slot.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-MSPM0G5187",
+          "price": "$24.20",
+          "date": "2026-10-04"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "mspm0g5187/",
+        "docs/arrivals/mspm0g5187.md",
+        "mspm0g3507/mcu-bench/edgeai/",
+        "docs/experiments/2026-10-10-mspm0g5187-npu-live-light.md",
+        "mspm0g5187/radio/",
+        "site/radio-demos.html"
+      ],
+      "learn": "docs/arrivals/img/mspm0g5187-audio.png",
+      "faq": "mspm0g5187/FAQ.md"
+    },
+    {
+      "id": "lp-mspm33c321a",
+      "cat": "board",
+      "name": "LP-MSPM33C321A LaunchPad development kit",
+      "what": "TI's 160 MHz Cortex-M33 board with 1 MB flash and 256 kB RAM, TrustZone and security hardware, a built-in 128 x 32 OLED screen, 8 MB of QSPI flash and a debug probe that measures current (EnergyTrace). A prototype kit sold in limited quantity.",
+      "use_for": [
+        "Touchscreen interfaces with LVGL (TI ships a demo for the Waveshare 3.5 inch display used here)",
+        "Post-quantum and classic encryption speed tests",
+        "Comparing a Cortex-M33 with the MSPM0's Cortex-M0+ at the same clock",
+        "Status screens on the onboard OLED with no wiring"
+      ],
+      "connect": "One USB cable (in the box). 80-pin BoosterPack headers plus a mikroBUS socket, 3.3 V logic. J101 joins the debug probe to the chip: lift TXD>> when TI's display demo uses PA10. The OLED and QSPI flash are on the board; the flash holds the out-of-box video.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-MSPM33C321A",
+          "price": "$39.99",
+          "date": "2026-10-04"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "mspm33c321a/README.md",
+        "mspm33c321a/bench/",
+        "mspm33c321a/blink.sh"
+      ],
+      "learn": "docs/arrivals/mspm33c321a.md",
+      "faq": "mspm33c321a/FAQ.md"
+    },
+    {
+      "id": "lp-am13e230",
+      "cat": "board",
+      "name": "LP-AM13E230 LaunchPad development kit",
+      "what": "TI's Arm motor-control board: a 200 MHz Cortex-M33 with a trig math unit and a neural-network accelerator (NPU), five motor PWM modules, three fast ADCs, an isolated debug probe and a CAN-FD transceiver. Prototype silicon and a short-term SDK; sold in limited quantity.",
+      "use_for": [
+        "Control-loop speed against the C2000 F2800137 with the same code",
+        "AI models on an NPU against the CPU",
+        "Motor projects with a motor BoosterPack (not bought) or a small DRV8833 board",
+        "Porting STM32G4 code (TI ships a compatibility layer)"
+      ],
+      "connect": "One USB-C cable (in the box). 40-pin BoosterPack headers, 3.3 V logic; motor BoosterPacks such as BOOSTXL-DRV8323RS plug straight on. J10 is the chip's power-measurement header. Revision E1 boards (MCU178E1 on the back) use different pins.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-AM13E230",
+          "price": "$19.79",
+          "date": "2026-10-04"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "am13e230/README.md",
+        "am13e230/bench/",
+        "am13e230/blink.sh",
+        "am13e230/stepper-uln2003/README.md",
+        "am13e230/bldc-drv8376/README.md",
+        "tool-telemetry/tool/am13e230/"
+      ],
+      "learn": "docs/arrivals/am13e230.md",
+      "faq": "am13e230/FAQ.md"
+    },
+    {
+      "id": "lp-am263p",
+      "cat": "board",
+      "name": "LP-AM263P LaunchPad development kit (AM263Px Sitara MCU; kit to confirm by photo)",
+      "what": "TI's Arm real-time board: a chip with four Cortex-R5F cores at 400 MHz, a trig math unit on each core, five 4 Msps ADCs, 20 comparators, 32 PWM modules, 3 MB of on-chip RAM and a 32 MB octal flash, plus two gigabit Ethernet ports, CAN-FD and an industrial-Ethernet engine. The cores can run in lockstep for safety.",
+      "use_for": [
+        "Control-loop speed against the C2000 F2800137 and the AM13E230 with the same code",
+        "Running two or four control loops on separate cores",
+        "Flash execute-in-place with a cache, against code in RAM",
+        "Gigabit Ethernet and industrial-Ethernet projects"
+      ],
+      "connect": "Two cables. A USB Type-C supply of 5 V at 3 A powers the board (not in the box). The USB micro-B cable in the box is the debugger and serial port. The box also holds a micro SD card and a CAT5 cable. Two BoosterPack sites, 3.3 V logic. Boot mode is set by the DIP switch SW1. Never run TI's security key writer: it is a one-way change.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-AM263P",
+          "price": "",
+          "date": "2026-10-09",
+          "url": "https://www.ti.com/tool/LP-AM263P",
+          "note": "price not listed; shown out of stock on 2026-10-09; the plan treats the kit name as a variable until a photo confirms it (the TMDSCNCD263P controlCARD uses the same SDK)"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "am263p/",
+        "portability/h264/"
+      ],
+      "learn": "docs/arrivals/am263p.md"
+    },
+    {
+      "id": "frdm-mcxa153",
+      "cat": "board",
+      "name": "NXP FRDM-MCXA153 development board",
+      "what": "NXP's low-cost 96 MHz Cortex-M33 board with 128 kB flash and 32 kB RAM (the same memory as the LP-MSPM0G3507), a built-in MCU-Link debugger, an RGB LED, a temperature sensor and Arduino headers. The core has no floating-point unit.",
+      "use_for": [
+        "Comparing a Cortex-M33 with a Cortex-M0+ at the same memory",
+        "Motor-control style loops (motor PWM and encoder input on the chip)",
+        "Arduino-shield and mikroBUS click-board projects"
+      ],
+      "connect": "USB-C into J15 (MCU-LINK, the top port) for flashing and serial; J8 is the chip's own USB. Arduino Uno sockets, 3.3 V logic. Keep jumper JP2 fitted: it carries the chip's power.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "FRDM-MCXA153",
+          "price": "$15.75",
+          "date": "2026-10-06"
+        },
+        {
+          "seller": "NXP",
+          "number": "FRDM-MCXA153",
+          "price": "$15.00",
+          "date": "2026-10-06"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "frdm-mcxa153/"
+      ],
+      "learn": "docs/arrivals/img/frdm-mcxa153-usb.png",
+      "faq": "frdm-mcxa153/FAQ.md"
+    },
+    {
+      "id": "pico2",
+      "cat": "board",
+      "name": "Raspberry Pi Pico 2 H (SC1632)",
+      "what": "Raspberry Pi's board with headers fitted: the RP2350 chip with two Arm Cortex-M33 or two RISC-V cores at 150 MHz, 520 kB RAM and 4 MB flash. No debugger on the board: programs go on by drag and drop.",
+      "use_for": [
+        "The hobbyist baseline every TI board is compared with",
+        "The Freenove kit's projects, which were written for this board",
+        "Bigger models and demos: every one in this project fits its RAM"
+      ],
+      "connect": "Micro-USB (cable not included; USB-C to micro-B for this Mac). Hold BOOTSEL while plugging in to load a program. 40 pins on a breadboard, 3.3 V logic; VBUS gives 5 V from USB.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "SC1632",
+          "price": "$6.00",
+          "date": "2026-10-06"
+        },
+        {
+          "seller": "Raspberry Pi (list price)",
+          "number": "SC1632",
+          "price": "$6.00",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "pico2/"
+      ],
+      "learn": "docs/arrivals/img/pico2-pinout.png",
+      "faq": "pico2/FAQ.md"
+    },
+    {
+      "id": "nucleo-g071rb",
+      "cat": "board",
+      "name": "NUCLEO-G071RB (ST Nucleo-64 board)",
+      "what": "ST's 64 MHz Cortex-M0+ board with 128 kB flash and 36 kB RAM, a built-in ST-LINK debugger on USB Micro-B, a green LED, a button and ARDUINO Uno sockets. No AES or random-number hardware.",
+      "use_for": [
+        "Running ST's own STM32CubeG0 examples next to their MSPM0 ports",
+        "The same benchmark suite on another vendor's M0+, like for like with the LP-MSPM0G3507",
+        "Zephyr, STM32duino and ST's command-line tools on one board"
+      ],
+      "connect": "One USB-C to Micro-B cable into CN2 (USB_STLINK). 3.3 V logic. Serial to the Mac is USART2 (PA2, PA3) through the debugger; ARDUINO D0 and D1 are USART1 (PC5, PC4). JP3 is where a meter measures the chip's current.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "NUCLEO-G071RB",
+          "price": "$20.21",
+          "date": "2026-10-06"
+        }
+      ],
+      "status": "ordered 2026-10-06",
+      "used_in": [],
+      "learn": "docs/arrivals/img/nucleo-g071rb-minute0.png",
+      "faq": "nucleo-g071rb/FAQ.md"
+    },
+    {
+      "id": "nucleo-u083rc",
+      "cat": "board",
+      "name": "NUCLEO-U083RC (ST Nucleo-64 board)",
+      "what": "ST's ultra-low-power 56 MHz Cortex-M0+ board with 256 kB flash, 40 kB RAM, hardware AES and a true random-number generator, a built-in STLINK-V2EC debugger on USB-C and ARDUINO Uno sockets.",
+      "use_for": [
+        "Hardware AES and random numbers against software, next to the LP-MSPM0G3507",
+        "ST's low-power line against the MSPM0 power story, once a meter is here",
+        "The same benchmark suite on another vendor's M0+"
+      ],
+      "connect": "One USB-C cable into CN1 (STLINK). 3.3 V logic. Serial to the Mac is USART2 (PA2, PA3) through the debugger; ARDUINO D0 and D1 are not connected as shipped, so use D8 (PA9) and D2 (PA10) for USART1. JP5 is where a meter measures the chip's current.",
+      "buy": [
+        {
+          "seller": "DigiKey",
+          "number": "NUCLEO-U083RC",
+          "price": "$13.57",
+          "date": "2026-10-06"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "nucleo-u083rc/README.md",
+        "nucleo-u083rc/blink.sh",
+        "nucleo-u083rc/RESULTS-nucleo-u083rc.md",
+        "nucleo-u083rc/sweep/README.md"
+      ],
+      "learn": "docs/arrivals/img/nucleo-u083rc-minute0.png",
+      "faq": "nucleo-u083rc/FAQ.md"
+    },
+    {
+      "id": "lp-em-cc2755p10",
+      "cat": "board",
+      "name": "LP-EM-CC2755P10 LaunchPad development kit",
+      "what": "TI's 2.4 GHz radio board for Bluetooth 6.0 (with Channel Sounding), Thread, Zigbee and Matter: CC2755P10 chip, Arm Cortex-M33 at 96 MHz, 1 MB flash, 162 kB RAM, up to +20 dBm. No USB port and no probe of its own.",
+      "use_for": [
+        "Matter over Thread devices for Home Assistant and Apple Home",
+        "Thread routers and border-router radios",
+        "Bluetooth LE and Channel Sounding distance tests (needs a second CC27xx board)",
+        "Zigbee devices with room to spare"
+      ],
+      "connect": "Plugs onto an LP-XDS110ET or LP-XDS110 debugger (sold separately, required), which powers it at 3.3 V. 40-pin BoosterPack headers. Printed antenna plus a U.FL socket. Close the LED jumpers to use the LEDs.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-EM-CC2755P10",
+          "price": "$53.90",
+          "date": "2026-10-04",
+          "note": "TI.com order T07011659; the tool page showed out of stock on TI.com on 2026-10-07"
+        }
+      ],
+      "status": "in hand, on a standalone LP-XDS110 probe (serial LS5600RE)",
+      "used_in": [
+        "cc2755p10/"
+      ],
+      "learn": "docs/arrivals/cc2755p10.md",
+      "faq": "cc2755p10/FAQ.md"
+    },
+    {
+      "id": "lp-em-cc35x1",
+      "cat": "board",
+      "name": "LP-EM-CC35X1 LaunchPad development kit",
+      "what": "TI's Wi-Fi 6 and Bluetooth LE 5.4 board: CC3551E chip, Arm Cortex-M33 at 160 MHz that runs your program, 1.1 MB of RAM, 8 MB QSPI flash, dual-band 2.4 and 5 GHz Wi-Fi. No probe of its own.",
+      "use_for": [
+        "Wi-Fi sensors into Home Assistant over MQTT",
+        "Matter over Wi-Fi (TI marks the CC3551E production ready in its Matter release)",
+        "The Wi-Fi side of a two-chip Thread border router"
+      ],
+      "connect": "Plugs onto an LP-XDS110ET or LP-XDS110 debugger with its TGT VDD jumper on EXT, and needs its own USB-C cable too (in the box); both cables to the same computer (TI SWRU629C). Chip antenna; the SMA and U.FL need a capacitor moved. Programming goes through TI's Wi-Fi Toolbox and first needs a one-time activation that burns fuses.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-EM-CC35X1",
+          "price": "$54.99",
+          "date": "2026-10-04",
+          "url": "https://www.ti.com/tool/LP-EM-CC35X1",
+          "note": "TI.com order T07011659; TI.com showed it out of stock on 2026-10-07"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "cc35x1/",
+        "border-router/",
+        "thermostat-system/",
+        "iwrl6432boost/eval/",
+        "tool-telemetry/"
+      ],
+      "learn": "docs/arrivals/cc35x1.md",
+      "faq": "cc35x1/FAQ.md"
+    },
+    {
+      "id": "antenna-915-sma",
+      "cat": "wiring",
+      "name": "915 MHz SMA whip antenna (TE / Linx ANT-916-CW-HWR-SMA)",
+      "what": "A tilt-and-swivel whip antenna for 900 to 930 MHz, 1.2 dBi, SMA male plug.",
+      "use_for": [
+        "The BP-CC1407P-9-FE radio, which ships with an SMA socket and no antenna"
+      ],
+      "connect": "Screws onto the BoosterPack's SMA socket J7. Fit it before the radio is powered.",
+      "buy": [
+        {
+          "seller": "authorized distributors (Octopart listing)",
+          "number": "ANT-916-CW-HWR-SMA",
+          "price": "about $13, not cart-checked",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "in hand: one came in the BP-CC1407P-9-FE box (2026-10-08)",
+      "used_in": [],
+      "learn": "docs/arrivals/bp-cc1407p-9-fe.md"
+    },
+    {
+      "id": "long-header-strip",
+      "cat": "wiring",
+      "name": "Long double-ended 0.1 in header strip, 40 pins, 20 mm (SparkFun)",
+      "what": "Break-away pin strip with long pins on both sides, so two socket headers can be joined.",
+      "use_for": [
+        "Stacking a BoosterPack on a LaunchPad kit whose header is sockets (LP-MSPM0G3519, LP-MSPM33C321A, LP-MSPM0C1104) when the BoosterPack's underside is sockets too"
+      ],
+      "connect": "Break off 10-pin pieces and push them into the LaunchPad kit's sockets, then stack the BoosterPack on top.",
+      "buy": [
+        {
+          "seller": "SparkFun",
+          "number": "Long Header - Male (PTH, 0.1in., 40-Pin)",
+          "price": "$3.50",
+          "date": "2026-10-07"
+        }
+      ],
+      "status": "to order only if needed at arrival (order on request)",
+      "used_in": [],
+      "learn": "docs/arrivals/boostxl-sharp128.md"
+    },
+    {
+      "id": "iwrl6432boost",
+      "cat": "sensor",
+      "name": "IWRL6432BOOST 60 GHz mmWave radar evaluation module",
+      "what": "TI's low-power 60 GHz radar sensor board: a radar chip with three receive and two transmit antennas on the circuit board, its own Arm Cortex-M4F at 160 MHz and a hardware accelerator for FFTs, 1 MB of RAM, an XDS110 debugger and a micro-USB port. It finds people by their motion, even small motion, and sends a point cloud and presence flags over a serial port.",
+      "use_for": [
+        "Presence sensing that sees a person sitting still, for Home Assistant",
+        "Finding out how small a host MCU can run the processor side of a radar",
+        "Low-power sensing: duty-cycled deep sleep, about 1 to 2 mW on the chip's rails per TI"
+      ],
+      "connect": "Micro-USB cable (in the box) to the Mac: powers the board and gives two serial ports and JTAG. The board ships in run-from-flash mode (S1 position 1 ON, position 2 OFF); for flashing, move only S1 position 1 to OFF. There is also a reset button. BoosterPack connectors J8 and J9 for a host LaunchPad. Keep 20 cm between the board and a person. Do not drive any pin from a powered host while the board is unpowered.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "IWRL6432BOOST",
+          "date": "2026-10-09",
+          "url": "https://www.ti.com/tool/IWRL6432BOOST",
+          "note": "price not read; the page showed out of stock on TI.com that day"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "docs/arrivals/iwrl6432boost.md",
+        "thermostat-system/",
+        "iwrl6432boost/eval/"
+      ],
+      "learn": "docs/arrivals/iwrl6432boost.md",
+      "faq": ""
+    },
+    {
+      "id": "rshtech-h10c",
+      "cat": "gear",
+      "name": "RSHTECH 10-port powered USB-C 3.2 hub (RSH-H10C)",
+      "what": "A powered hub with ten USB ports on its own supply, so a row of boards draws power from the wall instead of the laptop.",
+      "use_for": [
+        "Keeping six to ten boards and probes plugged in at once",
+        "Stable power for boards that brown out on a laptop port",
+        "Leaving boards connected between sessions"
+      ],
+      "connect": "Its own power adapter, one USB-C cable to the computer. Each board's debug USB goes into a port.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "ASIN B0H2P2SW6Q",
+          "note": "ordered 2026-10-06; $50.46 paid with tax"
+        }
+      ],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "acer-usbc-hub",
+      "cat": "gear",
+      "name": "Acer 10 Gbps USB-C hub, 4 USB-C ports plus 100 W pass-through",
+      "what": "A small unpowered hub that splits one USB-C port into four, with a charging input so the laptop keeps its power.",
+      "use_for": [
+        "A second set of USB-C ports beside the powered hub",
+        "Charging the laptop through the hub while boards stay connected"
+      ],
+      "connect": "One USB-C cable to the computer; a USB-C charger into the power-delivery port.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "ASIN B0F5HSNDXF",
+          "note": "ordered 2026-10-06 in a mixed order, per-item price not shown"
+        }
+      ],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "anker-prime-160w",
+      "cat": "gear",
+      "name": "Anker Prime charger, 160 W, 3 ports, with display",
+      "what": "A three-port USB-C charger that shows the power each port is delivering on a small screen.",
+      "use_for": [
+        "Powering a hungry board such as the SK-TDA4VM (20 V at 3 A) from one brick",
+        "Reading a board's power draw at a glance"
+      ],
+      "connect": "USB-C to the board's power input. Check that the board takes USB-C power delivery and what voltage it asks for.",
+      "buy": [
+        {
+          "seller": "Anker store",
+          "number": "WSPDV2HZNOFF",
+          "price": "$115.99",
+          "note": "paid 2026-09-17 after a discount; list $149.99"
+        }
+      ],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "anker-nano-45w",
+      "cat": "gear",
+      "name": "Anker Nano charger, 45 W, with display",
+      "what": "A small single-port USB-C charger with a power readout.",
+      "use_for": [
+        "Powering one board away from the computer",
+        "A second power source for a two-board demo"
+      ],
+      "connect": "USB-C to the board.",
+      "buy": [
+        {
+          "seller": "Anker store",
+          "number": "WS24CNCZYG9B",
+          "price": "$24.99",
+          "note": "paid 2026-09-17 after a discount"
+        }
+      ],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "anker-prime-240w-cables",
+      "cat": "wiring",
+      "name": "Anker Prime USB-C to USB-C cables, 240 W, 3 ft and 6 ft",
+      "what": "Braided USB-C cables rated for 240 W, so any board or charger here gets its full power.",
+      "use_for": [
+        "Powering high-current boards from the 160 W charger",
+        "Long runs from the charger to the bench"
+      ],
+      "connect": "USB-C at both ends.",
+      "buy": [
+        {
+          "seller": "Anker store",
+          "price": "$29.99 (3 ft), $34.99 (6 ft)",
+          "note": "paid 2026-09-17"
+        }
+      ],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "agvee-usbc-microusb",
+      "cat": "wiring",
+      "name": "AGVEE USB-C to micro-USB cables, 3.3 ft, 2 pack",
+      "what": "Cables for the many LaunchPad development kits that still use micro-USB, straight from a USB-C laptop or hub.",
+      "use_for": [
+        "Connecting micro-USB boards to a USB-C-only computer without an adapter"
+      ],
+      "connect": "USB-C to the computer or hub, micro-USB to the board.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "ASIN B0DJY122Z7",
+          "note": "ordered 2026-10-04 in a mixed order, per-item price not shown"
+        }
+      ],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "syntech-usbc-usba",
+      "cat": "wiring",
+      "name": "Syntech USB-C to USB-A adapters, 2 pack",
+      "what": "Adapters that let a USB-A cable or device plug into a USB-C port.",
+      "use_for": [
+        "Using the USB-A cable that came in a board's box on a USB-C laptop"
+      ],
+      "connect": "USB-C side into the computer or hub.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "ASIN B07CVX3516",
+          "note": "ordered 2026-10-04 in a mixed order, per-item price not shown"
+        }
+      ],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "tessan-tower-strip",
+      "cat": "gear",
+      "name": "TESSAN tower power strip with surge protection, 10 ft flat cord",
+      "what": "A vertical power strip that takes the hub supply and the chargers in one place.",
+      "use_for": [
+        "One switched power source for the whole bench"
+      ],
+      "connect": "Wall outlet; the hub supply and chargers plug into it.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "note": "ordered 2026-08-18; $30.99 before tax"
+        }
+      ],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "logitech-c310",
+      "cat": "gear",
+      "name": "Logitech USB webcam (C310 class, 720p)",
+      "what": "A plain USB webcam that works with no driver. Placed close to one board it reads small displays and LED colors.",
+      "use_for": [
+        "A close-up of one board",
+        "A camera that needs no network or account"
+      ],
+      "connect": "USB-A into the computer or hub.",
+      "buy": [],
+      "status": "in hand",
+      "used_in": []
+    },
+    {
+      "id": "insta360-link-2-pro",
+      "cat": "gear",
+      "name": "Insta360 Link 2 Pro USB webcam (4K, pan-tilt gimbal)",
+      "what": "A UVC webcam with a motorised pan-tilt gimbal and 4x digital zoom that Linux drives through standard V4L2 controls, so a program can aim it. MJPEG and H.264 up to 3840x2160, plus a USB microphone.",
+      "use_for": [
+        "Camera input for the BeagleY-AI vision demos (people count, body-pose game)",
+        "An overhead bench camera a script can aim at one board"
+      ],
+      "connect": "USB-C on the camera to a USB-A port through a USB-C-to-A adapter. On the BeagleY-AI it drops off USB at 1080p and on gimbal moves when powered from the board's port (beagley-ai/bench/camera-usb-drops-2026-11-03.log); 720p without moves is stable.",
+      "buy": [],
+      "status": "in hand",
+      "used_in": [
+        "beagley-ai/bench/camdetect/",
+        "beagley-ai/games/pop-the-bubbles/"
+      ]
+    },
+    {
+      "id": "ha-connect-zbt2",
+      "cat": "home",
+      "name": "Home Assistant Connect ZBT-2",
+      "what": "Home Assistant's own USB radio for Zigbee and Thread, the coordinator for every Zigbee and Thread board test in the house network.",
+      "use_for": [
+        "Joining Zigbee boards to Home Assistant",
+        "Running a Thread network that Matter devices use"
+      ],
+      "connect": "USB into the machine that runs Home Assistant, on an extension cable away from USB 3 ports and Wi-Fi.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "ASIN B0G34ZTW51",
+          "note": "ordered 2026-03-29"
+        },
+        {
+          "seller": "Home Assistant",
+          "url": "https://www.home-assistant.io/connect/zbt-2",
+          "price": "$49",
+          "note": "recommended MSRP before tax, read 2026-10-16 on home-assistant.io"
+        }
+      ],
+      "status": "in use",
+      "used_in": []
+    },
+    {
+      "id": "thirdreality-plug-gen2",
+      "cat": "home",
+      "name": "ThirdReality Smart Plug Gen2 (Zigbee, power metering)",
+      "what": "A Zigbee wall plug that switches a lamp or fan and reports its power draw; Home Assistant sees it through ZHA.",
+      "use_for": [
+        "Switch a real lamp from a board (voice or radar)",
+        "Turn a fan on from a CO2 reading"
+      ],
+      "connect": "Plugs into the wall; pairs to the Home Assistant Zigbee coordinator (the ZBT-2). No wires to the LaunchPad.",
+      "buy": [
+        {
+          "seller": "thirdreality.com",
+          "number": "Smart Plug Gen2",
+          "price": "$11.69 sale, $12.99 list",
+          "date": "2026-10-13"
+        }
+      ],
+      "status": "owned (2026-10-14; already in the house)",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "zigbee-plug-amazon",
+      "cat": "home",
+      "name": "Zigbee smart plug (bought on Amazon; model not recorded)",
+      "what": "A mains-powered Zigbee wall plug. It switches a lamp from Home Assistant, and because it stays plugged in it also acts as a Zigbee relay for the network: on this bench every join of the LP-CC1354P10-1 sleepy sensor went through it, because the ZBT-2 coordinator was out of that board's range.",
+      "use_for": [
+        "Switching a real lamp from Home Assistant, to check the coordinator path on its own",
+        "A mains-powered Zigbee relay that extends the network so a battery-class board can join"
+      ],
+      "connect": "Plugs into the wall; pairs to Home Assistant through the ZBT-2 (Settings, Devices and services, Zigbee Home Automation, Add device). No wires to a LaunchPad.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "model and ASIN not recorded",
+          "note": "Bought on Amazon; price and listing not recorded."
+        }
+      ],
+      "status": "owned; model, ASIN and price not recorded",
+      "used_in": [
+        "cc1354p10/zigbee-sleepy-sensor/README.md"
+      ],
+      "learn": ""
+    },
+    {
+      "id": "dc-supply-12v",
+      "cat": "gear",
+      "name": "12 V DC power supply, 0.5 A or more (any wall adapter; model not recorded)",
+      "what": "Motor power for the brushless motor bench: the DRV8376EVM takes 4.5 to 65 V DC on two screw terminals and is reverse-polarity protected. The bench used a 12 V, 0.5 A adapter, read at 12.4 V on the board with the motor unloaded; it never sagged.",
+      "use_for": [
+        "Motor power for the DRV8376EVM with the BLY171S motor, unloaded"
+      ],
+      "connect": "Positive to VBAT, negative to PGND on the DRV8376EVM screw terminals. An adapter with a barrel plug needs the plug cut off or a barrel-to-screw-terminal adapter; the bench notes do not say which was used.",
+      "buy": [
+        {
+          "seller": "any",
+          "price": "not priced",
+          "note": "Any regulated 12 V adapter that gives 0.5 A or more; 1 A or more is safer once the motor is loaded. A 24 V supply matches the motor's label (24 V rated)."
+        }
+      ],
+      "status": "in hand (model not recorded)",
+      "used_in": [
+        "am13e230/bldc-drv8376/README.md"
+      ],
+      "learn": ""
+    },
+    {
+      "id": "drv8376evm",
+      "cat": "motor",
+      "name": "DRV8376EVM three-phase motor driver evaluation module",
+      "what": "TI's evaluation board for the DRV8376, a three-phase brushless motor driver with the six power transistors inside one chip (4.5 to 65 V, 4.5 A peak), current sensing built in, and 3.3 V and 5 V regulators on the chip. The board is a 40-pin BoosterPack: it plugs onto a LaunchPad, which does the commutation; the chip does not spin a motor on its own. Screw terminals for the motor supply (VBAT, PGND) and the three phases (OUT A, B, C); a five-way terminal block for Hall sensors with a jumper that picks their supply (3.3 V, 5 V or external). The PWM mode (6x or 3x), slew rate, current-sense gain and overcurrent level are set by resistors on the board; the program finds the PWM mode at start.",
+      "use_for": [
+        "Spinning a Hall-sensor brushless motor from the LP-AM13E230 (six-step, the bench program)",
+        "TI's three-shunt Hall FOC solution on the AM13, once ported from the DRV8323RH BoosterPack",
+        "Current-loop and bearing-fault work on a real motor"
+      ],
+      "connect": "Plug onto the LaunchPad kit's BoosterPack headers with the screw terminals pointing away from the USB connector: the Hall-block socket (EVM J8) on J2/J4, the nFAULT-side socket (EVM J9) on J1/J3 with its pin 20 (3.3 V) on J1 pin 1. Then its INHA/INLA, INHB/INLB and INHC/INLC are J4 pins 40 to 35 (MCPWM4 1A to 3B on the LP-AM13E230), Hall A, B, C are J4 pins 34, 33, 32 (PB7, PB6, PA12), nSLEEP J1 pin 9 (PA23), nFAULT J1 pin 10 (PA22), DRVOFF J2 pin 13 (PB18), phase-voltage senses J3 pins 26, 25, 24 and bus sense J3 pin 23 (PA17, PA28, PA18, PA16), current senses J3 pins 27 to 29. Motor supply 4.5 to 65 V DC on VBAT and PGND (reverse-polarity protected). Hall supply jumper J13: GVDD (5 V) for most motors. On the LP-AM13E230, switches S6 and S4 must sit at BP so PB6, PB7, PA11 and PA12 reach the headers.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "DRV8376EVM",
+          "price": "not recorded",
+          "date": "2026-10-15"
+        }
+      ],
+      "status": "on hand (2026-10-15, with the motor wired)",
+      "used_in": [
+        "am13e230/bldc-drv8376/README.md",
+        "tool-telemetry/tool/am13e230/"
+      ],
+      "learn": "docs/arrivals/drv8376evm.md",
+      "docs": "DRV8376EVM user's guide SLVUD20; DRV8376 data sheet SLVSHD4A"
+    },
+    {
+      "id": "anaheim-bly17",
+      "cat": "motor",
+      "name": "Anaheim Automation BLY171S-24V-4000 brushless motor (NEMA 17, Hall sensors)",
+      "what": "A small three-phase brushless DC motor in the NEMA 17 frame with three Hall sensors inside: 24 V, 4,000 rpm, 26 W, 1.8 A rated, 27 oz-in peak torque, 1.5 ohm and 2.1 mH line to line, 4.96 oz-in per A, 2.45 V per 1,000 rpm, delta winding, eight poles (four pole pairs), Halls at 120 electrical degrees (product sheet L010228; label read 2026-10-15, dated 10/21). Eight wires: three phases (yellow A, red B, black C) and five Hall lines (red supply 4.5 to 28 V, black ground, blue A, green B, white C; open-collector outputs). Locked-rotor current at full voltage would be 16 A, so the driver's 4.5 A overcurrent limit and the program's duty cap do the protecting.",
+      "use_for": [
+        "First brushless spin on the DRV8376EVM from the LP-AM13E230",
+        "Hall-sensored FOC and speed control",
+        "A bearing-fault or load-change data set for the NPU"
+      ],
+      "connect": "Phases to OUT A, OUT B, OUT C on the driver board (any order; the program learns the Hall table). Hall wires to the five-way block: red to HALL POWER, black to HALL GROUND, blue, green and white to HALL A, B, C.",
+      "buy": [
+        {
+          "seller": "Anaheim Automation",
+          "number": "BLY171S-24V-4000",
+          "price": "$65.00",
+          "date": "2026-10-19",
+          "url": "https://anaheimautomation.com/brushless-dc/brushless-motors/brushless-motors/bly17",
+          "note": "1 piece, listed as 220 in stock; read from the product table through a search result, not a cart. The -MA version with a wired connector is $101.00."
+        }
+      ],
+      "status": "on hand (2026-10-15)",
+      "used_in": [
+        "am13e230/bldc-drv8376/README.md",
+        "tool-telemetry/tool/am13e230/"
+      ],
+      "docs": "Anaheim Automation BLY17 series product sheet L010228"
+    },
+    {
+      "id": "qiwo-57bl-70w",
+      "cat": "motor",
+      "name": "QIWO QW57F2H03N3070 57 mm brushless motor (24 V, 70 W, Hall sensors)",
+      "what": "A 57 mm frame three-phase brushless DC motor with Hall sensors inside. Label (photo 2026-10-17): 24 V, 70 W, 3000 r/min, 0.22 N.m, dated 2026/06/13, Changsha Qiwo Electronic Technology. There is no data sheet: pole pairs, winding resistance, inductance, back-EMF constant, Hall supply range and Hall output type are not known and are the first measurements. Two cables: a thick one with three phase wires (yellow, green, blue) and a thin shielded one with five Hall wires (red, blue, green, yellow and one more; roles to confirm).",
+      "use_for": [
+        "The larger motor on the AM13 motor bench, after the 26 W BLY171S",
+        "Power-tool class tests on a cordless battery",
+        "Measuring an unknown motor: Hall order, pole pairs, Rs, Ls, flux, then predict, measure and attribute"
+      ],
+      "connect": "Phases (thick cable) to the driver's OUT A, B, C in any order. Hall cable to the driver's Hall block: supply, ground, A, B, C. Start the Hall supply at 5 V; the 3.3 V of the BOOSTXL-DRV8323RS may not be enough.",
+      "buy": [
+        {
+          "seller": "Amazon (Changsha Qiwo Electronic Technology)",
+          "number": "QW57F2H03N3070 listing chosen 2026-10-14",
+          "price": "about $60 (shopping list); price paid not recorded",
+          "date": "2026-10-14"
+        }
+      ],
+      "status": "on hand (2026-10-17)",
+      "used_in": [
+        "am13e230/foc-drv8376/README.md"
+      ],
+      "learn": "docs/arrivals/qiwo-57bl-70w.md",
+      "docs": "Label only (docs/arrivals/img/qiwo-57bl-70w-label.jpg); no data sheet"
+    },
+    {
+      "id": "boostxl-drv8323rs",
+      "cat": "motor",
+      "name": "BOOSTXL-DRV8323RS (SPI) three-phase motor driver BoosterPack",
+      "what": "TI's BoosterPack with a DRV8323 smart gate driver and three CSD88584Q5DC power transistors: 6 to 54 V supply and up to 15 A drive current (user's guide SLVUB01C). The RS variant is configured over SPI (gain, gate drive strength, overcurrent) where the RH uses resistors. A buck converter on the board makes the 3.3 V that feeds the Hall inputs.",
+      "use_for": [
+        "The 15 A step up from the DRV8376EVM on the AM13 motor bench",
+        "TI's three-shunt FOC on the LP-AM13E230 (needs an SPI setup routine: a port)",
+        "Same suite on the BLY171S and the QIWO motor"
+      ],
+      "connect": "Plug onto the LaunchPad BoosterPack headers. Supply on J1 (+VM, GND; polarity matters), motor phases on J5, Hall sensors on J2. SPI on the LP-AM13E230 Rev E2: PB5 SCLK, PB10 PICO, PA20 POCI, chip select PB12. Observe the Hall supply is 3.3 V only.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "BOOSTXL-DRV8323RS",
+          "price": "$86.90",
+          "date": "2026-10-14"
+        }
+      ],
+      "status": "arrived 2026-10-20",
+      "used_in": [
+        "am13e230/foc-drv8376/README.md"
+      ],
+      "learn": "docs/arrivals/boostxl-drv8323rs.md",
+      "docs": "BOOSTXL-DRV8323Rx user's guide SLVUB01C"
+    },
+    {
+      "id": "dewalt-20v-adapter",
+      "cat": "gear",
+      "name": "DeWalt 20V MAX battery adapter with switch and inline fuse",
+      "what": "A dock for DeWalt 20V MAX packs with a power switch, an inline blade fuse holder and two leads. The pack is five Li-ion cells: 18 V nominal, about 20 V full, about 15 V empty (treat 15 V as the floor). Ships with a 30 A fuse; swapped for 10 A before first use.",
+      "use_for": [
+        "Battery power for the motor bench, replacing the 12 V adapter",
+        "The power-tool story: a real cordless pack driving a Hall motor"
+      ],
+      "connect": "Red lead to the driver's VM (motor supply) terminal, black to PGND, switch off, 10 A fuse fitted. Nothing switched on until the firmware for battery power is flashed. Never short the leads, never leave a pack connected unattended.",
+      "buy": [
+        {
+          "seller": "Amazon",
+          "number": "B0B63LPYN5",
+          "price": "$15.99",
+          "date": "2026-10-14"
+        }
+      ],
+      "status": "on order (arrival not confirmed)",
+      "used_in": [
+        "am13e230/foc-drv8376/README.md"
+      ],
+      "learn": "docs/arrivals/dewalt-20v-adapter.md",
+      "docs": "Amazon listing B0B63LPYN5; DRV8376EVM user's guide SLVUD20"
+    },
+    {
+      "id": "tmds62levm",
+      "cat": "board",
+      "name": "TMDS62LEVM (AM62L evaluation module)",
+      "what": "TI's evaluation board for the AM62L, a dual-core 64-bit Cortex-A53 processor at up to 1.25 GHz with 160 KB of on-chip SRAM and no on-chip flash. The board adds 2 GB of LPDDR4, 32 GB eMMC, a 64 MB octal SPI NOR flash, a 128 MB QSPI NAND, HDMI and DSI display outputs, two gigabit Ethernet ports, USB-C (device or host) and USB-A, an M.2 Key E slot for a Wi-Fi module, three CAN FD headers, an ADC header, two GPIO expansion headers, eight power monitors and an XDS110 debug probe. Runs Linux from TI's SDK and Zephyr upstream. No power supply, cables or SD card in the box.",
+      "use_for": [
+        "The question whether a Linux processor can run Zephyr with no DDR at all, from its on-chip SRAM or in place from the SPI flash, against a DDR-less microcontroller like the STM32N657",
+        "A second Linux board beside the SK-TDA4VM: the CPU-only point for the Linux benchmarks, boot time and power",
+        "Two gigabit Ethernet ports with time-sensitive networking for gateway demos"
+      ],
+      "connect": "USB-C power delivery into J17 (5 to 15 V, 3 A; the board needs a source that offers more than 15 W). Serial console on micro-USB J7 (four ports; the first is the Linux and Zephyr console at 115200). JTAG on micro-USB J8. Boot medium by the SW2, SW3 and SW4 switches: SD card, eMMC, OSPI, UART or USB. The 30-pin header J2 carries SPI1, SPI3, UART4, I2C3 and GPIOs at 3.3 V.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "TMDS62LEVM",
+          "price": "not recorded",
+          "date": "2026-10-18"
+        }
+      ],
+      "status": "arrived 2026-10-21",
+      "used_in": [
+        "am62l-evm/"
+      ],
+      "learn": "docs/arrivals/am62l-evm.md"
+    },
+    {
+      "id": "smart-bulb-br30-cc",
+      "cat": "home",
+      "name": "Feit Electric Smart WiFi Bulb, BR30, color changing, 8 W",
+      "what": "A color bulb controlled from a phone app, Google Home and Alexa. The demo light for the smart-home builds: a board turns it on, a sensor changes its color.",
+      "use_for": [
+        "Radar presence turns the light on, empty room turns it off",
+        "A LaunchPad button or knob sets the color through Home Assistant",
+        "The same light shown in Google Home, Alexa and Apple Home at once"
+      ],
+      "connect": "Screws into a lamp; joins Wi-Fi through the Feit Electric phone app (an account is required; installation guide feit.com/smartwifibulb). No HomeKit code in the box guide. Home Assistant reaches it through a cloud integration or local control; Apple Home through Home Assistant's HomeKit Bridge. No wires to the LaunchPad. Constant power to the socket is required.",
+      "buy": [
+        {
+          "seller": "MacKay Hardware and Rental (Ace)",
+          "number": "BULB LED SMRT BR30 CC 8W, SKU 3925617",
+          "price": "$17.99",
+          "date": "2026-10-19"
+        }
+      ],
+      "status": "on hand 2026-10-19; paired and in Home Assistant through the Feit cloud 2026-10-20 (20 toggles median 698 ms)",
+      "used_in": [
+        "docs/research/feit-bulb-home-assistant-2026-10-20.md"
+      ],
+      "learn": ""
+    },
+    {
+      "id": "cr2032-duracell",
+      "cat": "wiring",
+      "name": "Duracell CR2032 lithium coin cell, 3 V (4 pack)",
+      "what": "A 3 V coin cell, about 225 mAh, for a board that wakes once a minute.",
+      "use_for": [
+        "The L1306 once-a-minute clock on a coin cell (the battery-life project)",
+        "Bluetooth beacons and BTHome sensors running off the USB cable"
+      ],
+      "connect": "A CR2032 holder wired to the board's 3V3 and GND pins, with the USB power jumper removed so the probe does not back-feed it.",
+      "buy": [
+        {
+          "seller": "MacKay Hardware and Rental (Ace)",
+          "number": "SKU 3414794",
+          "price": "$13.99 for 4",
+          "date": "2026-10-19"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "alligator-clips-2in",
+      "cat": "wiring",
+      "name": "Insulated alligator clips, 2 in (2 pack)",
+      "what": "Clips for a quick probe ground, a test lead on a pin, or holding a wire during a measurement.",
+      "use_for": [
+        "Scope or meter ground on a board",
+        "Hold the thermocouple lead while it is taped down"
+      ],
+      "connect": "Clip onto a test point or a header pin; never across two adjacent pins.",
+      "buy": [
+        {
+          "seller": "MacKay Hardware and Rental (Ace)",
+          "number": "SKU 3011970",
+          "price": "$3.99",
+          "date": "2026-10-19"
+        }
+      ],
+      "status": "on hand 2026-10-19",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "clamp-lamp-bench",
+      "cat": "gear",
+      "name": "Clamp lamp, 6 ft cord, with a 60 W-equivalent LED bulb (two)",
+      "what": "Bench lighting: even light over the boards for photographs.",
+      "use_for": [
+        "Straight-down board photographs on plain paper"
+      ],
+      "connect": "Clamps to the shelf edge; aim from two sides to kill the shadows of the boards and cables.",
+      "buy": [
+        {
+          "seller": "MacKay Hardware and Rental (Ace)",
+          "number": "LAMP CLAMP 18/2 SPT-2 6 ft, SKU 31860; LED G25, SKU 3908175",
+          "price": "$19.99 each, bulb $7.99",
+          "date": "2026-10-19"
+        }
+      ],
+      "status": "on hand 2026-10-19",
+      "used_in": [],
+      "learn": ""
+    }
+  ]
+}

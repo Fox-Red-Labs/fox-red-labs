@@ -1,0 +1,20 @@
+// Fixed HMI scene matching am62l-hmi/main.c: 12 animated bars, 12 counters, one big counter, 1920x1080.
+component Bar inherits Rectangle {
+    in property <int> idx;
+    in property <length> maxw;
+    in property <int> n;
+    property <bool> fwd: true;
+    property <length> w: fwd ? 120px : maxw;
+    animate w { duration: (1500 + idx * 180) * 1ms; easing: ease-in-out; }
+    Timer { interval: (1500 + idx * 180) * 1ms; running: true; triggered => { fwd = !fwd; } }
+    y: 40px + idx * 70px; x: 40px; height: 56px; width: w; border-radius: 14px;
+    background: Colors.rgb(32 + idx * 10, 128 + idx * 10, 224);
+    Text { x: 1580px; y: 12px; text: Math.mod(n * (idx + 3), 100000); font-size: 28px; color: white; }
+}
+export component Scene inherits Window {
+    width: 1920px; height: 1080px; background: #101820;
+    property <int> n;
+    Timer { interval: 16ms; running: true; triggered => { n += 1; } }
+    for i in 12: Bar { idx: i; maxw: 1920px - 480px; n: root.n; }
+    Text { x: 1620px; y: 960px; text: n; font-size: 48px; color: #ffd040; }
+}

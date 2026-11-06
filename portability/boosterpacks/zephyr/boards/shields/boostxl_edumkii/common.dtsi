@@ -1,0 +1,84 @@
+/*
+ * BOOSTXL-EDUMKII: 128 x 128 ST7735S screen on SPI (pins 7, 15, 13, 31, 17),
+ * backlight on pin 39 (jumper J5 on 2-3), buttons S1 (pin 33), S2 (pin 32)
+ * and the joystick press (pin 5). Pin numbers: SLAU599B Tables 2-1 to 2-10.
+ * The joystick axes, microphone and accelerometer are analog; the per-board
+ * overlays in boards/ add the joystick on that LaunchPad kit's ADC.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+	chosen {
+		zephyr,display = &edumkii_st7735s;
+	};
+
+	edumkii_mipi_dbi {
+		compatible = "zephyr,mipi-dbi-spi";
+		spi-dev = <&boosterpack_spi>;
+		dc-gpios = <&boosterpack_header 31 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&boosterpack_header 17 GPIO_ACTIVE_LOW>;
+		write-only;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		edumkii_st7735s: st7735s@0 {
+			compatible = "sitronix,st7735r";
+			reg = <0>;
+			mipi-max-frequency = <8000000>;
+			mipi-mode = "MIPI_DBI_MODE_SPI_4WIRE";
+			width = <128>;
+			height = <128>;
+			x-offset = <2>;
+			y-offset = <3>;
+			madctl = <0xc8>;
+			colmod = <0x55>;
+			vmctr1 = <0x0e>;
+			pwctr1 = [a2 02 84];
+			pwctr2 = [c5];
+			pwctr3 = [0a 00];
+			frmctr1 = [01 2c 2d];
+			frmctr2 = [01 2c 2d];
+			frmctr3 = [01 2c 2d 01 2c 2d];
+			gamctrp1 = [02 1c 07 12 37 32 29 2d 29 25 2b 39 00 01 03 10];
+			gamctrn1 = [03 1d 07 06 2e 2c 29 2d 2e 2e 37 3f 00 00 02 10];
+		};
+	};
+
+	edumkii_backlight: backlight {
+		compatible = "regulator-fixed";
+		regulator-name = "edumkii_backlight";
+		enable-gpios = <&boosterpack_header 39 GPIO_ACTIVE_HIGH>;
+		regulator-boot-on;
+	};
+
+	edumkii_buttons: edumkii_buttons {
+		compatible = "gpio-keys";
+
+		edumkii_s1: button_s1 {
+			label = "EDUMKII S1";
+			gpios = <&boosterpack_header 33 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			zephyr,code = <INPUT_KEY_0>;
+		};
+
+		edumkii_s2: button_s2 {
+			label = "EDUMKII S2";
+			gpios = <&boosterpack_header 32 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			zephyr,code = <INPUT_KEY_1>;
+		};
+
+		edumkii_joy_select: joystick_select {
+			label = "EDUMKII joystick select";
+			gpios = <&boosterpack_header 5 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			zephyr,code = <INPUT_KEY_ENTER>;
+		};
+	};
+};
+
+&boosterpack_spi {
+	cs-gpios = <&boosterpack_header 13 GPIO_ACTIVE_LOW>;
+};

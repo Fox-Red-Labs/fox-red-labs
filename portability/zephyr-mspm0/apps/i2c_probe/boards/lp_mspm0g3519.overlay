@@ -1,0 +1,44 @@
+/*
+ * LP-MSPM0G3519, BP-BASSENSORSMKII on the top site: BoosterPack pin 9 (SCL) is PC2 and
+ * pin 10 (SDA) is PC3, I2C2 function (PINCM76 and PINCM77, function 2; SysConfig
+ * output for MSPM0G351X, SDK 2.11.00.07). The pack has its own pull-ups; the internal
+ * ones are on so an empty bus idles high.
+ * Sensor power pins (this repo's pack driver, portability/boosterpacks/bassensorsmkii):
+ * PA25 HDC2080 and PA26 DRV5055 sit behind P-channel switches (low = on); PB26 OPT3001
+ * and PB27 TMP117 are powered straight from the pin (high = on).
+ */
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/pinctrl/mspm0-pinctrl.h>
+
+&pinctrl {
+	i2c2_scl_pc2: i2c2_scl_pc2 {
+		pinmux = <MSP_PINMUX(76, MSPM0_PIN_FUNCTION_2)>;
+		input-enable;
+		drive-open-drain;
+		bias-pull-up;
+	};
+
+	i2c2_sda_pc3: i2c2_sda_pc3 {
+		pinmux = <MSP_PINMUX(77, MSPM0_PIN_FUNCTION_2)>;
+		input-enable;
+		drive-open-drain;
+		bias-pull-up;
+	};
+};
+
+&i2c2 {
+	pinctrl-0 = <&i2c2_scl_pc2 &i2c2_sda_pc3>;
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	status = "okay";
+};
+
+/ {
+	bs_power {
+		compatible = "gpio-leds";
+		bs_hdc: bs_hdc { gpios = <&gpioa 25 GPIO_ACTIVE_HIGH>; };
+		bs_drv: bs_drv { gpios = <&gpioa 26 GPIO_ACTIVE_HIGH>; };
+		bs_opt: bs_opt { gpios = <&gpiob 26 GPIO_ACTIVE_HIGH>; };
+		bs_tmp: bs_tmp { gpios = <&gpiob 27 GPIO_ACTIVE_HIGH>; };
+	};
+};

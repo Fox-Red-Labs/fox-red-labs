@@ -1,0 +1,14 @@
+board,cpu_mhz,timer_mhz,cycle_counter,led,uart,adc,source
+mspm0g3507,80,,systick,PB22 blue,,,data/boards.csv; led: tools/led_pin_check.sh
+mspm0l1306,32,,systick,,,,data/boards.csv
+mspm0c1104,24,,systick,,,,data/boards.csv
+mspm0g3519,80,,systick,,,,data/boards.csv
+mspm0g5187,80,,systick,,,,data/boards.csv
+cc2340r5,48,48,systick,DIO14 red,,DIO23,cc2340r5/README.md; cc2340r5/bench/board/base.syscfg
+cc1354p10,48,48,systick,,,DIO23,cc1354p10/bench/board/base.syscfg
+cc2755p10,96,48,systick,DIO16 red; DIO12 green,UART1 loopback TX DIO21 RX DIO22,DIO27,cc2755p10/README.md; cc2755p10/bench/board/foc.syscfg
+f2800137,120,,c28-cpu-timer,,,,data/boards.csv
+nucleo-u083rc,56,,systick,,,,data/boards.csv
+mspm33c321a,160,,systick,,,,data/boards.csv
+am13e230,200,,systick,,,,data/boards.csv
+cc35x1,160,,systick,,,,data/boards.csv

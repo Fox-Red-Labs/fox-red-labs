@@ -1,0 +1,36 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+const gpio  = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1 = gpio.addInstance();
+const uart  = scripting.addModule("/drivers/uart", {}, false);
+const uart1 = uart.addInstance();
+gpio1.$name = "GPIO_LEDS";
+gpio1.associatedPins.create(2);
+gpio1.associatedPins[0].$name       = "USER_LED_1";
+gpio1.associatedPins[0].pin.$assign = "PA5";
+gpio1.associatedPins[1].$name       = "USER_TEST";
+gpio1.associatedPins[1].pin.$assign = "PA6";
+uart1.$name                            = "UART_0";
+uart1.enableFIFO                       = true;
+uart1.targetBaudRate                   = 9600;
+uart1.peripheral.$assign               = "UC4";
+uart1.peripheral.rxPin.$assign         = "PA1";
+uart1.peripheral.txPin.$assign         = "PA0";
+uart1.txPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig0";
+uart1.txPinConfig.direction            = scripting.forceWrite("OUTPUT");
+uart1.txPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.txPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.txPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+uart1.rxPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig1";
+uart1.rxPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.rxPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+const sysctl = scripting.addModule("/drivers/sysctl", {}, false);
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+sysctl.peripheral.$suggestSolution       = "SYSCTL";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";

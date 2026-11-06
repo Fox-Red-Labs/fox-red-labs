@@ -1,0 +1,24 @@
+<!-- experiment
+id: E208
+board: TMDS62LEVM (simulated in Renode; the board is on order)
+date: 2026-10-18
+status: works
+reached: verified
+line: A Zephyr hello world linked into the AM62L's 144 kB of on-chip SRAM, entered at EL3 with no TF-A and no DDR, boots in Renode on a platform made from the build's own device tree and prints on UART0 at the chip's address. Six translation tables were too few (the pin-control driver's register mapping panics the kernel); eight are enough, and the image is 124 kB. Nothing about clocks, the ROM, TIFS, speed or power is simulated: those wait for the board.
+stop: none
+-->
+# Can the AM62L's DDR-less Zephyr image be run before the board arrives, and what does the simulator settle?
+
+**Short answer.** Yes, for the questions a functional simulator can answer. Antmicro's `dts2repl` turned the Zephyr build's device tree into a Renode platform (Cortex-A53, GICv3 at the AM62L's addresses, the 16550 UART0 at 0x02800000 with the K3 register stride, the 144 kB SRAM span at 0x707F0000), and the bare-EL3 image booted on it and printed `Hello World! am62l_evm/am62l3/a53`. The run found one real defect before any hardware: with 6 translation tables the kernel panics when the pin-control driver maps its registers; 8 tables fix it and cost 8 kB. The chip-specific blocks (clock tree, the two-phase boot ROM, the TIFS firmware) have no model in Renode, QEMU or gem5, and timing and power are outside a functional simulator, so those are what the board run measures. Terms: [vocab](../vocab.md). 1 kB = 1,024 bytes.
+
+**Question.** Before a TMDS62LEVM arrives, can the Zephyr image meant to run from its on-chip SRAM with the DDR never initialized be booted in a simulator, and which of the board's open questions does that settle?
+
+**Vendor position.** The AM62L's Linux SDK documents the boot flow and the SRAM map (software-dl.ti.com, AM62LX 12.01.00.05.03, read 2026-10-18); no simulator is listed among its tools. QEMU's Arm machine list (qemu.org, "Arm System emulator") has no TI K3 entry. Renode's supported platforms (renode.readthedocs.io, "Supported boards", read 2026-10-18) include generic Cortex-A53 platforms "with GICv3 and GICv2". Renode's `dts2repl` README: "a tool for converting device tree sources into Renode's .repl files", used for the Zephyr dashboard's roughly 300 boards. Renode 1.17.0 runs natively on Apple-silicon Macs (`brew install renode/tap/renode`).
+
+**What was tried.** 2026-10-18 on an M4 Mac (macOS 26.3). Zephyr upstream at commit a915b2f, image `build-sram-all` (`am62l-evm/zephyr/sram-all.overlay` plus `bare-el3.conf`: one core, EL3 entry, no SCMI, no PSCI, UART0 only, 144 kB SRAM at 0x707F0000). `dts2repl build-sram-all/zephyr/zephyr.dts -o am62l-sram.repl` (the tool prints nothing without `-o`). One edit to the generated file: the generic timer frequency from the tool's 62.5 MHz default to the chip's 200 MHz. Renode 1.17.0 from the Homebrew tap (the tap must be trusted first: `brew trust renode/tap`), `renode --console --disable-xwt` with `am62l-evm/zephyr/renode/run.resc`: load the platform, `sysbus LoadELF`, UART0 to a file, run three simulated seconds. Debugging with `cpu0 LogFunctionNames true` to see the function trace. Files: `am62l-evm/zephyr/renode/` (platform, script, runner).
+
+**How far it got.** Configure, compile, link, load and run. First run: the trace went `__reset`, `z_arm64_el3_init`, `z_arm64_el2_init`, `z_arm64_el1_init`, `z_arm64_mm_init`, `arm_gic_init`, `pinctrl_ti_k3_init`, `arch_mem_map`, then `printk`, a synchronous exception, `z_fatal_error`, `arch_system_halt`: the pin-control driver maps its 0x4084000 register page, the MMU needs a new table, none is left (6 configured), the kernel logs and panics; nothing reaches the UART because the console driver initializes after pin control. Second run with `CONFIG_MAX_XLAT_TABLES=8`: boots and prints the banner and the hello line on UART0.
+
+**The line.** No stop. The numbers: 6 translation tables fail at the pin-control mapping; 8 work; the image grows from 116 kB to 124 kB (defaults) and 120 kB (tight settings) in the 144 kB map; the 80 kB map is 44 kB over at defaults, 40 kB tight, 24 kB with no C-library heap, so the real floor for this image is 104 kB. What the simulation cannot say: whether UART0 has a clock when Zephyr starts without TIFS (Renode has no clock tree; every TI control register is a tag that reads 0), whether the boot ROM will load the image as its phase-1 payload (no ROM model), what the secure ROM does when BL-1 never reports done, and every speed, boot-time and power number (Renode is functional, not cycle-accurate). The board run measures these.
+
+**Ask.** If you have run Zephyr on a TI K3 A53 in Renode or QEMU with a platform closer to the chip (clock and control-module models), say which files; and if you know the AM62L ROM's maximum phase-1 image size from the TRM (SPRUJB4), say the section.

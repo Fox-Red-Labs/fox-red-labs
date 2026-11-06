@@ -1,0 +1,13 @@
+# Renode script: boot the bare-EL3 SRAM Zephyr image on the AM62L platform description and capture UART0 to a file.
+# Usage (from this folder): renode --console --disable-xwt -e "include @run.resc"
+# ELF: set with -e 'set elf @/path/zephyr.elf' before the include, else zephyr.elf in the current folder is used.
+using sysbus
+$elf?=@zephyr.elf
+$uartlog?=@/tmp/am62l-renode-uart.txt
+mach create "am62l"
+machine LoadPlatformDescription @am62l-sram.repl
+sysbus LoadELF $elf
+mainuart0 CreateFileBackend $uartlog true
+logLevel 3
+emulation RunFor "3"
+quit

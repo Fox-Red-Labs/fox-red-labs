@@ -1,0 +1,100 @@
+//@cliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)" --part "Default"
+//@v2CliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)"
+// @cliArgs --board /ti/boards/LP_MSPM33C321A --rtos nortos
+/**
+ * Six-step Hall spin with timer PWM on the LP-MSPM33C321A + DRV8376EVM (Fox Red Labs, 2026-10-20). TIMA0_1 at 20 kHz, complementary outputs with dead band: C0 PB6/PB7 (phase C), C1 PC17/PC29 (A), C3 PC18/PC19 (B). Software-triggered HSADC:
+ * HSADC0 SOC0..2 = ISENA PC3 (ch21), ISENB PC4 (ch13), ISENC PC5 (ch14); HSADC1 SOC0..3 = VSENVM PA17 (ch2),
+ * VSENA PB27 (ch14), VSENB PA15 (ch0), VSENC PA16 (ch1). Base: TI's hsadc_conversion_software_trigger.
+ */
+const HSADC         = scripting.addModule("/ti/driverlib/HSADC", {}, false);
+const HSADC1        = HSADC.addInstance();
+const HSADC2        = HSADC.addInstance();
+const VREF          = scripting.addModule("/ti/driverlib/VREF");
+const ProjectConfig = scripting.addModule("/ti/project_config/ProjectConfig");
+
+HSADC1.$name                      = "HSADC0";
+HSADC1.enabledSOCs                = ["ADC_SOC_NUMBER0","ADC_SOC_NUMBER1","ADC_SOC_NUMBER2"];
+HSADC1.enabledSEQs                = ["ADC_SEQ_NUMBER1"];
+HSADC1.seqEndSOC                  = "ADC_SOC_NUMBER2";
+HSADC1.seq1Enable                 = true;
+HSADC1.seq1SampleWindow           = 32;
+HSADC1.soc0Channel                = "ADC_CH_ADCIN_21";
+HSADC1.soc1Channel                = "ADC_CH_ADCIN_13";
+HSADC1.soc2Channel                = "ADC_CH_ADCIN_14";
+HSADC1.peripheral.$assign         = "ADC0";
+HSADC1.peripheral.adcPin21.$assign = "PC3";
+HSADC1.peripheral.adcPin13.$assign = "PC4";
+HSADC1.peripheral.adcPin14.$assign = "PC5";
+
+const Board                       = scripting.addModule("/ti/driverlib/Board", {}, false);
+Board.peripheral.$assign          = "DEBUGSS";
+Board.peripheral.swclkPin.$assign = "PA20";
+Board.peripheral.swdioPin.$assign = "PA19";
+
+HSADC2.$name                      = "HSADC1";
+HSADC2.adcBase                    = "HSADC1_BASE";
+HSADC2.enabledSOCs                = ["ADC_SOC_NUMBER0","ADC_SOC_NUMBER1","ADC_SOC_NUMBER2","ADC_SOC_NUMBER3"];
+HSADC2.enabledSEQs                = ["ADC_SEQ_NUMBER1"];
+HSADC2.seqEndSOC                  = "ADC_SOC_NUMBER3";
+HSADC2.seq1Enable                 = true;
+HSADC2.seq1SampleWindow           = 32;
+HSADC2.soc0Channel                = "ADC_CH_ADCIN_2";
+HSADC2.soc1Channel                = "ADC_CH_ADCIN_14";
+HSADC2.soc2Channel                = "ADC_CH_ADCIN_0";
+HSADC2.soc3Channel                = "ADC_CH_ADCIN_1";
+HSADC2.peripheral.$assign         = "ADC1";
+HSADC2.peripheral.adcPin2.$assign  = "PA17";
+HSADC2.peripheral.adcPin14.$assign = "PB27";
+HSADC2.peripheral.adcPin0.$assign  = "PA15";
+HSADC2.peripheral.adcPin1.$assign  = "PA16";
+
+
+const PWM  = scripting.addModule("/ti/driverlib/PWM", {}, false);
+const PWM1 = PWM.addInstance();
+PWM1.$name                           = "PWM_0";
+PWM1.clockPrescale                   = 1;
+PWM1.timerCount                      = 8000;
+PWM1.ccIndex                         = [0,1,3];
+PWM1.ccIndexCmpl                     = [0,1,3];
+PWM1.deadBandEn                      = true;
+PWM1.dbRiseDelayTimerCount           = 20;
+PWM1.dbFallDelayTimerCount           = 20;
+PWM1.PWM_CHANNEL_0.$name             = "ti_driverlib_pwm_PWMTimerCC0";
+PWM1.PWM_CHANNEL_0.dutyCycle         = 0;
+PWM1.PWM_CHANNEL_1.$name             = "ti_driverlib_pwm_PWMTimerCC1";
+PWM1.PWM_CHANNEL_1.dutyCycle         = 0;
+PWM1.PWM_CHANNEL_3.$name             = "ti_driverlib_pwm_PWMTimerCC3";
+PWM1.PWM_CHANNEL_3.dutyCycle         = 0;
+PWM1.ccp0PinConfig.$name             = "ti_driverlib_gpio_GPIOPinGeneric10";
+PWM1.ccp1PinConfig.$name             = "ti_driverlib_gpio_GPIOPinGeneric11";
+PWM1.ccp3PinConfig.$name             = "ti_driverlib_gpio_GPIOPinGeneric13";
+PWM1.ccp0Pin_cmplConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric20";
+PWM1.ccp1Pin_cmplConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric21";
+PWM1.ccp3Pin_cmplConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric23";
+PWM1.peripheral.$assign              = "TIMA0_1";
+PWM1.peripheral.ccp0Pin.$assign      = "PB6";
+PWM1.peripheral.ccp0Pin_cmpl.$assign = "PB7";
+PWM1.peripheral.ccp1Pin.$assign      = "PC17";
+PWM1.peripheral.ccp1Pin_cmpl.$assign = "PC29";
+PWM1.peripheral.ccp3Pin.$assign      = "PC18";
+PWM1.peripheral.ccp3Pin_cmpl.$assign = "PC19";
+
+const SYSCTL              = scripting.addModule("/ti/driverlib/SYSCTL", {}, false);
+SYSCTL.peripheral.$assign = "SYSCTL";
+const divider3       = system.clockTree["EXTDIVMCLK"];
+divider3.divideValue = 1;
+const multiplier2         = system.clockTree["PLL_QDIV"];
+multiplier2.multiplyValue = 10;
+SYSCTL.MCLKSource     = "HSCLK";
+SYSCTL.EXCLKSource    = "HFCLK";
+SYSCTL.SYSPLL_Pdiv    = 1;
+SYSCTL.SYSPLL_CLK0En  = true;
+SYSCTL.SYSPLL_CLK1En  = true;
+SYSCTL.SYSPLL_CLK2XEn = true;
+SYSCTL.clockTreeEn    = true;
+
+VREF.peripheral.$assign            = "VREF";
+VREF.peripheral.vrefPosPin.$assign = "PA23";
+VREF.vrefPosPinConfig.$name        = "ti_driverlib_gpio_GPIOPinGeneric0";
+
+ProjectConfig.migrationCondition = true;

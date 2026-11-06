@@ -1,0 +1,28 @@
+{
+ "target": "TI C2000",
+ "impl": [
+  {
+   "idiom": "bytes.pack_8bit",
+   "families": [
+    "C2000"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "A char is 16 bits and there is no uint8_t: store every byte masked with 0xFF in a 16-bit char and print or send the low 8 bits.",
+   "trap": "A byte-oriented radio driver or host needs the bytes repacked before they leave the chip; the serial check passed without it.",
+   "check": "printed bytes equal the original's",
+   "glue": "ports/esp32-ble-gamepad/boards/f2800137/gp_core.h",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "f2800137",
+     "level": "ran",
+     "what": "5 of 5 lines equal the C6 output",
+     "path": "ports/esp32-ble-gamepad/boards/f2800137/gp_core.c"
+    }
+   ],
+   "status": "proven",
+   "id": "c2000:bytes.pack_8bit/default"
+  }
+ ]
+}

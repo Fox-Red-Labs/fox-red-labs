@@ -1,0 +1,75 @@
+/*
+ * BoosterPack site 1 (J1 to J4) of the LP-MSPM0G3519, pins 1 to 40.
+ * Pin map: LP-MSPM0G3519 user guide SLAU947 (BoosterPack header table),
+ * cross-checked with the pins the display and sensor packs need.
+ * Pins 33 and 34 are the XDS110 backchannel UART until J12 and J13 move.
+ * Pins 9, 10, 37 and 38 are PC2, PC3, PC5 and PC4. Zephyr main's gpio_mspm0
+ * driver has no port C table for the G series, so they are left out of the map.
+ * Pin 40 is S2. Pin 27, 26, 28 are the RGB LED until J19 to J21 come off.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/mspm0-pinctrl.h>
+
+/ {
+	boosterpack_header: connector {
+		compatible = "ti,boosterpack-header";
+		#gpio-cells = <2>;
+		gpio-map-mask = <0xffffffff 0xffffffc0>;
+		gpio-map-pass-thru = <0 0x3f>;
+		gpio-map = <2 0 &gpioa 14 0>,
+			   <3 0 &gpioa 9 0>,
+			   <4 0 &gpioa 8 0>,
+			   <5 0 &gpiob 29 0>,
+			   <6 0 &gpioa 25 0>,
+			   <7 0 &gpiob 31 0>,
+			   <8 0 &gpiob 30 0>,
+			   <11 0 &gpiob 14 0>,
+			   <12 0 &gpiob 11 0>,
+			   <13 0 &gpiob 12 0>,
+			   <14 0 &gpiob 7 0>,
+			   <15 0 &gpiob 8 0>,
+			   <17 0 &gpioa 30 0>,
+			   <18 0 &gpiob 6 0>,
+			   <19 0 &gpioa 7 0>,
+			   <23 0 &gpioa 27 0>,
+			   <24 0 &gpioa 26 0>,
+			   <25 0 &gpiob 24 0>,
+			   <26 0 &gpiob 25 0>,
+			   <27 0 &gpiob 26 0>,
+			   <28 0 &gpiob 27 0>,
+			   <29 0 &gpiob 10 0>,
+			   <30 0 &gpioa 15 0>,
+			   <31 0 &gpioa 13 0>,
+			   <32 0 &gpioa 12 0>,
+			   <33 0 &gpioa 11 0>,
+			   <34 0 &gpioa 10 0>,
+			   <35 0 &gpiob 5 0>,
+			   <36 0 &gpiob 4 0>,
+			   <39 0 &gpiob 9 0>,
+			   <40 0 &gpiob 3 0>;
+	};
+};
+
+&gpioa { status = "okay"; };
+&gpiob { status = "okay"; };
+
+/* The SDK board file routes SPI1 clock to PB9. The BoosterPack clock
+ * (pin 7) is PB31, PINCM68 function 3. The node is not in the HAL's
+ * pinctrl file for this chip, so the module defines it.
+ */
+&pinctrl {
+	spi1_sclk_pb31: spi1_sclk_pb31 {
+		pinmux = <MSP_PINMUX(68, MSPM0_PIN_FUNCTION_3)>;
+	};
+};
+
+boosterpack_spi: &spi1 {
+	status = "okay";
+	pinctrl-0 = <&spi1_sclk_pb31 &spi1_pico_pb8 &spi1_poci_pb7>;
+	pinctrl-names = "default";
+	#address-cells = <1>;
+	#size-cells = <0>;
+};

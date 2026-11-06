@@ -1,0 +1,13 @@
+board,test,variant,status,value,value_hi,runs,clock_mhz,conditions,date,source,checked,note
+cc3200,probe_included,,measured,yes,,,,,2026-10-06,cc3200-launchxl/README.md,by-us,onboard FTDI FT2232D debugger opens but the chip does not answer on JTAG or SWD
+cc3200,time_to_blink,,failed,,,,,,2026-10-06,cc3200-launchxl/README.md,,debugger cannot reach the chip: JTAG reads all ones; SWD cannot read IDR; parked
+cc3200,blink_build,,not_run,,,,,,2026-10-06,cc3200-launchxl/README.md,,CCStudio 21.0.1 has no CC3200 entry (CC3220 only)
+cc3200,blink_flash,openocd,failed,,,,,,2026-10-06,cc3200-launchxl/README.md,,scan chain all ones; cannot read IDR; SOP 000 and 4-wire JTAG tried
+cc3200,blink_flash,uniflash,failed,,,,,,2026-10-06,cc3200-launchxl/README.md,,No device driver was specified for IcePick_C in UniFlash 9.6
+cc3200,stack_support,wifi,failed,,,,,,2026-10-06,cc3200-launchxl/README.md,,chip never answered the debugger; pre-production XCC3200HZ part; UART flashing with SOP 100 not yet tried
+cc3200,radio_airtime,,not_run,,,,,,2026-10-07,cc3200-launchxl/README.md,,board parked: debugger cannot reach the chip
+cc3200,radio_energy_event,,not_run,,,,,,2026-10-07,cc3200-launchxl/README.md,,board parked: debugger cannot reach the chip
+cc3200,radio_energy_avg_ua,,not_run,,,,,,2026-10-07,cc3200-launchxl/README.md,,board parked: debugger cannot reach the chip
+cc3200,radio_throughput,,not_run,,,,,,2026-10-07,cc3200-launchxl/README.md,,board parked: debugger cannot reach the chip
+cc3200,radio_range,,not_run,,,,,,2026-10-07,cc3200-launchxl/README.md,,board parked: debugger cannot reach the chip
+cc3200,radio_flash_used,,not_run,,,,,,2026-10-07,cc3200-launchxl/README.md,,board parked: no CC3200 build target in CCStudio 21.0.1

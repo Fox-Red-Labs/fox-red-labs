@@ -1,0 +1,15 @@
+{
+ "name": "rec_danse_macabre",
+ "title": "Danse macabre (Saint-Saens)",
+ "rate": 10000,
+ "nsamples": 400000,
+ "bytes": 200000,
+ "start_s": 2.0,
+ "length_s": 40.0,
+ "credit": "Philadelphia Orchestra, Leopold Stokowski, Victor 6505, 1925",
+ "license": "Public domain",
+ "source": "https://commons.wikimedia.org/wiki/File:PhiladelphiaSymphonyOrchestra-DanseMacabre.ogg",
+ "source_sha256": "5da52fa63c374fa3744886548aa74786128cdd4760b976194b22f22f30c69820",
+ "adpcm_rms_error": 203.2,
+ "filter": "highpass=f=120,lowpass=f=4500,acompressor=threshold=-24dB:ratio=3:attack=5:release=120:makeup=2, peak -1 dBFS, 0.3 s fades"
+}

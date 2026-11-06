@@ -1,0 +1,6 @@
+{"mcpServers": {
+  "ccs-project":   {"command": "/usr/bin/env", "args": ["-u", "ELECTRON_RUN_AS_NODE", "/Applications/ti/ccs2101/ccs/tools/node/node", "/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/app/plugins/ccs-ai/extension/dist/mcp-server-proxy.js", "project"]},
+  "ccs-debug":     {"command": "/usr/bin/env", "args": ["-u", "ELECTRON_RUN_AS_NODE", "/Applications/ti/ccs2101/ccs/tools/node/node", "/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/app/plugins/ccs-ai/extension/dist/mcp-server-proxy.js", "debug"]},
+  "ccs-sysconfig": {"command": "/usr/bin/env", "args": ["-u", "ELECTRON_RUN_AS_NODE", "/Applications/ti/ccs2101/ccs/tools/node/node", "/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/app/plugins/ccs-ai/extension/dist/mcp-server-proxy.js", "sysconfig"]},
+  "ccs-serial":    {"command": "/usr/bin/env", "args": ["-u", "ELECTRON_RUN_AS_NODE", "/Applications/ti/ccs2101/ccs/tools/node/node", "/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/app/plugins/ccs-ai/extension/dist/mcp-server-proxy.js", "serial"]}
+}}

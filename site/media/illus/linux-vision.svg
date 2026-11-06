@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="The setup for Run a vision model on a Linux board&#x27;s AI accelerator: Image, then Linux, then TDA4VM C7x, then labels">
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="20" y="70" width="150" height="112" rx="6" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle cx="95" cy="100" r="12" fill="none" stroke="#161312" stroke-width="2"/>
+<path d="M95 112 L95 144 M95 122 L76 134 M95 122 L114 134 M95 144 L82 170 M95 144 L108 170" stroke="#161312" stroke-width="2" fill="none" stroke-linecap="round"/>
+<text x="95" y="206" text-anchor="middle" font-size="15" fill="#6B625B">camera frame</text>
+<line x1="174" y1="130" x2="216" y2="130" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M210 124 L220 130 L210 136" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="198.0" y="118" text-anchor="middle" font-size="15" fill="#6B625B">Linux</text>
+<rect x="226" y="96" width="150" height="68" rx="10" fill="#B42418"/>
+<text x="301.0" y="126.0" text-anchor="middle" font-size="18" font-weight="600" fill="#F7F3EC">SK-TDA4VM</text>
+<text x="301.0" y="148.0" text-anchor="middle" font-size="18" font-weight="600" fill="#F7F3EC">C7x + MMA</text>
+<line x1="380" y1="130" x2="414" y2="130" stroke="#161312" stroke-width="2" stroke-linecap="round"/>
+<path d="M408 124 L418 130 L408 136" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="424" y="70" width="150" height="112" rx="6" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<rect x="470" y="82" width="58" height="96" fill="none" stroke="#B42418" stroke-width="2.5" stroke-dasharray="6 4"/>
+<circle cx="499" cy="100" r="12" fill="none" stroke="#161312" stroke-width="2"/>
+<path d="M499 112 L499 144 M499 122 L480 134 M499 122 L518 134 M499 144 L486 170 M499 144 L512 170" stroke="#161312" stroke-width="2" fill="none" stroke-linecap="round"/>
+<circle cx="499" cy="100" r="3.5" fill="#B42418"/>
+<circle cx="480" cy="134" r="3.5" fill="#B42418"/>
+<circle cx="518" cy="134" r="3.5" fill="#B42418"/>
+<circle cx="499" cy="144" r="3.5" fill="#B42418"/>
+<circle cx="486" cy="170" r="3.5" fill="#B42418"/>
+<circle cx="512" cy="170" r="3.5" fill="#B42418"/>
+<text x="499" y="206" text-anchor="middle" font-size="15" fill="#6B625B">box and keypoints</text>
+<text x="588" y="250" text-anchor="end" font-size="12" fill="#6B625B">drawing; the measured runs used random input</text></svg>

@@ -1,0 +1,12 @@
+mainmenu "core1-rpmsg"
+source "Kconfig.zephyr"
+
+config FRL_RING_CONSOLE
+	bool "Send printk to a 4 KB ring buffer in on-chip SRAM instead of a UART"
+	help
+	  Layout at FRL_RING_ADDR: u32 magic 0x52524C46, u32 head (bytes written, only grows),
+	  u32 size of data area (4080), u32 reserved; data from +16. Byte i is at data[i % size].
+
+config FRL_RING_ADDR
+	hex "Physical address of the ring (top 4 KB of the Zephyr SRAM map)"
+	default 0x70813000

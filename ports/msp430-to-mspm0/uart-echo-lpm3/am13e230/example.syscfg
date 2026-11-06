@@ -1,0 +1,27 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+// Port of msp430fr243x_euscia0_uart_01: 9600 baud echo, receive interrupt. UART on the board's serial port (PA0 transmit, PA1 receive).
+const gpio   = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1  = gpio.addInstance();
+const uart   = scripting.addModule("/drivers/uart", {}, false);
+const uart1  = uart.addInstance();
+const sysctl = scripting.addModule("/drivers/sysctl", {}, false);
+
+gpio1.$name                         = "GPIO_LEDS";
+gpio1.associatedPins[0].$name       = "USER_LED_1";
+gpio1.associatedPins[0].direction   = "OUTPUT";
+gpio1.associatedPins[0].pin.$assign = "PA5";
+
+uart1.$name                    = "APP_UART_0";
+uart1.enableFIFO               = true;
+uart1.registerInterrupt        = true;
+uart1.targetBaudRate           = 9600;
+uart1.peripheral.rxPin.$assign = "PA1";
+uart1.peripheral.txPin.$assign = "PA0";
+uart1.txPinConfig.$name        = "drivers_gpio_v0_gpioPinConfig0";
+uart1.rxPinConfig.$name        = "drivers_gpio_v0_gpioPinConfig1";
+
+sysctl.peripheral.$suggestSolution = "SYSCTL";
+uart1.peripheral.$suggestSolution  = "UC1";

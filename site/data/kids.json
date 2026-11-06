@@ -1,0 +1,23 @@
+{
+ "note": "Build with your kids: the labs section under Builds (docs/research/kids-stem-section-proposal-2026-10-17.md). One entry per lab: the level, the payoff in a child's words, why it is cool, the project it points at (site/data/projects.json slug; its tested boards decide the status word), the grown-up's part, a session length (an estimate until one child is timed) and the safety line. Rendered by tools/render_kids.py to site/kids.html. A lab shows as ready only when its project ran on a board; otherwise it says what still has to run. No accounts, no forms for children, no analytics. The second typeface and the two warm colors are not in use yet; until then the skin is Barlow at a larger size on the site's own colors.",
+ "levels": [
+  {"id": "elementary", "name": "Elementary", "ages": "about 5 to 10", "can": "Look, press, choose, draw.", "session": "15 to 20 minutes", "grownup": "builds, wires and runs the commands; the child chooses and watches"},
+  {"id": "middle", "name": "Middle school", "ages": "about 11 to 14", "can": "Follow a wiring card, copy a command.", "session": "30 to 45 minutes", "grownup": "nearby, checks the wiring before power"},
+  {"id": "high", "name": "High school", "ages": "about 14 to 18", "can": "Read a normal project page.", "session": "60 to 90 minutes", "grownup": "optional, except soldering and purchases"},
+  {"id": "college", "name": "College labs", "ages": "", "can": "Run a lab from the sheet: setup, expectation, measurement, compare.", "session": "2 to 3 hours", "grownup": "a lab supervisor for instruments"}
+ ],
+ "labs": [
+  {"id": "blink", "level": "elementary", "project": "blink", "payoff": "A light you control", "why": "You tell the chip how to blink, and it does exactly that, every time.", "safety": "USB power only.", "note": "In the Digital Lab the grown-up plugs the board in and the child picks the colors and times from the page; no code."},
+  {"id": "digits", "level": "elementary", "project": "handwritten-digits", "payoff": "Draw a number, the chip guesses", "why": "A chip the size of a fingernail reads your handwriting.", "safety": "USB power only.", "note": "The grown-up builds it ahead of time; the child only draws."},
+  {"id": "pwm-dim", "level": "elementary", "project": "pwm-dim", "payoff": "Fade a light, like a dimmer", "why": "The chip switches so fast the light looks dimmer instead of blinking.", "safety": "USB power only.", "note": ""},
+  {"id": "button-led", "level": "elementary", "project": "button-led", "payoff": "Press, light on", "why": "Your first input and your first output on one board.", "safety": "USB power only.", "note": ""},
+  {"id": "screen", "level": "middle", "project": "small-screen", "payoff": "Paint colors with a finger", "why": "Eleven wires, one screen, and your own drawings on it.", "safety": "USB power only. Check the twelve wires against the card before power.", "note": ""},
+  {"id": "digits-build", "level": "middle", "project": "handwritten-digits", "payoff": "Build the digit reader yourself", "why": "You wire the screen and load the model; then it reads your writing.", "safety": "USB power only.", "note": ""},
+  {"id": "sensors", "level": "middle", "project": "sensor-boosterpack", "payoff": "Light, humidity, a magnet", "why": "Real sensors on a plug-in board, numbers you can change by hand.", "safety": "USB power only.", "note": ""},
+  {"id": "temperature", "level": "middle", "project": "temperature", "payoff": "Read the room", "why": "The board has a thermistor; warm it with a finger and watch.", "safety": "USB power only.", "note": ""},
+  {"id": "alarm", "level": "high", "project": "alarm-listener", "payoff": "The chip hears an alarm tone", "why": "A small board learns a sound and tells you when it hears it.", "safety": "Low volume. A real smoke alarm test is grown-up only.", "note": ""},
+  {"id": "voltage", "level": "high", "project": "read-a-voltage", "payoff": "Read a knob", "why": "Analog in: a knob becomes a number on the screen.", "safety": "USB power only; 3.3 V on the pins, never 5 V.", "note": ""},
+  {"id": "ai", "level": "high", "project": "small-ai-model", "payoff": "Tiny networks decide if a room is busy", "why": "You time a model on the chip and check it against the test set.", "safety": "USB power only.", "note": ""},
+  {"id": "terminal", "level": "high", "project": "build-from-terminal", "payoff": "Build and flash in one command", "why": "No window, no clicks: the way engineers do it.", "safety": "USB power only.", "note": ""}
+ ]
+}

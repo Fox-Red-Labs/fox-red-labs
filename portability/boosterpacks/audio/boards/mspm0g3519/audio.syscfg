@@ -1,0 +1,64 @@
+/**
+ * BOOSTXL-AUDIO on the LP-MSPM0G3519 (BoosterPack pins from SLAU947 Figure 4-2, pack pins from SLAU670A Figure 12):
+ *   pin 7 PB31 DAC8311 SCLK     pin 12 PB11 DAC8311 SYNC    pin 15 PB8 DAC8311 DIN
+ *   pin 13 PB12 amplifier line  pin 5 PB29 microphone power pin 6 PA25 microphone out (ADC0 channel 2)
+ * Console: UART0 PA10 and PA11 (jumpers J12 and J13 on BP) at 115200. SysTick at 8 kHz paces the samples (MCLK 32 MHz).
+ * @cliArgs --device "MSPM0G351X" --package "LQFP-100(PZ)" --part "Default"
+ * @v2CliArgs --device "MSPM0G3519" --package "LQFP-100(PZ)"
+ */
+// @cliArgs --board /ti/boards/LP_MSPM0G3519 --rtos nortos
+const ADC12   = scripting.addModule("/ti/driverlib/ADC12", {}, false);
+const ADC121  = ADC12.addInstance();
+const Board   = scripting.addModule("/ti/driverlib/Board");
+const GPIO    = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1   = GPIO.addInstance();
+const SYSCTL  = scripting.addModule("/ti/driverlib/SYSCTL");
+const SYSTICK = scripting.addModule("/ti/driverlib/SYSTICK");
+const UART    = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1   = UART.addInstance();
+
+ADC121.$name                       = "ADC12_0";
+ADC121.sampClkSrc                  = "DL_ADC12_CLOCK_ULPCLK";
+ADC121.sampClkDiv                  = "DL_ADC12_CLOCK_DIVIDE_8";
+ADC121.sampleTime0                 = "10 us";
+ADC121.powerDownMode               = "DL_ADC12_POWER_DOWN_MODE_MANUAL";
+ADC121.adcMem0chansel              = "DL_ADC12_INPUT_CHAN_2";
+ADC121.peripheral.$assign          = "ADC0";
+ADC121.peripheral.adcPin2.$assign  = "PA25";
+
+Board.peripheral.$assign          = "DEBUGSS";
+Board.peripheral.swclkPin.$assign = "PA20";
+Board.peripheral.swdioPin.$assign = "PA19";
+
+GPIO1.$name                          = "DAC";
+GPIO1.associatedPins.create(5);
+GPIO1.associatedPins[0].$name        = "SYNC";
+GPIO1.associatedPins[0].initialValue = "SET";
+GPIO1.associatedPins[0].pin.$assign  = "PB11";
+GPIO1.associatedPins[1].$name        = "SCLK";
+GPIO1.associatedPins[1].pin.$assign  = "PB31";
+GPIO1.associatedPins[2].$name        = "DIN";
+GPIO1.associatedPins[2].pin.$assign  = "PB8";
+GPIO1.associatedPins[3].$name        = "AMP";
+GPIO1.associatedPins[3].initialValue = "SET";
+GPIO1.associatedPins[3].pin.$assign  = "PB12";
+GPIO1.associatedPins[4].$name        = "MIC";
+GPIO1.associatedPins[4].pin.$assign  = "PB29";
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;
+
+SYSTICK.periodEnable    = true;
+SYSTICK.period          = 4000;
+SYSTICK.interruptEnable = true;
+SYSTICK.systickEnable   = true;
+
+UART1.$name                    = "UART_0";
+UART1.targetBaudRate           = 115200;
+UART1.enableFIFO               = true;
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+
+const ProjectConfig              = scripting.addModule("/ti/project_config/ProjectConfig", {}, false);
+ProjectConfig.migrationCondition = true;

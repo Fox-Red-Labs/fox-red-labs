@@ -1,0 +1,5 @@
+/* TI's rf_diagnostics sample lowers the SPI clock to 8 MHz on the CC2745R10-Q1
+ * (intermittent SPI transport errors at 12 MHz, per TI's sample overlay). Same here. */
+&ti_bp_cc140xp_trx {
+	spi-max-frequency = <8000000>;
+};

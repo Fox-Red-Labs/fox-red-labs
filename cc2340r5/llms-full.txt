@@ -1,0 +1,2061 @@
+# Fox Red Labs: cc2340r5
+
+Every reader page concatenated, for AI assistants. 14 files. Each starts with a line giving its path and heading. Links inside keep the paths they have in the repo.
+
+==============================================================================
+FILE: cc2340r5/README.md | How do you blink an LED on a TI LP-EM-CC2340R5 LaunchPad development kit from a Mac?
+==============================================================================
+
+# How do you blink an LED on a TI LP-EM-CC2340R5 LaunchPad development kit from a Mac?
+
+> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+
+Clip an XDS110 debug probe onto the board, build TI's `drivers/empty` example from the SimpleLink Low Power F3 SDK 9.21.00.36 with `make`, and flash it with UniFlash 9.6.0: when nothing goes wrong, the build takes 22 seconds and the flash 7 seconds. On an Intel MacBook (macOS 15.7.9) on 2026-10-05 the whole run took about 9 minutes of machine time and 3 minutes hands-on, and most of it went to a connection error that cleared once the probe was pulled off and pressed back on (gotcha 5).
+
+Terms: XDS110 probe, SWD, UniFlash, SysConfig and CCFG are defined in [docs/vocab.md](../docs/vocab.md). Errors and fixes: [FAQ.md](FAQ.md). In every memory figure here 1 kB = 1,024 bytes, so 36 kB is 36,864 bytes.
+
+Status, 2026-10-06: Works. TI's SDK example on FreeRTOS blinked the red LED, confirmed by eye; Zephyr 4.4.2 blinky then blinked the green LED ([zephyr/README.md](zephyr/README.md)).
+
+Contents: [the board](#the-board), [what is in this folder](#whats-in-this-folder), [what you need](#what-you-need-before-you-start), [ten-minute path](#ten-minute-path), [build](#one-command-build), [flash](#flash-7-seconds), [gotchas](#gotchas-so-far), [what was measured](#what-was-measured), [if you see this](#if-you-see-this).
+
+## What is in this folder, and what is not
+
+**In this folder:** this README, `AGENTS.md` (notes for an AI assistant, every line from a run), `FAQ.md` (every error hit, with its exact text and the fix), and the demos listed under "What's in this folder" below. Results are rows in `data/results/cc2340r5.csv` at the top of the repository, not in this folder.
+
+**Not in this folder:** TI's SDK, CCStudio, SysConfig and the compilers (you install them; the versions are in the table under "What you need before you start"), and built images (`.out`, `.hex`, `.bin`, `.elf`), which are not cleared for redistribution. You build them with the command below.
+
+## The board
+
+| Part | Fact |
+|---|---|
+| Kit | LP-EM-CC2340R5 LaunchPad development kit |
+| Chip | CC2340R52: Bluetooth LE and 802.15.4 radio, Arm Cortex-M0+ at 48 MHz |
+| Memory | 512 kB flash, 36 kB RAM. The CC2340R53 is a 64 kB version on a separate board, LP-EM-CC2340R53 |
+| Debugger | None on the board and no USB port. A separate XDS110 probe (LP-XDS110ET or LP-XDS110) clips on and carries power, flashing and serial |
+| LEDs | Red on DIO14 (TI's SDK blink); green (Zephyr blinky) |
+
+Sources: this README as run on 2026-10-05 and 2026-10-06, `zephyr/README.md`, `FAQ.md`, `data/results/cc2340r5.csv`.
+
+## What's in this folder
+
+- [FAQ.md](FAQ.md): every error and limit met on this board, with the fix and what caused it.
+- [zephyr/](zephyr/README.md): Zephyr 4.4.2 blinky with the XDS110 probe, 82 seconds from the first command to running.
+- [zigbee/](zigbee/README.md): TI's Zigbee light example joined to Home Assistant, two settings changed.
+- [matrix/](matrix/README.md): which radio stacks and tools work on this board, RAM left per stack, and benchmarks.
+- [baremetal/](baremetal/README.md): CoreMark and interrupt latency with no operating system and TI Arm Clang.
+- [zephyr-ti/](zephyr-ti/README.md): Bluetooth with TI's Zephyr fork. It builds; hello_world ran after a boot-configuration change; Bluetooth samples printed nothing.
+- [thread/](thread/README.md): Thread with TI's `ot-ti`. The radio co-processor image builds, links and runs (joined a CC1354P10 leader, 2026-10-06); full Thread devices fail to link (RAM).
+- [oad/](oad/README.md): over-the-air updates of the blink image.
+- [ble-light/](ble-light/README.md): a Bluetooth light.
+- [zigbee-alarm/](zigbee-alarm/README.md): a Zigbee smoke and CO alarm.
+- `src/`: the copy of TI's blink example built below.
+
+## What you need before you start
+
+| Thing | Why | Version used here | Where to get it |
+|---|---|---|---|
+| The LP-EM-CC2340R5 board **and** a debug probe (LP-XDS110ET or LP-XDS110) | This board has no USB port or probe of its own. The probe clips on and carries power, flashing and serial. | any serial | Board: <https://www.ti.com/tool/LP-EM-CC2340R5>. Probe: <https://www.ti.com/tool/LP-XDS110ET> |
+| SimpleLink Low Power F3 SDK | Examples and drivers for the chip | 9.21.00.36 LTS | <https://www.ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK>, macOS installer, 536 MB |
+| TI Arm Clang compiler | Builds the code | 5.1.1 LTS | Comes inside CCStudio 21.0.1: <https://www.ti.com/tool/download/CCSTUDIO/21.0.1> |
+| SysConfig | Generates the pin setup code | 1.26.3 | <https://www.ti.com/tool/download/SYSCONFIG>. CCStudio also bundles one |
+| UniFlash (or CCStudio) | Writes the program to the chip | 9.6.0 | <https://www.ti.com/tool/download/UNIFLASH>, macOS installer |
+
+On the test Mac nothing new had to be downloaded for this board, because everything came from the Mac setup guide. Install steps, times and disk space are in [mac-setup/README.md](../mac-setup/README.md).
+
+## Ten-minute path
+
+Measured on 2026-10-05: about 3 minutes hands-on and 9 minutes of machine time, most of it a connection problem. Step 1 and step 5 happen at the bench; steps 2 to 4 in a terminal.
+
+1. At the bench: clip the XDS110 probe onto the LP-EM-CC2340R5 and plug the probe into the Mac. You should see the probe and two serial ports. If a flash later fails with error -615, pull the probe off and press it back on (gotcha 5).
+2. In the terminal: let CCStudio write the connection file (4 seconds). Do not write it by hand (gotcha 2). Replace `<any empty folder>` with a new empty folder and `<SDK>` with `/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS`; the file lands in `targetConfigs/CC2340R5.ccxml` inside the imported project.
+
+```bash
+/Applications/ti/ccs2101/ccs/ccs-server.app/Contents/MacOS/ccs-server-cli.sh -noSplash -workspace <any empty folder> -application com.ti.ccs.apps.importProject -ccs.location <SDK>/examples/rtos/LP_EM_CC2340R5/drivers/empty/freertos/ticlang/empty_LP_EM_CC2340R5_freertos_ticlang.projectspec
+```
+
+3. In the terminal: go to the copy of TI's blink example, then run the `make` command under "One-command build". It writes `empty.out` and `empty.hex` in 22 seconds.
+
+```bash
+cd src/freertos/ticlang
+```
+
+4. In the terminal: go back to this folder (`cd ../../..`), put your probe's serial number in `CC2340R5.ccxml` (`xdsdfu -e` lists them), then flash and run the program (7 seconds):
+
+```bash
+/Applications/ti/uniflash_9.6.0/dslite.sh --mode flash -c CC2340R5.ccxml -e -f -u src/freertos/ticlang/empty.hex
+```
+
+5. At the bench: the red LED (DIO14) is on for one second and off for one second.
+
+## One-command build
+
+The example is the SDK's `drivers/empty`: it toggles the red LED (DIO14) every second. A copy is in `src/`. Run this from `src/freertos/ticlang`; the build took 22 seconds.
+
+```bash
+make SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR=/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS \
+     SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh \
+     TICLANG_ARMCOMPILER=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
+```
+
+The three paths are where TI's installers put the tools on the test Mac. Change them if yours are elsewhere. Output: `empty.out` and `empty.hex`. The build does not make the connection file and does not flash.
+
+## Flash (7 seconds)
+
+Go back to this folder first (`cd ../../..` from the build folder), then:
+
+```bash
+/Applications/ti/uniflash_9.6.0/dslite.sh --mode flash -c CC2340R5.ccxml -e -f -u src/freertos/ticlang/empty.hex
+```
+
+`CC2340R5.ccxml` is the connection file: XDS110 probe, CC2340R5 chip, SWD on, probe picked by serial number. Change the serial number to match your probe (`xdsdfu -e` lists them). The flags, from `dslite.sh --mode flash --help`: `-f` loads the file into flash, `-u` runs the program afterward, and `-e` prints progress messages (it is `--verbose`, not erase). UniFlash's settings file for this chip family (`CC23xx_FlashProperties.xml`) sets "Erase Settings during Program Load" to "Chip Erase" by default, and this connection file does not change it.
+
+Do not add `-v` (verify) for now. With `-v`, UniFlash reports one mismatch in the chip's boot configuration area (CCFG) and ends with `a data verification error occurred, file load failed`, although the program was written and ran after a reset (gotcha 8).
+
+## Gotchas
+
+1. **The board needs a second board.** **Tool or docs:** the probe is sold separately. There is no USB port on the LP-EM-CC2340R5 itself. Without the XDS110 probe you cannot power, flash or talk to it. Order the probe with the board.
+2. **Do not write the connection file by hand.** **Our mistake, and Tool or docs.** UniFlash's command line needs a `.ccxml` file and does not make one. A hand-written one named the probe and the chip, looked right, and left SWD switched off, and this chip only speaks SWD. The errors that follow (`Unable to access the DAP`, `invalid processor ID`) do not say so. Let CCStudio write the file:
+
+   ```bash
+   /Applications/ti/ccs2101/ccs/ccs-server.app/Contents/MacOS/ccs-server-cli.sh -noSplash -workspace <any empty folder> -application com.ti.ccs.apps.importProject -ccs.location <SDK>/examples/rtos/LP_EM_CC2340R5/drivers/empty/freertos/ticlang/empty_LP_EM_CC2340R5_freertos_ticlang.projectspec
+   ```
+
+   Replace `<any empty folder>` with a new empty folder and `<SDK>` with the SDK folder (`/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS` here). Four seconds. The file lands in `targetConfigs/CC2340R5.ccxml` inside the imported project.
+3. **"List operations" is not a connection test.** **Tool or docs.** `dslite.sh -p` prints the flash operations without talking to the chip. It succeeded here while every real connection failed. Use a real flash or a memory read (`--mode memory`) instead.
+4. **With two probes plugged in, name the one you want.** **Tool or docs.** Two boards at once is fine. The command-line tool does not say which probe it used, so put the serial number in the connection file. CCStudio has an agent skill that does this.
+5. **`The target failed to see a correctly formatted SWD header` (error -615): pull the probe off and press it back on.** **Setup or handling:** most likely the probe seating; not proven (the USB cable was replugged at the same time). Here the probe powered the board, carried the serial port and could pulse reset, so it looked connected. Every software fix failed. UniFlash's `cc23xx-unlock-debug-access` mode was tried twice before the probe was reseated and returned `Failed: Connect failed` both times. Then the USB cable was unplugged, the probe was pulled off the board and pressed back on, and the cable was plugged in again. The next flash connected on the first try. Check the seating before anything else. The program a previous owner left on the board did not stop the flash.
+6. **The SDK's build settings point at folders that do not exist.** **Tool or docs.** `imports.mak` names a CCStudio 20.4 folder and a placeholder user name. Pass the three paths on the `make` line as above.
+7. **Zephyr works on this board with the XDS110 probe, but not through `west flash`.** **Third-party behavior** (upstream Zephyr 4.4.2). Zephyr's flash step for this board is set up for J-Link only. Build with `west`, then flash `zephyr_crc32.hex` with UniFlash. Details in [zephyr/README.md](zephyr/README.md).
+8. **Verify reports one mismatch on this chip.** **Unknown.** Every image flashed with verify on (`-v`) reported the same byte, TI SDK builds and upstream Zephyr builds alike. For the SDK blink, UniFlash then reported the whole load as failed:
+
+   `error: Cortex_M0P: File Loader: Verification failed: Values at address 0x4E020750 do not match (expected: 0x00, actual: 0xFF) Please verify target memory and memory map.`
+
+   `Failed: File: .../empty.hex: a data verification error occurred, file load failed.` (path shortened)
+
+   The program area verified and the program ran each time. The mismatch is in the CCFG area: 0x4E020750 is the first byte of its user record, a 128-byte area for the application's own data that sits just after the main CCFG checksum at 0x4E02074C (layout from TI's `hw_ccfg.h`). Later flashes ran without verify, so it is not known whether every image shows it. Flash without `-v` until the cause is known.
+
+## What was measured
+
+| What | Number | Conditions | Level | Source |
+|---|---|---|---|---|
+| Board in hand to blinking LED | About 3 minutes hands-on, about 9 minutes machine time | Intel MacBook, macOS 15.7.9, 2026-10-05; about 8 of the 9 minutes were a connection problem | measured | `time_to_blink` (cli) in `data/results/cc2340r5.csv` |
+| SDK blink build | 22 s | `make` with the three paths, SDK 9.21.00.36 | measured | `blink_build` (cli) |
+| SDK blink flash | 7 s | UniFlash 9.6.0 `dslite.sh`, no verify | measured | `blink_flash` (uniflash) |
+| Zephyr blinky, first command to running | 82 s (build 47 s, flash 7 s) | Zephyr 4.4.2, XDS110 probe | measured | `time_to_blink` (zephyr), `blink_build` (zephyr) |
+| CoreMark, bare metal | 111.09 per second (2.31 per MHz) | 48 MHz, TI Arm Clang -O3 | measured | `coremark`, `coremark_per_mhz` (ticlang-bare-o3) |
+| Interrupt latency, pend to handler, bare metal | 28 to 29 cycles | 48 MHz | measured | `irq_latency` (bare) |
+| GPIO toggle by register write, -O3 | 2.1 cycles per loop pass | 48 MHz, bare metal | measured | `gpio_toggle` (register-bare-o3) |
+| Blink image size, FreeRTOS | 11.7 kB flash, 13.0 kB RAM | SDK `drivers/empty` | measured | `blink_flash_bytes`, `blink_ram_bytes` (freertos) |
+| RAM left with a Zigbee end device | 6.2 kB | TI's `onoff_switch` | measured | `radio_ram_left` (zigbee-end-device) |
+| RAM left with a Zigbee router | 799 bytes | TI's `onoff_light`, logging on | measured | `radio_ram_left` (zigbee-router) |
+| Zigbee light toggled from Home Assistant | Median 95 ms; 20 of 20 toggles landed | First pairing; about 5 s after a re-pairing about two hours later | measured | `radio_cmd_latency`, `radio_cmd_success` (zigbee-home-assistant) |
+
+More rows, with the recipes: [matrix/](matrix/README.md), [baremetal/](baremetal/README.md), [zigbee/](zigbee/README.md).
+
+## If you see this
+
+- If you see `The target failed to see a correctly formatted SWD header` (error -615), pull the probe off the board and press it back on, then flash again. It cleared on the first try after reseating the probe; the cause is most likely the seating but not proven.
+- If you see `Unable to access the DAP` or `invalid processor ID`, the connection file is wrong: a hand-written one left SWD switched off. Use the `.ccxml` that CCStudio writes (step 2 above).
+- If you see `error: Cortex_M0P: File Loader: Verification failed: Values at address 0x4E020750 do not match (expected: 0x00, actual: 0xFF)`, flash without `-v`. The program area verified and the program ran each time.
+
+The rest of the errors, with causes: [FAQ.md](FAQ.md).
+
+## Limits
+
+Verify mismatches at 0x4E020750, the first byte of the CCFG user record. Later flashes ran without verify, so it is not known whether every image shows it.
+
+## Where these facts come from
+
+Checked 2026-10-05 and 2026-10-06 on an Intel MacBook, macOS 15.7.9, with SimpleLink Low Power F3 SDK 9.21.00.36 LTS, TI Arm Clang 5.1.1 LTS (from CCStudio 21.0.1), SysConfig 1.26.3, UniFlash 9.6.0 and Zephyr 4.4.2. Every number above is a row in `data/results/cc2340r5.csv`; the notes for an AI assistant are in `AGENTS.md`.
+
+==============================================================================
+FILE: cc2340r5/FAQ.md | What goes wrong with the TI LP-EM-CC2340R5 LaunchPad development kit on a Mac, and how do you fix it?
+==============================================================================
+
+# What goes wrong with the TI LP-EM-CC2340R5 LaunchPad development kit on a Mac, and how do you fix it?
+
+Every problem met with the TI LP-EM-CC2340R5 LaunchPad (CC2340R52 chip, XDS110 probe) on an Intel Mac, macOS 15.7.9. Each answer starts with the fix and quotes the exact error text so a search finds it. Versions: SimpleLink Low Power F3 SDK 9.21.00.36, TI Arm Clang 5.1.1, SysConfig 1.26.3, UniFlash 9.6.0, Zephyr 4.4.2, Home Assistant 2026.9.2 with zigpy 2.2.0.
+
+**What caused it**, one tag per answer:
+
+| Tag | Meaning |
+|---|---|
+| Our mistake | A step in this project's own runs was wrong. Listed so you do not repeat it |
+| Setup or handling | How the hardware was plugged in or set up |
+| TI example default | A TI example works on TI's bench but its default does not fit a real home |
+| Tool or docs | A TI tool bug, a missing tool, or a missing or wrong instruction |
+| Chip limit | The silicon cannot do it, usually RAM |
+| Third-party behavior | Home Assistant, zigpy, macOS or upstream Zephyr, not TI |
+| Radio environment | The signal between the board and the receiver |
+| Unknown | Not found |
+
+Contents: [Connecting and flashing](#connecting-and-flashing), [Memory and CPU](#memory-and-cpu), [Zephyr](#zephyr), [Zigbee and Home Assistant](#zigbee-and-home-assistant), [Over-the-air updates](#over-the-air-updates), [Thread, Matter and two radios at once](#thread-matter-and-two-radios-at-once), [Bluetooth from a Mac](#bluetooth-from-a-mac). 1 kB = 1,024 bytes.
+
+Words used below (more in [docs/vocab.md](../docs/vocab.md)): the **probe** is the small XDS110 board that clips onto the LaunchPad and connects it to USB. **UniFlash** (`dslite.sh`) is TI's command-line flashing tool. **CCFG** is the chip's boot configuration area at 0x4E020000. **ZHA** is Home Assistant's built-in Zigbee integration.
+
+## Connecting and flashing
+
+### Why does UniFlash say "Unable to access the DAP"?
+
+Check two things: that the command reaches the right probe, and that the connection file has SWD on. Let CCStudio write the file. **Tag: Our mistake.** UniFlash's command line needing a hand-made file is a Tool or docs, listed under the next question. The first attempt had three problems stacked. Two probes were plugged in, and it is not known whether the first attempts reached the other board's probe; the same error appeared later with one probe connected. A hand-written `.ccxml` connection file then left SWD off, which this chip needs; that file gave `Unable to access the DAP`, the chip's debug access port (and `invalid processor ID`). UniFlash's command line needs a `.ccxml` file and does not make one, and the errors do not mention SWD. Fixing the file still left the next error, below. The command that makes a correct file in 4 seconds is in `README.md`, gotcha 2.
+
+### Why does flashing fail with "The target failed to see a correctly formatted SWD header" (error -615)?
+
+Pull the probe off the LaunchPad and press it back on firmly. **Tag: Unknown (suspected: Setup or handling).** The error stayed through a corrected connection file, a CCStudio-written file, slower clock speeds and two tries of UniFlash's unlock mode (`Failed: Connect failed`). The board still powered up and printed on the serial port, so it looked connected. After the probe was pulled off and pressed back on, and the USB cable replugged at the same time, the first flash worked. Most likely the probe was not fully seated on the debug pins; not proven. `README.md`, gotcha 5. TI's OAD example README gives a second cause, an OAD app flashed without its bootloader: see [the OAD entry](#flashing-the-oad-app-alone-fails-with-error--615-why) under Over-the-air updates.
+
+### `make` says "sysconfig_1.26.3/sysconfig_cli.sh: No such file or directory" building an F3 example
+
+Point `SYSCONFIG_TOOL` at the SysConfig you have installed. **Tag: Setup or handling.** With SysConfig 1.28.0 all 22 builds of the 11 Wi-Fi SDK twins in the F3 9.21.00.36 projects passed (2026-10-24, `docs/experiments/2026-10-24-cc2340r5-cc35x1-driver-twins.md`).
+
+### `dslite.sh -p` succeeds but flashing fails. Is the connection fine?
+
+No. `-p` lists flash operations without talking to the chip. **Tag: Tool or docs.** Use a real flash or a memory read (`--mode memory`) to test the connection.
+
+### Why does verify fail: "Verification failed: Values at address 0x4E020750 do not match (expected: 0x00, actual: 0xFF)"?
+
+The program still runs; flash without `-v` until the cause is known. **Tag: Unknown.** It happened on every image flashed with verify on (`-v`): TI SDK builds and upstream Zephyr builds alike. The address is the first byte of the CCFG user record, a small area for application data (layout in the SDK's `hw_ccfg.h`). Most later flashes skipped verify, so it is not known whether every image shows it.
+
+### DSLite `memory -r 0x0,0x20000` wrote a 512 kB file. Is the length in bytes?
+
+No: DSLite `memory -r` counts the length in 32-bit words (0x20000 gives 512 kB, the whole 512 kB flash). **Tag: Our mistake.** The length was read as bytes twice, and the first backup read ran past the end of flash. Try a small read first (`0x0,0x10` is 16 words, so the file should be 64 bytes) and check the file size. The CCFG read `0x4E020000,0x200` gives 2 kB. UniFlash 9.6.0. `oad/README.md`, step 1.
+
+### Can you flash two boards from one Mac?
+
+Yes. Put each probe's serial number in its connection file (`xdsdfu -e` lists them). **Tag: Tool or docs.** The command line does not say which probe it used.
+
+### Does the LP-EM-CC2340R5 have a USB port, or do you need a separate probe?
+
+You need a separate probe. **Tag: Tool or docs.** The board has no USB port of its own; the LP-XDS110ET or LP-XDS110 probe clips on and provides power, flashing and the serial port. Order it with the board.
+
+### Which chip is on your LP-EM-CC2340R5: CC2340R5, CC2340R52 or CC2340R53?
+
+The CC2340R52 (36 kB of RAM). **Tag: Tool or docs.** The board name says R5 and the chip is an R52; the 64 kB CC2340R53 is on a different board, the LP-EM-CC2340R53. To check yours, read the 4-byte part ID at 0x4E00007C with `dslite.sh --mode memory`. This board read 0x803B2DDA; drop the top byte (a valid flag and revision bits) and look up 0x3B2DDA in the SDK's `source/ti/devices/cc23x0r5/driverlib/chipinfo.h`: CC2340R52E0RKPR.
+
+### Can flashing lock or brick a CC2340R5?
+
+It can, if an image turns off debug access or chip erase in its boot configuration (CCFG). **Tag: Setup or handling.** The lock is a chip safety feature set by the image you flash. The permission fields of the images built here (the Zephyr builds, the Zigbee and other TI example builds, the bare-metal benchmark, TI's Zephyr fork, and the DMM and Thread builds) were read; all allowed both. The lock fields of TI's prebuilt dual-image MCUboot hex were read too: debug port and chip erase both allow, debug authorization open, no sectors protected. TI's prebuilt `basic_ble_app.hex`, the other MCUboot builds, and the Zigbee OTA client images were not checked. Upstream Zephyr prints a "LOCK YOUR DEVICE" warning when its settings would lock the chip; TI's fork and SDK builds have no such check, so read the fields yourself. Check `ti_devices_config.c` (TI SDK) or the built devicetree (Zephyr) for `allowDebugPort` and `allowChipErase` before flashing anything new.
+
+### Why is your `.bin` file 1.22 GB?
+
+The boot configuration area sits at 0x4E020000, so a raw binary from address 0 spans 1.22 GB (1.2 GB). **Tag: Tool or docs.** It is mostly empty (a sparse file). Flash the `.hex`, never the `.bin`.
+
+### What do you need to buy and install to start?
+
+The LP-EM-CC2340R5 board, an LP-XDS110ET (or LP-XDS110) probe, and a USB cable for the probe. Software: TI's SimpleLink Low Power F3 SDK (0.55 GB download, 2.0 GB installed plus 2.2 GB of extras, 4.8 GB free needed while installing; <https://www.ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK>), UniFlash, and TI Arm Clang, which comes with CCStudio. A free myTI account and a short export form are needed for TI downloads. **Tag: Tool or docs.** The probe is sold separately. Sizes and links: `mac-setup/README.md`. Prices change; check ti.com.
+
+### Does this work on an Apple Silicon Mac, Windows or Linux?
+
+Not tested. **Tag: Unknown.** Everything here ran on an Intel Mac with macOS 15.7.9. Several fixes are Mac or Intel specific (the `tilogger` byte-size bug also affects Linux; the `lief` install failure was on Intel macOS).
+
+### Which serial port and speed show the board's output?
+
+`/dev/cu.usbmodem<probe serial>1` at 115200 baud, 8 data bits, no parity. **Tag: Setup or handling.** The probe creates two ports; the one ending in 1 carries the board's serial output. Some TI examples send binary logs, not text (see `tilogger` below).
+
+### The SDK's `make` cannot find the compiler or SysConfig
+
+Pass the three paths on the `make` command line: `SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR`, `SYSCONFIG_TOOL` and `TICLANG_ARMCOMPILER`. **Tag: Tool or docs.** The SDK's `imports.mak` points at a CCStudio 20.4 folder and a placeholder user name. The full command: `README.md`, "Build".
+
+### The serial port shows lines from the program you flashed before
+
+Read and discard what is waiting before you trust the output, or reset the board after opening the port. **Tag: Unknown.** The previous program's lines appeared right after flashing a new one; where they were held was not checked.
+
+### How do you recover a CC2340R5 that will not connect after a bad flash?
+
+First reseat the probe (see "Why does flashing fail with 'The target failed to see a correctly formatted SWD header'" above). UniFlash also has a `cc23xx-unlock-debug-access` mode for chips whose debug access is turned off. **Tag: Unknown.** It was run twice while the probe was badly seated and returned `Failed: Connect failed`; after the reseat it was not needed, so it is not known whether it recovers a locked chip.
+
+### How long does box to blinking LED take when nothing goes wrong?
+
+About 30 seconds of machine time once the tools are installed: building TI's blink example took 22 seconds and flashing 7 seconds; Zephyr's blink took 82 seconds from the first command, build included. **Tag: Setup or handling.** The first run took about 9 minutes of waiting because of the connection problems above. Installing the tools is separate: `mac-setup/README.md`.
+
+### My new board is already blinking or running something. Is that expected?
+
+This board arrived running a previous owner's program, which printed on the serial port. **Tag: Setup or handling.** Flashing your program replaces it; nothing needed erasing first.
+
+### Can you do all this inside CCStudio instead of the terminal?
+
+Probably, but it was not run on this board. **Tag: Unknown.** CCStudio was used only to write the connection file. On the MSPM0 board in this project, CCStudio's AI tools flashed a blink in 2 minutes 29 seconds (`mspm0g3507/`).
+
+### Can you debug the CC2340R5 with GDB or OpenOCD from a Mac?
+
+Not with the tools used here. **Tag: Third-party behavior.** The prebuilt OpenOCD used for the MSPM0 board has no CC23xx support, and upstream Zephyr's flash setup for this board knows only J-Link. CCStudio's debugger should work (it wrote the connection file); it was not used to debug.
+
+### Which LED should blink?
+
+Red for TI's SDK blink example; green for Zephyr's blinky, whose board file calls the green LED `led0`. **Tag: Setup or handling.** A different color is a quick way to tell which program is running.
+
+### How do you put TI's own Bluetooth demo back on the board?
+
+Flash TI's prebuilt image from the SDK: `examples/rtos/LP_EM_CC2340R5/ble/prebuilt_hexfiles/basic_ble_app.hex`, with the UniFlash command in `README.md`. **Tag: Setup or handling.** TI's source names it "Basic BLE project" (`ble.deviceName` in the example's `basic_ble.syscfg`); not checked on the prebuilt file. Which program a new board ships with is not known; this one arrived running a previous owner's.
+
+## Memory and CPU
+
+### How much RAM does the LP-EM-CC2340R5 have? The product page says 64 kB
+
+36 kB. **Tag: Chip limit.** The board carries the CC2340R52 (part CC2340R52E0RKPR, read from the chip's factory part ID). TI's data sheet SWRS272F (May 2026) lists 36 kB of SRAM for the R52 and 64 kB for the CC2340R53, which is sold on its own board, the LP-EM-CC2340R53. The product page says "up to 64KB" because it covers both.
+
+### Is the CC2340R5 a Cortex-M33?
+
+No, a Cortex-M0+ at 48 MHz, confirmed from the chip's CPU ID register (0x410CC601). **Tag: Chip limit.** TI's M33 wireless parts are the CC27xx (CC2755P10: Cortex-M33 at 96 MHz, 162 kB RAM). CoreMark on this chip: 111.09 with TI Arm Clang at -O3 (2.31 per MHz), 84.07 under Zephyr with GCC.
+
+### How much RAM is left for your code after the radio stack?
+
+With each example's own settings: Bluetooth (`basic_ble`) 5.1 kB; Zigbee end device (on/off switch, logging on) 6.2 kB; Zigbee OTA client (logging off) 10.7 kB; Zigbee router with logging on 799 bytes; Thread radio co-processor (TI's `ot-ti`, after a settings-area fix that it needed to link) 8.8 kB. With TI's Zephyr fork, the Bluetooth peripheral sample leaves 1.7 kB. **Tag: Unknown (suspected: Chip limit).** These are the linker's figures for each example's own settings; your own build will differ. Per-stack figures: `matrix/README.md`.
+
+### Why are your Zephyr timings 48 times off on the CC2340R5?
+
+Upstream Zephyr's config says the cycle counter runs at 48 MHz; the driver reads a 1 MHz register. **Tag: Third-party behavior.** This is upstream Zephyr 4.4.2, `drivers/timer/cc23x0_systim_timer.c`. Read `SYSTIM TIME250N` (4 MHz) instead; `mspm0g3507/mcu-bench/src/main.c` shows how. The same board file also lists 80 kB of RAM; the chip has 36 kB.
+
+## Zephyr
+
+### On Zephyr, a pin interrupt stops firing after the pin is configured again. Why?
+
+If you call `gpio_pin_configure` (Arduino `pinMode`, MicroPython `Pin.init`) on a pin after setting its interrupt, set the interrupt again. **Tag: Third-party behavior.** Zephyr 4.4.2's `gpio_cc23x0` driver rewrites the pin's IOC register without the edge-detect bits, so the edge setting is lost (IOC10 read 0x60034000 before and 0x60004000 after). Measured on S1 (DIO10) 2026-10-25: 0 of 10 edges counted after the reconfigure, 10 of 10 when only the pull field was changed. `portability/arduino/zephyr/README.md`, `ports/micropython/zephyr-cc2340r5/README.md`.
+
+### On Zephyr, PWM on the red LED (`pwm5`) does nothing. Why?
+
+Use timer channel 2: `<&pwm5 2 ...>` in devicetree, `machine.PWM(("pwm5", 2), ...)` in MicroPython. **Tag: Third-party behavior.** The red LED pin is muxed to LGPT1 channel 2 (`DIO14_T1_C2N`), and the cell after `&pwm5` is the timer channel. Zephyr 4.4.2's board file gives channel 0 for the red PWM LED; channel 0 wrote LGPT1's C0 compare register and left C2 alone (register read-back, 2026-10-25). The green LED (`pwm6`, channel 0) matches its pin. The LED itself was not watched. `ports/micropython/zephyr-cc2340r5/README.md`.
+
+### In MicroPython, `PWM(..., duty_u16=16384)` at 1 kHz gives a much smaller duty than asked. Why?
+
+Use `duty_ns`, or apply `ports/micropython/zephyr-cc2340r5/pwm-duty-u16-overflow.patch` to the MicroPython tree before building. **Tag: Third-party behavior.** MicroPython 1.29.0's `machine_pwm.c` multiplies `duty_u16` by the period in nanoseconds in 32 bits, which overflows for any frequency under about 15.3 kHz at full duty. Measured 2026-10-25: compare register 2,562 instead of 12,000 for 16,384 at 1 kHz; 12,000, 36,000 and 48,000 for 16,384, 49,152 and 65,535 with the patch. The LED was not watched. `ports/micropython/zephyr-cc2340r5/README.md`.
+
+### On Zephyr, an I2C scan finds nothing, but a register read at the same address works. Why?
+
+Probe an address with a one-byte register read (Arduino `Wire.requestFrom`, MicroPython `readfrom_mem(addr, reg, 1)` inside `try`) instead of an empty write. **Tag: Third-party behavior (cause not traced).** The scan sends an empty write to each address, and Zephyr 4.4.2's CC23x0 I2C driver returns an error for it even when a device is there. Seen 2026-10-25 with the Sensors BoosterPack seated: the scan found 0 devices (Arduino `Wire`) and `[]` (MicroPython), while a read at 0x44 returned the OPT3001 ID. The board has no I2C pull-ups, so the BoosterPack must supply them. `portability/arduino/zephyr/README.md`, `ports/micropython/zephyr-cc2340r5/README.md`.
+
+### On Arduino-on-Zephyr, `Serial.println` output has most newlines missing at 9600 baud. Why?
+
+Apply `portability/arduino/zephyr/serial-blocking-write.patch` to the ArduinoCore-zephyr checkout. **Tag: Third-party behavior.** The core's `ZephyrSerial::write()` copies bytes into a 64-byte ring buffer and drops what does not fit; AnalogReadSerial writes about 5 bytes every millisecond and 9600 baud carries about 1. With the patch (a loop that waits for room) 612 clean lines arrived in 3 s. The first line of output is the 115200 boot banner read at 9600; ignore it. `portability/arduino/zephyr/README.md`.
+
+### On Arduino-on-Zephyr, `SPI.transfer(buf, n)` returns zeros or leaves stale bytes in the buffer. Why?
+
+Call `SPI.transfer(byte)` in a loop. **Tag: Third-party behavior.** ArduinoCore-zephyr `af5b8610f9be` runs `spi_write` and then a separate `spi_read`, so the buffer receives the second transfer's input instead of the bytes clocked in during the first. Measured on the LP-MSPM0G3519 (`transfer(buf, 16)` returned 0 of 16 correct); the cause is in the core, so it applies here too, but a buffer transfer was not run on this board. `portability/arduino/zephyr/README.md`.
+
+### Why does upstream Zephyr's `west flash` not work for `lp_em_cc2340r5`?
+
+Upstream Zephyr's flash setup for this board knows only the J-Link probe. **Tag: Third-party behavior.** Build with `west build`, then flash `build/zephyr/zephyr_crc32.hex` (not `zephyr.hex`) with UniFlash. `zephyr/README.md`.
+
+### Does upstream Zephyr support Bluetooth on the CC2340R5?
+
+No. Zephyr 4.4.2 supports GPIO and UART on this board. **Tag: Third-party behavior.** TI's own fork (`TexasInstruments/simplelink-zephyr`) has a Bluetooth driver.
+
+### Images from TI's Zephyr fork flash fine but never run. Why?
+
+For a Bluetooth build, turn on the C library heap first: see the next question, "On the LP-EM-CC2340R5, a Bluetooth build from TI's Zephyr fork builds and flashes but shows no serial output and no advertising. Why?"; with the heap on, the project's beacon and TI's peripheral sample ran with the fork's own boot configuration. **Tag: Unknown (suspected: Tool or docs).** On 2026-10-05, before the heap was found, `hello_world` printed its boot banner only after one boot-configuration byte was changed (CCFG byte 0x4E02001C, 0x0F in the fork, 0x07 in upstream Zephyr 4.4.2) and recomputed all four checksums with upstream Zephyr's `soc/ti/simplelink/cc23x0/ti_ccfg_crc32_calculate.py` (serial capture not saved). On 2026-10-08 the Bluetooth images ran with 0x0F, so that change is not needed for them; why hello_world needed it was not rechecked. Tests ran only with the probe attached. `docs/experiments/2026-10-05-cc2340r5-ti-zephyr-ble.md`.
+
+### On the LP-EM-CC2340R5, a Bluetooth build from TI's Zephyr fork builds and flashes but shows no serial output and no advertising. Why?
+
+Turn on Zephyr's C library heap: add `CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=2048` to `prj.conf`, or 1024 for TI's `samples/bluetooth/peripheral`, which does not link at 2048. **Tag: Unknown (suspected: Tool or docs).** The heap is the memory a program asks for while it runs, through `malloc`. The fork's settings for this board leave it at 0 bytes, so every request fails, and the debugger's evidence reads as TI's Bluetooth stack failing to get memory for its first timer.
+
+To see the value your build used, run `grep MALLOC_ARENA build/zephyr/.config`. At 2048 the peripheral sample fails to link with this line:
+
+```text
+ld.bfd: region `RAM' overflowed by 346 bytes
+```
+
+How it was found, 2026-10-08: halted with the debugger, the program sat in a loop at line 146 of the fork's `drivers/bluetooth/hci/hci_ti.c`. It was called from `halAssertHandlerExt`, TI's Bluetooth assert handler (the function the stack calls when one of its own checks fails; it then waits for a debugger). Below it on the stack were `ICall_abort`, `ICall_setTimer` and the timer callback `osal_msec_timer_cback`, and `ICall_setTimer` gets its memory from `malloc`. That is a reading of the call chain; the allocation was not stepped through.
+
+With the heap on and nothing else changed, the BTHome beacon and TI's peripheral sample advertised and were seen from a Mac, with the fork's own boot-configuration byte (CCFG byte 0x4E02001C at 0x0F). TI simplelink-zephyr `v3.7.0-ti-1.00.01_ga`, GCC 12.2 (Zephyr SDK), UniFlash 9.6.0. Page: [the experiment](../docs/experiments/2026-10-05-cc2340r5-ti-zephyr-ble.md).
+
+### TI's Zephyr fork beacon sample prints "Beacon started" and then `***** HARD FAULT *****`. Why is it not seen on air when the peripheral sample is?
+
+The cause is not known. For a Bluetooth starting point on this fork, use `samples/bluetooth/peripheral` or this repo's BTHome beacon (`ports/bthome/zephyr/`), which both ran. **Tag: Unknown.** With the heap at 2 kB, `samples/bluetooth/beacon` printed `Bluetooth initialized` and `Beacon started, advertising as 40:F3:B0:xx:xx:xx (public)`, then `>>> ZEPHYR FATAL ERROR 0: CPU exception on CPU 0` with `Faulting instruction address (r15/pc): 0x0000bf3c`, 0.122 s after boot; one scan from the Mac found 0 devices named "Test beacon". Not chased: the address was not mapped to a function. 2026-10-08, TI simplelink-zephyr `v3.7.0-ti-1.00.01_ga`.
+
+### TI's Zephyr fork peripheral sample prints `Unable to send 0x2025 to driver (err -2)`. Can you ignore it?
+
+For advertising, yes: the sample went on to print `Bluetooth initialized` and `Advertising successfully started`, and the Mac saw it. **Tag: Unknown.** The lines at start are `<err> bt_ctlr_hci_driver: Failed to send buffer to device`, then `<err> bt_hci_core: send_cmd: Unable to send 0x2025 to driver (err -2)`. 0x2025 is the Bluetooth command that reads the chip's public key, used for secure pairing; pairing was not run, so whether it works is not known. 2026-10-08, heap 1 kB, TI simplelink-zephyr `v3.7.0-ti-1.00.01_ga`.
+
+### Which file do you flash: `zephyr.hex` or `zephyr_crc32.hex`?
+
+Upstream Zephyr 4.4.2: `zephyr_crc32.hex`, which has the boot checksums filled in. TI's Zephyr fork: `zephyr.hex`, because the fork writes the checksums into it. **Tag: Tool or docs.** TI's fork changed the file name from upstream's (upstream's own naming is Third-party behavior), and neither project's page says so.
+
+### TI's Zephyr fork build stops with `crc_tool: command not found` or fails installing `lief`
+
+Install TI's `ti-simplelink-crc-tool` without its pinned dependencies and use a current `lief` wheel: `pip install --only-binary=:all: lief`, then `pip install --no-deps <the tool's wheel>`. **Tag: Tool or docs.** The tool pins `lief` 0.12.3, which has no ready-made package for Python 3.12 on an Intel Mac and failed to build from source (the exact pip error was not saved). `crc_tool: command not found` appears after a good link when the tool is missing. Details: `zephyr-ti/README.md`, step 5.
+
+### TI's Zephyr fork build fails calling objcopy at a fixed path
+
+The fork's CC23xx post-build step calls objcopy inside a Zephyr SDK folder that may not exist. Change it to use the toolchain's objcopy (`${CMAKE_OBJCOPY}`). **Tag: Tool or docs.** The exact error was not saved. Setting `ZEPHYR_SDK_INSTALL_DIR` to work around it does not help: it starts a Zephyr SDK lookup that fails (**Our mistake**, the first try). Details: `zephyr-ti/README.md`, step 6.
+
+### TI's Zephyr fork says `west flash` supports only J-Link
+
+Flash `zephyr.hex` with UniFlash instead (command in `README.md`). **Tag: Tool or docs.** The fork's README for this board says "only JLink is available", and TI sells this board with an XDS110 probe.
+
+### Building TI's Zephyr fork stops in Kconfig after you trimmed the modules
+
+Keep `mbedtls` and `tinycrypt` in the module list (`west config manifest.project-filter -- '-.*,+simplelink-hal_ti,+cmsis,+mbedtls,+tinycrypt'`). **Tag: Our mistake.** The first filter left them out to save disk space, and Bluetooth needs both.
+
+### Does the Zephyr form of the BTHome beacon run on the CC2340R5?
+
+Yes, with the C library heap on: built on TI's Zephyr fork with `CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=2048` (110.5 kB of flash, 30.5 kB of RAM), it ran on 2026-10-08 and the Mac decoded its BTHome v2 packets as "FRL Temp" at -35 dBm. **Tag: Unknown (suspected: Tool or docs).** The tag is for the failure with the heap at 0, the fork's setting: it printed nothing and sent nothing (2026-10-07), like the fork's own Bluetooth samples; the answer above gives the cause as far as it was traced. Experiment: [docs/experiments/2026-10-05-cc2340r5-ti-zephyr-ble.md](../docs/experiments/2026-10-05-cc2340r5-ti-zephyr-ble.md).
+
+## Zigbee and Home Assistant
+
+### TI's Zigbee example never joins your Home Assistant network, and there is no error
+
+The example searches channel 11 only. **Tag: TI example default.** In the example's `.syscfg`, set `zigbee.primaryChannels = [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26];` and, to join an existing network, `zigbee.deviceType = ["zr"];` (router) instead of the default coordinator. `zigbee/README.md`.
+
+### The Zigbee example's serial output is unreadable symbols
+
+It is TI's binary log format, not text. **Tag: TI example default.** Decode it with TI's `tilogger` from `tools/log/tiutils` in the SDK, after the fix below.
+
+### `tilogger` prints "unpack requires a buffer of 8 bytes" and "'NoneType' object has no attribute 'parse_native'"
+
+Change `struct.unpack("L", ts_format)` to `struct.unpack("<I", ts_format)` on line 132 of `tilogger_uart_transport/uart_to_log.py`. **Tag: Tool or docs.** `"L"` is 4 bytes on Windows and 8 on macOS and Linux. Run it as `PYTHONUNBUFFERED=1 tilogger --elf <your .out file> uart /dev/cu.usbmodem<probe serial>1 115200 stdout`; without `PYTHONUNBUFFERED=1` the output is lost when you stop it. (The first diagnosis blamed an empty log section in the build. That was wrong. **Our mistake.**)
+
+### My TI device shows up in Home Assistant as "unk_manufacturer unk_model"
+
+The example leaves the manufacturer and model names empty. **Tag: TI example default.** Harmless. The IEEE address starting `00:12:4b` is TI's.
+
+### After reflashing, Home Assistant says "Failed to send request: device did not respond"
+
+Remove the device in Home Assistant, wait until it is gone from the device list, then let it join again. **Tag: Our mistake.** The device was rejoined too fast, and Home Assistant kept a stale record of the old join. Why the first rejoin failed to answer at all is **Unknown (suspected: the chip erase resets the board's network security counters while the coordinator remembers the old ones).**
+
+### Why does your Zigbee board answer in 5 seconds instead of under 100 ms?
+
+Not explained. **Tag: Unknown (suspected: Radio environment).** The same image on the same desk answered in 95 ms median after its first pairing, and 3.5 to 7 seconds after re-pairing about two hours later, while the coordinator reported a weaker link: RSSI -85 dBm at the first pairing, -89 to -91 dBm in the readings right after re-pairing (the full range that evening was -88 to -91; observed 2026-10-05, not saved). Measure more than once.
+
+### How do you make a TI Zigbee example forget your network?
+
+Probably by reflashing, but this was not checked. **Tag: Unknown.** What was done: remove the device in Home Assistant, wait until it is gone, then reflash. UniFlash's settings for this chip erase the whole chip during every program load by default, which should clear the stored network; that was not checked directly, and the example's reset button was not tested. Note: in UniFlash's `dslite.sh`, `-e` means `--verbose`, not erase (in TI's `xdsdfu` tool, `-e` lists probes).
+
+### Does the CC2340R5 work as a Zigbee end device in Home Assistant?
+
+It rejoined the test network 15 seconds after flashing. **Tag: Unknown.** Home Assistant kept the earlier router record, so the device type and sleep behavior were not confirmed. The OTA client example, also an end device, joined and showed up as one.
+
+### Will TI's Zigbee examples work with Zigbee2MQTT?
+
+Not tested. **Tag: Unknown.** Only Home Assistant's ZHA with a Nabu Casa ZBT-2 was used.
+
+### How do you find which channel your Zigbee network uses?
+
+Home Assistant shows it in the Zigbee integration's network settings. **Tag: Setup or handling.** It can be read through Home Assistant's API (`zha/network/settings`); the test network is on channel 20. TI's examples need it in `zigbee.primaryChannels`, or all 16 channels.
+
+### How do you make a TI Zigbee end device keep its receiver on?
+
+Change it in C: in the example's main file, `zb_set_rx_on_when_idle(ED_RX_ALWAYS_ON);` becomes `zb_set_rx_on_when_idle(ZB_TRUE);`, and skip the polling setup that follows. **Tag: Unknown (suspected: Tool or docs).** Adding `zigbee.powerModeOperation = "alwaysOn";` to the `.syscfg` built without complaint and changed nothing (TI's metadata marks the option read-only by default), and a `-DED_RX_ALWAYS_ON=ZB_TRUE` compiler flag did not change the built file either. The OTA tests used this.
+
+### TI's CC2755 example moved to a CC2340R5 fails with a flash address out of range
+
+Move the storage addresses inside the chip's 512 kB. **Tag: TI example default.** SysConfig reported `Region Base (0xE6000) is outside the device's usable flash [0x0, 0x80000)`: the example's Zigbee and Bluetooth settings storage sat at CC27xx addresses (0xE6000 and 0xE3000). The port used 0x7C000 and 0x79000 (0x7E000 for the CC2340R53 build).
+
+### Which Zigbee coordinators work with TI's examples?
+
+Only a Nabu Casa ZBT-2 with Home Assistant's ZHA was tested. **Tag: Unknown.** Other coordinators and Zigbee2MQTT were not run.
+
+### The same `onoff_light` image that joined on 2026-10-05 never joined on a rerun. Why?
+
+Not solved. **Tag: Unknown.** On 2026-10-16 the image rebuilt from the same source was flashed or reset three times, each with ZHA joining open for about 4 minutes and the device removed from ZHA first once. It never appeared in ZHA's device list. As a control, the Zigbee alarm image (an end device) joined the same network in 31 s and then 7 s, with the coordinator and three routers up. The light's own log differed between tries: in one, "Device (1) STARTED OK" and "Successful steering" 6.2 s after reset; in another, steering was cancelled at 6.3 s (ZBOSS signal 55) and the stack reported no active links at 16 s (signal 24). Not checked: what cancels steering, and the coordinator's own log. Until then, treat the join as seen once. `zigbee/README.md`.
+
+### A Zigbee smoke or CO alarm joins Home Assistant but its sensors never change
+
+Remove the device in ZHA, wait until it is gone, open joining and flash again. **Tag: Unknown (suspected: Third-party behavior).** ZHA did not enroll the zone (zone state 0). One of three scripted re-pairings never showed up within two minutes after a removal that was only seconds old; the suspected cause is pairing before ZHA finished the removal. Entities with no device class have the same cause: the zone type was not read, so reconfigure the device in ZHA. `zigbee-alarm/README.md`.
+
+### The Zigbee alarm stays on "smoke" after `SMOKE 0`
+
+The image sends its own zone status change notification. **Tag: Tool or docs.** ZBOSS's `zb_zcl_ias_zone_set_status()` notifies only when an alarm bit is set; clearing it returns false and sends nothing. The project's `alarm.c` sets the attribute and sends the notification itself, to the address ZHA wrote. `zigbee-alarm/README.md`.
+
+### The board stops answering when ZHA writes the alarm's CIE address
+
+Declare the IAS Zone attributes with the extended list, `ZB_ZCL_DECLARE_IAS_ZONE_ATTRIB_LIST_EXT`. **Tag: Unknown (suspected: Tool or docs).** With the short list the board stopped responding at that write; with the extended one it did not. The cause is inside TI's closed library and was not checked; the suspect is that the short list has no internal context entry. `zigbee-alarm/README.md`.
+
+### The Zigbee alarm goes silent after an idle minute
+
+Keep the receiver on: build without `zb_sleep_now()` and without the sleepy power mode. **Tag: Unknown (suspected: Chip limit).** With `zigbee.powerModeOperation = "sleepy"` and `zb_sleep_now()` the board joined and 10 of 10 changes landed right after the join, then it stopped answering ZHA's reads and stopped hearing serial lines. The suspect is that the UART receiver is off in standby; a product would wake the chip with a GPIO line first. Current was not measured. `zigbee-alarm/README.md`.
+
+## Over-the-air updates
+
+### Home Assistant never offers an update for TI's OTA client example
+
+The example declares the OTA cluster in its code but leaves it out of the endpoint descriptor Home Assistant reads. **Tag: Tool or docs.** zigpy then logs "Ignoring message on unknown cluster: 0x0019". Replace the endpoint declaration with one that lists OTA Upgrade (0x0019): `matrix/ota_endpoint.patch.c`.
+
+### Where is `zOTAfileGen` in the F3 SDK?
+
+It is not there; the example README points at the CC13xx/CC26xx SDK. **Tag: Tool or docs.** `matrix/make_zigbee_ota.py` writes the standard Zigbee OTA file header (manufacturer 0xBEBE, image type 0x2340 for this example). zigpy's parser accepted it.
+
+### You put a new image in Home Assistant's OTA folder and nothing is offered
+
+zigpy caches the folder for 24 hours. **Tag: Third-party behavior.** Reload the ZHA integration, for example through Home Assistant's API (`config/config_entries/entry/<id>/reload`), which took 6 seconds. The folder is set with the `advanced` provider under `zha: zigpy_config: ota: extra_providers:` in `configuration.yaml`.
+
+### The Zigbee update starts and stalls at about 1%
+
+Unsolved. **Tag: Unknown (suspected: Radio environment).** Four transfers stopped at 0.32% to 1.34% of the 200.1 kB image. As TI's example ships it is a sleeping end device (checks for messages every 3 seconds), and block requests sometimes came 17 seconds apart; with the receiver forced on in C it reached about 150 bytes a second, then hit `ZIGBEE_DELIVERY_FAILED: 3074`. `docs/experiments/2026-10-05-cc2340r5-zigbee-ota-home-assistant.md`.
+
+### Can you update the LP-EM-CC2340R5 over Bluetooth from a Mac?
+
+Yes, with this project's `tools/oad/oad_client.py` (Python and the bleak library) and TI's dual-image OAD example: one run on 2026-10-07 sent the 236 kB image in 31.4 s (61.5 kbit/s, ATT MTU 251), the board advertised its new name 7.8 s after the enable command, and version 2.0.0 read back. **Tag: Tool or docs.** TI's own senders are a phone app (SimpleLink Connect) and a Windows program; the SDK has no Mac or Linux sender. One run only, and the LED was not watched. Steps: `oad/README.md`.
+
+### TI's OAD guide and the SDK source disagree. Which one is right?
+
+The source: a client written from the guide does not work, one written from `oad_profile.c`, `oad_service.c` and `sw_update.c` does. **Tag: Tool or docs.** Eight differences turned up; the table "Where TI's guide and the SDK source disagree" in `oad/README.md` lists them all. The block size is always 240, not chosen from the packet size; block requests arrive on 0xFFC5, not 0xFFC2; the Enable Image command (`04`) that every update needs is missing from the guide's command table; "download complete" carries the block count, not 0xFFFFFFFF; block size, version and status commands are answered before image identify, not refused; the software-version reply is 7 bytes, not 5; the header's image size leaves out the header and signature, so a client must send the real file length; and the guide's header table names two fields wrongly. Guide: BLE5-Stack User's Guide in F3 SDK 9.21.00.36, OAD chapter.
+
+### The OAD client stops with "ATT MTU ... carries at most ... bytes a write, the target wants 240"
+
+The Mac and the board agreed a packet size too small for one 240-byte block, so the client stopped before sending any of the image; nothing on the board changed. **Tag: Tool or docs.** TI's OAD source fixes the block at 240 bytes and ignores the offset of a long write, so the link needs an ATT MTU of 243 or more; the guide says the block size follows the packet size. The full message, from `tools/oad/oad_client.py`, is `ATT MTU <mtu> carries at most <mtu - 3> bytes a write, the target wants 240. The target ignores the offset of a long write, so this would corrupt the image. Stopping.` What to try: check that the board's image allows a large packet (TI's dual-image example sets `maxPDUSize = 255` in its `.syscfg`, and the Mac then agreed 251), then reconnect; on a Mac, macOS picks its side of the packet size, so another Mac may agree a larger one (not tested). The stop appeared only with the software stand-in `tools/oad/sim_target.py` set to 185; the board run agreed 251. `oad/README.md`, "The protocol".
+
+### Which OAD flavour fits the LP-EM-CC2340R5?
+
+Dual image (`basic_ble_oad_dual_image`): your app keeps running during the download and only two files go on the chip. **Tag: Setup or handling.** The board has no external SPI flash fitted, so off-chip OAD does not fit it as shipped; on-chip OAD fits but erases your app during the download and needs a second "persistent" app. Dual image halves the room for the app: each slot is 236 kB, and TI's Bluetooth app uses 192 kB. Multi-step OAD needs a bootloader built with a different option and was not run. `oad/README.md`.
+
+### The OAD linker file lets the app run 2 kB into the download slot. Is that a problem?
+
+Not for a build that `imgtool` accepts, because `imgtool` refuses an image too large for its slot. **Tag: Unknown (suspected: Tool or docs).** The dual-image example's linker gives the app 0x3B700 bytes from 0x6100, which ends at 0x41800, 2 kB past the 0x41000 start of the download slot. The app used 192 kB of it (from the linker map), far from the edge. Why TI sized it that way was not found. `oad/README.md`.
+
+### TI's prebuilt MCUboot hex has all its CCFG checksums set to zero. Will it boot?
+
+Yes, if you flash it with UniFlash's default settings, which rewrite the checksums while flashing; do not turn "Overwrite CRC fields in CCFG" off. **Tag: Tool or docs.** All four checksums in `mcuboot_dual_image.hex` read 0x00000000. On 2026-10-07 UniFlash logged `Updating CRC32 field ccfg.crc32 @ address 0x4E02074C, based on data in the range [0x4E020010, 0x4E02074B]. Value changes from 0x00000000 to 0xB714DFB7` and the board booted. UniFlash 9.6.0's settings file skips the user record checksum by default, which may explain the verify mismatch at 0x4E020750 above; not tested.
+
+### Flashing the OAD app alone fails with error -615. Why?
+
+Flash TI's MCUboot and the app in one command, as in `oad/README.md`, step 2. **Tag: Setup or handling.** The dual-image app starts at 0x6000 and needs MCUboot at 0x0 to start it; TI's example README says the probe reports error -615 when the app is flashed without it. This was not run. The other cause of -615, a probe not fully seated, is under Connecting and flashing.
+
+## Thread, Matter and two radios at once
+
+### Can the CC2340R5 be a Thread end device or router?
+
+Not with TI's configurations, built with GCC 12.2 rather than TI's tested toolchain, on the CC2340R52. **Tag: Unknown (suspected: Chip limit).** TI's `ot-ti` lists it as a radio co-processor (RCP) only. With the board check removed, every node build compiles and then fails to link with messages like `region 'SRAM' overflowed by 10216 bytes` (the linker writes the quotes as `SRAM'` with a backtick in front): 7.5 kB to 23.8 kB more RAM than the chip has, depending on build options. A trimmed build might fit (not run). All link on the 64 kB CC2340R53; not run. `docs/experiments/2026-10-05-cc2340r5-thread-full-device.md`.
+
+### `ot-ti` builds just the RCP for LP_EM_CC2340R5 and skips the rest without a message
+
+Two board-name checks in `examples/apps/cli/CMakeLists.txt` and `examples/apps/CMakeLists.txt` skip them. **Tag: Tool or docs.** TI does not state why; the RAM shortfalls in the Thread answer above line up with TI's RCP-only listing.
+
+### `ot-ti` link fails with "section .nvs VMA [0000000000010000,0000000000013fff] overlaps section .text"
+
+The settings storage is placed inside the code for every CC23xx part. **Tag: Unknown (suspected: Tool or docs).** The build used GCC 12.2, SysConfig 1.26.3 and F3 SDK 9.20.00.86 rather than TI's exact setup, which may contribute. Move it to the end of flash (0x7C000 here): `thread/ot-ti-local.patch`.
+
+### Can you run Bluetooth and an 802.15.4 radio stack (Zigbee, Thread, TI 15.4) at the same time on a CC2340R5?
+
+Not with TI's example on the CC2340R52. **Tag: Unknown (suspected: Chip limit).** The test used Bluetooth plus TI's 15.4 MAC stack, expected to be the lightest pairing; Zigbee or Thread would likely need more RAM (not measured). TI's DMM release notes say "The CC23XX products do not support DMM." TI's CC2755 DMM example, retargeted, compiles but fails to link with `error #10099-D: program will not fit into available memory` and `run placement with alignment fails for section ".bss" size 0xca0e` (full message in the experiment page). It is 2.1 kB short of the chip's free RAM before any heap. It links for the CC2340R53 with 1.9 kB unused; not run. `docs/experiments/2026-10-05-cc2340r5-dmm.md`.
+
+### Does the CC2340R5 support Matter?
+
+TI offers no Matter build for it: TI's Matter fork has examples for the CC27xx only. **Tag: Tool or docs.** No build was tried; RAM is the likely reason. TI forum figures for Matter on older TI parts are about 700 kB of flash and 148 to 153 kB of RAM.
+
+### Should you buy the LP-EM-CC2340R5 or the LP-EM-CC2340R53 for a first project?
+
+For Bluetooth or Zigbee alone, the LP-EM-CC2340R5 (CC2340R52 chip) worked. For Thread as a full device, Bluetooth plus Zigbee or Thread at once, or room for your own code beside a radio stack, the builds here point to the 64 kB CC2340R53 (LP-EM-CC2340R53 board). **Tag: Unknown (suspected: Chip limit).** Builds for it linked; nothing has been run on one.
+
+### TI's Thread build script will not run on your Mac
+
+`ot-ti`'s `script/bootstrap` is written for Linux (apt-get, sudo). **Tag: Tool or docs.** Run its CMake step by hand with existing tools; the full setup is in `thread/README.md`. Its release notes name F3 SDK 9.20.00.81 and the repo pins 9.20.00.86, while 9.21.00.36 is the current download.
+
+### What is "error #10264: NVRAM memory range overlaps existing memory range FLASH"?
+
+The linker file gives flash a range that runs into the area reserved for stored settings (NVRAM). **Tag: Our mistake.** It appeared when moving TI's CC2755 DMM example to a CC23xx chip: the flash region had to end where the Zigbee settings storage starts. Fixed linker file: `matrix/dmm_r53_linker.cmd`.
+
+### Should you use upstream Zephyr or TI's Zephyr fork for Bluetooth on this board?
+
+TI's fork, with the C library heap turned on (`CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=2048`); upstream Zephyr 4.4.2 has no Bluetooth for this board. **Tag: Third-party behavior.** On the fork, the BTHome beacon and TI's peripheral sample ran on 2026-10-08; TI's beacon sample hard-faults (see above). TI's F3 SDK, without Zephyr, worked first time and is still the better-tested path.
+
+### The Thread radio CLI image prints unreadable bytes at 115200 baud
+
+Not solved. **Tag: Unknown.** The `ot-cli-radio` test image built for this board (after its checksums were filled) answered with bytes that did not decode, then nothing, at every common speed. Observed 2026-10-06; not saved.
+
+## Bluetooth from a Mac
+
+### A Bluetooth scan over SSH on another Mac fails: "Bluetooth is not authorized for an unknown reason"
+
+macOS grants Bluetooth only to apps a person has approved, not to SSH sessions. **Tag: Third-party behavior.** Scan from the Mac in front of you, or approve a helper app on the other Mac's screen.
+
+### Home Assistant in Docker on a Mac cannot see Bluetooth devices
+
+Docker on macOS has no access to the Mac's Bluetooth radio. **Tag: Third-party behavior.** Use an ESPHome Bluetooth proxy (an ESP32 board) or a Mac-side relay.
+
+### My Mac sees fewer advertisements than the board sends
+
+The test Mac reported about 2.5 a second at a 100 ms interval, where the board should send about 10. **Tag: Unknown (suspected: Third-party behavior).** Measured once, with one receiver. Use gaps between packets, not counts, to check the interval.
+
+### Can you change the Bluetooth name or advertising interval without the SysConfig GUI?
+
+Yes: edit the example's `.syscfg` file and run `make` (31 seconds). **Tag: Tool or docs.** TI's READMEs describe only the GUI. Example lines: `ble.deviceName = "My sensor";` and `ble.advSet1.advParam1.primIntMin = 20;` (milliseconds). Diff: `matrix/basic_ble_text.syscfg.diff`.
+
+### My BTHome or custom-service UUID arrives byte-swapped from SysConfig
+
+Type the UUID with its two bytes swapped in the `.syscfg`: for BTHome's 0xFCD2, write `ble.advSet1.advData1.UUID016SD = 0xD2FC;`. **Tag: Tool or docs.** SysConfig 1.26.3 with the F3 SDK writes the 16-bit service-data UUID high byte first (`0xfc, 0xd2` in `ti_ble_config.c`); Bluetooth sends UUIDs low byte first, so scanners read 0xD2FC and nothing that looks for BTHome matches. The "More 16-bit UUIDs" field in the same tool gets the order right. Check the bytes in the generated `ti_ble_config.c` once. The worked line is in `ports/bthome/basic_ble.patch`.
+
+### How can you see the board's Bluetooth from a phone?
+
+Any Bluetooth scanner app should list TI's `basic_ble` example as "Basic BLE project". **Tag: Unknown.** Scans ran only from a Mac (with the Python library `bleak`); phone apps were not run.
+
+### How long will it run on a battery, and how do you measure its current from a Mac?
+
+Not measured. **Tag: Tool or docs.** TI's EnergyTrace software runs on Windows and Linux, not macOS. A separate meter such as Nordic's Power Profiler Kit II works from a Mac; none was bought for this project. TI's data sheet quotes under 0.71 microamps in standby for the CC2340R52.
+
+### You set an option in the `.syscfg` text and nothing changed, with no error
+
+Check the generated `ti_*.h` or `ti_*.c` file for the value. **Tag: Unknown (suspected: Tool or docs).** A Zigbee "always on" line built without complaint and was ignored; TI's metadata marks that option read-only by default. Some options can only be changed in C (see "How do you make a TI Zigbee end device keep its receiver on?").
+
+### Why is Bluetooth throughput only 4 to 7 kbit/s from a Mac?
+
+The test was a request-and-reply echo, not a stream. **Tag: Unknown (suspected: Third-party behavior).** Each 20 to 128-byte write waited for its echo, and macOS's choice of connection interval is expected to have paced it; the interval was not read. A streaming test needs a characteristic that accepts writes without a reply, which TI's `data_stream` example does not have.
+
+### Why does the Mac hang about 30 seconds when you connect to "CC2340R5 Gamepad", then drop it?
+
+Remove the device in System Settings, Bluetooth, connect again and accept the pairing request. **Tag: Third-party behavior.** The gamepad's HID service needs an encrypted link, so macOS asks for pairing; if the request is not accepted it waits out a 30 s timeout and passes no input. 12 of 12 unaccepted connects returned after 31.2 to 31.4 s. Details: `docs/experiments/2026-10-19-esp32-ble-gamepad-port-matrix.md`.
+
+### Why does the Mac see "FRL Nordic" advertise, then fail to connect and turn its Bluetooth off?
+
+Turn Bluetooth off and on in Control Center (or `sudo pkill bluetoothd`), check `system_profiler SPBluetoothDataType` shows `State: On`, and remove any earlier pairing of this board, such as "CC2340R5 Gamepad", in System Settings, Bluetooth. **Tag: Unknown (suspected: Third-party behavior).** On 2026-10-25 the Nordic image advertised normally, a bleak connect timed out after 10 s, the next hung, and macOS's `bluetoothd` was stopped by its watchdog and came back with the controller off. The same image had connected 3 of 3 times on 2026-10-12. Details: `ports/nordic-apps/README.md`.
+
+### Why does the gamepad reader page say "No gamepad"?
+
+Press a button once with the page in front. **Tag: Third-party behavior.** Chrome and Edge hand a gamepad to a page only after the first input while it is open. Safari was not run. Page: `site/bench/gamepad.html`.
+
+## Benchmarks
+
+### Why does Embench `st` fail its own check on the CC2340R5 with TI Arm Clang?
+
+It prints `R,embench,st,10314129,FAIL` because the compiler's software double add is sometimes one step low. **Tag: Tool or docs.** On this core (no FPU) TI Arm Clang 5.1.1 links its own `__aeabi_dadd`, which rounds down in about 1 in 36 random additions where IEEE 754 rounds up; `st` checks its sums to 1e-13 and they come out 9.09e-13 and 1.82e-12 off. The same code passes on a Mac and with GCC.
+
+### Can the CC2340R5 run a Q15 digital-power PID loop at 100 kHz?
+
+Not quite: with no missed period in 1,000 it holds 97.4 kHz at -O2 and 113.5 kHz at -O3 (48 MHz, code in flash). **Tag: Unknown (suspected: Chip limit).** At exactly 100 kHz the -O2 build's loop runs past some of its periods. The float version holds 21.8 kHz. Only builds from flash were tried. The limit lies between 480 and 493 timer counts; the timing checks were expected to lower it, and they did not. Why is not known; one suspect is that the checks run while the ADC is still sampling the next trigger.
+
+### How fast can the CC2340R5 run the FOC motor-control loop?
+
+Up to 2.42 kHz with no missed period in 1,000, and each interrupt takes 3,380 percent of a 100 kHz period of CPU time, about 16k cycles. **Tag: Unknown (suspected: Chip limit).** The Cortex-M0+ has no FPU, so every float operation and every sine and cosine is library code; only -O2, -O3 and -Os builds from flash were tried. Two of the nine load runs were not clean: the main loop saw only 995 and 986 of the 1,000 interrupts. Why is not known; the rows use the clean runs.
+
+### How much CPU does the CC2340R5's PID loop take?
+
+At -O2 each Q15 interrupt takes 99.6 percent of a 100 kHz period (478 cycles at 48 MHz, measured at 48.7 kHz) and each float one 430.5 percent (measured at 10.9 kHz); at -O3, 90.8 and 427.9 percent. **Tag: Unknown (suspected: Chip limit).** 478 cycles of CPU alone would allow about 100 kHz, and the loop's highest rate is 97.4 kHz, so at that rate almost no CPU is left. How the 478 comes about: per interrupt the main loop lost 601 cycles; minus one 22-cycle pass of the main loop's timer-reading loop, 82 cycles of timing checks and 19 of bookkeeping leaves 478. Measured at half the highest rate. The first try, at the highest rate itself, left the main loop no time and gave no number; that was a mistake in the method. The worst interrupt, with the checks left in, took 121.9 percent. Only builds from flash were tried; not run: code in RAM, other compilers.
+
+### Are the CC2340R5's loop rates exact, given that its timer check reads 1.8 percent fast?
+
+They may be up to 1.8 percent high. **Tag: Unknown (suspected: the CPU clock and the LGPT0 timer clock each have a tolerance and the two add up).** The rates are worked out from LGPT0 timer counts at its nominal 48 MHz; the check read 1,018 timer counts per 1k CPU cycles, so if the check is right each rate is up to 1.8 percent lower, for example 95.6 rather than 97.4 kHz for the Q15 PID loop.
+
+### How much faster is the CC2340R5's AES hardware for one 16-byte block?
+
+5.4 times faster than tiny-AES-c for one block (ECB hardware 1.2k cycles against 6.4k for software with its key expanded beforehand; CBC hardware takes 2k), against 128 times at 1 kB. **Tag: Tool or docs.** For one block most of the hardware time is the driver call, which also loads the key every time; with the software's key expansion timed too the ratio is 6.8. TI Arm Clang 5.1.1 -O2, F3 SDK 9.21.00.36.
+
+### Why did the FreeRTOS `yield_rt` test fail one pass in 1,008?
+
+The harness started timing 50 ms after boot, and something interrupts once at about 53 ms. **Tag: Our mistake.** The bad pass ran the partner task 0 or 2 times instead of once; waiting 500 ms before timing fixed it in six of six runs. What that early interrupt is was not found.
+
+### Why does the `rtos-heap` bench report `I,heap,total 8192` when the heap is bigger?
+
+The line prints TI's default heap size, not the one the image links. **Tag: Our mistake.** That file is compiled without this project's heap setting; the linker map shows the real heap, 25.7 kB (`.bss.ucHeap`). The 41-task result is unaffected.
+
+### Why does an ESPHome or other Zigbee router image fail to link with "run placement with alignment fails for section ".data""?
+
+The image needs more than the chip's 36 kB of RAM. **Tag: Chip limit.** The ESPHome router build needed 37.4 kB, 1.3 kB over. Build it as a Zigbee end device instead (it fit with 4.0 kB left), or shrink ZBOSS's tables in SysConfig (not run). Details: `docs/experiments/2026-10-13-cc2340r5-esphome-fit.md`.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-25. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+How it locks up:
+
+- The probe is not fully seated: The target failed to see a correctly formatted SWD header (`cc2340r5/FAQ.md`, `cc2340r5/AGENTS.md`)
+- An image whose CCFG turns off debug access or chip erase (no image built here did) (`cc2340r5/FAQ.md`)
+
+Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
+
+| Method | Remote or hands | Status | Evidence |
+|---|---|---|---|
+| Pull the probe off the LaunchPad, press it on firmly, replug USB, then flash (the error stayed through a corrected ccxml and slower clocks until the reseat) | hands | proven | `cc2340r5/FAQ.md`, date not recorded |
+| UniFlash cc23xx-unlock-debug-access (Failed: Connect failed, twice, while the probe was badly seated; whether it recovers a locked chip is not known) | remote | failed | `cc2340r5/FAQ.md`, `cc2340r5/AGENTS.md`, date not recorded |
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: cc2340r5/AGENTS.md | What should an AI coding assistant know before working on a TI LP-EM-CC2340R5 LaunchPad development kit?
+==============================================================================
+
+# What should an AI coding assistant know before working on a TI LP-EM-CC2340R5 LaunchPad development kit?
+
+That the chip is a CC2340R52 with 36 kB of RAM, not the 64 kB CC2340R53 the board name suggests, and that the board has no USB port, so nothing works until a separate XDS110 probe is clipped on. This file is the short list of what broke and what worked, each item from runs on one board unless it says otherwise.
+
+Terms: [docs/vocab.md](../docs/vocab.md) and the [LP-EM-CC2340R5 FAQ](FAQ.md) in the Fox Red Labs repo. In short: the **probe** is the small XDS110 board that clips onto the LaunchPad and connects it to USB; **UniFlash** (`dslite.sh`) is TI's command-line flashing tool; **CCFG** is the chip's boot configuration area at 0x4E020000; **ZHA** is Home Assistant's built-in Zigbee integration; **RCP** is a radio-only co-processor image. 1 kB = 1,024 bytes and 1 GB = 1,024 MB. Checked 2026-10-05 to 2026-10-08 on an Intel Mac, macOS 15.7.9, with SimpleLink Low Power F3 SDK 9.21.00.36, TI Arm Clang 5.1.1, SysConfig 1.26.3, UniFlash 9.6.0, Zephyr 4.4.2, Home Assistant 2026.9.2 with zigpy 2.2.0, on one LP-EM-CC2340R5.
+
+**How to use it.** Copy this file into the top folder of your own project as `AGENTS.md`. Most coding assistants read that name; for one that reads `CLAUDE.md`, copy it under that name or add the line `@AGENTS.md` to your `CLAUDE.md`. Paths below in backticks starting `cc2340r5/` are in the Fox Red Labs repo, where the evidence for each line lives; they are not in your copy, and links in this file only work inside that repo.
+
+## The board
+
+| Part | Fact |
+|---|---|
+| Chip | CC2340R52 (part CC2340R52E0RKPR, read from the factory part ID): Arm Cortex-M0+ at 48 MHz, Bluetooth LE and 802.15.4 radio (`cc2340r5/FAQ.md`) |
+| Memory | 512 kB flash, 36 kB RAM. The 64 kB CC2340R53 is on a different board, LP-EM-CC2340R53 (`cc2340r5/FAQ.md`) |
+| Debug probe | None on the board and no USB port. An LP-XDS110ET or LP-XDS110 probe clips on and carries power, flashing and serial (`cc2340r5/README.md`) |
+| LEDs | Red LED on DIO14 toggles in TI's `drivers/empty` blink; green is `led0` in Zephyr's blinky (`cc2340r5/README.md`, `cc2340r5/FAQ.md`) |
+| Serial | `/dev/cu.usbmodem<probe serial>1` at 115200 baud, 8 data bits, no parity; the probe makes two ports and the one ending in 1 is the board's (`cc2340r5/FAQ.md`) |
+| Debug access | SWD only. A connection file with SWD off gives `Unable to access the DAP` (`cc2340r5/README.md`) |
+
+## Start here
+
+Tools it was built with: SimpleLink Low Power F3 SDK 9.21.00.36 LTS (`<SDK>`), TI Arm Clang 5.1.1 LTS (inside CCStudio 21.0.1), SysConfig 1.26.3, UniFlash 9.6.0 (`dslite.sh`). Install order and disk sizes: `mac-setup/README.md`.
+
+Probe: an LP-XDS110ET or LP-XDS110 clipped onto the board, TGT VDD jumper on XDS so the probe powers the board. `xdsdfu -e` lists the probe serial; put it in `cc2340r5/CC2340R5.ccxml`, which also picks your probe when two are plugged in. Do not write the `.ccxml` by hand: let CCStudio write it (`cc2340r5/README.md`, gotcha 2).
+
+Backup: no `backup.py` recipe for this board. The recorded commands are DSLite reads, whose length counts 32-bit words, so check the files come out 512 kB and 2 kB (`cc2340r5/oad/README.md`). Keep them outside the repository, they can hold a Zigbee key:
+
+```text
+DSLITE=/Applications/ti/uniflash_9.6.0/deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/DSLite; CCXML=cc2340r5/CC2340R5.ccxml; BK=<backup folder>
+$DSLITE memory -c $CCXML -r 0x0,0x20000 -o $BK/main_flash.bin
+$DSLITE memory -c $CCXML -r 0x4E020000,0x200 -o $BK/ccfg.bin
+```
+
+Build (22 s), in `cc2340r5/src/freertos/ticlang`. The SDK's `imports.mak` names folders a Mac lacks, so pass three paths:
+
+```bash
+make SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR=<SDK> SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh TICLANG_ARMCOMPILER=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
+```
+
+Flash (7 s), from `cc2340r5/`. Avoid `-v` (every image fails verify at the CCFG, though it runs), the `.bin` (1.22 GB, it spans to the CCFG), and `dslite.sh -p` (lists operations, does not talk to the chip). `-e` means verbose here, not erase.
+
+```bash
+/Applications/ti/uniflash_9.6.0/dslite.sh --mode flash -c CC2340R5.ccxml -e -f -u src/freertos/ticlang/empty.hex
+```
+
+Check: the red LED (DIO14) toggles once a second. `uint32_t time = 1;` on line 57 of `src/empty.c` sets the seconds per toggle; edit, rebuild, flash again.
+
+Restore: merge the backup into one hex, then flash it. The default load erases the chip first, then writes the backup (`cc2340r5/oad/README.md`):
+
+```bash
+python3 cc2340r5/oad/images.py merge $BK/restore.hex $BK/main_flash.bin@0x0 $BK/ccfg.bin@0x4E020000
+```
+
+```text
+$DSLITE flash -c $CCXML -e -f -u $BK/restore.hex
+```
+
+## If you see this
+
+| What you see | Cause | Do this | Check |
+|---|---|---|---|
+| `Unable to access the DAP` | Hand-written connection file with SWD off, or the wrong probe | Let CCStudio write the `.ccxml` (README gotcha 2) and add your probe serial | Flash connects |
+| `Failed: Connect failed` from `cc23xx-unlock-debug-access` | Probe not fully seated; the unlock mode never recovered a chip here | Pull the probe off, press it on firmly, replug USB, then flash instead of unlocking | Flash connects |
+| Zigbee example never joins, nothing printed | TI's example searches channel 11 only | In the `.syscfg` set `zigbee.primaryChannels = [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26];` and `zigbee.deviceType = ["zr"];` | Home Assistant lists the device |
+| Zigbee serial output is unreadable symbols | TI's binary log format | Decode with `tilogger`; change `struct.unpack("L", ts_format)` to `struct.unpack("<I", ts_format)` on line 132 of `uart_to_log.py` | Readable lines |
+| `Region Base (0xE6000) is outside the device's usable flash [0x0, 0x80000)` | TI's CC2755 example moved here keeps storage addresses past 512 kB | Set the storage addresses to 0x7C000 and 0x79000 | SysConfig passes |
+| ``ld.bfd: region `RAM' overflowed by 346 bytes`` | Zephyr `samples/bluetooth/peripheral` with a 2048 heap on TI's fork | Use `CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=1024` | Link passes, sample advertises |
+| `section .nvs VMA [0000000000010000,0000000000013fff] overlaps section .text` | `ot-ti` puts settings at 0x10000 | Apply `cc2340r5/thread/ot-ti-local.patch` (settings at 0x7C000) | Link passes |
+| `error #10264: NVRAM memory range overlaps existing memory range FLASH` | The DMM linker flash region runs into the Zigbee settings storage | Use `cc2340r5/matrix/dmm_r53_linker.cmd` | Link passes |
+| `Failed to send request: device did not respond` in Home Assistant | A flash then a rejoin while the old device record remains | Remove the device in Home Assistant, wait until it is gone, rejoin | Entity appears |
+| `R,embench,st,10314129,FAIL` | TI Arm Clang 5.1.1's software double add rounds down about 1 in 36 times | Treat `st` as a compiler result, not a board fault | Other Embench rows pass |
+| A Bluetooth link drops (bleak: disconnected) the moment a debugger reads the board | CCStudio scripting and DSLite memory reads halt or reset the core | Release the probe during the link: get results over UART or Bluetooth, read the pin with `DSLite memory -r 0x40023200,1` after the link closes (CCStudio scripting resets the chip, so its read shows the boot state) | Link stays up; DOUT bit 14 follows the LED write (`ports/nordic-apps/host/nordic_nolink.py`, run 2026-11-02) |
+| Zephyr pin interrupt counts nothing after a later `pinMode`, `Pin.init` or `gpio_pin_configure` on that pin | Zephyr 4.4.2 `gpio_cc23x0` clears the edge-detect bits on configure | Set the interrupt again after configuring (`portability/arduino/zephyr/README.md`, run 2026-10-25) | ISR count advances |
+| Zephyr PWM on the red LED changes no register that reaches DIO14 | Board file's `pwm-leds` uses `<&pwm5 0 ...>`; DIO14 is LGPT1 channel 2 | Use channel 2 (`ports/micropython/zephyr-cc2340r5/README.md`, run 2026-10-25) | LGPT1 C2CC holds the duty |
+| MicroPython `PWM(duty_u16=...)` duty far too small at 1 kHz | 32-bit overflow in MicroPython 1.29.0 `machine_pwm.c` | `duty_ns`, or `ports/micropython/zephyr-cc2340r5/pwm-duty-u16-overflow.patch` (run 2026-10-25) | C2CC = duty x 48000 / 65535 |
+| An I2C scan on Zephyr finds nothing, but a register read at the same address works | The scan sends an empty write, which fails on Zephyr 4.4.2 CC23x0 I2C driver (cause not traced) | Probe with a one-byte register read | 0x44 answers reads on the Sensors BoosterPack (`portability/arduino/zephyr/README.md`, run 2026-10-25) |
+| The Mac lists the Nordic image ("FRL Nordic") but a bleak connect times out, then `system_profiler SPBluetoothDataType` shows `State: Off` | macOS `bluetoothd` stopped by its XPC watchdog during the connect; cause not found (run 2026-10-25) | Turn Bluetooth off and on in Control Center, or `sudo pkill bluetoothd`; remove old pairings of this board ("CC2340R5 Gamepad") in System Settings, Bluetooth | `State: On`, then the connect returns |
+| ``make`` cannot find `sysconfig_1.26.3/sysconfig_cli.sh` | That SysConfig version is not installed | Pass `SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.28.0/sysconfig_cli.sh`; the F3 9.21 examples build with it (`docs/experiments/2026-10-24-cc2340r5-cc35x1-driver-twins.md`) | Build passes |
+
+Traps shared with other boards: TRAPS.md.
+
+## Radios and stacks
+
+RAM left for your code, from each example's own settings (`cc2340r5/matrix/README.md`):
+
+| Stack | What ran | RAM left |
+|---|---|---|
+| Bluetooth LE, TI SDK `basic_ble` | Advertise, connect, echo | 5.1 kB |
+| Zigbee router, TI SDK | Joined Home Assistant; 20 of 20 commands landed | 799 B with logging on |
+| Zigbee end device (`onoff_switch`) | Rejoined 15 s after flashing, measured once; device type not confirmed | 6.2 kB |
+| Zigbee OTA client | Joined and listed as an end device | 10.7 kB |
+| Thread RCP (`ot-ti`) | Flashed and run 2026-10-06: joined the CC1354P10 Thread leader (Mac host drives it) | 8.8 kB |
+| Bluetooth plus 802.15.4 (DMM) | Compiles, fails to link on the R52 (2.1 kB short of total free RAM before any heap); links on the R53 | none |
+| Full Thread device | Fails to link, 7.5 kB to 23.8 kB over | none |
+| Bluetooth on TI's Zephyr fork | Ran with the C library heap on (below) | 1.7 kB for the peripheral sample |
+| Matter | TI offers no build for this chip (its Matter fork has CC27xx examples only); not run | |
+
+The two link failures are tagged Unknown, suspected chip limit: only TI's configurations were tried. The R53 builds linked, but nothing was run on an R53 (`cc2340r5/FAQ.md`). Upstream Zephyr 4.4.2 supports GPIO and UART on this board and no Bluetooth.
+
+## What ran here
+
+| Project | Result | Source |
+|---|---|---|
+| TI blink, FreeRTOS | Built 22 s, flashed 7 s; first run about 9 min, mostly a probe error | `cc2340r5/README.md`, `data/results/cc2340r5.csv` (`time_to_blink`) |
+| Zephyr 4.4.2 blinky | 82 s from first command to running | `cc2340r5/zephyr/README.md` |
+| CoreMark, bare metal | 111.09 (2.31 per MHz) with TI Arm Clang -O3; 84.07 under Zephyr with GCC | `cc2340r5/baremetal/README.md`, `cc2340r5/FAQ.md` |
+| Interrupt latency | 28 to 29 cycles from pend to handler, bare metal | `data/results/cc2340r5.csv` (`irq_latency`) |
+| Dhrystone and FFT | 0.602 DMIPS/MHz; 256-point q15 FFT in 1.685 ms | `data/results/cc2340r5.csv` (`dhrystone`, `fft256`) |
+| Q15 PID loop | 97.4 kHz at -O2 and 113.5 kHz at -O3 with no missed period in 1,000 | `cc2340r5/FAQ.md` |
+
+<!-- ports:start (tools/render_ports.py) -->
+## Ports that ran here
+
+Code written for other chips and tools, brought to this board. The files to copy, the command and what you see for each are in `docs/ports.md`; the method and a prompt to port your own are there too. Works ran and did what it should; Could work ran in part.
+
+| Port | Status | Result | Evidence |
+|---|---|---|---|
+| Arduino sketches on the LP-EM-CC2340R5 and LP-MSPM0G3519 through the Zephyr-based core: Blink and AnalogReadSerial | Works | Arduino's stock Blink and AnalogReadSerial run unchanged on the LP-EM-CC2340R5 and LP-MSPM0G3519 through the Zephyr-based core. | `portability/arduino/zephyr/README.md` |
+| ESP32-BLE-Gamepad (a Bluetooth HID gamepad library) on TI, ST and C2000 boards | Works | The ESP32-BLE-Gamepad descriptor and reports match the library's output byte for byte on four boards, and 15 of 15 button changes from the LP-EM-CC2340R5 reached a Mac as gamepad reports. | `docs/experiments/2026-10-19-esp32-ble-gamepad-port-matrix.md` |
+| ESPHome Zigbee device on the LP-EM-CC2340R5 | Works | The same YAML with cc23xx: runs a Zigbee end device on the LP-EM-CC2340R5. | `docs/experiments/2026-10-13-esphome-cc27xx-platform.md` |
+| MicroPython 1.29.0 on the LP-EM-CC2340R5 through upstream's Zephyr port | Works | MicroPython's own Zephyr port runs on the 36 kB LP-EM-CC2340R5: a >>> prompt, with Pin, ADC, PWM, SPI and I2C from Python. | `ports/micropython/zephyr-cc2340r5/README.md` |
+| Nordic's nRF Blinky and UART services on the LP-EM-CC2340R5 | Works | TI's basic_ble with two 8-line service descriptions shows Nordic's LED Button and UART services to a Mac on the LP-EM-CC2340R5. | `ports/nordic-apps/README.md` |
+| OpenOCD flash driver for the LP-EM-CC2340R5 and LP-EM-CC2755P10 | Works | OpenOCD erases, writes, verifies and restarts a blink on the LP-EM-CC2340R5 over the XDS110, with no CCStudio or UniFlash. | `docs/experiments/2026-10-18-openocd-cc23xx-driver.md` |
+| Zigbee smoke and CO alarm on the LP-EM-CC2340R5 | Works | A Zigbee smoke and CO alarm joins Home Assistant as one device on the LP-EM-CC2340R5, with no custom Home Assistant code. | `cc2340r5/zigbee-alarm/README.md` |
+| Bluetooth media remote (HID) on the LP-EM-CC2340R5 | Could work | A hand-written HID service on TI's basic_ble builds for the LP-EM-CC2340R5, and a Mac sees it as a keyboard-class device and starts pairing. | `ports/ble-hid-remote/README.md` |
+| MSPM0 code on the CC2340R5 and CC1354P10 radio chips | Could work | MSPM0 driver examples build for the CC2340R5 with a 47-line shim, the first 5 ran with the same pin states as TI's own build, and 4 of 4 ran on the CC1354P10. | `portability/README.md` |
+<!-- ports:end -->
+
+## Where the evidence lives
+
+Start at `cc2340r5/README.md`, then `cc2340r5/FAQ.md` for each problem with its exact error and fix, and `cc2340r5/matrix/README.md` for the stack verdicts. Rows are in `data/results/cc2340r5.csv`. If this file is wrong about your board, correct the FAQ first.
+
+<!-- recovery:start -->
+## When the board stops answering
+
+Checked 2026-10-25. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+
+How it locks up:
+
+- The probe is not fully seated: The target failed to see a correctly formatted SWD header (`cc2340r5/FAQ.md`, `cc2340r5/AGENTS.md`)
+- An image whose CCFG turns off debug access or chip erase (no image built here did) (`cc2340r5/FAQ.md`)
+
+Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
+
+| Method | Remote or hands | Status | Evidence |
+|---|---|---|---|
+| Pull the probe off the LaunchPad, press it on firmly, replug USB, then flash (the error stayed through a corrected ccxml and slower clocks until the reseat) | hands | proven | `cc2340r5/FAQ.md`, date not recorded |
+| UniFlash cc23xx-unlock-debug-access (Failed: Connect failed, twice, while the probe was badly seated; whether it recovers a locked chip is not known) | remote | failed | `cc2340r5/FAQ.md`, `cc2340r5/AGENTS.md`, date not recorded |
+
+<!-- recovery:end -->
+
+==============================================================================
+FILE: cc2340r5/baremetal/README.md | How fast is the TI LP-EM-CC2340R5 (CC2340R52) on bare metal with TI Arm Clang?
+==============================================================================
+
+# How fast is the TI LP-EM-CC2340R5 (CC2340R52) on bare metal with TI Arm Clang?
+
+Terms: CoreMark, SysTick, NVIC, VIMS and CCFG are defined below and in [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [FAQ.md](../FAQ.md).
+
+EEMBC CoreMark scores 111.09 at -O3 (2.31 per MHz at 48 MHz) and 57.54 at -Oz, with TI Arm Clang 5.1.1 and no operating system, measured on the board on 2026-10-05. Interrupt latency from pend to handler is 28 to 29 CPU cycles (about 0.6 microseconds at 48 MHz), and a GPIO register toggle takes 2.1 cycles per loop pass at -O3.
+
+Built and flashed from an Intel Mac (macOS 15.7.9) with SimpleLink Low Power F3 SDK 9.21.00.36, SysConfig 1.26.3 and UniFlash 9.6.0. The board carries the CC2340R52 chip, 36 kB of RAM; the CC2340R53 is a 64 kB version on a separate board, LP-EM-CC2340R53. 1 kB = 1,024 bytes.
+
+Contents: [results](#results-measured-2026-10-05), [run it](#run-it), [recipe](#recipe), [what it measures](#what-it-measures), [memory](#memory-from-the-linker-map-memory-configuration), [what to do next](#what-to-do-next), [files](#files).
+
+Words used on this page (more in [docs/vocab.md](../../docs/vocab.md)):
+
+- **CoreMark**: EEMBC's standard benchmark for small processors. Higher is faster; "per MHz" divides out the clock so chips at different speeds compare.
+- **SysTick**: the Arm core's built-in 24-bit timer. Here it counts every CPU cycle.
+- **VIMS**: the CC23xx flash cache and prefetch unit, between the CPU and flash.
+- **NVIC**: the Arm core's interrupt controller.
+
+## Results, measured 2026-10-05
+
+| | -O3 | -Oz |
+|---|--:|--:|
+| CoreMark, iterations per second | **111.09** | 57.54 |
+| CoreMark per MHz | **2.31** | 1.20 |
+| GPIO toggle, TI driver call, cycles | 19.2 | 31.0 |
+| GPIO toggle, register write in a loop, cycles | 2.1 | 9.0 |
+| One register write (16 back-to-back), cycles | 2.0 | 2.25 |
+| Interrupt latency, pend to handler, direct vector, cycles (includes one SysTick read) | 29 | 28 |
+| Flash used (measured build) | 36.8 kB | 25.6 kB |
+
+Each build was run once (measured once); the loop rows are the best of 5 passes within that run. Both runs pass CoreMark's own check ("Correct operation validated", crcfinal 0x4983). Clock read back as 48 MHz (`ClockP_getCpuFreq`); a short host-timed check of the cycle counter gave 48.02 and 48.07 MHz, which agrees but over only 0.3 s. Flash wait states read live from the chip: 2 (1T) and 2 (2T), the factory-trimmed values. Cache, prefetch and micropredictor on (`CCHCTRL` 0x7). Interrupt latency was the same on all 200 tries in each build.
+
+How it compares:
+
+- **Against Arm's figure.** Arm's published CoreMark for the Cortex-M0+ is 2.46 per MHz (Arm Application Note 350, CoreMark on Cortex processors). 2.31 is 94% of it, with flash wait states in the path.
+- **Against the MSPM0G3507**, same core, same compiler: 2.46 per MHz at 32 MHz and 2.30 at 80 MHz (rows `coremark_per_mhz` in `data/results/mspm0g3507.csv`). The two chips land within 1% of each other per MHz at full speed.
+- **Against Zephyr with GCC on this same chip** (`coremark` rows in `data/results/cc2340r5.csv`): CoreMark 84.07 there (the build named O3, which is really -O2 with loop unrolling), 111.09 here, 32% more. That comparison changes the compiler and the operating system at once, and Zephyr's timer setup on this chip as well, so the 32% is not the compiler alone.
+
+Every number above is a row in `data/results/cc2340r5.csv`.
+
+## Run it
+
+Run from this folder. `--build-only` touches no hardware.
+
+```bash
+./run.sh O3 --build-only
+```
+
+```bash
+./run.sh Oz --build-only
+```
+
+```bash
+./run.sh O3
+```
+
+```bash
+./run.sh Oz
+```
+
+The first two build and check the CCFG. The last two also flash with UniFlash and capture the serial output to `results/run-<variant>.txt` (a folder the script makes). Flashing runs `/Applications/ti/uniflash_9.6.0/dslite.sh --mode flash -c <connection file> -e -f -u build-<variant>/bench.hex` after a listener opens `/dev/cu.usbmodem<probe serial>1` at 115200. The connection file is the board folder's `CC2340R5.ccxml`; `run.sh` names its full path in the `CCXML` line near the top, so change that line if your copy of the repo is somewhere else. Change the probe serial in the connection file, and the port name (`SERIAL_DEV`), to match yours. `-e` prints progress messages; it is `--verbose`, not erase. Capture stops at `BENCH DONE` or after 300 seconds. The script also saves the host time for every line, for the clock check below.
+
+The script refuses to flash unless the generated `ti_devices_config.c` has `allowDebugPort`, `allowChipErase`, `allowFlashProgram` and `allowReturnToFactory` all `CCFG_PERMISSION_ALLOW`.
+
+**Our mistake, now fixed in `run.sh`:** the first -Oz capture stopped on the previous program's `BENCH DONE` line, because the old program repeats its report every 10 seconds, and saved the wrong run. The listener now waits for a `BENCH DONE` that follows this build's own `I,optimization` line.
+
+## Recipe
+
+| Item | Value |
+|---|---|
+| Board | LP-EM-CC2340R5 (CC2340R52: Arm Cortex-M0+, 512 kB flash, 36 kB RAM), XDS110 probe. Board revision: not recorded |
+| SDK | SimpleLink Low Power F3 SDK 9.21.00.36 LTS, NoRTOS |
+| Starting point | `examples/nortos/LP_EM_CC2340R5/drivers/empty` (ticlang makefile and linker file) |
+| SysConfig | 1.26.3 CLI |
+| Compiler | TI Arm Clang 5.1.1.LTS (from CCStudio 21.0.1) |
+| Flags | `-O3` or `-Oz`, plus `-mcpu=cortex-m0plus -march=thumbv6m -mfloat-abi=soft -mthumb -Wall -gdwarf-3` and the SysConfig `.opt` file, as in the SDK makefile |
+| CoreMark | EEMBC sources unmodified (commit 1f483d5, SHA-1 in `coremark/coremark-source.sha1`), new `core_portme.c/.h`. `PERFORMANCE_RUN` (seeds 0, 0, 0x66), `MEM_STACK`, 2k iterations |
+| Code location | Flash. No `.TI.ramfunc` section in either map |
+| CPU clock | 48 MHz, SysConfig default. `ClockP_CPU_FREQ` is 48000000 for CC23X0 in `kernel/nortos/dpl/ClockPLPF3.h`, printed at run time from `ClockP_getCpuFreq()` |
+| Flash wait states | Not set by this program. `hw_fcfg.h` says the factory trim is "Flash 1T wait states (default: 2 WS trimmed)" and "Flash 2T wait states (default: 5 WS untrimmed, 2 WS trimmed)". The program prints the live `VIMS.FLWS1T`, `VIMS.FLWS2T` and the factory trim values (`I,vims_flws1t`, `I,fcfg_flws1t` and so on) |
+| Cache | VIMS has a cache, prefetch and micropredictor (`VIMS.CCHCTRL`, `hw_vims.h`). Not set by this program; the live register is printed as `I,vims_cchctrl` |
+| CCFG | SysConfig default, byte-identical to the stock `empty` example's generated `ti_devices_config.c` (diffed 2026-10-05) |
+| Power | `PowerLPF3_DISALLOW_STANDBY` and `PowerLPF3_DISALLOW_IDLE` constraints set, so the CPU never sleeps and SysTick counts every cycle |
+| Supply | USB, through the LaunchPad. Not measured |
+| Timer | SysTick on the CPU clock, 24-bit, with a wrap counter: one tick is one CPU cycle (`bench_timer.h`) |
+| Date | Built 2026-10-05 |
+
+Changes from the SDK `empty` example, all of them:
+
+1. `bench.syscfg` is `empty.syscfg` plus the four UART2 lines copied from the SDK's `uart2echo.syscfg` (XDS110 backchannel UART).
+2. `lpf3_nortos.cmd`: stack 1 kB raised to 4 kB, because CoreMark keeps its 2 kB work area on the stack. Heap stays at the SDK's 8 kB.
+3. `makefile`: more source files, `OPT` instead of the fixed `-Oz`, runs from `build-<variant>/`, and `-Wl,--search_path=.` so the linker file finds the generated `.genmap`.
+4. `bench.c` replaces `empty.c`. `main_nortos.c` is the SDK's, unchanged.
+
+This follows the project's benchmark method ([docs/methodology.md](../../docs/methodology.md), section 11) and mirrors the MSPM0G3507 bare-metal work in [mspm0g3507/mcu-bench/baremetal/](../../mspm0g3507/mcu-bench/baremetal/).
+
+## What it measures
+
+Same method as the MSPM0G3507 bare-metal pass: loops timed by the cycle counter, best of 5.
+
+| Row | What |
+|---|---|
+| `timer_read` | one `bench_cycles()` call |
+| `empty_loop` | loop overhead |
+| `gpio_toggle_driver` | `GPIO_toggle(CONFIG_GPIO_LED_0)`, the TI driver call |
+| `gpio_toggle_register` | direct write to `GPIO.DOUTTGL31_0` in a loop |
+| `gpio_toggle_str16` | one write to `DOUTTGL31_0`: 16 back-to-back STR in inline asm, minus a SysTick read pair |
+| `systick_read_pair` | two back-to-back SysTick reads |
+| `irq_latency_best`, `_worst_of_200` | pend LRFD IRQ0 (IRQ 6, the line the Zephyr run used) through the NVIC, read SysTick as the handler's first line. Direct vector, installed with `HwiP_plug`, no wrapper |
+
+The LED used is the SDK's `LED0`, DIO14 (red). The Zephyr run toggled DIO15 (green). Same register either way.
+
+Output on the XDS110 UART at 115200, in the shared benchmark program's format: `BENCH START`, `I,key,value` lines, `R,name,cycles,iterations,description` lines, CoreMark's own report (including `crclist`, `crcmatrix`, `crcstate`, `crcfinal` and "Correct operation validated"), then `BENCH DONE`. The whole report repeats every 10 seconds, with `I,pass,<n>`.
+
+Clock check: `I,cycles_now` is printed at the start and end of each report. Cycles between two passes divided by the host seconds between those lines gives the real CPU clock.
+
+## Memory, from the linker map MEMORY CONFIGURATION
+
+| Build | Flash used, of 512 kB | SRAM used, of 36 kB | CCFG |
+|---|--:|--:|--:|
+| -O3 | 36.8 kB (0x9318) in the measured build; 36.6 kB (0x9244) after the rebuild that removed the compiler's version string | 15.8 kB (0x3F02) | 2 kB |
+| -Oz | 25.6 kB (0x6692) in the measured build; 25.4 kB (0x65BE) after the rebuild | 15.8 kB (0x3F02) | 2 kB |
+
+SRAM includes the 8 kB heap and the 4 kB stack, both reserved, not used. Whole program; split by component is not done.
+
+## What to do next
+
+- Energy per CoreMark iteration and sleep current need a power meter. **Tool or docs:** the LP-XDS110ET probe's EnergyTrace has no Mac support.
+- Split the memory figures by component.
+
+## Files
+
+| File | From |
+|---|---|
+| `bench.c`, `bench_timer.h`, `coremark/core_portme.c`, `coremark/core_portme.h` | written here |
+| `main_nortos.c` | SDK `empty` example, unchanged |
+| `bench.syscfg`, `lpf3_nortos.cmd`, `makefile` | SDK `empty` example, changed as listed above |
+| `coremark/core_*.c`, `coremark/coremark.h`, `LICENSE.md` | EEMBC, unmodified |
+| `run.sh` | build, check, flash, capture |
+
+==============================================================================
+FILE: cc2340r5/ble-light/README.md | Bluetooth light on the LP-EM-CC2340R5 (CC2340R52)
+==============================================================================
+
+# Bluetooth light on the LP-EM-CC2340R5 (CC2340R52)
+
+Terms: [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [FAQ.md](../FAQ.md). Status: Should work. The firmware builds for this board and has not run on it.
+
+A phone page controls the kit's LEDs over Bluetooth Low Energy. It is the same firmware as the CC2755P10 one, built from the same source. The service UUID, characteristics, LED pins and what is untested are in [cc2755p10/ble-light/README.md](../../cc2755p10/ble-light/README.md).
+
+Build it from the top of the repository:
+
+```bash
+cc2340r5/ble-light/build.sh
+```
+
+The output lands in `prebuilt/cc2340r5/ble-light/`. The LEDs are red on DIO14 and green on DIO15. Built 2026-10-15 with SimpleLink Low Power F3 SDK 9.21.00.36.
+
+Next: flash it, then connect from a phone browser that supports Web Bluetooth and write a color.
+
+==============================================================================
+FILE: cc2340r5/desk-display/README.md | Bluetooth desk display (LP-EM-CC2340R5 + SSD1306 OLED)
+==============================================================================
+
+# Bluetooth desk display (LP-EM-CC2340R5 + SSD1306 OLED)
+
+Status: firmware flashed and booting; Bluetooth echo and display not yet run. Evidence: [experiment page](../../docs/experiments/2026-10-30-cc2340r5-desk-display.md).
+
+![Four wires](img/wiring.png)
+
+| Wire | LaunchPad end | OLED end |
+|---|---|---|
+| Power | J1 pin 1 (3V3) | VCC |
+| Ground | J3 pin 22 (GND) | GND |
+| Clock | J1 pin 9 (DIO24, I2C_SCL) | SCL |
+| Data | J1 pin 10 (DIO0, I2C_SDA) | SDA |
+
+Run, after wiring and with USB plugged in (one venv once: `python3 -m venv ~/.venvs/ble && ~/.venvs/ble/bin/pip install bleak`):
+
+```bash
+DESK_LAT=<lat> DESK_LON=<lon> cc2340r5/desk-display/run.sh clock    # time, date, weather on the OLED
+cc2340r5/desk-display/run.sh page                                    # browser page at http://localhost:8000/ (stop the clock first: one link at a time)
+cc2340r5/desk-display/run.sh test                                    # three lines, echo check, no display needed
+```
+
+Rebuild and flash: `cc2340r5/desk-display/build.sh`, then DSLite with `cc2340r5/CC2340R5.ccxml -e -f -u out/frl_desk_cc2340r5.hex`. Back up first (cc2340r5/AGENTS.md). Restore is the same page's restore recipe.
+
+If the Mac's Bluetooth stops answering after a connect: turn Bluetooth off and on in Control Center (cc2340r5/AGENTS.md).
+
+==============================================================================
+FILE: cc2340r5/matrix/README.md | What works on the TI LP-EM-CC2340R5, and where does each radio stack stop?
+==============================================================================
+
+# What works on the TI LP-EM-CC2340R5, and where does each radio stack stop?
+
+Terms: RCP, DMM, OTA, ZHA, MCUboot and CCFG are defined in [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [FAQ.md](../FAQ.md).
+
+Bluetooth LE and a Zigbee router into Home Assistant work on this board from TI's SimpleLink Low Power F3 SDK 9.21.00.36 examples, with a few settings changed. Most of the rest fails to link for lack of RAM (the chip has 36 kB) with TI's configurations, and the remainder stops at a missing TI port or a fault not found.
+
+In six lines:
+
+1. **Works:** Bluetooth LE (advertise, connect, echo) and a Zigbee router into Home Assistant. A Zigbee end device (TI's on/off switch example) rejoined the network 15 s after flashing, measured once; its device type and sleep behavior were not confirmed. TI's OTA client example, also an end device, joined and was listed as an end device.
+2. **RAM decides:** 36 kB. Left for your code: 5.1 kB with Bluetooth, 6.2 kB with a Zigbee end device, 10.7 kB with the Zigbee OTA client, 8.8 kB with the Thread RCP (flashed and run, 2026-10-06), 799 B with a Zigbee router with logging on.
+3. **Compiles, fails to link (RAM):** a full Thread device (7.5 kB to 23.8 kB over, depending on build options) and Bluetooth plus 802.15.4 at once (DMM, 2.1 kB short of the chip's total free RAM before any heap). **Unknown (suspected: Chip limit):** only TI's configurations were tried, built with this repo's settings; a trimmed build might fit; not run. Both link on the 64 kB CC2340R53.
+4. **Builds, does not run:** Bluetooth on TI's Zephyr fork. hello_world ran after a boot-configuration change; Bluetooth samples printed nothing. **Unknown.**
+5. **Starts, never finishes:** a Zigbee over-the-air update from Home Assistant. Best 1.34% in four transfers. **Unknown (suspected: Radio environment).**
+6. **Not offered for this chip:** Matter, Thread under Zephyr, Bluetooth under upstream Zephyr. ESPHome's Zigbee end device links (32.0 kB of the 36 kB of RAM; not run); its router build is 1.3 kB over.
+
+Tested 2026-10-05 into 2026-10-06 on one board with an XDS110 probe, from an Intel MacBook (macOS 15.7.9) with TI Arm Clang 5.1.1, SysConfig 1.26.3 and UniFlash 9.6.0; Home Assistant ran ZHA with a ZBT-2 radio on a separate host. The board carries the CC2340R52 chip (36 kB of RAM); the 64 kB CC2340R53 is on a separate board, LP-EM-CC2340R53. 1 kB = 1,024 bytes.
+
+## Verdict for each combination
+
+| Combination | Verdict | Cause | Detail |
+|---|---|---|---|
+| Bluetooth LE, TI SDK | **Works** | | Advertised, connected, echo checked |
+| Bluetooth LE, upstream Zephyr 4.4.2 | **No** | **Third-party behavior** | Board file lists GPIO and UART only |
+| Bluetooth LE, TI's Zephyr fork | **Builds; Bluetooth samples print nothing** | **Unknown** | hello_world ran after a boot-configuration change (CCFG byte 0x4E02001C); Bluetooth samples printed nothing ([zephyr-ti](../zephyr-ti/README.md)) |
+| Zigbee router, TI SDK | **Works** | | Joined Home Assistant; 20 of 20 commands landed; 95 ms median at first pairing; about 5 s after re-pairing, cause unknown ([zigbee](../zigbee/README.md)) |
+| Zigbee end device, TI SDK | **Joined; type confirmed only for the OTA client example** | **Unknown** (type, sleep) | `onoff_switch` rejoined 15 s after flashing, measured once; Home Assistant kept its old router record |
+| Bluetooth plus 802.15.4 at once (DMM) | **Compiles, fails to link (RAM) on the R52; links on the R53** | **Unknown (suspected: Chip limit)** | 2.1 kB short of the chip's total free RAM before any heap; a trimmed build might fit; not run |
+| Thread | **RCP only per TI; RCP flashed and run (joined a CC1354P10 leader, 2026-10-06); node builds fail to link (RAM)** | **Unknown (suspected: Chip limit)** | Node builds 7.5 kB to 23.8 kB over, depending on build options; a trimmed build might fit; not run ([thread](../thread/README.md)) |
+| Thread, Zephyr | **No** | **Tool or docs** | No 802.15.4 driver for CC23xx in TI's fork |
+| Matter | **No** | **Tool or docs** | TI's Matter fork has CC27xx examples only; not built |
+| Proprietary 2.4 GHz packets | **Builds** | | `rfPacketTx`; not run, needs a second radio |
+| Bluetooth over-the-air update | **Works from a Mac** | | One run on 2026-10-07 with this repo's `tools/oad/oad_client.py` and TI's dual-image example; TI's own senders are a phone app or a Windows program ([oad](../oad/README.md)) |
+| Zigbee over-the-air update | **Starts, never finishes** | **Unknown (suspected: Radio environment)** | Best 1.34% of 200.1 kB |
+| SysConfig without the GUI | **Works** | | About seven settings tried as `.syscfg` text edits; Bluetooth changes seen on air |
+| ESPHome | **End device links, not run; router build does not fit** | **Chip limit** | The router build needed 37.4 kB of the 36 kB of RAM ([experiment](../../docs/experiments/2026-10-13-cc2340r5-esphome-fit.md)) |
+| Clock speed | **48 MHz** | | TI documents only 48 MHz; read back at 48.0 MHz once |
+
+"No" verdicts say which kind of no: **Tool or docs** when TI offers nothing for this chip, **Chip limit** when the chip cannot (written as suspected when only TI's configurations were tried), **Third-party behavior** when the gap is in non-TI software.
+
+Why the OTA cause is suspected, not proven: the coordinator's readings of this board that evening, none taken during a transfer, were LQI 36 to 48 and RSSI -88 to -91 dBm, a weak link.
+
+## More on this board
+
+- RAM per stack: `memory-breakdown.json` in this folder, and the rows `radio_ram_left` and `radio_flash_used` in `data/results/cc2340r5.csv`.
+- Bluetooth, Zigbee and CPU numbers: the same CSV.
+- Write-ups: [DMM](../../docs/experiments/2026-10-05-cc2340r5-dmm.md), [Thread](../../docs/experiments/2026-10-05-cc2340r5-thread-full-device.md), [Zigbee OTA](../../docs/experiments/2026-10-05-cc2340r5-zigbee-ota-home-assistant.md), [TI's Zephyr](../../docs/experiments/2026-10-05-cc2340r5-ti-zephyr-ble.md), [SysConfig](../../docs/experiments/2026-10-05-cc2340r5-sysconfig-without-gui.md).
+
+## Not done
+
+Sleep current, energy, packet error rate and range; a full Thread border router with this chip as its radio ([thread](../thread/README.md); the CC2340R5 RCP already drove a CC1354P10 host in [the border-router host](../../border-router/host-cc1354/README.md)); the debugger on TI's Zephyr Bluetooth samples, which print nothing ([zephyr-ti](../zephyr-ti/README.md)).
+
+==============================================================================
+FILE: cc2340r5/oad/README.md | How do I update a TI LP-EM-CC2340R5 over Bluetooth from a Mac terminal?
+==============================================================================
+
+# How do I update a TI LP-EM-CC2340R5 over Bluetooth from a Mac terminal?
+
+Yes for the Bluetooth name and version; the red LED was not watched. The update ran once on 2026-10-07: 31.4 s transfer, 7.8 s to the new name, version 2.0.0 read back. One run.
+
+That is about 41 s from scan to new name (the sum of the saved timings: scan 0.84 s, connect 0.99 s, transfer 31.44 s, enable to new name 7.78 s), and 43 s including the version read, which the run's JSON output does not log separately. Use TI's dual-image OAD example with TI's prebuilt MCUboot bootloader, and send the new image with [`tools/oad/oad_client.py`](../../tools/oad/oad_client.py), a Python script on the bleak Bluetooth library that speaks TI's OAD protocol. Both images build from the terminal in about two minutes, and a dry run checks the image header, SHA-256, signature and the chip's lock fields with no board.
+
+Terms: OAD, dual image, MCUboot, SHA-256 and ECDSA signature, ATT MTU, bleak, imgtool, 0xFF padding, CCFG and CCFG checksums, OTA and the XDS110 probe are defined in [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [FAQ.md](../FAQ.md). 1 kB = 1,024 bytes.
+
+Time to repeat, once the tools in [mac-setup/README.md](../../mac-setup/README.md) are installed: about 2 minutes to build, about 13 s to flash, under a minute for the update, plus the backup and restore reads (not timed).
+
+OAD (over-the-air download) is TI's name for sending new firmware to a running Bluetooth device. TI documents it with a phone app (SimpleLink Connect) or a Windows tool; this page does it from a Mac terminal.
+
+Contents: [why dual image](#which-oad-flavour-and-why), [what you need](#what-you-need), [build](#build-two-minutes), [the files](#the-files), [dry run](#check-the-image-without-a-board), [expected and measured](#what-was-expected-and-what-was-measured), [on the board](#on-the-board), [the protocol](#the-protocol-as-the-sdk-source-implements-it), [guide against source](#where-tis-guide-and-the-sdk-source-disagree), [can it lock the chip](#can-this-lock-the-chip), [not confirmed](#what-could-not-be-confirmed), [still open](#what-is-still-open).
+
+Checked 2026-10-07 on an Intel MacBook, macOS 15.7.9: SimpleLink Low Power F3 SDK 9.21.00.36 LTS, TI Arm Clang 5.1.1 LTS, SysConfig 1.26.3, UniFlash 9.6.0, Python 3.14.7 with bleak 3.0.2.
+
+## Which OAD flavour, and why
+
+The F3 SDK has three single-image flavours for this board. The build uses **dual image** (`basic_ble_oad_dual_image`).
+
+| Flavour | Where the new image waits | Runs during the download | Fits this board? |
+|---|---|---|---|
+| Off-chip | External SPI flash (a separate flash chip on the board, wired to the SPI bus) | Your app | No: the LP-EM-CC2340R5 has no external flash fitted |
+| On-chip | Internal flash, after your app is erased | A small "persistent" app (`basic_persistent`), a second app that stays on the chip only to receive the new image | Yes, but your app is gone during the download and a second app must be built and flashed |
+| Dual image | Internal flash, second half | Your app | Yes: your app keeps running, and only two files go on the chip |
+
+Dual image halves the room for your app: each slot is 236 kB. TI's Bluetooth app uses 192 kB of it, so there is room. The fourth example, multi-step OAD, splits one large app into two halves; it needs a bootloader built with a different option and is a separate test.
+
+## What you need
+
+| Thing | Version used | Where |
+|---|---|---|
+| LP-EM-CC2340R5 board and an LP-XDS110ET (or LP-XDS110) probe | any serial | <https://www.ti.com/tool/LP-EM-CC2340R5> |
+| SimpleLink Low Power F3 SDK, SysConfig, TI Arm Clang, UniFlash | as above | install steps in [mac-setup/README.md](../../mac-setup/README.md) |
+| Python 3 with bleak, a Bluetooth library for Python | 3.14.7, bleak 3.0.2 | <https://pypi.org/project/bleak/> |
+| A Mac with Bluetooth, and Bluetooth permission for your terminal app | macOS 15.7.9 | System Settings, Privacy and Security, Bluetooth |
+
+Set up once. A Python environment with bleak (here in your home folder, outside the repo):
+
+```bash
+python3 -m venv ~/ble && ~/ble/bin/pip install bleak
+```
+
+The public key compiled into TI's MCUboot, which the client uses to check the signature. Change the SDK path if yours differs:
+
+```bash
+export KEYS=/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/source/third_party/mcuboot/boot/ti/source/mcuboot_app/keys.c
+```
+
+## Build (two minutes)
+
+From the repo root:
+
+```bash
+cc2340r5/oad/build.sh
+```
+
+The script copies TI's example twice into `build/` (git-ignored), applies [`app.patch`](app.patch), and builds each copy with `make` and TI's own post-build step, which signs the image with MCUboot's `imgtool`. The two copies differ in three ways:
+
+| | v1 (flash with the probe) | v2 (send over the air) |
+|---|---|---|
+| Advertised name | `FRL OAD 1` | `FRL OAD 2` |
+| LED | green, toggles every 1,000 ms | red, toggles every 250 ms |
+| Signed version | 1.0.0 | 2.0.0 |
+
+The name is one line in the example's `.syscfg`; the blink is a short patch to `app/app_main.c` (a timer that toggles one LED) that reads its LED and rate from a header the script writes. The build took 65 s for v1 and 49 s for v2, as `build.sh` printed them on 2026-10-07 (observed, not saved). TI's unchanged example took 43.6 s (`real 43.59`). Paths to the SDK and tools are at the top of `build.sh`; change them if yours differ.
+
+## The files
+
+From `images.txt`, which the build script writes with SHA-256 sums:
+
+| File | Bytes | What it is |
+|---|--:|---|
+| `images/mcuboot_dual_image.hex` | 36,716 | TI's prebuilt MCUboot for dual image, copied from the SDK's `prebuilt_hexfiles`. 13.1 kB of code at 0x0, plus the CCFG |
+| `images/frl_oad_v1.bin` | 241,664 | v1, flashed at 0x6000. Header 256 + app 196,564 + signature area 152 (196,564 is the image size field; the linker map's APP_SLOT shows 196,560 used), padded with 0xFF to the slot size |
+| `images/frl_oad_v2.bin` | 241,664 | v2, the update. Real content 192.4 kB; 43.6 kB are padding |
+
+Each slot is 0x3B000 bytes: the app slot runs from 0x6000 to 0x41000, the download slot from 0x41000 to 0x7C000, and the Bluetooth bond storage (where the board keeps the keys of devices it has paired with) sits at 0x7D000. MCUboot's own table of slots, read from the hex, says the same. RAM: 32,234 of 36 kB used (from the linker map).
+
+The padding is sent too. TI's post-build adds MCUboot's 16-byte "upgrade waiting" marker at the very end of the slot, and TI's own phone app sends the whole padded file when that marker is there. So 18.5% of the bytes sent are 0xFF.
+
+## Check the image without a board
+
+```text
+~/ble/bin/python tools/oad/oad_client.py --dry-run --keys-c $KEYS cc2340r5/oad/images/frl_oad_v2.bin
+```
+
+`--keys-c` points at the public key compiled into TI's MCUboot. Output on v2, trimmed:
+
+```text
+  img_size          196564
+  version           2.0.0+0
+  tlvs              ['SHA256 (32 B)', 'KEYHASH (32 B)', 'ECDSA_SIG (70 B)']
+  sha256_ok         True
+  keyhash_ok        True
+  signature_ok      True
+  trailer_magic     True
+  send_bytes        241664
+  identify payload  3db8f396000000000001000000b0030000000000020000000000000000000000
+  transfer plan     1024 blocks of 236 data bytes (block size 240 with the 4-byte block number), last block 236 bytes, 245760 bytes written in total
+dry run OK: the image parses, its hash and signature check out, and it fits the slot
+```
+
+`tlvs` is the list of tagged records MCUboot adds after the app, each a type, a length and a value: `SHA256` is the hash of header and app, `KEYHASH` is the SHA-256 of the public key that signed the image (so MCUboot can tell which key to check with), and `ECDSA_SIG` is the signature. MCUboot images carry no CRC: the check is a SHA-256 of header and app, and an ECDSA P-256 signature over it. The dry run recomputes both, verifies the signature with the key from `keys.c` (in plain Python, no extra packages), and confirms TI's prebuilt MCUboot contains that same key (`images.py haskey`). The check was tested on five broken copies of the file: one flipped bit in the app, in the signature, or in the version field each failed, and a wrong header magic failed. A file cut short after the signature area passed with a printed note that the upgrade marker is missing, which is the right answer: the image is valid, but MCUboot may not install it. All five were refused. TI's `oad_image_tool` and `computeCRC32.py` (in `tools/common/oad`) are for TI's older image format; no CC2340R5 example uses them.
+
+The client's Bluetooth path was also run against a software stand-in for the board, [`tools/oad/sim_target.py`](../../tools/oad/sim_target.py), which follows the state machine in the SDK's `oad_profile.c`. All 1,024 blocks arrived in order, the stand-in's slot matched the file byte for byte, and it came back as `FRL OAD 2` version 2.0.0. With the packet size set to 185 the client stopped before sending a block. This tests the client's logic, not the radio or TI's code.
+
+```text
+~/ble/bin/python tools/oad/sim_target.py cc2340r5/oad/images/frl_oad_v2.bin
+```
+
+## What was expected, and what was measured
+
+The Expected column was written before the board run. The Measured column is the one run on 2026-10-07; the source of each number is in the cell.
+
+| Step | Expected | Where the expectation comes from | Measured |
+|---|---|---|---|
+| Flash MCUboot and v1 | about 10 to 20 s; green LED toggles every second; `FRL OAD 1` advertising | the 7 s blink flash in [../README.md](../README.md), with about 270 kB more to write; an estimate | 13 s for both files in one command (observed on the console, not saved). `FRL OAD 1` seen at -33 dBm in the first 15 s scan (observed, not saved) |
+| Packet size the Mac agrees (ATT MTU, the largest data packet per write) | 243 bytes or more, needed for 240-byte blocks | the board allows 251 (`maxPDUSize = 255`); this Mac agreed 65 with an example capped at 65 | 251 (`att_mtu` in the client's JSON output) |
+| Transfer, 1,024 blocks | about 46 s; 31 s to 2 minutes | this Mac's 45 ms median write-and-notify round trip, times 1,024 | **31.4 s**, 1,024 blocks of 236 data bytes, no retries |
+| Speed | about 40 kbit/s of image data | 236 kB in 46 s | **61.5 kbit/s**: 236 kB in 31.4 s, packet size 251, connect 0.99 s after a 0.84 s scan |
+| Enable to `FRL OAD 2` seen | under 15 s | MCUboot copies 236 kB and checks the signature; estimate, no measurement | **7.78 s** from the enable command to the new name advertising; enable status SUCCESS, the link dropped for the reset |
+| Version read after the update | 2.0.0 | the signed header | **2.0.0** (raw `020000000000`); the header at 0x6000 reads byte 20 = `02` |
+| LED after the update | red, toggling every 250 ms | the patch | not watched; the name, version and header say the new image runs, but the LED itself was not checked |
+
+What could fail, as listed before the run: the Mac agrees a packet size under 243 (the client stops before sending anything, see the protocol section); the Mac's connection interval is longer than 15 ms (slower, not broken); MCUboot does not install the image (marker or version rule; the board then still runs v1); macOS shows the old cached name for the board (the client reads the name from the advertisement, not the cache). None of these happened on the one run: the packet size was 251, MCUboot installed v2, and the client saw the new name. The connection interval was not read.
+
+## On the board
+
+Run these from the repo root, one at a time. `DSLITE` is UniFlash's command-line program; the connection file picks the probe by serial number (put your probe's serial in the `.ccxml` file). `BK` is a backup folder outside the repo; any path works.
+
+```bash
+export DSLITE=/Applications/ti/uniflash_9.6.0/deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/DSLite CCXML=cc2340r5/CC2340R5.ccxml BK=$HOME/cc2340r5-oad-backup && mkdir -p $BK
+```
+
+1. Back up the whole flash and the CCFG, outside the repo (the board may hold a Zigbee network key). DSLite's `memory -r <address>,<length>` takes the length as a count of 32-bit words, not bytes: 0x20000 is a count of 32-bit words; the file came out 512 kB, the whole 512 kB flash. The CCFG read below, 0x200 words, came out 2 kB. Check the file sizes after your own read.
+
+```text
+$DSLITE memory -c $CCXML -r 0x0,0x20000 -o $BK/main_flash.bin
+```
+
+```text
+$DSLITE memory -c $CCXML -r 0x4E020000,0x200 -o $BK/ccfg.bin
+```
+
+```bash
+python3 cc2340r5/oad/images.py merge $BK/restore.hex $BK/main_flash.bin@0x0 $BK/ccfg.bin@0x4E020000
+```
+
+```bash
+python3 cc2340r5/oad/images.py ccfg $BK/restore.hex
+```
+
+2. Flash MCUboot and v1 in one command. UniFlash's default for CC23xx chips erases the whole chip at the start of every program load ("Erase Settings during Program Load", default Chip Erase, in `CC23xx_FlashProperties.xml`; see the FAQ), so both files go in the same load. In the command, `-e` is `--verbose` (progress messages), `-f` loads the files to flash, and `-u` runs the program afterwards.
+
+```text
+$DSLITE flash -c $CCXML -e -f -u cc2340r5/oad/images/mcuboot_dual_image.hex cc2340r5/oad/images/frl_oad_v1.bin,0x6000
+```
+
+Check: the green LED toggles once a second. If the app is flashed without MCUboot, the probe reports error -615 when it tries to run it, as TI's example README describes.
+
+3. Send v2 over the air and check it comes back:
+
+```text
+~/ble/bin/python tools/oad/oad_client.py --name "FRL OAD 1" --expect-name "FRL OAD 2" --keys-c $KEYS --json oad-run.json cc2340r5/oad/images/frl_oad_v2.bin
+```
+
+It prints the running version, the block size, progress every 5% with kbit/s, the download time, the time from "enable" to the new name, and the new version, and writes the numbers to `oad-run.json`. Then look at the board: red LED, four toggles a second (not watched on the run).
+
+4. Optional second proof, by probe: the image header at 0x6000 holds the version at byte 20. The length 0x8 is 8 words, so the file is 32 bytes.
+
+```text
+$DSLITE memory -c $CCXML -r 0x6000,0x8 -o $BK/hdr.bin && xxd $BK/hdr.bin
+```
+
+Byte 20 reads `02` after the update and `01` before.
+
+5. Put the board back. The same default chip erase clears the flash first, then the backup is written:
+
+```text
+$DSLITE flash -c $CCXML -e -f -u $BK/restore.hex
+```
+
+## The protocol, as the SDK source implements it
+
+Service `F000FFC0-0451-4000-B000-000000000000`, on TI's 128-bit base `F000xxxx-0451-4000-B000-000000000000`:
+
+| Characteristic | UUID (short) | Direction | Use |
+|---|---|---|---|
+| Image identify | 0xFFC1 | write with response; notify | the image header; 1-byte accept or refuse |
+| Image block | 0xFFC2 | write | 4-byte block number, then 236 bytes of the file |
+| Control | 0xFFC5 | write without response; notify | commands, replies and block requests |
+
+The sequence the client runs: turn on notifications for 0xFFC1 and 0xFFC5; Get Software Version (`07`); Get Block Size (`01`, reply `01 F0 00` = 240); write the 32-byte image header to 0xFFC1 with its size field set to the bytes being sent; Start (`03`); answer each block request `12 <status> <block number>` with that block; on status 14 (download complete) send Enable Image (`04`); the board replies `04 00`, drops the link, resets, and MCUboot installs the image. Sources: `source/ti/ble/profiles/oad/src/oad_profile.c`, `source/ti/ble/services/oad/src/oad_service.c` and `source/ti/ble/app_util/sw_update/src/sw_update.c` in the SDK, and TI's open-source SimpleLink Connect app (`src/components/FWUpdate/FWUpdate_Modal.tsx` on github.com/TexasInstruments/simplelink-connect).
+
+The block size is fixed at 240 in the source, and the board ignores the offset of a long write, so every block must fit in one write. The client checks the agreed packet size first and stops if a 240-byte block would not fit, with this message from [`tools/oad/oad_client.py`](../../tools/oad/oad_client.py) (the numbers in angle brackets are filled in from the connection):
+
+`ATT MTU <mtu> carries at most <mtu - 3> bytes a write, the target wants 240. The target ignores the offset of a long write, so this would corrupt the image. Stopping.`
+
+## Where TI's guide and the SDK source disagree
+
+The guide is the BLE5-Stack User's Guide in the SDK (`docs/ble5stack/ble_user_guide`, OAD chapter). Where they disagree, the client follows the source. Each row is **Tool or docs**.
+
+| Topic | Guide says | Source does |
+|---|---|---|
+| Block size | chosen from the agreed packet size, 20 to 244 | always 240 (`OAD_DEFAULT_BLOCK_SIZE`) |
+| Where block requests arrive | notifications on 0xFFC2 | notifications on 0xFFC5; 0xFFC2 never notifies |
+| Enable Image `04` | not in the command table | required after the download, or nothing installs |
+| Download complete | block number 0xFFFFFFFF | the block count (1,024 here) |
+| Commands before image identify | answered with AUTH_FAIL | block size, version and status answered any time; start, enable and cancel get NOT_STARTED |
+| Software version reply | 5 bytes | 7 bytes: major, minor, revision (2), build (2) |
+| Bytes to send | the header's image size | `ih_img_size` leaves out the header and signature, so a client must replace it; TI's app does, the guide does not say so |
+| Header table | `ih_flags` is "total length", `_pad1` is 2 bytes | MCUboot flags; `_pad1` is 4 bytes |
+
+## Can this lock the chip?
+
+Not from these images, as far as the files show. The CCFG was not read back from the chip after the update (not done). **Setup or handling:** the lock fields are set by the CCFG of whatever you flash. The CCFG that reaches the chip here is MCUboot's (the app `.bin` files have none), and in it `allowDebugPort` and `allowChipErase` are both allow (0xA), debug authorization is open (0x5A), and no flash sectors are write-protected; the two app builds' own CCFGs say the same (from `images.txt`). The update itself writes only to the download slot (0x41000 to 0x7BFFF, enforced by the flash driver's region), and MCUboot writes only the app slot, so neither can change the CCFG.
+
+One oddity: TI's prebuilt MCUboot hex has all four CCFG checksums set to zero. **Tool or docs.** UniFlash's default for this chip family rewrites those checksums from the image while flashing (setting "Overwrite CRC fields in CCFG", default on, in `CC23xx_FlashProperties.xml`), so flash it with UniFlash defaults and do not turn that setting off. This was seen on 2026-10-07 flashing TI's prebuilt hex: UniFlash logged `Updating CRC32 field ccfg.crc32 @ address 0x4E02074C ... Value changes from 0x00000000 to 0xB714DFB7`. It rewrote three of the four fields; the log has no line for the user record. The same settings file shows UniFlash skips the CCFG user record by default, which may explain the verify mismatch at 0x4E020750 described in gotcha 8 of the CC2340R5 start-here page ([../README.md](../README.md)); not tested.
+
+## What could not be confirmed
+
+- **Unknown:** which upgrade mode TI's prebuilt MCUboot uses (overwrite or swap) and whether it refuses older versions. No configuration file ships beside the hex. Suspected overwrite, because the app is linked for the first slot only and TI's post-build adds the upgrade marker. v2 is signed 2.0.0 against v1's 1.0.0, so a version rule would not block this test.
+- **Unknown:** the connection interval macOS agrees with this board; the client does not read it. The packet size was measured: 251 bytes.
+- **Unknown (suspected: Tool or docs):** the linker gives the app slot 0x3B700 bytes from 0x6100, which runs 2 kB past the 0x41000 start of the download slot. `imgtool` would refuse an image too large for the slot, so a build cannot silently overlap; this app uses 192 kB.
+- Not tested: writing blocks without response (`--no-response`), which the guide recommends for speed and TI's app does not use.
+- One run only. The red LED was not watched. Only this Intel Mac was used.
+
+## What is still open
+
+1. Run the update twice more, for a median of three.
+2. Test `--no-response` (blocks written without response) against the same image.
+3. Watch the LED after the update: red, four toggles a second.
+4. Run the same steps on an Apple Silicon Mac.
+
+==============================================================================
+FILE: cc2340r5/thread/README.md | Can the TI LP-EM-CC2340R5 run Thread as an end device or router?
+==============================================================================
+
+# Can the TI LP-EM-CC2340R5 run Thread as an end device or router?
+
+Terms: RCP, MTD, FTD, NCP, NVS, CCFG, `.bss` and linker are defined below and in [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [FAQ.md](../FAQ.md).
+
+Not as a Thread node with TI's configurations on this chip: node builds fail to link for lack of RAM. **As a radio co-processor it works** (2026-10-06). The `ot-rcp` image answers OpenThread's POSIX host on the Mac over the debugger UART at **921600 baud** (`OPENTHREAD/1.4.0.0; CC23XX thread-v1.4-ti-1.0-ea-1.0`) once its CCFG checksums are filled (Zephyr's `ti_ccfg_crc32_calculate.py`), it is flashed with DSLite and it is started with a probe reset.
+
+On the CC2340R52 chip (36 kB of RAM) the RCP links with 8.8 kB to spare. Every Thread node build (MTD, FTD, CLI or NCP) compiles, fits in flash, and then fails to link because RAM runs out, by 7.5 to 23.8 kB depending on build options. **Unknown (suspected: Chip limit):** only TI's configurations were tried, built with this repo's settings (GCC 12.2, board checks removed); a trimmed build might fit; not run. The same builds link on the CC2340R53 (64 kB of RAM); the default builds in the table below leave 7.3 to 20.5 kB to spare.
+
+TI's `ot-ti` UART runs at 921600 baud, not 115200. The unreadable output seen earlier from the radio CLI image at 115200 was probably this; it was not rechecked at 921600.
+
+The RAM numbers line up with TI's listing of this board as RCP only, but TI does not state its reason (**Unknown**). TI enforces the listing with a CMake board check, not a memory check (see "The gate").
+
+Built 2026-10-05 on an Intel Mac (macOS 15.7.9) from TI's `ot-ti`, branch `thread-v1.4-ti` (commit `eaac0deb`, the commit tagged as release `thread-v1.4-ti-2.1`). The build pass flashed nothing. Afterward the radio test CLI (`ot-cli-radio`) was flashed once, with its boot checksums filled by upstream Zephyr's script; it answered with bytes that did not decode at 115200 baud and with nothing at other common rates. **Unknown.** That serial output was observed 2026-10-05; not saved.
+
+The board carries the CC2340R52 chip, 36 kB of RAM; the CC2340R53 is a 64 kB version on a separate board, LP-EM-CC2340R53. 1 kB = 1,024 bytes; 1 GB = 1,024 MB.
+
+Words used on this page (more in [docs/vocab.md](../../docs/vocab.md)):
+
+- **RCP**, radio co-processor: only the radio. A bigger computer runs Thread and drives it over a serial link.
+- **MTD**, minimal Thread device: an end device. It does not route.
+- **FTD**, full Thread device: can route for other devices.
+- **NCP**, network co-processor: runs Thread itself and is controlled by a host.
+- **NVS**, non-volatile storage: the flash area where Thread keeps its settings across power cycles.
+
+Contents: [results and link errors](#results), [the gate](#the-gate-what-restricts-the-r52-to-rcp), [local edits](#local-edits), [this repo's toolchain differs from TI's](#this-repos-toolchain-differs-from-tis), [CCFG](#ccfg-debug-and-erase), [exact commands](#exact-commands), [attempts](#attempts-and-wall-times), [a huge .bin file](#trap-a-huge-bin-file), [what to do next](#what-to-do-next), [details: output files, tools, disk](#details).
+
+## Results
+
+| Build (target) | Links on the R52 (36 kB)? | Flash used | RAM used | R52: RAM over or under | R53 (64 kB): RAM under |
+|---|---|--:|--:|--:|--:|
+| RCP (`ot-rcp`) | yes* | 107.1 kB | 27.2 kB | 8.8 kB under | 36.8 kB under |
+| Radio CLI (`ot-cli-radio`) | yes* | 96.1 kB | 25.8 kB | 10.2 kB under | 38.2 kB under |
+| CLI MTD (`ot-cli-mtd`) | **no** | 353.3 kB | 46 kB | **10 kB over** | 18 kB under |
+| CLI FTD (`ot-cli-ftd`) | **no** | 417.5 kB | 52 kB | **16 kB over** | 12 kB under |
+| NCP MTD (`ot-ncp-mtd`) | **no** | 342.5 kB | 43.5 kB | **7.5 kB over** | 20.5 kB under |
+| NCP FTD (`ot-ncp-ftd`) | **no** | 404.4 kB | 56.7 kB | **20.7 kB over** | 7.3 kB under |
+
+\* Every image, on both chips, links only after the settings-area fix (edit 3 below). That includes the RCP TI lists as supported.
+
+The GNU linker (`ld`) gives two kinds of link error, shown here with its path cut to the file name:
+
+**Before the settings-area fix**, images stop on the settings area. **Unknown (suspected: Tool or docs)**; see "This repo's toolchain differs from TI's" below. From the R53 run, `ot-rcp`:
+
+```text
+ld: section .nvs VMA [0000000000010000,0000000000013fff] overlaps section .text VMA [0000000000000090,0000000000016213]
+```
+
+Every image is larger than the 64 kB below the settings area, so every image overlaps it. Seen for `ot-rcp` and `ot-cli-mtd` on the R53 and for `ot-rcp` and `ot-cli-radio` on the R52 (observed 2026-10-05; not saved; the radio CLI also reported a `.rodata` overlap there).
+
+**Node builds on the R52, after the fix**, run out of RAM. **Unknown (suspected: Chip limit).** CLI MTD shown; the other node builds give the same pair with their own byte count:
+
+```text
+ld: bin/ot-cli-mtd.out section `.bss' will not fit in region `SRAM'
+ld: region `SRAM' overflowed by 10216 bytes
+```
+
+Notes on the table:
+
+- Flash counts code, read-only data and the copy of initialized data. RAM is the top of the stack minus the RAM base, so it includes the startup stack (2 kB) and the FreeRTOS heap (3.3 kB). Every number comes from the linker map, and the "over" numbers match the linker's own "overflowed by N bytes" lines.
+- Flash is not the problem. The biggest image (CLI FTD) uses 417.5 kB of the 496 kB that sit below the settings area, 84%.
+- R52 and R53 images are byte-for-byte the same size. Both build as device `cc23x0r5` with the same FreeRTOS settings. The only difference is the RAM region SysConfig writes into the linker map: `0x9000` (36 kB) for the R52, `0x10000` (64 kB) for the R53.
+- The node builds configure on the R52 only after the board check is removed ("The gate"). The NCP rows need `-DNCP_BUILD_ENABLED=ON`.
+- `-DNCP_BUILD_ENABLED=ON` also grows the CLI builds (it is a global define). With it on, the R52 CLI MTD is 10.5 kB over and CLI FTD 23.8 kB over. The CLI rows above are from the default build with it off.
+- "Radio CLI" is a radio test tool, not a Thread node. It builds by default for this board.
+
+### Where the RAM goes (R52 CLI MTD, from the map)
+
+| Item | Bytes |
+|---|---|
+| `ot::Instance` (all of OpenThread's state, including 44 message buffers of 128 B = 5,632 B) | 12,256 |
+| App task stack (`APP_STACK_SIZE` 2k words in `examples/apps/cli/freertos_main.c`) | 8,192 |
+| CLI interpreter | 7,152 |
+| FreeRTOS heap (`configTOTAL_HEAP_SIZE` 3400 for CC23X0R5) | 3,400 |
+| FreeRTOS timer and idle task stacks and control blocks | 3,056 |
+| Startup stack (linker script) | 2,048 |
+| UART TX buffer | 1,024 |
+
+The RCP needs none of the Thread state, which is why it fits. Getting an MTD under 36 kB would mean cutting about 7.5 kB from the NCP MTD (smaller app stack, fewer message buffers, smaller tables). That might be possible, but it is untested, it would be a custom configuration, and TI also lists sleepy end devices as unsupported on CC23xx (known issue TIOP-1452).
+
+## The gate (what restricts the R52 to RCP)
+
+**Tool or docs:** the build skips the node apps without a message. It is two CMake checks in `ot-ti`. Nothing in `boards.cmake` or `script/build` blocks it.
+
+1. `examples/apps/cli/CMakeLists.txt`, lines 49 to 56:
+
+   ```cmake
+   if((OT_FTD) AND (NOT TI_SIMPLELINK_DEVICE STREQUAL "cc13x2_cc26x2") AND
+       (NOT TI_SIMPLELINK_BOARD STREQUAL "LP_EM_CC2340R5"))
+       include(ftd.cmake)
+   endif()
+   if((OT_MTD) AND (NOT TI_SIMPLELINK_DEVICE STREQUAL "cc13x2_cc26x2") AND
+       (NOT TI_SIMPLELINK_BOARD STREQUAL "LP_EM_CC2340R5"))
+   include(mtd.cmake)
+   endif()
+   ```
+
+2. `examples/apps/CMakeLists.txt`, line 38: `if(NOT TI_SIMPLELINK_BOARD STREQUAL "LP_EM_CC2340R5")` around `add_subdirectory(ncp)`.
+
+The libraries (`libopenthread-mtd.a`, `libopenthread-ftd.a`) build for the R52 even with the gate in place. Only the app executables are skipped. No warning is printed, so `./script/build LP_EM_CC2340R5` produces just `ot-rcp` and `ot-cli-radio` and says nothing about the rest.
+
+## Local edits
+
+Made in the local `ot-ti` clone only; the full diff is in `ot-ti-local.patch` in this folder.
+
+1. Removed the R52 check from the FTD and MTD `if` lines in `examples/apps/cli/CMakeLists.txt`.
+2. Changed the NCP check in `examples/apps/CMakeLists.txt` to `if(TRUE)`.
+3. **Settings-area fix, needed for every image:** `src/cc23xx_cc27xx/openthread.syscfg` puts NVS at `0x10000` for all CC23xx parts, under a comment that says "place at the end of Flash". The smallest image is 96.1 kB, and `0x10000` is 64 kB from the start of flash, so code always runs into it. Moved to `0x7C000`, the last 16 kB of the 512 kB flash. Confirmed the original fails the same way on the R53 (`ot-rcp` and `ot-cli-mtd`), so it is not a side effect of the R52 or the gate.
+
+## This repo's toolchain differs from TI's
+
+Any of these could contribute to the settings-area link error above. **Unknown (suspected: Tool or docs).** The smallest image (96.1 kB) is about 32 kB larger than the space below the settings area (64 kB), a gap a compiler change is unlikely to close, but no build with TI's own toolchain was run.
+
+- **Compiler:** GCC 12.2.0 from Zephyr SDK 0.17.4, not the GCC 9 (2020-q2) `ot-ti`'s build script expects, nor the Arm GNU 12.2.rel1 its bootstrap installs on Ubuntu.
+- **SysConfig 1.26.3**, not the 1.27.0 `ot-ti` expects.
+- **F3 SDK 9.20.00.86**, the submodule `ot-ti` pins (per its license file name), where TI's release notes say lpf3-9.20.00.81. The release notes and the pinned submodule disagree.
+
+Full table under "Details".
+
+## CCFG (debug and erase)
+
+From the generated `ti_devices_config.c`, identical for every build:
+
+- `allowDebugPort`, `allowChipErase`, `allowFlashProgram`, `allowFlashVerify`, `allowReturnToFactory`: all `CCFG_PERMISSION_ALLOW`
+- `debugCfg.authorization = CCFG_DBGAUTH_DBGOPEN`, `allowBldr = CCFG_DBGBLDR_ALLOW`
+- `chipEraseRetain` keeps no sectors (`0x0` and the required `0xF0000000`)
+- Serial ROM bootloader disabled, `pAppVtor` = reset vectors at `0x0`
+- **All CCFG CRC fields are 0.** **Tool or docs:** `ot-ti` has no post-build CRC step. The comment says the CRCs must be filled "as a post-build step, or by the flashloader". Whether UniFlash or CCStudio fills them at load time was not tested; the one flash here filled them first with upstream Zephyr's `soc/ti/simplelink/cc23x0/ti_ccfg_crc32_calculate.py`.
+
+The images do not include the NVS area (it is `ALLOC` only), so flashing would not wipe stored settings beyond what the tool's erase does.
+
+## Exact commands
+
+Comments after `#` are notes and wall times, not part of the command. `otbuild.sh` and `mapmem.py` in the clone's `_tools/` folder are local helper scripts, not part of `ot-ti` and not in this repo.
+
+```bash
+git clone --depth 1 -b thread-v1.4-ti --recurse-submodules --shallow-submodules \
+  https://github.com/TexasInstruments/ot-ti ~/ot-ti                     # 2 min 28 s
+
+# Tools
+mkdir -p ~/ot-ti/_tools/gcc/bin && cd ~/ot-ti/_tools/gcc/bin
+for f in ~/zephyr-toolchain/arm-zephyr-eabi/bin/arm-zephyr-eabi-*; do
+  n=$(basename $f); ln -sf $f ${n/arm-zephyr-eabi/arm-none-eabi}; done
+python3 -m venv ~/ot-ti/_tools/venv && ~/ot-ti/_tools/venv/bin/pip install "cmake<4"
+export PATH=$HOME/ot-ti/_tools/gcc/bin:$HOME/ot-ti/_tools/venv/bin:$PATH
+export TI_SYSCONFIG_ROOT=/Applications/ti/sysconfig_1.26.3
+
+# F3 SDK libraries (driverlib etc.), GCC only                            # 1 min 25 s
+make -C ~/ot-ti/third_party/ti_simplelink_sdk/repo_cc23xx_cc27xx CMAKE=$(which cmake) \
+  GCC_ARMCOMPILER=$HOME/ot-ti/_tools/gcc TICLANG_ARMCOMPILER= IAR_ARMCOMPILER= \
+  SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh GENERATOR=Ninja
+
+# Same configure and build as script/build (wrapper: ~/ot-ti/_tools/otbuild.sh <BOARD> <dir> [-D...])
+cmake -GNinja -DOT_COMPILE_WARNING_AS_ERROR=ON -DTI_SIMPLELINK_BOARD=LP_EM_CC2340R5 \
+  -DOT_PLATFORM=external -DCMAKE_TOOLCHAIN_FILE=src/arm-none-eabi-m0p.cmake ~/ot-ti -B _build/r5_default
+cmake --build _build/r5_default -- -k 0
+# NCP: add -DNCP_BUILD_ENABLED=ON. R53: -DTI_SIMPLELINK_BOARD=LP_EM_CC2340R53.
+
+# Memory per image from the map: python3 ~/ot-ti/_tools/mapmem.py <RAM size> <map files>
+```
+
+`script/bootstrap` was read and **not run**: it downloads a Linux-only SysConfig `.run` installer, runs OpenThread's own bootstrap (Homebrew on a Mac), and uses `apt-get` and `sudo`. **Tool or docs** (no macOS path).
+
+`script/build` was **not run as is**: it also rebuilds the whole F2 SDK (CC13xx and CC26xx, not needed for this board) and points at `/opt/gcc-arm-none-eabi-9-2020-q2-update`. The F3 SDK make step was run once by hand, then the same CMake command `script/build` uses.
+
+## Attempts and wall times
+
+| # | Attempt | Result | Wall time |
+|---|---|---|---|
+| 1 | R52 default, upstream source | Configure and compile OK. `ot-rcp` and `ot-cli-radio` fail to link on the `.nvs` overlap (log not saved; attempt 7 shows the same error) | 1 min 34 s |
+| 2 | R52 default, NVS moved to `0x7C000` | Both link | 1 min 29 s |
+| 3 | R52, FTD and MTD gate removed | Configure and compile OK. `ot-cli-mtd` overflowed by 10 kB, `ot-cli-ftd` by 16400 | 6 s (incremental) |
+| 4 | R52, plus NCP gate removed, `-DNCP_BUILD_ENABLED=ON` | `ot-ncp-mtd` over by 7632, `ot-ncp-ftd` over by 21176, `ot-cli-mtd` over by 10768, `ot-cli-ftd` over by 24320 | 1 min 27 s |
+| 5 | R53 default (FTD, MTD, RCP, radio CLI) | All four link | 1 min 28 s |
+| 6 | R53, `-DNCP_BUILD_ENABLED=ON` | All six link | 2 min 6 s |
+| 7 | R53, original NVS at `0x10000` | `ot-rcp` and `ot-cli-mtd` fail with the same `.nvs` overlap | 4 s (incremental) |
+
+The full build logs were not kept.
+
+## Trap: a huge .bin file
+
+**Tool or docs.** Each app's post-build step runs `objcopy -O binary`. On CC23xx the image includes CCFG at `0x4E020000`, so the `.bin` fills the gap from `0x0` with zeros: `ot-rcp.bin` was 1.22 GB (1.2 GB). It was deleted after every build. Anyone building on a full disk will hit this. Use the `.out` or make a `.hex`.
+
+## What to do next
+
+- For a Thread end device or router on this chip family, use the CC2340R53 board (LP-EM-CC2340R53) or a CC27xx part. Neither has been run here.
+- To use this board as an RCP, it needs a host running OpenThread's border router. `board-to-board/thread-two-radios-2026-10-06/` ran it with a Mac host: it joined a CC1354P10 leader.
+- Find why the flashed radio CLI's serial output does not decode.
+
+## Details
+
+### Output files (LP_EM_CC2340R5, linked)
+
+Built into `out/` in this folder, which is not in the repository. `ot-rcp` was flashed 2026-10-06 (CRCs filled) and ran; `ot-cli-radio` was flashed once, from a copy with its CRCs filled.
+
+| File | SHA-256 |
+|---|---|
+| `out/ot-rcp.out`, `out/ot-rcp.hex`, `out/ot-rcp.map` | hex `5fc1b18061eadc895787fa236b8a37cb180c51fe394d0b32fe5642e0f629a162` |
+| `out/ot-cli-radio.out`, `out/ot-cli-radio.hex`, `out/ot-cli-radio.map` | hex `946c2881649c77915975ba50822e70e6224cd3cb52752ef5e82666f17cfa6085` |
+
+The `.hex` files were made with `arm-none-eabi-objcopy -O ihex` (`ot-ti` does not make them). Maps for the failed and R53 builds were not kept.
+
+### Tools used, and differences from what `ot-ti` expects
+
+| Tool | `ot-ti` expects | Used | Matters? |
+|---|---|---|---|
+| Arm GCC | `/opt/gcc-arm-none-eabi-9-2020-q2-update` (script default) or Arm GNU 12.2.rel1 (bootstrap, Ubuntu only) | Zephyr SDK 0.17.4 GCC 12.2.0 (`~/zephyr-toolchain/arm-zephyr-eabi`), linked as `arm-none-eabi-*` in `~/ot-ti/_tools/gcc/bin`. Has newlib nano for v6-m. | Compiled clean with warnings as errors. Sizes could differ a little from Arm's build of 12.2. No official toolchain download was needed. |
+| SysConfig | 1.27.0 | 1.26.3 (`/Applications/ti/sysconfig_1.26.3`) | No version error or warning. Only warning was the default RNG noise conditioning key. |
+| F3 SDK | lpf3-9.20.00.81 (release notes) | The submodule `ot-ti` pins, which is 9.20.00.86 (per its license file name). `/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS` was not used. | The release notes and the pinned submodule disagree on the build number. |
+| CMake | any | 3.31.10 from pip in `~/ot-ti/_tools/venv` (no system CMake on this Mac) | CMake 4 was avoided because the SDK uses old `cmake_minimum_required` lines. |
+| Ninja, make, python3 | yes | already installed | |
+
+### Disk
+
+| Item | Size |
+|---|---|
+| Clone with submodules, as cloned | 4.0 GB (1.2 GB of it is `.git`, 2.5 GB the two SDKs) |
+| `~/ot-ti` now (one build tree, tools, logs; unused F2 SDK working tree removed with `git submodule deinit`) | 3.4 GB |
+| Peak during the run | 5.7 GB, plus 1.22 GB (1.2 GB) per `.bin` before deletion |
+| One build tree | 520 to 710 MB |
+| CMake venv | 133 MB |
+| `thread/out/` | 7.7 MB |
+
+The shallow clone alone is 4.0 GB, so plan for the peak above. To get the F2 SDK back:
+
+```bash
+git -C ~/ot-ti submodule update --init third_party/ti_simplelink_sdk/repo_cc13xx_cc26xx
+```
+
+To remove everything:
+
+```text
+rm -rf ~/ot-ti
+```
+
+==============================================================================
+FILE: cc2340r5/zephyr-ti/README.md | Does Bluetooth LE work on the TI LP-EM-CC2340R5 with TI's Zephyr fork (simplelink-zephyr)?
+==============================================================================
+
+# Does Bluetooth LE work on the TI LP-EM-CC2340R5 with TI's Zephyr fork (simplelink-zephyr)?
+
+Terms: Zephyr, west, CCFG, XDS110 and UniFlash are defined in [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [FAQ.md](../FAQ.md).
+
+**Update 2026-10-08: yes, with Zephyr's C library heap turned on** (`CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=2048` in `prj.conf`; 1024 for the peripheral sample). The silent start below was TI's Bluetooth stack failing to get memory for a timer with the heap at 0. The BTHome beacon and the peripheral sample then ran with the fork's own CCFG byte; the beacon sample hard-faults. Details: [the experiment page](../../docs/experiments/2026-10-05-cc2340r5-ti-zephyr-ble.md). The rest of this page covers the build as first run on 2026-10-05, before the heap setting was found.
+
+As first built on 2026-10-05, the Bluetooth samples printed nothing. TI's fork (tag `v3.7.0-ti-1.00.01_ga`) builds the Bluetooth beacon and peripheral samples with workarounds, and they flash, but nothing printed as built. hello_world printed its boot banner after CCFG byte 0x4E02001C was changed from 0x0F to 0x07 and all four checksums were recomputed; the Bluetooth samples, changed the same way, printed nothing, so it is not known whether they booted. **Unknown (suspected: Tool or docs):** the heap setting above is the suspected cause; it was found after these runs.
+
+Contents: [results](#results), [hello_world ran after a boot-configuration change](#hello_world-ran-after-a-boot-configuration-change), [Bluetooth samples print nothing](#bluetooth-samples-print-nothing), [suspects](#suspects-where-this-setup-differs-from-tis), [versions](#versions), [commands and workarounds](#commands), [times](#times-wall-clock-machine-waiting), [disk](#disk), [lock check](#lock-check).
+
+Tested 2026-10-05 on an Intel Mac (macOS 15.7.9) with the XDS110 probe and UniFlash 9.6.0. This is the Zephyr side of the comparison with TI's own SDK (FreeRTOS) Bluetooth build, which works ([../matrix/README.md](../matrix/README.md)).
+
+The board carries the CC2340R52 chip, 36 kB of RAM; the CC2340R53 is a 64 kB version on a separate board, LP-EM-CC2340R53. 1 kB = 1,024 bytes; 1 GB = 1,024 MB.
+
+> **Which file to flash.** TI's fork runs TI's CRC tool after the build (`ti-simplelink-crc-tool`, a Python program that computes the CCFG checksums, or CRCs, and writes them into the built file), so its `zephyr.hex` carries three of the four checksums: flash `zephyr.hex`. Upstream Zephyr 4.4.2 writes them into a separate `zephyr_crc32.hex`, so flash that one there. **Tool or docs:** the fork handles the checksums differently from upstream Zephyr, and its tool leaves the fourth at zero (see below). Never flash `zephyr.bin`: it is 1.22 GB (1.2 GB; see Disk).
+
+## Results
+
+| Sample | Flash used | RAM used | As built | With CCFG byte 0x4E02001C set to 0x07 |
+|---|--:|--:|---|---|
+| `samples/hello_world` | 30.6 kB | 8 kB (22.2%) | Flashed, no serial output | **Printed its boot banner:** `*** Booting Zephyr OS build cbababd4c1b4 *** Hello World! lp_em_cc2340r5/cc2340r5` (observed 2026-10-05; not saved) |
+| `samples/bluetooth/beacon` | 110.2 kB (21.5%) | 28.4 kB (78.9%) | Flashed, no serial output, nothing on air | No serial output; `no adverts seen` in 30 s |
+| `samples/bluetooth/peripheral` | 202.8 kB (39.6%) | 34.3 kB (95.3%) | Flashed, no serial output, nothing on air | No serial output; `no adverts seen` in 30 s |
+
+Flash is out of 512 kB, RAM out of 36 kB. The peripheral sample fits only because TI ships a board file for it (`boards/lp_em_cc2340r5.conf`) that turns off settings, flash storage and the GATT cache. The beacon sample fits with no changes and has no board file. Every flash ended in UniFlash's `Success`.
+
+"Nothing printed" was tested with the probe attached only. A power cycle with no probe was not run.
+
+## hello_world ran after a boot-configuration change
+
+**Unknown (suspected: Tool or docs).** Diffing the configuration area (CCFG, 0x4E020000) against an upstream Zephyr 4.4.2 image that runs on this board: the fork sets `misc` at 0x4E02001C to 0x0F, upstream to 0x07. The two builds also differ in Zephyr version (the fork is based on Zephyr 3.7.0, per its `VERSION` file; upstream was 4.4.2), so this byte is one difference among several, not the only one. The extra bit is `saciTimeoutOverride` (`hw_ccfg.h`), which makes the boot ROM use the configuration's own wait for a debugger command instead of the factory one. hello_world printed its boot banner after CCFG byte 0x4E02001C was changed from 0x0F to 0x07 and all four checksums were recomputed (observed 2026-10-05; not saved). The setting may be meant for a power-up without a probe, which was not tested.
+
+The change, as run here. It uses the `intelhex` Python package, which upstream Zephyr's Python environment includes, and upstream Zephyr's checksum script. Replace `~/zephyrproject` with your upstream Zephyr workspace and `build/zephyr/zephyr.hex` with your build's hex.
+
+```bash
+python3 -c "from intelhex import IntelHex; b=IntelHex('build/zephyr/zephyr.hex'); b[0x4E02001C]=0x07; b.write_hex_file('zephyr_misc07.hex')"
+```
+
+```bash
+python3 ~/zephyrproject/zephyr/soc/ti/simplelink/cc23x0/ti_ccfg_crc32_calculate.py zephyr_misc07.hex zephyr_fixed.hex
+```
+
+```bash
+/Applications/ti/uniflash_9.6.0/dslite.sh --mode flash -c CC2340R5.ccxml -e -f -u zephyr_fixed.hex
+```
+
+The other CCFG differences from upstream are the user-record CRC the fork leaves at zero and debug in the boot loader (`allowBldr`, 0x00 here, 0xA5 upstream). The user record is a 128-byte area at 0x4E020750 in the CCFG for the application's own data; its last word is a CRC over the rest. TI's `hw_ccfg.h` says the boot code has "no dependencies" on it and calls that CRC optional. Filling only the user-record CRC, with upstream's script on the unchanged beacon image, did not make it run. The hello_world image that printed its banner had the byte changed and all four CRCs filled by upstream's script, so the byte change with the user-record CRC still at zero was not tested. `allowBldr` was left as the fork sets it.
+
+## Bluetooth samples print nothing
+
+**Unknown.** With the same boot-configuration change, beacon and peripheral print nothing, not even Zephyr's boot banner, and nothing is seen on air in 30 seconds, so it is not known whether they booted. The interrupt control register showed no fault in progress; suspected: the code waits in early start-up (a clock or the radio), but that was not checked.
+
+## Suspects: where this setup differs from TI's
+
+Any of these could be why the Bluetooth samples print nothing. None is proven.
+
+- **Compiler.** GCC 12.2 from Zephyr SDK 0.17.4, reused from the upstream Zephyr run through `cross-compile`, not TI's tested toolchain.
+- **lief 1.0.0 instead of 0.12.3.** `lief` is a Python library that reads and rewrites compiled program files; TI's CRC tool uses it to write the checksums into the built file. The tool was written for lief 0.12.3 and ran here with 1.0.0 (workaround in step 5 below). The output CRCs agree with an independent calculation, but lief rewrote the ELF file (the compiled program the hex is made from), and the rest of the image was not compared against an unpatched one.
+- **User-record CRC left at 0 by TI's tool.** TI's CRC tool patches three CRCs (boot config, main CCFG, debug config). Upstream Zephyr's script also writes a fourth, the user record's CRC at 0x4E0207CC. The three shared CRCs match the upstream script byte for byte. Filling the fourth alone did not help, and the hello_world image that printed its banner had it filled. TI's `hw_ccfg.h` says the boot code does not depend on the user record; that was not tested on the chip.
+- **The objcopy path patch** (step 6 below), a one-line local change to the fork's build. `objcopy` is the GNU tool that copies a built program into other file formats, such as `.hex` and `.bin`.
+
+Other limits:
+
+- **The peripheral sample has 1.7 kB of RAM left.** **Chip limit.** Adding anything (logging, a second service, bonding) will likely overflow.
+- **`west flash` supports only J-Link for this board**, per the fork's README ("only JLink is available"). **Tool or docs**, because here it is TI's fork and TI's README. Upstream Zephyr 4.4.2 has the same J-Link-only flash setup for this board; the FAQ tags that one **Third-party behavior** because upstream is not TI's. Flash with UniFlash and the XDS110 probe instead, as above.
+
+## Versions
+
+| Item | Value |
+|---|---|
+| Repo | <https://github.com/TexasInstruments/simplelink-zephyr> |
+| Tag | `v3.7.0-ti-1.00.01_ga` (commit `cbababd4`). Newest GA tag on 2026-10-05. Newer `9.x` tags exist but are all `_ea` (early access) or `-internal`, so they were not used. |
+| HAL | `simplelink-hal_ti` at `ab1817da` ("simplelink_lpf3: 218d961-ti-v1.00 release") |
+| Other modules | `cmsis` `4b96cbb1`, `mbedtls` `2f24831e`, `tinycrypt` `1012a3eb` |
+| Compiler | `~/zephyr-toolchain/arm-zephyr-eabi` (GCC 12.2 from Zephyr SDK 0.17.4), via `cross-compile` |
+| Python | 3.12 venv at `~/zephyr-ti/.venv` |
+| CRC tool | `ti-simplelink-crc-tool` 1.2.5.0 from PyPI, run with `lief` 1.0.0 (see step 5) |
+
+## Commands
+
+Steps that differ from TI's README are marked OVERRIDE. Comments after `#` are notes, not commands.
+
+```bash
+# 1. Python and west. 32 s.
+mkdir -p ~/zephyr-ti && cd ~/zephyr-ti
+python3.12 -m venv .venv && . .venv/bin/activate
+pip install --upgrade pip west cmake
+
+# 2. Workspace at the GA tag, shallow. 31 s.
+west init -m https://github.com/TexasInstruments/simplelink-zephyr \
+  --mr v3.7.0-ti-1.00.01_ga --clone-opt=--depth=1 ~/zephyr-ti/ws
+
+# 3. Only the modules this build needs. OVERRIDE: project filter. 18 s total (11 s, then 7 s for the two crypto modules the first build asked for).
+cd ~/zephyr-ti/ws
+west config manifest.project-filter -- '-.*,+simplelink-hal_ti,+cmsis,+mbedtls,+tinycrypt'
+west update --narrow -o=--depth=1
+
+# 4. Python packages. 12 s.
+pip install -r zephyr/scripts/requirements-base.txt
+
+# 5. OVERRIDE: TI's CRC tool. It is listed only in requirements-extras.txt, and it pins
+#    lief 0.12.3, which has no wheel for Python 3.12 on an Intel Mac and fails to build.
+#    Install the tool without its pins and use a current lief wheel. Under a minute, not timed.
+pip install --only-binary=:all: lief
+pip download --no-deps -d ~/zephyr-ti/_pkgs ti-simplelink-crc-tool
+pip install --no-deps ~/zephyr-ti/_pkgs/ti_simplelink_crc_tool-1.2.5.0-py3-none-any.whl
+
+# 6. OVERRIDE: the fork's CC23xx post-build step calls objcopy at a fixed Zephyr SDK path.
+#    Point it at the active compiler's objcopy instead (one-line local patch, not committed anywhere).
+sed -i '' 's#${ZEPHYR_SDK_INSTALL_DIR}/arm-zephyr-eabi/bin/arm-zephyr-eabi-objcopy#${CMAKE_OBJCOPY}#' \
+  zephyr/soc/ti/simplelink/cc23x0/CMakeLists.txt
+
+# 7. Build. 60 s and 63 s from clean.
+export ZEPHYR_TOOLCHAIN_VARIANT=cross-compile
+export CROSS_COMPILE=$HOME/zephyr-toolchain/arm-zephyr-eabi/bin/arm-zephyr-eabi-
+cd ~/zephyr-ti/ws/zephyr
+west build -p always -b lp_em_cc2340r5 samples/bluetooth/peripheral -d ~/zephyr-ti/build-peripheral
+west build -p always -b lp_em_cc2340r5 samples/bluetooth/beacon     -d ~/zephyr-ti/build-beacon
+```
+
+The workarounds, with the error each one avoids:
+
+- **Step 5, lief.** **Tool or docs.** Without it, installing the CRC tool with its pins fails with `ERROR: Failed to build 'lief' when getting requirements to build wheel`. Without the CRC tool at all (it is not in `requirements-base.txt`), the build links and then stops at `/bin/sh: crc_tool: command not found`.
+- **Step 6, objcopy.** **Tool or docs.** The fork's `soc/ti/simplelink/cc23x0/CMakeLists.txt` runs `${ZEPHYR_SDK_INSTALL_DIR}/arm-zephyr-eabi/bin/arm-zephyr-eabi-objcopy`, a path that exists only with a full Zephyr SDK install. Setting `ZEPHYR_SDK_INSTALL_DIR` to work around it made Zephyr look for a full SDK and stop in `FindZephyr-sdk.cmake` (**Our mistake**). The exact error text of both stops was not saved.
+- **Step 3, module filter.** **Our mistake.** The first filter left out `mbedtls` and `tinycrypt`, and Kconfig (Zephyr's build-time settings system, the `CONFIG_...` options) stopped. The filter above includes them. The exact Kconfig error text was not saved.
+
+The manifest has a group meant for TI staff only. It is off by default (`group-filter` in `west.yml`), and the project filter above does not turn it on: `+simplelink-hal_ti` matches only that one project name. Do not add a bare `hal_ti` pattern to the filter.
+
+## Times (wall clock, machine waiting)
+
+| Step | Time |
+|---|---|
+| venv plus west and CMake | 32 s |
+| `west init` (shallow) | 31 s |
+| `west update` (4 modules, shallow) | 18 s |
+| `requirements-base.txt` | 12 s |
+| CRC tool plus lief | under 1 min, not timed |
+| Build, peripheral (clean) | 60 s |
+| Build, beacon (clean) | 63 s |
+
+Three failed build attempts came first: the Kconfig stop on missing mbedtls and tinycrypt (18 s), `crc_tool: command not found` after a good link (66 s), and the Zephyr SDK lookup triggered by setting `ZEPHYR_SDK_INSTALL_DIR` (11 s). They are not counted above.
+
+## Disk
+
+| Path | Size |
+|---|---|
+| `~/zephyr-ti/ws` (zephyr plus 4 modules) | 663 MB |
+| `~/zephyr-ti/.venv` | 179 MB |
+| `~/zephyr-ti/build-peripheral` | 40 MB |
+| `~/zephyr-ti/build-beacon` | 33 MB |
+| **`~/zephyr-ti` total** | **915 MB** |
+
+The compiler is shared with the upstream run and not counted. `zephyr.bin` in each build folder is 1.22 GB (1.2 GB) because it spans from address 0 to the end of the configuration area, which starts at 0x4E020000. It is a sparse file: `du` shows 208 kB or less on disk for each one here. Do not copy it with a tool that fills sparse files, and do not flash it. Use the hex.
+
+## Lock check
+
+Can these images lock the chip? No: every permission is set to allow. TI's fork sets the chip's configuration area (CCFG) from Kconfig, not devicetree. Both Bluetooth builds have:
+
+```text
+CONFIG_CC23X0_ALLOW_DEBUG_PORT=y
+CONFIG_CC23X0_ALLOW_ENERGY_TRACE=y
+CONFIG_CC23X0_ALLOW_FLASH_VERIFY=y
+CONFIG_CC23X0_ALLOW_FLASH_PROGRAM=y
+CONFIG_CC23X0_ALLOW_CHIP_ERASE=y
+CONFIG_CC23X0_ALLOW_TOOLS_CLIENT_MODE=y
+CONFIG_CC23X0_ALLOW_RETURN_TO_FACTORY=y
+```
+
+In the hex, the permission word at 0x4E020018 is `aaaaaaaa` (every permission set to allow), and debug authorization at 0x4E0207D0 is `0x5A` (debug open). Main flash sectors are not write-protected (`0xffffffff`). The CCFG sector write-protect mask is 0, the same value as the upstream blinky image that flashed and ran on this board. No "LOCK YOUR DEVICE" warning was printed. The fork's sources do not contain that check at all, so its absence proves nothing by itself; the values above are what was checked.
+
+==============================================================================
+FILE: cc2340r5/zephyr/README.md | Zephyr on the LP-EM-CC2340R5 with the XDS110 probe
+==============================================================================
+
+# Zephyr on the LP-EM-CC2340R5 with the XDS110 probe
+
+Terms: [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [FAQ.md](../FAQ.md). 1 kB = 1,024 bytes.
+
+Works: Zephyr 4.4.2 `samples/basic/blinky` runs on the LP-EM-CC2340R5. It took 82 seconds from the first command to the program printing on the serial port (2026-10-05). The serial port shows the LED state changing every second, and the green LED was seen blinking.
+
+The LED is the **green** one. Zephyr's board file makes green `led0`, and blinky uses `led0`. The SDK example that was on the board before blinks red, so a green blink also proves the new program is the one running.
+
+## Times
+
+| Step | Seconds |
+|---|--:|
+| Read the board file, check the workspace, measure disk | 16 |
+| Build (clean) | 47 |
+| Check the image before flashing | 12 |
+| Flash and start | 7 |
+| **Total** | **82** |
+
+Nothing new was downloaded: the Zephyr workspace and compiler (944 MB and 1.1 GB) were already on the Mac. This build added 34 MB. The first-time install of both is in [mac-setup/README.md](../../mac-setup/README.md).
+
+## Manual overrides
+
+| # | The official way | What blocked it | What was done instead |
+|---|------------------|-----------------|-----------------------|
+| 1 | `west flash`, per the Zephyr board page ("flashed in the usual way") | The board's flash setup lists J-Link only. The probe sold for this board is an XDS110. The prebuilt OpenOCD used for the MSPM0 board has no CC23xx support. | UniFlash command line with the connection file from this repo. |
+| 2 | Flash `zephyr.hex` | The chip's boot code checks checksums in its configuration area. The build writes a second file, `zephyr_crc32.hex`, with them filled in. `west flash` picks that file on its own; a person flashing by hand has to know. | Flashed `zephyr_crc32.hex`. |
+| 3 | Flash with verify | Verify reports one mismatch at 0x4E020750 (expected 0x00, read 0xFF). Same address with the SDK image and the Zephyr image. | Treated as a tool or chip quirk, not a bad flash: both programs run. Cause still open. |
+
+## Safety check before flashing
+
+Zephyr's source for this chip warns that an image built without the chip-erase permission "will LOCK YOUR DEVICE." Before flashing, the built device tree was checked: debug port, flash program, chip erase and return to factory are all allowed, and the build printed no lock warning. The image was also checked to contain only the program area (0x0 to 0x277C) and the configuration area (0x4E020000 to 0x4E020800).
+
+## Repeat it
+
+`./setup-intel-mac.sh` installs Zephyr if it is not there, builds, checks the named probe is connected, flashes and resets. Set `ZP`, `TC` and `PROBE_SERIAL` to choose folders and the board.
+
+## What you see
+
+The build's memory report is flash 9.9 kB and RAM 4 kB. After reset the serial port prints `LED state: ON` and `LED state: OFF` one second apart, and the green LED toggles with it.
+
+Next: Bluetooth on this board needs TI's Zephyr fork; see [zephyr-ti](../zephyr-ti/README.md).
+
+==============================================================================
+FILE: cc2340r5/zigbee-alarm/README.md | How do I make a TI CC2340R5 report smoke and CO to Home Assistant over Zigbee?
+==============================================================================
+
+# How do I make a TI CC2340R5 report smoke and CO to Home Assistant over Zigbee?
+
+Terms: ZHA, ZBT-2, end device, router, IAS Zone, NVS and CIE are defined in [docs/vocab.md](../../docs/vocab.md) (CIE is the alarm panel that receives the alert; here, Home Assistant).
+
+Build this folder with one command, flash it, open joining in ZHA, and the board shows up as one device with a **Smoke** and a **Carbon monoxide** binary sensor, no custom code on the Home Assistant side. It listens on its USB serial port for the lines `SMOKE 1`, `SMOKE 0`, `CO 1`, `CO 0` and sets or clears the zone's alarm bit. Result on 2026-10-13: the device was listed 5.6 s after the flash finished, the sensors came up with device classes `smoke` and `carbon_monoxide`, and 20 of 20 changes landed for each zone (median 38 ms for smoke and 56 ms for CO). Status: Works, one run. Problems and fixes are in the table below and in [FAQ.md](../FAQ.md).
+
+## Ten-minute path
+
+1. Tools (versions used): TI Arm Clang 5.1.1, SysConfig 1.26.3, the SimpleLink Low Power F3 SDK 9.21.00.36, UniFlash 9.6.0, at the paths in `build.sh`.
+2. `./build.sh` (about 30 s). The image is `freertos/ticlang/alarm.hex`. Add `EXTRA_CFLAGS=-DFRL_DEBUG_UART` for status lines on the serial port (`ZB <signal> <status>`, `NTF <endpoint> <status>`).
+3. In Home Assistant: Settings, Devices, Zigbee Home Automation, Add device (or the `zha.permit` service, duration 240).
+4. `/Applications/ti/uniflash_9.6.0/dslite.sh --mode flash -c ../CC2340R5.ccxml -e -f -u freertos/ticlang/alarm.hex` (13 s). The flash erases the board's stored network, so it joins as new every time.
+5. The device appears in ZHA about 6 s later as "Fox Red Labs FRL-ALARM". Send a line: `python3 uart_send.py /dev/cu.usbmodem<probe serial>1 "SMOKE 1"` and the Smoke sensor turns on.
+
+## What it is
+
+TI's `onoff_light` Zigbee example (ZBOSS stack, FreeRTOS) with the light replaced by two IAS Zone servers: endpoint 1 zone type 0x0028 (fire sensor), endpoint 2 zone type 0x002B (CO sensor; ZBOSS spells the same value `GAS_SENSOR`). The role is end device with the receiver on. The serial lines arrive through UART2 on the debug probe's back channel (115200, 8N1) in callback mode; the code is `alarm.c` (about 300 lines), the configuration `alarm.syscfg`. Logging is off (RAM).
+
+The zone status change notification is sent by this project's own code. ZBOSS's `zb_zcl_ias_zone_set_status()` only notifies when an alarm bit gets set; clearing it returns false and sends nothing, so Home Assistant stayed on "smoke" after `SMOKE 0`. `alarm.c` sets the attribute and sends the notification itself to the address ZHA wrote.
+
+## If you see ... do
+
+| You see | Do |
+|---|---|
+| Device joins but the sensors never change | Home Assistant did not enroll the zone (zone state 0). Remove the device in ZHA, wait until it is gone, open permit-join, flash again. One of three scripted re-pairings never showed up within two minutes after a removal that was only seconds old (cause not isolated; suspected: pairing before ZHA finished the removal). |
+| `IAS zone` entities with no device class | Same cause: the zone type was not read. Reconfigure the device in ZHA (or remove and re-pair). |
+| The board goes silent after a minute | You built with `zb_sleep_now()` enabled or the sleepy power mode. Both stop the receiver and the serial listener; see below. |
+| The board stops answering when ZHA writes the CIE address | Use the extended zone attribute list (`ZB_ZCL_DECLARE_IAS_ZONE_ATTRIB_LIST_EXT`). With the short list the board stopped responding at that write; with the extended one it did not (cause inside the closed library not checked, suspected: the short list has no internal context entry). |
+
+## Sleepy: tried, does not work with a serial input
+
+The syscfg value `zigbee.powerModeOperation = "sleepy"` plus TI's `zb_sleep_now()` (the default in the examples) built and joined, and 10 of 10 changes landed right after the join. After an idle spell the board stopped answering ZHA's reads and stopped hearing serial lines. Cause not isolated (suspected: the UART receiver is off in standby; a product would wake the chip with a GPIO line from the listener, then read the UART). So the image keeps the receiver on. Current was not measured; no battery figure is claimed.
+
+## Files
+
+`alarm.c`, `alarm.syscfg`, `build.sh`, `freertos/ticlang/makefile` and `lpf3_zigbee_freertos.cmd` (TI's, renamed), `osif/` and `dmm/` (TI's, unchanged). Bench tools: `uart_send.py`, `uart_cap.py`, `latency.py` (the 20-event measurement), `join_bench.sh`, `ha_ws.py` (Home Assistant websocket helper; the token is read at run time and never printed).
+
+Parts of `alarm.c`, `osif/` and `dmm/` are from TI's SDK example (BSD-3-Clause, Texas Instruments Incorporated).
+
+==============================================================================
+FILE: cc2340r5/zigbee/README.md | How do I get a TI LP-EM-CC2340R5 into Home Assistant over Zigbee?
+==============================================================================
+
+# How do I get a TI LP-EM-CC2340R5 into Home Assistant over Zigbee?
+
+Terms: ZHA, ZBT-2, coordinator, router, end device, NVS, LQI, RSSI and tilogger are defined in [docs/vocab.md](../../docs/vocab.md). Errors and fixes: [FAQ.md](../FAQ.md).
+
+Build TI's `onoff_light` example from the SimpleLink Low Power F3 SDK 9.21.00.36 with two lines changed in its `.syscfg` file, flash it, and open joining in Home Assistant's Zigbee integration (ZHA): on 2026-10-05 the board joined 37 seconds after the flash finished, and 20 of 20 on/off commands from Home Assistant landed. The two lines make the board a router and let it search all 16 channels; they are in [the next section](#the-fix-two-lines-in-the-syscfg).
+
+Latency, measured once each: median 95 ms at the first pairing; about 5 s after a re-pairing about two hours later, cause **Unknown (suspected: Radio environment)** ([what was measured](#what-was-measured-and-what-was-not)).
+
+A rerun on 2026-10-16 of the same image did not join (see "Rerun of 2026-10-16" below). Treat the join as seen once.
+
+Contents: [the two-line fix](#the-fix-two-lines-in-the-syscfg), [build and flash](#build-and-flash), [times](#times), [gotchas](#gotchas), [what was measured](#what-was-measured-and-what-was-not), [what to do next](#what-to-do-next), [also tried: Bluetooth](#also-tried-bluetooth), [files](#files).
+
+## The fix: two lines in the `.syscfg`
+
+TI's example searches channel 11 only and starts its own network as a coordinator. **TI example default.** A home network is usually on another channel (this one is on 20), so the board never finds it, and nothing says so: the device is simply absent. In `onoff_light/on_off_light.syscfg`, set:
+
+```text
+zigbee.deviceType                    = ["zr"];
+```
+
+```text
+zigbee.primaryChannels               = [11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26];
+```
+
+The first line makes the board a router (it was `["zc"]`, a coordinator that forms its own network). The second searches all 16 channels (it was unset, which means channel 11 only: `DEFAULT_CHANLIST` is `0x00000800`). You can also list just your network's channel. The generated `ti_zigbee_config.h` shows the channel mask. Everything else is TI's example as shipped.
+
+Setup on the other end: a Nabu Casa Home Assistant Connect ZBT-2 (a USB Zigbee and Thread radio) plugged into a separate host, running Home Assistant in Docker with ZHA. The build and flash ran on an Intel MacBook, macOS 15.7.9, with TI Arm Clang 5.1.1, SysConfig 1.26.3 and UniFlash 9.6.0.
+
+The board carries the CC2340R52 chip, 36 kB of RAM; the CC2340R53 is a 64 kB version on a separate board, LP-EM-CC2340R53. 1 kB = 1,024 bytes.
+
+## Build and flash
+
+Run these from the board folder, `cc2340r5/`, where the connection file is.
+
+```bash
+cd zigbee/onoff_light/freertos/ticlang
+```
+
+```bash
+make -j4 SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR=/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS \
+         SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh \
+         TICLANG_ARMCOMPILER=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
+```
+
+```bash
+cd ../../../..
+```
+
+```bash
+/Applications/ti/uniflash_9.6.0/dslite.sh --mode flash -c CC2340R5.ccxml -e -f -u zigbee/onoff_light/freertos/ticlang/onoff_light.hex
+```
+
+The paths are where TI's installers put the tools on a Mac; change them if yours differ. `CC2340R5.ccxml` is the connection file from [../README.md](../README.md). Open the Zigbee network for joining in Home Assistant first (Settings, Devices, Add device, or the `zha.permit` service with a duration of 180). The device joins on its own within 37 to 58 seconds of boot in the tries.
+
+## Times
+
+Every step ran from the terminal; the only hands-on check was looking at the LED.
+
+| Step | Where | Waiting | Notes |
+|---|---|--:|---|
+| Copy the example, read its README, find the role setting | terminal | about 3 min | The example is a coordinator by default. Changed to router in the `.syscfg`. |
+| Build (SysConfig plus TI Arm Clang, `make -j4`) | terminal | 30 s | |
+| Flash | terminal | 14 s | UniFlash command line, same connection file as the blink run. |
+| First join attempt | radio | about 6 min | Device never appeared. The 6 minutes went to finding out why: the channel-11 default above. |
+| Rebuild with all channels, flash | terminal | 31 s build, 15 s flash | 275.7 kB of flash and 35.2 kB of the 36 kB of RAM, from the linker map of the same source rebuilt later that evening. |
+| Join | radio | 37 s | From the flash finishing to the device listed in ZHA. |
+| 20 toggles from Home Assistant | network | 24 s | All 20 landed. Median 95 ms, min 73, max 292. |
+
+The waiting times in the table add up to about 11.5 minutes, from the first command to the LED switching from Home Assistant. Without the 6-minute channel detour, about 5.5.
+
+## Gotchas
+
+1. **TI's Zigbee examples listen on channel 11 only.** **TI example default.** The fix is the `primaryChannels` line above. Prove the join from Home Assistant's device list, not from the board's log.
+2. **The serial log is binary, and TI's decoder `tilogger` fails on a Mac as shipped (`unpack requires a buffer of 8 bytes`).** **Tool or docs.** The one-line fix to the decoder is in [FAQ.md](../FAQ.md).
+3. **The device shows up as "unk_manufacturer unk_model".** **TI example default.** The example does not fill the Basic cluster's manufacturer and model strings. Home Assistant lists it under those names and exposes it as a switch, not a light. Harmless, but a newcomer will wonder if it is theirs. The IEEE address starts with `00:12:4b`, TI's prefix.
+4. **To start over, remove the device in Home Assistant first, and wait.** **Our mistake**, with **Third-party behavior**. The example keeps its Zigbee network settings in the chip's non-volatile storage (NVS, the `NVRAM` region in its linker map). Remove the device in Home Assistant, wait until it is gone from the device list, then reflash or use the example's reset button. Re-pairing before Home Assistant had finished removing the device left a stale record and `Failed to send request: device did not respond`. Note on erasing: `-e` in the flash command above is `--verbose` (progress messages), not erase. UniFlash's settings file for this chip family sets a chip erase during every program load by default, and this repo's connection file does not change it. Whether a reflash alone made the board forget its network was not checked (**Unknown**).
+5. **RAM is nearly full.** **Chip limit.** 799 bytes free with logging on. Turn `loggingEnabled` off in SysConfig before adding anything.
+6. **Stale bytes on the serial port.** **Unknown.** After a flash, the first read of the serial port showed lines from the previous program. The cause was not checked. Flush the port first (`termios.tcflush`) or read twice, and wait for the new program's own output.
+
+## What was measured, and what was not
+
+- Measured once: join time; 20 switch commands with success count and latency from this Mac; link quality as reported by the coordinator at the first pairing, LQI 60 and RSSI -85 dBm. (LQI is the coordinator's 0 to 255 link-quality score, higher is better. RSSI is received signal strength in dBm, closer to 0 is stronger; -85 dBm is weak.) The distance between the desk and the coordinator was not measured.
+- The latency includes the network hop between the Mac and the Home Assistant host (13 to 43 ms for a plain API call), ZHA, the coordinator, the air, the board, and the response back. The Home Assistant call returns after the board acknowledges the command, so the air round trip is inside the call time.
+- Re-measured about two hours later: after other images were flashed and the board was removed and re-paired, 30 of 30 commands landed with a median of about 5 s (3.5 to 7.0 s). Link quality after the re-pairing: the coordinator's readings of this board that evening, none during a transfer: LQI 36 to 48, RSSI -88 to -91 dBm (observed 2026-10-05; not saved). None was taken during the over-the-air update tests. **Unknown (suspected: Radio environment).** The route through other Zigbee devices was not checked. Measure more than once before quoting a latency.
+- End device, measured once: TI's on/off switch example, built as an end device, rejoined the network 15 s after flashing. Its device type and sleep behavior were not confirmed; TI's OTA client example, also an end device, joined and was listed as an end device ([../matrix/README.md](../matrix/README.md)).
+- Not measured: current, range, packet loss over hours, behavior as a sleepy end device, and anything about Thread. The board was a router here because routers stay awake and are the simplest thing to command.
+
+## Keep it running: automation, restart, update, recovery
+
+What this board controls is its own red LED, through a switch entity in Home Assistant. It is not a mains light fitting. Each line says whether it has been run.
+
+| Part of the job | How | Status |
+|---|---|---|
+| Parts | The LP-EM-CC2340R5 board, the LP-XDS110ET probe and a Home Assistant Connect ZBT-2 coordinator, plus a computer already running Home Assistant. The probe and the coordinator are reused on later builds | Parts read on the sellers' pages |
+| The entity | ZHA lists the board as `unk_manufacturer unk_model` with one switch entity (gotcha 3); its entity id is on its device page | Run 2026-10-05 |
+| One automation | [home-assistant/automation-sunset.yaml](home-assistant/automation-sunset.yaml): the switch on at sunset and off at 23:00, as two automations. Paste them into `automations.yaml` with your entity id, or rebuild it in the automation editor | **Not run** |
+| Restart: power loss | Unplug the probe's USB cable for 30 s, plug it back in, then switch the entity from Home Assistant. Expected: the board keeps its network settings in NVS (gotcha 4) and answers without being paired again. Pass: 20 of 20 commands land within 2 minutes of power returning | **Not run**: blocked by the join below |
+| Restart: Home Assistant | Restart Home Assistant, then switch the entity. Pass: 20 of 20 land | **Not run**: blocked by the join below |
+| Update | Over the air from Home Assistant: stalled at about 1 percent in four tries, cause unknown ([experiment](../../docs/experiments/2026-10-05-cc2340r5-zigbee-ota-home-assistant.md)). The update that works is a reflash over the probe (Build and flash above). UniFlash's default load erases the whole chip first ([oad/README.md](../oad/README.md)), NVS included, so after a reflash remove the device in Home Assistant and pair it again (gotcha 4) | Reflash run; keeping the pairing across a reflash not run |
+| Recovery | Back up the shipped flash before the first write and put it back with the commands in [AGENTS.md](../AGENTS.md) (Backup, Restore). For copies the browser bench saved: `cc2340r5/restore-from-page.sh <folder>` | The page-copy route passed on 2026-10-16 (see below) |
+
+**Rerun of 2026-10-16: the light did not join.** This README's image (`onoff_light.hex`, rebuilt byte for byte from the committed source) was flashed or reset three times with ZHA's joining open for about 4 minutes each, the device removed from ZHA first once; it never appeared in ZHA's device list. As a control, the same board with the Zigbee alarm image (`../zigbee-alarm/`, an end device) joined in 31 s and then 7 s on the same network, whose coordinator and three routers were up. The light's own log (tilogger, gotcha 2) is inconsistent between tries. In one, "Device (1) STARTED OK" (1 is a router) and "Successful steering" 6.2 s after a reset. In another, with a debug copy that would print the network it joined, steering was cancelled at 6.3 s (ZBOSS signal 55) and the stack reported no active links left at 16 s (signal 24), with no join to print. Home Assistant's network is on channel 20, PAN ID 0xDE8D. Cause not found; which network, if any, the light joins is not established. Until it is found, the automation and restart checks above cannot run. Next: find what cancels steering (the example's start-up and button handling), and repeat with the coordinator's own log open.
+
+**Putting back a copy the browser bench saved, 2026-10-16: passed.** With the alarm image joined, the bench page wrote its Bluetooth light and saved the alarm image as two `.bin` files first. `cc2340r5/restore-from-page.sh` put them back in 30 s. Main flash and CCFG read back identical, except 375 bytes inside the NVS area (0x7F000 to 0x7FFFF) that the alarm wrote as it started. Home Assistant then read the device's IAS Zone state over the air, with the same network address and no re-pairing. The board was then returned to the Bluetooth light it held before, read back identical.
+
+## What to do next
+
+- Keep logging off if you add application code (gotcha 5).
+- To test Bluetooth, Thread, or an over-the-air update on the same board, see [../matrix/README.md](../matrix/README.md).
+
+## Also tried: Bluetooth
+
+TI's Bluetooth examples on this board, with flash-to-air, connection and echo times from a Mac: [../matrix/README.md](../matrix/README.md) and the CSV rows in `data/results/cc2340r5.csv`.
+
+## Files
+
+- `onoff_light/`: TI's example with the two-line change. Build outputs are not committed.
+- `home-assistant/automation-sunset.yaml`: the sunset automation described above.
+- The decoded log of a join and the 20-toggle timings are not in the repository; the numbers are in the tables above and in `data/results/cc2340r5.csv`. The flashes ran without verify (`-v`), so they say nothing about the mismatch at 0x4E020750 seen on other images.
+
+==============================================================================
+FILE: cc2340r5/zigbee/onoff_light/README.md | TI's `onoff_light` Zigbee example, LP-EM-CC2340R5: README as shipped in the SDK, plus one section
+==============================================================================
+
+# TI's `onoff_light` Zigbee example, LP-EM-CC2340R5: README as shipped in the SDK, plus one section
+
+Terms: [docs/vocab.md](../../../docs/vocab.md). Errors and fixes: [FAQ.md](../../FAQ.md). This is TI's own README for the LP-EM-CC2340R5 `onoff_light` example, SimpleLink Low Power F3 SDK 9.21.00.36. The "UART Logging" section is added here. TI's text below says the example is a Zigbee Coordinator, and it is as shipped. The build in [the Zigbee page](../README.md) changes two lines in the `.syscfg` file to make it a router that searches all 16 channels.
+
+# On/Off Server Output ZC
+
+* [Introduction](#intro)
+* [Software Prerequisites](#software-prereqs)
+* [Functional Description](#functional-desc)
+  * [Software Overview](#software-overview)
+    * [Application Files](#application)
+* [Configuration With SysConfig](#sysconfig)
+* [UART Logging](#uart-logging)
+* [Example Usage](#usage)
+  * [Buttons](#usage-buttons)
+  * [Commissioning the Device Into the Network](#Commission-Device)
+
+# <a name="intro"></a> Introduction
+
+This document discusses how to use the On/Off Server Output Sample App and the
+different parts that compose it. On/Off Server Output Sample App is an examples
+that exercises different features of TI Zigbee Coordinator (ZC) implementation.
+
+Some of the features exercised include:
+
+* Zigbee Coordinator network formation
+* Output device that acts as *Target* of Finding and Binding
+* Receive and respond to On/Off Toggle data frame
+
+# <a name="software-prereqs"></a> Software Prerequisites
+
+* [Code Composer Studio&trade; (CCS)](http://processors.wiki.ti.com/index.php/Download_CCS#Download_the_latest_CCS) v12.7 or newer
+
+* [SimpleLink&trade; LOWPOWER SDK](http://www.ti.com/tool/SIMPLELINK-LOWPOWER-SDK)
+
+# <a name="functional-desc"></a> Functional Description
+
+## <a name="software-overview"></a> Software Overview
+
+This section describes the software components and the corresponding source files.
+
+### <a name="application"></a> Application Files
+
+The On/Off Server Output ZC Sample App works in conjunction with a Zigbee End
+Device (ZED) or a Zigbee Router (ZR). For this, the On/Off Server Switch ZED
+Sample App can be used. Upon startup, the On/Off Server Output ZC initializes
+necessary hardware components, including the GPIO connected to Green LED. It then
+starts the network formation. When the ZED/ZR is connected, the ZC is ready
+to receive On/Off toggle commands to toggle the Green LED.
+
+* **on_off_light.c:** Contains the application's event loop, device initialization
+function calls, and network formation and on/off toggle command specific logic.
+
+# <a name="sysconfig"></a> Configuration With SysConfig
+
+SysConfig is a GUI configuration tool that allows for TI driver and stack configurations.
+
+To configure using SysConfig, import the SysConfig-enabled project into CCS. Double
+click the `*.syscfg` file from the CCS project explorer, where `*` is the name of the
+example project. The SysConfig GUI window will appear, where Zigbee stack and TI driver
+configurations can be adjusted. These settings will be reflected in the generated files.
+
+The example project comes with working default settings for SysConfig. For the purposes
+of this README, it is not recommended to change the default driver settings, as any
+changes may impact the functionality of the example. The Zigbee stack settings may be
+changed as required for your use case.
+
+Note that some Zigbee settings are stored in non-volatile storage, and Zigbee
+prioritizes stored settings over SysConfig settings. To guarantee SysConfig settings are
+applied, perform a factory reset of the device to  clear non-volatile storage.
+
+# <a name="usage"></a> Example Usage
+
+This section describes how to use this sample application.
+
+## <a name="Commission-Device"></a> Forming the Network and Commissioning a Device into the Network
+
+Zigbee Coordinator forms the network. At startup, the On/Off Server Output ZC
+Sample App starts the Zigbee network and wait for *Beacon Requests* from ZED/ZR
+attempting to join the network. The ZC will then respond and the commissioning
+process will continue until the ZED is joined into the network. At this point,
+On/Off Server Output ZC is ready to respond to On/Off Toggle commands from the
+ZED/ZR
+---
+
+# <a name="uart-logging"></a> UART Logging
+
+This example has logging enabled by default (`zigbee.loggingEnabled = true` in the `.syscfg` file).
+
+## How It Works
+
+Logs are encoded in a compact **binary format** over UART at **115200 baud**. A standard serial terminal shows garbled characters, so use `tilogger` to decode them.
+
+The binary format stores log level, module ID, and arguments as raw bytes rather than ASCII strings. This keeps UART traffic minimal so logging has negligible impact on real-time Zigbee operation.
+
+## Decoding Logs with tilogger
+
+TI says `tilogger` runs on **native Windows only** (not WSL, where binary frames get corrupted over WSL serial). On a Mac it runs after a one-line fix to the decoder; see [FAQ.md](../../FAQ.md).
+
+```powershell
+# Install (once):
+pip install tilogger
+
+# Decode live from UART:
+tilogger --elf <path_to_build>/<example_name>.out uart <COM_PORT> 115200 stdout
+
+# Example:
+tilogger --elf examples/rtos/LP_EM_CC2755P20/zigbee/onoff_switch/freertos/ticlang/onoff_switch.out uart COM24 115200 stdout
+```
+
+## Enabling / Disabling Logging
+
+In the example `.syscfg` file:
+
+```javascript
+// Enable (default):
+zigbee.loggingEnabled = true;
+
+// Disable (saves about 2 kB RAM and reduces code size):
+zigbee.loggingEnabled = false;
+```
+
+When disabled, also remove the `LogSinkUART` section from the syscfg.
+
+## Log Modules
+
+| Module | What it covers |
+|--------|---------------|
+| `LogModule_Zigbee_App` | Application-level events (commissioning, OTA status, signals) |
+| `LogModule_Zigbee_OSIF` | OSIF-level events (NVS open/close, flash ops, timers) |
+| `LogModule_Zigbee_LLMAC` | MAC-level events (uses `LogSinkBuf`, too high-frequency for UART) |

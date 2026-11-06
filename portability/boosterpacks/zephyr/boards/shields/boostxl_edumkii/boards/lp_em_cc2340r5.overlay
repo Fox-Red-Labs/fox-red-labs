@@ -1,0 +1,12 @@
+/*
+ * LP-EM-CC2340R5. Only the SPI label is added; the board file has the
+ * connector. Pin 31 (data/command), 32, 33 and 5 (buttons) and 2 (joystick X)
+ * are not connected on this LaunchPad, so the EDUMKII shield stops in
+ * devicetree. No flash, no run: this board runs the house light.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <boosterpack/lp_em_cc2340r5.dtsi>
+
+#include "../common.dtsi"

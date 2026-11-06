@@ -1,0 +1,1 @@
+/* Nothing to add: the UART console and the GPIO ports come from the board file in the Zephyr tree built by zephyr-tree.sh uart. */

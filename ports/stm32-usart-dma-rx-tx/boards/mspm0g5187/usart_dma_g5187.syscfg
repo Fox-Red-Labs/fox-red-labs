@@ -1,0 +1,23 @@
+//@cliArgs --device "MSPM0G518X" --package "LQFP-64(PM)" --part "Default"
+//@v2CliArgs --device "MSPM0G5187" --package "LQFP-64(PM)"
+// @cliArgs --board /ti/boards/LP_MSPM0G5187
+// Port of MaJerle/stm32-usart-uart-dma-rx-tx usart_rx_idle_line_irq_ringbuff_tx_G0.
+// SysConfig sets the UART0 instance, its pins and the default clock; DMA channels, the
+// receive timeout and the baud divisors are set in main.c usart_init(), as the STM32 original does.
+// The baud below is a placeholder: usart_init() overwrites the divisors from the UART_BAUD build define.
+
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+
+UART1.$name                    = "UART_0";
+UART1.profile                  = "CONFIG_PROFILE_1";
+UART1.peripheral.$assign       = "UC0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+UART1.targetBaudRate           = 115200;
+UART1.enableInternalLoopback  = false;   // this SysConfig version defaults it ON; TX would never reach PA10
+UART1.enableFIFO               = true;
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;

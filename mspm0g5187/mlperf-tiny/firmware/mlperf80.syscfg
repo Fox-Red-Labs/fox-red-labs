@@ -1,0 +1,23 @@
+/* LP-MSPM0G5187 at 80 MHz (SYSPLL), TinyEngine NPU library on, UC0 on PA10 (TX) and PA11 (RX) at 115200 baud, no LEDs.
+ * Made from the SysConfig files of TI's motor_bearing_fault_detection_ai_npu (clock, NPU library) and
+ * uart_external_loopback_interrupt (UART pins) in MSPM0 SDK 2.11.00.07. */
+//@cliArgs --device "MSPM0G518X" --package "LQFP-64(PM)" --part "Default"
+//@v2CliArgs --device "MSPM0G5187" --package "LQFP-64(PM)"
+// @cliArgs --board /ti/boards/LP_MSPM0G5187 --rtos nortos
+const SYSCTL        = scripting.addModule("/ti/driverlib/SYSCTL");
+const UART          = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1         = UART.addInstance();
+const ProjectConfig = scripting.addModule("/ti/project_config/ProjectConfig");
+const Board = scripting.addModule("/ti/driverlib/Board", {}, false);
+SYSCTL.validateClkStatus = true;
+SYSCTL.MCLKSource        = "HSCLK";
+SYSCTL.SYSPLL_CLK0En     = true;
+UART1.$name                    = "UART_0";
+UART1.profile                  = "CONFIG_PROFILE_1";
+UART1.peripheral.$assign       = "UC0";
+UART1.targetBaudRate           = 115200;
+UART1.enableFIFO               = true;
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+ProjectConfig.genLibNPU   = true;
+ProjectConfig.genLibCMSIS = true;

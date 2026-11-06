@@ -1,0 +1,77 @@
+{
+ "name": "LAUNCHXL-F2800137 LaunchPad development kit",
+ "sources": "TMS320F2800137 product page and datasheet (features list, 2026-10-06); LaunchPad user guide SPRUJ32 (board parts, switches, J101, FAQ)",
+ "columns": [
+  {
+   "head": "The chip: F2800137",
+   "items": [
+    [
+     "Processor: C28x",
+     "Built for control math. 120 million steps a second (120 MHz). Not Arm: TI's own compiler, no Zephyr"
+    ],
+    [
+     "Math helpers: FPU and TMU",
+     "Hardware for decimals and for sine, cosine and divide, the math motors need"
+    ],
+    [
+     "Flash: 256 KB",
+     "Holds the program. Kept when the power is off"
+    ],
+    [
+     "RAM: 36 KB",
+     "Working memory while it runs. Cleared at power off"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "PWM: 14 channels",
+     "Fast on-off signals that set motor speed and power-supply output"
+    ],
+    [
+     "ADC: 2, 12-bit",
+     "Measure a voltage, 0 to 4095 steps, up to 4 million times a second"
+    ],
+    [
+     "Comparators: 4",
+     "Shut a PWM off in hardware when a current gets too high"
+    ],
+    [
+     "Encoder input: 1, capture: 2",
+     "Read a motor's position / time an incoming pulse"
+    ],
+    [
+     "UART: 3, SPI: 1, I2C: 2, CAN: 1",
+     "Serial text / fast bus / sensor bus / the car and factory network"
+    ],
+    [
+     "GPIO: 38 pins",
+     "Plain on/off pins: LEDs, buttons, control lines"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "USB debug probe (XDS110), CAN and encoder connectors, reset button, LEDs"
+    ],
+    [
+     "Headers",
+     "Two 40-pin BoosterPack sites (80 pins)"
+    ],
+    [
+     "Debug link",
+     "2 wires only (cJTAG), through the J101 jumpers"
+    ],
+    [
+     "Not on the chip",
+     "No Wi-Fi or Bluetooth, no USB of its own"
+    ]
+   ]
+  }
+ ]
+}

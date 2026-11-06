@@ -1,0 +1,45 @@
+/*
+ * BOOSTXL-AUDIO: DAC8311 (14-bit, SPI) feeding the TPA301 amplifier and the
+ * speaker. Pins (SLAU670A Figure 12): 7 clock, 15 data in, 12 SYNC (the DAC's
+ * select, active low), 13 amplifier line, 5 microphone power, 6 microphone
+ * out (analog, not wired here). J5 shipped on the SPI DAC.
+ * Pin 12 and pin 13 are the least certain; the amplifier line polarity is
+ * unread (active high is assumed, see PORTING-NOTES.md).
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+/ {
+	zephyr,user {
+		dac = <&audio_dac>;
+		dac-channel-id = <0>;
+		dac-resolution = <14>;
+	};
+
+	audio_amp: amplifier {
+		compatible = "regulator-fixed";
+		regulator-name = "audio_amp";
+		enable-gpios = <&boosterpack_header 13 GPIO_ACTIVE_HIGH>;
+		regulator-boot-on;
+	};
+
+	audio_mic_power: mic_power {
+		compatible = "regulator-fixed";
+		regulator-name = "audio_mic_power";
+		enable-gpios = <&boosterpack_header 5 GPIO_ACTIVE_HIGH>;
+		regulator-boot-on;
+	};
+};
+
+&boosterpack_spi {
+	cs-gpios = <&boosterpack_header 12 GPIO_ACTIVE_LOW>;
+
+	audio_dac: dac8311@0 {
+		compatible = "ti,dac8311";
+		reg = <0>;
+		spi-max-frequency = <10000000>;
+		#io-channel-cells = <1>;
+	};
+};

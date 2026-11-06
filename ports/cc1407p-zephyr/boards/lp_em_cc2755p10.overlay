@@ -1,0 +1,46 @@
+/*
+ * BP-CC1407P-9-FE on the LP-EM-CC2755P10, for TI's ti_cc140xp samples.
+ *
+ * TI's Zephyr fork (simplelink-zephyr v3.7.0-ti-1.00.01_ga) ships the
+ * ti_bp_cc140xp shield for the LP-EM-CC2745R10-Q1 only. Its generic overlay
+ * needs a `boosterpack_spi` label, which the LP-EM-CC2755P10 board file does
+ * not define (it has `boosterpack_header` only), so the shield cannot be used
+ * as is. This overlay does what the shield doc says for such a host: the
+ * device node written against the board's own SPI0 and GPIO controller.
+ * Build without --shield and pass this file with -DEXTRA_DTC_OVERLAY_FILE.
+ *
+ * Pins (same map as the CC2745R10-Q1 fix-up): SPI0 SCLK DIO3 (header 7),
+ * POCI DIO4 (14), PICO DIO5 (15), CS DIO7 (18), RESET DIO16 (36, the red
+ * LED), SPI_INT read on DIO28 (header 10). Hardware: red LED jumper off, one
+ * wire from BoosterPack pin 23 to pin 10.
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+&spi0 {
+	status = "okay";
+	/* 3-wire: chip select is a plain GPIO driven by the driver (POCI "ready" handshake). */
+	pinctrl-0 = <&spi0_sck_default &spi0_mosi_default &spi0_miso_default>;
+	pinctrl-1 = <&spi0_sck_sleep &spi0_mosi_sleep &spi0_miso_sleep>;
+	cs-gpios = <&gpio0 19 GPIO_ACTIVE_LOW>,  /* onboard flash (index 0) */
+	           <&gpio0 7 GPIO_ACTIVE_LOW>;   /* CC1407P, header 18 (index 1) */
+
+	ti_cc140xp: ti_bp_cc140xp_trx: ti_cc140xp@1 {
+		compatible = "ti,cc140xp-trx";
+		reg = <1>;
+		spi-max-frequency = <12000000>;
+		reset-gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;            /* header 36 */
+		trx-host-spi-int-gpios = <&gpio0 28 GPIO_ACTIVE_LOW>; /* header 10, wired from 23 */
+		poci-gpios = <&gpio0 4 GPIO_ACTIVE_LOW>;              /* header 14 */
+	};
+};
+
+/* SPI1's default pinctrl claims DIO12 (green LED) and DIO16 (RESET); no sample uses it. */
+&spi1 {
+	status = "disabled";
+};
+
+/* The red LED shares DIO16 with RESET. */
+&led1 {
+	status = "disabled";
+};

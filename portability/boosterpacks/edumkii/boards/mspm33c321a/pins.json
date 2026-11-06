@@ -1,0 +1,105 @@
+{
+ "board": "mspm33c321a",
+ "launchpad": "LP-MSPM33C321A",
+ "family": "mspm33",
+ "sysconfig_head": [
+  "--device \"MSPM33C321A\" --package \"LQFP-100(PFA)\" --part \"Default\"",
+  "--device \"MSPM33C321A\" --package \"LQFP-100(PFA)\""
+ ],
+ "lcd": true,
+ "gpio": {
+  "LCD_CS": "PB28",
+  "LCD_DC": "PC22",
+  "LCD_RST": "PC23",
+  "BL_RED": "PC29",
+  "LED_GREEN": "PC18",
+  "LED_BLUE": "PC19",
+  "BUZZER": "PC17",
+  "S1": "PA11",
+  "S2": "PC21",
+  "I2C_SCL": "PB13",
+  "I2C_SDA": "PB12"
+ },
+ "spi": {
+  "sclk": "PB31",
+  "mosi": "PB8",
+  "miso": "PB14",
+  "bitrate": 16000000,
+  "dma": true
+ },
+ "uart": {
+  "peripheral": "UC12",
+  "tx": "PA10",
+  "baud": 115200
+ },
+ "adc": {
+  "kind": "hsadc1",
+  "map": {
+   "ACC_Z": [
+    0,
+    "PA15"
+   ],
+   "ACC_Y": [
+    1,
+    "PA16"
+   ],
+   "ACC_X": [
+    2,
+    "PA17"
+   ],
+   "JOY_X": [
+    3,
+    "PA18"
+   ],
+   "MIC": [
+    9,
+    "PA22"
+   ],
+   "JOY_Y": [
+    14,
+    "PB27"
+   ],
+   "SEL_DIAG": [
+    7,
+    "PA21"
+   ]
+  }
+ },
+ "bp": {
+  "2": "PA18",
+  "5": "PA21",
+  "6": "PA22",
+  "7": "PB31",
+  "9": "PB13",
+  "10": "PB12",
+  "13": "PB28",
+  "15": "PB8",
+  "17": "PC23",
+  "23": "PA17",
+  "24": "PA16",
+  "25": "PA15",
+  "26": "PB27",
+  "31": "PC22",
+  "32": "PC21",
+  "33": "PA11",
+  "34": "PA10",
+  "37": "PC19",
+  "38": "PC18",
+  "39": "PC29",
+  "40": "PC17"
+ },
+ "notes": {
+  "2": "PA18 is also the BSL button through J3 (not button S1, which is PA11): pull J3",
+  "5": "WARNING: Never drive PA21. On this LaunchPad BoosterPack pin 5 has no chip connection (R21 not fitted), and PA21 is the VREF- pin, tied to ground through R10. A pack that puts a high level on this pin drives that ground. A pack microphone that needs power on this pin needs a jumper from pin 8 to pin 5",
+  "33": "PA11 is the backchannel UART RX; the hello example uses TX only",
+  "34": "PA10 is the backchannel UART TX (BoosterPack gator-clip pin): console output",
+  "40": "PC17 is also button S2 through J4: pull J4",
+  "39": "J5 on the BoosterPack picks backlight (2-3) or red LED (1-2)"
+ },
+ "joy_sel_raw": {
+  "port": "GPIOA",
+  "pin": "DL_GPIO_PIN_21",
+  "iomux": "IOMUX_PINCM46",
+  "note": "PA21 is also ADC1_7: the port switches the pad between analog and digital input"
+ }
+}

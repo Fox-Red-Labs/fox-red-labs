@@ -1,0 +1,372 @@
+{
+ "id": "cc2340r5",
+ "board": "LP-EM-CC2340R5",
+ "part": "CC2340R52",
+ "family": "CC23xx",
+ "title": "Is the TI LP-EM-CC2340R5 the right board for my project?",
+ "short": "A small Bluetooth and Zigbee board built around TI's CC2340R52 chip. Bluetooth and Zigbee ran from TI's examples with settings changes only; RAM (36 kB) is what limits it, at least in TI's configurations as we built them. TI.com no longer sells this board; DigiKey listed it on 2026-10-08; the LP-EM-CC2340R53, with 64 kB of RAM, is the kit TI sells now, and our Thread and two-radio builds linked for its chip.",
+ "meet": {
+  "what": "A LaunchPad development kit for TI's CC2340R52 wireless chip: Bluetooth Low Energy, Zigbee, and Thread as a radio co-processor. It has no USB port of its own; a separate XDS110 probe clips on to power it, flash it and carry its serial port.",
+  "facts": [
+   [
+    "Chip",
+    "CC2340R52 (the board name says R5)"
+   ],
+   [
+    "CPU",
+    "Arm Cortex-M0+, 48 MHz"
+   ],
+   [
+    "Flash",
+    "512 kB"
+   ],
+   [
+    "RAM",
+    "36 kB"
+   ],
+   [
+    "Radios",
+    "2.4 GHz: Bluetooth LE, Zigbee, Thread (radio co-processor only), proprietary"
+   ],
+   [
+    "Debug probe",
+    "Separate: LP-XDS110ET or LP-XDS110"
+   ],
+   [
+    "Software",
+    "TI SimpleLink Low Power F3 SDK (FreeRTOS); upstream Zephyr for blink only"
+   ],
+   [
+    "Availability",
+    "TI.com no longer sells it; DigiKey listed it at $34.38 on 2026-10-08. TI now sells the LP-EM-CC2340R53 ($27.50)"
+   ],
+   [
+    "Chip price",
+    "$1.211 to $1.241 at 1,000 units on TI.com (2026-10-06)"
+   ]
+  ],
+  "source": "docs/research/ti-portfolio-specs-2026-10-06.md"
+ },
+ "projects": [
+  {
+   "t": "Blink an LED with TI's SDK",
+   "st": "works",
+   "result": "Build 22 s, flash 7 s once the tools were set up",
+   "source": "cc2340r5/README.md"
+  },
+  {
+   "t": "Blink an LED with Zephyr",
+   "st": "works",
+   "result": "82 s from first command to running; four AI models each did it in 3.0 to 3.6 minutes",
+   "source": "cc2340r5/zephyr/README.md"
+  },
+  {
+   "t": "Bluetooth: advertise and connect to a Mac",
+   "st": "works",
+   "result": "On air 1.40 s after flashing; connects in 0.55 s; 45 ms round trip for 20 bytes",
+   "source": "cc2340r5/matrix/benchmarks.md"
+  },
+  {
+   "t": "Switch a light from Home Assistant over Zigbee",
+   "st": "partial",
+   "result": "20 of 20 commands, 95 ms median at first pairing on 2026-10-05; about 5 s after re-pairing. The 2026-10-16 repeat did not join Home Assistant; cause open",
+   "source": "cc2340r5/zigbee/README.md"
+  },
+  {
+   "t": "Speed test (CoreMark)",
+   "st": "works",
+   "result": "111.09 with TI Arm Clang (2.31 per MHz); 84.07 under Zephyr with GCC",
+   "source": "cc2340r5/baremetal/README.md"
+  },
+  {
+   "t": "Update firmware over Zigbee from Home Assistant",
+   "st": "partial",
+   "result": "Offered and downloading after four fixes; best 7.20% of the image before stalling. **Tag: Unknown (suspected: Radio environment).** Cause not found",
+   "source": "docs/experiments/2026-10-05-cc2340r5-zigbee-ota-home-assistant.md"
+  },
+  {
+   "t": "Bluetooth on TI's Zephyr fork",
+   "st": "no",
+   "result": "hello_world ran after a boot-configuration change; Bluetooth samples printed nothing",
+   "source": "docs/experiments/2026-10-05-cc2340r5-ti-zephyr-ble.md"
+  }
+ ],
+ "chains": [
+  {
+   "t": "Bluetooth alone",
+   "st": "works",
+   "why": "TI's examples leave about 5.1 kB of RAM for your code",
+   "source": "cc2340r5/matrix/memory.md",
+   "verdict": "Yes"
+  },
+  {
+   "t": "Zigbee alone (router or end device)",
+   "st": "works",
+   "why": "TI's examples leave 0.8 kB (router, logging on) to 10.7 kB (update client, logging off) of RAM for your code",
+   "source": "cc2340r5/matrix/memory.md",
+   "verdict": "Yes"
+  },
+  {
+   "t": "Two radio stacks at the same time",
+   "st": "no",
+   "why": "TI's release notes say CC23xx chips do not support two stacks at once. TI's two-radio example for the CC2755P10, Bluetooth plus TI 15.4, moved by us to this chip, did not link. It was 2.1 kB of RAM short even before its 19.3 kB heap. **Tag: Unknown (suspected: Chip limit).** Only that example was tried. It links for the CC2340R53 after that build's 40 kB heap is cut to 24 kB; not run",
+   "source": "docs/experiments/2026-10-05-cc2340r5-dmm.md",
+   "verdict": "No, not with TI's example",
+   "why_not": "ram"
+  },
+  {
+   "t": "Thread as an end device or router",
+   "st": "no",
+   "why": "TI's configurations did not link when built with our toolchain, which is not the version TI tested. They were 7.5 to 20.7 kB of RAM short for the default builds, up to 23.8 kB with the NCP option. **Tag: Unknown (suspected: Chip limit).** A trimmed build was not tried. They link for the CC2340R53; not run",
+   "source": "docs/experiments/2026-10-05-cc2340r5-thread-full-device.md",
+   "verdict": "No, not with TI's configurations",
+   "why_not": "ram"
+  },
+  {
+   "t": "Thread as a radio for another computer (RCP)",
+   "st": "works",
+   "why": "TI's ot-rcp image, driven by OpenThread on a Mac, joined a Thread network led by the LP-CC1354P10-1 and became a router. It is also the radio of our two-board border router host",
+   "source": "board-to-board/thread-two-radios-2026-10-06/README.md",
+   "verdict": "Yes, as the radio for a computer or another board"
+  },
+  {
+   "t": "Matter",
+   "st": "no",
+   "why": "TI offers no Matter build for this chip",
+   "source": "cc2340r5/FAQ.md",
+   "verdict": "No, TI has no Matter build for this chip",
+   "why_not": "no-software"
+  },
+  {
+   "t": "Zephyr with Bluetooth",
+   "st": "partial",
+   "why": "Upstream Zephyr has no Bluetooth for this board. In TI's fork, with Zephyr's C library heap set to CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=2048 (1024 for TI's peripheral sample), our BTHome beacon and TI's peripheral sample advertised. A Mac saw them. TI's beacon sample hard-faults. **Tag: Unknown.** Suspected: Tool or docs, the fork leaves the heap at 0 bytes",
+   "source": "docs/experiments/2026-10-05-cc2340r5-ti-zephyr-ble.md",
+   "verdict": "Partly"
+  },
+  {
+   "t": "Change settings without TI's setup app",
+   "st": "works",
+   "why": "TI's SysConfig app writes the settings into a text file; we edited that file in a text editor instead. Four settings verified on the board; one option was ignored and had to be changed in C",
+   "source": "docs/experiments/2026-10-05-cc2340r5-sysconfig-without-gui.md",
+   "verdict": "Yes"
+  }
+ ],
+ "benchmarks": [
+  [
+   "CoreMark, TI Arm Clang -O3, bare metal",
+   "111.09",
+   "2.31 per MHz, 94% of Arm's figure for this core"
+  ],
+  [
+   "CoreMark, Zephyr 4.4.2, GCC -O2 with loop unrolling",
+   "84.07",
+   "Also changes the OS and timer method; not a compiler-only comparison"
+  ],
+  [
+   "Interrupt latency, bare metal",
+   "28 to 29 cycles",
+   "About 0.6 microseconds at 48 MHz"
+  ],
+  [
+   "Bluetooth connect from a Mac",
+   "0.55 s",
+   "Measured once"
+  ],
+  [
+   "Bluetooth echo, 20 bytes",
+   "45 ms median",
+   "50 round trips"
+  ],
+  [
+   "Zigbee command from Home Assistant",
+   "95 ms median",
+   "20 commands, first pairing; about 5 s after re-pairing, cause unknown; the 2026-10-16 repeat did not join Home Assistant (cause open)"
+  ]
+ ],
+ "benchmarks_source": "cc2340r5/matrix/benchmarks.md",
+ "gotchas": [
+  [
+   "Flashing fails with 'target failed to see a correctly formatted SWD header' (error -615)",
+   "**Tag: Unknown (suspected: Setup or handling).** Pull the probe off and press it back on"
+  ],
+  [
+   "UniFlash says 'Unable to access the DAP'",
+   "a connection file written by hand leaves SWD off and this chip needs it on, so let CCStudio write the file, and check the command reaches the right probe (cc2340r5/FAQ.md)"
+  ],
+  [
+   "TI's Zigbee example never joins Home Assistant",
+   "**Tag: TI example default.** It listens on channel 11 only; set all 16 channels"
+  ],
+  [
+   "TI's log decoder prints 'unpack requires a buffer of 8 bytes'",
+   "change `struct.unpack(\"L\", ts_format)` to `struct.unpack(\"<I\", ts_format)` on line 132 of `tilogger_uart_transport/uart_to_log.py`; \"L\" is 4 bytes on Windows and 8 on macOS and Linux (cc2340r5/FAQ.md)"
+  ],
+  [
+   "Zephyr's west flash does not work",
+   "**Tag: Third-party behavior.** This board's Zephyr setup knows only J-Link; flash with UniFlash"
+  ]
+ ],
+ "faq_page": "faq-cc2340r5.html",
+ "faq_source": "cc2340r5/FAQ.md",
+ "memory_source": "cc2340r5/matrix/memory-breakdown.json",
+ "ai_cost": {
+  "headline": "A fresh AI agent with this repo's notes got Zephyr's blink running on this board in 3.0 to 3.6 minutes, for $0.12 to $1.36 of AI use at list price, depending on the model.",
+  "rows": [
+   [
+    "Claude Haiku 4.5",
+    "3.6 min",
+    "12",
+    "$0.12 to $0.16"
+   ],
+   [
+    "Claude Sonnet 5.5",
+    "3.1 min",
+    "6",
+    "$0.21 to $0.30"
+   ],
+   [
+    "Claude Opus 5.5",
+    "3.0 min",
+    "8",
+    "$0.40 to $0.59"
+   ],
+   [
+    "Claude Fable 5.1",
+    "3.0 min",
+    "7",
+    "$0.89 to $1.36"
+   ]
+  ],
+  "source": "docs/model-comparison.md",
+  "per_project": {
+   "intro": "Other jobs, each given to three fresh Claude Sonnet 5.5 agents with this repo's docs on 2026-10-06, and each result checked independently.",
+   "rows": [
+    [
+     "Build TI's Bluetooth example, flash it, confirm it advertises",
+     "3 of 3",
+     "3.7 to 4.6 min",
+     "$0.50 to $0.64"
+    ],
+    [
+     "Build and run the CoreMark speed test, read the score",
+     "3 of 3",
+     "2.3 to 3.1 min",
+     "$0.39 to $0.43"
+    ],
+    [
+     "Answer: can this board be a Thread device? (no board needed; the right answer is no, with the RAM numbers)",
+     "3 of 3",
+     "under 0.5 min",
+     "$0.22 to $0.24"
+    ]
+   ],
+   "source": "docs/model-comparison.md"
+  }
+ },
+ "updated": "2026-10-06",
+ "glance": [
+  [
+   "111",
+   "CoreMark score",
+   "Speed test, TI Arm Clang, 48 MHz",
+   "cc2340r5/baremetal/README.md"
+  ],
+  [
+   "36 kB",
+   "RAM",
+   "Working memory; this is what runs out first",
+   "docs/research/ti-portfolio-specs-2026-10-06.md"
+  ],
+  [
+   "512 kB",
+   "Flash",
+   "Program storage; TI's Bluetooth example leaves about 313 kB",
+   "cc2340r5/matrix/memory-breakdown.json"
+  ],
+  [
+   "45 ms",
+   "Bluetooth round trip",
+   "20 bytes from a Mac and back, median of 50",
+   "cc2340r5/matrix/benchmarks.md"
+  ],
+  [
+   "95 ms",
+   "Zigbee from Home Assistant",
+   "Light command, median of 20, first pairing (2026-10-05); the 2026-10-16 repeat did not join Home Assistant (cause open)",
+   "cc2340r5/zigbee/README.md"
+  ]
+ ],
+ "good_for": [
+  "A Bluetooth device that talks to a computer: we tested from a Mac",
+  "A Zigbee light or switch in Home Assistant; its over-the-air update from Home Assistant stalled, see the experiments; the 2026-10-16 repeat did not join Home Assistant (cause open)",
+  "The Thread radio (RCP) for a Mac or another board that runs the Thread stack",
+  "Speed tests and plain C with no operating system"
+ ],
+ "not_for": [
+  "Thread nodes that run the network on the chip itself: TI's configurations did not link with our toolchain (not TI's tested one). They were 7.5 to 20.7 kB of RAM short for the default builds, and up to 23.8 kB with the NCP option. Suspected chip limit; a trimmed build was not tried",
+  "Matter: TI offers no Matter build for this chip",
+  "Two radio stacks at once: TI says CC23xx chips do not support it, and TI's two-radio example did not link here",
+  "A big app on top of a radio stack: about 5 kB of RAM is left with Bluetooth",
+  "Bluetooth under Zephyr: partly, in TI's fork only, with the C library heap set; one of TI's three samples faults"
+ ],
+ "instead": [
+  {
+   "match": [
+    "Thread devices",
+    "Thread as an end device"
+   ],
+   "try": "LP-EM-CC2340R53",
+   "why": "64 kB of RAM; TI's Thread end-device and router builds link for its chip, not run",
+   "source": "docs/experiments/2026-10-05-cc2340r5-thread-full-device.md"
+  },
+  {
+   "match": "Two radio stacks",
+   "try": "LP-EM-CC2340R53",
+   "why": "TI's two-radio example links for its chip, not run",
+   "source": "docs/experiments/2026-10-05-cc2340r5-dmm.md"
+  },
+  {
+   "match": "Matter",
+   "try": "LP-EM-CC2755P10",
+   "why": "Matter over Thread, evaluation only; for Matter over Wi-Fi the LP-EM-CC35X1 has a production-ready release",
+   "source": "docs/research/matter-on-ti-2026-10-06.md"
+  }
+ ],
+ "buy": "TI no longer sells this board on TI.com. The LP-EM-CC2340R53, $27.50 at TI.com, has the same radio and almost twice the RAM, 64 kB against 36 kB, so it is the one to buy. Both boards need a separate debug probe, such as the LP-XDS110ET, $59.29 at TI.com: $86.79 for the pair.",
+ "measured_on": "Measured 2026-10-05 on an Intel Mac (macOS 15.7.9) with the SimpleLink Low Power F3 SDK 9.21.00.36, SysConfig 1.26.3 and TI Arm Clang 5.1.1; Zephyr 4.4.2 with GCC 12.2.",
+ "hotspots": [
+  {
+   "x": 27.5,
+   "y": 47.5,
+   "label": "The chip",
+   "title": "CC2340R52",
+   "text": "A 48 MHz Arm Cortex-M0+ with 512 kB of flash and 36 kB of RAM, and a 2.4 GHz radio for Bluetooth LE, Zigbee, Thread and proprietary links. The antenna and its connector sit just above it.",
+   "source": "docs/research/ti-portfolio-specs-2026-10-06.md"
+  },
+  {
+   "x": 46.5,
+   "y": 50.5,
+   "label": "Debug header",
+   "title": "Header for the separate probe",
+   "text": "This board has no USB port. A separate XDS110 probe clips onto this header, which is marked with ground, 5V, 3V3, serial (RXD, TXD), reset and the SWD pins. The probe powers it, flashes it and carries the serial port.",
+   "source": "cc2340r5/README.md"
+  },
+  {
+   "x": 31,
+   "y": 17,
+   "label": "Headers",
+   "title": "BoosterPack pin headers",
+   "text": "Rows of numbered DIO pins run along the top and bottom edges, with 3V3, 5V and ground, for plug-on boards.",
+   "source": "cc2340r5/README.md"
+  },
+  {
+   "x": 18.5,
+   "y": 60.5,
+   "label": "LEDs",
+   "title": "Red and green LEDs",
+   "text": "The red LED (DIO14) is the one TI's SDK blink example toggles. The green one (DIO15) is the one Zephyr's blinky uses.",
+   "source": "cc2340r5/FAQ.md"
+  }
+ ]
+}

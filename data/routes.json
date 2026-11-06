@@ -1,0 +1,1475 @@
+{
+ "note": "Supported first-use routes for tools/frl (the local setup tool). One owner per fact: board identity, LED pins, write limits and each route's tools live here; backup regions stay in tools/benchmark/recipes.json; project status per board stays in site/data/projects.json. A route is a tuple: board and revision, recipe, host OS and CPU, tool versions, transport and verification method. 'hosts' lists only cells with a run record; anything else is untested. Format: docs/frl.md.",
+ "boards": {
+  "mspm0l1306": {
+   "kit": "LP-MSPM0L1306",
+   "install_total": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free.",
+   "aliases": [
+    "LP-MSPM0L1306",
+    "MSPM0L1306 LaunchPad",
+    "L1306",
+    "MSPM0L1306"
+   ],
+   "printed": "The kit name LP-MSPM0L1306 and its revision (for example Rev. A) are printed sideways on the right half of the board, between the TEXAS INSTRUMENTS logo and the S2 button (TI's board drawing, SLAU869E; mspm0l1306/img/board-tour.png).",
+   "official": "https://www.ti.com/tool/LP-MSPM0L1306",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "mspm0l1306_xds110.ccxml",
+    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_mspm0.cfg",
+    "speed_khz": 2500,
+    "connect_under_reset": false,
+    "identity": {
+     "addr": "0x41C40000",
+     "words": 3,
+     "fields": [
+      "traceid",
+      "deviceid",
+      "userid"
+     ],
+     "deviceid_mask": "0x0FFFFFFF",
+     "deviceid": "0x0BB8202F",
+     "why": "FACTORYREGION TRACEID, DEVICEID and USERID (hw_factoryregion.h, MSPM0 SDK 2.11.00.07). DEVICEID part number 0xBB82 and TI's JEDEC code 0x17 were read on our LP-MSPM0L1306 on 2026-10-14; TRACEID is set per die during test, so it tells two boards of the same model apart."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00010000"
+     }
+    ],
+    "never_write": "NONMAIN (0x41C00000), the boot configuration. A first demo never erases it or all of flash."
+   },
+   "leds": [
+    {
+     "label": "LED2 red (PA26)",
+     "port": "A",
+     "bit": 26,
+     "gpio_base": "0x400A0000"
+    },
+    {
+     "label": "LED2 blue (PA27)",
+     "port": "A",
+     "bit": 27,
+     "gpio_base": "0x400A0000"
+    },
+    {
+     "label": "LED2 green (PA13)",
+     "port": "A",
+     "bit": 13,
+     "gpio_base": "0x400A0000"
+    },
+    {
+     "label": "LED1 red (PA0)",
+     "port": "A",
+     "bit": 0,
+     "gpio_base": "0x400A0000"
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-MSPM0L1306",
+     "outcome": "LED2 on the board flashes the pattern you asked for, checked by timing the LED pin through the debugger.",
+     "example": "examples/nortos/LP_MSPM0L1306/driverlib/gpio_toggle_output",
+     "source_file": "gpio_toggle_output.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/gpio_toggle_output.out",
+     "led": "LED2 red (PA26)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "mspm0_sdk",
+       "validated": [
+        "2.11.00.07"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.26.3"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "openocd",
+       "validated": [
+        "0.12.0+dev-02228"
+       ],
+       "needs": "target/ti_mspm0.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "tested",
+     "next": [
+      {
+       "project": "print-a-message",
+       "why": "no extra parts: the board prints over the same USB cable"
+      },
+      {
+       "project": "speed-test",
+       "why": "no extra parts: CoreMark on this chip, 78 per second at 32 MHz"
+      }
+     ],
+     "edit": "pattern"
+    },
+    "print-message": {
+     "project": "print-a-message",
+     "title": "Print your own message from the LP-MSPM0L1306",
+     "outcome": "The board prints your message over the USB cable once a second, checked by reading the serial port.",
+     "example": "examples/nortos/LP_MSPM0L1306/driverlib/uart_tx_console_multibyte_repeated_fifo_dma",
+     "source_file": "uart_tx_console_multibyte_repeated_fifo_dma.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/uart_tx_console_multibyte_repeated_fifo_dma.out",
+     "edit": "message",
+     "default_message": "Hello from my LaunchPad",
+     "tools": {
+      "sdk": {
+       "kind": "mspm0_sdk",
+       "validated": [
+        "2.11.00.07"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.26.3"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "openocd",
+       "validated": [
+        "0.12.0+dev-02228"
+       ],
+       "needs": "target/ti_mspm0.cfg"
+      }
+     },
+     "verify": {
+      "kind": "uart",
+      "seconds": 4.0
+     },
+     "status": "tested",
+     "next": [
+      {
+       "project": "blink",
+       "why": "no extra parts: make the LED flash a pattern you choose"
+      },
+      {
+       "project": "speed-test",
+       "why": "no extra parts: CoreMark on this chip, 78 per second at 32 MHz"
+      }
+     ]
+    }
+   },
+   "checks_before_flash": "LED2 needs its jumpers J2, J3, J12 and J13 on (as shipped), and J101's nine debugger jumpers on.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "J16 and J17 on XDS (right, as shipped) send UART0 (PA8 TX, PA9 RX) to the USB serial port",
+    "why": "The XDS110's first serial port carries the chip's UART0; seen as /dev/cu.usbmodemML1300011 on our Mac on 2026-10-14"
+   }
+  },
+  "mspm0g3519": {
+   "kit": "LP-MSPM0G3519",
+   "install_total": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free.",
+   "aliases": [
+    "LP-MSPM0G3519",
+    "MSPM0G3519 LaunchPad",
+    "G3519",
+    "MSPM0G3519"
+   ],
+   "printed": "The kit name LP-MSPM0G3519 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-MSPM0G3519",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "mspm0g3519_xds110.ccxml",
+    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_mspm0.cfg",
+    "speed_khz": 2500,
+    "connect_under_reset": false,
+    "identity": {
+     "addr": "0x41C40000",
+     "words": 3,
+     "fields": [
+      "traceid",
+      "deviceid",
+      "userid"
+     ],
+     "deviceid_mask": "0x0FFFFFFF",
+     "deviceid": "0x0BBA902F",
+     "why": "FACTORYREGION DEVICEID read on our LP-MSPM0G3519 (site/flash/bench/boards-draft/mspm0g3519.json); part number 0xBBA9."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00080000"
+     }
+    ],
+    "never_write": "NONMAIN (0x41C00000), the boot configuration. A first demo never erases it or all of flash."
+   },
+   "leds": [
+    {
+     "label": "LED2 red (PB26)",
+     "port": "B",
+     "bit": 26,
+     "gpio_base": "0x400A2000"
+    },
+    {
+     "label": "LED2 green (PB27)",
+     "port": "B",
+     "bit": 27,
+     "gpio_base": "0x400A2000"
+    },
+    {
+     "label": "LED2 blue (PB22)",
+     "port": "B",
+     "bit": 22,
+     "gpio_base": "0x400A2000"
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-MSPM0G3519",
+     "outcome": "LED2 red on the board flashes the pattern you asked for, checked by timing the LED pin through the debugger.",
+     "example": "examples/nortos/LP_MSPM0G3519/driverlib/gpio_toggle_output",
+     "source_file": "gpio_toggle_output.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/gpio_toggle_output.out",
+     "led": "LED2 red (PB26)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "mspm0_sdk",
+       "validated": [
+        "2.11.00.07"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.26.3"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "openocd",
+       "validated": [
+        "0.12.0+dev-02228"
+       ],
+       "needs": "target/ti_mspm0.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "tested",
+     "next": [],
+     "edit": "pattern",
+     "led_macro": "GPIO_LEDS_USER_LED_2_PIN",
+     "clear_macros": [
+      "GPIO_LEDS_USER_LED_1_PIN",
+      "GPIO_LEDS_USER_LED_2_PIN",
+      "GPIO_LEDS_USER_LED_3_PIN",
+      "GPIO_LEDS_USER_TEST_PIN"
+     ]
+    }
+   },
+   "checks_before_flash": "LED2 needs its jumpers on (as shipped) and the XDS110's debugger jumpers on.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
+   }
+  },
+  "mspm0c1104": {
+   "kit": "LP-MSPM0C1104",
+   "install_total": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free.",
+   "aliases": [
+    "LP-MSPM0C1104",
+    "MSPM0C1104 LaunchPad",
+    "C1104",
+    "MSPM0C1104"
+   ],
+   "printed": "The kit name LP-MSPM0C1104 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-MSPM0C1104",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "mspm0c1104_xds110.ccxml",
+    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_mspm0.cfg",
+    "speed_khz": 2500,
+    "connect_under_reset": false,
+    "identity": {
+     "addr": "0x41C40000",
+     "words": 3,
+     "fields": [
+      "traceid",
+      "deviceid",
+      "userid"
+     ],
+     "deviceid_mask": "0x0FFFFFFF",
+     "deviceid": "0x3BBA102F",
+     "why": "FACTORYREGION DEVICEID read on our LP-MSPM0C1104 (site/flash/bench/boards-draft/mspm0c1104.json); part number 0xBBA1."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00004000"
+     }
+    ],
+    "never_write": "NONMAIN (0x41C00000), the boot configuration. A first demo never erases it or all of flash."
+   },
+   "leds": [
+    {
+     "label": "LED1 red (PA22)",
+     "port": "A",
+     "bit": 22,
+     "gpio_base": "0x400A0000"
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-MSPM0C1104",
+     "outcome": "LED1 red on the board flashes the pattern you asked for, checked by timing the LED pin through the debugger.",
+     "example": "examples/nortos/LP_MSPM0C1104/driverlib/gpio_toggle_output",
+     "source_file": "gpio_toggle_output.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/gpio_toggle_output.out",
+     "led": "LED1 red (PA22)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "mspm0_sdk",
+       "validated": [
+        "2.11.00.07"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.26.3"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "openocd",
+       "validated": [
+        "0.12.0+dev-02228"
+       ],
+       "needs": "target/ti_mspm0.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "tested",
+     "next": [],
+     "edit": "pattern",
+     "led_macro": "GPIO_LEDS_USER_LED_1_PIN",
+     "clear_macros": [
+      "GPIO_LEDS_USER_LED_1_PIN",
+      "GPIO_LEDS_USER_TEST_PIN"
+     ]
+    }
+   },
+   "checks_before_flash": "J7 must be on for the LED to light (SLAU908B Table 2-1), and J101 11:12 and 13:14 stay on (SWD to the XDS110, as shipped). Never mass erase this chip.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
+   }
+  },
+  "mspm0g5187": {
+   "kit": "LP-MSPM0G5187",
+   "install_total": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free.",
+   "aliases": [
+    "LP-MSPM0G5187",
+    "MSPM0G5187 LaunchPad",
+    "G5187",
+    "MSPM0G5187"
+   ],
+   "printed": "The kit name LP-MSPM0G5187 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-MSPM0G5187",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "mspm0g5187_xds110.ccxml",
+    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_mspm0.cfg",
+    "speed_khz": 2500,
+    "connect_under_reset": false,
+    "identity": {
+     "addr": "0x41C40000",
+     "words": 3,
+     "fields": [
+      "traceid",
+      "deviceid",
+      "userid"
+     ],
+     "deviceid_mask": "0x0FFFFFFF",
+     "deviceid": "0x0BBBC02F",
+     "why": "FACTORYREGION DEVICEID read on our LP-MSPM0G5187 (site/flash/bench/boards-draft/mspm0g5187.json; read again with OpenOCD 2026-10-24); part number 0xBBBC."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00020000"
+     }
+    ],
+    "never_write": "NONMAIN (0x41C00000), the boot configuration. A first demo never erases it or all of flash."
+   },
+   "leds": [
+    {
+     "label": "LED2 red (PA17)",
+     "port": "A",
+     "bit": 17,
+     "gpio_base": "0x400A0000"
+    },
+    {
+     "label": "LED2 green (PA24)",
+     "port": "A",
+     "bit": 24,
+     "gpio_base": "0x400A0000"
+    },
+    {
+     "label": "LED2 blue (PB13)",
+     "port": "B",
+     "bit": 13,
+     "gpio_base": "0x400A2000"
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-MSPM0G5187",
+     "outcome": "LED2 red on the board flashes the pattern you asked for, checked by timing the LED pin through the debugger.",
+     "example": "examples/nortos/LP_MSPM0G5187/driverlib/gpio_toggle_output",
+     "source_file": "gpio_toggle_output.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/gpio_toggle_output.out",
+     "led": "LED2 red (PA17)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "mspm0_sdk",
+       "validated": [
+        "2.11.00.07"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.26.3"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "openocd",
+       "validated": [
+        "0.12.0+dev-02228"
+       ],
+       "needs": "target/ti_mspm0.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "tested",
+     "next": [],
+     "edit": "pattern",
+     "led_macro": "GPIO_LEDS_USER_LED_2_PIN",
+     "clear_macros": [
+      "GPIO_LEDS_USER_LED_1_PIN",
+      "GPIO_LEDS_USER_LED_2_PIN",
+      "GPIO_LEDS_USER_LED_3_PIN",
+      "GPIO_LEDS_USER_TEST_PIN"
+     ],
+     "per_pin_port": true
+    }
+   },
+   "checks_before_flash": "J12 [2:1] on for LED2 red (TI's example README), and the XDS110's debugger jumpers on (as shipped).",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
+   }
+  },
+  "mspm33c321a": {
+   "kit": "LP-MSPM33C321A",
+   "install_total": "TI's MSPM33 SDK, TI Arm Clang, SysConfig and TI's OpenOCD (CCSTUDIO-OPENOCD); no CCStudio needed.",
+   "aliases": [
+    "LP-MSPM33C321A",
+    "MSPM33C321A LaunchPad",
+    "M33C321A",
+    "MSPM33C321A"
+   ],
+   "printed": "The kit name LP-MSPM33C321A is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-MSPM33C321A",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "mspm33c321a_xds110.ccxml",
+    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "dslite_range_base": "0x10000000",
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_mspm33.cfg",
+    "speed_khz": 2500,
+    "identity": {
+     "addr": "0x80111000",
+     "words": 3,
+     "fields": [
+      "traceid",
+      "deviceid",
+      "userid"
+     ],
+     "deviceid_mask": "0x0FFFFFFF",
+     "deviceid": "0x0BBB702F",
+     "why": "Factory region TRACEID, DEVICEID, USERID at 0x80111000 on the MSPM33 (0x41C40000, the MSPM0 address, reads 0 here); read on our LP-MSPM33C321A (site/flash/bench/boards-draft/mspm33c321a.json) and again with TI's OpenOCD 2026-10-24."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x10000000",
+      "end": "0x10100000"
+     }
+    ],
+    "never_write": "NONMAIN (0x80100000 and up: boot and bootloader configuration), the factory region and data flash. Never mass erase or factory reset.",
+    "openocd": "ti_openocd"
+   },
+   "leds": [
+    {
+     "label": "LED2 blue (PA2)",
+     "port": "A",
+     "bit": 2,
+     "gpio_base": "0x400F0000"
+    },
+    {
+     "label": "LED2 red (PC26)",
+     "port": "C",
+     "bit": 26,
+     "gpio_base": "0x400F4000"
+    },
+    {
+     "label": "LED2 green (PC27)",
+     "port": "C",
+     "bit": 27,
+     "gpio_base": "0x400F4000"
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-MSPM33C321A",
+     "outcome": "LED2 red on the board flashes the pattern you asked for, checked by timing the LED pin through the debugger.",
+     "example": "examples/nortos/LP_MSPM33C321A/driverlib/gpio_toggle_output",
+     "source_file": "gpio_toggle_output.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/gpio_toggle_output.out",
+     "led": "LED2 red (PC26)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "mspm33_sdk",
+       "validated": [
+        "1.04.00.00"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "ti_openocd",
+       "needs": "target/ti_mspm33.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "tested",
+     "next": [],
+     "edit": "pattern",
+     "led_macro": "GPIO_LEDS_USER_LED_2_PIN",
+     "clear_macros": [
+      "GPIO_LEDS_USER_LED_1_PIN",
+      "GPIO_LEDS_USER_LED_2_PIN",
+      "GPIO_LEDS_USER_LED_3_PIN"
+     ],
+     "per_pin_port": true,
+     "sdk_var": "MSPM33_SDK_INSTALL_DIR"
+    }
+   },
+   "checks_before_flash": "LED2 jumpers on as shipped, and the XDS110's debugger jumpers on.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
+   }
+  },
+  "cc2340r5": {
+   "kit": "LP-EM-CC2340R5",
+   "install_total": "TI's SimpleLink Low Power F3 SDK, TI Arm Clang, SysConfig and TI's OpenOCD (CCSTUDIO-OPENOCD); no CCStudio needed. The LP-EM board needs a separate XDS110 probe (LP-XDS110ET).",
+   "aliases": [
+    "LP-EM-CC2340R5",
+    "CC2340R5 LaunchPad",
+    "CC2340R5",
+    "CC2340R5 LaunchPad"
+   ],
+   "printed": "The kit name LP-EM-CC2340R5 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-EM-CC2340R5",
+   "probe": {
+    "family": "XDS110",
+    "onboard": false,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_cc23xx.cfg",
+    "speed_khz": 4000,
+    "identity": {
+     "method": "flash_probe",
+     "part": "CC2340R5",
+     "why": "`init` then `flash probe 0` with TI's OpenOCD cc23xx driver prints \"Device: CC2340R52E0RKPR, Flash: 512kb, RAM: 36kb\" (read on our LP-EM-CC2340R5, probe LS470GTU, 2026-10-24); a plain memory read fails until that driver has opened the debug port through SACI."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00080000"
+     },
+     {
+      "name": "CCFG (the image's own, from SysConfig)",
+      "start": "0x4E020000",
+      "end": "0x4E020800"
+     }
+    ],
+    "never_write": "anything outside main flash and the CCFG; never a factory reset. Every write is DSLite's chip erase (main flash and CCFG), so frl backs up both first and the restore writes both back",
+    "write": "dslite_lpf3",
+    "ccxml": "cc2340r5_xds110.ccxml",
+    "openocd": "ti_openocd"
+   },
+   "leds": [
+    {
+     "label": "LED0 red (DIO14)",
+     "port": "A",
+     "bit": 14,
+     "gpio_base": "0x40023000",
+     "why": "DIO14 is CONFIG_GPIO_LED_0 in the ti_drivers_config.h that SysConfig generates for TI's drivers/empty on the LP_EM_CC2340R5 (SDK 9.21.00.36); GPIO base and the DOUT31_0 and DOE31_0 offsets are from source/ti/devices/cc23x0r5/inc/hw_gpio.h (GPIO_O_DOUT31_0 0x200, GPIO_O_DOE31_0 0x500) and hw_memmap.h (GPIO_BASE 0x40023000), SimpleLink Low Power F3 SDK 9.21.00.36."
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x200",
+    "doe": "0x500"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-EM-CC2340R5",
+     "outcome": "The red LED on the board flashes the pattern you asked for, checked by reading the LED pin registers through DSLite: the pin is an output and goes on and off. The timing is not measured, because a debugger read of this part takes seconds.",
+     "example": "examples/nortos/LP_EM_CC2340R5/drivers/empty",
+     "source_file": "empty.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/empty.out",
+     "led": "LED0 red (DIO14)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "f3_sdk",
+       "validated": [
+        "9.21.00.36"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "ti_openocd",
+       "needs": "target/ti_cc23xx.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "partial",
+     "next": [],
+     "edit": "pattern",
+     "template": "gpio_driver",
+     "led_macro": "CONFIG_GPIO_LED_0",
+     "sdk_var": "SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR"
+    },
+    "print-message": {
+     "project": "print-a-message",
+     "title": "Print your own message from the LP-EM-CC2340R5",
+     "outcome": "The board prints your message over the USB cable once a second, checked by reading the serial port; reading the chip's memory would stop this part, so the check listens instead.",
+     "example": "examples/nortos/LP_EM_CC2340R5/drivers/display",
+     "source_file": "display.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/display.out",
+     "edit": "message",
+     "message_style": "display",
+     "sdk_var": "SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR",
+     "default_message": "Hello from my LaunchPad",
+     "tools": {
+      "sdk": {
+       "kind": "f3_sdk",
+       "validated": [
+        "9.21.00.36"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "ti_openocd",
+       "needs": "target/ti_cc23xx.cfg"
+      }
+     },
+     "verify": {
+      "kind": "uart",
+      "seconds": 5.0
+     },
+     "status": "tested",
+     "next": [
+      {
+       "project": "blink",
+       "why": "no extra parts: make the LED flash a pattern you choose"
+      }
+     ]
+    }
+   },
+   "checks_before_flash": "The LP-EM board on an LP-XDS110ET with the TGT VDD jumper on XDS (as shipped), and the LED jumper on.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
+   }
+  },
+  "cc2755p10": {
+   "kit": "LP-EM-CC2755P10",
+   "install_total": "TI's SimpleLink Low Power F3 SDK, TI Arm Clang, SysConfig and TI's OpenOCD (CCSTUDIO-OPENOCD); no CCStudio needed. The LP-EM board needs a separate XDS110 probe (LP-XDS110ET).",
+   "aliases": [
+    "LP-EM-CC2755P10",
+    "CC2755P10 LaunchPad",
+    "CC2755P10",
+    "CC2755P10 LaunchPad"
+   ],
+   "printed": "The kit name LP-EM-CC2755P10 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-EM-CC2755P10",
+   "probe": {
+    "family": "XDS110",
+    "onboard": false,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_cc27xx.cfg",
+    "speed_khz": 4000,
+    "identity": {
+     "method": "flash_probe",
+     "part": "CC2755P10",
+     "why": "`flash probe 0` with TI's OpenOCD cc27xx driver names the part the way the cc23xx driver does for the CC2340R5; read on our LP-EM-CC2755P10 (probe LS5600RE, 2026-11-02: CC2755P105E0WRHAR)."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x000E8000"
+     },
+     {
+      "name": "CCFG (the image's own, from SysConfig)",
+      "start": "0x4E020000",
+      "end": "0x4E020800"
+     },
+     {
+      "name": "SCFG (the image's own, from SysConfig)",
+      "start": "0x4E040000",
+      "end": "0x4E040400"
+     }
+    ],
+    "never_write": "anything outside main flash, the CCFG and the SCFG; never the HSM area (0x000E8000 and up), OTP (0x4E020800) or a factory reset. Every write is DSLite's chip erase (main flash, CCFG and SCFG), and a chip with no valid CCFG and SCFG keeps its debug port closed, so frl backs up all three first and the restore writes all three back",
+    "write": "dslite_lpf3",
+    "ccxml": "cc2755p10_xds110.ccxml",
+    "dslite_erase_settings": ["RetainMainSectors=true"],
+    "openocd": "ti_openocd"
+   },
+   "leds": [
+    {
+     "label": "LED0 red (DIO16)",
+     "port": "A",
+     "bit": 16,
+     "gpio_base": "0x40023000",
+     "why": "DIO16 is CONFIG_GPIO_LED_0 in the ti_drivers_config.h that SysConfig generates for TI's drivers/empty on the LP_EM_CC2755P10 (SDK 9.21.00.36); GPIO base (secure alias; 0x50023000 is the non-secure one) and the offsets are from source/ti/devices/cc27xxx10/inc/hw_memmap.h and hw_gpio.h in the same SDK."
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x200",
+    "doe": "0x500"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-EM-CC2755P10",
+     "outcome": "The red LED on the board flashes the pattern you asked for, checked by reading the LED pin registers through DSLite: the pin is an output and goes on and off. The timing is not measured, because a debugger read of this part takes seconds.",
+     "example": "examples/nortos/LP_EM_CC2755P10/drivers/empty",
+     "source_file": "empty.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/empty.out",
+     "led": "LED0 red (DIO16)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "f3_sdk",
+       "validated": [
+        "9.21.00.36"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "ti_openocd",
+       "needs": "target/ti_cc27xx.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "partial",
+     "next": [],
+     "edit": "pattern",
+     "template": "gpio_driver",
+     "led_macro": "CONFIG_GPIO_LED_0",
+     "sdk_var": "SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR"
+    }
+   },
+   "checks_before_flash": "The LP-EM board on an LP-XDS110ET with the TGT VDD jumper on XDS (as shipped), and the LED jumper on.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
+   }
+  },
+  "am13e230": {
+   "kit": "LP-AM13E230",
+   "install_total": "TI's AM13E230x SDK, TI Arm Clang, SysConfig and TI's OpenOCD (CCSTUDIO-OPENOCD); no CCStudio needed.",
+   "aliases": [
+    "LP-AM13E230",
+    "AM13E230 LaunchPad",
+    "AM13E230",
+    "AM13E23019"
+   ],
+   "printed": "The kit name LP-AM13E230 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-AM13E230",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "am13e230_xds110.ccxml",
+    "dslite_erase": ["FlashEraseSelection=Necessary Bank(s) Only (for Program Load)"],
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_am13e230x.cfg",
+    "speed_khz": 2500,
+    "identity": {
+     "addr": "0x60111000",
+     "words": 3,
+     "fields": [
+      "traceid",
+      "deviceid",
+      "userid"
+     ],
+     "deviceid_mask": "0x0FFFFFFF",
+     "deviceid": "0x0BBE002F",
+     "deviceid_any": [
+      "0x0BBE002F",
+      "0x0000002F"
+     ],
+     "why": "DEVICEID at 0x60111004 (hw_factoryregion.h, AM13E230x SDK 26.01.00.03). Production parts: PARTNUM 0x0BBE, manufacturer 0x17 (AM13E230x datasheet SPRSPC3A, Table 7-3). Our prototype XAM13E23019 reads PARTNUM 0x0000 (0x0000002F, read 2026-10-14 and 2026-10-24); TRACEID and USERID read 0 on it. VERSION (bits 28 to 31) is masked."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00080000"
+     }
+    ],
+    "never_write": "NONMAIN (0x60100000 and 0x60101000: boot and bootloader configuration), the factory region (0x60111000 and up) and the ECC regions. Never mass erase or factory reset.",
+    "openocd": "ti_openocd"
+   },
+   "leds": [
+    {
+     "label": "LED4 red (PA5)",
+     "port": "A",
+     "bit": 5,
+     "gpio_base": "0x400F0000"
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-AM13E230",
+     "outcome": "LED4 on the board flashes the pattern you asked for, checked by timing the LED pin through the debugger.",
+     "example": "examples/driverlib/gpio/gpio_toggle_output",
+     "source_file": "main.c",
+     "build_dir": "am13e230x_lp/m33_nortos",
+     "image": "frl-build/blink.out",
+     "led": "LED4 red (PA5)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "am13_sdk",
+       "validated": [
+        "26.01.00.03"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "ti_openocd",
+       "needs": "target/ti_am13e230x.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "tested",
+     "next": [],
+     "edit": "pattern",
+     "builder": "am13"
+    }
+   },
+   "checks_before_flash": "LED4 is wired to PA5 on the LaunchPad as shipped; the XDS110's debugger jumpers on.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
+   }
+  },
+  "f2800137": {
+   "kit": "LAUNCHXL-F2800137",
+   "install_total": "C2000Ware, TI's C2000 compiler and CCStudio (its scripting runs the debug steps; OpenOCD has no C28x support).",
+   "aliases": [
+    "LAUNCHXL-F2800137",
+    "F2800137 LaunchPad",
+    "F2800137",
+    "TMS320F2800137"
+   ],
+   "printed": "The kit name LAUNCHXL-F2800137 is printed on the board.",
+   "official": "https://www.ti.com/tool/LAUNCHXL-F2800137",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "c28x_xds110.ccxml",
+    "dslite_erase": ["FlashEraseSelection=Necessary Sectors Only (for Program Load)"],
+    "word_addressed": true,
+    "transport": "dss",
+    "ccxml": "c28x_xds110.ccxml",
+    "identity": {
+     "method": "partidh",
+     "deviceid": "0x06FF0500",
+     "deviceid_mask": "0xFFFFFFFF",
+     "why": "PARTIDH at 0x5D00A (word address): 0x06FF0500 is the TMS320F2800137 (data/chip-registry/c2000-hercules-tiva.json; measured on our board, again with DSLite and CCStudio scripting 2026-10-24)."
+    },
+    "writable": [
+     {
+      "name": "main flash (word addresses)",
+      "start": "0x00080000",
+      "end": "0x000A0000"
+     }
+    ],
+    "never_write": "OTP, the DCSM security zones and their passwords, and the user configuration; CCStudio's flash tool erases and writes main flash sectors only.",
+    "entry": "0x80000"
+   },
+   "leds": [
+    {
+     "label": "LED4 red (GPIO20)",
+     "gpio_dat": "0x7F00",
+     "gpio_dir": "0x7C0A",
+     "bit": 20,
+     "active_low": true
+    }
+   ],
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LAUNCHXL-F2800137",
+     "outcome": "LED4 on the board flashes the pattern you asked for, checked by sampling the LED pin through the debugger.",
+     "example": "driverlib/f280013x/examples/led",
+     "source_file": "led_ex1_blinky.c",
+     "build_dir": ".",
+     "image": "frl-build/blink.out",
+     "builder": "c28",
+     "c28": {
+      "device": "f280013x",
+      "board_define": "_LAUNCHXL_F2800137",
+      "family_define": "F280013x"
+     },
+     "led": "LED4 red (GPIO20)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "c2000ware",
+       "validated": [
+        "26.02.00.00"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.1"
+       ]
+      },
+      "compiler": {
+       "kind": "c2000_cgt",
+       "validated": [
+        "25.11.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "debug": {
+       "kind": "ccs_scripting"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 6.0,
+      "tolerance_ms": 40,
+      "min_rate": 20,
+      "why": "CCStudio reads memory about 30 times a second while the C28x runs, so the tolerance is two sample periods"
+     },
+     "status": "tested",
+     "next": [],
+     "edit": "pattern"
+    }
+   },
+   "checks_before_flash": "S3 boot switches set for flash boot (GPIO24 and GPIO32 as shipped); LED4 on GPIO20."
+  },
+  "cc1354p10": {
+   "kit": "LP-CC1354P10-1",
+   "install_total": "TI's SimpleLink CC13xx CC26xx SDK, TI Arm Clang, SysConfig and CCStudio (its Python scripting runs the debug steps: this chip refuses the second connect a DSLite load makes).",
+   "aliases": [
+    "LP-CC1354P10-1",
+    "CC1354P10 LaunchPad",
+    "CC1354P10"
+   ],
+   "printed": "The kit name LP-CC1354P10-1 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-CC1354P10",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "transport": "ccs13",
+    "ccxml": "cc1354p10_xds110.ccxml",
+    "identity": {
+     "method": "icepick_device_id",
+     "deviceid": "0x0BB7802F",
+     "deviceid_mask": "0x0FFFFFFF",
+     "why": "FCFG1 ICEPICK_DEVICE_ID at 0x50000B18 (FCFG1_BASE 0x50000800 + 0x318, hw_fcfg1.h, F2 SDK 8.33.00.16) read 0x1BB7802F on our LP-CC1354P10-1 through probe LS5600RE, 2026-10-25; the top four bits are the silicon revision, the rest 0x0BB7802F is the CC13x4 and CC26x4 JTAG ID (data/chip-registry/wireless.json)."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00100000"
+     }
+    ],
+    "not_written": [
+     {
+      "name": "CCFG (the image's copy is left out; the board keeps its own)",
+      "start": "0x50000000",
+      "end": "0x50000800"
+     }
+    ],
+    "never_write": "the CCFG, FCFG1 and anything outside main flash; frl writes only the 2 KB main-flash sectors the image's segments touch, each at its own address, with CCStudio's loadBinaryProgram, and only the restore writes the CCFG, back to the bytes read from this board"
+   },
+   "leds": [
+    {
+     "label": "red LED (DIO6)",
+     "dio": 6,
+     "why": "CONFIG_GPIO_LED_0 is DIO6 in the ti_drivers_config.h SysConfig generates for the LP_EM_CC1354P10_1 board (F2 SDK 8.33.00.16); timed from the program's own toggle log (frl_log_ms), since the GPIO output register cannot be read while the program runs; at the halt, DIO6's own bits in GPIO DOE31_0 and DOUT31_0 must agree with the log."
+    }
+   ],
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-CC1354P10-1",
+     "outcome": "The red LED on the board flashes the pattern you asked for, checked by reading the times the program logged for each LED change.",
+     "example_repo": "tools/frl/examples/cc1354p10-blink",
+     "example": "tools/frl/examples/cc1354p10-blink (the shape of TI's drivers/empty; the F2 SDK from TI's GitHub has no examples folder)",
+     "source_file": "blink.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/blink.out",
+     "led": "red LED (DIO6)",
+     "default_pattern": "150,150,150,900",
+     "sdk_var": "SIMPLELINK_CC13XX_CC26XX_SDK_INSTALL_DIR",
+     "tools": {
+      "sdk": {
+       "kind": "f2_sdk",
+       "validated": [
+        "8.33.00.16"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "debug": {
+       "kind": "ccs_scripting"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 5.0,
+      "tolerance_ms": 20,
+      "min_rate": 100,
+      "why": "the chip logs each LED change with its own clock to the ms, so the check reads the log after a halt instead of sampling the pin"
+     },
+     "status": "partial",
+     "next": [],
+     "edit": "pattern"
+    }
+   },
+   "checks_before_flash": "The board on its own USB cable, or on an LP-XDS110 with the target powered from the probe. This chip accepts a debugger only just after power-on: if a step says the connect was refused, unplug the USB cable for 6 s and run it again at once."
+  },
+  "cc35x1": {
+   "kit": "LP-EM-CC35X1",
+   "install_total": "TI's SimpleLink Wi-Fi SDK, the SimpleLink Wi-Fi Toolbox (it signs and programs), TI Arm Clang, SysConfig, and TI's xds110reset (inside CCStudio or UniFlash). The board needs an LP-XDS110ET or LP-XDS110 probe and its own USB-C power cable.",
+   "aliases": [
+    "LP-EM-CC35X1",
+    "CC35X1 LaunchPad",
+    "CC3551E",
+    "CC35X1"
+   ],
+   "printed": "The kit name LP-EM-CC35X1 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-EM-CC35X1",
+   "probe": {
+    "family": "XDS110",
+    "onboard": false,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "transport": "toolbox",
+    "identity": {
+     "method": "config_port",
+     "part": "CC3551E",
+     "why": "The configuration access port's DEVICEID reads 0x1BB9602F on our LP-EM-CC35X1 (probe E10000FQ, 2026-10-25), which data/chip-registry names CC3551E; read-only, through discover.py."
+    },
+    "backup": "reprogram",
+    "banner_seconds": 6,
+    "writable": [
+     {
+      "name": "the vendor image slots in external flash, through the Toolbox",
+      "start": "0x00000000",
+      "end": "0xFFFFFFFF"
+     }
+    ],
+    "never_write": "the chip's fuses and activation: frl never runs custom_activation, full_flash_erase or any fuse command; the Toolbox programs the signed images of one build"
+   },
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "J4 and J6 on the lower two pins",
+    "why": "The probe's first serial port at 115200 baud, as TI's examples use (cc35x1/AGENTS.md)."
+   },
+   "leds": [],
+   "recipes": {
+    "print-message": {
+     "project": "print-a-message",
+     "title": "Print your own message from the LP-EM-CC35X1",
+     "outcome": "The board prints your message over the USB cable once a second, checked by reading the serial port.",
+     "example": "examples/rtos/LP_EM_CC35X1/drivers/uart2echo",
+     "source_file": "uart2echo.c",
+     "build_dir": "freertos/ticlang",
+     "image": "freertos/ticlang/uart2echo.out",
+     "builder": "cc35",
+     "default_message": "Hello from my LaunchPad",
+     "edit": "message",
+     "message_style": "uart2echo",
+     "tools": {
+      "sdk": {
+       "kind": "wifi_sdk",
+       "validated": [
+        "10.20.00.39"
+       ]
+      },
+      "toolbox": {
+       "kind": "wifi_toolbox",
+       "validated": [
+        "4.3.23"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      }
+     },
+     "verify": {
+      "kind": "uart",
+      "seconds": 5.0
+     },
+     "status": "partial",
+     "next": []
+    }
+   },
+   "checks_before_flash": "The chip must already be activated (cc35x1/README.md step 3): frl never activates it. The board on an LP-XDS110ET or LP-XDS110 with the TGT VDD jumper on EXT, J4 and J6 on the lower two pins, and the board's own USB-C cable plugged in for power."
+  }
+ },
+ "hosts": {
+  "mac-intel": {
+   "cell": "Intel Mac, macOS 15.7.9 (Darwin 24.6.0), x86_64, bash, Python 3.9.6",
+   "board": "LP-MSPM0L1306 (revision not recorded), probe firmware not recorded",
+   "tools": "MSPM0 SDK 2.11.00.07, SysConfig 1.26.3, TI Arm Clang 5.1.1.LTS, xPack OpenOCD 0.12.0+dev-02228, make 3.81",
+   "result": "tested: blink-pattern backed up, built, flashed, verified and restored on hardware, no assistant, Claude Code 2.1.299 and Codex CLI 0.160.0 (ChatGPT app 26.930.31730)",
+   "date": "2026-10-14",
+   "evidence": "reviews/evidence/frl-2026-10-14/runs.json",
+   "fresh": false,
+   "note": "The lab Mac, tools already installed: not a fresh host"
+  },
+  "mac-apple-silicon": {
+   "cell": "Apple Silicon Mac mini, macOS 26.3, arm64, Python 3.9.6",
+   "tools": "TI Arm Clang 5.1.1.LTS osx-arm64, SysConfig 1.28.1 (x86_64 Node under Rosetta), xPack OpenOCD 0.12.0-7 darwin-arm64",
+   "result": "built: image built there passed frl verify on the board (flashed from the Intel Mac); doctor ready with SysConfig unvalidated. Flashing from this host untested (no board on it)",
+   "date": "2026-10-14",
+   "evidence": "reviews/evidence/frl-2026-10-14/hosts.md",
+   "fresh": true
+  },
+  "windows-native": {
+   "result": "untested"
+  },
+  "windows-wsl": {
+   "result": "untested"
+  },
+  "linux": {
+   "cell": "Ubuntu 24.04 x86_64 container (linux/amd64 under OrbStack), Python 3.12.3, GNU Make 4.3",
+   "tools": "TI Arm Clang 5.1.1.LTS linux-x64, SysConfig 1.28.1, xPack OpenOCD 0.12.0-7 linux-x64",
+   "result": "built: image built there passed frl verify on the board (flashed from the Intel Mac). USB flashing from Linux untested",
+   "date": "2026-10-14",
+   "evidence": "reviews/evidence/frl-2026-10-14/hosts.md",
+   "fresh": true
+  }
+ }
+}

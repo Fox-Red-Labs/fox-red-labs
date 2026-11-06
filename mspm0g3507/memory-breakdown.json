@@ -1,0 +1,196 @@
+{
+  "board": "LP-MSPM0G3507",
+  "chip": "MSPM0G3507",
+  "flash_total": 131072,
+  "ram_total": 32768,
+  "units": "bytes",
+  "generated": "2026-10-15",
+  "method": "Each object and library in the linker map was put in one component. TI maps: SECTION ALLOCATION MAP entries placed by address in FLASH or SRAM, grouped by library or object (driverlib.a, drivers_mspm0g1x0x_g3x0x.a, the SysConfig-generated ti_msp_dl_config and ti_drivers_config and the startup file go to TI drivers and device library; freertos.lib and the no-RTOS layer nortos_mspm0g1x0x_g3x0x.a to RTOS; libc.a, libsysbm.a and libclang_rt.builtins.a to C library and compiler runtime; the app's own objects and the neural-net model to Your app), the .stack and .sysmem sections to Heap and stacks, and the compressed start-up tables (.cinit) and alignment holes to Other. Zephyr GNU map: every input section was added up by address (run address in RAM; initialized data also counted at its load address in flash). Zephyr kernel, arch, drivers and the C-library glue went to RTOS; picolibc and libgcc to C library and compiler runtime; app/libapp.a to Your app; TI's hal_ti driverlib to TI drivers and device library; stacks to Heap and stacks. Every build's components add up exactly to the used FLASH and RAM the linker or west reported. The chip has no radio, so no build has a radio stack. None of these builds writes the chip's boot configuration area (NONMAIN).",
+  "builds": [
+    {
+      "id": "driverlib",
+      "label": "DriverLib, no OS (a small app)",
+      "sdk": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1, no RTOS, portability/three-ways/driverlib",
+      "source": "portability/three-ways/maps/driverlib-g3507.map",
+      "flash": {
+        "RTOS": 0,
+        "Radio stack": 0,
+        "TI drivers and device library": 674,
+        "C library and compiler runtime": 202,
+        "Your app (the example's own code)": 1450,
+        "Heap and stacks": 0,
+        "Other": 26
+      },
+      "ram": {
+        "RTOS": 0,
+        "Radio stack": 0,
+        "TI drivers and device library": 0,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 16,
+        "Heap and stacks": 512,
+        "Other": 0
+      },
+      "check": {
+        "flash_used_in_map": 2352,
+        "flash_sum": 2352,
+        "ram_used_in_map": 528,
+        "ram_sum": 528,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 131072
+        },
+        "nonmain_used": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "tidrivers_nortos",
+      "label": "TI Drivers, no OS",
+      "sdk": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1, no RTOS, portability/three-ways/tidrivers",
+      "source": "portability/three-ways/maps/tidrivers-g3507-nortos.map",
+      "flash": {
+        "RTOS": 1670,
+        "Radio stack": 0,
+        "TI drivers and device library": 9518,
+        "C library and compiler runtime": 1280,
+        "Your app (the example's own code)": 1260,
+        "Heap and stacks": 0,
+        "Other": 120
+      },
+      "ram": {
+        "RTOS": 217,
+        "Radio stack": 0,
+        "TI drivers and device library": 894,
+        "C library and compiler runtime": 13,
+        "Your app (the example's own code)": 522,
+        "Heap and stacks": 2560,
+        "Other": 1
+      },
+      "check": {
+        "flash_used_in_map": 13848,
+        "flash_sum": 13848,
+        "ram_used_in_map": 4207,
+        "ram_sum": 4207,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 131072
+        },
+        "nonmain_used": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "tidrivers_freertos",
+      "label": "TI Drivers on FreeRTOS",
+      "sdk": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1, FreeRTOS kernel built by our own script, portability/three-ways/tidrivers",
+      "source": "portability/three-ways/maps/tidrivers-g3507-freertos.map",
+      "flash": {
+        "RTOS": 9216,
+        "Radio stack": 0,
+        "TI drivers and device library": 9518,
+        "C library and compiler runtime": 802,
+        "Your app (the example's own code)": 1354,
+        "Heap and stacks": 0,
+        "Other": 150
+      },
+      "ram": {
+        "RTOS": 4611,
+        "Radio stack": 0,
+        "TI drivers and device library": 894,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 1034,
+        "Heap and stacks": 512,
+        "Other": 8
+      },
+      "check": {
+        "flash_used_in_map": 21040,
+        "flash_sum": 21040,
+        "ram_used_in_map": 7059,
+        "ram_sum": 7059,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 131072
+        },
+        "nonmain_used": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "digit_touch",
+      "label": "Handwritten-digit demo (screen, touch, neural net)",
+      "sdk": "MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1, -O3, ports/bitnetmcu/touch",
+      "source": "ports/bitnetmcu/touch/out/digit_touch.map",
+      "flash": {
+        "RTOS": 0,
+        "Radio stack": 0,
+        "TI drivers and device library": 1946,
+        "C library and compiler runtime": 1378,
+        "Your app (the example's own code)": 39943,
+        "Heap and stacks": 0,
+        "Other": 37
+      },
+      "ram": {
+        "RTOS": 0,
+        "Radio stack": 0,
+        "TI drivers and device library": 0,
+        "C library and compiler runtime": 0,
+        "Your app (the example's own code)": 1032,
+        "Heap and stacks": 4096,
+        "Other": 0
+      },
+      "check": {
+        "flash_used_in_map": 43304,
+        "flash_sum": 43304,
+        "ram_used_in_map": 5128,
+        "ram_sum": 5128,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 131072
+        },
+        "nonmain_used": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    },
+    {
+      "id": "zephyr",
+      "label": "Zephyr blinky-class app",
+      "sdk": "Zephyr 4.4.2, GCC 12.2.0 (Zephyr SDK 0.17.4), upstream lp_mspm0g3507 board, portability/three-ways/zephyr",
+      "source": "portability/three-ways/maps/zephyr-g3507.map",
+      "flash": {
+        "RTOS": 8375,
+        "Radio stack": 0,
+        "TI drivers and device library": 630,
+        "C library and compiler runtime": 2867,
+        "Your app (the example's own code)": 816,
+        "Heap and stacks": 0,
+        "Other": 16
+      },
+      "ram": {
+        "RTOS": 607,
+        "Radio stack": 0,
+        "TI drivers and device library": 0,
+        "C library and compiler runtime": 32,
+        "Your app (the example's own code)": 16,
+        "Heap and stacks": 3328,
+        "Other": 9
+      },
+      "check": {
+        "flash_used_in_map": 12704,
+        "flash_sum": 12704,
+        "ram_used_in_map": 3992,
+        "ram_sum": 3992,
+        "flash_region": {
+          "origin": "0x0",
+          "length": 131072
+        },
+        "nonmain_used": 0,
+        "unexplained_flash": 0,
+        "unexplained_ram": 0
+      }
+    }
+  ]
+}

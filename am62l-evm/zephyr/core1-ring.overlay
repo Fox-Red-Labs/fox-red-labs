@@ -1,0 +1,10 @@
+/* Image B: Zephyr image ends 4 KB early (0x70813000) so the ring at 0x70813000 to 0x70814000 is never linked over. No UART used. Apply after sram-all.overlay. */
+&sram_all { reg = <0x707f0000 0x23000>; };
+/ {
+	chosen {
+		/delete-property/ zephyr,console;
+		/delete-property/ zephyr,shell-uart;
+	};
+};
+&main_uart0 { status = "disabled"; };
+&main_uart1 { status = "disabled"; };

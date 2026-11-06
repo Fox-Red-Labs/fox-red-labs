@@ -1,0 +1,105 @@
+{
+ "board": "mspm0g3507",
+ "launchpad": "LP-MSPM0G3507",
+ "family": "mspm0",
+ "sysconfig_head": [
+  "--device \"MSPM0G350X\" --package \"LQFP-64(PM)\" --part \"Default\"",
+  "--device \"MSPM0G3507\" --package \"LQFP-64(PM)\""
+ ],
+ "lcd": true,
+ "gpio": {
+  "LCD_CS": "PB6",
+  "LCD_DC": "PA13",
+  "LCD_RST": "PB15",
+  "BL_RED": "PB1",
+  "LED_GREEN": "PA28",
+  "LED_BLUE": "PA31",
+  "BUZZER": "PB4",
+  "S1": "PA11",
+  "S2": "PA12",
+  "JOY_SEL": "PA26",
+  "I2C_SCL": "PB2",
+  "I2C_SDA": "PB3"
+ },
+ "spi": {
+  "peripheral": "SPI1",
+  "sclk": "PB9",
+  "mosi": "PB8",
+  "miso": "PB7",
+  "bitrate": 8000000
+ },
+ "uart": {
+  "peripheral": "UART0",
+  "tx": "PA10",
+  "baud": 115200
+ },
+ "adc": {
+  "kind": "adc12",
+  "map": {
+   "JOY_X": [
+    "ADC0",
+    2,
+    "PA25"
+   ],
+   "MIC": [
+    "ADC0",
+    5,
+    "PB24"
+   ],
+   "ACC_Y": [
+    "ADC0",
+    7,
+    "PA22"
+   ],
+   "ACC_X": [
+    "ADC1",
+    6,
+    "PB19"
+   ],
+   "ACC_Z": [
+    "ADC1",
+    5,
+    "PB18"
+   ],
+   "JOY_Y": [
+    "ADC1",
+    3,
+    "PA18"
+   ]
+  }
+ },
+ "bp": {
+  "2": "PA25",
+  "5": "PA26",
+  "6": "PB24",
+  "7": "PB9",
+  "9": "PB2",
+  "10": "PB3",
+  "13": "PB6",
+  "15": "PB8",
+  "17": "PB15",
+  "23": "PB19",
+  "24": "PA22",
+  "25": "PB18",
+  "26": "PA18",
+  "31": "PA13",
+  "32": "PA12",
+  "33": "PA11",
+  "34": "PA10",
+  "37": "PA31",
+  "38": "PA28",
+  "39": "PB1",
+  "40": "PB4"
+ },
+ "notes": {
+  "5": "PA26 carries the on-board light sensor input through J18: pull J18",
+  "6": "PB24 carries the on-board thermistor through J9: pull J9",
+  "24": "PA22 is the light-sensor op-amp output through J16: pull J16",
+  "26": "PA18 is also button S1/BSL through J8: pull J8",
+  "33": "PA11 is the backchannel RX through J22: move J22 to 2-3 for S1",
+  "34": "PA10 is the console TX through J21 (default): the gator-clip pin carries the console"
+ },
+ "sysctl": [
+  "forceDefaultClkConfig = true"
+ ]
+}

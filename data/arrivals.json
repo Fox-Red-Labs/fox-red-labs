@@ -1,0 +1,407 @@
+{
+ "_about": "Boards and parts the lab works with and how each shows up on USB. tools/benchmark/detect.py and tools/arrival/arrival.py read it to name a board you plug in; 'usb' is the vendor and product id. Your own probe serials are not in this copy.",
+ "known_probes": {},
+ "usb_families": {
+  "_about": "How a vendor's board shows up on USB. VID:PID in hex, lower case. 'serial_hint' is a prefix seen on earlier TI boards of that family; a new TI board is confirmed by reading its chip id, never by the prefix alone.",
+  "ti-xds110": {
+   "vid": "0451",
+   "pid": "bef3",
+   "name": "XDS110 Embed with CMSIS-DAP",
+   "note": "Every TI LaunchPad development kit with an onboard XDS110, and the LP-XDS110ET. Serial is 8 characters. Prefixes seen so far: MG35 (G3507), ML13 (L1306), LS45 (CC1354P10), CL37 (F2800137), LS47 (standalone probe). The LP-AM263P's probe is a TM4C1294-based XDS110 and should show the same 0451:bef3; add its prefix here after the first read. Identify the board with: /Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e, then a chip-id read with DSLite or OpenOCD. The IWRL6432BOOST's on-board XDS110 (TM4C1294) is expected here too (prefix not yet seen)"
+  },
+  "ti-xds110-bootloader": {
+   "vid": "0451",
+   "pid": "bef4",
+   "name": "XDS110 in DFU mode",
+   "note": "A probe mid firmware update. Do not touch; wait for it to come back as bef3"
+  },
+  "st-link": {
+   "vid": "0483",
+   "pid": [
+    "374b",
+    "3752",
+    "374d",
+    "374e",
+    "374f",
+    "3753",
+    "3754",
+    "3757"
+   ],
+   "name": "ST-LINK",
+   "note": "374b or 3752 is ST-LINK/V2-1 (TN1235 Rev 7 section 5.1), on the NUCLEO-G071RB (MB1360). The STLINK-V2EC on the NUCLEO-U083RC (MB1932) showed 0483:3752, firmware V2J43M28, and no mass-storage volume (read 2026-10-08). The rest are the V3 family. Both ST boards share this family: the plans tell them apart by chip id and the mass-storage volume name. Record the PID each board shows on arrival"
+  },
+  "nxp-mcu-link": {
+   "vid": "1fc9",
+   "pid": [
+    "0143",
+    "0135"
+   ],
+   "name": "MCU-LINK",
+   "note": "FRDM-MCXA153's onboard MCU-Link, CMSIS-DAP mode. Verify on arrival"
+  },
+  "raspberrypi-rp2350-boot": {
+   "vid": "2e8a",
+   "pid": "000f",
+   "name": "RP2350 Boot",
+   "note": "Pico 2 held in BOOTSEL: a USB disk named RP2350 appears. Running a pico-sdk program with USB serial it shows as 2e8a:0009; running MicroPython as 2e8a:0005 (picotool 2.3.1 and MicroPython v1.29.0 sources, read 2026-10-07). No debug probe on the board"
+  },
+  "espressif-usb-jtag": {
+   "vid": "303a",
+   "pid": "1001",
+   "name": "USB JTAG/serial debug unit",
+   "note": "The ESP32-C6's own USB port. The DevKitC-1's second port is a USB-to-UART bridge (10c4:ea60 CP2102N on most revisions; verify on arrival)"
+  },
+  "cp210x": {
+   "vid": "10c4",
+   "pid": "ea60",
+   "name": "CP210x UART bridge",
+   "note": "USB-to-UART chip used on the ESP32-C6-DevKitC-1 UART port and many hobby boards"
+  },
+  "raspberrypi-rp2350-app": {
+   "vid": "2e8a",
+   "pid": [
+    "0009",
+    "0005"
+   ],
+   "name": "Pico 2 running a program (SDK USB serial or MicroPython)",
+   "note": "A Pico 2 running a program with no USB code shows nothing at all"
+  },
+  "cp2108": {
+   "vid": "10c4",
+   "pid": "ea71",
+   "name": "CP2108 quad UART bridge",
+   "note": "SK-TDA4VM serial console J4 (four UART ports; the Linux console is the third). Seen 2026-10-09 on macOS 15 (Darwin 24.6.0): enumerates on USB but macOS creates no /dev/cu.* or /dev/tty.* ports for it, because no CP210x VCP driver is installed. Serial D0B8727BC62A038711EC24EEABE1C09. Other CP210x boards use other PIDs; auto_launch is off for this family."
+  },
+  "ftdi-ft4232h": {
+   "vid": "0403",
+   "pid": "6011",
+   "name": "FT4232H quad UART bridge",
+   "note": "The TMDS62LEVM's UART port J7 (user guide SPRUJG8B table 2-24): A = SoC UART0 (console), B = SoC UART1, C = WKUP UART0, D = SoC UART4, 115200. macOS's built-in FTDI driver makes /dev/cu.usbserial-<serial>A to D. Serial not read; the EVM's XDS110 on J8 is the ti-xds110 entry"
+  }
+ },
+ "items": [
+  {
+   "id": "mspm0c1104",
+   "name": "LP-MSPM0C1104",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "mspm0c1104",
+   "part_id": "lp-mspm0c1104",
+   "folder": "mspm0c1104/",
+   "sdk": "mspm0_sdk_2_11_00_07 (installed)",
+   "serials": []
+  },
+  {
+   "id": "mspm0g3519",
+   "name": "LP-MSPM0G3519",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "mspm0g3519",
+   "part_id": "lp-mspm0g3519",
+   "folder": "mspm0g3519/",
+   "sdk": "mspm0_sdk_2_11_00_07 (installed); Zephyr 4.4.2 (installed, board support to verify)",
+   "serials": []
+  },
+  {
+   "id": "mspm0g5187",
+   "name": "LP-MSPM0G5187",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "mspm0g5187",
+   "part_id": "lp-mspm0g5187",
+   "folder": "mspm0g5187/",
+   "sdk": "mspm0_sdk_2_11_00_07 (installed; check it carries G518x)",
+   "serials": []
+  },
+  {
+   "id": "mspm33c321a",
+   "name": "LP-MSPM33C321A",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "mspm33c321a",
+   "part_id": "lp-mspm33c321a",
+   "folder": "mspm33c321a/",
+   "sdk": "mspm33_sdk_1_04_00_00 (installed)",
+   "serials": []
+  },
+  {
+   "id": "am13e230",
+   "name": "LP-AM13E230",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "am13e230",
+   "part_id": "lp-am13e230",
+   "folder": "am13e230/",
+   "sdk": "am13e230x_sdk_26_01_00_03 (installed, pre-release)",
+   "serials": []
+  },
+  {
+   "id": "am263p",
+   "name": "LP-AM263P",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "am263p",
+   "part_id": "lp-am263p",
+   "folder": "am263p/",
+   "sdk": "mcu_plus_sdk_am263px_26_01_00_08 (not installed; Mac installer 209,117 kB)",
+   "serials": []
+  },
+  {
+   "id": "cc35x1",
+   "name": "LP-EM-CC35X1",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "cc35x1",
+   "part_id": "lp-em-cc35x1",
+   "folder": "cc35x1/",
+   "sdk": "to verify: the CC35xx Wi-Fi SDK on ti.com (simplelink_wifi_sdk_10_20_00_39 is installed; check it is the right family)",
+   "serials": []
+  },
+  {
+   "id": "cc2755p10",
+   "name": "LP-EM-CC2755P10",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "cc2755p10",
+   "part_id": "lp-em-cc2755p10",
+   "folder": "cc2755p10/",
+   "sdk": "simplelink_lowpower_f3_sdk_9_21_00_36_LTS (installed; check CC27xx coverage) and TI Matter matter-v1.5-ti-1.2-ea.2 (not installed)",
+   "serials": []
+  },
+  {
+   "id": "xds110et",
+   "name": "LP-XDS110ET",
+   "kind": "probe",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "part_id": "lp-xds110et",
+   "serials": []
+  },
+  {
+   "id": "bp-cc1407p-9-fe",
+   "name": "BP-CC1407P-9-FE",
+   "kind": "plugon",
+   "vendor": "TI",
+   "usb": null,
+   "part_id": "bp-cc1407p-9-fe",
+   "serials": []
+  },
+  {
+   "id": "boostxl-edumkii",
+   "name": "BOOSTXL-EDUMKII",
+   "kind": "plugon",
+   "vendor": "TI",
+   "usb": null,
+   "part_id": "boostxl-edumkii",
+   "serials": []
+  },
+  {
+   "id": "bp-bassensorsmkii",
+   "name": "BP-BASSENSORSMKII",
+   "kind": "plugon",
+   "vendor": "TI",
+   "usb": null,
+   "part_id": "bp-bassensorsmkii",
+   "serials": []
+  },
+  {
+   "id": "boostxl-sharp128",
+   "name": "BOOSTXL-SHARP128",
+   "kind": "plugon",
+   "vendor": "TI",
+   "usb": null,
+   "part_id": "boostxl-sharp128",
+   "serials": []
+  },
+  {
+   "id": "nucleo-g071rb",
+   "name": "NUCLEO-G071RB",
+   "kind": "board",
+   "vendor": "ST",
+   "usb": "st-link",
+   "board_id": "nucleo-g071rb",
+   "part_id": "nucleo-g071rb",
+   "folder": "nucleo-g071rb/",
+   "sdk": "STM32CubeG0 and the ST command-line tools (not installed; the plan names the versions read on st.com)",
+   "serials": []
+  },
+  {
+   "id": "nucleo-u083rc",
+   "name": "NUCLEO-U083RC",
+   "kind": "board",
+   "vendor": "ST",
+   "usb": "st-link",
+   "board_id": "nucleo-u083rc",
+   "part_id": "nucleo-u083rc",
+   "folder": "nucleo-u083rc/",
+   "sdk": "STM32CubeU0 and the ST command-line tools (not installed)",
+   "serials": []
+  },
+  {
+   "id": "frdm-mcxa153",
+   "name": "FRDM-MCXA153",
+   "kind": "board",
+   "vendor": "NXP",
+   "usb": "nxp-mcu-link",
+   "board_id": "frdm-mcxa153",
+   "part_id": "frdm-mcxa153",
+   "folder": "frdm-mcxa153/",
+   "sdk": "MCUXpresso SDK 26.09.00 in ~/mcuxsdk (installed 2026-10-11); LinkServer not installed",
+   "serials": []
+  },
+  {
+   "id": "pico2",
+   "name": "Raspberry Pi Pico 2 H",
+   "kind": "board",
+   "vendor": "Raspberry Pi",
+   "usb": "raspberrypi-rp2350-boot",
+   "board_id": "pico2",
+   "part_id": "pico2",
+   "folder": "pico2/",
+   "sdk": "pico-sdk 2.3.1, pico-examples sdk-2.3.1, picotool 2.3.1, RISC-V toolchain 16.1.0 in ~/pico (installed 2026-10-11)",
+   "serials": []
+  },
+  {
+   "id": "esp32c6",
+   "name": "ESP32-C6-DevKitC-1-N8",
+   "kind": "board",
+   "vendor": "Espressif",
+   "usb": "espressif-usb-jtag",
+   "board_id": "esp32c6",
+   "part_id": "esp32c6-devkitc-1",
+   "folder": "esp32c6/",
+   "sdk": "ESP-IDF (not installed; version from the plan) and ESPHome (for the Bluetooth proxy, in a venv)",
+   "serials": []
+  },
+  {
+   "id": "tda4",
+   "name": "TDA4 starter kit (SK-TDA4VM, J721EXSKG01EVM, board rev PROC112A1 (001), kit confirmed from photos 2026-10-09)",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "cp2108",
+   "board_id": "tda4",
+   "part_id": "sk-tda4vm",
+   "folder": "tda4/",
+   "sdk": "PROCESSOR-SDK-LINUX-SK-TDA4VM 11.00.00.08 (Edge AI image, not downloaded)",
+   "serials": []
+  },
+  {
+   "id": "hobby-parts",
+   "name": "Hobby add-ons (Freenove kit, OLED, TM1637, KY-040, DRV8833, VL53L1X, RCWL-1601, Qwiic cables)",
+   "kind": "parts",
+   "vendor": "various",
+   "usb": null,
+   "part_id": [
+    "freenove-fnk0058",
+    "elegoo-ssd1306",
+    "diyables-tm1637",
+    "taiss-ky040",
+    "hiletgo-drv8833",
+    "adafruit-vl53l1x",
+    "adafruit-rcwl1601",
+    "adafruit-qwiic-female",
+    "adafruit-qwiic-male"
+   ],
+   "serials": []
+  },
+  {
+   "id": "iwrl6432boost",
+   "name": "IWRL6432BOOST",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "iwrl6432boost",
+   "part_id": "iwrl6432boost",
+   "folder": "iwrl6432boost/",
+   "sdk": "MMWAVE-L-SDK 05.05.04.00 (installer 05.05.04.02; Windows and Linux only; not installed) and Radar Toolbox 4.00.00.05 (1.0 GB; not downloaded). Flash with the SDK's arprog_cmdline.py (Python)",
+   "serials": []
+  },
+  {
+   "id": "drv8376evm",
+   "name": "DRV8376EVM with Anaheim BLY17 motor",
+   "kind": "plugon",
+   "vendor": "TI",
+   "usb": "none (rides on the LP-AM13E230)",
+   "board_id": "am13e230",
+   "part_id": "drv8376evm",
+   "folder": "am13e230/bldc-drv8376/",
+   "sdk": "am13e230x_sdk_26_01_00_03 (our program; TI's firmware is for the F280049C)",
+   "serials": []
+  },
+  {
+   "id": "qiwo-57bl-70w",
+   "name": "QIWO 57 mm BLDC motor QW57F2H03N3070 (24 V, 70 W, 3000 rpm)",
+   "kind": "parts",
+   "vendor": "Amazon (Changsha Qiwo Electronic Technology)",
+   "usb": "none",
+   "board_id": "am13e230",
+   "part_id": "qiwo-57bl-70w",
+   "folder": "am13e230/foc-drv8376/",
+   "serials": []
+  },
+  {
+   "id": "boostxl-drv8323rs",
+   "name": "BOOSTXL-DRV8323RS (SPI) BoosterPack",
+   "kind": "plugon",
+   "vendor": "TI",
+   "usb": "none (rides on the LP-AM13E230)",
+   "board_id": "am13e230",
+   "part_id": "boostxl-drv8323rs",
+   "folder": "am13e230/foc-drv8376/",
+   "sdk": "am13e230x_sdk_26_01_00_03 (examples are for the RH variant; SPI setup is a port)",
+   "serials": []
+  },
+  {
+   "id": "dewalt-20v-adapter",
+   "name": "DeWalt 20V MAX battery adapter with switch and fuse (Amazon B0B63LPYN5)",
+   "kind": "parts",
+   "vendor": "Amazon",
+   "usb": "none",
+   "board_id": "am13e230",
+   "part_id": "dewalt-20v-adapter",
+   "folder": "am13e230/foc-drv8376/",
+   "serials": []
+  },
+  {
+   "id": "am62l-evm",
+   "name": "TMDS62LEVM (AM62L evaluation module, AM62L32 dual Cortex-A53)",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "am62l-evm",
+   "part_id": "tmds62levm",
+   "folder": "am62l-evm/",
+   "sdk": "Zephyr upstream main a915b2f (board am62l_evm/am62l3/a53); Linux SDK for AM62L 12.01.00.05 (SD image to download when approved); FreeRTOS SDK 11.02.00.23 is reference only (no macOS installer, TI moving to Zephyr)",
+   "serials": []
+  },
+  {
+   "id": "boostxl-audio",
+   "name": "BOOSTXL-AUDIO",
+   "kind": "plugon",
+   "vendor": "TI",
+   "usb": null,
+   "part_id": "boostxl-audio",
+   "serials": []
+  },
+  {
+   "id": "beagley-ai",
+   "name": "BeagleY-AI (TI AM67A, 4 GB)",
+   "kind": "board",
+   "vendor": "BeagleBoard.org",
+   "usb": null,
+   "board_id": "beagley-ai",
+   "part_id": "beagley-ai",
+   "folder": "beagley-ai/",
+   "sdk": "BeagleY-AI TI SDK Edge AI 11.00.00.08 (build 2025-09-06), 1.16 GB download, 10.6 GB unpacked, not downloaded",
+   "serials": []
+  }
+ ]
+}

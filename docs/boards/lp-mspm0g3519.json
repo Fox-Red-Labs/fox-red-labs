@@ -1,0 +1,77 @@
+{
+ "name": "LP-MSPM0G3519 LaunchPad development kit",
+ "sources": "MSPM0Gx51x data sheet SLASFA2C (rev. September 2026, read 2026-10-07: features, memories, peripherals); LaunchPad user guide SLAU947 (October 2024, read 2026-10-07: kit contents, Table 2-1 jumpers J12 to J23, J101 isolation block, Figure 4-2 BoosterPack connectors, EnergyTrace on the XDS110); MSPM0 SDK 2.11.00.07 example READMEs (pins)",
+ "columns": [
+  {
+   "head": "The chip: MSPM0G3519",
+   "items": [
+    [
+     "Processor: Arm Cortex-M0+",
+     "Runs the program, up to 80 million steps a second (80 MHz) with the PLL. No floating-point unit"
+    ],
+    [
+     "Flash: 512 kB",
+     "Two banks, so one can hold an update while the other runs. Plus 16 kB of data flash"
+    ],
+    [
+     "RAM: 128 kB",
+     "Working memory: 4 times the LP-MSPM0G3507 and 128 times the C1104"
+    ],
+    [
+     "Power: 3.3 V on this board",
+     "The chip accepts 1.62 to 3.6 V, so 5 V parts need care"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "GPIO: up to 94 pins",
+     "Plain on/off pins. 80 header positions on the board"
+    ],
+    [
+     "UART: 7 / I2C: 3 / SPI: 3",
+     "Serial text, sensor bus, fast display bus (one SPI to 32 Mbit/s)"
+    ],
+    [
+     "CAN-FD: 2",
+     "The car and machine network. Needs a transceiver chip to reach a real bus"
+    ],
+    [
+     "ADC: 2 / DAC: 1",
+     "Two 12-bit voltmeters at 4 million samples a second; one 12-bit voltage maker"
+    ],
+    [
+     "Math accelerator",
+     "Hardware divide, square root and sine/cosine, since the core has no floating point"
+    ],
+    [
+     "AES, random numbers, CRC",
+     "Hardware encryption with key storage, a true random-number source, checksums"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "USB debug probe with EnergyTrace (it measures current), RGB LED, red LED, 3 buttons, 40 MHz and 32 kHz crystals"
+    ],
+    [
+     "Headers",
+     "80 pins in eight rows (J1 to J8): room for two BoosterPacks, plus a QEI encoder header"
+    ],
+    [
+     "Not on the chip",
+     "No floating point, no neural accelerator, no I2S audio, no USB for the chip, no radio"
+    ],
+    [
+     "Watch out",
+     "J12 and J13 switch the serial pins between USB and the header. Our OpenOCD build does not list this chip"
+    ]
+   ]
+  }
+ ]
+}

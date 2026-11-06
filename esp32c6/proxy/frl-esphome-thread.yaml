@@ -1,0 +1,42 @@
+# E41: ESPHome over Thread on the ESP32-C6, joined to the house Thread network (an Apple border router) with the
+# dataset Home Assistant holds (thread_tlv in secrets.yaml, never committed). No Wi-Fi: ESPHome's openthread
+# component conflicts with wifi. Home Assistant reaches it over the Thread network's border router.
+substitutions:
+  name: frl-esphome-thread
+
+esphome:
+  name: ${name}
+
+esp32:
+  variant: esp32c6
+  flash_size: 8MB
+  framework:
+    type: esp-idf
+
+network:
+  enable_ipv6: true
+
+openthread:
+  tlv: !secret thread_tlv
+
+logger:
+  hardware_uart: USB_SERIAL_JTAG
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+debug:
+  update_interval: 30s
+
+sensor:
+  - platform: debug
+    free:
+      name: "Heap free"
+  - platform: internal_temperature
+    name: "Chip temperature"
+    update_interval: 30s

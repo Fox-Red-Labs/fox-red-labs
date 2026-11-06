@@ -1,0 +1,47 @@
+/*
+ * Arduino pin map for the LP-MSPM0G3519 (ArduinoCore-zephyr static module, Zephyr main).
+ * D0 = PB27 green LED (LED_BUILTIN), D1 = PB26 red LED, D2 = PB22 blue LED, D3 = PA25 = A0.
+ * A0 = PA25 = ADC0 channel 2 (header J1 pin 6). The ADC12 node is not enabled by the board file
+ * (no board in Zephyr main uses it yet), so it is switched on here: ULPCLK 40 MHz, range 32 to 40 MHz,
+ * divide by 8 (5 MHz ADC clock), 12 result registers, VDD reference.
+ * UART0 on PA10/PA11 is the XDS110 backchannel (the board's console).
+ */
+#include <zephyr/dt-bindings/adc/adc.h>
+#include <zephyr/dt-bindings/clock/mspm0_clock.h>
+
+/ {
+	zephyr,user {
+		digital-pin-gpios = <&gpiob 27 0>,
+				    <&gpiob 26 0>,
+				    <&gpiob 22 0>,
+				    <&gpioa 25 0>;	/* A0 */
+
+		builtin-led-gpios = <&gpiob 27 0>;
+
+		adc-pin-gpios = <&gpioa 25 0>;
+
+		io-channels = <&adc0 2>;
+
+		serials = <&uart0>;
+	};
+};
+
+&adc0 {
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clocks = <&ckm MSPM0_CLOCK_ULPCLK>;
+	ti,clk-range = <6>;
+	ti,clk-divider = <8>;
+	max-result-reg = <12>;
+	pinctrl-0 = <&analog_pa25>;
+	pinctrl-names = "default";
+
+	channel@2 {
+		reg = <2>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_VDD_1";
+		zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 32)>;
+		zephyr,resolution = <12>;
+	};
+};

@@ -1,0 +1,411 @@
+{
+ "_about": "How the benchmark tools plan and run each board. 'class_defaults' gives minutes per test and what a class needs beyond the board on USB, for boards with no recipe yet. 'boards' holds the boards whose steps are scripted: the probe, what a run erases, how to back up and restore, and each step (commands run from 'cwd', the rows it writes, minutes measured on our bench, what to expect). Commands are the board's existing scripts; a step that needs a wire says so in 'needs'. Read by tools/benchmark/plan.py and tools/benchmark/backup.py.",
+ "class_order": [
+  "setup",
+  "core",
+  "analog",
+  "control",
+  "ai",
+  "display",
+  "hobby",
+  "radio",
+  "power",
+  "sweep",
+  "agent"
+ ],
+ "class_defaults": {
+  "setup": {
+   "minutes": 10,
+   "needs": ""
+  },
+  "core": {
+   "minutes": 4,
+   "needs": ""
+  },
+  "analog": {
+   "minutes": 10,
+   "needs": "uart_max_clean and adc_dac_error need one jumper wire (the board's arrival plan or RUN-THE-TESTS page shows where)"
+  },
+  "control": {
+   "minutes": 15,
+   "needs": ""
+  },
+  "ai": {
+   "minutes": 10,
+   "needs": ""
+  },
+  "display": {
+   "minutes": 15,
+   "needs": "a display BoosterPack"
+  },
+  "hobby": {
+   "minutes": 15,
+   "needs": "the hobby parts and wires"
+  },
+  "radio": {
+   "minutes": 20,
+   "needs": "a second radio or a hub (Home Assistant, a second board)"
+  },
+  "power": {
+   "minutes": 15,
+   "needs": "a meter: EnergyTrace on an XDS110-ET probe, or a bench meter in the 3V3 shunt"
+  },
+  "sweep": {
+   "minutes": 90,
+   "needs": "run with the ti-board-sweep skill"
+  },
+  "agent": {
+   "minutes": 30,
+   "needs": "run with the ai-cost-run skill (six fresh agents)"
+  }
+ },
+ "boards": {
+  "mspm0l1306": {
+   "probe": "ML130001",
+   "device": "MSPM0L1306",
+   "erases": "main flash, 64 kB at 0x00000000. NONMAIN (boot configuration) is never written.",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 65536
+     },
+     {
+      "name": "NONMAIN (read only, never restored)",
+      "addr": "0x41C00000",
+      "bytes": 512,
+      "restore": false
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "mspm0l1306/tools/ocd.sh",
+     "route": "mspm0l1306",
+     "route_why": "with a route in data/routes.json, backup.py runs OpenOCD from Python (tools/frl/target.py), so a reader's backup works on macOS, Linux and Windows; ocd.sh stays for the bench",
+     "why": "DSLite's memory map refuses reads at 0x0000FFF8 on this board (2026-10-08); OpenOCD dump_image reads all 64 kB"
+    }
+   },
+   "machine_note": "Scripts call tools at fixed macOS paths at the top of each build.sh and run.sh and in mspm0l1306/tools/ocd.sh; change those lines on another machine.",
+   "steps": [
+    {
+     "id": "blink",
+     "tests": [
+      [
+       "blink_build",
+       "cli"
+      ],
+      [
+       "blink_flash",
+       "openocd"
+      ]
+     ],
+     "minutes": 2,
+     "cwd": "mspm0l1306",
+     "commands": [
+      "cp -R <mspm0 sdk>/examples/nortos/LP_MSPM0L1306/driverlib/gpio_toggle_output <run folder>/",
+      "change the toggle delay in <run folder>/gpio_toggle_output/gpio_toggle_output.c",
+      "../mspm0g3507/mcu-bench/sdk-common/sdkmake.sh <run folder>/gpio_toggle_output/ticlang",
+      "tools/ocd.sh \"reset halt\" \"program <run folder>/gpio_toggle_output/ticlang/gpio_toggle_output.out verify\" \"reset run\""
+     ],
+     "expect": "build about 3.3 s, flash about 0.6 s, the LED blinks at the changed rate",
+     "proof": "the person at the board sees the changed rate, or a pin read"
+    },
+    {
+     "id": "coremark-o3",
+     "tests": [
+      [
+       "coremark",
+       "ticlang-bare-o3"
+      ],
+      [
+       "coremark_per_mhz",
+       "ticlang-bare-o3"
+      ]
+     ],
+     "minutes": 2,
+     "cwd": "mspm0l1306/bench/coremark",
+     "commands": [
+      "./build.sh O3 32",
+      "./run.sh O3 32 16"
+     ],
+     "expect": "Correct operation validated, Total ticks 408864304, 78.27 iterations per second",
+     "checked": "crc"
+    },
+    {
+     "id": "timing-o3",
+     "tests": [
+      [
+       "gpio_toggle",
+       "register"
+      ],
+      [
+       "gpio_toggle",
+       "driver"
+      ],
+      [
+       "irq_latency",
+       "bare"
+      ]
+     ],
+     "minutes": 1,
+     "cwd": "mspm0l1306/bench/timing",
+     "commands": [
+      "./build.sh O3",
+      "./run.sh O3"
+     ],
+     "expect": "11 words from struct tm; decode with the field list in main.c (toggle 1.0 to 1.12 cycles, interrupt entry 25 to 28)",
+     "checked": "readback"
+    }
+   ]
+  },
+  "mspm0g3519": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash only, by the sectors the image writes",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 524288
+     },
+     {
+      "name": "NONMAIN (read only, never restored)",
+      "addr": "0x41C00000",
+      "bytes": 512,
+      "restore": false
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "mspm0g3519",
+     "route_why": "a route in data/routes.json: backup.py runs OpenOCD from Python (tools/frl/target.py), as for the LP-MSPM0L1306",
+     "why": "512 kB main flash (device_linker.cmd, MSPM0 SDK 2.11.00.07)"
+    }
+   },
+   "steps": []
+  },
+  "mspm0c1104": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash only, by the sectors the image writes",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 16384
+     },
+     {
+      "name": "NONMAIN (read only, never restored)",
+      "addr": "0x41C00000",
+      "bytes": 512,
+      "restore": false
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "mspm0c1104",
+     "route_why": "a route in data/routes.json: backup.py runs OpenOCD from Python (tools/frl/target.py), as for the LP-MSPM0L1306",
+     "why": "16 kB main flash (device_linker.cmd, MSPM0 SDK 2.11.00.07); never mass erase this chip"
+    }
+   },
+   "steps": []
+  },
+  "mspm0g5187": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash only, by the sectors the image writes",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 131072
+     },
+     {
+      "name": "NONMAIN (read only, never restored)",
+      "addr": "0x41C00000",
+      "bytes": 512,
+      "restore": false
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "mspm0g5187",
+     "route_why": "a route in data/routes.json: backup.py runs OpenOCD from Python (tools/frl/target.py), as for the LP-MSPM0L1306",
+     "why": "128 kB main flash (device_linker.cmd, MSPM0 SDK 2.11.00.07)"
+    }
+   },
+   "steps": []
+  },
+  "mspm33c321a": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash only, by the sectors the image writes",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x10000000",
+      "bytes": 1048576
+     },
+     {
+      "name": "NONMAIN (read only, never restored)",
+      "addr": "0x80100000",
+      "bytes": 8192,
+      "restore": false
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "mspm33c321a",
+     "route_why": "a route in data/routes.json: backup.py runs OpenOCD from Python (tools/frl/target.py), as for the LP-MSPM0L1306",
+     "why": "1 MB main flash at its 0x10000000 alias (the bank TI's OpenOCD driver maps); NONMAIN read only"
+    }
+   },
+   "steps": []
+  },
+  "cc2340r5": {
+   "probe": "",
+   "device": "",
+   "erases": "the whole chip, main flash and CCFG, on every write and restore: DSLite's chip erase, the way TI's tools write this part (tools/frl/lpf3.py)",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 524288
+     },
+     {
+      "name": "CCFG (boot configuration; the chip erase clears it, so the restore writes it back)",
+      "addr": "0x4E020000",
+      "bytes": 2048
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "cc2340r5",
+     "restore": "dslite_lpf3",
+     "route_why": "a route in data/routes.json: backup.py runs TI's OpenOCD from Python (tools/frl/target.py)",
+     "why": "512 kB main flash and the 2 kB CCFG, the regions DSLite backed up on this board (ports/openocd-cc23xx/README.md); read with TI's OpenOCD, written back with DSLite in one chip-erase load"
+    }
+   },
+   "steps": []
+  },
+  "cc2755p10": {
+   "probe": "",
+   "device": "",
+   "erases": "the whole chip, main flash, CCFG and SCFG, on every write and restore: DSLite's chip erase, the way TI's tools write this part (tools/frl/lpf3.py)",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 950272
+     },
+     {
+      "name": "CCFG (boot configuration; the chip erase clears it, so the restore writes it back)",
+      "addr": "0x4E020000",
+      "bytes": 2048
+     },
+     {
+      "name": "SCFG (second boot configuration; the chip erase clears it, so the restore writes it back)",
+      "addr": "0x4E040000",
+      "bytes": 1024
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "cc2755p10",
+     "restore": "dslite_lpf3",
+     "route_why": "a route in data/routes.json: backup.py runs TI's OpenOCD from Python (tools/frl/target.py)",
+     "why": "main flash below the HSM area (0x000E8000), the 2 kB CCFG and the 1 kB SCFG (ELF segments of TI's drivers/empty for this kit: 0x4E020000 and 0x4E040000); read with TI's OpenOCD, written back with DSLite in one chip-erase load (the SCFG read through DSLite matched the SDK default, 2026-11-02)"
+    }
+   },
+   "steps": []
+  },
+  "am13e230": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash only, by the sectors the image writes",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 524288
+     },
+     {
+      "name": "NONMAIN (read only, never restored)",
+      "addr": "0x60100000",
+      "bytes": 8192,
+      "restore": false
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "am13e230",
+     "route_why": "a route in data/routes.json: backup.py runs OpenOCD from Python (tools/frl/target.py), as for the LP-MSPM0L1306",
+     "why": "512 kB main flash (device data, AM13E230x SDK); NONMAIN read only"
+    }
+   },
+   "steps": []
+  },
+  "f2800137": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash sectors the image covers (CCStudio's flash tool)",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x80000",
+      "bytes": 262144
+     }
+    ],
+    "tool": {
+     "kind": "dss",
+     "script": "tools/frl/dss/frl_c28.js",
+     "route": "f2800137",
+     "why": "256 kB main flash, word addresses 0x80000 to 0x9FFFF (TMS320F2800137); read and written through CCStudio scripting, since OpenOCD has no C28x support; OTP and DCSM are never read back or written"
+    }
+   },
+   "steps": []
+  },
+  "cc1354p10": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash sectors the image covers (CCStudio's flash tool); the restore also writes the CCFG sector",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x0",
+      "bytes": 1048576
+     },
+     {
+      "name": "CCFG",
+      "addr": "0x50000000",
+      "bytes": 2048
+     }
+    ],
+    "tool": {
+     "kind": "ccs13",
+     "script": "tools/frl/ccs/frl_cc13x4.py",
+     "route": "cc1354p10",
+     "why": "1 MB main flash and the 2 kB CCFG of the CC1354P10, read and written through CCStudio's Python scripting, one connect per step (this chip refuses the second connect a DSLite load makes)"
+    }
+   },
+   "steps": []
+  }
+ }
+}

@@ -1,0 +1,81 @@
+diff --git a/src/draw/sw/lv_draw_sw.c b/src/draw/sw/lv_draw_sw.c
+index f0599c2..9a1fa55 100644
+--- a/src/draw/sw/lv_draw_sw.c
++++ b/src/draw/sw/lv_draw_sw.c
+@@ -419,24 +419,29 @@ static void execute_drawing(lv_draw_task_t * t)
+         case LV_DRAW_TASK_TYPE_BORDER:
+             lv_draw_sw_border(t, t->draw_dsc, &t->area);
+             break;
++#if !LV_DRAW_SW_SLIM   /* size patch: drop shadow, blur, image, layer, triangle, mask-rect drawing */
+         case LV_DRAW_TASK_TYPE_BOX_SHADOW:
+             lv_draw_sw_box_shadow(t, t->draw_dsc, &t->area);
+             break;
++#endif
+         case LV_DRAW_TASK_TYPE_LETTER:
+             lv_draw_sw_letter(t, t->draw_dsc, &t->area);
+             break;
+         case LV_DRAW_TASK_TYPE_LABEL:
+             lv_draw_sw_label(t, t->draw_dsc, &t->area);
+             break;
++#if !LV_DRAW_SW_SLIM   /* size patch: drop shadow, blur, image, layer, triangle, mask-rect drawing */
+         case LV_DRAW_TASK_TYPE_IMAGE:
+             lv_draw_sw_image(t, t->draw_dsc, &t->area);
+             break;
++#endif
+         case LV_DRAW_TASK_TYPE_ARC:
+             lv_draw_sw_arc(t, t->draw_dsc, &t->area);
+             break;
+         case LV_DRAW_TASK_TYPE_LINE:
+             lv_draw_line_iterate(t, t->draw_dsc, lv_draw_sw_line);
+             break;
++#if !LV_DRAW_SW_SLIM   /* size patch: drop shadow, blur, image, layer, triangle, mask-rect drawing */
+         case LV_DRAW_TASK_TYPE_BLUR:
+             lv_draw_sw_blur(t, t->draw_dsc, &t->area);
+             break;
+@@ -449,6 +454,7 @@ static void execute_drawing(lv_draw_task_t * t)
+         case LV_DRAW_TASK_TYPE_MASK_RECTANGLE:
+             lv_draw_sw_mask_rect(t, t->draw_dsc);
+             break;
++#endif
+ #if LV_USE_VECTOR_GRAPHIC && LV_USE_THORVG
+         case LV_DRAW_TASK_TYPE_VECTOR:
+             lv_draw_sw_vector(t, t->draw_dsc);
+diff --git a/src/draw/sw/lv_draw_sw_letter.c b/src/draw/sw/lv_draw_sw_letter.c
+index 334f146..d15e329 100644
+--- a/src/draw/sw/lv_draw_sw_letter.c
++++ b/src/draw/sw/lv_draw_sw_letter.c
+@@ -191,7 +191,9 @@ static void LV_ATTRIBUTE_FAST_MEM draw_letter_cb(lv_draw_task_t * t, lv_draw_gly
+                             .x = glyph_draw_dsc->pivot.x - glyph_draw_dsc->g->ofs_x,
+                             .y = glyph_draw_dsc->g->box_h + glyph_draw_dsc->g->ofs_y
+                         };
++#if !LV_DRAW_SW_SLIM   /* size patch: only A1/A2/A4/A8 bitmap glyphs, no image-format glyphs */
+                         lv_draw_sw_image(t, &img_dsc, glyph_draw_dsc->letter_coords);
++#endif
+                     }
+                     break;
+                 }
+diff --git a/src/lv_init.c b/src/lv_init.c
+index 80cae40..301f2c0 100644
+--- a/src/lv_init.c
++++ b/src/lv_init.c
+@@ -277,8 +277,10 @@ void lv_init(void)
+     lv_sysmon_builtin_init();
+ #endif
+ 
++#if !LV_DRAW_SW_SLIM   /* size patch: no image decoder when the demo draws no images */
+     lv_image_decoder_init(LV_CACHE_DEF_SIZE, LV_IMAGE_HEADER_CACHE_DEF_CNT);
+     lv_bin_decoder_init();  /*LVGL built-in binary image decoder*/
++#endif
+ 
+ #if LV_USE_DRAW_VG_LITE
+     lv_draw_vg_lite_init();
+@@ -447,7 +449,9 @@ void lv_deinit(void)
+     lv_theme_mono_deinit();
+ #endif
+ 
++#if !LV_DRAW_SW_SLIM
+     lv_image_decoder_deinit();
++#endif
+ 
+     lv_refr_deinit();
+ 

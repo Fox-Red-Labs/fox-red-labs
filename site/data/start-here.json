@@ -1,0 +1,209 @@
+{
+ "_about": "The Start here box on a project page, keyed by project slug. Rendered by tools/render_projects.py right after the page picture; a project with no entry here renders without a box. Parts with an id resolve to data/parts.json for name, price, seller, date and buy link (the first buy entry with a url, else the first entry); 'what' here overrides the catalog line. A part with id null carries its own name and seller and gets no link. Steps: n, app (where it happens), do (the action, markdown-ish inline; [text](https://...) links stay links), say (optional: words to type into the AI chat, shown with a Copy button), picture ({src under site/, alt, caption}; null renders 'Picture coming'; 'none' means the step needs no picture), if_you_see (list of 'If you see X, do Y' lines; never a log entry or roadmap id), tested (what we actually ran for this step, so the reader knows), faq (optional anchor on the box's faq_page). open: what is not yet run, added to the page's 'What is still open'. honest: the what-we-ran line shown on the first screen of the box. route: the one route this box documents (board, agent, editor, how the agent reaches the build and flash tools). variants: other routes with their own evidence status and source; they never inherit the main route's times. recommend (top level): the beginner block the Demos hub shows before its catalog, built from this box. evidence_gaps are for us: tools/site_check.py prints them as notes and the page never shows them. checked: the date prices and buy links were read on the seller's page.",
+ "checked": "2026-10-09",
+ "projects": {
+  "blink": {
+   "board": "lp-mspm0g3507",
+   "route": "LP-MSPM0G3507 on its USB cable; CCStudio 21.0.1 open; Claude Code in VS Code or a terminal, reaching CCStudio's build and flash servers; MSPM0 SDK 2.11.00.07; Intel Mac, macOS 15.7.9.",
+   "why": "It is the board our AI steps were timed on, end to end, with a person watching the LED: 2 min 29 s from plugging in to a changed blink on 2026-10-05. It has its own USB debugger, so there is no probe to buy. Its 32 kB of RAM is room for the next projects (a screen, a small AI model) that the 4 kB LP-MSPM0L1306 cannot hold.",
+   "parts": [
+    {
+     "id": "lp-mspm0g3507",
+     "what": "The board. A built-in USB debugger loads your program and powers the board."
+    },
+    {
+     "id": null,
+     "name": "Micro-USB data cable, plus a USB-C adapter if your Mac has only USB-C ports",
+     "what": "The borrowed board came with a micro-USB cable with a USB-A plug on the computer end; our USB-C-only MacBook needed a multi-port adapter. We did not open a sealed box, so check what is in yours. A charge-only cable looks the same and the board will not show up.",
+     "seller": "The cable was in the box of the board we borrowed",
+     "price": null
+    }
+   ],
+   "also_needed": [
+    "A Mac with at least 12 GB free. Delete each installer file once it has finished. CCStudio and the SDK take 10.3 GB once installed. We tested only an Intel MacBook on macOS 15.7.9; Apple Silicon, Windows and Linux were not tried.",
+    "Free TI downloads, with a free myTI login: CCStudio 21.0.1 and the MSPM0 SDK 2.11.00.07 (both the current versions on ti.com on 2026-10-08).",
+    "Claude Code with a Claude subscription, for steps 6, 8 and 9. We used Claude Code 2.1.278, installed from a terminal with `curl -fsSL https://claude.ai/install.sh | bash`. The test Mac was already logged in to Claude, so the login step was not timed. Which Claude plan is enough was not tested. The timed run typed into Claude Code inside VS Code; the same tool in a plain terminal passed the same job in our agent runs."
+   ],
+   "total": "The board, from [TI.com](https://www.ti.com/tool/LP-MSPM0G3507). The cable came in the box of the board we borrowed. The Claude subscription is extra.",
+   "time": [
+    [
+     "About 3 min",
+     "once the tools are installed: 2 min 29 s on the wall clock from plugging the board in to a changed blink (09:13:32 to 09:16:01 on 2026-10-05), about a minute of it before any prompt was typed and one short prompt after that; the rest the machine (2 s to import TI's example, 6 s to build, 38 s to flash and start). The color change after that took 10 s. Measured on a borrowed LP-MSPM0G3507 with Claude Code in VS Code and CCStudio open. Not a sealed box, and finding the USB adapter was not counted."
+    ],
+    [
+     "About 32 min",
+     "the first time: about 29 min of setup (11 of your time, 18 waiting) on 2026-10-04, then the 3 min blink. The Mac already had git, Claude Code and Node installed and was logged in to Claude and to myTI, so this is not a clean-machine number. Not counted: the 30 min we spent clearing disk space."
+    ]
+   ],
+   "ai_tool": "Only Claude Code was tested. The blink itself needs no AI: TI's example blinks as shipped, and the board we borrowed was already blinking a previous owner's program when it was plugged in. The AI does the import, the build, the flash and the change in steps 8 and 9.",
+   "honest": "**What we ran, and what we did not.** Steps 1 to 5 were timed on the test Mac on 2026-10-04. Steps 7 to 9 were timed on 2026-10-05 on the LP-MSPM0G3507, with Claude Code running in VS Code and calling CCStudio's build and flash servers; a person watched the LED each time. Step 6 (pointing Claude Code at CCStudio's servers) is written from TI's guide and the file our agent runs use; see its own line. CCStudio's own chat panel is set up and answers (step 5), but no blink has been run through it on any board. The LP-MSPM0L1306 blinked from a terminal, with no AI step; see the variants at the end.",
+   "steps": [
+    {
+     "n": 1,
+     "app": "Mac",
+     "do": "Check you have at least 12 GB free (Apple menu, System Settings, General, Storage). Make a free myTI account on ti.com if you do not have one.",
+     "picture": "none",
+     "if_you_see": [],
+     "tested": "The test Mac had 13 GB free and ran short during the CCStudio install, because the installer file was still on disk; it took about 30 min of clearing. Delete each installer as you go.",
+     "faq": "does-the-blink-recipe-work-on-an-apple-silicon-mac-on-window"
+    },
+    {
+     "n": 2,
+     "app": "Browser, then installer",
+     "do": "Download CCStudio 21.0.1 (TI's free code editor and debugger for its chips) for macOS from [TI's CCStudio page](https://www.ti.com/tool/CCSTUDIO) (1.9 GB) and install it. It goes to `/Applications/ti/ccs2101`. Open it once when the installer finishes, then delete the installer file to get 1.9 GB back.",
+     "picture": null,
+     "if_you_see": [
+      "If TI shows a short export approval form (a few questions about where the software will be used) before the download starts, fill it in. It takes about a minute, then the download begins.",
+      "If CCStudio quits without a window on its first launch, open it yourself from Applications. A first launch started from an AI agent in VS Code quit silently on the test Mac."
+     ],
+     "tested": "Timed on the test Mac: about 7 min of your time, 12 min waiting. The full install with every chip family is 8.1 GB."
+    },
+    {
+     "n": 3,
+     "app": "Browser",
+     "do": "Open [TI's MSPM0 SDK page](https://www.ti.com/tool/MSPM0-SDK) and download the macOS file, `mspm0_sdk_2_11_00_07.app.zip` (0.4 GB). It is the third link.",
+     "picture": {
+      "src": "media/start/blink-sdk-download.jpg",
+      "alt": "TI's MSPM0-SDK page, version 2.11.00, with three download links: Windows, Linux and macOS",
+      "caption": "The SDK page. The macOS file is the last of the three. The padlock marks the export approval form."
+     },
+     "if_you_see": [
+      "If nothing seems to download, look in your browser's downloads. The SDK downloads in the browser, not inside CCStudio."
+     ],
+     "tested": "Timed on the test Mac: about 3 min of download."
+    },
+    {
+     "n": 4,
+     "app": "Installer",
+     "do": "Unzip the file, open the installer and click through it. It installs to `/Applications/ti/mspm0_sdk_2_11_00_07` (2.2 GB). Then delete the zip and the installer.",
+     "picture": null,
+     "if_you_see": [],
+     "tested": "Timed on the test Mac: 1 min of clicks, 2 min 48 s waiting."
+    },
+    {
+     "n": 5,
+     "app": "CCStudio",
+     "do": "Choose Help, Get Started with AI. Set Agent to Claude Code and tick Enable. Provider: Anthropic. Scope: pick Workspace (the folder CCStudio keeps your projects in). Global would change the settings file every other Claude Code session on your Mac uses. Leave Auth Token and Base URL blank, tick \"Enable CCStudio IDE ecosystem MCP servers for Claude Code\" (the four tools, which CCStudio calls servers, that let an AI import, build and flash projects and read the board), click Apply, and log in to Claude in the chat panel if it asks. Keep CCStudio open from here on: its build and flash servers only run while it is open.",
+     "picture": {
+      "src": "media/start/blink-ccstudio-ai-panel.jpg",
+      "alt": "CCStudio's AI assistant panel with Claude Code chosen as the agent, Enable ticked and Anthropic as the provider",
+      "caption": "The AI panel as it first opens. Scope starts on Global; pick Workspace."
+     },
+     "if_you_see": [
+      "If CCStudio lists no SDK afterwards, quit CCStudio and open it again.",
+      "If several chat panels open, close the extras. One is enough."
+     ],
+     "tested": "Done on the test Mac in about 3 min. The chat answered and all four of CCStudio's tool servers (project, debug, SysConfig, serial) responded. The test Mac was already logged in to Claude, so no login was asked for. We did not run the blink through this chat panel; the timed run used Claude Code in VS Code, next."
+    },
+    {
+     "n": 6,
+     "app": "Terminal",
+     "do": "Step 5 set up the chat inside CCStudio. This step lets Claude Code in VS Code or a terminal use the same four tools, which is how the timed run worked. From here on the tools are called servers, CCStudio's word. Install Claude Code if you do not have it (`curl -fsSL https://claude.ai/install.sh | bash`, then `claude` once to log in). Then tell it where CCStudio's four servers are. TI's guide gives the command for each server; on a Mac the four entries are the file below. Save it as `ccs-mcp.json` in the folder you will work in and start Claude Code with `claude --mcp-config ccs-mcp.json`. In VS Code, open that folder and start Claude Code from its panel the same way.",
+     "say": "{\"mcpServers\": {\n  \"ccs-project\":   {\"command\": \"/usr/bin/env\", \"args\": [\"-u\", \"ELECTRON_RUN_AS_NODE\", \"/Applications/ti/ccs2101/ccs/tools/node/node\", \"/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/app/plugins/ccs-ai/extension/dist/mcp-server-proxy.js\", \"project\"]},\n  \"ccs-debug\":     {\"command\": \"/usr/bin/env\", \"args\": [\"-u\", \"ELECTRON_RUN_AS_NODE\", \"/Applications/ti/ccs2101/ccs/tools/node/node\", \"/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/app/plugins/ccs-ai/extension/dist/mcp-server-proxy.js\", \"debug\"]},\n  \"ccs-sysconfig\": {\"command\": \"/usr/bin/env\", \"args\": [\"-u\", \"ELECTRON_RUN_AS_NODE\", \"/Applications/ti/ccs2101/ccs/tools/node/node\", \"/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/app/plugins/ccs-ai/extension/dist/mcp-server-proxy.js\", \"sysconfig\"]},\n  \"ccs-serial\":    {\"command\": \"/usr/bin/env\", \"args\": [\"-u\", \"ELECTRON_RUN_AS_NODE\", \"/Applications/ti/ccs2101/ccs/tools/node/node\", \"/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/app/plugins/ccs-ai/extension/dist/mcp-server-proxy.js\", \"serial\"]}\n}}",
+     "picture": "none",
+     "if_you_see": [
+      "If Claude Code says a server timed out, check CCStudio is open with a workspace and that step 5's Apply was pressed.",
+      "If you installed CCStudio somewhere other than `/Applications/ti/ccs2101`, change that path in all four lines."
+     ],
+     "tested": "Partly. Our agent runs start Claude Code in a terminal with this exact file and `--mcp-config`, and passed the blink job on the LP-MSPM0L1306 three runs of three. The Claude Code session that did the timed run on the LP-MSPM0G3507 had the same four servers registered for its project folder. Saving the file and starting Claude Code by hand, as written here, has not been timed on a fresh Mac.",
+     "faq": "which-claude-plan-is-enough-for-the-blink-steps-and-what-doe"
+    },
+    {
+     "n": 7,
+     "app": "Your desk",
+     "do": "Plug the board into the Mac with the USB cable, at the micro-USB port on the debugger end of the board (the end with the large square chip and the Texas Instruments logo). The Mac sees a debug probe (the board's built-in programmer) and two serial ports. There is no driver to install.",
+     "picture": {
+      "src": "media/g3507-on-bench.jpg",
+      "alt": "The LP-MSPM0G3507 on a desk, its USB cable plugged into the micro-USB port at the top right corner, next to the debugger chip",
+      "caption": "The board on this bench with the cable in. The micro-USB port is at the top right, on the debugger half of the board; the chip you program is the smaller one on the left half."
+     },
+     "if_you_see": [
+      "If the board already blinks when you plug it in, that is the program it shipped with, or a previous owner's. Step 8 replaces it."
+     ],
+     "tested": "Done 2026-10-05: the probe showed up with no driver install. Our borrowed board was already blinking a previous owner's program, which is why step 8 changes the blink instead of only loading it.",
+     "faq": "i-plugged-the-lp-mspm0g3507-in-and-the-mac-sees-nothing-is-t"
+    },
+    {
+     "n": 8,
+     "app": "VS Code or terminal, Claude Code",
+     "do": "Type the line below. Claude Code imports TI's example through CCStudio, cuts the delay, builds it, flashes it and starts it. Look at the RGB LED: it should blink about five times a second.",
+     "say": "I plugged in an LP-MSPM0G3507 and CCStudio is open. Import TI's gpio_toggle_output example for LP_MSPM0G3507, change the blink so I am sure it is mine (make it 5 times faster), then build it, flash it and run it.",
+     "picture": null,
+     "if_you_see": [
+      "If Claude Code asks permission to use a `ccs-project` or `ccs-debug` tool, say yes. It asks once per tool."
+     ],
+     "tested": "Timed 2026-10-05, 09:14:34 to 09:16:01: import 2 s, build 6 s, flash and start 38 s, 2 min 29 s after the board was plugged in; the delay went from 0.5 s to 0.1 s. The agent spent about 30 s reading TI's agent guide first, one time only.",
+     "faq": "my-lp-mspm0g3507-started-blinking-as-soon-as-i-plugged-it-in"
+    },
+    {
+     "n": 9,
+     "app": "VS Code or terminal, Claude Code",
+     "do": "Now make it yours. Type the line below. Claude Code edits the loop, rebuilds and flashes again. The LED should show blue, then red, then green, two seconds each. The AI cannot see the LED; you can.",
+     "say": "Change the program so the RGB LED shows blue for 2 seconds, then red for 2 seconds, then green for 2 seconds.",
+     "picture": {
+      "src": "media/start/blink-g3507-ccstudio-edited.jpg",
+      "alt": "CCStudio showing gpio_toggle_output.c after the AI's edit, running on the board",
+      "caption": "The file after this step, open in CCStudio with the program running on the board. Claude Code in VS Code made the edit (line 36 is the 2 s delay; showOnly turns on one color at a time)."
+     },
+     "if_you_see": [],
+     "tested": "Timed 2026-10-05: 10 s from the prompt to the new pattern running (build 2 s, then flash and start). The ask was blue for 2 seconds, then red for 2 seconds, with a third LED added; the agent chose green."
+    }
+   ],
+   "variants": [
+    {
+     "name": "LP-MSPM0L1306, from a terminal, no AI step",
+     "board": "lp-mspm0l1306",
+     "status": "TI's blink example built in 3.3 s and flashed in 0.6 s with OpenOCD, and the RGB LED cycled (2026-10-06). No AI step was timed on it, and nothing ran through CCStudio on it. Its 4 kB of RAM rules out the screen and the larger AI models later.",
+     "source": "mspm0l1306/README.md"
+    },
+    {
+     "name": "LP-MSPM0C1104, from a terminal, no AI step",
+     "board": "lp-mspm0c1104",
+     "status": "77 s from the first command to a changed blink, proven by reading the LED pin, on 2026-10-08. The box was opened off camera. The chip has 1 kB of RAM, so almost nothing else on this site fits on it.",
+     "source": "mspm0c1104/STOPWATCH.md"
+    },
+    {
+     "name": "CCStudio's own chat panel instead of VS Code",
+     "board": null,
+     "status": "Set up and answering (step 5) on the test Mac; no blink has been run through it on any board. The steps from 7 on should be the same words typed into that panel, untimed.",
+     "source": "mac-setup/STOPWATCH.md"
+    },
+    {
+     "name": "LP-EM-CC2340R5 (a radio board)",
+     "board": "lp-em-cc2340r5",
+     "status": "About 9 min from board in hand to blinking, 8 of them a half-seated probe; it needs the separate LP-XDS110ET debugger.",
+     "source": "cc2340r5/STOPWATCH.md"
+    }
+   ],
+   "other_boards": [
+    "lp-mspm0l1306",
+    "lp-mspm0c1104",
+    "launchxl-f2800137",
+    "lp-em-cc2340r5"
+   ],
+   "other_note": {
+    "lp-mspm0l1306": "from a terminal, no AI step timed",
+    "lp-mspm0c1104": "77 s from a terminal, no AI step timed",
+    "lp-em-cc2340r5": "also needs an LP-XDS110ET debugger, sold on [TI.com: LP-XDS110ET](https://www.ti.com/tool/LP-XDS110ET)"
+   },
+   "next": {
+    "href": "project-print-a-message.html",
+    "text": "Print a message to the Mac over USB serial: about 10 minutes (our estimate) on the same board, plus one jumper wire."
+   },
+   "evidence_gaps": [
+    "Step 6 as written (save ccs-mcp.json, start claude --mcp-config) has not been run by hand on a fresh Mac; the agent runs used the same file and flag, and the timed session had the servers registered for its folder.",
+    "Pictures missing: CCStudio download page and installer clicks (step 2), SDK installer (step 4), the 5 times faster blink on the board (step 8). Step 7's picture is the board on the bench, not a numbered USB callout.",
+    "No sealed-box run on this board: the timed board was borrowed and already programmed. A clean-machine setup time (no Claude login, no myTI login, no git) has not been measured.",
+    "Stock on TI.com needs a login to see; the price was read without one on 2026-10-09."
+   ],
+   "open": "",
+   "faq_page": "faq-mspm0g3507.html"
+  }
+ },
+ "recommend": {
+  "project": "blink",
+  "outcome": "Your own blink pattern on the board's RGB LED, changed by a sentence you type.",
+  "action": "Build your first project",
+  "conditions": "Timed on an Intel MacBook, macOS 15.7.9, CCStudio 21.0.1, MSPM0 SDK 2.11.00.07, Claude Code 2.1.278; one run on 2026-10-05 on a borrowed board; prices read 2026-10-09."
+ }
+}

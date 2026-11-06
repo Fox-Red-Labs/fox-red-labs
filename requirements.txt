@@ -1,0 +1,12 @@
+# Python packages for this repository. Python 3.12 or newer (.python-version names 3.14, the one the suite last passed on).
+#
+#   python3 -m pip install -r requirements.txt            core: site build, checks and the test suite
+#   python3 -m pip install -r requirements-optional.txt   only what the bench, motor or edge-AI tool you run needs
+#
+# The site build (tools/site_build.py), the site check and the results check use the standard library only.
+# tools/site_check.py also calls node, if installed, to parse each page's inline scripts.
+# Run the tests with: bash tools/run_tests.sh
+
+pytest>=8.3          # tools/tests
+pillow>=10           # step and wiring pictures, board and card renders (tools/step_graphic.py, tools/wiring_graphic.py, tools/render_boards.py)
+numpy>=1.26          # motor-model tests (tools/motor_models), room-occupancy dataset tools; tests skip without it

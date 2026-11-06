@@ -1,0 +1,26 @@
+file	title	license	author	source	sha256_12
+tobudx.gb	Tobu Tobu Girl Deluxe	MIT	Tangram Games	https://github.com/SimonLarsen/tobutobugirl-dx	0a0e8018dbbc
+maxpirate.gb	Max Pirate	MIT	Lemmy Hawkins	https://github.com/MWehrstedt/MaxPirate	ade748a976cc
+maxpirateeb.gb	Max Pirate Extra Boom	MIT	Lemmy Hawkins	https://github.com/MWehrstedt/MaxPirateExtra	11320e82aea3
+PlantBoy.gb	PlantBoy	MIT	exezin	https://github.com/exezin/PlantBoy	4b62569dfa8e
+rex-runner.gb	Rex Runner GB	MIT	The Void	https://github.com/etdv-thevoid/rex-runner-gb	91bd12159d30
+jp.gb	JP	MIT	Graham Coulby (IonicLimb)	https://github.com/gcoulby/JP	417fa2e7287f
+carazu.gb	Carazu	GPL-3.0-or-later	Martin Holtkamp	https://github.com/mholtkamp/carazu	eef9dea9ecba
+geometrix.gbc	Geometrix	GPL-3.0-or-later	AntonioND	https://github.com/AntonioND/geometrix	f13575af6bf8
+big2small.gb	Big2Small	GPL-3.0-or-later	mdsteele	https://github.com/mdsteele/big2small	59c096333f93
+Rebound.gbc	Rebound	MIT	DevEd	https://github.com/DevEd2/ReboundGB/	195765b8ca3b
+RenegadeRush.gb	Renegade Rush	MIT	quinnp	https://github.com/QuinnPainter/Renegade-Rush	0511a3de1bb5
+ucity.gbc	uCity	GPL-3.0-or-later	AntonioND	https://github.com/AntonioND/ucity	0d608db175dd
+PostBot.gb	PostBot	MIT	Tobias Rojahn	https://github.com/MasterIV/PostBot	65824d3d7df8
+CrossConnect.gbc	CrossConnect	MIT	quinnp	https://github.com/QuinnPainter/CrossConnect	5465e7b4aa37
+tuff.gb	Tuff	MIT	BonsaiDen	https://github.com/BonsaiDen/Tuff.gb	ca28220f7f04
+tobu.gb	Tobu Tobu Girl	MIT (assets CC BY 4.0)	Tangram Games	https://github.com/SimonLarsen/tobutobugirl	5d3871cae77d
+breakout.sfc	Breakout (PVSnesLib example)	MIT (repository statement; per-asset credits not audited)	PVSnesLib authors	https://github.com/alekmaul/pvsneslib release 4.6.0	
+Mode7LZ77.sfc	Mode 7 spinning plane (PVSnesLib example)	MIT (repository statement; per-asset credits not audited)	PVSnesLib authors	https://github.com/alekmaul/pvsneslib release 4.6.0	
+Transparency.sfc	Transparency demo (PVSnesLib example)	MIT (repository statement; per-asset credits not audited)	PVSnesLib authors	https://github.com/alekmaul/pvsneslib release 4.6.0	
+effectsandmusic.sfc	Sound effects and music (PVSnesLib example)	MIT (repository statement; per-asset credits not audited)	PVSnesLib authors	https://github.com/alekmaul/pvsneslib release 4.6.0	
+music.sfc	Music player (PVSnesLib example)	MIT (repository statement; per-asset credits not audited)	PVSnesLib authors	https://github.com/alekmaul/pvsneslib release 4.6.0	
+Mode1ContinuousScroll.sfc	Scrolling background (PVSnesLib example)	MIT (repository statement; per-asset credits not audited)	PVSnesLib authors	https://github.com/alekmaul/pvsneslib release 4.6.0	
+DynamicEngineMetaSprite.sfc	Big sprites (PVSnesLib example)	MIT (repository statement; per-asset credits not audited)	PVSnesLib authors	https://github.com/alekmaul/pvsneslib release 4.6.0	
+benchmark.exe	GPU benchmark (ps1-tests)	MIT	JaCzekanski	https://github.com/JaCzekanski/ps1-tests release build-158	
+animated-triangle.exe	Spinning triangle (ps1-tests)	MIT	JaCzekanski	https://github.com/JaCzekanski/ps1-tests release build-158	

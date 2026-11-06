@@ -1,0 +1,108 @@
+/**
+ * BOOSTXL-AUDIO on the LP-MSPM33C321A (BoosterPack pins from SLAU969 Figure 4-2, pack pins from SLAU670A Figure 12):
+ *   pin 7 PB31 DAC8311 SCLK     pin 12 PB29 DAC8311 SYNC    pin 15 PB8 DAC8311 DIN
+ *   pin 13 PB28 amplifier line  pin 5 PA21 microphone power (also the VREF- pin, VREF not used here)
+ *   pin 6 PA22 microphone out (HSADC0 channel 7)
+ * Halloween show: the same pack pins, plus the RGB LED (blue PA2, red PC26, green PC27; SLAU969, shunts J7 to J9),
+ * none of them a BoosterPack pin. Buttons S2 (PC17, BoosterPack pin 40, through J4) and S1 (PA18, pin 2, through J3,
+ * the bootloader-invoke line) are set up in main_halloween.c; the pack uses neither pin.
+ * Console: PA10 TX and PA11 RX at 115200. MCLK 160 MHz from the SYSPLL (as TI's uart_tx_display_throughput);
+ * SysTick period 20000 gives 8 kHz.
+ * @cliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)" --part "Default"
+ * @v2CliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)"
+ */
+// @cliArgs --board /ti/boards/LP_MSPM33C321A --rtos nortos
+const Board   = scripting.addModule("/ti/driverlib/Board", {}, false);
+const GPIO    = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1   = GPIO.addInstance();
+const GPIO2   = GPIO.addInstance();
+const GPIO3   = GPIO.addInstance();
+const GPIO4   = GPIO.addInstance();
+const GPIO5   = GPIO.addInstance();
+const HSADC   = scripting.addModule("/ti/driverlib/HSADC", {}, false);
+const HSADC1  = HSADC.addInstance();
+const SYSCTL  = scripting.addModule("/ti/driverlib/SYSCTL", {}, false);
+const SYSTICK = scripting.addModule("/ti/driverlib/SYSTICK");
+const UART    = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1   = UART.addInstance();
+
+Board.peripheral.$assign          = "DEBUGSS";
+Board.peripheral.swclkPin.$assign = "PA20";
+Board.peripheral.swdioPin.$assign = "PA19";
+
+GPIO1.$name                          = "DAC";
+GPIO1.associatedPins.create(4);
+GPIO1.associatedPins[0].$name        = "SYNC";
+GPIO1.associatedPins[0].initialValue = "SET";
+GPIO1.associatedPins[0].pin.$assign  = "PB29";
+GPIO1.associatedPins[1].$name        = "SCLK";
+GPIO1.associatedPins[1].pin.$assign  = "PB31";
+GPIO1.associatedPins[2].$name        = "DIN";
+GPIO1.associatedPins[2].pin.$assign  = "PB8";
+GPIO1.associatedPins[3].$name        = "AMP";
+GPIO1.associatedPins[3].initialValue = "SET";
+GPIO1.associatedPins[3].pin.$assign  = "PB28";
+
+GPIO2.$name                          = "MICPWR";
+GPIO2.associatedPins[0].$name        = "ON";
+GPIO2.associatedPins[0].pin.$assign  = "PA21";
+GPIO2.associatedPins[0].direction    = "INPUT";   /* pin 5 is held low by this board: never drive it (2026-10-25) */
+
+GPIO3.$name                          = "RGB";
+GPIO3.associatedPins.create(3);
+GPIO3.associatedPins[0].$name        = "BLUE";
+GPIO3.associatedPins[0].pin.$assign  = "PA2";
+GPIO3.associatedPins[1].$name        = "RED";
+GPIO3.associatedPins[1].pin.$assign  = "PC26";
+GPIO3.associatedPins[2].$name        = "GREEN";
+GPIO3.associatedPins[2].pin.$assign  = "PC27";
+
+GPIO4.$name                          = "BTN";
+GPIO4.associatedPins.create(2);
+GPIO4.associatedPins[0].$name        = "A";
+GPIO4.associatedPins[0].direction    = "INPUT";
+GPIO4.associatedPins[0].pin.$assign  = "PC17";
+GPIO4.associatedPins[1].$name        = "B";
+GPIO4.associatedPins[1].direction    = "INPUT";
+GPIO4.associatedPins[1].pin.$assign  = "PA18";
+
+GPIO5.$name                          = "MICALT";
+GPIO5.associatedPins[0].$name        = "PWR";
+GPIO5.associatedPins[0].pin.$assign  = "PB30";   /* BoosterPack pin 8: powers the pack's microphone through a wire to pin 5 */
+
+HSADC1.$name                      = "HSADC0";
+HSADC1.enabledSEQs                = ["ADC_SEQ_NUMBER1"];
+HSADC1.seq1SampleWindow           = 16;
+HSADC1.seq1Enable                 = true;
+HSADC1.enabledSOCs                = ["ADC_SOC_NUMBER0"];
+HSADC1.soc0Channel                = "ADC_CH_ADCIN_7";
+HSADC1.peripheral.$assign         = "ADC0";
+HSADC1.peripheral.adcPin7.$assign = "PA22";
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.MCLKSource            = "HSCLK";
+SYSCTL.SYSPLL_CLK0En         = true;
+SYSCTL.SYSPLL_CLK1En         = true;
+SYSCTL.SYSPLL_CLK2XEn        = true;
+SYSCTL.SYSPLL_Pdiv           = 1;
+SYSCTL.peripheral.$assign    = "SYSCTL";
+
+SYSTICK.periodEnable    = true;
+SYSTICK.period          = 20000;
+SYSTICK.interruptEnable = true;
+SYSTICK.systickEnable   = true;
+
+UART1.$name                    = "UART_0";
+UART1.targetBaudRate           = 115200;
+UART1.enableFIFO               = true;
+UART1.peripheral.$assign       = "UC12";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+
+const ProjectConfig              = scripting.addModule("/ti/project_config/ProjectConfig", {}, false);
+ProjectConfig.migrationCondition = true;
+
+ProjectConfig.genLinker  = true;
+ProjectConfig.genStartup = true;
+ProjectConfig.genOpts    = true;
+ProjectConfig.genLibs    = true;

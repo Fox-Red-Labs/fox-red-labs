@@ -1,0 +1,80 @@
+{
+ "name": "ESP32-C6-DevKitC-1-N8 (Espressif)",
+ "sources": "ESP32-C6 Series Datasheet v1.5 (2026-03-31): CPU, memory, radios, ADC, UART, security, current; ESP32-C6-DevKitC-1 v1.2 user guide (esp-dev-kits, docs.espressif.com) and schematic v1.4 (PDF on dl.espressif.com): board parts, J1 and J3 headers, J5, CP2102N-A02 bridge; all read 2026-10-07",
+ "columns": [
+  {
+   "head": "The chip: ESP32-C6",
+   "items": [
+    [
+     "Processor: RISC-V, 32-bit",
+     "One main core at up to 160 MHz, plus a small 20 MHz low-power core for jobs while the main one sleeps"
+    ],
+    [
+     "Flash: 8 MB",
+     "In the ESP32-C6-WROOM-1 module, outside the chip. Code runs from it through a 32 kB cache"
+    ],
+    [
+     "RAM: 512 kB",
+     "Working memory (plus 16 kB that stays on in deep sleep). Rarely the limit on this chip"
+    ],
+    [
+     "Power: 3.3 V",
+     "The chip wants 3.0 to 3.6 V. The board makes it from USB 5 V; signal pins are 3.3 V"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "Radios: 3 on one antenna",
+     "Wi-Fi 6 (2.4 GHz), Bluetooth LE 5, and 802.15.4 for Zigbee and Thread. They take turns on the air",
+     "🔗"
+    ],
+    [
+     "GPIO: 23 on the headers",
+     "Plain on/off pins, and any of them can carry UART, SPI or I2C through the pin switchboard"
+    ],
+    [
+     "UART: 2 (+1 low-power)",
+     "Simple serial text, up to 5 Mbaud. UART0 (GPIO16, GPIO17) goes to the board's USB-to-UART chip"
+    ],
+    [
+     "ADC: 1, 7 channels",
+     "Measures a voltage in 4,096 steps (12-bit), up to 100,000 times a second. No DAC to make one"
+    ],
+    [
+     "Security blocks",
+     "AES, SHA, RSA and ECC math in hardware, and a true random number generator",
+     "🧮"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "Two USB-C ports (the chip's own USB, and a USB-to-UART chip), BOOT and RESET buttons, one color LED (GPIO8), power LED"
+    ],
+    [
+     "Headers",
+     "32 pins in two rows, J1 and J3. Fits a breadboard"
+    ],
+    [
+     "Not on the board",
+     "No sensors. No USB cable in the bag. No separate debug probe needed: the chip's own USB does JTAG",
+     "🚧"
+    ],
+    [
+     "Not on the chip",
+     "No FPU (floating point is done in software), no DAC"
+    ],
+    [
+     "Watch out",
+     "GPIO4, 5, 8, 9 and 15 set the boot mode at reset; GPIO12 and 13 are the USB port's own wires"
+    ]
+   ]
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+/**
+ * Three ways, DriverLib, LP-MSPM0G3519: ADC0 channel 11 (the internal temperature sensor, nothing connected) against the
+ * internal 2.5 V reference, UART0 at 115200 on PA10/PA11 (backchannel), LED on PB27.
+ * 32 MHz SYSOSC, TI's default clock tree.
+ */
+//@cliArgs --device "MSPM0G351X" --package "LQFP-100(PZ)" --part "Default"
+//@v2CliArgs --device "MSPM0G3519" --package "LQFP-100(PZ)"
+// @cliArgs --board /ti/boards/LP_MSPM0G3519 --rtos nortos
+
+const Board  = scripting.addModule("/ti/driverlib/Board");
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const ADC12  = scripting.addModule("/ti/driverlib/ADC12", {}, false);
+const ADC121 = ADC12.addInstance();
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const VREF   = scripting.addModule("/ti/driverlib/VREF");
+
+ADC121.$name                      = "ADC12_0";
+ADC121.sampClkSrc                 = "DL_ADC12_CLOCK_SYSOSC";
+ADC121.sampClkDiv                 = "DL_ADC12_CLOCK_DIVIDE_8";
+ADC121.adcMem0chansel             = "DL_ADC12_INPUT_CHAN_11";
+ADC121.disChan11                  = true;
+ADC121.sampleTime0                = "125 us";
+ADC121.adcMem0vrefp               = "INTREF";
+ADC121.powerDownMode              = "DL_ADC12_POWER_DOWN_MODE_MANUAL";
+ADC121.peripheral.$assign         = "ADC0";
+
+GPIO1.$name                          = "GPIO_LEDS";
+GPIO1.port                           = "PORTB";
+GPIO1.associatedPins[0].$name        = "USER_LED";
+GPIO1.associatedPins[0].assignedPin  = "27";
+GPIO1.associatedPins[0].pin.$assign  = "PB27";
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+UART1.targetBaudRate           = 115200;
+
+VREF.basicIntVolt         = "DL_VREF_BUFCONFIG_OUTPUT_2_5V";
+VREF.advClockConfigEnable = true;
+VREF.advClkSrc            = "DL_VREF_CLOCK_BUSCLK";
+VREF.peripheral.$assign   = "VREF";
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;

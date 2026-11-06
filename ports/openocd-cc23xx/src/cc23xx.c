@@ -1,0 +1,932 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+/***************************************************************************
+ * NOR flash driver for the TI SimpleLink Low Power F3 wireless MCUs:
+ * CC23xx (Cortex-M0+) and CC27xx (Cortex-M33).
+ *
+ * How it talks to the chip:
+ *  - Identity: DEVICEID and PARTID from the configuration access port
+ *    (CFG-AP, access port 1), read before any write. Unknown parts are refused.
+ *  - Erase and write: the boot ROM's flash functions (HAPI table at
+ *    0x0F00004C: entry 3 sector erase, entry 5 program), called on the halted
+ *    CPU through the AHB-AP. The chip's device management interface (SACI) has
+ *    no sector erase, only a chip erase and a main-application erase, so a
+ *    2 kB sector erase has to go through the CPU.
+ *  - Reset: through SACI on the security access port (SEC-AP, access port 2):
+ *    RSTCTL = 0x5C resets the chip into SACI, then SACI exits halted at the
+ *    application entry (reset halt/init) or runs (reset run). See
+ *    "cc23xx saci_reset", used by tcl/target/ti/cc23xx.cfg as the reset-assert
+ *    event.
+ *  - Never: a write or erase of the CCFG (0x4E020000), the SCFG (0x4E040000)
+ *    or the HSM firmware area (0xE8000 and up on CC27xx); a chip erase; any
+ *    lifecycle, password or key command. Banks over the CCFG and SCFG accept a
+ *    write only when it equals what the chip holds (so a TI hex file that
+ *    carries them still programs), and refuse any change. The HSM bank refuses
+ *    everything.
+ *
+ * Sources: TI CC27xx TRM SWCU195A chapter 9 (SACI), CCStudio 21.0.1
+ * cc23xx_dap_saci_util.gel, cc23xx_util.gel, cc23xx_xds.gel (IDs, command
+ * codes, reset flow), SimpleLink Low Power F3 SDK 9.21 driverlib hapi.h and
+ * flash.h (ROM flash calls and the VIMS cache handling around them).
+ ***************************************************************************/
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "imp.h"
+#include <helper/binarybuffer.h>
+#include <helper/time_support.h>
+#include <target/algorithm.h>
+#include <target/arm_adi_v5.h>
+#include <target/armv7m.h>
+#include <target/cortex_m.h>
+#include <jtag/swd.h>
+#include <transport/transport.h>
+
+/* Memory map */
+#define CC23XX_FLASH_BASE       0x00000000
+#define CC23XX_SECTOR_SIZE      2048
+#define CC23XX_CCFG_BASE        0x4E020000
+#define CC23XX_CCFG_SIZE        2048
+#define CCFG_USER_REC_START     0x750
+#define CCFG_USER_REC_END       0x7D0
+#define CC23XX_SCFG_BASE        0x4E040000
+#define CC23XX_SCFG_SIZE        1024
+#define CC27XX_HSM_BASE         0x000E8000
+#define CC27XX_HSM_SIZE         0x00018000
+
+/* Boot ROM flash API (hapi.h, same table address on CC23x0 and CC27xx) */
+#define HAPI_TABLE_BASE         0x0F00004C
+#define HAPI_IDX_SECTOR_ERASE   3
+#define HAPI_IDX_PROGRAM        5
+#define FLASH_API_KEY           0xB7E3A08F
+#define VIMS_CCHCTL             0x40024424  /* cache control, 0 = cache and line buffer off */
+
+/* Access ports */
+#define CC23XX_CFGAP            1
+#define CC23XX_SECAP            2
+#define CFGAP_DEVICEID          0x00
+#define CFGAP_PARTID            0x04
+#define CFGAP_DEVICESTATUS      0x0C
+#define SECAP_TXD               0x00
+#define SECAP_TXCTL             0x04
+#define SECAP_RXD               0x08
+#define SECAP_RXCTL             0x0C
+#define SECAP_RSTCTL            0x18
+#define SECAP_RSTCTL_SACI_RESET 0x5C
+
+#define DEVSTAT_BOOT(v)         (((v) >> 8) & 0xFF)
+#define DEVSTAT_AHB_OPEN(v)     (((v) >> 24) & 1)
+#define BOOT_IN_SACI            0x20
+
+/* SACI commands (cc23xx_dap_saci_util.gel) */
+#define SACI_NOP                0x01
+#define SACI_EXIT_SACI_HALT     0x07
+#define SACI_VERIFY_MAIN        0x10
+#define SACI_EXIT_SACI_RUN      0x15
+#define SACI_BLDR_RESET_DEVICE  0x14
+#define SACI_DEBUG_REQ_PWD_ID   0x05    /* CC23xx; TRM SWCU193A 8.3.2.2.1 */
+#define SACI_DEBUG_REQ_KEY_ID   0x1D    /* CC27xx; TRM SWCU195A 9.3.2.2.3 */
+#define SACI_AUTH_LEVEL_SECURE  0x401AA5A5
+#define BOOT_APP_WAITLOOP_DBGPROBE  0xC1
+#define BOOT_BLDR_WAITLOOP_DBGPROBE 0x81
+
+#define SACI_TX_FULL            0x1
+#define SACI_TX_CMD_START       0x2
+#define SACI_RX_FULL            0x1
+
+#define ROM_CALL_TIMEOUT_MS     5000
+
+enum cc23xx_region {
+	REGION_MAIN,
+	REGION_CCFG,
+	REGION_SCFG,
+	REGION_HSM,
+};
+
+enum cc23xx_family {
+	FAMILY_CC23,
+	FAMILY_CC27,
+};
+
+struct cc23xx_part {
+	const char *name;
+	enum cc23xx_family family;
+	uint32_t deviceid;          /* DEVICEID with the revision nibble masked off */
+	const uint8_t *variants;    /* PARTID bits 23:16, NULL = any */
+	unsigned int n_variants;
+	const uint8_t *not_variants;
+	unsigned int n_not_variants;
+	uint32_t main_size;         /* writable main flash, from 0 */
+	uint32_t sram_size;
+};
+
+static const uint8_t cc27xxx10_variants[] = { 0xE8, 0xDE, 0x9D, 0xE6, 0x31 };
+static const uint8_t cc23x0r22_variant[] = { 0x9E };
+
+static const struct cc23xx_part cc23xx_parts[] = {
+	{ "CC23x0R5", FAMILY_CC23, 0x0BB8402F, NULL, 0, cc23x0r22_variant, 1, 0x80000, 0x9000 },
+	{ "CC23x0R2", FAMILY_CC23, 0x0BB8502F, NULL, 0, NULL, 0, 0x40000, 0x7000 },
+	{ "CC27xxx10", FAMILY_CC27, 0x0BB9802F, cc27xxx10_variants, ARRAY_SIZE(cc27xxx10_variants),
+		NULL, 0, CC27XX_HSM_BASE, 0x28800 },
+};
+
+struct cc23xx_bank {
+	enum cc23xx_region region;
+	bool probed;
+	const struct cc23xx_part *part;
+	uint32_t deviceid;
+	uint32_t partid;
+	uint8_t saci_seq;
+};
+
+static const char *saci_result_name(unsigned int r)
+{
+	switch (r) {
+	case 0x00: return "SUCCESS";
+	case 0x80: return "INVALID_CMD_ID";
+	case 0x81: return "INVALID_ADDRESS_PARAM";
+	case 0x82: return "INVALID_SIZE_PARAM";
+	case 0x83: return "INVALID_KEY_PARAM";
+	case 0x84: return "FLASH_FSM_ERROR";
+	case 0x85: return "PARAM_BUFFER_OVERFLOW";
+	case 0x86: return "NOT_ALLOWED";
+	case 0x87: return "CRC32_MISMATCH";
+	case 0x88: return "INVALID_PWD_PARAM";
+	case 0x89: return "BLANK_CHECK_FAILED";
+	case 0xFF: return "CMD_FAILED";
+	default: return "unknown";
+	}
+}
+
+/* ---------- access port helpers ---------- */
+
+static struct adiv5_dap *cc23xx_dap(struct target *target)
+{
+	struct arm *arm = target_to_arm(target);
+	return arm ? arm->dap : NULL;
+}
+
+static int cc23xx_ap_read(struct adiv5_dap *dap, unsigned int apn, unsigned int reg, uint32_t *val)
+{
+	struct adiv5_ap *ap = dap_get_ap(dap, apn);
+	if (!ap)
+		return ERROR_FAIL;
+	int retval = dap_queue_ap_read(ap, reg, val);
+	if (retval == ERROR_OK)
+		retval = dap_run(dap);
+	dap_put_ap(ap);
+	return retval;
+}
+
+static int cc23xx_ap_write(struct adiv5_dap *dap, unsigned int apn, unsigned int reg, uint32_t val)
+{
+	struct adiv5_ap *ap = dap_get_ap(dap, apn);
+	if (!ap)
+		return ERROR_FAIL;
+	int retval = dap_queue_ap_write(ap, reg, val);
+	if (retval == ERROR_OK)
+		retval = dap_run(dap);
+	dap_put_ap(ap);
+	return retval;
+}
+
+static const struct cc23xx_part *cc23xx_match(uint32_t deviceid, uint32_t partid)
+{
+	uint8_t variant = (partid >> 16) & 0xFF;
+	for (unsigned int i = 0; i < ARRAY_SIZE(cc23xx_parts); i++) {
+		const struct cc23xx_part *p = &cc23xx_parts[i];
+		if ((deviceid & 0x0FFFFFFF) != p->deviceid)
+			continue;
+		bool ok = !p->variants;
+		for (unsigned int k = 0; k < p->n_variants; k++)
+			if (p->variants[k] == variant)
+				ok = true;
+		for (unsigned int k = 0; k < p->n_not_variants; k++)
+			if (p->not_variants[k] == variant)
+				ok = false;
+		if (ok)
+			return p;
+	}
+	return NULL;
+}
+
+static int cc23xx_read_identity(struct target *target, uint32_t *deviceid, uint32_t *partid,
+		uint32_t *devstat)
+{
+	struct adiv5_dap *dap = cc23xx_dap(target);
+	if (!dap)
+		return ERROR_FAIL;
+	int retval = cc23xx_ap_read(dap, CC23XX_CFGAP, CFGAP_DEVICEID, deviceid);
+	if (retval == ERROR_OK)
+		retval = cc23xx_ap_read(dap, CC23XX_CFGAP, CFGAP_PARTID, partid);
+	if (retval == ERROR_OK && devstat)
+		retval = cc23xx_ap_read(dap, CC23XX_CFGAP, CFGAP_DEVICESTATUS, devstat);
+	return retval;
+}
+
+/* ---------- SACI (TRM SWCU195A 9.3.1) ---------- */
+
+static int saci_wait_tx_empty(struct adiv5_dap *dap, int64_t ms)
+{
+	int64_t end = timeval_ms() + ms;
+	uint32_t v;
+	do {
+		int retval = cc23xx_ap_read(dap, CC23XX_SECAP, SECAP_TXCTL, &v);
+		if (retval != ERROR_OK)
+			return retval;
+		if (!(v & SACI_TX_FULL))
+			return ERROR_OK;
+	} while (timeval_ms() < end);
+	LOG_ERROR("cc23xx: SACI stopped reading commands (TXCTL 0x%08" PRIx32 ")", v);
+	return ERROR_TIMEOUT_REACHED;
+}
+
+static int saci_wait_rx_full(struct adiv5_dap *dap, int64_t ms)
+{
+	int64_t end = timeval_ms() + ms;
+	uint32_t v;
+	do {
+		int retval = cc23xx_ap_read(dap, CC23XX_SECAP, SECAP_RXCTL, &v);
+		if (retval != ERROR_OK)
+			return retval;
+		if (v & SACI_RX_FULL)
+			return ERROR_OK;
+	} while (timeval_ms() < end);
+	LOG_ERROR("cc23xx: no SACI response (RXCTL 0x%08" PRIx32 ")", v);
+	return ERROR_TIMEOUT_REACHED;
+}
+
+/* Send one SACI command (w[0] holds the command ID and command-specific bits 31:16; the
+ * sequence number is filled in here) and return its result code in *result. */
+static int saci_cmd_data(struct adiv5_dap *dap, uint8_t *seq, const uint32_t *w, unsigned int n,
+		int64_t rx_ms, unsigned int *result, unsigned int *ndata)
+{
+	uint8_t sq = (*seq)++;
+	uint32_t w0 = (w[0] & 0xFFFF00FF) | ((uint32_t)sq << 8);
+	int retval = saci_wait_tx_empty(dap, 2000);
+	if (retval == ERROR_OK)
+		retval = cc23xx_ap_write(dap, CC23XX_SECAP, SECAP_TXCTL, SACI_TX_CMD_START);
+	if (retval == ERROR_OK)
+		retval = cc23xx_ap_write(dap, CC23XX_SECAP, SECAP_TXD, w0);
+	for (unsigned int i = 1; retval == ERROR_OK && i < n; i++) {
+		retval = saci_wait_tx_empty(dap, 2000);
+		if (retval == ERROR_OK && i == 1)
+			retval = cc23xx_ap_write(dap, CC23XX_SECAP, SECAP_TXCTL, 0);
+		if (retval == ERROR_OK)
+			retval = cc23xx_ap_write(dap, CC23XX_SECAP, SECAP_TXD, w[i]);
+	}
+	if (retval == ERROR_OK)
+		retval = saci_wait_tx_empty(dap, 2000);
+	if (retval == ERROR_OK)
+		retval = saci_wait_rx_full(dap, rx_ms);
+	uint32_t hdr = 0;
+	if (retval == ERROR_OK)
+		retval = cc23xx_ap_read(dap, CC23XX_SECAP, SECAP_RXD, &hdr);
+	if (retval != ERROR_OK)
+		return retval;
+	/* drop any response data words */
+	for (unsigned int i = 0; i < (hdr >> 24); i++) {
+		uint32_t dummy;
+		retval = saci_wait_rx_full(dap, 2000);
+		if (retval == ERROR_OK)
+			retval = cc23xx_ap_read(dap, CC23XX_SECAP, SECAP_RXD, &dummy);
+		if (retval != ERROR_OK)
+			return retval;
+	}
+	if ((hdr & 0xFF) != (w0 & 0xFF) || ((hdr >> 8) & 0xFF) != sq) {
+		LOG_ERROR("cc23xx: SACI answer 0x%08" PRIx32 " does not match command 0x%08" PRIx32, hdr, w0);
+		return ERROR_FAIL;
+	}
+	*result = (hdr >> 16) & 0xFF;
+	if (ndata)
+		*ndata = hdr >> 24;
+	LOG_DEBUG("cc23xx: SACI cmd 0x%02" PRIx32 " -> %s", w0 & 0xFF, saci_result_name(*result));
+	return ERROR_OK;
+}
+
+static int saci_cmd(struct adiv5_dap *dap, uint8_t *seq, const uint32_t *w, unsigned int n,
+		int64_t rx_ms, unsigned int *result)
+{
+	return saci_cmd_data(dap, seq, w, n, rx_ms, result, NULL);
+}
+
+/* Reset the chip into SACI (SEC-AP RSTCTL = 0x5C), reconnect, and send a NOP at once
+ * (it also keeps the 1 s SACI inactivity timeout from running out). */
+static int saci_enter(struct target *target, uint8_t *seq)
+{
+	struct adiv5_dap *dap = cc23xx_dap(target);
+	if (!dap)
+		return ERROR_FAIL;
+	uint32_t v;
+	if (cc23xx_ap_read(dap, CC23XX_SECAP, SECAP_RXCTL, &v) == ERROR_OK && (v & SACI_RX_FULL))
+		cc23xx_ap_read(dap, CC23XX_SECAP, SECAP_RXD, &v);
+	/* the port drops while the chip resets: ignore the result of this write */
+	cc23xx_ap_write(dap, CC23XX_SECAP, SECAP_RSTCTL, SECAP_RSTCTL_SACI_RESET);
+	int64_t t0 = timeval_ms();
+	uint32_t st = 0;
+	while (timeval_ms() - t0 < 1500) {
+		if (dap_dp_init_or_reconnect(dap) == ERROR_OK &&
+				cc23xx_ap_read(dap, CC23XX_CFGAP, CFGAP_DEVICESTATUS, &st) == ERROR_OK &&
+				DEVSTAT_BOOT(st) == BOOT_IN_SACI) {
+			uint32_t nop = SACI_NOP;
+			unsigned int r;
+			int retval = saci_cmd(dap, seq, &nop, 1, 2000, &r);
+			if (retval != ERROR_OK)
+				return retval;
+			if (r != 0) {
+				LOG_ERROR("cc23xx: SACI NOP: %s", saci_result_name(r));
+				return ERROR_FAIL;
+			}
+			LOG_DEBUG("cc23xx: in SACI after %" PRId64 " ms, DEVICESTATUS 0x%08" PRIx32,
+				timeval_ms() - t0, st);
+			return ERROR_OK;
+		}
+		alive_sleep(2);
+	}
+	LOG_ERROR("cc23xx: the chip did not enter SACI (last DEVICESTATUS 0x%08" PRIx32 ")", st);
+	return ERROR_FAIL;
+}
+
+/* ---------- ROM calls on the halted CPU ---------- */
+
+static int cc23xx_rom_call(struct target *target, unsigned int idx, const uint32_t *args,
+		unsigned int nargs, uint32_t *ret)
+{
+	struct working_area *wa = NULL;
+	uint32_t fn;
+	int retval = target_read_u32(target, HAPI_TABLE_BASE + 4 * idx, &fn);
+	if (retval != ERROR_OK)
+		return retval;
+	if (fn < 0x0F000000 || fn >= 0x10000000) {
+		LOG_ERROR("cc23xx: ROM table entry %u is 0x%08" PRIx32 ", not in ROM", idx, fn);
+		return ERROR_FAIL;
+	}
+	/* 2-byte BKPT stub plus a 256-byte stack */
+	retval = target_alloc_working_area(target, 260, &wa);
+	if (retval != ERROR_OK) {
+		LOG_ERROR("cc23xx: no working area for the ROM call");
+		return retval;
+	}
+	uint8_t stub[4] = { 0x00, 0xBE, 0x00, 0xBE };  /* bkpt #0; bkpt #0 */
+	retval = target_write_buffer(target, wa->address, sizeof(stub), stub);
+	if (retval != ERROR_OK)
+		goto out;
+
+	struct reg_param regs[7];
+	static const char *const names[4] = { "r0", "r1", "r2", "r3" };
+	unsigned int n = 0;
+	for (; n < nargs && n < 4; n++) {
+		init_reg_param(&regs[n], names[n], 32, PARAM_IN_OUT);
+		buf_set_u32(regs[n].value, 0, 32, args[n]);
+	}
+	if (n == 0) {
+		init_reg_param(&regs[n], "r0", 32, PARAM_IN_OUT);
+		buf_set_u32(regs[n].value, 0, 32, 0);
+		n++;
+	}
+	unsigned int ir0 = 0;
+	init_reg_param(&regs[n], "sp", 32, PARAM_OUT);
+	buf_set_u32(regs[n].value, 0, 32, (wa->address + wa->size) & ~7u);
+	n++;
+	init_reg_param(&regs[n], "lr", 32, PARAM_OUT);
+	buf_set_u32(regs[n].value, 0, 32, wa->address | 1);
+	n++;
+
+	struct armv7m_algorithm info = {
+		.common_magic = ARMV7M_COMMON_MAGIC,
+		.core_mode = ARM_MODE_THREAD,
+	};
+	retval = target_run_algorithm(target, 0, NULL, n, regs, fn & ~1u, wa->address,
+			ROM_CALL_TIMEOUT_MS, &info);
+	if (retval == ERROR_OK && ret)
+		*ret = buf_get_u32(regs[ir0].value, 0, 32);
+	for (unsigned int i = 0; i < n; i++)
+		destroy_reg_param(&regs[i]);
+out:
+	target_free_working_area(target, wa);
+	return retval;
+}
+
+/* The SDK's FlashEraseSector()/FlashProgram() switch the VIMS cache off around the ROM call
+ * and restore it afterwards; do the same. */
+static int cc23xx_rom_flash_call(struct target *target, unsigned int idx, const uint32_t *args,
+		unsigned int nargs, uint32_t *status)
+{
+	uint32_t cchctl;
+	int retval = target_read_u32(target, VIMS_CCHCTL, &cchctl);
+	if (retval != ERROR_OK)
+		return retval;
+	retval = target_write_u32(target, VIMS_CCHCTL, 0);
+	if (retval != ERROR_OK)
+		return retval;
+	int r2 = cc23xx_rom_call(target, idx, args, nargs, status);
+	retval = target_write_u32(target, VIMS_CCHCTL, cchctl);
+	return r2 != ERROR_OK ? r2 : retval;
+}
+
+/* ---------- flash driver ---------- */
+
+FLASH_BANK_COMMAND_HANDLER(cc23xx_flash_bank_command)
+{
+	if (CMD_ARGC < 6)
+		return ERROR_COMMAND_SYNTAX_ERROR;
+	struct cc23xx_bank *priv = calloc(1, sizeof(*priv));
+	if (!priv)
+		return ERROR_FAIL;
+	switch (bank->base) {
+	case CC23XX_FLASH_BASE:
+		priv->region = REGION_MAIN;
+		break;
+	case CC23XX_CCFG_BASE:
+		priv->region = REGION_CCFG;
+		break;
+	case CC23XX_SCFG_BASE:
+		priv->region = REGION_SCFG;
+		break;
+	case CC27XX_HSM_BASE:
+		priv->region = REGION_HSM;
+		break;
+	default:
+		LOG_ERROR("cc23xx: no flash region at 0x%08" TARGET_PRIxADDR
+			" (main 0x0, CCFG 0x4E020000, SCFG 0x4E040000, HSM 0xE8000)", bank->base);
+		free(priv);
+		return ERROR_FAIL;
+	}
+	priv->saci_seq = 0x40;
+	bank->driver_priv = priv;
+	bank->write_start_alignment = 16;
+	bank->write_end_alignment = 16;
+	bank->default_padded_value = 0xFF;
+	bank->erased_value = 0xFF;
+	return ERROR_OK;
+}
+
+static int cc23xx_probe(struct flash_bank *bank)
+{
+	struct cc23xx_bank *priv = bank->driver_priv;
+	uint32_t deviceid, partid, st;
+	int retval = cc23xx_read_identity(bank->target, &deviceid, &partid, &st);
+	if (retval != ERROR_OK) {
+		LOG_ERROR("cc23xx: cannot read DEVICEID through the configuration access port");
+		return retval;
+	}
+	const struct cc23xx_part *part = cc23xx_match(deviceid, partid);
+	if (!part) {
+		LOG_ERROR("cc23xx: DEVICEID 0x%08" PRIx32 " PARTID 0x%08" PRIx32
+			" is not a part this driver knows; refusing", deviceid, partid);
+		return ERROR_FLASH_OPERATION_FAILED;
+	}
+	priv->part = part;
+	priv->deviceid = deviceid;
+	priv->partid = partid;
+
+	uint32_t size;
+	switch (priv->region) {
+	case REGION_MAIN:
+		size = part->main_size;
+		break;
+	case REGION_CCFG:
+		size = CC23XX_CCFG_SIZE;
+		break;
+	case REGION_SCFG:
+		if (part->family != FAMILY_CC27) {
+			LOG_ERROR("cc23xx: %s has no SCFG", part->name);
+			return ERROR_FLASH_OPERATION_FAILED;
+		}
+		size = CC23XX_SCFG_SIZE;
+		break;
+	case REGION_HSM:
+		if (part->family != FAMILY_CC27) {
+			LOG_ERROR("cc23xx: %s has no HSM area", part->name);
+			return ERROR_FLASH_OPERATION_FAILED;
+		}
+		size = CC27XX_HSM_SIZE;
+		break;
+	default:
+		return ERROR_FAIL;
+	}
+	free(bank->sectors);
+	bank->size = size;
+	unsigned int ssize = size < CC23XX_SECTOR_SIZE ? size : CC23XX_SECTOR_SIZE;
+	bank->num_sectors = size / ssize;
+	bank->sectors = alloc_block_array(0, ssize, bank->num_sectors);
+	if (!bank->sectors)
+		return ERROR_FAIL;
+	priv->probed = true;
+	LOG_INFO("cc23xx: %s, DEVICEID 0x%08" PRIx32 ", PARTID 0x%08" PRIx32 ", %s bank 0x%08"
+		TARGET_PRIxADDR " %" PRIu32 " kB", part->name, deviceid, partid,
+		priv->region == REGION_MAIN ? "main" : priv->region == REGION_CCFG ? "CCFG" :
+		priv->region == REGION_SCFG ? "SCFG" : "HSM (never written)", bank->base, size / 1024);
+	if (!DEVSTAT_AHB_OPEN(st))
+		LOG_WARNING("cc23xx: the CPU access port is closed (DEVICESTATUS 0x%08" PRIx32
+			"); erase and write need it open", st);
+	return ERROR_OK;
+}
+
+static int cc23xx_auto_probe(struct flash_bank *bank)
+{
+	struct cc23xx_bank *priv = bank->driver_priv;
+	return priv->probed ? ERROR_OK : cc23xx_probe(bank);
+}
+
+static int cc23xx_ready(struct flash_bank *bank)
+{
+	if (bank->target->state != TARGET_HALTED) {
+		LOG_ERROR("cc23xx: target not halted (run \"reset halt\" first)");
+		return ERROR_TARGET_NOT_HALTED;
+	}
+	return cc23xx_auto_probe(bank);
+}
+
+static int cc23xx_erase(struct flash_bank *bank, unsigned int first, unsigned int last)
+{
+	struct cc23xx_bank *priv = bank->driver_priv;
+	int retval = cc23xx_auto_probe(bank);
+	if (retval != ERROR_OK)
+		return retval;
+	switch (priv->region) {
+	case REGION_HSM:
+		LOG_ERROR("cc23xx: 0x%08" TARGET_PRIxADDR " and up is TI's HSM firmware; never erased",
+			bank->base);
+		return ERROR_FLASH_PROTECTED;
+	case REGION_CCFG:
+	case REGION_SCFG:
+		/* write_image erase calls this for any image that carries the configuration
+		 * areas; the write that follows succeeds only if it changes nothing. */
+		LOG_WARNING("cc23xx: %s at 0x%08" TARGET_PRIxADDR " is never erased by this driver; kept as on the chip",
+			priv->region == REGION_CCFG ? "CCFG" : "SCFG", bank->base);
+		return ERROR_OK;
+	default:
+		break;
+	}
+	retval = cc23xx_ready(bank);
+	if (retval != ERROR_OK)
+		return retval;
+	for (unsigned int i = first; i <= last; i++) {
+		uint32_t addr = bank->base + bank->sectors[i].offset;
+		uint32_t args[2] = { FLASH_API_KEY, addr };
+		uint32_t status = 0xFFFFFFFF;
+		retval = cc23xx_rom_flash_call(bank->target, HAPI_IDX_SECTOR_ERASE, args, 2, &status);
+		if (retval != ERROR_OK)
+			return retval;
+		if (status != 0) {
+			LOG_ERROR("cc23xx: ROM sector erase at 0x%08" PRIx32 " returned 0x%08" PRIx32, addr, status);
+			return ERROR_FLASH_OPERATION_FAILED;
+		}
+		bank->sectors[i].is_erased = 1;
+		keep_alive();
+	}
+	return ERROR_OK;
+}
+
+static int cc23xx_config_write(struct flash_bank *bank, const uint8_t *buffer, uint32_t offset,
+		uint32_t count)
+{
+	struct cc23xx_bank *priv = bank->driver_priv;
+	const char *what = priv->region == REGION_CCFG ? "CCFG" : "SCFG";
+	uint8_t *now = malloc(count);
+	if (!now)
+		return ERROR_FAIL;
+	int retval = target_read_buffer(bank->target, bank->base + offset, count, now);
+	if (retval != ERROR_OK) {
+		LOG_ERROR("cc23xx: cannot read the chip's %s to compare", what);
+		free(now);
+		return retval;
+	}
+	/* The CCFG user record (0x750 to 0x7CF) is skipped, as TI's PROG_CCFG_SECTOR "skip user
+	 * record" option does: SDK images differ there only in its fill (0x00 or 0xFF). */
+	unsigned int diff = 0, first = 0, skipped = 0;
+	for (uint32_t i = 0; i < count; i++) {
+		uint32_t at = offset + i;
+		if (priv->region == REGION_CCFG && at >= CCFG_USER_REC_START && at < CCFG_USER_REC_END) {
+			if (now[i] != buffer[i])
+				skipped++;
+			continue;
+		}
+		if (now[i] != buffer[i] && diff++ == 0)
+			first = i;
+	}
+	free(now);
+	if (skipped)
+		LOG_WARNING("cc23xx: CCFG user record differs in %u bytes; not compared and not written", skipped);
+	if (diff) {
+		LOG_ERROR("cc23xx: the image's %s differs from the chip's in %u bytes (first at 0x%08"
+			TARGET_PRIxADDR "); this driver never writes the %s. Build the image with the chip's %s, "
+			"or leave it out of the file", what, diff, bank->base + offset + first, what, what);
+		return ERROR_FLASH_PROTECTED;
+	}
+	LOG_INFO("cc23xx: image %s equals the chip's (%" PRIu32 " bytes); nothing written", what, count);
+	return ERROR_OK;
+}
+
+static int cc23xx_write(struct flash_bank *bank, const uint8_t *buffer, uint32_t offset,
+		uint32_t count)
+{
+	struct cc23xx_bank *priv = bank->driver_priv;
+	int retval = cc23xx_auto_probe(bank);
+	if (retval != ERROR_OK)
+		return retval;
+	if (priv->region == REGION_HSM) {
+		LOG_ERROR("cc23xx: 0x%08" TARGET_PRIxADDR " and up is TI's HSM firmware; never written",
+			bank->base);
+		return ERROR_FLASH_PROTECTED;
+	}
+	if (priv->region == REGION_CCFG || priv->region == REGION_SCFG)
+		return cc23xx_config_write(bank, buffer, offset, count);
+	if (offset + count > bank->size) {
+		LOG_ERROR("cc23xx: write past the end of main flash; refusing");
+		return ERROR_FLASH_DST_OUT_OF_BANK;
+	}
+	retval = cc23xx_ready(bank);
+	if (retval != ERROR_OK)
+		return retval;
+
+	struct working_area *buf = NULL;
+	uint32_t chunk = CC23XX_SECTOR_SIZE;
+	while (target_alloc_working_area_try(bank->target, chunk, &buf) != ERROR_OK) {
+		chunk /= 2;
+		if (chunk < 256) {
+			LOG_ERROR("cc23xx: no working area for the write buffer");
+			return ERROR_TARGET_RESOURCE_NOT_AVAILABLE;
+		}
+	}
+	while (count) {
+		uint32_t n = count < chunk ? count : chunk;
+		/* do not cross a sector boundary in one ROM call */
+		uint32_t to_end = CC23XX_SECTOR_SIZE - ((bank->base + offset) % CC23XX_SECTOR_SIZE);
+		if (n > to_end)
+			n = to_end;
+		retval = target_write_buffer(bank->target, buf->address, n, buffer);
+		if (retval != ERROR_OK)
+			break;
+		uint32_t args[4] = { FLASH_API_KEY, buf->address, bank->base + offset, n };
+		uint32_t status = 0xFFFFFFFF;
+		retval = cc23xx_rom_flash_call(bank->target, HAPI_IDX_PROGRAM, args, 4, &status);
+		if (retval != ERROR_OK)
+			break;
+		if (status != 0) {
+			LOG_ERROR("cc23xx: ROM program at 0x%08" TARGET_PRIxADDR " (%" PRIu32 " bytes) returned 0x%08" PRIx32,
+				bank->base + offset, n, status);
+			retval = ERROR_FLASH_OPERATION_FAILED;
+			break;
+		}
+		buffer += n;
+		offset += n;
+		count -= n;
+		keep_alive();
+	}
+	target_free_working_area(bank->target, buf);
+	return retval;
+}
+
+static int cc23xx_protect(struct flash_bank *bank, int set, unsigned int first, unsigned int last)
+{
+	LOG_ERROR("cc23xx: protection lives in the CCFG, which this driver does not write");
+	return ERROR_FLASH_OPER_UNSUPPORTED;
+}
+
+static int cc23xx_protect_check(struct flash_bank *bank)
+{
+	/* not read from the CCFG; reported as unknown */
+	for (unsigned int i = 0; i < bank->num_sectors; i++)
+		bank->sectors[i].is_protected = -1;
+	return ERROR_OK;
+}
+
+static int cc23xx_info(struct flash_bank *bank, struct command_invocation *cmd)
+{
+	struct cc23xx_bank *priv = bank->driver_priv;
+	if (!priv->probed) {
+		command_print_sameline(cmd, "cc23xx: not probed");
+		return ERROR_OK;
+	}
+	command_print_sameline(cmd, "%s DEVICEID 0x%08" PRIx32 " PARTID 0x%08" PRIx32 " (variant 0x%02" PRIx32 ")",
+		priv->part->name, priv->deviceid, priv->partid, (priv->partid >> 16) & 0xFF);
+	return ERROR_OK;
+}
+
+/* ---------- commands ---------- */
+
+/* Wait until the boot status reads want (or, with want 0, anything but SACI) with the CPU's
+ * access port open. The application wait loop (0xC1) also accepts the bootloader wait loop (0x81),
+ * where the ROM stops when the CCFG names a bootloader. */
+static int saci_wait_boot(struct target *target, unsigned int want, int64_t ms, uint32_t *st)
+{
+	struct adiv5_dap *dap = cc23xx_dap(target);
+	int64_t end = timeval_ms() + ms;
+	do {
+		if (dap_dp_init_or_reconnect(dap) == ERROR_OK &&
+				cc23xx_ap_read(dap, CC23XX_CFGAP, CFGAP_DEVICESTATUS, st) == ERROR_OK &&
+				DEVSTAT_AHB_OPEN(*st) &&
+				(want ? (DEVSTAT_BOOT(*st) == want ||
+					(want == BOOT_APP_WAITLOOP_DBGPROBE && DEVSTAT_BOOT(*st) == BOOT_BLDR_WAITLOOP_DBGPROBE))
+				 : DEVSTAT_BOOT(*st) != BOOT_IN_SACI))
+			return ERROR_OK;
+		alive_sleep(5);
+	} while (timeval_ms() < end);
+	return ERROR_TIMEOUT_REACHED;
+}
+
+/* Halt the CPU in the boot ROM's debug wait loop (BOOTSTA 0xC1) and set R3 = 0, the ROM's
+ * "go on to the application" flag (TRM 9.3.2.2.1), so a later resume enters the application. */
+static int cc23xx_halt_in_waitloop(struct target *target)
+{
+	struct adiv5_dap *dap = cc23xx_dap(target);
+	struct adiv5_ap *ap = dap_get_ap(dap, 0);
+	if (!ap)
+		return ERROR_FAIL;
+	int retval = mem_ap_write_atomic_u32(ap, DCB_DHCSR, DBGKEY | C_DEBUGEN | C_HALT);
+	uint32_t dhcsr = 0;
+	int64_t end = timeval_ms() + 500;
+	while (retval == ERROR_OK) {
+		retval = mem_ap_read_atomic_u32(ap, DCB_DHCSR, &dhcsr);
+		if (retval != ERROR_OK || (dhcsr & S_HALT) || timeval_ms() > end)
+			break;
+	}
+	if (retval == ERROR_OK && !(dhcsr & S_HALT))
+		retval = ERROR_TARGET_TIMEOUT;
+	if (retval == ERROR_OK)
+		retval = mem_ap_write_atomic_u32(ap, DCB_DCRDR, 0);
+	if (retval == ERROR_OK)
+		retval = mem_ap_write_atomic_u32(ap, DCB_DCRSR, DCRSR_WNR | 3);
+	dap_put_ap(ap);
+	return retval;
+}
+
+/* reset-assert event: reset through SACI, then halt in the boot ROM's debug wait loop just before
+ * the application entry (reset halt and reset init) or run (reset run). The order is TI's:
+ * TRM SWCU195A 9.3.2.2.1 and SecApReset in cc23xx_xds.gel. */
+COMMAND_HANDLER(cc23xx_handle_saci_reset)
+{
+	struct target *target = get_current_target(CMD_CTX);
+	struct adiv5_dap *dap = cc23xx_dap(target);
+	uint32_t deviceid, partid, st = 0;
+	int retval = cc23xx_read_identity(target, &deviceid, &partid, NULL);
+	if (retval != ERROR_OK) {
+		command_print(CMD, "cc23xx: cannot read DEVICEID; no reset");
+		return retval;
+	}
+	const struct cc23xx_part *part = cc23xx_match(deviceid, partid);
+	if (!part) {
+		command_print(CMD, "cc23xx: DEVICEID 0x%08" PRIx32 " PARTID 0x%08" PRIx32 " unknown; no reset",
+			deviceid, partid);
+		return ERROR_FAIL;
+	}
+	uint8_t seq = 0x40;
+	unsigned int r, nd;
+	int64_t t0 = timeval_ms();
+	retval = saci_enter(target, &seq);
+	if (retval != ERROR_OK)
+		return retval;
+	/* Ask whether debugging is open (TI: required before EXIT_SACI_HALT). An answer with key or
+	 * password ID words means debug authentication, which this driver does not do. */
+	{
+		uint32_t w[2] = { SACI_DEBUG_REQ_KEY_ID, SACI_AUTH_LEVEL_SECURE };
+		if (part->family == FAMILY_CC23)
+			w[0] = SACI_DEBUG_REQ_PWD_ID;
+		retval = saci_cmd_data(dap, &seq, w, part->family == FAMILY_CC27 ? 2 : 1, 2000, &r, &nd);
+		if (retval != ERROR_OK)
+			return retval;
+		if (r != 0 || nd != 0) {
+			command_print(CMD, "cc23xx: SACI %s: %s, %u ID words: debugging is %s",
+				part->family == FAMILY_CC27 ? "DEBUG_REQ_KEY_ID" : "DEBUG_REQ_PWD_ID",
+				saci_result_name(r), nd,
+				r ? "not allowed by the CCFG" : "behind authentication, which this driver does not do");
+			return ERROR_FAIL;
+		}
+	}
+	uint32_t w = target->reset_halt ? SACI_EXIT_SACI_HALT : SACI_EXIT_SACI_RUN;
+	retval = saci_cmd(dap, &seq, &w, 1, 2000, &r);
+	if (retval != ERROR_OK)
+		return retval;
+	if (r != 0) {
+		command_print(CMD, "cc23xx: SACI %s: %s", target->reset_halt ? "EXIT_SACI_HALT" : "EXIT_SACI_RUN",
+			saci_result_name(r));
+		return ERROR_FAIL;
+	}
+	retval = saci_wait_boot(target, target->reset_halt ? BOOT_APP_WAITLOOP_DBGPROBE : 0, 3000, &st);
+	if (retval != ERROR_OK) {
+		command_print(CMD, "cc23xx: the boot did not reach %s (DEVICESTATUS 0x%08" PRIx32 ")",
+			target->reset_halt ? "its debug wait loop" : "the application", st);
+		return retval;
+	}
+	if (target->reset_halt) {
+		retval = cc23xx_halt_in_waitloop(target);
+		if (retval != ERROR_OK) {
+			command_print(CMD, "cc23xx: could not halt the CPU in the boot wait loop");
+			return retval;
+		}
+	}
+	LOG_INFO("cc23xx: reset through SACI, %s, %" PRId64 " ms, DEVICESTATUS 0x%08" PRIx32,
+		target->reset_halt ? "halted in the boot ROM before the application" : "running",
+		timeval_ms() - t0, st);
+	return ERROR_OK;
+}
+
+/* SACI VERIFY_MAIN_SECTORS: the chip's own CRC32 (or blank check) over whole sectors. Resets
+ * the chip into SACI; leaves it in SACI until the next reset. */
+COMMAND_HANDLER(cc23xx_handle_saci_verify)
+{
+	if (CMD_ARGC != 2 && CMD_ARGC != 3)
+		return ERROR_COMMAND_SYNTAX_ERROR;
+	struct target *target = get_current_target(CMD_CTX);
+	uint32_t addr, len, crc = 0;
+	COMMAND_PARSE_NUMBER(u32, CMD_ARGV[0], addr);
+	COMMAND_PARSE_NUMBER(u32, CMD_ARGV[1], len);
+	bool blank = CMD_ARGC == 2;
+	if (!blank)
+		COMMAND_PARSE_NUMBER(u32, CMD_ARGV[2], crc);
+	if (addr % CC23XX_SECTOR_SIZE || len % CC23XX_SECTOR_SIZE || !len) {
+		command_print(CMD, "address and length must be whole 2 kB sectors");
+		return ERROR_COMMAND_ARGUMENT_INVALID;
+	}
+	uint8_t seq = 0x40;
+	int retval = saci_enter(target, &seq);
+	if (retval != ERROR_OK)
+		return retval;
+	uint32_t w[4] = { SACI_VERIFY_MAIN | (blank ? 0x80000000u : 0), addr, len, crc };
+	unsigned int r;
+	retval = saci_cmd(cc23xx_dap(target), &seq, w, 4, 30000, &r);
+	if (retval != ERROR_OK)
+		return retval;
+	command_print(CMD, "SACI VERIFY_MAIN_SECTORS %s 0x%08" PRIx32 "+0x%" PRIx32 ": %s",
+		blank ? "blank check" : "CRC32", addr, len, saci_result_name(r));
+	return r == 0 ? ERROR_OK : ERROR_FAIL;
+}
+
+/* Leave the debug port dormant, the state these chips power up in. OpenOCD's own exit puts an
+ * SWJ-DP in JTAG state; TI's tools (CCStudio, UniFlash) then fail with Error -615 until the
+ * board is power-cycled. The target files call this before shutdown. */
+COMMAND_HANDLER(cc23xx_handle_dormant)
+{
+	struct target *target = get_current_target(CMD_CTX);
+	struct adiv5_dap *dap = cc23xx_dap(target);
+	if (!dap || !dap->ops || !transport_is_swd())
+		return ERROR_FAIL;
+	const struct swd_driver *swd = adiv5_dap_swd_driver(dap);
+	if (!swd || !swd->switch_seq)
+		return ERROR_FAIL;
+	int retval = swd->switch_seq(SWD_TO_DORMANT);
+	if (retval == ERROR_OK)
+		retval = swd->run();
+	/* OpenOCD's exit then sends SWD-to-JTAG, which a dormant port ignores; with this flag set it
+	 * would send dormant-to-JTAG instead and wake the port into JTAG state. */
+	dap->switch_through_dormant = false;
+	return retval;
+}
+
+static const struct command_registration cc23xx_exec_command_handlers[] = {
+	{
+		.name = "saci_reset",
+		.handler = cc23xx_handle_saci_reset,
+		.mode = COMMAND_EXEC,
+		.usage = "",
+		.help = "Reset through SACI: halt at the application entry if the reset asks for a halt, "
+			"else run. Used as the reset-assert event.",
+	},
+	{
+		.name = "saci_verify",
+		.handler = cc23xx_handle_saci_verify,
+		.mode = COMMAND_EXEC,
+		.usage = "address length [crc32]",
+		.help = "SACI VERIFY_MAIN_SECTORS over whole sectors: blank check, or the chip's CRC32 "
+			"against the one given. Leaves the chip in SACI until the next reset.",
+	},
+	{
+		.name = "dormant",
+		.handler = cc23xx_handle_dormant,
+		.mode = COMMAND_EXEC,
+		.usage = "",
+		.help = "Put the SWD debug port in its dormant state (run before shutdown so TI's tools connect next).",
+	},
+	COMMAND_REGISTRATION_DONE
+};
+
+static const struct command_registration cc23xx_command_handlers[] = {
+	{
+		.name = "cc23xx",
+		.mode = COMMAND_ANY,
+		.help = "TI CC23xx/CC27xx flash commands",
+		.usage = "",
+		.chain = cc23xx_exec_command_handlers,
+	},
+	COMMAND_REGISTRATION_DONE
+};
+
+const struct flash_driver cc23xx_flash = {
+	.name = "cc23xx",
+	.commands = cc23xx_command_handlers,
+	.flash_bank_command = cc23xx_flash_bank_command,
+	.erase = cc23xx_erase,
+	.protect = cc23xx_protect,
+	.write = cc23xx_write,
+	.read = default_flash_read,
+	.probe = cc23xx_probe,
+	.auto_probe = cc23xx_auto_probe,
+	.erase_check = default_flash_blank_check,
+	.protect_check = cc23xx_protect_check,
+	.info = cc23xx_info,
+	.free_driver_priv = default_flash_free_driver_priv,
+};

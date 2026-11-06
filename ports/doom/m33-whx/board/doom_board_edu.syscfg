@@ -1,0 +1,172 @@
+// Doom board image with the Educational BoosterPack: doom_board.syscfg plus the pins, SPI + DMA and HSADC of portability/boosterpacks/edumkii/boards/mspm33c321a (no UART).
+// Derived from TI's qspi_flash_readback_DMA.syscfg (clock tree, QSPI pins, LEDs); DMA and QSPI interrupts removed.
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ */
+//@cliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)" --part "Default"
+//@v2CliArgs --device "MSPM33C321A" --package "LQFP-100(PFA)"
+// @cliArgs --board /ti/boards/LP_MSPM33C321A --rtos nortos
+
+/**
+ * Import the modules used in this configuration.
+ */
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const QSPI   = scripting.addModule("/ti/driverlib/QSPI", {}, false);
+const QSPI1  = QSPI.addInstance();
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const EG0 = GPIO.addInstance();
+const EG1 = GPIO.addInstance();
+const EG2 = GPIO.addInstance();
+const EG3 = GPIO.addInstance();
+const EG4 = GPIO.addInstance();
+const EG5 = GPIO.addInstance();
+const EG6 = GPIO.addInstance();
+const EG7 = GPIO.addInstance();
+const EG8 = GPIO.addInstance();
+const EG9 = GPIO.addInstance();
+const EG10 = GPIO.addInstance();
+const SPI  = scripting.addModule("/ti/driverlib/SPI", {}, false);
+const SPI1 = SPI.addInstance();
+const DMA  = scripting.addModule("/ti/driverlib/DMA", {}, false);
+const DMA1 = DMA.addInstance();
+const HSADC = scripting.addModule("/ti/driverlib/HSADC", {}, false);
+const HSADC1 = HSADC.addInstance();
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+const divider3       = system.clockTree["EXTDIVMCLK"];
+divider3.divideValue = 1;
+
+const multiplier2         = system.clockTree["PLL_QDIV"];
+multiplier2.multiplyValue = 10;
+
+
+const Board                       = scripting.addModule("/ti/driverlib/Board", {}, false);
+Board.peripheral.$assign          = "DEBUGSS";
+Board.peripheral.swclkPin.$assign = "PA20";
+Board.peripheral.swdioPin.$assign = "PA19";
+
+GPIO1.$name                               = "GPIO_LEDS";
+GPIO1.associatedPins.create(2);
+GPIO1.associatedPins[0].$name             = "PASS_LED";
+GPIO1.associatedPins[0].launchPadShortcut = "LED2GreenEn";
+GPIO1.associatedPins[0].pin.$assign       = "PC27";
+GPIO1.associatedPins[1].$name             = "FAIL_LED";
+GPIO1.associatedPins[1].launchPadShortcut = "LED2RedEn";
+GPIO1.associatedPins[1].pin.$assign       = "PC26";
+
+QSPI1.$name                                 = "QSPI_0";
+QSPI1.direction                             = "PICO_POCI_IO2_IO3";
+QSPI1.targetBitRate                         = 40000000;
+QSPI1.sclkPinConfig.$name                   = "ti_driverlib_gpio_GPIOPinGeneric0";
+QSPI1.picoPinConfig.$name                   = "ti_driverlib_gpio_GPIOPinGeneric1";
+QSPI1.pociPinConfig.$name                   = "ti_driverlib_gpio_GPIOPinGeneric2";
+QSPI1.cs0PinConfig.$name                    = "ti_driverlib_gpio_GPIOPinGeneric3";
+QSPI1.peripheral.$assign                    = "QSPI";
+QSPI1.peripheral.sclkPin.$assign            = "PB16";
+QSPI1.peripheral.picoPin.$assign            = "PA12";
+QSPI1.peripheral.pociPin.$assign            = "PA14";
+QSPI1.peripheral.io2Pin.$assign             = "PA13";
+QSPI1.peripheral.io3Pin.$assign             = "PB15";
+QSPI1.peripheral.cs0Pin.$assign             = "PC0";
+QSPI1.io2PinConfig.$name                    = "ti_driverlib_gpio_GPIOPinGeneric14";
+QSPI1.io3PinConfig.$name                    = "ti_driverlib_gpio_GPIOPinGeneric15";
+
+SYSCTL.clockTreeEn = true;
+
+// ---- Educational BoosterPack pins: from portability/boosterpacks/edumkii/boards/mspm33c321a/pins.json (tools/gen_board.py), no UART ----
+EG0.$name = "E_BL_RED";
+EG0.associatedPins[0].$name = "BL_RED";
+EG0.associatedPins[0].initialValue = "CLEARED";
+EG0.associatedPins[0].pin.$assign = "PC29";
+EG1.$name = "E_BUZZER";
+EG1.associatedPins[0].$name = "BUZZER";
+EG1.associatedPins[0].initialValue = "CLEARED";
+EG1.associatedPins[0].pin.$assign = "PC17";
+EG2.$name = "E_I2C_SCL";
+EG2.associatedPins[0].$name = "I2C_SCL";
+EG2.associatedPins[0].direction = "INPUT";
+EG2.associatedPins[0].pin.$assign = "PB13";
+EG3.$name = "E_I2C_SDA";
+EG3.associatedPins[0].$name = "I2C_SDA";
+EG3.associatedPins[0].direction = "INPUT";
+EG3.associatedPins[0].pin.$assign = "PB12";
+EG4.$name = "E_LCD_CS";
+EG4.associatedPins[0].$name = "LCD_CS";
+EG4.associatedPins[0].initialValue = "SET";
+EG4.associatedPins[0].pin.$assign = "PB28";
+EG5.$name = "E_LCD_DC";
+EG5.associatedPins[0].$name = "LCD_DC";
+EG5.associatedPins[0].initialValue = "SET";
+EG5.associatedPins[0].pin.$assign = "PC22";
+EG6.$name = "E_LCD_RST";
+EG6.associatedPins[0].$name = "LCD_RST";
+EG6.associatedPins[0].initialValue = "SET";
+EG6.associatedPins[0].pin.$assign = "PC23";
+EG7.$name = "E_LED_BLUE";
+EG7.associatedPins[0].$name = "LED_BLUE";
+EG7.associatedPins[0].initialValue = "CLEARED";
+EG7.associatedPins[0].pin.$assign = "PC19";
+EG8.$name = "E_LED_GREEN";
+EG8.associatedPins[0].$name = "LED_GREEN";
+EG8.associatedPins[0].initialValue = "CLEARED";
+EG8.associatedPins[0].pin.$assign = "PC18";
+EG9.$name = "E_S1";
+EG9.associatedPins[0].$name = "S1";
+EG9.associatedPins[0].direction = "INPUT";
+EG9.associatedPins[0].pin.$assign = "PA11";
+EG10.$name = "E_S2";
+EG10.associatedPins[0].$name = "S2";
+EG10.associatedPins[0].direction = "INPUT";
+EG10.associatedPins[0].pin.$assign = "PC21";
+SPI1.$name = "SPI_LCD";
+SPI1.targetBitRate = 16000000;
+SPI1.frameFormat = "MOTO4";
+SPI1.peripheral.sclkPin.$assign = "PB31";
+SPI1.peripheral.mosiPin.$assign = "PB8";
+SPI1.peripheral.misoPin.$assign = "PB14";
+SPI1.rxFifoThreshold = "DL_SPI_RX_FIFO_LEVEL_ONE_FRAME";
+SPI1.txFifoThreshold = "DL_SPI_TX_FIFO_LEVEL_EMPTY";
+SPI1.enabledDMAEvent2Triggers = "DL_SPI_DMA_INTERRUPT_TX";
+SPI1.enabledInterrupts = ["DMA_DONE_TX"];
+DMA1.$name = "DMA0";
+SPI1.DMA_CHANNEL_EVENT2.$name = "CH1";
+SPI1.DMA_CHANNEL_EVENT2.srcLength = "BYTE";
+SPI1.DMA_CHANNEL_EVENT2.dstLength = "BYTE";
+SPI1.DMA_CHANNEL_EVENT2.addressMode = "b2b";
+SPI1.DMA_CHANNEL_EVENT2.dstIncDec = "UNCHANGED";
+SPI1.DMA_CHANNEL_EVENT2.peripheral.$assign = "DMA0_CH1";
+HSADC1.$name = "HSADC1";
+HSADC1.adcBase = "HSADC1_BASE";
+HSADC1.enabledSOCs = ["ADC_SOC_NUMBER0","ADC_SOC_NUMBER1","ADC_SOC_NUMBER2","ADC_SOC_NUMBER3","ADC_SOC_NUMBER4","ADC_SOC_NUMBER5","ADC_SOC_NUMBER6"];
+HSADC1.soc0Channel = "ADC_CH_ADCIN_0";
+HSADC1.soc1Channel = "ADC_CH_ADCIN_1";
+HSADC1.soc2Channel = "ADC_CH_ADCIN_2";
+HSADC1.soc3Channel = "ADC_CH_ADCIN_3";
+HSADC1.soc4Channel = "ADC_CH_ADCIN_7";
+HSADC1.soc5Channel = "ADC_CH_ADCIN_9";
+HSADC1.soc6Channel = "ADC_CH_ADCIN_14";
+HSADC1.enabledSEQs = ["ADC_SEQ_NUMBER1"];
+HSADC1.seqEndSOC = "ADC_SOC_NUMBER6";
+HSADC1.seq1Enable = true;
+HSADC1.seq1SampleWindow = 64;
+HSADC1.peripheral.$assign = "ADC1";
+HSADC1.peripheral.adcPin0.$assign = "PA15";
+HSADC1.peripheral.adcPin1.$assign = "PA16";
+HSADC1.peripheral.adcPin2.$assign = "PA17";
+HSADC1.peripheral.adcPin3.$assign = "PA18";
+HSADC1.peripheral.adcPin7.$assign = "PA21";
+HSADC1.peripheral.adcPin9.$assign = "PA22";
+HSADC1.peripheral.adcPin14.$assign = "PB27";
+
+const ProjectConfig              = scripting.addModule("/ti/project_config/ProjectConfig", {}, false);
+ProjectConfig.migrationCondition = true;
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */

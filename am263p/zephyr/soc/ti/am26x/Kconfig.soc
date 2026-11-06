@@ -1,0 +1,28 @@
+# Fox Red Labs: out-of-tree Zephyr SoC for TI's AM263P4 (Sitara AM263Px), R5FSS0-0 only. Not a TI or Zephyr port.
+config SOC_FAMILY_TI_AM26X
+	bool
+
+config SOC_FAMILY
+	default "ti_am26x" if SOC_FAMILY_TI_AM26X
+
+config SOC_SERIES_AM26X
+	bool
+	select SOC_FAMILY_TI_AM26X
+
+config SOC_SERIES
+	default "am26x" if SOC_SERIES_AM26X
+
+config SOC_AM263P4
+	bool
+	select SOC_SERIES_AM26X
+
+config SOC_AM263P4_R5F0_0
+	bool
+	select SOC_AM263P4
+
+config SOC_AM263P4_R5F0_1
+	bool
+	select SOC_AM263P4
+
+config SOC
+	default "am263p4" if SOC_AM263P4

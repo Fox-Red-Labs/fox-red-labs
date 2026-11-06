@@ -1,0 +1,80 @@
+{
+ "name": "NUCLEO-U083RC (ST Nucleo-64 board, MB1932)",
+ "sources": "STM32U083xC datasheet DS14463 Rev 2 (features, ST's CoreMark and current figures); Nucleo-64 MB1932 user manual UM3256 Rev 2 (jumpers JP1, JP4, JP5, JP6 to JP10, Tables 7, 9 and 10, Figure 3 top layout); both read on st.com 2026-10-07",
+ "columns": [
+  {
+   "head": "The chip: STM32U083RC",
+   "items": [
+    [
+     "Processor: Arm Cortex-M0+",
+     "Runs the program, up to 56 million steps a second (56 MHz). A 1 kB cache hides flash wait states"
+    ],
+    [
+     "Flash: 256 kB",
+     "Holds the program. Kept when the power is off"
+    ],
+    [
+     "RAM: 40 kB",
+     "Working memory, all of it parity-checked"
+    ],
+    [
+     "Power: 3.3 V on this board",
+     "The chip accepts 1.71 to 3.6 V. ST's low-power line: 52 µA per MHz running, 16 nA asleep in Shutdown (ST's figures)"
+    ]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    [
+     "UART: 7 (including low-power ones)",
+     "Serial text. USART2 goes to the Mac through the debug probe; USART1 is on Arduino D8 and D2"
+    ],
+    [
+     "I2C: 4 / SPI: 3",
+     "Two-wire sensor bus / fast bus for displays and memory chips"
+    ],
+    [
+     "ADC: 1 / DAC: 1 channel",
+     "Measures a voltage in 4,096 steps, and makes one, so the chip can test itself with a wire"
+    ],
+    [
+     "AES: 128 and 256-bit",
+     "Encrypts in hardware. The reason this board is here",
+     "🔧"
+    ],
+    [
+     "True random numbers",
+     "Hardware noise source for keys",
+     "🧪"
+    ],
+    [
+     "USB device and LCD driver",
+     "Full-speed USB with no crystal; drives a segment display directly",
+     "🔌"
+    ]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    [
+     "On the board",
+     "STLINK-V2EC debug probe on USB-C, green LED LD4, blue button B1, reset button B2, 32.768 kHz crystal"
+    ],
+    [
+     "Headers",
+     "ARDUINO Uno V3 sockets plus two rows of ST morpho pins that reach every chip pin"
+    ],
+    [
+     "Not on the chip",
+     "No FPU, no math accelerator, no radio"
+    ],
+    [
+     "Watch out",
+     "ST says keep readout protection off on this probe: with it on, the program stops running"
+    ]
+   ]
+  }
+ ]
+}

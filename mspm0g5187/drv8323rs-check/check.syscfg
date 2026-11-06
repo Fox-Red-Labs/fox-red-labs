@@ -1,0 +1,62 @@
+// LP-MSPM0G5187 cross-check of the BOOSTXL-DRV8323RS (read only). Pins from SLVUB01C tables 2 and 3 and the SDK board file:
+// SPI UC2 SCLK PB18 (BP 7), PICO PB17 (BP 15, driver SDI), POCI PB19 (BP 14, driver SDO, pull-up: the driver's SDO is open drain),
+// nSCS PA29 (BP 12, GPIO), ENABLE PB21 (BP 5), nFAULT PB25 (BP 8, pull-up), VSENVM PA25 (BP 2, ADC0 channel 2).
+// Gate inputs held low: INHA PB4 (40), INLA PB5 (39), INHB PB0 (38), INLB PB1 (37), INHC PA28 (36), INLC PA31 (35).
+//@cliArgs --device "MSPM0G518X" --package "LQFP-64(PM)" --part "Default"
+//@v2CliArgs --device "MSPM0G5187" --package "LQFP-64(PM)"
+// @cliArgs --board /ti/boards/LP_MSPM0G5187 --rtos nortos
+const ADC12  = scripting.addModule("/ti/driverlib/ADC12", {}, false);
+const ADC121 = ADC12.addInstance();
+const Board  = scripting.addModule("/ti/driverlib/Board", {}, false);
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const GPIO2  = GPIO.addInstance();
+const SPI    = scripting.addModule("/ti/driverlib/SPI", {}, false);
+const SPI1   = SPI.addInstance();
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+
+ADC121.$name                      = "ADC12_0";
+ADC121.sampClkSrc                 = "DL_ADC12_CLOCK_ULPCLK";
+ADC121.sampClkDiv                 = "DL_ADC12_CLOCK_DIVIDE_8";
+ADC121.sampleTime0                = "125 us";
+ADC121.powerDownMode              = "DL_ADC12_POWER_DOWN_MODE_MANUAL";
+ADC121.adcMem0chansel             = "DL_ADC12_INPUT_CHAN_2";
+ADC121.peripheral.$assign         = "ADC0";
+ADC121.peripheral.adcPin2.$assign = "PA25";
+
+Board.peripheral.$assign          = "DEBUGSS";
+Board.peripheral.swclkPin.$assign = "PA20";
+Board.peripheral.swdioPin.$assign = "PA19";
+
+GPIO1.$name = "OUT";
+GPIO1.associatedPins.create(8);
+GPIO1.associatedPins[0].$name = "INHA"; GPIO1.associatedPins[0].pin.$assign = "PB4";
+GPIO1.associatedPins[1].$name = "INLA"; GPIO1.associatedPins[1].pin.$assign = "PB5";
+GPIO1.associatedPins[2].$name = "INHB"; GPIO1.associatedPins[2].pin.$assign = "PB0";
+GPIO1.associatedPins[3].$name = "INLB"; GPIO1.associatedPins[3].pin.$assign = "PB1";
+GPIO1.associatedPins[4].$name = "INHC"; GPIO1.associatedPins[4].pin.$assign = "PA28";
+GPIO1.associatedPins[5].$name = "INLC"; GPIO1.associatedPins[5].pin.$assign = "PA31";
+GPIO1.associatedPins[6].$name = "NSCS"; GPIO1.associatedPins[6].initialValue = "SET"; GPIO1.associatedPins[6].pin.$assign = "PA29";
+GPIO1.associatedPins[7].$name = "ENABLE"; GPIO1.associatedPins[7].pin.$assign = "PB21";
+
+GPIO2.$name = "IN";
+GPIO2.associatedPins[0].$name = "NFAULT"; GPIO2.associatedPins[0].direction = "INPUT";
+GPIO2.associatedPins[0].internalResistor = "PULL_UP"; GPIO2.associatedPins[0].pin.$assign = "PB25";
+
+SPI1.$name                      = "SPI_0";
+SPI1.targetBitRate              = 500000;
+SPI1.phase                      = "1";
+SPI1.dataSize                   = 16;
+SPI1.frameFormat              = "MOTO3";
+SPI1.chipSelect                 = [];
+SPI1.peripheral.$assign         = "UC2";
+SPI1.peripheral.sclkPin.$assign = "PB18";
+SPI1.peripheral.mosiPin.$assign = "PB17";
+SPI1.peripheral.misoPin.$assign = "PB19";
+SPI1.misoPinConfig.enableConfig     = true;
+SPI1.misoPinConfig.internalResistor = "PULL_UP";
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;
+const ProjectConfig              = scripting.addModule("/ti/project_config/ProjectConfig", {}, false);
+ProjectConfig.migrationCondition = true;

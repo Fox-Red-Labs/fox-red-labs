@@ -1,0 +1,23 @@
+--- m3_exec.h
++++ m3_exec.h
+@@ -911,11 +911,17 @@
+ 
+         if (M3_LIKELY(numPagesToGrow))
+         {
+-            u32 requiredPages = memory->numPages + numPagesToGrow;
++            // 64-bit sum: with 1-byte pages numPages can be near 2^32 and the 32-bit sum wraps to a small count (a silent shrink)
++            u64 requiredPages = (u64) memory->numPages + (u64) (u32) numPagesToGrow;
+ 
+-            M3Result r = ResizeMemory (runtime, requiredPages);
+-            if (r)
++            if (requiredPages > memory->maxPages)
+                 _r0 = -1;
++            else
++            {
++                M3Result r = ResizeMemory (runtime, (u32) requiredPages);
++                if (r)
++                    _r0 = -1;
++            }
+ 
+             _mem = memory->mallocated;
+         }

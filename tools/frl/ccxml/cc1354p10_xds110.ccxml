@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- frl template, {SERIAL} filled at run time. Built from TI's own ccs_base/arm/cc13xx_cc26xx_2pin_cJTAG_XDS110.ccxml: ICEPick router driver plus
+     2-pin cJTAG. Without the ICEPick driver, DSLite reports "An invalid processor ID has been found". -->
+<configurations XML_version="1.2" id="configurations_0">
+	<configuration XML_version="1.2" id="configuration_0">
+		<instance XML_version="1.2" desc="Texas Instruments XDS110 USB Debug Probe" href="connections/TIXDS110_Connection.xml" id="Texas Instruments XDS110 USB Debug Probe" xml="TIXDS110_Connection.xml" xmlpath="connections"/>
+		<connection XML_version="1.2" id="Texas Instruments XDS110 USB Debug Probe">
+			<instance XML_version="1.2" href="drivers/tixds510icepick_c.xml" id="drivers" xml="tixds510icepick_c.xml" xmlpath="drivers"/>
+			<instance XML_version="1.2" href="drivers/tixds510cs_dap.xml" id="drivers" xml="tixds510cs_dap.xml" xmlpath="drivers"/>
+			<instance XML_version="1.2" href="drivers/tixds510cortexM33.xml" id="drivers" xml="tixds510cortexM33.xml" xmlpath="drivers"/>
+			<instance XML_version="1.2" href="drivers/tixds510sec_ap.xml" id="drivers" xml="tixds510sec_ap.xml" xmlpath="drivers"/>
+			<property Type="choicelist" Value="4" id="SWD Mode Settings">
+				<choice Name="cJTAG (1149.7) 2-pin advanced modes" value="enable">
+					<property Type="choicelist" Value="1" id="XDS110 Aux Port"/>
+				</choice>
+			</property>
+			<!-- Pick the probe by serial number. Several XDS110 probes share this Mac. -->
+			<property Type="choicelist" Value="1" id="SEPK.POD_PORT">
+				<choice Name="Select by serial number" value="1">
+					<property Type="stringfield" Value="{SERIAL}" id="SEPK.POD_SERIAL"/>
+				</choice>
+			</property>
+			<platform XML_version="1.2" id="platform_0">
+				<instance XML_version="1.2" desc="CC1354P10" href="devices/cc1354p10.xml" id="CC1354P10" xml="cc1354p10.xml" xmlpath="devices"/>
+			</platform>
+		</connection>
+	</configuration>
+</configurations>

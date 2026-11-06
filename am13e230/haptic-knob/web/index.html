@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Haptic knob: setup and live view</title>
+<style>
+body{font-family:Barlow,system-ui,sans-serif;background:#f4efe6;color:#161312;max-width:820px;margin:20px auto;padding:0 16px}
+button{font:inherit;padding:10px 16px;border:2px solid #161312;background:#fff;border-radius:6px;cursor:pointer}
+button.go{background:#b42418;color:#fff;border-color:#b42418}button.stop{background:#161312;color:#fff}
+.card{background:#fff;border:1px solid #6b625b;border-radius:8px;padding:14px;margin:12px 0}.row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.big{font-size:34px;font-weight:700}.dim{color:#6b625b}pre{background:#161312;color:#f4efe6;padding:10px;border-radius:6px;min-height:80px;max-height:160px;overflow:auto}
+select,input[type=range]{font:inherit}label{display:block}canvas{background:#fff}
+</style></head><body>
+<h1>Haptic knob</h1>
+<p class="dim">Chrome or Edge. Serve this folder with <code>python3 -m http.server 8000</code>, open <code>http://localhost:8000/</code>. Close any other program using the LaunchPad serial port first.</p>
+<div class="card row"><button id="conn">Connect serial port</button><span id="link" class="dim">Not connected</span></div>
+<div class="card"><b>Before you press Start</b>
+<label><input type="checkbox" class="chk"> The 12 V supply is on, the motor shaft is free and my hands, hair and cables are clear of it</label>
+<label><input type="checkbox" class="chk"> I am at the bench and can pull the 12 V plug</label>
+<div class="row" style="margin-top:10px"><button class="go" id="start" disabled>Start (20 s)</button><button class="stop" id="stopb" disabled>STOP</button>
+<span id="state" class="dim">idle</span><span class="dim" id="left"></span></div>
+<p class="dim">The board ends the run by itself after 20 s. Stop sends "s"; unplugging the 12 V supply is the real emergency stop.</p></div>
+<div class="card row"><canvas id="dial" width="260" height="260"></canvas>
+<div><div class="dim">Angle</div><div class="big" id="ang">-</div><div class="dim">Hall sectors</div><div class="big" id="net">-</div>
+<div class="dim">Torque duty</div><div class="big" id="duty">-</div></div>
+<div><label>Detents per turn <select id="det"><option>2</option><option>3</option><option>4</option><option>6</option><option>8</option><option selected>12</option></select></label>
+<label>Strength <input id="str" type="range" min="1" max="10" value="5"> <span id="strv">5</span></label>
+<p class="dim">The Hall sensors give 24 steps a turn (15 degrees each). The detents are a coarse spring in those steps, so they feel like clicks, not a smooth notch.</p></div></div>
+<pre id="log"></pre>
+<script>
+const $=id=>document.getElementById(id);let port,writer,running=false,t0=0,pend=null;
+const log=s=>{$('log').textContent=(s+'\n'+$('log').textContent).slice(0,3000)};
+const chk=()=>[...document.querySelectorAll('.chk')].every(c=>c.checked);
+document.querySelectorAll('.chk').forEach(c=>c.onchange=()=>$('start').disabled=!(port&&chk()&&!running));
+function dial(deg,det){const c=$('dial').getContext('2d'),r=110,x=130,y=130;c.clearRect(0,0,260,260);c.lineWidth=3;c.strokeStyle='#6b625b';
+ c.beginPath();c.arc(x,y,r,0,7);c.stroke();for(let i=0;i<det;i++){const a=i*2*Math.PI/det-Math.PI/2;c.beginPath();c.moveTo(x+r*Math.cos(a),y+r*Math.sin(a));c.lineTo(x+(r-14)*Math.cos(a),y+(r-14)*Math.sin(a));c.stroke()}
+ const a=deg*Math.PI/180-Math.PI/2;c.strokeStyle='#b42418';c.lineWidth=6;c.beginPath();c.moveTo(x,y);c.lineTo(x+(r-20)*Math.cos(a),y+(r-20)*Math.sin(a));c.stroke()}
+dial(0,12);
+async function send(s){if(writer)await writer.write(new TextEncoder().encode(s))}
+function params(){clearTimeout(pend);pend=setTimeout(async()=>{if(running){await send('D'+$('det').value+'\n');await send('W'+$('str').value+'\n')}},250)}
+$('det').onchange=params;$('str').oninput=()=>{$('strv').textContent=$('str').value;params()};
+$('conn').onclick=async()=>{try{port=await navigator.serial.requestPort();await port.open({baudRate:115200});writer=port.writable.getWriter();$('link').textContent='Connected';
+ $('start').disabled=!chk();read()}catch(e){log('error: '+e.message)}};
+$('start').onclick=async()=>{running=true;t0=performance.now();$('start').disabled=true;$('stopb').disabled=false;$('state').textContent='running';await send('H');setTimeout(params,300)};
+$('stopb').onclick=()=>send('s');
+async function read(){const rd=port.readable.getReader(),dec=new TextDecoder();let buf='';
+ for(;;){const {value,done}=await rd.read();if(done)break;buf+=dec.decode(value);let i;
+  while((i=buf.indexOf('\n'))>=0){const l=buf.slice(0,i).trim();buf=buf.slice(i+1);
+   if(l.startsWith('H,')){const p=l.split(',').map(Number);$('ang').textContent=p[3]+'°';$('net').textContent=p[2];$('duty').textContent=p[5]+' %';dial(p[3],p[6]);$('left').textContent=Math.max(0,20-p[1]/1000).toFixed(0)+' s left'}
+   else if(l.startsWith('haptic done')){running=false;$('state').textContent='ended: '+l.replace('haptic done ','');$('stopb').disabled=true;$('start').disabled=!chk();log(l)}
+   else if(l)log(l)}}}
+</script></body></html>

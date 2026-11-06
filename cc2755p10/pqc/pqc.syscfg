@@ -1,0 +1,18 @@
+// @cliArgs --board /ti/boards/LP_EM_CC2755P10 --rtos nortos
+// Post-quantum timing image for the LP-EM-CC2755P10: the bench's base configuration (LED, backchannel UART) and a custom
+// power policy that does nothing, so an idle CPU spins and the debugger can always attach. No TRNG: the timed calls are
+// the deterministic (derand) entry points with NIST ACVP inputs.
+
+var Power = scripting.addModule("/ti/drivers/Power");
+
+system.getScript("kernel_config_release.syscfg.js");
+
+var GPIO = scripting.addModule("/ti/drivers/GPIO");
+var gpio = GPIO.addInstance();
+gpio.$hardware = system.deviceData.board.components.LED0;
+gpio.$name = "CONFIG_GPIO_LED_0";
+
+var UART2 = scripting.addModule("/ti/drivers/UART2");
+var uart2 = UART2.addInstance();
+uart2.$hardware = system.deviceData.board.components.XDS110UART;
+uart2.$name = "CONFIG_UART2_0";

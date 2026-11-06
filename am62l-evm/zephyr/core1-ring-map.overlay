@@ -1,0 +1,12 @@
+/* The ring page (0x70813000 to 0x70814000) lies outside the image's RAM, so the MMU does not map it unless a devicetree node says so.
+ * A zephyr,memory-region node with a zephyr,memory-attr gets a flat page-table entry; attr 0 means Normal non-cacheable, so every store
+ * reaches the SRAM at once and Linux's uncached read of the same page sees it with no cache maintenance. Apply after sram-all.overlay. */
+#include <zephyr/dt-bindings/memory-attr/memory-attr.h>
+/ {
+	frl_ring: memory@70813000 {
+		compatible = "zephyr,memory-region";
+		reg = <0x70813000 0x1000>;
+		zephyr,memory-region = "FRL_RING";
+		zephyr,memory-attr = <0>;
+	};
+};

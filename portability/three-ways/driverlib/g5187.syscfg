@@ -1,0 +1,47 @@
+/**
+ * Three ways, DriverLib, LP-MSPM0G5187: ADC0 channel 2 on PA25 (header test pin, nothing connected) against the
+ * internal 2.5 V reference, UART0 (UC0) at 115200 on PA10/PA11 (backchannel), LED on PA17.
+ * 32 MHz SYSOSC, TI's default clock tree.
+ */
+//@cliArgs --device "MSPM0G518X" --package "LQFP-64(PM)" --part "Default"
+//@v2CliArgs --device "MSPM0G5187" --package "LQFP-64(PM)"
+// @cliArgs --board /ti/boards/LP_MSPM0G5187 --rtos nortos
+
+const Board  = scripting.addModule("/ti/driverlib/Board");
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const ADC12  = scripting.addModule("/ti/driverlib/ADC12", {}, false);
+const ADC121 = ADC12.addInstance();
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const GPIO1  = GPIO.addInstance();
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const VREF   = scripting.addModule("/ti/driverlib/VREF");
+
+ADC121.$name                      = "ADC12_0";
+ADC121.sampClkSrc                 = "DL_ADC12_CLOCK_SYSOSC";
+ADC121.sampClkDiv                 = "DL_ADC12_CLOCK_DIVIDE_8";
+ADC121.adcMem0chansel             = "DL_ADC12_INPUT_CHAN_2";
+ADC121.sampleTime0                = "125 us";
+ADC121.adcMem0vrefp               = "INTREF";
+ADC121.powerDownMode              = "DL_ADC12_POWER_DOWN_MODE_MANUAL";
+ADC121.peripheral.$assign         = "ADC0";
+
+GPIO1.$name                          = "GPIO_LEDS";
+GPIO1.port                           = "PORTA";
+GPIO1.associatedPins[0].$name        = "USER_LED";
+GPIO1.associatedPins[0].assignedPin  = "17";
+GPIO1.associatedPins[0].pin.$assign  = "PA17";
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UC0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+UART1.targetBaudRate           = 115200;
+
+VREF.basicIntVolt         = "DL_VREF_BUFCONFIG_OUTPUT_2_5V";
+VREF.advClockConfigEnable = true;
+VREF.advClkSrc            = "DL_VREF_CLOCK_BUSCLK";
+VREF.peripheral.$assign   = "VREF";
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;

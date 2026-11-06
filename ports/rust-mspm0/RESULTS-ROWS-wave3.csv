@@ -1,0 +1,13 @@
+board,test,variant,status,value,value_hi,runs,clock_mhz,conditions,date,source,checked,note
+mspm0l1306,blink_flash_bytes,rust-embassy,measured,2636,,1,32,blinky; embassy-mspm0 community HAL commit 7915b85a; rustc 1.99.1 -O s with LTO; text 2612 plus data 24 by tiarmsize; flashed and ran,2026-10-20,ports/rust-mspm0/README.md,linker,
+mspm0l1306,blink_ram_bytes,rust-embassy,measured,112,,1,32,blinky; data 24 plus bss 88; the stack is the rest of the 4096 B and is not counted,2026-10-20,ports/rust-mspm0/README.md,linker,
+mspm0l1306,port_flash_bytes,rust-uart-hello,measured,3744,,1,32,uart_hello; text 3720 plus data 24; blocking UART0 on PA8 and PA9 at 115200,2026-10-20,ports/rust-mspm0/README.md,linker,
+mspm0l1306,port_ram_bytes,rust-uart-hello,measured,148,,1,32,uart_hello; data 24 plus bss 124; stack not counted,2026-10-20,ports/rust-mspm0/README.md,linker,
+mspm0l1306,blink_build,rust-cold,measured,107,,1,32,"cargo build --release with CARGO_HOME and target folder empty, so every crate downloaded and built; both programs",2026-10-20,ports/rust-mspm0/README.md,host-clock,
+mspm0l1306,blink_build,rust-incremental,measured,3.05,,1,32,cargo build --release --bin blinky after touching the source,2026-10-20,ports/rust-mspm0/README.md,host-clock,
+mspm0l1306,blink_flash,rust-openocd,measured,2.6,,1,32,blinky ELF programmed and read back through tools/bench/run.py; uart_hello took 2.9,2026-10-20,ports/rust-mspm0/README.md,host-clock,run.py flash_s field 4.0 includes the tool start
+mspm0l1306,time_to_blink,rust-from-nothing,measured,160,,1,32,"rustup minimal install 50 s plus cold build 107 s plus flash 2.6 s; machine time only, no hands-on timing",2026-10-20,ports/rust-mspm0/README.md,host-clock,about 2.7 minutes
+mspm0l1306,rust_install_size_mb,rustup-minimal,measured,602,,1,32,du of ~/.rustup 591508 kB plus ~/.cargo/bin 12652 kB; target thumbv6m-none-eabi; download size not measured,2026-10-20,ports/rust-mspm0/README.md,du,
+mspm0l1306,build_cache_size_mb,embassy-cache,measured,231,,1,32,downloaded crates and git checkout 121 MB plus one release build folder 110 MB,2026-10-20,ports/rust-mspm0/README.md,du,
+mspm0l1306,blink_led_pin,rust-embassy,measured,5,,1,32,"tools/check/blink.py: PA0 output enabled, 12 samples over 3 s, 5 changes, PASS; camera could not isolate one LED among many boards",2026-10-20,ports/rust-mspm0/README.md,probe-gpio,
+mspm0l1306,uart_hello_console,rust-embassy,ran,,,1,32,"console shows 'Hello from Rust on MSPM0L1306' then t=1, t=2 ... at two lines a second on /dev/cu.usbmodemML1300011",2026-10-20,ports/rust-mspm0/README.md,console,

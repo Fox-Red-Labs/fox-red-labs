@@ -1,0 +1,23 @@
+{
+ "name": "DRV8376EVM evaluation module",
+ "sources": "DRV8376EVM user's guide SLVUD20 (October 2024; Figure 2-1 board, Figure 2-4 Hall block, Tables 2-1 and 2-2 headers, section 2.6 resistors, Figure 4-1 schematic); DRV8376 data sheet SLVSHD4A (March 2025). Read 2026-10-15.",
+ "columns": [
+  {"head": "The chip: DRV8376", "items": [
+   ["Power stage: three half-bridges", "Six MOSFETs in one chip, 0.4 ohm on-resistance each pair, 4.5 to 65 V, 4.5 A peak; up to 100 kHz PWM"],
+   ["Control: 6x or 3x PWM", "A microcontroller gives it the gate signals; the chip does not commutate by itself. Mode set by a resistor"],
+   ["Current sense: built in", "Three amplifiers on the low sides, gain 0.4 to 5 V per V by resistor, outputs on the headers"],
+   ["Regulators: 3.3 V and 5 V", "30 mA each, enough for the Hall sensors and the sense dividers"]
+  ]},
+  {"head": "Protection inside", "items": [
+   ["Overcurrent", "4.5 A or 2 A by resistor; reported on nFAULT, retries on its own"],
+   ["Current limit", "ILIMIT pin: a divider, a DAC from the LaunchPad, or off, by jumper J4"],
+   ["Undervoltage, overtemperature, shoot-through", "Dead time under 200 ns inserted by the chip; nFAULT goes low on any fault"],
+   ["Sleep and off", "nSLEEP low puts it to sleep (a 20 to 40 us pulse clears faults); DRVOFF high floats every output"]
+  ]},
+  {"head": "On the board, and missing", "items": [
+   ["On the board", "Screw terminals for VBAT, PGND, OUT A, B, C; five-way Hall block with a supply jumper J13; VM, AVDD, GVDD, MCU and NFAULT LEDs; voltage dividers on VM and the three phases; reverse-polarity protection; 40-pin LaunchPad sockets"],
+   ["Missing", "No microcontroller, no supply, no motor. Made for the LAUNCHXL-F280049C; the same socket positions carry MCPWM4 on the LP-AM13E230"],
+   ["Watch out", "A borrowed board may not be in the shipped setting: the PWM mode, gain and overcurrent level are resistors R53 to R60. Our program reads the mode at start"]
+  ]}
+ ]
+}

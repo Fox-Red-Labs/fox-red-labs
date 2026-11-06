@@ -1,0 +1,9 @@
+# What was flashed on 2026-10-08, in order (LP-EM-CC2340R5, probe attached, Intel Mac macOS 15.7.9).
+# Flash: UniFlash 9.6.0 dslite.sh --mode flash -e -f -u <hex>; then the probe's xds110reset; serial captured for
+# 8 to 12 s at 115200 baud; then a Bluetooth scan from the Mac (bleak). CCFG byte = the byte at 0x4E02001C in the hex.
+# Copied from the console of that session; the result files are beside this one.
+1  our BTHome beacon, heap 2048, CCFG byte changed to 0x07 and checksums recomputed   -> serial-arena.txt, scan-arena.txt: boots, "FRL Temp" seen
+2  our BTHome beacon, heap 2048, as built (CCFG byte 0x0F, the fork's own)            -> serial-arena-asbuilt.txt, scan-arena-asbuilt.txt: boots, "FRL Temp" seen
+3  TI's peripheral sample, heap 2048: did not link, "region `RAM' overflowed by 346 bytes"; rebuilt with heap 1024
+4  TI's beacon sample, heap 2048, as built (CCFG byte 0x0F)                           -> serial-beacon-arena.txt, scan-beacon-arena.txt: prints "Beacon started", then a HARD FAULT; scan for "Test beacon" found 0 devices
+5  TI's peripheral sample, heap 1024, as built (CCFG byte 0x0F)                       -> serial-periph-arena.txt, scan-periph-arena.txt: "Advertising successfully started", seen on air

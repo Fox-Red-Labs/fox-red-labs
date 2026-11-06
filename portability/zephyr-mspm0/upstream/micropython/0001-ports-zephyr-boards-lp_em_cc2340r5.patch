@@ -1,0 +1,83 @@
+diff --git a/ports/zephyr/boards/lp_em_cc2340r5.conf b/ports/zephyr/boards/lp_em_cc2340r5.conf
+new file mode 100644
+index 0000000..2c38ba2
+--- /dev/null
++++ b/ports/zephyr/boards/lp_em_cc2340r5.conf
+@@ -0,0 +1,19 @@
++# Hardware features.
++CONFIG_GPIO=y
++CONFIG_ADC=y
++CONFIG_PWM=y
++CONFIG_I2C=y
++CONFIG_SPI=y
++
++# 36 kB of RAM: no networking, sensors, shell helpers or file systems.
++CONFIG_NETWORKING=n
++CONFIG_SENSOR=n
++CONFIG_THREAD_ANALYZER=n
++CONFIG_NET_BUF_POOL_USAGE=n
++CONFIG_MICROPY_VFS_FAT=n
++CONFIG_MICROPY_VFS_LFS2=n
++
++# MicroPython config.
++CONFIG_MICROPY_CONFIG_ROM_LEVEL_BASIC_FEATURES=y
++CONFIG_MICROPY_HEAP_SIZE=20480
++CONFIG_MAIN_STACK_SIZE=4096
+diff --git a/ports/zephyr/boards/lp_em_cc2340r5.overlay b/ports/zephyr/boards/lp_em_cc2340r5.overlay
+new file mode 100644
+index 0000000..d9f654c
+--- /dev/null
++++ b/ports/zephyr/boards/lp_em_cc2340r5.overlay
+@@ -0,0 +1,52 @@
++/*
++ * ADC channels for MicroPython's machine.ADC on the LP-EM-CC2340R5.
++ * The pins are already routed to the ADC by the board file (adc0_ch0..ch8).
++ * Channel number -> pin: 2 = DIO5, 3 = DIO2, 4 = DIO1, 6 = DIO25.
++ * Used as: -DEXTRA_DTC_OVERLAY_FILE=<this file>
++ */
++#include <zephyr/dt-bindings/adc/adc.h>
++
++/ {
++	zephyr,user {
++		io-channels = <&adc0 2>, <&adc0 3>, <&adc0 4>, <&adc0 6>;
++	};
++};
++
++&adc0 {
++	status = "okay";
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	channel@2 {
++		reg = <2>;
++		zephyr,gain = "ADC_GAIN_1";
++		zephyr,reference = "ADC_REF_VDD_1";
++		zephyr,vref-mv = <3300>;
++		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
++		zephyr,resolution = <12>;
++	};
++	channel@3 {
++		reg = <3>;
++		zephyr,gain = "ADC_GAIN_1";
++		zephyr,reference = "ADC_REF_VDD_1";
++		zephyr,vref-mv = <3300>;
++		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
++		zephyr,resolution = <12>;
++	};
++	channel@4 {
++		reg = <4>;
++		zephyr,gain = "ADC_GAIN_1";
++		zephyr,reference = "ADC_REF_VDD_1";
++		zephyr,vref-mv = <3300>;
++		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
++		zephyr,resolution = <12>;
++	};
++	channel@6 {
++		reg = <6>;
++		zephyr,gain = "ADC_GAIN_1";
++		zephyr,reference = "ADC_REF_VDD_1";
++		zephyr,vref-mv = <3300>;
++		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
++		zephyr,resolution = <12>;
++	};
++};

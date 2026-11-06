@@ -1,0 +1,18 @@
+# Serial capture, 115200 baud, copied from the capture file e3-arena-asbuilt-serial.bin with terminal colour codes removed. Lines before the first 'Booting' may be the previous image's output still in the probe's buffer.
+FRL BTHome: packet 2, count 2, update 0
+FRL BTHome: packet 3, count 3, update 0
+FRL BTHome: packet 4, count 4, update 0
+*** Booting Zephyr OS build cbababd4c1b4 ***
+FRL BTHome: starting
+[00:00:01.239,693] <inf> bt_hci_core: Identity: 40:F3:B0:xx:xx:xx (public)
+[00:00:01.239,768] <inf> bt_hci_core: HCI: version unknown (0x10) revision 0x0350, manufacturer 0x000d
+[00:00:01.239,842] <inf> bt_hci_core: LMP: version unknown (0x10) subver 0x0350
+FRL BTHome: bt_enable 0
+FRL BTHome: adv start 0, address 40:F3:B0:xx:xx:xx (public)
+*** Booting Zephyr OS build cbababd4c1b4 ***
+FRL BTHome: starting
+[00:00:00.117,153] <inf> bt_hci_core: Identity: 40:F3:B0:xx:xx:xx (public)
+[00:00:00.117,228] <inf> bt_hci_core: HCI: version unknown (0x10) revision 0x0350, manufacturer 0x000d
+[00:00:00.117,302] <inf> bt_hci_core: LMP: version unknown (0x10) subver 0x0350
+FRL BTHome: bt_enable 0
+FRL BTHome: adv start 0, address 40:F3:B0:xx:xx:xx (public)

@@ -1,0 +1,44 @@
+# When a reader files one of the three report forms, turn it into a row in data/community/reports.csv and
+# open a pull request with it, so a report is never retyped and never lost. The row says "reported"; a
+# lab changes that to reproduced or fixed after repeating it on the bench (data/community/README.md).
+name: Community report to row
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+
+# A form issue arrives with its labels, so GitHub sends "opened" and one "labeled" per label: run once per issue.
+concurrency:
+  group: community-report-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  row:
+    if: contains(github.event.issue.labels.*.name, 'report') && (github.event.action == 'opened' || github.event.label.name == 'report')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Issue to row
+        env:
+          ISSUE_JSON: ${{ toJSON(github.event.issue) }}
+        run: |
+          printf '%s' "$ISSUE_JSON" > /tmp/issue.json
+          python3 tools/community/issue_to_row.py /tmp/issue.json
+          python3 tools/community/check.py
+      - uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676  # v7, pinned to the commit the tag pointed at on 2026-10-12
+        with:
+          branch: report/issue-${{ github.event.issue.number }}
+          title: "Report from issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}"
+          commit-message: "Community report: issue #${{ github.event.issue.number }}"
+          body: |
+            One row added to `data/community/reports.csv` from issue #${{ github.event.issue.number }}, status `reported`.
+            Merge to show it on the page. After repeating it on the bench, change its status to `reproduced` or `fixed` and put the page that carries the fix in `link`.
+          labels: report

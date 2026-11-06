@@ -1,0 +1,19 @@
+/*
+ * The LP-EM-CC2340R5 board file already defines boosterpack_header.
+ * Pin 31 (display data/command) and pins 2, 5, 6, 8, 11, 19, 32 are not
+ * connected on this LaunchPad, so shields that need them stop at devicetree.
+ * SPI0: clock DIO18 (pin 7), data out DIO13 (pin 15), data in DIO12 (pin 14).
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/* The board file leaves out the flag mask, so active-low pins would not match. */
+&boosterpack_header {
+	gpio-map-mask = <0xffffffff 0xffffffc0>;
+	gpio-map-pass-thru = <0 0x3f>;
+};
+
+boosterpack_spi: &spi0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+};

@@ -1,0 +1,7 @@
+/* samples/basic/blinky on the red channel of the RGB LED (LED2, PA26, active high, jumper J12)
+ * instead of LED1 on PA0. Used by build.sh blinky-rgb-red. */
+/ {
+	aliases {
+		led0 = &led1;
+	};
+};

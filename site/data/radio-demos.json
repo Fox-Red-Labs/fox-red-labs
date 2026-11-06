@@ -1,0 +1,418 @@
+{
+ "note": "Written by mspm0g5187/radio/demos.py; one entry per demo, the latest run.",
+ "demos": {
+  "voice": {
+   "title": "Walkie-talkie, one way",
+   "text": "Hi Mom! This is Fox Red Labs, talking over a nine hundred fifteen megahertz radio. Over.",
+   "frames_sent": 122,
+   "frames_received": 122,
+   "frames_bit_exact": 121,
+   "audio_seconds": 6.1,
+   "codec": "IMA ADPCM, 4 bits, 8 kHz (32 kbps)",
+   "phy": "Wi-SUN FSK mode 2b, 100 kbps, 915 MHz",
+   "frame_ms": 50,
+   "frame_bytes": 205,
+   "latency_ms_median": 99.2,
+   "latency_ms_max": 135.0,
+   "radio_counters": "DONE D V,frames=122,crc_ok=122,sync=122,dropped=0",
+   "sent_wav": "media/radio-demos/voice-sent.wav",
+   "received_wav": "media/radio-demos/voice-received.wav",
+   "run": "2026-10-11",
+   "serial_note": "Frame 47 reached the radio already cut to 123 of its 205 bytes: the CC1354P10's serial input dropped characters while it was transmitting. The radio's checksum passed on all 122 frames, so what was sent over the air arrived intact.",
+   "audio_match": "The received recording matches the sent one sample for sample except 40 ms at 2.36 s, the frame that was cut before it was sent."
+  },
+  "fox": {
+   "title": "Fox hunt, hot and cold",
+   "beacon": "CC1407P on the LP-MSPM0G5187, 2-GFSK 50 kbps, 915 MHz",
+   "hunter": "LP-CC1354P10-1",
+   "method": "The beacon steps its power down, standing in for walking away; tested on one desk; range not measured",
+   "scale": {
+    "hot": "above -40 dBm",
+    "warm": "-60 to -40",
+    "cool": "-80 to -60",
+    "cold": "below -80"
+   },
+   "steps": [
+    {
+     "beacon_dbm": 14,
+     "amplifier": "high",
+     "heard": 8,
+     "of": 8,
+     "rssi": -34,
+     "heat": "hot"
+    },
+    {
+     "beacon_dbm": 10,
+     "amplifier": "low",
+     "heard": 8,
+     "of": 8,
+     "rssi": -35,
+     "heat": "hot"
+    },
+    {
+     "beacon_dbm": 4,
+     "amplifier": "low",
+     "heard": 8,
+     "of": 8,
+     "rssi": -41,
+     "heat": "warm"
+    },
+    {
+     "beacon_dbm": 0,
+     "amplifier": "low",
+     "heard": 8,
+     "of": 8,
+     "rssi": -46,
+     "heat": "warm"
+    },
+    {
+     "beacon_dbm": -6,
+     "amplifier": "low",
+     "heard": 8,
+     "of": 8,
+     "rssi": -56,
+     "heat": "warm"
+    },
+    {
+     "beacon_dbm": -12,
+     "amplifier": "low",
+     "heard": 8,
+     "of": 8,
+     "rssi": -62,
+     "heat": "cool"
+    },
+    {
+     "beacon_dbm": -20,
+     "amplifier": "low",
+     "heard": 8,
+     "of": 8,
+     "rssi": -65,
+     "heat": "cool"
+    },
+    {
+     "beacon_dbm": -30,
+     "amplifier": "low",
+     "heard": 8,
+     "of": 8,
+     "rssi": -78,
+     "heat": "cool"
+    }
+   ],
+   "run": "2026-10-11"
+  },
+  "battery": {
+   "title": "Far shed sensor: battery life",
+   "status": "computed",
+   "tx_ms_measured": 9.3,
+   "assumptions": "CC1407P 22 mA transmitting at +14 dBm and 0.8 uA standby (TI data sheet SWRS301); MSPM0G5187 5 mA for 30 ms per report and 2 uA asleep (assumed, not measured); sensors and regulator losses not counted",
+   "rows": [
+    {
+     "report_every_s": 1.04,
+     "avg_uA": 342.9,
+     "days_on_2_AA_2500mAh": 304,
+     "days_on_CR2032_225mAh": 27
+    },
+    {
+     "report_every_s": 10,
+     "avg_uA": 38.2,
+     "days_on_2_AA_2500mAh": 2729,
+     "days_on_CR2032_225mAh": 246
+    },
+    {
+     "report_every_s": 60,
+     "avg_uA": 8.7,
+     "days_on_2_AA_2500mAh": 11979,
+     "days_on_CR2032_225mAh": 1078
+    },
+    {
+     "report_every_s": 300,
+     "avg_uA": 4.0,
+     "days_on_2_AA_2500mAh": 26178,
+     "days_on_CR2032_225mAh": 2356
+    }
+   ],
+   "run": "2026-10-11"
+  },
+  "ring": {
+   "title": "Key finder: ring on demand",
+   "base": "LP-CC1354P10-1, with the ring command sent from the computer",
+   "handset": "CC1407P on the LP-MSPM0G5187, which blinks its LEDs",
+   "rings": 10,
+   "answered": 10,
+   "ms_median": 21,
+   "ms_max": 21,
+   "tries": [
+    {
+     "n": 0,
+     "found": true,
+     "ms": 21,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    },
+    {
+     "n": 1,
+     "found": true,
+     "ms": 20,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    },
+    {
+     "n": 2,
+     "found": true,
+     "ms": 21,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    },
+    {
+     "n": 3,
+     "found": true,
+     "ms": 21,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    },
+    {
+     "n": 4,
+     "found": true,
+     "ms": 21,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    },
+    {
+     "n": 5,
+     "found": true,
+     "ms": 21,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -20
+    },
+    {
+     "n": 6,
+     "found": true,
+     "ms": 20,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    },
+    {
+     "n": 7,
+     "found": true,
+     "ms": 21,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    },
+    {
+     "n": 8,
+     "found": true,
+     "ms": 21,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    },
+    {
+     "n": 9,
+     "found": true,
+     "ms": 21,
+     "sends": 1,
+     "rssi_at_handset": -19,
+     "rssi_at_base": -19
+    }
+   ],
+   "run": "2026-10-11",
+   "log_ms": [
+    21,
+    20,
+    21,
+    21,
+    21,
+    21,
+    20,
+    21,
+    21,
+    21
+   ],
+   "log_ms_median": 21,
+   "log_ms_max": 21,
+   "timing_note": "log_ms: from the ring command being written to the base's serial port to the handset's answer arriving on it, from the log's timestamps; ms in tries adds lab.py's own read pauses (about 300 ms)"
+  },
+  "node": {
+   "title": "Mailbox, doorbell, panic button, messages and keep-close tag",
+   "minutes": 4.0,
+   "stop_after_s": 0,
+   "tags_heard": 235,
+   "events": [
+    {
+     "t": 0.0,
+     "what": "parent sent: Dinner in 5",
+     "rssi": null
+    },
+    {
+     "t": 30.4,
+     "what": "parent sent: Coming!",
+     "rssi": null
+    },
+    {
+     "t": 60.71,
+     "what": "parent sent: Stay there",
+     "rssi": null
+    },
+    {
+     "t": 91.06,
+     "what": "parent sent: Dinner in 5",
+     "rssi": null
+    },
+    {
+     "t": 121.35,
+     "what": "parent sent: Coming!",
+     "rssi": null
+    },
+    {
+     "t": 151.72,
+     "what": "parent sent: Stay there",
+     "rssi": null
+    },
+    {
+     "t": 152.77,
+     "what": "EV MAIL closed",
+     "rssi": -15,
+     "ha_ms": 19
+    },
+    {
+     "t": 160.7,
+     "what": "EV MAIL open",
+     "rssi": -17,
+     "ha_ms": 20
+    },
+    {
+     "t": 164.87,
+     "what": "EV MAIL closed",
+     "rssi": -16,
+     "ha_ms": 16
+    },
+    {
+     "t": 174.3,
+     "what": "EV MAIL open",
+     "rssi": -19,
+     "ha_ms": 21
+    },
+    {
+     "t": 182.01,
+     "what": "parent sent: Dinner in 5",
+     "rssi": null
+    },
+    {
+     "t": 192.06,
+     "what": "EV BELL",
+     "rssi": -21,
+     "ha_ms": 28
+    },
+    {
+     "t": 199.99,
+     "what": "MSG I'm home",
+     "rssi": -15,
+     "ha_ms": 27
+    },
+    {
+     "t": 212.36,
+     "what": "parent sent: Coming!",
+     "rssi": null
+    },
+    {
+     "t": 214.99,
+     "what": "EV PANIC",
+     "rssi": -18,
+     "ha_ms": 12
+    }
+   ],
+   "handset_summary": [
+    "DONE ERR unknown"
+   ],
+   "run": "2026-10-11",
+   "window_note": "The 4-minute window closed 2 s after the panic button, so S2 presses after it were not captured; the messages were rerun in a separate 90-second window.",
+   "parent_messages_sent": 8,
+   "parent_messages_shown_on_handset": 7,
+   "tags_sent_by_handset": 237
+  },
+  "tag": {
+   "title": "Mailbox, doorbell, panic button, messages and keep-close tag",
+   "minutes": 0.6,
+   "stop_after_s": 15.0,
+   "tags_heard": 15,
+   "events": [
+    {
+     "t": 0.0,
+     "what": "tag switched off (test)",
+     "rssi": null
+    },
+    {
+     "t": 3.01,
+     "what": "tag out of range",
+     "rssi": null
+    }
+   ],
+   "handset_summary": [
+    "DONE ERR unknown"
+   ],
+   "run": "2026-10-11"
+  },
+  "messages": {
+   "title": "Mailbox, doorbell, panic button, messages and keep-close tag",
+   "minutes": 1.5,
+   "stop_after_s": 0,
+   "tags_heard": 67,
+   "events": [
+    {
+     "t": 0.0,
+     "what": "MSG I'm home",
+     "rssi": -25,
+     "ha_ms": 14
+    },
+    {
+     "t": 0.68,
+     "what": "MSG Come outside",
+     "rssi": -26,
+     "ha_ms": 16
+    },
+    {
+     "t": 1.28,
+     "what": "MSG Dinner?",
+     "rssi": -26,
+     "ha_ms": 17
+    },
+    {
+     "t": 3.63,
+     "what": "MSG I'm home",
+     "rssi": -24,
+     "ha_ms": 17
+    },
+    {
+     "t": 5.1,
+     "what": "MSG Come outside",
+     "rssi": -25,
+     "ha_ms": 13
+    },
+    {
+     "t": 6.47,
+     "what": "MSG Dinner?",
+     "rssi": -25,
+     "ha_ms": 14
+    },
+    {
+     "t": 11.56,
+     "what": "tag out of range",
+     "rssi": null
+    }
+   ],
+   "handset_summary": [
+    "DONE ERR unknown"
+   ],
+   "run": "2026-10-11",
+   "end_note": "The 'tag out of range' event at the end is the handset's loop ending with the window, not a radio loss."
+  }
+ }
+}

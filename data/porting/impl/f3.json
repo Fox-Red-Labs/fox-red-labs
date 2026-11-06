@@ -1,0 +1,307 @@
+{
+ "target": "TI CC23xx (F3, TI Drivers and BLE5-Stack)",
+ "impl": [
+  {
+   "idiom": "gpio.write",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "MSPM0 source: one line in the force-included header maps DL_GPIO_clearPins on the LED pin to GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON).",
+   "trap": "The LED alias and the DriverLib LED mapping are the lines most likely to change behavior.",
+   "check": "LED level on the pin",
+   "glue": "portability/shim/mspm0_on_f3/fr_mspm0_on_f3.h",
+   "proof": [
+    {
+     "port": "mspm0-to-f3",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "10 of 10 driver examples build; the first 5 ran on the CC2340R5",
+     "path": "portability/shim/mspm0_on_f3/fr_mspm0_on_f3.h"
+    }
+   ],
+   "status": "built",
+   "id": "f3:gpio.write/default"
+  },
+  {
+   "idiom": "gpio.config_pin",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "GPIO_CFG_HIZ_ON and GPIO_CFG_HIZ_OFF are defined as 0: F3 pins default to input with no pull.",
+   "trap": "A dropped flag can change behavior on a pin that was meant to float high impedance.",
+   "check": "read the pin level with and without a load",
+   "glue": "portability/shim/mspm0_on_f3/fr_mspm0_on_f3.h",
+   "proof": [
+    {
+     "port": "mspm0-to-f3",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "gpio_interrupt twin builds",
+     "path": "portability/shim/mspm0_on_f3/fr_mspm0_on_f3.h"
+    }
+   ],
+   "status": "built",
+   "id": "f3:gpio.config_pin/default"
+  },
+  {
+   "idiom": "uart.driver_api",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "UART_open, UART_read, UART_write and ten more are renamed to the UART2_ calls, one #define each; the board names CONFIG_UART_0 and CONFIG_UART_BAUD_RATE get one line each.",
+   "check": "same echo as the original driver example",
+   "glue": "portability/shim/mspm0_on_f3/fr_mspm0_on_f3.h",
+   "proof": [
+    {
+     "port": "mspm0-to-f3",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "uart_echo and uart_callback twins build; the first 5 of 10 apps ran",
+     "path": "portability/shim/mspm0_on_f3/fr_mspm0_on_f3.h"
+    }
+   ],
+   "status": "built",
+   "id": "f3:uart.driver_api/default"
+  },
+  {
+   "idiom": "ble.stack_init",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Start from TI's basic_ble example (SimpleLink Low Power F3 SDK 9.21.00.36) and apply one patch; the stack starts from SysConfig.",
+   "check": "device advertises",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "image advertises",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/board/basic_ble.base.patch"
+    }
+   ],
+   "status": "proven",
+   "id": "f3:ble.stack_init/default"
+  },
+  {
+   "idiom": "ble.gatt_characteristic",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "A static gattAttribute_t table (GATT_BT_ATT entries) with property bytes and permissions such as GATT_PERMIT_ENCRYPT_READ.",
+   "trap": "The table's value pointers are const: copy the descriptor into static storage that exists at link time.",
+   "check": "client reads it; properties match",
+   "glue": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "attribute table builds into the 193,995 B image",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c"
+    }
+   ],
+   "status": "built",
+   "id": "f3:ble.gatt_characteristic/default"
+  },
+  {
+   "idiom": "ble.hid_service",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "TI ships no HID over GATT service for the CC2340R5: write the service by hand (HID information, report map, control point, protocol mode, report with a report reference) on basic_ble.",
+   "degrades": "the link dropped 9 ms after encryption (reason 8) and did not return; no report was seen by a host",
+   "check": "host OS lists the device as HID and reads the report map",
+   "glue": "ports/ble-hid-remote/app/hid_remote.c",
+   "proof": [
+    {
+     "port": "ble-hid-remote",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "macOS lists it as Compatible LE HID; pairing accepted once",
+     "path": "ports/ble-hid-remote/runs/2026-10-12/bleak-connect.txt"
+    },
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "gamepad report map and report on the same pattern",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c"
+    }
+   ],
+   "status": "proven",
+   "id": "f3:ble.hid_service/default"
+  },
+  {
+   "idiom": "ble.hid_report_notify",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "redesign",
+   "replace": "GATT_PROP_NOTIFY on the input report plus the client configuration (gattCharCfg_t); report reference id 3, type input; notify after the core packs the report.",
+   "degrades": "not run against a host",
+   "check": "host receives the report bytes when subscribed",
+   "glue": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "builds; no host received a report",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c"
+    }
+   ],
+   "status": "built",
+   "id": "f3:ble.hid_report_notify/default"
+  },
+  {
+   "idiom": "ble.advertise",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Advertising set from SysConfig (flags, appearance 0x03C0, service UUIDs 0x1812 and 0x180F, name in the scan response).",
+   "check": "scanner sees name, appearance and UUIDs; advertises again after a disconnect",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "the Mac scan saw the advertisement; 4.1 callbacks per second",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c"
+    },
+    {
+     "port": "ble-hid-remote",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "122 packets in 75 s, appearance and UUIDs as set",
+     "path": "ports/ble-hid-remote/runs/2026-10-12/bleak-connect.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "f3:ble.advertise/default"
+  },
+  {
+   "idiom": "ble.device_info",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "TI's dev_info_service with the same strings as the original.",
+   "check": "client reads the same strings as the original",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "Device Information read by bleak equals the ESP32-C6's",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c"
+    }
+   ],
+   "status": "proven",
+   "id": "f3:ble.device_info/default"
+  },
+  {
+   "idiom": "ble.battery_service",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "TI's battery_server service.",
+   "check": "client reads the level",
+   "proof": [
+    {
+     "port": "ble-hid-remote",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "battery 100 read by bleak",
+     "path": "ports/ble-hid-remote/runs/2026-10-12/bleak-connect.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "f3:ble.battery_service/default"
+  },
+  {
+   "idiom": "ble.security_bonding",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Just Works pairing with GATT_PERMIT_ENCRYPT_READ on the HID attributes.",
+   "trap": "Two earlier pairing boxes with no click on Connect timed out after 30 s (SMP timeout).",
+   "degrades": "reconnect not proven",
+   "check": "host pairs, link encrypted, reconnect works",
+   "proof": [
+    {
+     "port": "ble-hid-remote",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "pairing accepted once, encrypted, then the link dropped",
+     "path": "ports/ble-hid-remote/runs/2026-10-12/bleak-connect.txt"
+    }
+   ],
+   "status": "proven",
+   "id": "f3:ble.security_bonding/default"
+  },
+  {
+   "idiom": "console.print",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "Display_printf(dispHandle, 0, 0, ...) on the UART display that the example's menu module opens; it adds the line end, so collect text up to each newline.",
+   "check": "same text on the host terminal",
+   "glue": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "ran",
+     "what": "MAP and RPT1 to RPT4 lines read over the console equal the C6's",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c"
+    }
+   ],
+   "status": "proven",
+   "id": "f3:console.print/default"
+  },
+  {
+   "idiom": "ble.gatt_server",
+   "families": [
+    "F3"
+   ],
+   "variant": "default",
+   "difficulty": "adapter",
+   "replace": "TI's stack has one GATT server: initialise the client configuration (GATTServApp_InitCharCfg) and register the attribute table with GATTServApp_RegisterService and a gattServiceCBs_t holding the read and write callbacks.",
+   "check": "services listed by a client",
+   "glue": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c",
+   "proof": [
+    {
+     "port": "esp32-ble-gamepad",
+     "board": "cc2340r5",
+     "level": "built",
+     "what": "service registers in the image that advertises",
+     "path": "ports/esp32-ble-gamepad/boards/cc2340r5/board/hid_gamepad.c"
+    }
+   ],
+   "status": "built",
+   "id": "f3:ble.gatt_server/default"
+  }
+ ]
+}

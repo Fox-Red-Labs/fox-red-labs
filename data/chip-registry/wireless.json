@@ -1,0 +1,1890 @@
+{
+ "generated": "2026-10-24",
+ "scope": "SimpleLink wireless families: CC13x0/CC26x0, CC13x2/CC26x2, CC13x2x7/CC26x2x7, CC13x1/CC26x1, CC13x4/CC26x4, CC23xx, CC27xx, CC32xx, CC33xx, CC35xx. Research only; no board was touched. Sources: CCStudio 21.0.1 targetdb and GEL, UniFlash 9.6.0 (DSLite, propertyDB, target_setup.json), xPack OpenOCD 0.12.0-7 scripts, TI's OpenOCD fork scripts and driver source (ti-release cb22a31e), SimpleLink Low Power F3 SDK 9.21.00.36, F2 SDK 8.33.00.16 (archived copy), Wi-Fi Toolbox 4.3.23, TI datasheets SWRS181D, SWRS204C, SWRS207J, SWRS215E, SWRS253B, SWRS258B, SWRS267B, SWRS268B, SWRS272F, SWRS294F, SWRS304D, SWRS306E, SWRS337B and TRMs SWCU117I, SWCU185G, SWCU192, SWCU193A, SWCU194, SWCU195A. Repo measured facts are cited by path. 'unknown' means no file read answers it.",
+ "probe_sequence": [
+  {
+   "step": 1,
+   "do": "Read what the probe is (XDS110 on a LaunchPad, external LP-XDS110, CMSIS-DAP on others). Do not pick a tool by the user's word.",
+   "source": "data/routes.json"
+  },
+  {
+   "step": 2,
+   "do": "Try JTAG (with the cJTAG-to-4-pin escape sequence on XDS110) and read the ICEPick IDCODE (IR 0x04). Mask 0x0FFFFFFF. A hit in {0x0B99A02F, 0x0B9BE02F, 0x0BB4102F, 0x0BB7702F, 0x0BB7A02F, 0x0BB7802F} identifies the CC13xx/CC26xx subfamily. These chips do not answer SWD.",
+   "source": "SWCU194 6.2, 6.3, Table 11-70; TRDB aet_trace_platform.xml"
+  },
+  {
+   "step": 3,
+   "do": "If JTAG is silent, wake SWD from dormant (selection alert, activation 0x1A, line reset) and read DPIDR. 0x2BA01477 (TI's cfg expectation for CC23xx) or 0x6BA02477 (measured on a CC2755P10) means CC23xx or CC27xx; 0x4BA02477 with AP0 0x102E0001 means CC35xx. Then read CFG-AP DEVICEID and apply the mask.",
+   "source": "docs/research/webflash-cc-wireless-2026-10-14.md; TI fork ti_cc23xx.cfg"
+  },
+  {
+   "step": 4,
+   "do": "CC32xx: the SOP straps pick SWD (Fn2WJ) or 4-pin JTAG (Fn4WJ); try both, then expect DAP 0x2BA01477 (SWD) or 0x4BA00477 behind ICEPick 0x0B97C02F (JTAG).",
+   "source": "SWRS215E Table 8-6; xPack ti_cc32xx.cfg"
+  },
+  {
+   "step": 5,
+   "do": "Identify the member: CC13x4 USER_ID at 0x50000A94 (CC13 bit 23, PA bit 25, PKG 18:16); M3/M4 parts USER_ID at 0x50001294; CC23/CC27 PARTID variant byte (bits 23:16) through CFG-AP reg 0x04.",
+   "source": "SWCU194 Table 11-60; TI fork cc26xx.h; cc23xx.c, cc27xx.c"
+  },
+  {
+   "step": 6,
+   "do": "Writes: CC13xx/CC26xx use DSLite with the sector-level erase default and a main-flash-only image; no tool in the files writes CC23xx or CC27xx main flash without a chip erase except our community OpenOCD driver; CC35xx uses the Toolbox.",
+   "source": "this file, write_paths"
+  }
+ ],
+ "families": [
+  {
+   "family": "CC13x0",
+   "members": [
+    {
+     "part": "CC1310F32",
+     "partnum": "0xB9BE",
+     "jtag_idcode": "0x0B9BE02F",
+     "core": "Cortex-M3",
+     "flash_kb": 32,
+     "launchpads": []
+    },
+    {
+     "part": "CC1310F64",
+     "partnum": "0xB9BE",
+     "jtag_idcode": "0x0B9BE02F",
+     "core": "Cortex-M3",
+     "flash_kb": 64,
+     "launchpads": []
+    },
+    {
+     "part": "CC1310F128",
+     "partnum": "0xB9BE",
+     "jtag_idcode": "0x0B9BE02F",
+     "core": "Cortex-M3",
+     "flash_kb": 128,
+     "launchpads": []
+    },
+    {
+     "part": "CC1350F128",
+     "partnum": "0xB9BE",
+     "jtag_idcode": "0x0B9BE02F",
+     "core": "Cortex-M3",
+     "flash_kb": 128,
+     "launchpads": []
+    }
+   ],
+   "members_note": "Names and sizes: CCStudio targetdb devices cc1310f32/f64/f128/cc1350f128.xml (all use Modules/CC13xx/CC1350, FCFG1 WAFER_ID 0xb9be); SWRS181D lists 32 to 128 kB for CC1310. Still sold status not checked.",
+   "launchpads_unverified": [
+    "LAUNCHXL-CC1310",
+    "LAUNCHXL-CC1350"
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router (IR 6 bits) in front of the Cortex-M3 DAP (IDCODE 0x4BA00477). cJTAG 2-pin is the power-up default; 4-pin JTAG after the escape sequence. No SWD.",
+    "notes": "The XDS110 'SWD Mode Settings' value in the CCStudio device file is 4 = cJTAG 2-pin; OpenOCD's LaunchPad board file selects `transport select jtag` and runs ti_cjtag_to_4pin_jtag after reset. The CC13x0/CC26x0 TRM (SWCU117I) has no mention of SWD.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/cc1310f128.xml; xPack OpenOCD scripts/target/ti_cc13x0.cfg, ti-cjtag.cfg, board/ti_cc13x0_launchpad.cfg; SWCU117I (text search: 0 hits for SWD)"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick IR 0x04 (IDCODE)",
+     "field": "full 32 bits, version nibble ignored",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0B9BE02F",
+     "source": "CCStudio 21.0.1 ccs_base/emulation/analysis/xmldb/aet_config/aet_trace_platform.xml (cc13x0 0x0B9BE02F, mask 0x0FFFFFFF); TI OpenOCD fork scripts/target/ti_cc13x0.cfg (JRC_TAPID 0x0B9BE02F)"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x50001318 (FCFG1 ICEPICK_DEVICE_ID); 0x50001294 (FCFG1 USER_ID)",
+     "field": "WAFER_ID bits 27:12 = 0xB9BE",
+     "mask": "0x0FFFFFFF",
+     "source": "TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc26xx.h (FCFG1_ICEPICK_ID, FCFG1_USER_ID, CC13X0_ICEPICK_ID 0x0b9be02f); CCStudio Modules/CC13xx/CC1350/FCFG1.xml (WAFER_ID reset 0xb9be)"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 DSLite `flash` mode with a ccxml that names the XDS110 and the ICEPick router. The device property file defaults FlashEraseSetting to 'Necessary Sectors Only (Retain untouched content within sector)'; other choices are All Unprotected Sectors, Specific Sectors and Do not erase sectors. KeepCcfgSetting (default 0) keeps the upper N bytes of the device CCFG. The setting id is the property id (`-s FlashEraseSetting=...`); the id spelling on the command line was not run. ",
+     "erase": "sector",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "True for an SDK .out or a hex that carries the CCFG region (measured on the CC1354P10: cc1354p10/AGENTS.md, a full .out load rewrote the CCFG with the SDK default). Expected false for a main-flash-only image; not run.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/<family>_FlashProperties.xml (FlashEraseSetting, KeepCcfgSetting); UniFlash 9.6.0 dslite.sh and scripts/flash.dsls (--setting id=value); UniFlash file_package_creator/templates for osx, win, linux"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "OpenOCD target target/ti_cc13x0.cfg (board/ti_cc13x0_launchpad.cfg) with `flash bank ... cc26xx`. The driver reads ICEPICK_DEVICE_ID at 0x50001318 and USER_ID at 0x50001294 and downloads a helper algorithm to RAM. JRC TAP ID in the cfg: 0x0B9BE02F (version ignored). LaunchPad board files use `transport select jtag` through the XDS110. Whether the driver erases per sector or per bank was not read; not run on our bench.",
+     "erase": "unknown",
+     "touches_ccfg": null,
+     "touches_ccfg_note": "unknown: the driver source was not read for CCFG handling",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_cc26x0.cfg, ti_cc13x2.cfg, ti_cc26x2.cfg; TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc26xx.c, cc26xx.h"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM serial bootloader over UART0 or SPI0, same packet protocol on both. Command set not read for this family; the CC13x4 command list (SWCU194 10.2.3) includes SECTOR_ERASE and MEMORY_READ. It runs only when CCFG BOOTLOADER_ENABLE allows it and either no valid image is present or the CCFG backdoor pin is asserted. The SDK's default ccfg.c leaves BOOTLOADER_ENABLE commented out (disabled). No TI host tool for it was found in the installed or archived SDK copies; community tools exist (not verified here).",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "COMMAND_SECTOR_ERASE and COMMAND_DOWNLOAD touch only the addresses sent; COMMAND_SET_CCFG exists and is not needed.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SWCU117I ROM bootloader chapter (not read in detail here); UniFlash 9.6.0 DebugServer/propertyDB/BL_CC13xxCC26xx_FlashProperties.xml lists a UniFlash serial-bootloader target 'CC1310F128(Bootloader)'"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CCFG",
+     "range": "last flash sector (device-dependent; memory-mapped register view at 0x50003000)",
+     "why": "Boot configuration: image-valid flag, bootloader enable and backdoor pin, debug-port (TAP) locks, chip-erase disable, sector write protection. A wrong CCFG can disable the ROM bootloader or lock the debug port.",
+     "source": "SWCU185G / SWCU117I CCFG chapters; CCStudio targetdb devices/cc2652r1f.xml (CCFG module at 0x50003000); UniFlash 9.6.0 DebugServer/propertyDB/BL_CC13xxCC26xx_FlashProperties.xml (Lock CPU TAP, Disable Chip Erase, Disable Bootloader)"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Debugger connects only in the first seconds after power-on, then Error -242 (measured on the CC1354P10)",
+     "fix": "Power-cycle the probe's USB port and connect at once; or xds110reset. A running program that sleeps or reconfigures the debug pins closes the window.",
+     "source": "cc1354p10/AGENTS.md, cc1354p10/TRAPS.md"
+    },
+    {
+     "symptom": "CPU DAP or TAP locked by the CCFG",
+     "fix": "Only a mass erase reopens it: CCStudio GEL MassErase() (cc26x4_xds.gel) or `dslite --mode cc13xx-cc26xx-mass-erase -d XDS110`. This is a mass erase and CCFG rewrite: forbidden for the tool by default; owner approval only.",
+     "source": "CCStudio ccs_base/emulation/gel/cc26x4_xds.gel; UniFlash 9.6.0 dslite.sh --listMode; UniFlash quick start guide, 'CC13xx/CC26xx Mass Erase from CLI'"
+    },
+    {
+     "symptom": "No valid image and no debug access",
+     "fix": "If the CCFG enabled the ROM bootloader, use it over UART0 (sector erase and memory read are available). Keep the board's BL_CONFIG when rewriting a CCFG so this route stays.",
+     "source": "SWCU194 section 10.1 and 10.2.3; cc1354p10/AGENTS.md"
+    }
+   ],
+   "probe": {
+    "launchpad": "XDS110 on the LaunchPad: try JTAG (cJTAG to 4-pin sequence) and read the ICEPick IDCODE; do not try SWD.",
+    "bare_chip": "XDS110 or XDS200 on TMS/TCK (cJTAG); 4-pin JTAG adds TDI/TDO."
+   },
+   "unknowns": [
+    "Per-sector behavior and CCFG handling of OpenOCD's cc26xx driver (source not read for erase/CCFG logic).",
+    "Whether UniFlash 9.6.0 DSLite CLI can drive the '(Bootloader)' serial targets or only the GUI.",
+    "Parts still in production: not checked."
+   ]
+  },
+  {
+   "family": "CC26x0 (including CC2640R2)",
+   "members": [
+    {
+     "part": "CC2620F128",
+     "partnum": "0xB99A",
+     "jtag_idcode": "0x0B99A02F",
+     "core": "Cortex-M3",
+     "flash_kb": 128,
+     "launchpads": []
+    },
+    {
+     "part": "CC2630F128",
+     "partnum": "0xB99A",
+     "jtag_idcode": "0x0B99A02F",
+     "core": "Cortex-M3",
+     "flash_kb": 128,
+     "launchpads": []
+    },
+    {
+     "part": "CC2640F128",
+     "partnum": "0xB99A",
+     "jtag_idcode": "0x0B99A02F",
+     "core": "Cortex-M3",
+     "flash_kb": 128,
+     "launchpads": []
+    },
+    {
+     "part": "CC2650F128",
+     "partnum": "0xB99A",
+     "jtag_idcode": "0x0B99A02F",
+     "core": "Cortex-M3",
+     "flash_kb": 128,
+     "launchpads": [],
+     "note": "A LAUNCHXL-CC2650 is named twice in repo docs; not a bench board."
+    },
+    {
+     "part": "CC2640R2F",
+     "partnum": "0xB99A",
+     "jtag_idcode": "0x0B99A02F",
+     "core": "Cortex-M3",
+     "flash_kb": 128,
+     "launchpads": []
+    },
+    {
+     "part": "CC2640R2L",
+     "partnum": "0xB99A",
+     "jtag_idcode": "0x0B99A02F",
+     "core": "Cortex-M3",
+     "flash_kb": null,
+     "launchpads": [],
+     "note": "flash size not read"
+    }
+   ],
+   "members_note": "CCStudio targetdb devices cc2620/2630/2640/2650f128.xml use Modules/CC26xx/CC2650 and cc2640r2f/r2l.xml use CC26x0R2F; both FCFG1.xml carry WAFER_ID 0xb99a. CC2640R2F flash 128 kB: SWRS204C device table. TI's fork driver also names an ICEPick ID 0x0B9BD02F (CC26X1_ICEPICK_ID) that no CCStudio file matches; part unknown.",
+   "launchpads_unverified": [
+    "LAUNCHXL-CC2650",
+    "LAUNCHXL-CC2640R2"
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router then Cortex-M3 DAP 0x4BA00477. cJTAG 2-pin default, 4-pin JTAG after escape. No SWD.",
+    "notes": "Same as CC13x0. SWCU117I has 0 mentions of SWD.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/cc2650f128.xml, cc2640r2f.xml (SWD Mode Settings 4 = cJTAG); xPack scripts/target/ti_cc26x0.cfg (default JRC_TAPID 0x0B99A02F), board/ti_cc26x0_launchpad.cfg"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick IR 0x04",
+     "field": "version ignored",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0B99A02F",
+     "source": "CCStudio 21.0.1 ccs_base/emulation/analysis/xmldb/aet_config/aet_trace_platform.xml (cc26x0 0x0B99A02F); SWCU117I section 9.2.2.1.51 ICEPICK_DEVICE_ID reset BB99A02Fh (PG_REV field Bh)"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x50001318 / 0x50001294",
+     "field": "WAFER_ID 0xB99A",
+     "mask": "0x0FFFFFFF",
+     "source": "TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc26xx.h (CC26X0_ICEPICK_ID 0x0b99a02f)"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 DSLite `flash` mode with a ccxml that names the XDS110 and the ICEPick router. The device property file defaults FlashEraseSetting to 'Necessary Sectors Only (Retain untouched content within sector)'; other choices are All Unprotected Sectors, Specific Sectors and Do not erase sectors. KeepCcfgSetting (default 0) keeps the upper N bytes of the device CCFG. The setting id is the property id (`-s FlashEraseSetting=...`); the id spelling on the command line was not run. ",
+     "erase": "sector",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "True for an SDK .out or a hex that carries the CCFG region (measured on the CC1354P10: cc1354p10/AGENTS.md, a full .out load rewrote the CCFG with the SDK default). Expected false for a main-flash-only image; not run.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/<family>_FlashProperties.xml (FlashEraseSetting, KeepCcfgSetting); UniFlash 9.6.0 dslite.sh and scripts/flash.dsls (--setting id=value); UniFlash file_package_creator/templates for osx, win, linux"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "OpenOCD target target/ti_cc26x0.cfg (board/ti_cc26x0_launchpad.cfg) with `flash bank ... cc26xx`. The driver reads ICEPICK_DEVICE_ID at 0x50001318 and USER_ID at 0x50001294 and downloads a helper algorithm to RAM. JRC TAP ID in the cfg: 0x0B99A02F (version ignored). LaunchPad board files use `transport select jtag` through the XDS110. Whether the driver erases per sector or per bank was not read; not run on our bench.",
+     "erase": "unknown",
+     "touches_ccfg": null,
+     "touches_ccfg_note": "unknown: the driver source was not read for CCFG handling",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_cc26x0.cfg, ti_cc13x2.cfg, ti_cc26x2.cfg; TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc26xx.c, cc26xx.h"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM serial bootloader over UART0 or SPI0, same packet protocol on both. Command set not read for this family. It runs only when CCFG BOOTLOADER_ENABLE allows it and either no valid image is present or the CCFG backdoor pin is asserted. The SDK's default ccfg.c leaves BOOTLOADER_ENABLE commented out (disabled). No TI host tool for it was found in the installed or archived SDK copies; community tools exist (not verified here).",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "COMMAND_SECTOR_ERASE and COMMAND_DOWNLOAD touch only the addresses sent; COMMAND_SET_CCFG exists and is not needed.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SWCU117I ROM bootloader chapter (not read in detail); UniFlash 9.6.0 DebugServer/propertyDB/BL_CC13xxCC26xx_FlashProperties.xml lists 'CC2640R2F(Bootloader)' and others"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CCFG",
+     "range": "last flash sector (device-dependent; memory-mapped register view at 0x50003000)",
+     "why": "Boot configuration: image-valid flag, bootloader enable and backdoor pin, debug-port (TAP) locks, chip-erase disable, sector write protection. A wrong CCFG can disable the ROM bootloader or lock the debug port.",
+     "source": "SWCU185G / SWCU117I CCFG chapters; CCStudio targetdb devices/cc2652r1f.xml (CCFG module at 0x50003000); UniFlash 9.6.0 DebugServer/propertyDB/BL_CC13xxCC26xx_FlashProperties.xml (Lock CPU TAP, Disable Chip Erase, Disable Bootloader)"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Debugger connects only in the first seconds after power-on, then Error -242 (measured on the CC1354P10)",
+     "fix": "Power-cycle the probe's USB port and connect at once; or xds110reset. A running program that sleeps or reconfigures the debug pins closes the window.",
+     "source": "cc1354p10/AGENTS.md, cc1354p10/TRAPS.md"
+    },
+    {
+     "symptom": "CPU DAP or TAP locked by the CCFG",
+     "fix": "Only a mass erase reopens it: CCStudio GEL MassErase() (cc26x4_xds.gel) or `dslite --mode cc13xx-cc26xx-mass-erase -d XDS110`. This is a mass erase and CCFG rewrite: forbidden for the tool by default; owner approval only.",
+     "source": "CCStudio ccs_base/emulation/gel/cc26x4_xds.gel; UniFlash 9.6.0 dslite.sh --listMode; UniFlash quick start guide, 'CC13xx/CC26xx Mass Erase from CLI'"
+    },
+    {
+     "symptom": "No valid image and no debug access",
+     "fix": "If the CCFG enabled the ROM bootloader, use it over UART0 (sector erase and memory read are available). Keep the board's BL_CONFIG when rewriting a CCFG so this route stays.",
+     "source": "SWCU194 section 10.1 and 10.2.3; cc1354p10/AGENTS.md"
+    }
+   ],
+   "probe": {
+    "launchpad": "XDS110 on the LaunchPad: JTAG, not SWD.",
+    "bare_chip": "TMS/TCK (cJTAG), optionally TDI/TDO."
+   },
+   "unknowns": [
+    "Identity of ICEPick ID 0x0B9BD02F in TI's fork driver.",
+    "CC2640R2L flash size.",
+    "Sector-level erase and CCFG handling of OpenOCD's cc26xx driver."
+   ]
+  },
+  {
+   "family": "CC13x2/CC26x2 (first generation, 352 kB)",
+   "members": [
+    {
+     "part": "CC1312R1F3",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC1352R1F3",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC1352P1F3",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC1312PSIP",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": null,
+     "launchpads": []
+    },
+    {
+     "part": "CC2642R1F",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC2652R1F",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC2652RB1F",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC2652P1F",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC2652PSIP",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": null,
+     "launchpads": []
+    },
+    {
+     "part": "CC2652RSIP",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": null,
+     "launchpads": []
+    },
+    {
+     "part": "CC2662R1F",
+     "partnum": "0xBB41",
+     "jtag_idcode": "0x0BB4102F",
+     "core": "Cortex-M4F",
+     "flash_kb": null,
+     "launchpads": []
+    }
+   ],
+   "members_note": "Names: CCStudio targetdb devices (all use Modules/CC26xx/CC2652, FCFG1 WAFER_ID 0xbb41). Sizes: SWRS207J and the CC1354P10 device comparison table (352 kB for CC1312R, CC1352R/P, CC2642R, CC2652R/RB/P); SIP and CC2662 sizes not read.",
+   "launchpads_unverified": [
+    "LAUNCHXL-CC26X2R1",
+    "LAUNCHXL-CC1352R1",
+    "LAUNCHXL-CC1352P",
+    "LAUNCHXL-CC1312R1"
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router, Cortex-M4 DAP 0x4BA00477. cJTAG 2-pin default; XDS110 board files use JTAG after the cJTAG-to-4-pin sequence. No SWD.",
+    "notes": "SWCU185G has 0 mentions of SWD. OpenOCD ti_cc26x2_launchpad.cfg: `transport select jtag`, 5500 kHz.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/cc2652r1f.xml; xPack scripts/board/ti_cc26x2_launchpad.cfg, target/ti_cc26x2.cfg (JRC_TAPID 0x0BB4102F); SWCU185G (text search: 0 hits for SWD)"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick IR 0x04",
+     "field": "version ignored (ti_cc26x2.cfg uses -ignore-version)",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0BB4102F",
+     "source": "CCStudio 21.0.1 ccs_base/emulation/analysis/xmldb/aet_config/aet_trace_platform.xml (cc13x2_26x2 0x0BB4102F); SWCU185G section 11.4.1.49 ICEPICK_DEVICE_ID reset 3BB4102Fh (PG_REV 3h, WAFER_ID BB41h)"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x50001318 (ICEPICK_DEVICE_ID), 0x50001294 (USER_ID)",
+     "field": "USER_ID bit 23 (CC13 mask 0x00800000) separates CC13x2 from CC26x2 in TI's driver",
+     "mask": "0x0FFFFFFF",
+     "source": "TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc26xx.c cc26xx_device_type, cc26xx.h"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 DSLite `flash` mode with a ccxml that names the XDS110 and the ICEPick router. The device property file defaults FlashEraseSetting to 'Necessary Sectors Only (Retain untouched content within sector)'; other choices are All Unprotected Sectors, Specific Sectors and Do not erase sectors. KeepCcfgSetting (default 0) keeps the upper N bytes of the device CCFG. The setting id is the property id (`-s FlashEraseSetting=...`); the id spelling on the command line was not run. ",
+     "erase": "sector",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "True for an SDK .out or a hex that carries the CCFG region (measured on the CC1354P10: cc1354p10/AGENTS.md, a full .out load rewrote the CCFG with the SDK default). Expected false for a main-flash-only image; not run.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/<family>_FlashProperties.xml (FlashEraseSetting, KeepCcfgSetting); UniFlash 9.6.0 dslite.sh and scripts/flash.dsls (--setting id=value); UniFlash file_package_creator/templates for osx, win, linux"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "OpenOCD target target/ti_cc13x2.cfg and ti_cc26x2.cfg (board/ti_cc13x2_launchpad.cfg, ti_cc26x2_launchpad.cfg) with `flash bank ... cc26xx`. The driver reads ICEPICK_DEVICE_ID at 0x50001318 and USER_ID at 0x50001294 and downloads a helper algorithm to RAM. JRC TAP ID in the cfg: 0x0BB4102F (version ignored). LaunchPad board files use `transport select jtag` through the XDS110. Whether the driver erases per sector or per bank was not read; not run on our bench.",
+     "erase": "unknown",
+     "touches_ccfg": null,
+     "touches_ccfg_note": "unknown: the driver source was not read for CCFG handling",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "xPack OpenOCD 0.12.0-7 scripts/target/ti_cc26x0.cfg, ti_cc13x2.cfg, ti_cc26x2.cfg; TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc26xx.c, cc26xx.h"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM serial bootloader over UART0 or SPI0, same packet protocol on both. Command set not read for this family. It runs only when CCFG BOOTLOADER_ENABLE allows it and either no valid image is present or the CCFG backdoor pin is asserted. The SDK's default ccfg.c leaves BOOTLOADER_ENABLE commented out (disabled). No TI host tool for it was found in the installed or archived SDK copies; community tools exist (not verified here).",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "COMMAND_SECTOR_ERASE and COMMAND_DOWNLOAD touch only the addresses sent; COMMAND_SET_CCFG exists and is not needed.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SWCU185G ROM bootloader chapter (not read in detail)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CCFG",
+     "range": "last flash sector (device-dependent; memory-mapped register view at 0x50003000)",
+     "why": "Boot configuration: image-valid flag, bootloader enable and backdoor pin, debug-port (TAP) locks, chip-erase disable, sector write protection. A wrong CCFG can disable the ROM bootloader or lock the debug port.",
+     "source": "SWCU185G / SWCU117I CCFG chapters; CCStudio targetdb devices/cc2652r1f.xml (CCFG module at 0x50003000); UniFlash 9.6.0 DebugServer/propertyDB/BL_CC13xxCC26xx_FlashProperties.xml (Lock CPU TAP, Disable Chip Erase, Disable Bootloader)"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Debugger connects only in the first seconds after power-on, then Error -242 (measured on the CC1354P10)",
+     "fix": "Power-cycle the probe's USB port and connect at once; or xds110reset. A running program that sleeps or reconfigures the debug pins closes the window.",
+     "source": "cc1354p10/AGENTS.md, cc1354p10/TRAPS.md"
+    },
+    {
+     "symptom": "CPU DAP or TAP locked by the CCFG",
+     "fix": "Only a mass erase reopens it: CCStudio GEL MassErase() (cc26x4_xds.gel) or `dslite --mode cc13xx-cc26xx-mass-erase -d XDS110`. This is a mass erase and CCFG rewrite: forbidden for the tool by default; owner approval only.",
+     "source": "CCStudio ccs_base/emulation/gel/cc26x4_xds.gel; UniFlash 9.6.0 dslite.sh --listMode; UniFlash quick start guide, 'CC13xx/CC26xx Mass Erase from CLI'"
+    },
+    {
+     "symptom": "No valid image and no debug access",
+     "fix": "If the CCFG enabled the ROM bootloader, use it over UART0 (sector erase and memory read are available). Keep the board's BL_CONFIG when rewriting a CCFG so this route stays.",
+     "source": "SWCU194 section 10.1 and 10.2.3; cc1354p10/AGENTS.md"
+    }
+   ],
+   "probe": {
+    "launchpad": "XDS110 on the LaunchPad: JTAG.",
+    "bare_chip": "TMS/TCK (cJTAG)."
+   },
+   "unknowns": [
+    "Flash size of the SIP parts and CC2662R1F.",
+    "OpenOCD cc26xx driver erase granularity and CCFG handling.",
+    "ROM bootloader command set for this family (not read)."
+   ]
+  },
+  {
+   "family": "CC13x2x7/CC26x2x7 (704 kB)",
+   "members": [
+    {
+     "part": "CC1312R7",
+     "partnum": "0xBB77",
+     "jtag_idcode": "0x0BB7702F",
+     "core": "Cortex-M4F",
+     "flash_kb": 704,
+     "launchpads": []
+    },
+    {
+     "part": "CC1352P7",
+     "partnum": "0xBB77",
+     "jtag_idcode": "0x0BB7702F",
+     "core": "Cortex-M4F",
+     "flash_kb": 704,
+     "launchpads": []
+    },
+    {
+     "part": "CC2652R7",
+     "partnum": "0xBB77",
+     "jtag_idcode": "0x0BB7702F",
+     "core": "Cortex-M4F",
+     "flash_kb": 704,
+     "launchpads": []
+    },
+    {
+     "part": "CC2652P7",
+     "partnum": "0xBB77",
+     "jtag_idcode": "0x0BB7702F",
+     "core": "Cortex-M4F",
+     "flash_kb": 704,
+     "launchpads": []
+    }
+   ],
+   "members_note": "Names: CCStudio devices cc1312r7/cc1352p7/cc2652p7/cc2652r7.xml (Modules/CC26xx/CC26x2x7, WAFER_ID 0xbb77). Sizes: SWRS253B (CC2652R7 704 kB) and the CC1354P10 device table.",
+   "launchpads_unverified": [
+    "LP-CC2652R7",
+    "LP-CC1352P7-4",
+    "LP-CC1312R7"
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C, Cortex-M4 DAP 0x4BA00477. cJTAG default, 4-pin JTAG after escape. No SWD.",
+    "notes": "SWCU192 has 0 mentions of SWD. xPack OpenOCD ships ti_cc26x2x7.cfg expecting 0x1BB7702F with -ignore-version on the JRC; TI's fork has no cc26x2x7 file.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/cc2652r7.xml; xPack scripts/target/ti_cc26x2x7.cfg, board/ti_cc26x2x7_launchpad.cfg; SWCU192 (0 hits for SWD)"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick IR 0x04",
+     "field": "version ignored",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0BB7702F",
+     "source": "CCStudio 21.0.1 ccs_base/emulation/analysis/xmldb/aet_config/aet_trace_platform.xml (cc13x2_26x2_704 0x0BB7702F); SWCU192 section 11.4.1.44 ICEPICK_DEVICE_ID reset 0BB7702Fh, WAFER_ID BB77h"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x50001318 / 0x50001294",
+     "field": "WAFER_ID 0xBB77",
+     "mask": "0x0FFFFFFF",
+     "source": "CCStudio devices/cc1312r7.xml (FCFG1 base 0x50001000); SWCU192 offset 318h"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 DSLite `flash` mode with a ccxml that names the XDS110 and the ICEPick router. The device property file defaults FlashEraseSetting to 'Necessary Sectors Only (Retain untouched content within sector)'; other choices are All Unprotected Sectors, Specific Sectors and Do not erase sectors. KeepCcfgSetting (default 0) keeps the upper N bytes of the device CCFG. The setting id is the property id (`-s FlashEraseSetting=...`); the id spelling on the command line was not run. ",
+     "erase": "sector",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "True for an SDK .out or a hex that carries the CCFG region (measured on the CC1354P10: cc1354p10/AGENTS.md, a full .out load rewrote the CCFG with the SDK default). Expected false for a main-flash-only image; not run.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/<family>_FlashProperties.xml (FlashEraseSetting, KeepCcfgSetting); UniFlash 9.6.0 dslite.sh and scripts/flash.dsls (--setting id=value); UniFlash file_package_creator/templates for osx, win, linux"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "xPack OpenOCD ti_cc26x2x7.cfg sources ti_cc26x0.cfg, which declares `flash bank cc26xx`. TI's fork driver's cc26xx_device_type has a `default:` branch that treats an unknown ICEPick ID as CC13x2/CC26x2, so it would run the cc26x2 helper algorithm on a x7 part; whether that works was not run.",
+     "erase": "unknown",
+     "touches_ccfg": null,
+     "touches_ccfg_note": "unknown",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "xPack scripts/target/ti_cc26x2x7.cfg; TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc26xx.c lines 49-73"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM serial bootloader over UART0 or SPI0, same packet protocol on both. Command set not read for this family. It runs only when CCFG BOOTLOADER_ENABLE allows it and either no valid image is present or the CCFG backdoor pin is asserted. The SDK's default ccfg.c leaves BOOTLOADER_ENABLE commented out (disabled). No TI host tool for it was found in the installed or archived SDK copies; community tools exist (not verified here).",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "COMMAND_SECTOR_ERASE and COMMAND_DOWNLOAD touch only the addresses sent; COMMAND_SET_CCFG exists and is not needed.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SWCU192 ROM bootloader chapter (not read in detail)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CCFG",
+     "range": "last flash sector (device-dependent; memory-mapped register view at 0x50003000)",
+     "why": "Boot configuration: image-valid flag, bootloader enable and backdoor pin, debug-port (TAP) locks, chip-erase disable, sector write protection. A wrong CCFG can disable the ROM bootloader or lock the debug port.",
+     "source": "SWCU185G / SWCU117I CCFG chapters; CCStudio targetdb devices/cc2652r1f.xml (CCFG module at 0x50003000); UniFlash 9.6.0 DebugServer/propertyDB/BL_CC13xxCC26xx_FlashProperties.xml (Lock CPU TAP, Disable Chip Erase, Disable Bootloader)"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Debugger connects only in the first seconds after power-on, then Error -242 (measured on the CC1354P10)",
+     "fix": "Power-cycle the probe's USB port and connect at once; or xds110reset. A running program that sleeps or reconfigures the debug pins closes the window.",
+     "source": "cc1354p10/AGENTS.md, cc1354p10/TRAPS.md"
+    },
+    {
+     "symptom": "CPU DAP or TAP locked by the CCFG",
+     "fix": "Only a mass erase reopens it: CCStudio GEL MassErase() (cc26x4_xds.gel) or `dslite --mode cc13xx-cc26xx-mass-erase -d XDS110`. This is a mass erase and CCFG rewrite: forbidden for the tool by default; owner approval only.",
+     "source": "CCStudio ccs_base/emulation/gel/cc26x4_xds.gel; UniFlash 9.6.0 dslite.sh --listMode; UniFlash quick start guide, 'CC13xx/CC26xx Mass Erase from CLI'"
+    },
+    {
+     "symptom": "No valid image and no debug access",
+     "fix": "If the CCFG enabled the ROM bootloader, use it over UART0 (sector erase and memory read are available). Keep the board's BL_CONFIG when rewriting a CCFG so this route stays.",
+     "source": "SWCU194 section 10.1 and 10.2.3; cc1354p10/AGENTS.md"
+    }
+   ],
+   "probe": {
+    "launchpad": "XDS110: JTAG.",
+    "bare_chip": "TMS/TCK (cJTAG)."
+   },
+   "unknowns": [
+    "Whether OpenOCD's cc26xx driver programs a x7 part correctly (default branch fall-through, not run).",
+    "ROM bootloader command set (not read)."
+   ]
+  },
+  {
+   "family": "CC13x1/CC26x1x3 (352 kB)",
+   "members": [
+    {
+     "part": "CC1311R3",
+     "partnum": "0xBB7A",
+     "jtag_idcode": "0x0BB7A02F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC1311P3",
+     "partnum": "0xBB7A",
+     "jtag_idcode": "0x0BB7A02F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC2651R3",
+     "partnum": "0xBB7A",
+     "jtag_idcode": "0x0BB7A02F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC2651P3",
+     "partnum": "0xBB7A",
+     "jtag_idcode": "0x0BB7A02F",
+     "core": "Cortex-M4F",
+     "flash_kb": 352,
+     "launchpads": []
+    },
+    {
+     "part": "CC2651R3SIPA",
+     "partnum": "0xBB7A",
+     "jtag_idcode": "0x0BB7A02F",
+     "core": "Cortex-M4F",
+     "flash_kb": null,
+     "launchpads": []
+    }
+   ],
+   "members_note": "Names: CCStudio devices (Modules/CC26xx/CC26x1x3, WAFER_ID 0xbb7a). 352 kB: SWRS258B (CC2651R3), CC1354P10 device table (CC1311R3/P3, CC2651R3/P3).",
+   "launchpads_unverified": [
+    "LP-CC2651R3SIPA",
+    "LP-CC1311P3"
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C, Cortex-M4 DAP. cJTAG default, 4-pin JTAG after escape.",
+    "notes": "No TRM for this subfamily was read. CCStudio device file uses the same SWD Mode Settings value 4 (cJTAG) as the other CC13xx/CC26xx devices.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/cc2651r3.xml, cc1311r3.xml"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick IR 0x04",
+     "field": "version ignored",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0BB7A02F",
+     "source": "CCStudio 21.0.1 ccs_base/emulation/analysis/xmldb/aet_config/aet_trace_platform.xml (cc13x2_26x2_352 0x0BB7A02F); CCStudio Modules/CC26xx/CC26x1x3/FCFG1.xml WAFER_ID 0xbb7a"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 DSLite `flash` mode with a ccxml that names the XDS110 and the ICEPick router. The device property file defaults FlashEraseSetting to 'Necessary Sectors Only (Retain untouched content within sector)'; other choices are All Unprotected Sectors, Specific Sectors and Do not erase sectors. KeepCcfgSetting (default 0) keeps the upper N bytes of the device CCFG. The setting id is the property id (`-s FlashEraseSetting=...`); the id spelling on the command line was not run. ",
+     "erase": "sector",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "True for an SDK .out or a hex that carries the CCFG region (measured on the CC1354P10: cc1354p10/AGENTS.md, a full .out load rewrote the CCFG with the SDK default). Expected false for a main-flash-only image; not run.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/<family>_FlashProperties.xml (FlashEraseSetting, KeepCcfgSetting); UniFlash 9.6.0 dslite.sh and scripts/flash.dsls (--setting id=value); UniFlash file_package_creator/templates for osx, win, linux"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM serial bootloader over UART0 or SPI0, same packet protocol on both. Command set not read for this family. It runs only when CCFG BOOTLOADER_ENABLE allows it and either no valid image is present or the CCFG backdoor pin is asserted. The SDK's default ccfg.c leaves BOOTLOADER_ENABLE commented out (disabled). No TI host tool for it was found in the installed or archived SDK copies; community tools exist (not verified here).",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "COMMAND_SECTOR_ERASE and COMMAND_DOWNLOAD touch only the addresses sent; COMMAND_SET_CCFG exists and is not needed.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "TRM for this subfamily not fetched"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CCFG",
+     "range": "last flash sector (device-dependent; memory-mapped register view at 0x50003000)",
+     "why": "Boot configuration: image-valid flag, bootloader enable and backdoor pin, debug-port (TAP) locks, chip-erase disable, sector write protection. A wrong CCFG can disable the ROM bootloader or lock the debug port.",
+     "source": "SWCU185G / SWCU117I CCFG chapters; CCStudio targetdb devices/cc2652r1f.xml (CCFG module at 0x50003000); UniFlash 9.6.0 DebugServer/propertyDB/BL_CC13xxCC26xx_FlashProperties.xml (Lock CPU TAP, Disable Chip Erase, Disable Bootloader)"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Debugger connects only in the first seconds after power-on, then Error -242 (measured on the CC1354P10)",
+     "fix": "Power-cycle the probe's USB port and connect at once; or xds110reset. A running program that sleeps or reconfigures the debug pins closes the window.",
+     "source": "cc1354p10/AGENTS.md, cc1354p10/TRAPS.md"
+    },
+    {
+     "symptom": "CPU DAP or TAP locked by the CCFG",
+     "fix": "Only a mass erase reopens it: CCStudio GEL MassErase() (cc26x4_xds.gel) or `dslite --mode cc13xx-cc26xx-mass-erase -d XDS110`. This is a mass erase and CCFG rewrite: forbidden for the tool by default; owner approval only.",
+     "source": "CCStudio ccs_base/emulation/gel/cc26x4_xds.gel; UniFlash 9.6.0 dslite.sh --listMode; UniFlash quick start guide, 'CC13xx/CC26xx Mass Erase from CLI'"
+    },
+    {
+     "symptom": "No valid image and no debug access",
+     "fix": "If the CCFG enabled the ROM bootloader, use it over UART0 (sector erase and memory read are available). Keep the board's BL_CONFIG when rewriting a CCFG so this route stays.",
+     "source": "SWCU194 section 10.1 and 10.2.3; cc1354p10/AGENTS.md"
+    }
+   ],
+   "probe": {
+    "launchpad": "XDS110: JTAG.",
+    "bare_chip": "TMS/TCK (cJTAG)."
+   },
+   "unknowns": [
+    "No OpenOCD target file for 0xBB7A in xPack 0.12.0-7 or TI's fork; TI's driver's default branch would treat it as a x2 part.",
+    "TRM not fetched; SWD absence inferred from the device file and the other CC13xx/CC26xx TRMs.",
+    "SIP part flash size."
+   ]
+  },
+  {
+   "family": "CC13x4/CC26x4 (CC13x4x10, CC26x4x10)",
+   "members": [
+    {
+     "part": "CC1314R10",
+     "partnum": "0xBB78",
+     "jtag_idcode": "0x0BB7802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": []
+    },
+    {
+     "part": "CC1354R10",
+     "partnum": "0xBB78",
+     "jtag_idcode": "0x0BB7802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": []
+    },
+    {
+     "part": "CC1354P10",
+     "partnum": "0xBB78",
+     "jtag_idcode": "0x0BB7802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": [
+      "LP-CC1354P10-1"
+     ],
+     "measured": "JTAG IDCODE 0x2BB7802F read on an XDS110-attached chip, 2026-10-24 (version nibble 2); SWD fails with 'cannot read IDR'. Board believed to be an LP-CC1354P10-1; the part number was not read from the chip."
+    },
+    {
+     "part": "CC2653P10",
+     "partnum": "0xBB78",
+     "jtag_idcode": "0x0BB7802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": []
+    },
+    {
+     "part": "CC2674R10",
+     "partnum": "0xBB78",
+     "jtag_idcode": "0x0BB7802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": []
+    },
+    {
+     "part": "CC2674P10",
+     "partnum": "0xBB78",
+     "jtag_idcode": "0x0BB7802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": []
+    }
+   ],
+   "members_note": "Names: CCStudio devices cc1314r10/cc1354p10/cc1354r10/cc2653p10/cc2674p10/cc2674r10.xml (Modules/CC26xx/CC26x4). 1024 kB: SWRS267B and SWRS268B Device Comparison. CC2653P10 flash not read from a datasheet. CC1354P10 LaunchPad: data/boards.csv (bench).",
+   "launchpads_unverified": [
+    "LP-CC2674P10",
+    "LP-EM-CC1354P10-1",
+    "LP-EM-CC1314R10"
+   ],
+   "debug_port": {
+    "protocol": "cJTAG",
+    "access": "ICEPick-C router first, then CS_DAP (DAP TAP ID 0x4BA00477) with the Cortex-M33 behind it. cJTAG 2-pin (TCK, TMS) is the power-up default; 4-pin JTAG is available. There is no SWD: the CC13x4x10/CC26x4x10 TRM (SWCU194) never mentions SWD, and the datasheet debug section (SWRS267B 9.11) lists only cJTAG and JTAG. A probe that tries SWD first gets 'cannot read IDR' (our measurement).",
+    "notes": "CCStudio's device file: XDS110 'SWD Mode Settings' value 4 'cJTAG (1149.7) 2-pin advanced modes', router icepick_c, ICEPick subpath port 0x10 to CS_DAP, Cortex_M33 AP designator 0x02000000. OpenOCD's TI LaunchPad boards for this generation use `transport select jtag` and the post-reset ti_cjtag_to_4pin_jtag sequence. Our measured data point: SWD 'cannot read IDR', JTAG IDCODE 0x2BB7802F.",
+    "source": "SWCU194 (March 2023) sections 6.1 to 6.3, Table 6-7, 11.4.36; SWRS267B section 9.11 (cJTAG is the default mode); CCStudio 21.0.1 ccs_base/common/targetdb/devices/cc1354p10.xml; xPack scripts/board/ti_cc26x2_launchpad.cfg; TI OpenOCD fork scripts/target/ti-cjtag.cfg"
+   },
+   "identify": [
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick IR 0x04 (IDCODE instruction 100b)",
+     "field": "version nibble varies by silicon (TRM reset 1, bench part reads 2); mask it",
+     "mask": "0x0FFFFFFF",
+     "value": "0x0BB7802F",
+     "source": "SWCU194 Table 6-6, 6.3.2.5 and Table 11-70 (ICEPICK_DEVICE_ID reset 1BB7802Fh, WAFER_ID BB78h, MANUFACTURER_ID 2Fh); CCStudio 21.0.1 ccs_base/emulation/analysis/xmldb/aet_config/aet_trace_platform.xml (cc13x4_26x4 0x0BB7802F, mask 0x0FFFFFFF); CCStudio Modules/CC26xx/CC26x4/FCFG1.xml (WAFER_ID resetval 0xbb78)"
+    },
+    {
+     "method": "mem_read",
+     "addr": "0x50000B18 (FCFG1 0x50000800 + 0x318, ICEPICK_DEVICE_ID); 0x50000A94 (FCFG1 + 0x294, USER_ID)",
+     "field": "USER_ID bit 23 CC13 (1 = CC13x4x10, 0 = CC26x4x10); bit 25 PA (20 dBm); bits 18:16 PKG (2 = RGZ 7x7, 7 = RSK 8x8); bits 15:12 PROTOCOL",
+     "mask": "bit fields",
+     "source": "SWCU194 memory map (FCFG1 0x50000800), Table 11-60 USER_ID, 11.4.36. Addresses are base plus offset, computed here; not read from a chip. NOTE: TI's fork driver reads 0x50001318, which is the M4 layout and wrong for these parts."
+    },
+    {
+     "method": "dpidr",
+     "addr": "n/a",
+     "field": "not available: no SWD",
+     "mask": "",
+     "source": "SWCU194 (0 SWD mentions)"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 DSLite `flash` mode with a ccxml that names the XDS110 and the ICEPick router. The device property file defaults FlashEraseSetting to 'Necessary Sectors Only (Retain untouched content within sector)'; other choices are All Unprotected Sectors, Specific Sectors and Do not erase sectors. KeepCcfgSetting (default 0) keeps the upper N bytes of the device CCFG. The setting id is the property id (`-s FlashEraseSetting=...`); the id spelling on the command line was not run. Measured on the CC1354P10 with the on-board XDS110: `dslite flash` fails at the second connect (Error -242) on an external LP-XDS110 and needs a power-cycle of the probe port; the repo's CCStudio-scripting loadBinaryProgram route loaded 12 of 12 images (cc1354p10/AGENTS.md, 2026-10-24).",
+     "erase": "sector",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "True for an SDK .out or a hex that carries the CCFG region (measured on the CC1354P10: cc1354p10/AGENTS.md, a full .out load rewrote the CCFG with the SDK default). Expected false for a main-flash-only image; not run.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/<family>_FlashProperties.xml (FlashEraseSetting, KeepCcfgSetting); UniFlash 9.6.0 dslite.sh and scripts/flash.dsls (--setting id=value); UniFlash file_package_creator/templates for osx, win, linux"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "No target config for 0xBB78 in xPack 0.12.0-7 or in TI's fork: ti_cc26x2.cfg expects 0x0BB4102F and ti_cc26x2x7.cfg 0x1BB7702F. A config can be written from the CCStudio data (JRC_TAPID 0x0BB7802F with -ignore-version, DAP 0x4BA00477, Cortex-M33) and would give debug access. Flashing is a separate gap: the fork's cc26xx driver reads the ICEPick ID from 0x50001318 (wrong region for the M33 parts, FCFG1 is at 0x50000800) and only embeds helper algorithms for CC26x0 and CC26x2, and the flash controller moved to 0x58030000. So no OpenOCD flash driver covers this family today.",
+     "erase": "none available",
+     "touches_ccfg": null,
+     "touches_ccfg_note": "no driver",
+     "platforms": [],
+     "source": "xPack scripts/target/ti_cc26x2.cfg, ti_cc26x2x7.cfg; TI OpenOCD fork scripts/target/ti_cc26x2.cfg; TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc26xx.c, cc26xx.h; CCStudio devices/cc1354p10.xml (FLASH 0x58030000, FCFG1 0x50000800, CCFG 0x50000000)"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM serial bootloader over UART0 or SPI0, same packet protocol on both. Commands: PING 0x20, DOWNLOAD 0x21, GET_STATUS 0x23, SEND_DATA 0x24, RESET 0x25, SECTOR_ERASE 0x26, CRC32 0x27, GET_CHIP_ID 0x28, MEMORY_READ 0x2A, MEMORY_WRITE 0x2B, BANK_ERASE 0x2C, SET_CCFG 0x2D, DOWNLOAD_CRC 0x2F. Packets: size byte, checksum byte, data; ACK or NACK per packet. Sector erase and memory read make this the best no-mass-erase backup and write route on paper. The board used here arrived with a nearly blank CCFG and sat in this bootloader (cc1354p10/AGENTS.md); not driven from a host. It runs only when CCFG BOOTLOADER_ENABLE allows it and either no valid image is present or the CCFG backdoor pin is asserted. The SDK's default ccfg.c leaves BOOTLOADER_ENABLE commented out (disabled). No TI host tool for it was found in the installed or archived SDK copies; community tools exist (not verified here).",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "COMMAND_SECTOR_ERASE and COMMAND_DOWNLOAD touch only the addresses sent; COMMAND_SET_CCFG exists and is not needed.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SWCU194 chapter 10 (10.1 Functionality, 10.2.3 commands)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CCFG",
+     "range": "0x50000000, 2 kB (0x800)",
+     "why": "Boot configuration: IMAGE_VALID_CONF, BL_CONFIG (bootloader enable, backdoor pin and level), DIS_CPU_DAP and other debug locks, BANK_ERASE_DIS and chip-erase disable, sector protection (CCFG_PROT_31_0, CCFG_PROT_63_32). Keep the board's BL_CONFIG so the ROM bootloader stays a recovery route.",
+     "source": "SWCU194 memory map (CCFG 0x50000000) and section 10.1; UniFlash 9.6.0 DebugServer/propertyDB/CC13x4x10_CC26x4x10_FlashProperties.xml (MemoryRange0 CCFG 0x50000000-0x500007FF, DisableCpuDapLoc 5000003A, DisableBootloaderLoc 5000002B, CCFG_PROT_31_0Loc 50000044); cc1354p10/AGENTS.md"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Debugger connects only in the first seconds after power-on, then Error -242 (measured on the CC1354P10)",
+     "fix": "Power-cycle the probe's USB port and connect at once; or xds110reset. A running program that sleeps or reconfigures the debug pins closes the window.",
+     "source": "cc1354p10/AGENTS.md, cc1354p10/TRAPS.md"
+    },
+    {
+     "symptom": "CPU DAP or TAP locked by the CCFG",
+     "fix": "Only a mass erase reopens it: CCStudio GEL MassErase() (cc26x4_xds.gel) or `dslite --mode cc13xx-cc26xx-mass-erase -d XDS110`. This is a mass erase and CCFG rewrite: forbidden for the tool by default; owner approval only.",
+     "source": "CCStudio ccs_base/emulation/gel/cc26x4_xds.gel; UniFlash 9.6.0 dslite.sh --listMode; UniFlash quick start guide, 'CC13xx/CC26xx Mass Erase from CLI'"
+    },
+    {
+     "symptom": "No valid image and no debug access",
+     "fix": "If the CCFG enabled the ROM bootloader, use it over UART0 (sector erase and memory read are available). Keep the board's BL_CONFIG when rewriting a CCFG so this route stays.",
+     "source": "SWCU194 section 10.1 and 10.2.3; cc1354p10/AGENTS.md"
+    },
+    {
+     "symptom": "SWD says 'cannot read IDR' (not a fault)",
+     "fix": "Switch to JTAG/cJTAG; read the ICEPick IDCODE; expect 0x_BB7802F.",
+     "source": "SWCU194 (no SWD); this research"
+    },
+    {
+     "symptom": "Wrong OpenOCD config on 0xBB78 reports an unexpected ICEPick ID",
+     "fix": "Use JRC_TAPID 0x0BB7802F with -ignore-version, DAP 0x4BA00477. No flash bank until a driver exists.",
+     "source": "TI OpenOCD fork scripts/target/ti_cc26x0.cfg (jtag newtap jrc ... -ignore-version)"
+    }
+   ],
+   "probe": {
+    "launchpad": "On-board or external XDS110: JTAG with the cJTAG-to-4-pin sequence, then ICEPick IDCODE. Connect right after power-up (first seconds).",
+    "bare_chip": "TCK/TMS (cJTAG 2-pin), optional TDI/TDO; nRESET on the probe's reset line."
+   },
+   "unknowns": [
+    "Which exact part sits on the 2026-10-24 bench chip: the IDCODE only says CC13x4/CC26x4. Read FCFG1 USER_ID at 0x50000A94 to tell CC13 from CC26 and PA from non-PA.",
+    "PG_REV 2 (version nibble of 0x2BB7802F): the TRM documents reset value 1. No public file maps version 2 to a revision name.",
+    "How TI's DSLite handles the Error -242 window on the on-board XDS110 versus the external LP-XDS110.",
+    "No host tool for the ROM bootloader found in any installed SDK copy; CCFG bootloader state of a given board must be read first.",
+    "CC2653P10 flash size."
+   ]
+  },
+  {
+   "family": "CC23xx (CC2340, CC2341)",
+   "members": [
+    {
+     "part": "CC2340R21",
+     "partnum": "0xBB85",
+     "jtag_idcode": "0x0BB8502F",
+     "core": "Cortex-M0+",
+     "flash_kb": 256,
+     "launchpads": [],
+     "source": "CC2340R2 family: DEVICEID 0xBB85 (GEL IsCC23x0R2, fork cc23xx.c: CC2340R21E0RGER); datasheet lists CC2340R21 256 kB, 28 kB RAM"
+    },
+    {
+     "part": "CC2340R22",
+     "partnum": "0xBB84",
+     "jtag_idcode": "0x0BB8402F",
+     "core": "Cortex-M0+",
+     "flash_kb": 256,
+     "launchpads": [],
+     "source": "same DEVICEID as CC2340R5; separated by PARTID variant byte 0x9E (fork cc23xx.c 'CC2340R22E0RKPR' PARTID 0x809E2DDA; GEL IsCC23x0R22)"
+    },
+    {
+     "part": "CC2340R52",
+     "partnum": "0xBB84",
+     "jtag_idcode": "0x0BB8402F",
+     "core": "Cortex-M0+",
+     "flash_kb": 512,
+     "launchpads": [
+      "LP-EM-CC2340R5"
+     ],
+     "source": "datasheet name CC2340R52 (SWRS272F); the LaunchPad is called CC2340R5; measured on our LP-EM-CC2340R5"
+    },
+    {
+     "part": "CC2340R53",
+     "partnum": "0xBBAE",
+     "jtag_idcode": "0x0BBAE02F",
+     "core": "Cortex-M0+",
+     "flash_kb": 512,
+     "launchpads": [
+      "LP-EM-CC2340R53"
+     ],
+     "source": "GEL IsCC23x0R53 (0x0BBAE02F); fork cc23xx.c; SDK board folder LP_EM_CC2340R53; 64 kB RAM per datasheet"
+    },
+    {
+     "part": "CC2341R10",
+     "partnum": "0xBBCC",
+     "jtag_idcode": "0x0BBCC02F",
+     "core": "Cortex-M0+",
+     "flash_kb": 1024,
+     "launchpads": [],
+     "source": "GEL IsCC23x1; fork cc23xx.c and cc27xx.c both list CC2341R10 (1024 kB, 96 kB RAM); has an SCFG per the CC27xx-style driver"
+    },
+    {
+     "part": "CC2341R74",
+     "partnum": "0xBBCC",
+     "jtag_idcode": "0x0BBCC02F",
+     "core": "Cortex-M0+",
+     "flash_kb": 768,
+     "launchpads": [],
+     "source": "GEL IsCC23x1R74; fork cc27xx.c CC2341R73E0WRHBRQ1 768 kB; part naming R73/R74 differs between sources"
+    }
+   ],
+   "members_note": "jtag_idcode here is the 32-bit DEVICEID read from the configuration access port (CFG-AP, AP1 reg 0x00), not a JTAG scan value: these chips have SWD only. Core Cortex-M0+: SWRS272F features list and CCStudio devices/cc2340r5.xml (Cortex_M0P). 'MODA' module board folder LP_EM_CC2340R5MODA also in the F3 SDK.",
+   "launchpads_unverified": [
+    "LP-EM-CC2340R5MODA",
+    "LP-EM-CC2340R53-Q1 (SDK board folder LP_EM_CC2340R53_Q1)"
+   ],
+   "debug_port": {
+    "protocol": "SWD",
+    "access": "SWD only, DP wake through the Arm dormant state (OpenOCD uses dap create -switch-thru-dormant; CCStudio's device file sets SWD.SWJ_DP_DEFAULT_MODE=1, whose meaning the files do not explain). Then AP0 AHB-AP (CPU), AP1 CFG-AP (identity), AP2 SEC-AP (SACI). The XDS110 'SWD Mode Settings' value is 2 'SWD Mode - Aux COM port is target TDO pin'. A SACI reset and a debug-open handshake are needed before AP0 answers: OpenOCD's TI fork reports the part only after its driver has opened the port ('flash probe 0'); a plain memory read fails first (data/routes.json cc2340r5).",
+    "notes": "TI fork cfg expects DAP SWD ID 0x2BA01477 for CC23xx (cc2340r5 measured working with TI's fork). TRM SWCU193A has JTAG only as a test-TAP select bit.",
+    "source": "CCStudio 21.0.1 ccs_base/common/targetdb/devices/cc2340r5.xml; TI OpenOCD fork scripts/target/ti_cc23xx.cfg; data/routes.json boards.cc2340r5.target.identity; SWRS272F features (SWD only); SWCU193A (JTAGSEL test TAP only)"
+   },
+   "identify": [
+    {
+     "method": "dpidr",
+     "addr": "SWD DP register 0x0 after dormant-to-SWD wake",
+     "field": "DPIDR; TI fork expects 0x2BA01477",
+     "mask": "",
+     "source": "TI OpenOCD fork scripts/target/ti_cc23xx.cfg (DAP_SWD_ID 0x2ba01477); not read by us on a CC2340R5 as a raw DPIDR"
+    },
+    {
+     "method": "mem_read",
+     "addr": "CFG-AP (AP1) register 0x00 DEVICEID, 0x04 PARTID",
+     "field": "DEVICEID & 0x0FFFFFFF in {0x0BB8502F CC2340R2x, 0x0BB8402F CC2340R5/R22, 0x0BBAE02F CC2340R53, 0x0BBCC02F CC2341}; PARTID bits 23:16 variant byte separates siblings (0x9E = CC2340R22)",
+     "mask": "0x0FFFFFFF",
+     "source": "SWCU193A Table 13-10 (DEVICEID reset 0BB8402Fh, DEVICE field BB84h), 13.4.7 PARTID; CCStudio emulation/gel/cc23xx_util.gel (IsCC23x0R2/R22/R5/R53/IsCC23x1); ports/openocd-cc23xx/src/cc23xx.c part table"
+    },
+    {
+     "method": "flash_probe",
+     "addr": "OpenOCD `init; flash probe 0` with TI's cc23xx driver",
+     "field": "prints 'Device: CC2340R52E0RKPR, Flash: 512kb, RAM: 36kb' (measured on our LP-EM-CC2340R5)",
+     "mask": "",
+     "source": "data/routes.json boards.cc2340r5.target.identity; TI fork src/flash/nor/cc23xx.c part table (OPN, DEVICEID, PARTID, flash kB, RAM kB)"
+    },
+    {
+     "method": "saci",
+     "addr": "SEC-AP (AP2)",
+     "field": "boot status 0x20 BOOT_ENTERED_SACI; DEBUG_REQ_PWD_ID 0x05 on CC23xx",
+     "mask": "",
+     "source": "SWCU193A 8.3.2.2.1; ports/openocd-cc23xx/src/cc23xx.c; docs/remote-board-recovery.md"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 DSLite `flash` with a ccxml. CC2340R2/R5 property file (CC23xx_FlashProperties.xml) offers only FlashEraseSetting = 'Chip Erase' (default), 'Chip Erase (retain sectors specified in CCFG)' or 'Do not erase sectors (program load only)'. There is no per-sector erase choice, so a program load with any erase is a chip erase. CC2341 uses CC23x1_FlashProperties.xml with NoFlashErase, RetainMainSectors and RetainCcfgScfg instead. Skip-sectors (FlashPageToggle/FlashPages, e.g. '0-5,8') excludes sectors from erase, program and verify; whether it can name the CCFG sector was not shown in the files. Answer for the project: no documented DSLite option erases only the needed sectors on CC23xx. The no-erase choice programs only blank flash. Not run.",
+     "erase": "chip",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "Chip erase clears main flash and the CCFG (SWCU193A 8.5.3.5; repo remote-board-recovery.md); the CCFG is re-written from the image unless the image has no CCFG data (CcfgSkipProgrammingUserRecord default 1 applies only to the 128-byte user record).",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/CC23xx_FlashProperties.xml (FlashEraseSetting, FlashPageToggle, CcfgSkipProgrammingUserRecord), CC23x1_FlashProperties.xml; UniFlash bin/FlashDLLDB.xml (FlashCC23xx for CC23*, CC27*)"
+    },
+    {
+     "tool": "openocd",
+     "status": "TI fork",
+     "detail": "TI's ti-openocd fork: `cc23xx` driver (ti_cc23xx.cfg, board ti_lp_em_cc2340r5.cfg, transport swd, xds110, 4000 kHz). cc_lpf3_base_erase sends a SACI CHIP ERASE on every program and writes the CCFG. This breaks the project rules. Measured: blink programmed in 6.2 s, verify step fails on an unset DEVICE_BLANK.",
+     "erase": "chip (SACI)",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "measured/read: cc_lpf3_base.c ERASE_CHIP then PROG_CCFG",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc_lpf3_base.c (lines 142-197), cc23xx.c; docs/experiments/2026-10-18-open-flash-path-survey.md (E216)"
+    },
+    {
+     "tool": "openocd",
+     "status": "community",
+     "detail": "Our own `cc23xx` driver (ports/openocd-cc23xx/, patch against OpenOCD master): identifies by DEVICEID/PARTID, resets through SACI, erases and writes per 2 kB sector through the boot ROM's HapiFlashSectorErase and HapiFlashProgram on the halted CPU, never sends a chip erase, never writes CCFG or SCFG. Measured on the CC2340R5: blink program+verify+reset in 0.37 s, 511 kB write and read-back identical in about 11 s. Not upstream. A chip whose CCFG closes the CPU port cannot be flashed this way.",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "refuses CCFG/SCFG unless equal to the chip's own (cc23xx.c header)",
+     "platforms": [
+      "mac",
+      "linux"
+     ],
+     "source": "ports/openocd-cc23xx/README.md and src/cc23xx.c; docs/experiments/2026-10-18-openocd-cc23xx-driver.md (E206)"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM serial bootloader, UART (autobaud) or SPI. Commands: PING 0x20, GET_STATUS 0x21, GET_PART_ID 0x22, RESET 0x23, CHIP_ERASE 0x24, CRC32 0x25, DOWNLOAD 0x26, DOWNLOAD_CRC 0x27, SEND_DATA 0x28. There is no sector erase and no memory read. CHIP_ERASE erases unprotected main sectors and then the CCFG. So the ROM route is a mass erase and cannot back up. Parameters in CCFG.bootCfg.bldrParam (enable, pin trigger, DIO, I/O map).",
+     "erase": "mass",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "the example flow downloads the CCFG at 0x4E020000 after the image",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SWCU193A sections 8.5.1 to 8.5.4 (Tables 8-39, 8.5.3.5, 8.5.4 example)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CCFG",
+     "range": "0x4E020000, 2 kB (0x800)",
+     "why": "Boot config, debug authorization and permissions (allowChipErase, allowFakeStby), bootloader parameters. Bad CRCs or permissions can close debug access; SWCU193A/SWCU195A debug access needs a valid CCFG.",
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/CC23xx_FlashProperties.xml (CcfgBase 4E020000, CcfgSize 800, CcfgPermissions); SWCU193A 8.5.2; repo docs/remote-board-recovery.md"
+    },
+    {
+     "region": "Chip erase / factory reset",
+     "range": "SACI CMD_FLASH_ERASE_CHIP (0x09 in TI's ti_lpf3.cfg)",
+     "why": "Clears main flash and the CCFG in one step; the project forbids it on any board.",
+     "source": "TI OpenOCD fork scripts/target/ti_lpf3.cfg (SACI_CMD_FLASH_ERASE_CHIP 0x09); SWCU193A 8.5.3.5"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Debugger cannot connect (Error -2001, -615, 'Debug is not allowed based on', 'Unable to authenticate with Secure Debug Manager')",
+     "fix": "Read the boot status through the CFG-AP first, then xds110reset, then power-cycle the probe port, then connect under reset. Do not use a chip erase as a reset.",
+     "source": "docs/remote-board-recovery.md"
+    },
+    {
+     "symptom": "OpenOCD reports no memory access until the driver has opened the debug port",
+     "fix": "Run `init` then `flash probe 0` with a cc23xx driver (SACI reset and debug open), then read memory.",
+     "source": "data/routes.json boards.cc2340r5.target.identity"
+    },
+    {
+     "symptom": "TI's DSLite fails after OpenOCD with 'Error -615 ... SWD header'",
+     "fix": "Leave the port dormant when OpenOCD exits (`cc23xx dormant` in our driver).",
+     "source": "docs/experiments/2026-10-18-openocd-cc23xx-driver.md"
+    },
+    {
+     "symptom": "Debug access closed by CCFG",
+     "fix": "UniFlash 'cc23xx-unlock-debug-access' mode runs ChipErase() (GEL): a mass erase. Forbidden for the tool; owner approval only.",
+     "source": "UniFlash 9.6.0 DebugServer/scripts/cc23xx-unlock-debug-access.dsls"
+    }
+   ],
+   "probe": {
+    "launchpad": "LP-EM boards have no probe: put them on an LP-XDS110 or LP-XDS110ET (separate USB). SWD with dormant wake, then CFG-AP DEVICEID.",
+    "bare_chip": "SWDIO/SWCLK are pads muxed with GPIO (DIO16/DIO17 on the CC2340R5 per the datasheet pin table); nRESET."
+   },
+   "unknowns": [
+    "Whether DSLite's 'Chip Erase (retain sectors specified in CCFG)' keeps the CCFG sector itself; the files only say 'retain sectors specified in CCFG' (main sectors).",
+    "Whether FlashPages (skip sectors) can name the CCFG sector, which would let DSLite program main flash with a CCFG-free erase; not run.",
+    "Which property file (CC23xx_ or CC23x1_) CC2340R53 uses; not found in the files.",
+    "A raw DPIDR from a CC2340R5 was not recorded; the 0x2BA01477 value is TI's cfg expectation.",
+    "CC2340R21 flash and RAM: 256 kB and 28 kB per datasheet table; PARTID values for R21 from the fork table only."
+   ]
+  },
+  {
+   "family": "CC27xx (CC2745, CC2755, CC2765 and related)",
+   "members": [
+    {
+     "part": "CC2745R10-Q1",
+     "partnum": "0xBB98",
+     "jtag_idcode": "0x0BB9802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": [
+      "LP-EM-CC2745R10-Q1",
+      "CC2745R10-CS-EVM"
+     ],
+     "source": "fork cc27xx.c (PARTID 0x80E8AF23); SWRS304D table 1024 kB with 96 kB reserved for HSM"
+    },
+    {
+     "part": "CC2745P10-Q1",
+     "partnum": "0xBB98",
+     "jtag_idcode": "0x0BB9802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": [],
+     "source": "fork cc27xx.c (PARTID 0x80DEAF23)"
+    },
+    {
+     "part": "CC2745R7-Q1 (R74)",
+     "partnum": "0xBB98",
+     "jtag_idcode": "0x0BB9802F",
+     "core": "Cortex-M33",
+     "flash_kb": 768,
+     "launchpads": [],
+     "source": "fork cc27xx.c CC2745R74 768 kB; datasheet table shows 864 for the 7-series; sizes differ between sources"
+    },
+    {
+     "part": "CC2755R10",
+     "partnum": "0xBB98",
+     "jtag_idcode": "0x0BB9802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": [
+      "LP-EM-CC2755R10-BG (SDK board folder LP_EM_CC2755R10_BG)"
+     ],
+     "source": "fork cc27xx.c; SWRS306E device comparison"
+    },
+    {
+     "part": "CC2755P10",
+     "partnum": "0xBB98",
+     "jtag_idcode": "0x0BB9802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": [
+      "LP-EM-CC2755P10"
+     ],
+     "source": "measured: DEVICEID 0x6BB9802F PARTID 0x80E66301 on our LP-EM-CC2755P10 (docs/research/webflash-cc-wireless-2026-10-14.md); 96 kB of flash reserved for HSM firmware"
+    },
+    {
+     "part": "CC2755R7",
+     "partnum": "0xBB98",
+     "jtag_idcode": "0x0BB9802F",
+     "core": "Cortex-M33",
+     "flash_kb": 864,
+     "launchpads": [],
+     "source": "SWRS306E device comparison (864 kB)"
+    },
+    {
+     "part": "CC2765R10-Q1",
+     "partnum": "0xBB98",
+     "jtag_idcode": "0x0BB9802F",
+     "core": "Cortex-M33",
+     "flash_kb": 1024,
+     "launchpads": [],
+     "source": "fork cc27xx.c (PARTID 0x803716D6); TI fork board file ti_lp_em_cc2765R10.cfg"
+    },
+    {
+     "part": "CC2755P20",
+     "partnum": "0xBBC5",
+     "jtag_idcode": "0x0BBC502F",
+     "core": "Cortex-M33",
+     "flash_kb": 2048,
+     "launchpads": [
+      "LP-EM-CC2755P20"
+     ],
+     "source": "fork cc27xx.c; GEL IsCC27xx_2M; SDK board folder LP_EM_CC2755P20"
+    },
+    {
+     "part": "CC2755R20",
+     "partnum": "0xBBC5",
+     "jtag_idcode": "0x0BBC502F",
+     "core": "Cortex-M33",
+     "flash_kb": 2048,
+     "launchpads": [],
+     "source": "fork cc27xx.c"
+    },
+    {
+     "part": "CC2755P15",
+     "partnum": "0xBBC5",
+     "jtag_idcode": "0x0BBC502F",
+     "core": "Cortex-M33",
+     "flash_kb": 1572,
+     "launchpads": [],
+     "source": "fork cc27xx.c CC2755P156 1572 kB; CCStudio device cc2755p15.xml"
+    },
+    {
+     "part": "CC2745R20",
+     "partnum": "0xBBC5",
+     "jtag_idcode": "0x0BBC502F",
+     "core": "Cortex-M33",
+     "flash_kb": 2048,
+     "launchpads": [],
+     "source": "CCStudio device cc2745r20.xml; GEL IsCC27xx_2M; flash from family pattern, not read"
+    },
+    {
+     "part": "CC2756P20",
+     "partnum": "0xBBC5",
+     "jtag_idcode": "0x0BBC502F",
+     "core": "Cortex-M33",
+     "flash_kb": 2048,
+     "launchpads": [],
+     "source": "CCStudio device cc2756p20.xml; flash not read"
+    },
+    {
+     "part": "CC2744R7",
+     "partnum": "0xBB98",
+     "jtag_idcode": "0x0BB9802F",
+     "core": "Cortex-M33",
+     "flash_kb": null,
+     "launchpads": [],
+     "source": "CCStudio device cc2744r7.xml only"
+    }
+   ],
+   "members_note": "jtag_idcode is the CFG-AP DEVICEID (SWD only chips). 0xBB98 = 1 MB class, 0xBBC5 = 2 MB class (GEL IsCC27xx_1M / IsCC27xx_2M). Sibling parts share DEVICEID; PARTID separates them. Measured DEVICEID 0x6BB9802F shows version nibble 6.",
+   "launchpads_unverified": [
+    "LP-EM-CC2765R10-Q1",
+    "LP-EM-CC2745R74",
+    "LP-EM-CC2755R74 (fork board files ti_lp_em_cc2745R74.cfg, ti_lp_em_cc2755R74.cfg, ti_lp_em_cc2765R10.cfg exist)"
+   ],
+   "debug_port": {
+    "protocol": "SWD",
+    "access": "SWD only. Dormant-to-SWD wake (8 high clocks, 128-bit selection alert, 4 idle clocks, activation code 0x1A, line reset) then DPIDR 0x6BA02477 (Cortex-M33, DPv2; measured on the LP-EM-CC2755P10). AP0 0x84770001 Arm memory port, AP1 0x002E0001 TI CFG-AP, AP2 0x002E0000 TI SEC-AP (SACI). A plain JTAG-to-SWD line reset gives 'ack 7' (no answer) first: measured.",
+    "notes": "TI's fork ti_cc27xx.cfg defaults DAP_SWD_ID to 0x2BA01477, but the CC2755P10 DPIDR measured 0x6BA02477. The OpenOCD run on 2026-10-24 stopped at 'Error connecting DP: cannot read IDR' twice (4000 and 1000 kHz): probable causes are the dormant sequence or the expected-id; neither isolated. Debug access also needs a valid CCFG and SCFG (SWCU195A 9.1.3).",
+    "source": "docs/research/webflash-cc-wireless-2026-10-14.md (probe LB07021W run); docs/frl.md line 146; data/routes.json boards.cc2755p10; TI OpenOCD fork scripts/target/ti_cc27xx.cfg; SWRS306E features (SWD)"
+   },
+   "identify": [
+    {
+     "method": "dpidr",
+     "addr": "SWD DP reg 0x0 after dormant wake",
+     "field": "0x6BA02477 measured",
+     "mask": "",
+     "source": "docs/research/webflash-cc-wireless-2026-10-14.md"
+    },
+    {
+     "method": "mem_read",
+     "addr": "CFG-AP (AP1) reg 0x00 DEVICEID, 0x04 PARTID",
+     "field": "DEVICEID & 0x0FFFFFFF: 0x0BB9802F (1 MB class) or 0x0BBC502F (2 MB class); PARTID variant byte bits 23:16",
+     "mask": "0x0FFFFFFF",
+     "source": "SWCU195A (CC27xx TRM) debug chapter; CCStudio emulation/gel/cc23xx_util.gel IsCC27xx_1M/_2M; TI fork src/flash/nor/cc27xx.c part table"
+    },
+    {
+     "method": "flash_probe",
+     "addr": "OpenOCD `flash probe 0` with TI's cc27xx driver",
+     "field": "OPN, flash kB, RAM kB from the fork table",
+     "mask": "",
+     "source": "data/routes.json boards.cc2755p10 (not read on a CC2755P10 yet)"
+    },
+    {
+     "method": "saci",
+     "addr": "SEC-AP (AP2)",
+     "field": "boot status; CC27xx debug request is DEBUG_REQ_KEY_ID 0x1D",
+     "mask": "",
+     "source": "SWCU195A 9.3.2.2.3; docs/remote-board-recovery.md (BOOT_ENTERED_SACI 0x20)"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 DSLite `flash`. CC27xx_FlashProperties.xml settings: NoFlashErase (default 0, 'Do not erase before program load'), RetainMainSectors (default 1, 'Retain MAIN sectors specified in existing CCFG', e.g. the HSM area), RetainCcfgScfg (default 0, 'Retain CCFG and SCFG sectors'). Default flash is a chip erase that clears CCFG and SCFG too (measured on the LP-EM-CC2755P10: docs/remote-board-recovery.md). Closest documented option to what the project needs: `-s RetainCcfgScfg=1` (with RetainMainSectors=1) and an image that holds main flash only, no CCFG or SCFG section. The files do not say which SACI erase (ERASE_MAIN_APP or ERASE_CHIP) DSLite sends for it, and it still erases all non-retained main sectors, not only the needed ones. `-s NoFlashErase=1` programs without erasing, valid only on blank sectors. Setting id spellings were not run. Not run.",
+     "erase": "mass",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "default true; with RetainCcfgScfg=1 and a CCFG-free image expected false (not run). CcfgOverwriteCrcsToggle (default 1) rewrites CCFG CRC fields only when a CCFG is in the image.",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/CC27xx_FlashProperties.xml (NoFlashErase, RetainMainSectors, RetainCcfgScfg, FlashPageToggle, CcfgSkipProgrammingUserRecord, PermissionsSetting); docs/remote-board-recovery.md section 5 and line 94"
+    },
+    {
+     "tool": "openocd",
+     "status": "TI fork",
+     "detail": "TI's ti-openocd `cc27xx` driver (ti_cc27xx.cfg: banks main 0x0, CCFG 0x4E020000, SCFG 0x4E040000). cc_lpf3_base_erase sends SACI chip erase on every program and writes CCFG: breaks the project rules, and a CC27xx chip erase can close the debug port. Not run on a CC27xx.",
+     "erase": "chip (SACI)",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "read from source",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "TI OpenOCD fork ti-release cb22a31e src/flash/nor/cc27xx.c, cc_lpf3_base.c; docs/experiments/2026-10-18-open-flash-path-survey.md"
+    },
+    {
+     "tool": "openocd",
+     "status": "community",
+     "detail": "Our ports/openocd-cc23xx driver covers CC27xxx10 (DEVICEID 0x0BB9802F): per-sector erase and write through the boot ROM, refuses the HSM area (0xE8000 and up) and CCFG/SCFG unless equal to the chip's. Verified on the CC2340R5 only; CC27xx path builds and has not run (E206).",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "by design",
+     "platforms": [
+      "mac",
+      "linux"
+     ],
+     "source": "ports/openocd-cc23xx/README.md; docs/experiments/2026-10-18-openocd-cc23xx-driver.md"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "ROM serial bootloader (SWCU195A 9.5): same nine commands as CC23xx, CHIP_ERASE only, no sector erase, no read. Mass erase route.",
+     "erase": "mass",
+     "touches_ccfg": true,
+     "touches_ccfg_note": "CHIP_ERASE clears CCFG; flow downloads CCFG after",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SWCU195A 9.5.3 (Table 9-54 command IDs)"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "CCFG",
+     "range": "0x4E020000, 2 kB",
+     "why": "Debug access is only enabled if CCFG and SCFG are valid (SWCU195A 9.1.3).",
+     "source": "SWCU195A 9.1.3; UniFlash CC27xx_FlashProperties.xml CcfgBase"
+    },
+    {
+     "region": "SCFG",
+     "range": "0x4E040000, 1 kB",
+     "why": "Secure configuration; invalid SCFG closes debug access. A DSLite default flash clears it.",
+     "source": "UniFlash CC27xx_FlashProperties.xml ScfgBase 0x4E040000, ScfgSize 400; docs/remote-board-recovery.md"
+    },
+    {
+     "region": "HSM firmware area",
+     "range": "0x000E8000 and up on the 1 MB parts (96 kB, 0x18000)",
+     "why": "Reserved for HSM firmware; a second chip erase removes it, and it cannot be put back without a valid CCFG/SCFG.",
+     "source": "SWRS306E footnote (96 kB reserved); ports/openocd-cc23xx/src/cc23xx.c CC27XX_HSM_BASE; remote-board-recovery.md"
+    },
+    {
+     "region": "Chip erase / factory reset",
+     "range": "SACI CMD_FLASH_ERASE_CHIP",
+     "why": "Worked 2026-10-09 as a mistake on a CC2755P10: debug closed, HSM failed to boot.",
+     "source": "docs/remote-board-recovery.md section 5"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Error -2001 / 'Unable to authenticate with Secure Debug Manager' after a chip erase",
+     "fix": "TRM 9.2.4.1: initial programming over SACI (main flash, then CCFG, then SCFG, then reset); then HSM image from the SDK bin/hsm if missing. Done once on 2026-10-09 with cc2755p10/recovery/saci_program.js.",
+     "source": "docs/remote-board-recovery.md sections 5 and 7; SWCU195A 9.2.4.1"
+    },
+    {
+     "symptom": "Debugger 'cannot read IDR' on a CC27xx",
+     "fix": "Use the dormant-to-SWD wake before reading DPIDR; expect 0x6BA02477; check the cfg's expected DP ID. Cause on 2026-10-24 not isolated.",
+     "source": "docs/frl.md; docs/research/webflash-cc-wireless-2026-10-14.md"
+    },
+    {
+     "symptom": "Chip stuck at boot status 0x3F",
+     "fix": "xds110reset -a toggle took one chip to 0xBA (ROM bootloader entered) once; not reliable.",
+     "source": "docs/remote-board-recovery.md"
+    }
+   ],
+   "probe": {
+    "launchpad": "LP-EM boards need an LP-XDS110 or LP-XDS110ET. SWD, dormant wake, then CFG-AP DEVICEID.",
+    "bare_chip": "SWDIO/SWCLK pads (DIO9/DIO10 on the CC2755P10 per the datasheet); nRESET."
+   },
+   "unknowns": [
+    "Which SACI erase DSLite uses with RetainCcfgScfg=1, and whether it leaves the HSM area untouched; not run.",
+    "A reliable OpenOCD connect to a CC27xx: the 2026-10-24 attempt failed at 'cannot read IDR'.",
+    "Flash sizes for CC2745R20, CC2756P20, CC2744R7 not read.",
+    "Whether CC2744R7 shares DEVICEID 0x0BB9802F (assumed from the 1 MB class; not read)."
+   ]
+  },
+  {
+   "family": "CC32xx (Wi-Fi)",
+   "members": [
+    {
+     "part": "CC3200",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "Cortex-M4",
+     "flash_kb": 0,
+     "launchpads": [
+      "CC3200-LAUNCHXL"
+     ],
+     "note": "external serial flash; parked: debugger cannot reach the chip (data/boards.csv, cc3200-launchxl/README.md)"
+    },
+    {
+     "part": "CC3220S",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "Cortex-M4",
+     "flash_kb": 0,
+     "launchpads": [],
+     "note": "external serial flash"
+    },
+    {
+     "part": "CC3220SF",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "Cortex-M4",
+     "flash_kb": 1024,
+     "launchpads": [],
+     "note": "1 MB executable flash (SF)"
+    },
+    {
+     "part": "CC3235S",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "Cortex-M4",
+     "flash_kb": 0,
+     "launchpads": [],
+     "note": "external serial flash"
+    },
+    {
+     "part": "CC3235SF",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "Cortex-M4",
+     "flash_kb": 1024,
+     "launchpads": [],
+     "note": "SWRS215E: 1 MB executable flash, 256 kB RAM"
+    }
+   ],
+   "members_note": "Members from UniFlash 9.6.0 target_setup.json (CC3200, CC3220, CC3220S, CC3220SF, CC3235S, CC3235SF; each with a _SWD variant and a Bootloader variant). CCStudio 21.0.1 has none of them. Sizes: SWRS215E device table. JTAG IDCODEs were not found for these parts in any file read.",
+   "launchpads_unverified": [
+    "CC3220SF-LAUNCHXL",
+    "CC3235SF-LAUNCHXL",
+    "CC3235S-LAUNCHXL"
+   ],
+   "debug_port": {
+    "protocol": "SWD | JTAG chosen by the sense-on-power (SOP) pins",
+    "access": "The SOP[2:0] pull levels at power-up pick the pin mapping: Fn2WJ (SOP 001, 2-pin SWD on TMS/TCK), Fn4WJ (SOP 000, 4-pin JTAG), LDfrUART_Fn4WJ (SOP 010) and UARTLOAD (SOP 100: waits for UART load, JTAG 4-wire). In JTAG a ICEPick-C router fronts the DAP; in SWD the DAP answers directly. OpenOCD cfg: SWD DAP ID 0x2BA01477, JTAG DAP 0x4BA00477, ICEPick JRC TAP ID 0x0B97C02F (version ignored). UniFlash has separate '_SWD' device entries for the 2-pin case.",
+    "notes": "On our parked CC3200-LAUNCHXL the JTAG chain read all ones and SWD said 'cannot read IDR' with SOP jumpers as received and removed.",
+    "source": "SWRS215E section 8.10.1 Table 8-6 (SOP modes); xPack scripts/target/ti_cc32xx.cfg; UniFlash target_setup.json CC3220SF_SWD; UniFlash devices/CC3220SF.xml (ICEPICK_C, CS_DAP), CC3220SF_SWD.xml (SWD Mode Settings 1); cc3200-launchxl/README.md"
+   },
+   "identify": [
+    {
+     "method": "dpidr",
+     "addr": "SWD DP reg 0x0 (Fn2WJ boot mode)",
+     "field": "TI cfg expects 0x2BA01477",
+     "mask": "",
+     "source": "xPack scripts/target/ti_cc32xx.cfg"
+    },
+    {
+     "method": "jtag_idcode",
+     "addr": "ICEPick IR 0x04 (Fn4WJ boot mode)",
+     "field": "JRC 0x0B97C02F version ignored; DAP 0x4BA00477",
+     "mask": "0x0FFFFFFF",
+     "source": "xPack scripts/target/ti_cc32xx.cfg"
+    },
+    {
+     "method": "flash_probe",
+     "addr": "OpenOCD cc3220sf flash driver",
+     "field": "not read",
+     "mask": "",
+     "source": "xPack scripts/target/ti_cc3220sf.cfg (`flash bank ... cc3220sf`)"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash property file CC3220SF_FlashProperties.xml: 'Program Load - Erase Method' default 'Necessary Pages Only'; FlashEraseType default 'Entire Flash' for the manual erase button. CC3235SF has its own file. CC32xx devices also need the UniFlash ImageCreator flow (dslite.sh `--mode cc32xx`, SLImageCreator) for file-system and service-pack images: the write of the application flash and the ImageCreator image are different jobs. Not run.",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "CC32xx has no CCFG; it has a bootloader image and file system in serial flash",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "UniFlash 9.6.0 DebugServer/propertyDB/CC3220SF_FlashProperties.xml, CC3235SF_FlashProperties.xml; UniFlash dslite.sh (cc31xx/cc32xx modes); bin/FlashDLLDB.xml FlashCC3220SF, FlashCC3235SF"
+    },
+    {
+     "tool": "openocd",
+     "status": "open upstream",
+     "detail": "xPack OpenOCD has ti_cc3220sf.cfg and board files for CC3200, CC3220 and CC32xx LaunchPad kits with a `cc3220sf` flash driver. Erase granularity and what it does to the bootloader/file-system regions was not read; not run.",
+     "erase": "unknown",
+     "touches_ccfg": null,
+     "touches_ccfg_note": "n/a",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "xPack scripts/target/ti_cc3220sf.cfg, board/ti_cc3220sf_launchpad.cfg, ti_cc3200_launchxl.cfg"
+    },
+    {
+     "tool": "rom_bootloader",
+     "status": "TI supported",
+     "detail": "UARTLOAD boot mode (SOP 100): the ROM waits indefinitely for a UART load of flash or SRAM. UniFlash targets 'CC3220SF(Bootloader)', 'CC3235SF(Bootloader)' and the _BL device files drive it. Not run.",
+     "erase": "unknown",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "n/a",
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SWRS215E Table 8-6; UniFlash target_setup.json (CC3220SF(Bootloader)), devices/CC3220SF_BL.xml"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "Bootloader and file-system regions in flash",
+     "range": "not read",
+     "why": "CC32xx keeps a file system with a 4 kB-minimum file allocation (SWRS215E); erasing the whole flash removes certificates and the service pack.",
+     "source": "SWRS215E (file system text near line 3990 of the text export)"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "Chain all ones / cannot read IDR",
+     "fix": "Check that the SOP jumpers match the wanted mode (Fn2WJ for SWD, Fn4WJ for JTAG) and that no SOP pins touch; try UARTLOAD to load over UART.",
+     "source": "SWRS215E Table 8-6; cc3200-launchxl/FAQ.md"
+    }
+   ],
+   "probe": {
+    "launchpad": "On-board debugger: try SWD first only if SOP says 2-pin; read the SOP jumpers before choosing a protocol.",
+    "bare_chip": "TMS/TCK for SWD or JTAG, TDI/TDO for 4-wire, SOP[2:0] straps, nRESET."
+   },
+   "unknowns": [
+    "JTAG IDCODE and partnum values for the CC32xx parts: not in any file read (the cfg gives only the ICEPick and DAP IDs).",
+    "Whether the xPack cc3220sf driver erases per sector.",
+    "CC3130/CC3135/CC3100/CC3120 network processors: not covered; UniFlash lists no device for them.",
+    "CC3200 on our bench never answered; the target is untested on hardware."
+   ]
+  },
+  {
+   "family": "CC33xx (Wi-Fi 6 companion IC, no application flash)",
+   "members": [
+    {
+     "part": "CC3300",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "none (companion IC)",
+     "flash_kb": 0,
+     "launchpads": [],
+     "note": "Wi-Fi 6 only"
+    },
+    {
+     "part": "CC3301",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "none (companion IC)",
+     "flash_kb": 0,
+     "launchpads": [
+      "BP-CC33x1 (Toolbox guide)"
+     ],
+     "note": "Wi-Fi 6 and BLE 5.4"
+    },
+    {
+     "part": "CC3350",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "none",
+     "flash_kb": 0,
+     "launchpads": []
+    },
+    {
+     "part": "CC3351",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "none",
+     "flash_kb": 0,
+     "launchpads": []
+    }
+   ],
+   "members_note": "SWRS294F describes the CC3300 and CC3301 as companion ICs to a host MCU (SDIO or SPI host interface); the Toolbox lists CC3300, CC3301, CC3301MOD, CC3350, CC3351, CC3351MOD radio-tool binaries. The part has a SWDIO pin and 'debug security through JTAG and debug port lock' in the datasheet, but no application flash for us to back up.",
+   "debug_port": {
+    "protocol": "SWD",
+    "access": "SWDIO pin on the 40-pin package; the host MCU supplies firmware over the host interface. Not a user-code target.",
+    "notes": "Debug port details not read.",
+    "source": "SWRS294F features and pin table (SWDIO pin 40)"
+   },
+   "identify": [
+    {
+     "method": "other",
+     "addr": "XDS110 with Toolbox",
+     "field": "`simplelink-wifi-toolbox cc33xx-fuse-programmer -i XDS110 -param1 auto download_programmer` then `get`",
+     "mask": "",
+     "source": "SimpleLink Wi-Fi Toolbox 4.3.23 docs/html/_sources/WiFi-toolbox/programmer_user_guide_cc33xx.rst.txt"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "toolbox",
+     "status": "TI supported",
+     "detail": "Toolbox `cc33xx-fuse-programmer` (download_programmer, get, set) reads and burns one-time fuses only: MAC address, Wi-Fi 6 disable, configuration key, country code, rollback protection, vendor key, OTP lock. `set` needs a programming token from a TI representative that must not be shared. No firmware flash on the chip: the host loads it. The `set` is irreversible.",
+     "erase": "none",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "no CCFG; fuses",
+     "touches_fuses": true,
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "SimpleLink Wi-Fi Toolbox 4.3.23 programmer_user_guide_cc33xx.rst.txt; programmer_cli_user_guide.rst.txt lines 563-666"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "OTP fuses (every `set`, and Lock)",
+     "range": "n/a",
+     "why": "One-time programmable; Lock is permanent. Needs a TI token the project does not hold.",
+     "source": "programmer_user_guide_cc33xx.rst.txt"
+    }
+   ],
+   "recovery": [],
+   "probe": {
+    "launchpad": "BP-CC33x1 BoosterPack on a host LaunchPad plus XDS110, only through the Toolbox.",
+    "bare_chip": "host MCU wiring (SDIO or SPI)."
+   },
+   "unknowns": [
+    "Identification value (IDCODE or fuse readout format) not read; read-only `get` output not recorded.",
+    "Debug port protocol and IDs not read.",
+    "Whether the tool should treat this family as read-only fuse inspection only: recommended, no backup target exists."
+   ]
+  },
+  {
+   "family": "CC35xx (CC3551E and siblings, Wi-Fi 6, external flash)",
+   "members": [
+    {
+     "part": "CC3551E",
+     "partnum": "0xBB96",
+     "jtag_idcode": "0x0BB9602F",
+     "core": "Cortex-M33 (160 MHz)",
+     "flash_kb": 8192,
+     "launchpads": [
+      "LP-EM-CC35X1"
+     ],
+     "measured": "DEVICEID read 0x1BB9602F through AP0 (configuration port) on our LP-EM-CC35X1; DPIDR 0x4BA02477 (docs/research/webflash-cc-wireless-2026-10-14.md)",
+     "note": "8 MB IS25WJ064F serial flash on the LaunchPad (external); the chip has no application flash"
+    },
+    {
+     "part": "CC3501E",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "Cortex-M33",
+     "flash_kb": 0,
+     "launchpads": [],
+     "note": "Toolbox radio-tool binary exists; no other data read"
+    },
+    {
+     "part": "CC3550E",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "Cortex-M33",
+     "flash_kb": 0,
+     "launchpads": [],
+     "note": "same"
+    },
+    {
+     "part": "CC3500E",
+     "partnum": "",
+     "jtag_idcode": "",
+     "core": "Cortex-M33",
+     "flash_kb": 0,
+     "launchpads": [],
+     "note": "same"
+    }
+   ],
+   "members_note": "SWRS337B: the CC355xE needs external serial flash for application code (QSPI/OSPI XIP). IDCODE 0x0BB9602F (measured 0x1BB9602F, version 1) matches TI's fork cc35x1e cfg default. Other siblings: Toolbox binaries only.",
+   "launchpads_unverified": [
+    "LP-EM-CC35X1ET (SDK example folder)"
+   ],
+   "debug_port": {
+    "protocol": "SWD",
+    "access": "SWD through CMSIS-DAP or XDS110. DPIDR 0x4BA02477 measured. Access ports: AP0 0x102E0001 (TI configuration port), AP1 0x002E0002, AP2 0x002E0000; AP3 to AP7 fault. The Cortex-M33 app core is not on AP0: CCStudio's device file puts it at AP designator 0x02000007. The core port stays closed until the Toolbox applies a signed debug request (`programmer ... debug --debug_action_req_path`), which TI's fork cfg runs on every connect.",
+    "notes": "TI's ti_cc35x1e.cfg declares no flash bank: debug only. The chip must be activated (fuses burned once) before it accepts any program.",
+    "source": "docs/research/webflash-cc-wireless-2026-10-14.md; docs/experiments/2026-10-18-open-flash-path-survey.md; CCStudio 21.0.1 ccs_base/common/targetdb/devices/CC35X1E.xml; TI OpenOCD fork scripts/target/ti_cc35x1e.cfg; cc35x1/README.md"
+   },
+   "identify": [
+    {
+     "method": "dpidr",
+     "addr": "SWD DP reg 0x0",
+     "field": "0x4BA02477 measured",
+     "mask": "",
+     "source": "docs/research/webflash-cc-wireless-2026-10-14.md"
+    },
+    {
+     "method": "mem_read",
+     "addr": "AP0 reg 0x00 DEVICEID (configuration port; do not do memory-style CSW/TAR writes on AP0)",
+     "field": "DEVICEID & 0x0FFFFFFF == 0x0BB9602F",
+     "mask": "0x0FFFFFFF",
+     "source": "docs/research/webflash-cc-wireless-2026-10-14.md; docs/research/bench-device-ids-2026-10-17.md"
+    },
+    {
+     "method": "other",
+     "addr": "Toolbox `programmer ... detect_flash_type` and `get_fuse_data`",
+     "field": "flash chip name; 'Process is stopped. Life cycle OPERATIONAL is not valid.' means not activated",
+     "mask": "",
+     "source": "cc35x1/README.md; Toolbox programmer_cli_user_guide.rst.txt"
+    }
+   ],
+   "write_paths": [
+    {
+     "tool": "toolbox",
+     "status": "TI supported",
+     "detail": "SimpleLink Wi-Fi Toolbox 4.3.23 `simplelink-wifi-toolbox programmer -i XDS110 -param1 <probe serial> programming --tool_settings <tool_settings.json>`. Images are built and signed first (`scripts/makefile`, flash-images-builder). `full_flash_erase` (whole external flash) and `--full_flash_erase` on factory_programming are separate, optional commands; `programming` alone does not need them. Measured: edit to blinking LED 60 s, 20 s for a later program-only change (cc35x1/README.md). `custom_activation` burns one-time fuses once and is irreversible. Programming writes images to the external flash, not a CCFG.",
+     "erase": "sector",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "no CCFG; one-time fuses are written only by activation/custom_activation/factory_programming",
+     "touches_fuses": true,
+     "platforms": [
+      "mac",
+      "windows",
+      "linux"
+     ],
+     "source": "Toolbox docs programmer_cli_user_guide.rst.txt; cc35x1/README.md; cc35x1/FAQ.md; Toolbox 4.3.23 startup guide line 8 ('cross-platform software kit')"
+    },
+    {
+     "tool": "openocd",
+     "status": "TI fork",
+     "detail": "ti_cc35x1e_launchpad.cfg: debug only, no flash bank; its init_board calls the Toolbox's signed debug request on every connect. With that call stubbed the DAP answers but no core port appears (E216).",
+     "erase": "none",
+     "touches_ccfg": false,
+     "touches_ccfg_note": "n/a",
+     "platforms": [
+      "mac",
+      "linux"
+     ],
+     "source": "docs/experiments/2026-10-18-open-flash-path-survey.md"
+    },
+    {
+     "tool": "dslite",
+     "status": "TI supported",
+     "detail": "UniFlash 9.6.0 carries CC35X1, CC35X1E and CC35XXE device and flash property files (CC35X1E_FlashProperties.xml, CC35XXE_flashDB.json). Whether DSLite can program a CC35xx end to end was not read or run; the project's measured route is the Toolbox.",
+     "erase": "unknown",
+     "touches_ccfg": null,
+     "touches_ccfg_note": "unknown",
+     "platforms": [],
+     "source": "UniFlash 9.6.0 DebugServer/flashDB/CC35XXE_flashDB.json, propertyDB/CC35X1E_FlashProperties.xml, bin/FlashDLLDB.xml FlashCC35X1E"
+    }
+   ],
+   "never_write": [
+    {
+     "region": "Activation fuses (custom_activation, factory_programming, enter_rma, partial_fuse_programming)",
+     "range": "OTP",
+     "why": "Irreversible: activation burns a security key into fuses, once; enter_rma is completely irreversible.",
+     "source": "cc35x1/README.md; Toolbox programmer_cli_user_guide.rst.txt (enter_rma)"
+    },
+    {
+     "region": "External flash full erase",
+     "range": "whole serial flash",
+     "why": "`full_flash_erase` removes signed images and the vendor storage; treated as a mass erase.",
+     "source": "Toolbox programmer_cli_user_guide.rst.txt (Full Flash Erase section)"
+    }
+   ],
+   "recovery": [
+    {
+     "symptom": "'Process is stopped. Life cycle OPERATIONAL is not valid. Get fuse data failed'",
+     "fix": "Not an error: the chip is not activated. Activation is a one-time fuse burn and needs the owner.",
+     "source": "cc35x1/README.md; cc35x1/FAQ.md"
+    },
+    {
+     "symptom": "Serial port silent or odd characters",
+     "fix": "Read at the image's baud: 115200 for TI SDK examples, 921600 for the CSI program.",
+     "source": "cc35x1/FAQ.md"
+    },
+    {
+     "symptom": "'Path to programming_instructions after path correction couldn't be found'",
+     "fix": "Rebuild with an absolute build folder or use absolute paths in tool_settings.json.",
+     "source": "cc35x1/README.md"
+    }
+   ],
+   "probe": {
+    "launchpad": "LP-EM-CC35X1 has no debugger: needs an LP-XDS110ET or LP-XDS110 plus its own USB-C power cable. TGT VDD jumper on EXT.",
+    "bare_chip": "SWD to the CC35 plus the external flash on QSPI; activation state must be read first."
+   },
+   "unknowns": [
+    "DPIDR and DEVICEID of CC3501E, CC3550E and CC3500E: not read.",
+    "Whether UniFlash DSLite can write the external flash; not run.",
+    "The format of the signed debug request file is not documented in the public Toolbox guide read here."
+   ]
+  }
+ ]
+}

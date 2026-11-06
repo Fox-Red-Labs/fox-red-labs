@@ -1,0 +1,40 @@
+diff --git a/cores/arduino/zephyrSerial.cpp b/cores/arduino/zephyrSerial.cpp
+index 0a9b2e6..816575c 100644
+--- a/cores/arduino/zephyrSerial.cpp
++++ b/cores/arduino/zephyrSerial.cpp
+@@ -137,19 +137,26 @@ int arduino::ZephyrSerial::read() {
+ }
+ 
+ size_t arduino::ZephyrSerial::write(const uint8_t *buffer, size_t size) {
+-	int ret;
++	size_t done = 0;
+ 
+-	k_sem_take(&tx.sem, K_FOREVER);
+-	ret = ring_buf_put(&tx.ringbuf, buffer, size);
+-	k_sem_give(&tx.sem);
++	/* Block until every byte is queued, like other Arduino cores, instead of dropping what does not fit. */
++	while (done < size) {
++		int ret;
+ 
+-	if (ret < 0) {
+-		return 0;
+-	}
++		k_sem_take(&tx.sem, K_FOREVER);
++		ret = ring_buf_put(&tx.ringbuf, buffer + done, size - done);
++		k_sem_give(&tx.sem);
+ 
+-	uart_irq_tx_enable(uart);
++		uart_irq_tx_enable(uart);
+ 
+-	return ret;
++		if (ret > 0) {
++			done += ret;
++		} else {
++			k_msleep(1);
++		}
++	}
++
++	return done;
+ }
+ 
+ #if DT_NODE_HAS_PROP(DT_PATH(zephyr_user), serials)

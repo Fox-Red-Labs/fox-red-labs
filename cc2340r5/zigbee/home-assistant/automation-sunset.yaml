@@ -1,0 +1,23 @@
+# Two Home Assistant automations for the LP-EM-CC2340R5 Zigbee light (cc2340r5/zigbee/README.md):
+# the board's switch on at sunset, off at 23:00.
+# Not run here yet: written against Home Assistant's automation format as documented on 2026-10-16
+# (https://www.home-assistant.io/docs/automation/yaml/). Replace switch.YOUR_BOARD_SWITCH with the entity id Home
+# Assistant gave your board: Settings, Devices, the "unk_manufacturer unk_model" device, its switch entity.
+- id: frl_cc2340r5_light_on_at_sunset
+  alias: "Board light on at sunset"
+  triggers:
+    - trigger: sun
+      event: sunset
+  actions:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.YOUR_BOARD_SWITCH
+- id: frl_cc2340r5_light_off_at_2300
+  alias: "Board light off at 23:00"
+  triggers:
+    - trigger: time
+      at: "23:00:00"
+  actions:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.YOUR_BOARD_SWITCH

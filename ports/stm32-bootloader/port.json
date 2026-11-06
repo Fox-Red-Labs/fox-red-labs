@@ -1,0 +1,41 @@
+{
+ "schema": 1,
+ "id": "stm32-bootloader",
+ "source": {"repo": "https://github.com/ferenc-nemeth/stm32-bootloader", "commit": "8848449", "file": "ports/stm32-bootloader/SOURCE.md"},
+ "paths": ["ports/stm32-bootloader/**"],
+ "original": {
+  "board": "stm32f100",
+  "not_on_bench": "The STM32VLDISCOVERY is not on the bench. The expected behaviour is the upstream bootloader's documented behaviour, checked on the hand-written reference port first (runs/2026-10-20/EXPECTATION.md).",
+  "captured": "2026-10-20",
+  "source": "ports/stm32-bootloader/runs/2026-10-20/checks/port-bootloader-g3519-1.json",
+  "expect": {
+   "capture": "ports/stm32-bootloader/runs/2026-10-20/checks/port-bootloader-g3519-1.json",
+   "json": [
+    {"path": "pass", "equals": true},
+    {"path": "passed", "equals": 6},
+    {"path": "tests.update.app_ran", "equals": true},
+    {"path": "tests.badcrc.naks", "equals": 1},
+    {"path": "tests.abort.recovery_ok", "equals": true}
+   ]
+  },
+  "metrics": {}
+ },
+ "check": {
+  "cmd": "bash ports/stm32-bootloader/tools/run_g3519.sh {out}/check.json",
+  "json": "{out}/check.json",
+  "exit0": true,
+  "own_lock": true,
+  "timeout_s": 600,
+  "pass": "Six checks over the console and the application area: the prompt and C until the first packet, an Xmodem-CRC update that ends in Firmware updated and the application running, the received bytes in flash at 0x00010000, the application starting after a reset, a NAK for a wrong CRC with the retry accepted, and CAN CAN after three errors with the prompt back.",
+  "metrics": {}
+ },
+ "boards": {
+  "mspm0g3519": {
+   "build": "make -C ports/stm32-bootloader/boards/mspm0g3519 TC=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS",
+   "image": "ports/stm32-bootloader/boards/mspm0g3519/bootloader.out",
+   "flash": "OpenOCD (xPack) over the XDS110, program and verify; the bootloader sits below 0x00010000. The check erases and dumps the application area through the probe, so it takes the probe lock itself (own_lock).",
+   "secs": 1,
+   "budget": []
+  }
+ }
+}

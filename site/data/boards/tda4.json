@@ -1,0 +1,322 @@
+{
+ "id": "tda4",
+ "board": "SK-TDA4VM",
+ "part": "TDA4VM",
+ "family": "Jacinto 7 (J721E)",
+ "title": "Is the TI SK-TDA4VM starter kit the right board for a vision project?",
+ "short": "TI's starter kit for the TDA4VM vision processor runs Linux on two 2.0 GHz Cortex-A72 cores and neural nets on a C7x DSP with an 8 TOPS matrix accelerator. All 14 TI zoo models we tried run on the accelerator in 2.2 to 13.8 ms, 13 to 135 times faster than the Arm cores on the 8 we ran on both. It boots to a login prompt in 24.2 s and one A72 scores 9,835 CoreMark at plain -O3. Wired Ethernet runs at line rate, about 940 Mbit/s each way. These are starter-kit numbers, not the chip's ceiling.",
+ "meet": {
+  "what": "A starter kit for TI's TDA4VM vision processor. The C7x is TI's DSP core and the MMA beside it is the matrix accelerator that runs neural nets; TI's model zoo is a folder of ready-made models on the card. It runs TI's Edge AI Linux from a micro-SD card; you talk to it over a four-port serial console on a micro-B cable, or over Ethernet and a display when you have them. Ours is revision PROC112A1. The card in the box did not boot on the board tested (it was not read; it was probably blank), and the console needs a CP210x driver on a Mac. A 20 V USB-C supply is needed and is not in the box.",
+  "facts": [
+   [
+    "Chip",
+    "TDA4VM (J721E)"
+   ],
+   [
+    "CPU",
+    "Two Arm Cortex-A72 at up to 2.0 GHz, 1 MB shared L2; six Cortex-R5F at up to 1.0 GHz (TI SK-TDA4VM page and TDA4VM data sheet Rev. L, read 2026-10-09)"
+   ],
+   [
+    "Accelerators",
+    "C7x DSP with the MMA deep-learning accelerator, 8 TOPS (8-bit) at 1.0 GHz; two C66x DSPs; vision and image blocks; hardware H.264 and H.265 decode (rated at four 1080p60 streams), H.264 encode (one 1080p60) (data sheet Rev. L)"
+   ],
+   [
+    "Memory",
+    "4 GB LPDDR4 at 4,266 MT/s; Linux on TI's image sees 2,170 MiB, the rest is reserved for the accelerators' firmware"
+   ],
+   [
+    "Storage",
+    "Micro-SD card (the kit's 128 GB card read 44 MB/s), 512 Mb octal-SPI flash"
+   ],
+   [
+    "Connections",
+    "Gigabit Ethernet, three USB-A, one USB-C, HDMI and DisplayPort, two CSI-2 camera ports, M.2 E and M keys, four CAN-FD, a 40-pin header"
+   ],
+   [
+    "Radios",
+    "None (an M.2 E-key slot takes a Wi-Fi card)"
+   ],
+   [
+    "Debug",
+    "No probe for the cores; a CP2108 four-port serial console over micro-B"
+   ],
+   [
+    "Software",
+    "Processor SDK Linux Edge AI 11.00.00.08: Linux 6.12, gcc 13.3, Python 3.12, ONNX Runtime and TFLite with TI's TIDL delegates, DLR 1.13.0, GStreamer with TI's plugins"
+   ],
+   [
+    "Power",
+    "USB-C PD in, 5 to 20 V; TI recommends a 20 V Type-C supply of 60 W class and warns a 5 V supply can reset the board (SPRUJ21); not in the box"
+   ]
+  ],
+  "source": "docs/arrivals/tda4.md"
+ },
+ "projects": [
+  {
+   "t": "Get Linux running from the box",
+   "st": "works",
+   "result": "27.7 s first boot, 24.2 s warm, bootloader to login. The kit's card did not boot, so it was written over the serial cable and a USB stick with no card reader: 62 minutes writing the card and booting by the stopwatch, about 2 h 30 min from the box to a login prompt including about 90 minutes on the console driver (not saved)",
+   "source": "tda4/README.md"
+  },
+  {
+   "t": "TI's model zoo on the deep-learning accelerator",
+   "st": "works",
+   "result": "All 14 models tried, 2.2 to 13.8 ms each; TI's four published figures within 10 percent; on the 8 models we also ran on the Arm cores, those took 13 to 135 times longer",
+   "source": "docs/experiments/2026-10-10-tda4-c7x-vs-a72.md"
+  },
+  {
+   "t": "Video into a model with no CPU copy",
+   "st": "works",
+   "result": "TI's zero-copy settings: 110.8 fps for a third of one A72, against 56.2 fps for two thirds without them",
+   "source": "docs/experiments/2026-10-10-tda4-zero-copy-decode.md"
+  },
+  {
+   "t": "TI's demo apps, headless",
+   "st": "partial",
+   "result": "9 of 15 configs ran with the display swapped for a file sink: the 8 file-only ones (image classification at only 1.0 fps) and the HTTP-source one once Ethernet was on (1.78 fps); 5 need a camera and exited at once, and the RTSP one needs an RTSP server of our own",
+   "source": "data/results/tda4.csv"
+  },
+  {
+   "t": "Hardware crypto from a Linux program",
+   "st": "partial",
+   "result": "The SA2UL block works through /dev/crypto with our own program, but is slower than the A72's own instructions at every block size we measured; openssl cannot reach it on this image",
+   "source": "docs/experiments/2026-10-10-tda4-sa2ul-crypto.md"
+  },
+  {
+   "t": "NVIDIA Holoscan Sensor Bridge device",
+   "st": "partial",
+   "result": "NVIDIA's emulator on the A72s sends frames over a real 1 GbE link: 300 of 300 intact at 720p and 30 fps to our checker on a Mac, 21.9 percent of one core; not tested against NVIDIA's own receiver",
+   "source": "docs/experiments/2026-10-10-tda4-holoscan-sensor-bridge.md"
+  }
+ ],
+ "chains": [
+  {
+   "t": "Working with no network, display or card reader",
+   "st": "works",
+   "verdict": "Yes, slowly",
+   "why": "Everything here went over the 115,200 baud console: commands, file pushes as base64, log pulls. The card itself was written through UART boot and a USB stick. Our helper scripts are in tda4/tools/",
+   "source": "tda4/README.md"
+  },
+  {
+   "t": "Compiling our own models for the accelerator",
+   "st": "waiting",
+   "verdict": "Could work",
+   "why": "TI's model tools, edgeai-tidl-tools, run on x86 Linux. The plain-C models run on the A72: the 8k model takes 0.193 ms",
+   "source": "data/results/tda4.csv"
+  },
+  {
+   "t": "The R5F and C66x cores",
+   "st": "waiting",
+   "verdict": "Could work",
+   "why": "They run TI's demo firmware on this image. Using them needs TI's RTOS SDK for J721E. A 74 us message round trip to the MCU R5F was measured",
+   "source": "data/results/tda4.csv"
+  }
+ ],
+ "combine_title": "What else we tried, and how it went",
+ "combine_lede": "Each row is something we tried beyond the standard list. A row that did not work is recorded with its reason.",
+ "benchmarks": [
+  [
+   "CoreMark, one A72, gcc -O3 / -O2 / best flags",
+   "9,835 / 10,466 / 10,782 per s",
+   "Best: -O3 -mcpu=cortex-a72 -funroll-loops, 5.39 per MHz (flag-tuned)"
+  ],
+  [
+   "CoreMark, two threads",
+   "19,580 per s",
+   "1.99 times one"
+  ],
+  [
+   "Dhrystone, by the rules",
+   "4.83 DMIPS/MHz",
+   "5.26 to 5.68 with inlining; TI's 24K for the pair works out to 6.0"
+  ],
+  [
+   "Memory latency, L1 / L2 (512 kB to 1 MB) / DDR",
+   "2.5 / 14 to 25 / 91 to 190 ns",
+   "Dependent pointer chase"
+  ],
+  [
+   "Memory bandwidth, two threads",
+   "5.4 GB/s triad",
+   "6.3 GB/s copy; one thread 4.75"
+  ],
+  [
+   "Zoo model on the C7x, smallest to largest",
+   "2.17 to 13.76 ms",
+   "14 models"
+  ],
+  [
+   "Same models on the two A72s",
+   "37 to 1,767 ms",
+   "fp32, 13 to 135 times slower; 8 models"
+  ],
+  [
+   "Decode into a model, zero copy / plain",
+   "110.8 / 56.2 fps",
+   "33 / 65 percent of one A72"
+  ],
+  [
+   "H.264 decode, 1280x768 zero copy / 1080p four streams plain",
+   "about 490 / 89 fps",
+   "1080p cannot use the zero-copy path here"
+  ],
+  [
+   "Warm boot, bootloader to login",
+   "24.2 s",
+   "Micro-SD card"
+  ],
+  [
+   "Timer jitter, worst in 60 s idle / under load",
+   "41 / 59 us",
+   "Stock kernel, no PREEMPT_RT"
+  ],
+  [
+   "ML-KEM-768 keygen, one A72",
+   "148.5k cycles",
+   "Plain C; the Cortex-M33 takes 996.5k"
+  ],
+  [
+   "Wired Ethernet, TCP send / receive",
+   "about 940 / 940 Mbit/s",
+   "4 percent CPU sending, 52 to 58 percent receiving"
+  ]
+ ],
+ "benchmarks_source": "tda4/RESULTS-tda4.md",
+ "glance": [
+  [
+   "2.2 to 13.8 ms",
+   "Per model on the accelerator",
+   "All 14 TI zoo models tried; 13 to 135 times faster than the Arm cores on the 8 run on both",
+   "docs/experiments/2026-10-10-tda4-c7x-vs-a72.md"
+  ],
+  [
+   "24.2 s",
+   "Warm boot to login",
+   "First bootloader byte to the login prompt, three runs",
+   "data/results/tda4.csv"
+  ],
+  [
+   "2x",
+   "Frames with zero copy",
+   "110.8 against 56.2 fps into the same model, at half the CPU time per second",
+   "docs/experiments/2026-10-10-tda4-zero-copy-decode.md"
+  ],
+  [
+   "9,835",
+   "CoreMark, one A72, gcc -O3",
+   "10,466 at -O2 and 10,782 with tuned flags",
+   "data/results/tda4.csv"
+  ],
+  [
+   "up to 190 ns",
+   "DDR load latency",
+   "At a 64 MB working set; 91 ns at 2 MB, 2.5 ns from L1",
+   "data/results/tda4.csv"
+  ],
+  [
+   "940 Mbit/s",
+   "Wired Ethernet, each way",
+   "iperf3 against a wired host; 0.31 ms round trip",
+   "data/results/tda4.csv"
+  ]
+ ],
+ "good_for": [
+  "Camera and vision projects that need a neural net at video rate: every zoo model ran on the accelerator in under 14 ms",
+  "Learning how a heterogeneous chip splits work: Linux on the A72s, models on the C7x, codecs and scalers in hardware, firmware on the R5Fs",
+  "Comparing a Linux vision processor with microcontrollers on the same code: our occupancy models and post-quantum rows ran unchanged"
+ ],
+ "not_for": [
+  "Anything that needs a radio. The board has none, and an M.2 slot takes a Wi-Fi card",
+  "A bench with no 20 V USB-C supply: the kit needs one and does not include it",
+  "Hard real-time loops on Linux: the stock kernel's timer jitter reached 59 us under load",
+  "Judging the chip's ceiling from this page alone: these are starter-kit numbers with a micro-SD card, no fan and TI's demo image"
+ ],
+ "buy": "From TI (ti.com/tool/SK-TDA4VM); TI.com showed no public price on 2026-10-09. Not in the box: the power supply, a camera, a Wi-Fi card. The micro-SD card in the box did not boot on the board tested until TI's image was written to it.",
+ "gotchas": [
+  [
+   "The Mac shows no serial port",
+   "Install the CP210x driver, click Allow in System Settings, replug. The console is the second of the four ports on a Mac, `/dev/cu.SLAB_USBtoUART1`. **Tag: Third-party behavior**"
+  ],
+  [
+   "All four ports stay silent after power-on",
+   "The card in the box did not boot on the board tested (it was not read; it was probably blank); write TI's Edge AI image to it. With no reader, UART boot and a USB stick work. **Tag: Tool or docs**"
+  ],
+  [
+   "A long job dies when you connect again",
+   "Start it with `setsid nohup ... &`; a console helper's Ctrl-C reaches jobs in the shell's process group. **Tag: Setup or handling**"
+  ],
+  [
+   "The board resets under heavy load",
+   "Use a 20 V USB-C supply of 60 W or more and a fan before sustained runs; the supply tested was a 65 W USB-C charger. One reset came at 92.6 C and one at idle, causes unknown. **Tag: Unknown**"
+  ],
+  [
+   "1080p decode fails to allocate memory",
+   "Drop `tiovxmemalloc` at 1080p; one stream then decodes at 67 fps, and two or four share about 90 fps. **Tag: Unknown**"
+  ],
+  [
+   "CoreMark is lower at -O3 than -O2",
+   "On this gcc -O2 reads 6.4 percent higher on the same files; quote the flags with the score. **Tag: Unknown (suspected: gcc's -O3 code for the A72; not profiled)**"
+  ],
+  [
+   "After moving the console cable, the port is silent",
+   "Probe all four ports; it can move from `/dev/cu.SLAB_USBtoUART1` to `UART2`. **Tag: Third-party behavior**"
+  ]
+ ],
+ "faq_page": "faq-tda4.html",
+ "faq_source": "tda4/FAQ.md",
+ "updated": "2026-10-10",
+ "measured_on": "Measured 2026-10-09 and 2026-10-10 from an Intel Mac (macOS 15.7.9) over the serial console at 115,200 baud, and over wired Ethernet at the end. SK-TDA4VM revision PROC112A1, Processor SDK Linux Edge AI 11.00.00.08, gcc 13.3, micro-SD boot, passive heatsink and no fan, an Apple USB-C charger recalled as 65 W (label not read). A starter kit on TI's demo image: see the results page for what that limits.",
+ "next": {
+  "title": "What do I do first with the SK-TDA4VM?",
+  "steps": [
+   "Get a 20 V USB-C PD supply; the kit does not include one.",
+   "Write TI's Edge AI image to the micro-SD card before the first power-on; the card in the box did not boot on the board tested.",
+   "Open the serial console first at 115,200 baud, login root, then power the board.",
+   "Run one zoo model on the accelerator, then read the FAQ before any heavy or long run."
+  ],
+  "source": "tda4/README.md"
+ },
+ "ai_cost": {
+  "headline": "Twelve fresh AI agents (Claude Sonnet 5.5, clean start, one at a time) did two jobs on this board on 2026-10-10 over its serial console. Each job ran three times with this repo's notes and three without. Total: $7.39 at list price. 11 of 12 results were checked right by us; the twelfth reported the right number but the board reset itself as it ended. Without this repo's notes the agents were as fast on the inference job, no faster on CoreMark, and cheaper on both.",
+  "rows": [
+   [
+    "Claude Sonnet 5.5, 12 fresh-agent runs (a zoo inference and CoreMark, each with and without this repo's notes)",
+    "2.0 to 7.7 min per run",
+    "200",
+    "$7.39"
+   ]
+  ],
+  "source": "docs/model-comparison.md",
+  "per_project": {
+   "intro": "Each job given to three fresh Claude Sonnet 5.5 agents, with this repo's notes and then without (only TI's public documents, the board's own files and the web), 2026-10-10. Results checked by us over the same console after each agent finished.",
+   "rows": [
+    [
+     "Run one zoo model on the C7x and report its median ms (with this repo's notes)",
+     "2 of 3 checked (the third unchecked: the board reset)",
+     "2.0 to 4.1 min",
+     "$0.51 to $0.74"
+    ],
+    [
+     "The same job without this repo's notes",
+     "3 of 3",
+     "2.1 to 2.2 min",
+     "$0.36 to $0.52"
+    ],
+    [
+     "Build and run CoreMark on one A72 over the console (with this repo's notes)",
+     "3 of 3",
+     "3.7 to 4.3 min",
+     "$0.84 to $0.95"
+    ],
+    [
+     "The same job without this repo's notes (all three built at -O2 and scored higher than our -O3 recipe)",
+     "3 of 3",
+     "2.9 to 7.7 min",
+     "$0.47 to $0.60"
+    ]
+   ],
+   "source": "docs/model-comparison.md"
+  }
+ },
+ "runs_note": "Most projects in this list are microcontroller projects, such as blinking a pin, reading an ADC or a Zigbee light. They do not map onto a Linux vision board, so they do not apply here. The board's own tests are in the benchmarks below and on the results page."
+}

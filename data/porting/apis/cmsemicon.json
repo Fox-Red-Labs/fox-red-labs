@@ -1,0 +1,189 @@
+{
+ "api": "cmsemicon",
+ "vendor": "Cmsemicon",
+ "detect": "CMS32|Cmsemicon|\\bCGC_\\w+|PORT_Init",
+ "symbol_re": "\\b(?:PORT_[A-Za-z]+|GPIO_(?:Output|Input|PullUp)_Enable|CGC_[A-Za-z_]+|ADC_[A-Za-z_]+|Adc_[A-Za-z_]+|Uart\\d?_[A-Za-z_]+|Usart\\d?_[A-Za-z_]+|TIM\\d+_[A-Za-z_]+|It_Init|IT_Start|IT_Stop|Interval_Init|INTP_[A-Za-z]+|Intp_Init|Key_Init|Led_Init|WDT_Config|WWDG_[A-Za-z]+|FLASH_[A-Za-z_]+|EraseSector|ProgramPage|ISR_Register|delay(?:MS|US)|[A-Za-z0-9]*DMA_Config|Dma_Config|SPI_[A-Za-z]+|CRC_[A-Za-z0-9_]+|OP\\d_Config|ACMP_[A-Za-z0-9_]+|__SLEEP|__DEEPSLEEP|Delay[A-Za-z_]*)\\b",
+ "calls_only": true,
+ "entries": [
+  {
+   "match": "PORT_Init|GPIO_Output_Enable|GPIO_Input_Enable|GPIO_PullUp_Enable|Led_Init|Key_Init",
+   "idiom": "gpio.config_pin",
+   "note": "the pin map (cms_pinmap.h) is the configuration: one line per pin; Cmsemicon pins A, B, C, F fold onto the one port",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "PORT_SetBit|PORT_ClrBit",
+   "idiom": "gpio.write",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "PORT_ToggleBit",
+   "idiom": "gpio.toggle",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "PORT_GetBit",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "INTP_Start|INTP_Stop|Intp_Init",
+   "idiom": "gpio.input_irq_edge",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "ISR_Register",
+   "idiom": "irq.vector_name",
+   "note": "the glue keeps a table and the real handlers call it",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "delayMS",
+   "idiom": "time.delay_ms",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "delayUS|Delay[A-Za-z_]*",
+   "idiom": "time.delay_us",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "CGC_[A-Za-z_]+",
+   "idiom": "clock.system_config",
+   "note": "the L1306 has SYSOSC and LFOSC only; HFXT and PLL calls are no-ops or nearest value",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "Uart\\d?_Init|Usart\\d?_Init",
+   "idiom": "uart.init_8n1",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "Uart\\d?_Send|Usart_Send",
+   "idiom": "uart.tx_byte_blocking",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "Uart\\d?_Receive|Usart_Receive",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "Uart\\d?_IntSend|Uart\\d?_IntRcv|Uart\\d?_Dma_Send|Uart\\d?_Dma_Rcv",
+   "idiom": "uart.tx_blocking",
+   "note": "the glue implements the DMA names with the interrupt or blocking path",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "USART1TX_DMA_Config|USART1RX_DMA_Config|Dma_Config|SPI00_DMA_Config|SPI_DMA_Config|ADC_DMA_Init|TIM1_DMA_Config",
+   "idiom": "dma.config_channel",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "Adc_[A-Za-z_]+|ADC_Start|ADC_Converse",
+   "idiom": "adc.start_conversion",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "TIM1_Config\\w*|TIM17_Config",
+   "idiom": "pwm.config_channel",
+   "note": "two channels, no complementary pair and no dead band on TIMG",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "TIM3_Config|TIM14_Config|TIM14_timing_Config|TIM16_Config|It_Init|IT_Start|IT_Stop|Interval_Init",
+   "idiom": "time.periodic_irq",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "WDT_Config|WWDG_Config|WWDG_SetCounter",
+   "idiom": "wdt.watchdog",
+   "note": "one watchdog on the L1306: window mode must be opened fully or the example resets the chip",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "CRC_[A-Za-z0-9_]+",
+   "idiom": "crc.compute",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "FLASH_[A-Za-z_]+|EraseSector|ProgramPage",
+   "idiom": "flash.write",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "__SLEEP|__DEEPSLEEP",
+   "idiom": "power.sleep",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "ACMP_\\w+",
+   "idiom": "analog.comparator",
+   "note": "one comparator on the L1306; ACMP0 and ACMP1 both land on COMP0",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "OP\\d_Config",
+   "idiom": "analog.opamp",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "INTP_(Init|ClearPendingFlag|GetPendingFlag|FilterConfig)",
+   "idiom": "gpio.input_irq_edge",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "ADC_(Init|IRQHandler|Stop|Set_Clock|Set_HardTrigger|Converse_Scan|InternSource|SamplingDelay_\\w+)",
+   "idiom": "adc.config_channel",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "Uart\\d?_putchar",
+   "idiom": "uart.tx_byte_blocking",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "Uart\\d?_getchar",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "WWDG_(Enable|SetPrescaler|SetWindowValue|ClearFlag|DeInit|EnableIT|GetFlagStatus)",
+   "idiom": "wdt.watchdog",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "TIM1_CLKSelcet",
+   "idiom": "clock.system_config",
+   "note": "",
+   "from": "port cmsemicon glue (glue/l1306)"
+  },
+  {
+   "match": "SPI_[A-Za-z]+",
+   "idiom": "dma.config_channel",
+   "note": "SPI names are in the glue; the SPI and I2C examples were not run",
+   "from": "port cmsemicon glue (glue/l1306)"
+  }
+ ]
+}

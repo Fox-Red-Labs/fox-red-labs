@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- IAR Project Connection File -->
+
+<iarProjectConnection version="1.2" name="basic_ble app" oneShot="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="IarProjectConnection_1.2.xsd">
+
+    <device>
+        <name>CC2340R5</name>
+    </device>
+
+    <asmIncludePath>
+        <path>$PROJ_DIR$</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/third_party/freertos/include</path>
+    </asmIncludePath>
+
+    <includePath>
+        <path>$PROJ_DIR$</path>
+        <path>$PROJ_DIR$/app</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/common/cc26xx</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/third_party/mbedtls/include</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/third_party/mbedtls/ti</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/third_party/mcuboot/boot/bootutil/include</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/third_party/mcuboot/boot/ti/source/mcuboot_app</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/common/cc26xx/flash_interface</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/drivers/rcl</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/posix/iar</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/kernel/freertos</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/third_party/freertos/include</path>
+        <path>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/third_party/freertos/portable/IAR/ARM_CM0</path>
+    </includePath>
+
+    <defines>
+        <define>ICALL_NO_APP_EVENTS</define>
+        <define>MBEDTLS_CONFIG_FILE=&quot;configs/config-hsm.h&quot;</define>
+        <define>MBEDTLS_PSA_CRYPTO_CONFIG_FILE=&quot;configs/config-psa-crypto-hsm.h&quot;</define>
+        <define>NVOCMP_NVPAGES=6</define>
+        <define>NVOCMP_POSIX_MUTEX</define>
+        <define>NVOCMP_NWSAMEITEM=1</define>
+        <define>FREERTOS</define>
+    </defines>
+
+    <extraOptions>
+        <args>
+            <arg>-f$PROJ_DIR$/ti_utils_build_compiler.opt</arg>
+            <arg>-f$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/config/build_components.opt</arg>
+            <arg>-f$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/config/factory_config.opt</arg>
+            <arg>--silent</arg>
+            <arg>-e</arg>
+            <arg>--aeabi</arg>
+            <arg>--thumb</arg>
+            <arg>--diag_suppress=Pa050</arg>
+        </args>
+    </extraOptions>
+
+    <linkerFile>
+        <override>true</override>
+        <path>$PROJ_DIR$/cc2340_freertos.icf</path>
+    </linkerFile>
+
+    <linkerExtraOptions>
+        <args>
+            <arg>--keep __vector_table</arg>
+            <arg>-L$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source</arg>
+            <arg>-L$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/kernel</arg>
+            <arg>--config_def PAGE_ALIGN=-1</arg>
+            <arg>--threaded_lib</arg>
+            <arg>-f$PROJ_DIR$/ti_utils_build_linker.cmd.genlibs</arg>
+            <arg>--silent</arg>
+        </args>
+    </linkerExtraOptions>
+
+    <customBuildTools>
+        <customBuildTool atRoot="true" name="SysConfig"> <!-- Custom build tool for entire project-->
+            <fileExtensions>.syscfg</fileExtensions>
+            <command>$SYSCONFIG_ROOT$/sysconfig_cli.bat -o $PROJ_DIR$ -s "$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/.metadata/product.json" --compiler iar $FILE_PATH$</command>
+            <output>
+                <path>SysConfig_Generated_Files.ipcf</path>
+            </output>
+            <hasPrio>true</hasPrio> <!-- true: run this tool before all other tools-->
+        </customBuildTool>
+    </customBuildTools>
+
+    <heaps>
+        <heap> <!-- If omitted, id="0" -->
+            <size>0</size>
+        </heap>
+        <heap id="1">
+            <size>0</size>
+        </heap>
+    </heaps>
+    <stacks>
+        <stack> <!-- If omitted, id="0" -->
+            <size>512</size>
+        </stack>
+    </stacks>
+
+    <preBuild>
+        <command>$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/tools/ble/oad/commands_runner --cfg_file &quot;$PROJ_DIR$\ti_ble_oad_prebuild.cfg&quot; --compiler iar --ewp &quot;$PROJ_DIR$\$PROJ_FNAME$.ewp&quot; --config &quot;$CONFIG_NAME$&quot; --iarbuild &quot;$TOOLKIT_DIR$\..\common\bin\IarBuild.exe&quot; --sysconfig_cli &quot;$SYSCONFIG_ROOT$\sysconfig_cli.bat&quot; --execute_sysconfig --sdk_dir &quot;$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$&quot;</command>
+    </preBuild>
+
+    <files>
+        <path copyTo="$PROJ_DIR$/basic_ble.syscfg">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/freertos/basic_ble.syscfg</path>
+        <path reference="$PROJ_DIR$/Board.html">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/boards/LP_EM_CC2340R5/Board.html</path>
+        <path copyTo="$PROJ_DIR$/cc2340_freertos.icf">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/freertos/iar/cc2340_freertos.icf</path>
+        <path copyTo="$PROJ_DIR$/main_freertos.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/common/Startup/main_freertos.c</path>
+        <path copyTo="$PROJ_DIR$/README.html">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/README.html</path>
+        <group name="app" build="true">
+            <path copyTo="$PROJ_DIR$/app/app_broadcaster.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_broadcaster.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_central.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_central.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_connection.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_connection.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_data.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_data.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_l2cap_coc.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_l2cap_coc.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_main.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_main.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_main.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_main.h</path>
+            <path copyTo="$PROJ_DIR$/app/app_menu.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_menu.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_ms_oad_pairing.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_ms_oad_pairing.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_ms_oad_peripheral.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_ms_oad_peripheral.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_observer.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_observer.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_padv_time_sync.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_padv_time_sync.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_padv_time_sync.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_padv_time_sync.h</path>
+            <path copyTo="$PROJ_DIR$/app/app_pairing.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_pairing.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_peripheral.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_peripheral.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_time_sync.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_time_sync.c</path>
+            <path copyTo="$PROJ_DIR$/app/app_time_sync.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/app_time_sync.h</path>
+        </group>
+        <group name="app/Profiles" build="true">
+            <path copyTo="$PROJ_DIR$/app/Profiles/app_dev_info.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/Profiles/app_dev_info.c</path>
+            <path copyTo="$PROJ_DIR$/app/Profiles/app_oad.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/Profiles/app_oad.c</path>
+            <path copyTo="$PROJ_DIR$/app/Profiles/app_simple_gatt.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/app/Profiles/app_simple_gatt.c</path>
+        </group>
+        <group name="common/BLEAppUtil" build="true">
+            <path reference="$PROJ_DIR$/common/BLEAppUtil/bleapputil_init.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/framework/src/bleapputil_init.c</path>
+            <path reference="$PROJ_DIR$/common/BLEAppUtil/bleapputil_process.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/framework/src/bleapputil_process.c</path>
+            <path reference="$PROJ_DIR$/common/BLEAppUtil/bleapputil_stack_callbacks.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/framework/src/bleapputil_stack_callbacks.c</path>
+            <path reference="$PROJ_DIR$/common/BLEAppUtil/bleapputil_task.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/framework/src/bleapputil_task.c</path>
+            <path reference="$PROJ_DIR$/common/BLEAppUtil/bleapputil_timers.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/framework/src/bleapputil_timers.c</path>
+        </group>
+        <group name="common/BLEAppUtil/inc" build="true">
+            <path reference="$PROJ_DIR$/common/BLEAppUtil/inc/bleapputil_api.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/framework/bleapputil_api.h</path>
+            <path reference="$PROJ_DIR$/common/BLEAppUtil/inc/bleapputil_timers.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/framework/bleapputil_timers.h</path>
+        </group>
+        <group name="common/config" build="true">
+            <path reference="$PROJ_DIR$/common/config/ble_user_config.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/config/src/ble_user_config.c</path>
+            <path reference="$PROJ_DIR$/common/config/ble_user_config.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/config/ble_user_config.h</path>
+            <path reference="$PROJ_DIR$/common/config/hci_supported_cmd.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/config/src/hci_supported_cmd.c</path>
+            <path reference="$PROJ_DIR$/common/config/hci_supported_cmd.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/controller/hci/hci_supported_cmd.h</path>
+        </group>
+        <group name="common/Drivers/NV" build="true">
+            <path reference="$PROJ_DIR$/common/Drivers/NV/crc.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/common/nv/crc.c</path>
+            <path reference="$PROJ_DIR$/common/Drivers/NV/crc.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/common/nv/crc.h</path>
+            <path reference="$PROJ_DIR$/common/Drivers/NV/nvintf.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/common/nv/nvintf.h</path>
+            <path reference="$PROJ_DIR$/common/Drivers/NV/nvocmp.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/common/nv/nvocmp.c</path>
+            <path reference="$PROJ_DIR$/common/Drivers/NV/nvocmp.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/common/nv/nvocmp.h</path>
+        </group>
+        <group name="common/iCall" build="true">
+            <path reference="$PROJ_DIR$/common/iCall/icall.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/icall/app/src/icall.c</path>
+            <path reference="$PROJ_DIR$/common/iCall/icall.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/icall/app/icall.h</path>
+            <path reference="$PROJ_DIR$/common/iCall/icall_addrs.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/icall/app/icall_addrs.h</path>
+            <path reference="$PROJ_DIR$/common/iCall/icall_platform.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/icall/app/icall_platform.h</path>
+            <path reference="$PROJ_DIR$/common/iCall/icall_POSIX.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/icall/app/src/icall_POSIX.c</path>
+            <path reference="$PROJ_DIR$/common/iCall/icall_user_config.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/icall/app/src/icall_user_config.c</path>
+            <path reference="$PROJ_DIR$/common/iCall/icall_user_config.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/icall/app/icall_user_config.h</path>
+        </group>
+        <group name="common/iCallBLE" build="true">
+            <path reference="$PROJ_DIR$/common/iCallBLE/icall_ble_apimsg.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/icall/app/icall_ble_apimsg.h</path>
+        </group>
+        <group name="common/lib_opt" build="true">
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_adaptivity.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_adaptivity.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_adv_conn.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_adv_conn.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_adv_nconn.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_adv_nconn.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_ae.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_ae.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_ble_health.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_ble_health.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_cm.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_cm.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_coex.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_coex.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_connectable.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_connectable.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_connection_handover.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_connection_handover.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_cs.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_cs.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_cs_test.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_cs_test.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_dmm.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_dmm.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_dmm_dynamic_priority.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_dmm_dynamic_priority.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_ext_vendor_specific_cmd.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_ext_vendor_specific_cmd.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_health_check.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_health_check.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_initiator.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_initiator.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_legacy_cmd.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_legacy_cmd.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_padv.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_padv.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_past_receiver.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_past_receiver.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_past_sender.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_past_sender.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_pawr_advertiser.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_pawr_advertiser.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_pawr_scan.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_pawr_scan.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_power_control.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_power_control.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_pscan.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_pscan.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_rssi_monitor.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_rssi_monitor.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_scanner.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_scanner.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_ts_periodic.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_ts_periodic.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/ctrl_opt_vendor_specific_cmd.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/ctrl_opt_vendor_specific_cmd.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/host_opt_gap_bond_mgr.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/host_opt_gap_bond_mgr.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/host_opt_gap_past_receiver.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/host_opt_gap_past_receiver.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/host_opt_gap_past_sender.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/host_opt_gap_past_sender.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/host_opt_gap_pawr_adv.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/host_opt_gap_pawr_adv.c</path>
+            <path reference="$PROJ_DIR$/common/lib_opt/host_opt_gap_pawr_scan.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/src/host_opt_gap_pawr_scan.c</path>
+        </group>
+        <group name="common/MenuModule" build="true">
+            <path reference="$PROJ_DIR$/common/MenuModule/menu_module.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/menu/src/menu_module.c</path>
+            <path reference="$PROJ_DIR$/common/MenuModule/menu_module.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/menu/menu_module.h</path>
+        </group>
+        <group name="common/Profiles/oad" build="true">
+            <path reference="$PROJ_DIR$/common/Profiles/oad/ms_oad_profile.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/profiles/oad/src/ms_oad_profile.c</path>
+            <path reference="$PROJ_DIR$/common/Profiles/oad/ms_oad_profile.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/profiles/oad/ms_oad_profile.h</path>
+            <path reference="$PROJ_DIR$/common/Profiles/oad/oad_profile.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/profiles/oad/src/oad_profile.c</path>
+            <path reference="$PROJ_DIR$/common/Profiles/oad/oad_profile.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/profiles/oad/oad_profile.h</path>
+        </group>
+        <group name="common/Profiles/simple_gatt" build="true">
+            <path reference="$PROJ_DIR$/common/Profiles/simple_gatt/simple_gatt_profile.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/profiles/simple_gatt/src/simple_gatt_profile.c</path>
+            <path reference="$PROJ_DIR$/common/Profiles/simple_gatt/simple_gatt_profile.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/profiles/simple_gatt/simple_gatt_profile.h</path>
+        </group>
+        <group name="common/Services/dev_info" build="true">
+            <path reference="$PROJ_DIR$/common/Services/dev_info/dev_info_service.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/services/dev_info/src/dev_info_service.c</path>
+            <path reference="$PROJ_DIR$/common/Services/dev_info/dev_info_service.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/services/dev_info/dev_info_service.h</path>
+        </group>
+        <group name="common/Services/oad" build="true">
+            <path reference="$PROJ_DIR$/common/Services/oad/oad_reset_service.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/services/oad/src/oad_reset_service.c</path>
+            <path reference="$PROJ_DIR$/common/Services/oad/oad_reset_service.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/services/oad/oad_reset_service.h</path>
+            <path reference="$PROJ_DIR$/common/Services/oad/oad_service.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/services/oad/src/oad_service.c</path>
+            <path reference="$PROJ_DIR$/common/Services/oad/oad_service.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/services/oad/oad_service.h</path>
+        </group>
+        <group name="common/Startup" build="true">
+            <path copyTo="$PROJ_DIR$/common/Startup/osal_icall_ble.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/examples/rtos/LP_EM_CC2340R5/ble/basic_ble/common/Startup/osal_icall_ble.c</path>
+            <path reference="$PROJ_DIR$/common/Startup/rom_init.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/lib_opt/rom_init.c</path>
+        </group>
+        <group name="common/Util" build="true">
+            <path reference="$PROJ_DIR$/common/Util/util.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/common/src/util.c</path>
+            <path reference="$PROJ_DIR$/common/Util/util.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/common/util.h</path>
+        </group>
+        <group name="common/Util/SwUpdate" build="true">
+            <path reference="$PROJ_DIR$/common/Util/SwUpdate/flash_interface.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/common/cc26xx/flash_interface/flash_interface.h</path>
+            <path reference="$PROJ_DIR$/common/Util/SwUpdate/flash_interface_oad.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/sw_update/src/flash_interface_oad.c</path>
+            <path reference="$PROJ_DIR$/common/Util/SwUpdate/sw_update.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/sw_update/src/sw_update.c</path>
+            <path reference="$PROJ_DIR$/common/Util/SwUpdate/sw_update.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/app_util/sw_update/sw_update.h</path>
+        </group>
+        <group name="HealthToolkit" build="true">
+            <path reference="$PROJ_DIR$/HealthToolkit/ble_sys_stat.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/health_toolkit/src/ble_sys_stat.c</path>
+            <path reference="$PROJ_DIR$/HealthToolkit/debugInfo.c">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/health_toolkit/src/debugInfo.c</path>
+        </group>
+        <group name="HealthToolkit/inc" build="true">
+            <path reference="$PROJ_DIR$/HealthToolkit/inc/ble_sys_stat.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/health_toolkit/ble_sys_stat.h</path>
+            <path reference="$PROJ_DIR$/HealthToolkit/inc/debugInfo.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/health_toolkit/debugInfo.h</path>
+            <path reference="$PROJ_DIR$/HealthToolkit/inc/debugInfo_errno.h">$SIMPLELINK_LOWPOWER_F3_SDK_INSTALL_DIR$/source/ti/ble/stack_util/health_toolkit/debugInfo_errno.h</path>
+        </group>
+    </files>
+</iarProjectConnection>

@@ -1,0 +1,68 @@
+From e6f03235fb6f17fb8d9ea8cb948716dd27d5dfcd Mon Sep 17 00:00:00 2001
+From: Contributor Name <contributor@example.invalid>
+Date: Sun, 25 Oct 2026 07:12:29 -0400
+Subject: [PATCH 3/3] boards: ti: lp_mspm0g3519: add I2C2 pin groups for the
+ BoosterPack
+
+BoosterPack pin 9 (SCL) is PC2 and pin 10 (SDA) is PC3, which are the
+I2C2 function (pin function 2) of PINCM76 and PINCM77. The SoC pinctrl
+data has no I2C2 groups for these pins, so define them in the board
+file. They are omitted from the devicetree unless referenced.
+
+There is no i2c2 node in main yet, so this does not enable the
+peripheral; document the pins and leave the node to the MSPM0 I2C
+driver series.
+
+Assisted-by: Claude:claude-sonnet-5-5
+---
+ boards/ti/lp_mspm0g3519/doc/index.rst     |  8 ++++++++
+ boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts | 17 +++++++++++++++++
+ 2 files changed, 25 insertions(+)
+
+diff --git a/boards/ti/lp_mspm0g3519/doc/index.rst b/boards/ti/lp_mspm0g3519/doc/index.rst
+index acf05d612..afedd9166 100644
+--- a/boards/ti/lp_mspm0g3519/doc/index.rst
++++ b/boards/ti/lp_mspm0g3519/doc/index.rst
+@@ -91,6 +91,14 @@ ADC
+ divided by 8) and with PA25, ADC0 channel 2, routed to the converter. Applications describe their
+ channels in an overlay; see ``samples/drivers/adc/adc_dt/boards/lp_mspm0g3519.overlay``.
+ 
++BoosterPack I2C
++===============
++
++The I2C2 peripheral is on BoosterPack pin 9 (SCL, PC2) and pin 10 (SDA, PC3), pin function 2
++(PINCM76 and PINCM77). The board file defines the pin groups ``i2c2_scl_pc2`` and
++``i2c2_sda_pc3`` for them. Enable an ``i2c2`` node that uses these groups once the MSPM0 I2C driver
++is available.
++
+ Building and Flashing
+ *********************
+ 
+diff --git a/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts b/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
+index 863a9a141..032bb09df 100644
+--- a/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
++++ b/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
+@@ -103,6 +103,23 @@
+ 		pinmux = <MSP_PINMUX(35, MSPM0_PIN_FUNCTION_12)>;
+ 		input-enable;
+ 	};
++
++	/* BoosterPack I2C: pin 9 (SCL) is PC2 and pin 10 (SDA) is PC3, I2C2 function (PINCM76,
++	 * PINCM77, function 2). SoC pinctrl data has no I2C2 groups for these pins.
++	 */
++	/omit-if-no-ref/ i2c2_scl_pc2: i2c2_scl_pc2 {
++		pinmux = <MSP_PINMUX(76, MSPM0_PIN_FUNCTION_2)>;
++		input-enable;
++		drive-open-drain;
++		bias-pull-up;
++	};
++
++	/omit-if-no-ref/ i2c2_sda_pc3: i2c2_sda_pc3 {
++		pinmux = <MSP_PINMUX(77, MSPM0_PIN_FUNCTION_2)>;
++		input-enable;
++		drive-open-drain;
++		bias-pull-up;
++	};
+ };
+ 
+ &gpioa {

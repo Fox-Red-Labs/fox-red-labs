@@ -1,0 +1,17 @@
+# Addresses from halt-registers.txt (PC, LR and return addresses on the stack) mapped with
+# arm-zephyr-eabi-addr2line -f -e zephyr.elf (Zephyr SDK GCC 12.2), image: our BTHome beacon on
+# simplelink-zephyr v3.7.0-ti-1.00.01_ga, CCFG byte 0x07, heap 0 (the 2026-10-07 build).
+# Copied from the console, 2026-10-08. Folder paths before each file name removed; line numbers kept.
+0x146b8 (PC)   AssertHandler          drivers/bluetooth/hci/hci_ti.c:146
+0xd640  (LR-1) halAssertHandlerExt    ble_ti/.../stack_util/health_toolkit/src/assert.c:187
+0x14b01        List_remove            modules/hal/ti/simplelink_lpf3/source/ti/drivers/utils/List.c:190
+0x15e23        ICall_abort            ble_ti/.../stack_util/icall/app/src/icall_POSIX.c:1648
+0xc9f9         ICall_setTimer         ble_ti/.../stack_util/icall/app/src/icall_POSIX.c:1825
+0x124ad        osal_msec_timer_cback  ble_ti/.../stack_util/osal/src/osal.c:1412
+# Disassembly at the PC (arm-zephyr-eabi-objdump -d): AssertHandler compares its cause code (R0 = 5 here)
+# and ends in a loop that reads a byte on the stack until it becomes 0, so the program waits there for a debugger.
+#    1469a: 781a  ldrb r2, [r3, #0]
+#    1469c: 2a00  cmp  r2, #0
+#    1469e: d1fc  bne.n 1469a
+# Heap setting in the fork's builds before the fix (each build's zephyr/.config):
+# beacon, peripheral, hello_world, our BTHome beacon: CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=0

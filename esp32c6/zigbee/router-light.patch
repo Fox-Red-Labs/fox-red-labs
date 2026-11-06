@@ -1,0 +1,36 @@
+diff -ru ../on_off_light/main/on_off_light.c ./main/on_off_light.c
+--- ../on_off_light/main/on_off_light.c	2026-10-11 15:09:11
++++ ./main/on_off_light.c	2026-10-11 15:10:15
+@@ -62,9 +62,9 @@
+             ESP_LOGI(TAG, "Deferred driver initialization %s", deferred_driver_init() ? "failed" : "successful");
+             ESP_LOGI(TAG, "Device started up in%s factory-reset mode", ezb_bdb_is_factory_new() ? "" : " non");
+             if (ezb_bdb_is_factory_new()) {
+-                ezb_bdb_start_top_level_commissioning(EZB_BDB_MODE_NETWORK_FORMATION);
++                ezb_bdb_start_top_level_commissioning(EZB_BDB_MODE_NETWORK_STEERING); /* FRL: router joins, does not form */
+             } else {
+-                ezb_bdb_open_network(180);
++                /* FRL: no ezb_bdb_open_network(180): a router must not open the house network */
+                 ESP_LOGI(TAG, "Device reboot");
+             }
+         } else {
+diff -ru ../on_off_light/main/on_off_light.h ./main/on_off_light.h
+--- ../on_off_light/main/on_off_light.h	2026-10-11 15:09:11
++++ ./main/on_off_light.h	2026-10-11 15:10:15
+@@ -14,7 +14,7 @@
+ 
+ #pragma once
+ 
+-#define ESP_ZIGBEE_PRIMARY_CHANNEL_MASK   (1U << CONFIG_ZB_EXAMPLE_PRIMARY_CHANNEL)
++#define ESP_ZIGBEE_PRIMARY_CHANNEL_MASK   (0x07FFF800U) /* FRL: all channels 11 to 26, to find an existing network */
+ #define ESP_ZIGBEE_SECONDARY_CHANNEL_MASK CONFIG_ZB_EXAMPLE_SECONDARY_CHANNEL_MASK
+ 
+ #define ESP_ZIGBEE_HA_ON_OFF_LIGHT_EP_ID (10)
+@@ -26,7 +26,7 @@
+ 
+ #define ESP_ZIGBEE_ZC_CONFIG()                          \
+     {                                                   \
+-        .device_type = EZB_NWK_DEVICE_TYPE_COORDINATOR, \
++        .device_type = EZB_NWK_DEVICE_TYPE_ROUTER,      \
+         .install_code_policy = false,                   \
+         .zczr_config = {                                \
+             .max_children = 10,                         \

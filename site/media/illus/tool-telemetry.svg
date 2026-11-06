@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="Three asset tags on motor-driven equipment send Bluetooth LE bursts to a site hub; one tag reports a short run, the hub forwards it over Wi-Fi, and the run-event count on a phone goes up by one">
+<style>
+  .arc { opacity: .15; }
+  .id0 { animation: idle 3s infinite; } .id2 { animation: idle 3s infinite; --o: 1.3s; }
+  .ev { animation: burst 6s infinite; }
+  .arc { animation-delay: calc(var(--o, 0s) + var(--s, 0s)); } .a1 { --s: .12s; } .a2 { --s: .24s; }
+  .bar { transform-box: fill-box; transform-origin: left center; animation: bar 6s infinite; }
+  .led { animation: led 6s infinite; }
+  .pk1 { animation: pk1 6s infinite; opacity: 0; }
+  .pk2 { animation: pk2 6s infinite; opacity: 0; }
+  .hubled { animation: hubled 6s infinite; }
+  .wf { opacity: .15; animation: wf 6s infinite; } .w1 { animation-delay: .15s; } .w2 { animation-delay: .3s; }
+  .n1 { animation: n1 6s infinite; } .n2 { opacity: 0; animation: n2 6s infinite; }
+  .ring { opacity: 0; animation: ring 6s infinite; }
+  @keyframes idle { 0%,100% { opacity: .15 } 25% { opacity: .7 } 50% { opacity: .15 } }
+  @keyframes burst { 0%,24% { opacity: .15 } 27%,34% { opacity: 1 } 40%,100% { opacity: .15 } }
+  @keyframes bar { 0% { transform: scaleX(0) } 12%,22% { transform: scaleX(1) } 24%,100% { transform: scaleX(0) } }
+  @keyframes led { 0%,24% { fill: #6B625B } 25%,36% { fill: #B42418 } 38%,100% { fill: #6B625B } }
+  @keyframes pk1 { 0%,30% { transform: translateX(0); opacity: 0 } 32% { opacity: 1 } 54% { transform: translateX(166px); opacity: 1 } 56%,100% { transform: translateX(166px); opacity: 0 } }
+  @keyframes pk2 { 0%,60% { transform: translateX(0); opacity: 0 } 62% { opacity: 1 } 80% { transform: translateX(100px); opacity: 1 } 82%,100% { transform: translateX(100px); opacity: 0 } }
+  @keyframes hubled { 0%,54% { fill: #6B625B } 56%,70% { fill: #B42418 } 72%,100% { fill: #6B625B } }
+  @keyframes wf { 0%,56% { opacity: .15 } 60%,70% { opacity: 1 } 76%,100% { opacity: .15 } }
+  @keyframes n1 { 0%,82% { opacity: 1 } 83%,100% { opacity: 0 } }
+  @keyframes n2 { 0%,82% { opacity: 0 } 83%,100% { opacity: 1 } }
+  @keyframes ring { 0%,82% { opacity: 0 } 84% { opacity: 1 } 96%,100% { opacity: 0 } }
+  @media (prefers-reduced-motion: reduce) {
+    .arc,.ev,.id0,.id2,.wf,.n1,.n2,.bar,.led,.hubled,.pk1,.pk2,.ring { animation: none !important; }
+    .arc,.wf { opacity: 1; } .n1,.pk1,.pk2,.ring { opacity: 0; } .n2 { opacity: 1; }
+    .bar { transform: scaleX(1); } .led,.hubled { fill: #B42418; }
+  }
+</style>
+<rect width="600" height="260" fill="#F4EFE9"/>
+<text x="18" y="22" font-size="16" font-weight="700" fill="#161312">equipment + tags</text>
+<rect x="18" y="34" width="78" height="52" rx="7" fill="#161312"/>
+<circle cx="40" cy="56" r="11" fill="none" stroke="#F7F3EC" stroke-width="3"/><circle cx="40" cy="56" r="3" fill="#F7F3EC"/>
+<rect x="60" y="50" width="26" height="12" rx="2" fill="#2A2421" stroke="#6B625B"/>
+<rect x="26" y="74" width="62" height="6" rx="3" fill="#6B625B"/>
+<rect x="100" y="49" width="24" height="22" rx="4" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle class="" cx="112" cy="60" r="4" fill="#B42418"/>
+<g fill="none" stroke="#B42418" stroke-width="3.5" stroke-linecap="round"><path class="arc id0 a0" d="M134 54 A8 8 0 0 1 134 66"/><path class="arc id0 a1" d="M141 49 A15 15 0 0 1 141 71"/><path class="arc id0 a2" d="M148 44 A22 22 0 0 1 148 76"/></g>
+<path d="M158 60 L296 136" stroke="#6B625B" stroke-width="2" stroke-dasharray="3 6" stroke-linecap="round" fill="none" opacity=".5"/>
+<rect x="18" y="110" width="78" height="52" rx="7" fill="#161312"/>
+<circle cx="40" cy="132" r="11" fill="none" stroke="#F7F3EC" stroke-width="3"/><circle cx="40" cy="132" r="3" fill="#F7F3EC"/>
+<rect x="60" y="126" width="26" height="12" rx="2" fill="#2A2421" stroke="#6B625B"/>
+<rect x="26" y="150" width="62" height="6" rx="3" fill="#6B625B"/>
+<rect class="bar" x="26" y="150" width="62" height="6" rx="3" fill="#B42418"/>
+<rect x="100" y="125" width="24" height="22" rx="4" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle class="led" cx="112" cy="136" r="4" fill="#6B625B"/>
+<g fill="none" stroke="#B42418" stroke-width="3.5" stroke-linecap="round"><path class="arc ev a0" d="M134 130 A8 8 0 0 1 134 142"/><path class="arc ev a1" d="M141 125 A15 15 0 0 1 141 147"/><path class="arc ev a2" d="M148 120 A22 22 0 0 1 148 152"/></g>
+<path d="M158 136 L296 136" stroke="#6B625B" stroke-width="2" stroke-dasharray="3 6" stroke-linecap="round" fill="none" opacity=".5"/>
+<rect x="18" y="186" width="78" height="52" rx="7" fill="#161312"/>
+<circle cx="40" cy="208" r="11" fill="none" stroke="#F7F3EC" stroke-width="3"/><circle cx="40" cy="208" r="3" fill="#F7F3EC"/>
+<rect x="60" y="202" width="26" height="12" rx="2" fill="#2A2421" stroke="#6B625B"/>
+<rect x="26" y="226" width="62" height="6" rx="3" fill="#6B625B"/>
+<rect x="100" y="201" width="24" height="22" rx="4" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<circle class="" cx="112" cy="212" r="4" fill="#B42418"/>
+<g fill="none" stroke="#B42418" stroke-width="3.5" stroke-linecap="round"><path class="arc id2 a0" d="M134 206 A8 8 0 0 1 134 218"/><path class="arc id2 a1" d="M141 201 A15 15 0 0 1 141 223"/><path class="arc id2 a2" d="M148 196 A22 22 0 0 1 148 228"/></g>
+<path d="M158 212 L296 136" stroke="#6B625B" stroke-width="2" stroke-dasharray="3 6" stroke-linecap="round" fill="none" opacity=".5"/>
+<text x="215" y="252" font-size="16" font-weight="700" fill="#6B625B" text-anchor="middle">Bluetooth LE</text>
+<g>
+  <line x1="342" y1="104" x2="342" y2="80" stroke="#161312" stroke-width="5" stroke-linecap="round"/>
+  <g fill="none" stroke="#B42418" stroke-width="4" stroke-linecap="round">
+    <path class="wf" d="M334 72 a11 11 0 0 1 16 0"/>
+    <path class="wf w1" d="M327 64 a21 21 0 0 1 30 0"/>
+    <path class="wf w2" d="M320 56 a31 31 0 0 1 44 0"/>
+  </g>
+  <rect x="300" y="104" width="84" height="64" rx="8" fill="#161312"/>
+  <rect x="312" y="124" width="40" height="8" rx="2" fill="#6B625B"/><rect x="312" y="140" width="28" height="8" rx="2" fill="#6B625B"/>
+  <circle class="hubled" cx="368" cy="118" r="5" fill="#6B625B"/>
+  <text x="342" y="196" font-size="17" font-weight="700" fill="#161312" text-anchor="middle">site hub</text>
+</g>
+<line x1="388" y1="136" x2="484" y2="136" stroke="#6B625B" stroke-width="2" stroke-dasharray="3 6" stroke-linecap="round" opacity=".5"/>
+<text x="436" y="164" font-size="16" font-weight="700" fill="#6B625B" text-anchor="middle">Wi-Fi</text>
+<g>
+  <rect x="490" y="36" width="100" height="196" rx="14" fill="#F7F3EC" stroke="#161312" stroke-width="3"/>
+  <rect x="498" y="52" width="84" height="164" rx="6" fill="#161312"/>
+  <rect class="ring" x="498" y="52" width="84" height="164" rx="6" fill="none" stroke="#B42418" stroke-width="4"/>
+  <text class="n1" x="540" y="140" font-size="44" font-weight="700" fill="#F7F3EC" text-anchor="middle">41</text>
+  <text class="n2" x="540" y="140" font-size="44" font-weight="700" fill="#F7F3EC" text-anchor="middle">42</text>
+  <text x="540" y="178" font-size="16" font-weight="700" fill="#F4EFE9" text-anchor="middle">run events</text>
+</g>
+<circle class="pk1" cx="134" cy="136" r="7" fill="#B42418"/>
+<circle class="pk2" cx="384" cy="136" r="7" fill="#B42418"/>
+</svg>

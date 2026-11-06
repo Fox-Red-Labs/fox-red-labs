@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- LP-EM-CC35X1 on the LP-XDS110ET. Made from cc2340r5/CC2340R5.ccxml with the Cortex-M33 driver, no SEC_AP (CC35X1E.xml lists CS_DAP and Cortex_M33 only) and the device file ccs_base/common/targetdb/devices/CC35X1E.xml ("Osprey MX1 PG2"), verified in CCStudio 21.0.1, 2026-10-07. Programming goes through the Wi-Fi Toolbox, not this file; this is for debug reads. Not used yet. -->
+<configurations XML_version="1.2" id="configurations_0">
+	<configuration XML_version="1.2" id="configuration_0">
+		<instance XML_version="1.2" desc="Texas Instruments XDS110 USB Debug Probe" href="connections/TIXDS110_Connection.xml" id="Texas Instruments XDS110 USB Debug Probe" xml="TIXDS110_Connection.xml" xmlpath="connections"/>
+		<connection XML_version="1.2" id="Texas Instruments XDS110 USB Debug Probe">
+			<instance XML_version="1.2" href="drivers/tixds510cs_dap.xml" id="drivers" xml="tixds510cs_dap.xml" xmlpath="drivers"/>
+			<instance XML_version="1.2" href="drivers/tixds510cortexM33.xml" id="drivers" xml="tixds510cortexM33.xml" xmlpath="drivers"/>
+			<!-- Pick the probe by serial number. Needed whenever more than one XDS110 is plugged in. -->
+			<property Type="choicelist" Value="1" id="SEPK.POD_PORT">
+				<choice Name="Only one XDS110 installed" value="0">
+				</choice>
+				<choice Name="Select by serial number" value="1">
+					<property Type="stringfield" Value="SERIAL_UNKNOWN" id="SEPK.POD_SERIAL"/>
+				</choice>
+			</property>
+
+			<property id="Debug Probe Selection" Type="choicelist" Value="1">
+				<choice Name="Select by serial number" value="0">
+					<property id="-- Enter the serial number" Type="stringfield" Value="SERIAL_UNKNOWN"/>
+				</choice>
+			</property>
+			<!-- SWD, as TI SWRU629C section 2.1.1 says for this board. CCStudio fills these in from the chip definition; the command-line tool does not. -->
+			<property id="SWD.SWJ_DP_DEFAULT_MODE" Value="1" Type="hiddenfield"/>
+			<property id="SWD.APPY_PIN_RESET_DORMANT_WAKEUP" Value="0" Type="choicelist"/>
+			<property Type="choicelist" Value="2" id="SWD Mode Settings">
+				<choice Name="SWD Mode - Aux COM port is target TDO pin" value="nothing"/>
+			</property>
+			<!-- Target supplied power: the board makes its own rails from USB-C and TGT VDD is on EXT (SWRU629C 2.5). -->
+			<property Type="choicelist" Value="0" id="Power Selection"/>
+			<property Type="choicelist" Value="0" id="JTAG Signal Isolation"/>
+			<platform XML_version="1.2" id="platform_0">
+				<instance XML_version="1.2" desc="CC35X1E" href="devices/CC35X1E.xml" id="CC35X1E" xml="CC35X1E.xml" xmlpath="devices"/>
+			</platform>
+		</connection>
+	</configuration>
+</configurations>

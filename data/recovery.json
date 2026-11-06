@@ -1,0 +1,1679 @@
+{
+ "note": "One entry per board id in data/boards.csv. Source of the 'When the board stops answering' sections in each board's AGENTS.md and FAQ.md (tools/recovery_table.py) and of docs/remote-board-recovery.md. Only facts the repo records. kind is remote (the Mac can do it with the board in place) or hands (a person presses, unplugs or moves something). status is proven, failed or untested; a method that worked for one lockup and failed for another is two rows. evidence is a list of repo paths; date is the day it was seen (null where the repo does not record it); note is free text. Update the entry the day a lockup or a recovery happens, and bump checked.",
+ "hubs": [],
+ "boards": {
+  "mspm0g3507": {
+   "name": "LP-MSPM0G3507",
+   "family": "MSPM0",
+   "folders": [
+    "mspm0g3507"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "TI low-power examples (sysctl_power_policy_sleep_to_standby, timx_timer_mode_pwm_x_trig_stop_restore) cut the debug link",
+     "evidence": [
+      "mspm0g3507/AGENTS.md",
+      "mspm0l1306/FAQ.md"
+     ],
+     "date": null
+    }
+   ],
+   "methods": [
+    {
+     "method": "Unplug and replug USB",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "mspm0g3507/AGENTS.md"
+     ],
+     "date": null,
+     "note": "xdsdfu -e lists the probe again"
+    }
+   ],
+   "restore": null,
+   "debug_pins": {
+    "swdio": "PA19",
+    "swclk": "PA20",
+    "iomux_base": "0x40428000",
+    "pincm": "PAn is PINCM(n+1), at iomux_base + 4*n",
+    "source": "mspm0g3507/src/README.md"
+   },
+   "power_mode": {
+    "register": "0x400B0140",
+    "source": "mspm0_sdk_2_11_00_07 hw_sysctl_mspm0c110x.h (PMODECFG at 0x1140 from SYSCTL_BASE 0x400AF000)"
+   }
+  },
+  "mspm0l1306": {
+   "name": "LP-MSPM0L1306",
+   "family": "MSPM0",
+   "folders": [
+    "mspm0l1306"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "An image enters SHUTDOWN right after boot: DAP Connection Error, low power mode",
+     "evidence": [
+      "mspm0l1306/FAQ.md"
+     ],
+     "date": null
+    },
+    {
+     "how": "A window-watchdog example resets the chip every few milliseconds: Could not find MEM-AP",
+     "evidence": [
+      "mspm0l1306/FAQ.md",
+      "ports/cms32/README.md"
+     ],
+     "date": null
+    },
+    {
+     "how": "A deep-sleep port with only the watchdog timer as wake source (ran, woke every 0.997 s)",
+     "evidence": [
+      "ports/msp430-to-mspm0/lpm3-wake/PORT.md"
+     ],
+     "date": "2026-10-21"
+    }
+   ],
+   "methods": [
+    {
+     "method": "Hold S1 (PA18), press and release S3 (reset), keep S1 held 2 s, then flash a non-sleeping image at once; replug USB afterwards",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "mspm0l1306/FAQ.md",
+      "mspm0l1306/AGENTS.md"
+     ],
+     "date": null,
+     "note": "for the SHUTDOWN lockup; the chip then starts in the ROM bootloader until a plain power cycle"
+    },
+    {
+     "method": "OpenOCD mailbox mass erase (mspm0_mass_erase)",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "mspm0l1306/FAQ.md"
+     ],
+     "date": null,
+     "note": "for the watchdog reset loop"
+    },
+    {
+     "method": "OpenOCD mailbox mass erase",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "mspm0l1306/FAQ.md"
+     ],
+     "date": null,
+     "note": "for the SHUTDOWN lockup: OpenOCD exits when the debug port fails to answer"
+    },
+    {
+     "method": "uhubctl power-off of the probe port",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [],
+     "date": "2026-10-21",
+     "note": "the tick counter restarted; the hub location is not recorded"
+    }
+   ],
+   "restore": null,
+   "debug_pins": {
+    "swdio": "PA19",
+    "swclk": "PA20",
+    "iomux_base": "0x40428000",
+    "pincm": "PAn is PINCM(n+1), at iomux_base + 4*n",
+    "source": "mspm0l1306/README.md"
+   },
+   "power_mode": {
+    "register": "0x400B0140",
+    "source": "mspm0_sdk_2_11_00_07 hw_sysctl_mspm0c110x.h (PMODECFG at 0x1140 from SYSCTL_BASE 0x400AF000)"
+   }
+  },
+  "mspm0c1104": {
+   "name": "LP-MSPM0C1104",
+   "family": "MSPM0",
+   "folders": [
+    "mspm0c1104"
+   ],
+   "checked": "2026-10-25",
+   "lockups": [
+    {
+     "how": "A program that faults before main (a write that stopped short): the fault handler faults too and the chip resets in a loop; MEM-AP is up only briefly. The chip has no ROM bootloader (TRM SLAU893C Table 1-6, no BSL support)",
+     "evidence": [
+      "docs/experiments/2026-10-19-mspm0c1104-lockout-root-cause.md",
+      "mspm0c1104/FAQ.md"
+     ],
+     "date": "2026-10-19"
+    },
+    {
+     "how": "The probe left nRST held low after a connect under reset; every connect fails until it is released",
+     "evidence": [
+      "docs/experiments/2026-10-19-mspm0c1104-lockout-root-cause.md"
+     ],
+     "date": "2026-10-19"
+    },
+    {
+     "how": "Second lockout after the ported tima_timer_mode_pwm_dead_band: the debug port answers, BOOTDIAG cycles (0x07 = nested exception, CCStudio GEL) and the loop resets the debug logic too, so AP0 flickers and power-AP holds do not stick; restored 2026-10-24 by DSSM factory reset",
+     "evidence": [
+      "mspm0c1104/AGENTS.md"
+     ],
+     "date": "2026-10-24"
+    },
+    {
+     "how": "Third lockout after the ported smbus_smbus_controller (G3507 port): the debug port answers (DPIDR 0x6ba02477), the core is not examined (CPUID reads 0x0), the same signature as the second lockout; restored 2026-10-25 by DSSM factory reset, oob-flash.bin written back",
+     "evidence": [],
+     "date": "2026-10-25"
+    },
+    {
+     "how": "Fourth lockout after the ported L1306 spi_controller_internal_loopback_poll (it passed preflight; SPI0 on PA2, PA11, PA16, PA18): repeated external reset, the debug port answers (DPIDR 0x6ba02477) and no MEM-AP is found; recovered the same day by the DSSM factory reset (0x020A), oob-flash.bin written and read back equal, nRST start, PA22 497 ms",
+     "evidence": [],
+     "date": "2026-10-25"
+    }
+   ],
+   "methods": [
+    {
+     "method": "Check OpenOCD's nRESET line; if 0, adapter deassert srst",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "docs/experiments/2026-10-19-mspm0c1104-lockout-root-cause.md"
+     ],
+     "date": "2026-10-19",
+     "note": "for the held-nRST case"
+    },
+    {
+     "method": "bench/recover_halt.tcl (wait-for-debug writes, vector catch, halt at first instruction), then program with OpenOCD",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "mspm0c1104/bench/recover_halt.tcl",
+      "docs/experiments/2026-10-19-mspm0c1104-lockout-root-cause.md"
+     ],
+     "date": "2026-10-19",
+     "note": "for the reset loop"
+    },
+    {
+     "method": "bench/recover_halt.tcl, about 7 variants and 72 halt-and-program retries",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "mspm0c1104/FAQ.md"
+     ],
+     "date": "2026-10-24",
+     "note": "second lockout: DHCSR stays 0, the core never halts"
+    },
+    {
+     "method": "Unplug USB for 5 s, replug, run recover_halt.tcl again (one try)",
+     "kind": "hands",
+     "status": "failed",
+     "evidence": [
+      "mspm0c1104/AGENTS.md"
+     ],
+     "date": "2026-10-24",
+     "note": "second lockout"
+    },
+    {
+     "method": "uhubctl power cycle of the probe's hub port, 30 s, four times",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [],
+     "date": "2026-10-24",
+     "note": "second lockout; the probe re-enumerated each time, whether VBUS dropped is unknown"
+    },
+    {
+     "method": "DSSM mass erase (0x020C)",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "mspm0c1104/FAQ.md"
+     ],
+     "date": "2026-10-15",
+     "note": "the C1104 does not answer it; CCStudio's GEL says mass erase is not available"
+    },
+    {
+     "method": "DSSM wait-for-debug (0x0206) through the SEC-AP mailbox, then nRST (bench/lockout_diag.tcl c1104_wfd)",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "mspm0c1104/bench/lockout_diag.tcl"
+     ],
+     "date": "2026-10-24",
+     "note": "second lockout: the ROM answers (RDR 0x00010003) but the loop continues; CPUID reads 0"
+    },
+    {
+     "method": "Power-AP hold as OpenOCD's ti_mspm0.cfg does it (DPREC 0x104008, SPREC 1), 400 writes",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [],
+     "date": "2026-10-24",
+     "note": "second lockout: DPREC reads back its reset value"
+    },
+    {
+     "method": "DSSM factory reset (0x020A): the command TI documents for this chip, erases main flash and resets NONMAIN; the core may still need the wait-for-debug hold afterwards",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "mspm0c1104/bench/lockout_diag.tcl"
+     ],
+     "date": "2026-10-24",
+     "note": "second lockout: the ROM answered (RCR 0x0A, RDR 0x00010003), the loop stopped, main flash read all 0xFF and NONMAIN TI's default; then write oob-flash.bin and start with an nRST board reset. Erases main flash; back it up first"
+    },
+    {
+     "method": "Longer unplug (30 s or more), then recover_halt.tcl",
+     "kind": "hands",
+     "status": "untested",
+     "evidence": [
+      "mspm0c1104/AGENTS.md"
+     ],
+     "date": null,
+     "note": "named as the next try; the 5 s replug failed"
+    },
+    {
+     "method": "Hold nRST while the probe connects (connect under reset)",
+     "kind": "remote",
+     "status": "untested",
+     "evidence": [
+      "docs/experiments/2026-10-19-mspm0c1104-lockout-root-cause.md"
+     ],
+     "date": null,
+     "note": "TRM Table 22-2: with nRST held, memory access is not available, so it is not expected to help; a held nRST made every connect fail on 2026-10-19"
+    }
+   ],
+   "restore": {
+    "tool": "xPack OpenOCD (flash write_image erase, verify_image); back up before every ported example",
+    "regions": "main flash (oob-flash.bin); NONMAIN is left as is (factory reset policy only, Type B)",
+    "evidence": []
+   },
+   "debug_pins": {
+    "swdio": "PA19",
+    "swclk": "PA20",
+    "iomux_base": "0x40428000",
+    "pincm": "PAn is PINCM(n+1), at iomux_base + 4*n",
+    "source": "same family pins as the G3507 and L1306 (mspm0g3507/src/README.md); not separately read for this chip"
+   },
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x0",
+      16384
+     ],
+     [
+      "SRAM",
+      "0x20000000",
+      1024
+     ]
+    ],
+    "config": [
+     [
+      "BCR_CONFIG",
+      "0x41C00000",
+      255
+     ]
+    ],
+    "source": "mspm0c1104 linker map (SDK 2.11.00.07, tima_timer_mode_pwm_dead_band.map)"
+   },
+   "power_mode": {
+    "register": "0x400B0140",
+    "source": "mspm0_sdk_2_11_00_07 hw_sysctl_mspm0c110x.h (PMODECFG at 0x1140 from SYSCTL_BASE 0x400AF000)"
+   }
+  },
+  "mspm0g3519": {
+   "name": "LP-MSPM0G3519",
+   "family": "MSPM0",
+   "folders": [
+    "mspm0g3519"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "A running program leaves the factory region unreadable (all zeros) in a low-power state",
+     "evidence": [
+      "tools/frl/target.py"
+     ],
+     "date": "2026-10-24"
+    }
+   ],
+   "methods": [
+    {
+     "method": "OpenOCD reset halt, read, reset run (writes nothing)",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "tools/frl/target.py"
+     ],
+     "date": "2026-10-24",
+     "note": "the program runs again afterwards"
+    }
+   ],
+   "restore": {
+    "tool": "DSLite: dslite.sh --mode flash -e -f -v backup-flash.bin,0x0, then a power cycle, read back and compare",
+    "regions": "main flash",
+    "evidence": [
+     "mspm0g3519/AGENTS.md"
+    ]
+   },
+   "debug_pins": {
+    "swdio": "PA19",
+    "swclk": "PA20",
+    "iomux_base": "0x40428000",
+    "pincm": "PAn is PINCM(n+1), at iomux_base + 4*n",
+    "source": "same family pins as the G3507 and L1306 (mspm0g3507/src/README.md); not separately read for this chip"
+   },
+   "power_mode": {
+    "register": "0x400B0140",
+    "source": "mspm0_sdk_2_11_00_07 hw_sysctl_mspm0c110x.h (PMODECFG at 0x1140 from SYSCTL_BASE 0x400AF000)"
+   },
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x0",
+      524288
+     ],
+     [
+      "SRAM",
+      "0x20200000",
+      131072
+     ]
+    ],
+    "config": [
+     [
+      "BCR_CONFIG",
+      "0x41C00000",
+      255
+     ],
+     [
+      "BSL_CONFIG",
+      "0x41C00100",
+      128
+     ]
+    ],
+    "source": "mspm0g3519 linker map (SDK 2.11.00.07, portability/three-ways/driverlib g3519 build, 2026-10-25)"
+   }
+  },
+  "mspm0g5187": {
+   "name": "LP-MSPM0G5187",
+   "family": "MSPM0",
+   "folders": [
+    "mspm0g5187"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "A retargeted example whose linker file is the G3519 map puts the stack top outside RAM; the chip faults in a reset loop (DSLite: Connection to MSPM0 core failed)",
+     "evidence": [
+      "mspm0g5187/FAQ.md"
+     ],
+     "date": "2026-10-24"
+    }
+   ],
+   "methods": [
+    {
+     "method": "sweep/results-g3519-port/tools/recover.sh with recover_halt_g5187.tcl (wait-for-debug hold), then program the backup",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "mspm0g5187/sweep/results-g3519-port/tools/recover.sh",
+      "mspm0g5187/FAQ.md"
+     ],
+     "date": "2026-10-24",
+     "note": "twice; main and data flash read back equal to the backup"
+    }
+   ],
+   "restore": {
+    "tool": "OpenOCD prog.sh: program backup-flash.bin 0x0 verify",
+    "regions": "main and data flash",
+    "evidence": [
+     "mspm0g5187/FAQ.md"
+    ]
+   },
+   "debug_pins": {
+    "swdio": "PA19",
+    "swclk": "PA20",
+    "iomux_base": "0x40428000",
+    "pincm": "PAn is PINCM(n+1), at iomux_base + 4*n",
+    "source": "same family pins as the G3507 and L1306 (mspm0g3507/src/README.md); not separately read for this chip"
+   },
+   "power_mode": {
+    "register": "0x400B0140",
+    "source": "mspm0_sdk_2_11_00_07 hw_sysctl_mspm0c110x.h (PMODECFG at 0x1140 from SYSCTL_BASE 0x400AF000)"
+   },
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x0",
+      131072
+     ],
+     [
+      "SRAM",
+      "0x20200000",
+      32768
+     ]
+    ],
+    "config": [
+     [
+      "BCR_CONFIG",
+      "0x41C00000",
+      255
+     ],
+     [
+      "BSL_CONFIG",
+      "0x41C00100",
+      128
+     ]
+    ],
+    "source": "mspm0g5187 linker map (SDK 2.11.00.07, portability/three-ways/driverlib g5187 build, 2026-10-25)"
+   }
+  },
+  "cc2340r5": {
+   "name": "LP-EM-CC2340R5",
+   "family": "CC23xx",
+   "folders": [
+    "cc2340r5"
+   ],
+   "checked": "2026-10-25",
+   "lockups": [
+    {
+     "how": "The probe is not fully seated: The target failed to see a correctly formatted SWD header",
+     "evidence": [
+      "cc2340r5/FAQ.md",
+      "cc2340r5/AGENTS.md"
+     ],
+     "date": null
+    },
+    {
+     "how": "An image whose CCFG turns off debug access or chip erase (no image built here did)",
+     "evidence": [
+      "cc2340r5/FAQ.md"
+     ],
+     "date": null
+    }
+   ],
+   "methods": [
+    {
+     "method": "Pull the probe off the LaunchPad, press it on firmly, replug USB, then flash",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "cc2340r5/FAQ.md"
+     ],
+     "date": null,
+     "note": "the error stayed through a corrected ccxml and slower clocks until the reseat"
+    },
+    {
+     "method": "UniFlash cc23xx-unlock-debug-access",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "cc2340r5/FAQ.md",
+      "cc2340r5/AGENTS.md"
+     ],
+     "date": null,
+     "note": "Failed: Connect failed, twice, while the probe was badly seated; whether it recovers a locked chip is not known"
+    },
+    {
+     "method": "xds110reset, uhubctl port cycle, boot-status read, connect under reset",
+     "kind": "remote",
+     "status": "untested",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": null,
+     "note": "written and run for the CC2755P10; not run on a CC2340R5"
+    }
+   ],
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x0",
+      524288
+     ],
+     [
+      "SRAM",
+      "0x20000000",
+      36864
+     ]
+    ],
+    "config": [
+     [
+      "CCFG",
+      "0x4E020000",
+      2048
+     ]
+    ],
+    "source": "CC2340R5 linker map (F3 SDK 9.21.00.36, portability/three-ways/tidrivers build-cc2340r5, 2026-10-25): FLASH 0x0 length 0x80000, SRAM 0x20000000 length 0x9000, CCFG 0x4E020000 length 0x800"
+   },
+   "restore": null
+  },
+  "cc1354p10": {
+   "name": "LP-CC1354P10-1",
+   "family": "CC13xx",
+   "folders": [
+    "cc1354p10"
+   ],
+   "checked": "2026-10-25",
+   "lockups": [
+    {
+     "how": "The debugger connects only in the first seconds after power-on (cause unknown, suspected chip limit); a sleeping image misses it: Error -242, A router subpath could not be accessed",
+     "evidence": [
+      "cc1354p10/FAQ.md",
+      "cc1354p10/AGENTS.md"
+     ],
+     "date": "2026-10-07"
+    },
+    {
+     "how": "A flash backup read, or a connect after a BLE demo, uses the one debug session: Error -242 on the next load",
+     "evidence": [
+      "cc1354p10/FAQ.md"
+     ],
+     "date": "2026-10-10"
+    },
+    {
+     "how": "External LP-XDS110 probe: loadProgram and DSLite flash fail at the second connect (Error -242, OnPreFileLoaded(): Connect failed)",
+     "evidence": [
+      "cc1354p10/FAQ.md"
+     ],
+     "date": "2026-10-24"
+    },
+    {
+     "how": "Loading a whole .out rewrites the CCFG at 0x50000000 with the SDK default, which differed from the board's original",
+     "evidence": [
+      "cc1354p10/AGENTS.md"
+     ],
+     "date": "2026-10-24"
+    }
+   ],
+   "methods": [
+    {
+     "method": "frl's ccs13 route: one CCStudio Python scripting session per step, connect retried after a 6 s power cycle of the probe port when FRL_POWER_CYCLE names it, write with loadBinaryProgram from 0 (CCFG left alone)",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "docs/frl.md",
+      "tools/frl/ccs13.py"
+     ],
+     "date": "2026-10-25",
+     "note": "three full cycles and four restores on the external LP-XDS110 probe, no connect refused, so the power-cycle branch did not run"
+    },
+    {
+     "method": "xds110reset -s <serial>",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "cc1354p10/FAQ.md"
+     ],
+     "date": "2026-10-10",
+     "note": "does not reopen the post-power-on window and did not clear -242 after a flash read; it does start a DSLite-flashed image"
+    },
+    {
+     "method": "uhubctl off 6 s on the probe's port of a USB-C adapter, then load at once",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "cc1354p10/FAQ.md"
+     ],
+     "date": "2026-10-08",
+     "note": "3 s off failed; never switch while a load is connected (Error -261)"
+    },
+    {
+     "method": "Power-cycle the probe port during a retrying connect(), then halt() and loadBinaryProgram(<flash bytes from 0>, 0x0)",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "cc1354p10/FAQ.md"
+     ],
+     "date": "2026-10-24",
+     "note": "12 of 12 images on the external probe; leaves the CCFG alone"
+    },
+    {
+     "method": "Start a loop of loads, then unplug and replug USB",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "cc1354p10/FAQ.md"
+     ],
+     "date": "2026-10-07",
+     "note": "in on the 21st try; a replug with no loop missed the window twice"
+    },
+    {
+     "method": "Unplug USB for 3 s, flash again",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "cc1354p10/FAQ.md"
+     ],
+     "date": "2026-10-10",
+     "note": "for -242 after a flash read"
+    },
+    {
+     "method": "ROM serial bootloader (BL_CONFIG kept in the CCFG as a recovery route)",
+     "kind": "hands",
+     "status": "untested",
+     "evidence": [
+      "cc1354p10/AGENTS.md"
+     ],
+     "date": null,
+     "note": "the board arrived in it with a blank CCFG"
+    }
+   ],
+   "restore": {
+    "tool": "CCStudio scripting loadBinaryProgram",
+    "regions": "1 MB main flash and 2 kB CCFG at 0x50000000: back up both, restore both",
+    "evidence": [
+     "cc1354p10/AGENTS.md"
+    ]
+   }
+  },
+  "cc3200": {
+   "name": "CC3200-LAUNCHXL",
+   "family": "CC3200",
+   "folders": [
+    "cc3200-launchxl"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [],
+   "methods": [],
+   "restore": null
+  },
+  "f2800137": {
+   "name": "LAUNCHXL-F2800137",
+   "family": "C2000",
+   "folders": [
+    "c2000-launchpad"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [],
+   "methods": [],
+   "restore": null
+  },
+  "nucleo-g071rb": {
+   "name": "NUCLEO-G071RB",
+   "family": "STM32G0",
+   "folders": [
+    "nucleo-g071rb"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [],
+   "methods": [],
+   "restore": null
+  },
+  "nucleo-u083rc": {
+   "name": "NUCLEO-U083RC",
+   "family": "STM32U0",
+   "folders": [
+    "nucleo-u083rc"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "Examination failed after ST's FLASH_EraseProgram example; the next 11 examples could not connect at first; low-power and watchdog examples can stop the chip answering",
+     "evidence": [
+      "nucleo-u083rc/FAQ.md",
+      "nucleo-u083rc/AGENTS.md"
+     ],
+     "date": null
+    }
+   ],
+   "methods": [
+    {
+     "method": "Wait a few minutes, or unplug USB and replug",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "nucleo-u083rc/FAQ.md"
+     ],
+     "date": null,
+     "note": "all 11 loaded and ran on a second try a few minutes later"
+    },
+    {
+     "method": "Fit JP1 (probe reset line), then STM32_Programmer_CLI -c port=SWD mode=UR",
+     "kind": "hands",
+     "status": "untested",
+     "evidence": [
+      "nucleo-u083rc/FAQ.md"
+     ],
+     "date": null,
+     "note": "left for a run with someone at the board"
+    }
+   ],
+   "restore": null
+  },
+  "frdm-mcxa153": {
+   "name": "FRDM-MCXA153",
+   "family": "MCX A",
+   "folders": [
+    "frdm-mcxa153"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "An ADC-triggered test program left the debug port answering FAULT or WAIT at every power-up (pyOCD SWD/JTAG communication failure), even under reset",
+     "evidence": [
+      "frdm-mcxa153/FAQ.md"
+     ],
+     "date": "2026-10-11"
+    }
+   ],
+   "methods": [
+    {
+     "method": "Unplug and replug USB",
+     "kind": "hands",
+     "status": "failed",
+     "evidence": [
+      "frdm-mcxa153/FAQ.md"
+     ],
+     "date": "2026-10-11",
+     "note": ""
+    },
+    {
+     "method": "Connect under reset (pyOCD, OpenOCD)",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "frdm-mcxa153/FAQ.md"
+     ],
+     "date": "2026-10-11",
+     "note": ""
+    },
+    {
+     "method": "Hold SW2 (ISP), press and release SW1 (reset), let go of SW2, then reprogram with blhost over the MCU-Link serial port at 57,600 baud",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "frdm-mcxa153/FAQ.md"
+     ],
+     "date": "2026-10-11",
+     "note": "ROM bootloader K3.2.0 answered blhost; the debug port still refused"
+    }
+   ],
+   "restore": null
+  },
+  "pico2": {
+   "name": "Raspberry Pi Pico 2 H",
+   "family": "RP2350",
+   "folders": [
+    "pico2"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "A running program with no USB code cannot be restarted into the loader by picotool load -f (exit code 0, board never reboots)",
+     "evidence": [
+      "pico2/FAQ.md"
+     ],
+     "date": "2026-10-11"
+    }
+   ],
+   "methods": [
+    {
+     "method": "Unplug USB, hold BOOTSEL, plug in, release; then picotool load -x",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "pico2/FAQ.md"
+     ],
+     "date": "2026-10-11",
+     "note": ""
+    },
+    {
+     "method": "uhubctl power cycle of the probe's hub port",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [],
+     "date": "2026-10-12",
+     "note": "the image booted back into itself and never showed; a BOOTSEL replug was still needed"
+    }
+   ],
+   "restore": null
+  },
+  "esp32c6": {
+   "name": "ESP32-C6-DevKitC-1-N8",
+   "family": "ESP32-C6",
+   "folders": [
+    "esp32c6"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "After an ESP-IDF light-sleep or power-management example, esptool says No serial data received on the USB port even with BOOT and RESET",
+     "evidence": [
+      "esp32c6/FAQ.md"
+     ],
+     "date": null
+    },
+    {
+     "how": "An OTA update stalls at Progress: 0.1% while the board still answers ping",
+     "evidence": [
+      "esp32c6/FAQ.md"
+     ],
+     "date": null
+    }
+   ],
+   "methods": [
+    {
+     "method": "Plug a second cable into the UART port and run esptool there (erase-flash, write-flash); its bridge resets the chip into the ROM bootloader",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "esp32c6/FAQ.md"
+     ],
+     "date": null,
+     "note": ""
+    },
+    {
+     "method": "Reset (OTA stall)",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "esp32c6/FAQ.md"
+     ],
+     "date": null,
+     "note": ""
+    },
+    {
+     "method": "uhubctl cycle of the probe's hub port",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [],
+     "date": "2026-10-12",
+     "note": "board was connected but never enabled"
+    }
+   ],
+   "restore": null
+  },
+  "mspm33c321a": {
+   "name": "LP-MSPM33C321A",
+   "family": "MSPM33",
+   "folders": [
+    "mspm33c321a"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "rtos/kernel/blink_led sleeps so deeply that the debug port stops answering (Device Connection Error, low power mode)",
+     "evidence": [
+      "mspm33c321a/FAQ.md",
+      "mspm33c321a/AGENTS.md"
+     ],
+     "date": null
+    },
+    {
+     "how": "A flash write cut off half-way: the image faults at boot (CFGAP_BOOTDIAG 0x07), the core never stops for the debugger",
+     "evidence": [
+      "mspm33c321a/AGENTS.md"
+     ],
+     "date": "2026-10-22"
+    },
+    {
+     "how": "An image that writes NONMAIN or the boot configuration at 0x80101800",
+     "evidence": [
+      "mspm33c321a/FAQ.md",
+      "mspm33c321a/AGENTS.md"
+     ],
+     "date": null
+    }
+   ],
+   "methods": [
+    {
+     "method": "xds110reset -s <serial> -a toggle -d 200, then flash a normal image",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "mspm33c321a/FAQ.md"
+     ],
+     "date": null,
+     "note": "for the deep-sleep lockup"
+    },
+    {
+     "method": "xds110reset and a USB replug",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "mspm33c321a/AGENTS.md"
+     ],
+     "date": "2026-10-22",
+     "note": "for the half-written image"
+    },
+    {
+     "method": "Wait-for-debug (EnableWaitForDebug before connect, or the pwrap.js register sequence), then loadBinaryProgram of the saved main flash",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "mspm33c321a/AGENTS.md"
+     ],
+     "date": "2026-10-22",
+     "note": "1 MB read-back hashed the same; no mass erase, NONMAIN untouched; also runs from the Digital Lab"
+    }
+   ],
+   "restore": {
+    "tool": "CCStudio scripting loadBinaryProgram with FlashEraseSelection Erase MAIN memory only",
+    "regions": "main flash at 0x10000000 (1 MB); never NONMAIN or 0x80101800",
+    "evidence": [
+     "mspm33c321a/AGENTS.md"
+    ]
+   },
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x10000000",
+      1048576
+     ],
+     [
+      "SRAM",
+      "0x30000000",
+      262144
+     ]
+    ],
+    "config": [
+     [
+      "BCR_CONFIG",
+      "0x80101800",
+      1023
+     ],
+     [
+      "BSL_CONFIG",
+      "0x80101C00",
+      1023
+     ]
+    ],
+    "source": "mspm33c321a linker map (SDK 1.04.00.00, portability/three-ways/driverlib m33c321a build, 2026-10-25)"
+   }
+  },
+  "am13e230": {
+   "name": "LP-AM13E230",
+   "family": "AM13",
+   "folders": [
+    "am13e230"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "Deep-sleep lockout: an image in STANDBY0 with only the watchdog interval timer as wake source never wakes; every connect fails (DSLite -613, -6310, -6311; OpenOCD -613; all access ports stalled behind DPIDR 0x6ba02477)",
+     "evidence": [
+      "ports/msp430-to-mspm0/lpm3-wake/PORT.md",
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-21"
+    },
+    {
+     "how": "Boot fault after an interrupted write or an erased vector table (CFG-AP BOOTDIAG 0x08000007)",
+     "evidence": [
+      "am13e230/AGENTS.md"
+     ],
+     "date": "2026-10-22"
+    },
+    {
+     "how": "restart sent while the target was running in CCStudio: error -614 on every read",
+     "evidence": [
+      "am13e230/AGENTS.md",
+      "am13e230/FAQ.md"
+     ],
+     "date": null
+    }
+   ],
+   "methods": [
+    {
+     "method": "xds110reset toggle and assert",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "ports/msp430-to-mspm0/lpm3-wake/PORT.md"
+     ],
+     "date": "2026-10-21",
+     "note": "deep-sleep lockout: the target never printed again"
+    },
+    {
+     "method": "uhubctl power-off of the probe port, 2 s, 20 s and 150 s (on two hubs; 15 s on the second)",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "ports/msp430-to-mspm0/lpm3-wake/PORT.md",
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-21",
+     "note": "the probe came back, the chip stayed stalled; this board most likely keeps power"
+    },
+    {
+     "method": "Connect under reset, and a hand-written OpenOCD connection, within 3 s of the probe appearing; 80 fast connects in a row",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "ports/msp430-to-mspm0/lpm3-wake/PORT.md",
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-21",
+     "note": ""
+    },
+    {
+     "method": "Unplug USB and replug",
+     "kind": "hands",
+     "status": "failed",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-21",
+     "note": "the probe enumerated, the chip still did not answer"
+    },
+    {
+     "method": "Hold S5 (BSL invoke), tap S1 (nRST), release S5; then flash the restore hex and read the first 64 bytes back",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [],
+     "date": "2026-10-24",
+     "note": "for the deep-sleep lockout"
+    },
+    {
+     "method": "Wait-for-debug (SPREC/DPREC0 sequence at AP 4 from CCStudio's own log)",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "am13e230/AGENTS.md",
+      "mspm33c321a/AGENTS.md"
+     ],
+     "date": "2026-10-22",
+     "note": "for the boot-fault lockup only; it needs the CS_DAP, which the deep-sleep lockout does not give (Error -613)"
+    },
+    {
+     "method": "Unplug and replug USB after a restart sent while running",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "am13e230/FAQ.md",
+      "am13e230/AGENTS.md"
+     ],
+     "date": null,
+     "note": "error -614 case"
+    }
+   ],
+   "restore": {
+    "tool": "DSLite flash of the restore hex; main flash backed up twice before a risky image (main-a.bin, main-b.bin identical)",
+    "regions": "main flash",
+    "evidence": [
+     "ports/msp430-to-mspm0/lpm3-wake/PORT.md",
+     "docs/remote-board-recovery.md"
+    ]
+   },
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH_BANK0",
+      "0x0",
+      262144
+     ],
+     [
+      "FLASH_BANK1",
+      "0x40000",
+      262144
+     ],
+     [
+      "RAM_C",
+      "0x00C18000",
+      32768
+     ],
+     [
+      "RAM_S",
+      "0x20000000",
+      98304
+     ]
+    ],
+    "config": [
+     [
+      "BCR_CONFIG",
+      "0x60100800",
+      336
+     ],
+     [
+      "BSL_CONFIG",
+      "0x60100C00",
+      80
+     ]
+    ],
+    "source": "am13e230 linker map (lpm3-wake.map, AM13 SDK 26.01.00.03)"
+   },
+   "power_mode": {
+    "register": "0x400B0144",
+    "source": "am13e230x_sdk_26_01_00_03/source/device/am13e230x/include/hw/hw_sysctl.h"
+   }
+  },
+  "cc2755p10": {
+   "name": "LP-EM-CC2755P10",
+   "family": "CC27xx",
+   "folders": [
+    "cc2755p10"
+   ],
+   "checked": "2026-10-25",
+   "lockups": [
+    {
+     "how": "Error -2001 or -615 after TI's zigbee/rf_test example, cause unknown",
+     "evidence": [
+      "cc2755p10/FAQ.md",
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-09"
+    },
+    {
+     "how": "A chip erase closes the debug port: Debug is not allowed based on, Error -2001, until main flash, CCFG and SCFG are programmed again",
+     "evidence": [
+      "cc2755p10/FAQ.md",
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-09"
+    },
+    {
+     "how": "A GCC ot-ti Thread image leaves the CCFG and SCFG checksums at 0, so the port stays closed",
+     "evidence": [
+      "cc2755p10/AGENTS.md"
+     ],
+     "date": null
+    },
+    {
+     "how": "SACI blank-check commands aimed at the HSM area time out and leave boot status 0x3F",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-09"
+    }
+   ],
+   "methods": [
+    {
+     "method": "tools/recovery/cc2x_status.js: read the boot status (reads only), before and after each step",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "tools/recovery/cc2x_status.js",
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-09",
+     "note": ""
+    },
+    {
+     "method": "xds110reset -a toggle -d 100",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-09",
+     "note": "took boot status 0x3F to 0xBA once"
+    },
+    {
+     "method": "xds110reset -a toggle -d 100",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "docs/remote-board-recovery.md",
+      "cc2755p10/FAQ.md"
+     ],
+     "date": "2026-10-09",
+     "note": "after zigbee/rf_test"
+    },
+    {
+     "method": "uhubctl power cycle of the probe's hub port, 5 s",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-09",
+     "note": "the board most likely kept power"
+    },
+    {
+     "method": "Connect under reset",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-09",
+     "note": "Error -615, one try"
+    },
+    {
+     "method": "SACI programming: recovery/saci_program.js check, then write (blink hex, CCFG, SCFG); skip the chip erase on a blank chip",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "cc2755p10/recovery/saci_program.js",
+      "docs/remote-board-recovery.md"
+     ],
+     "date": "2026-10-09",
+     "note": "for the erase lockout, under a minute; HSM firmware 4.7.6 was intact"
+    },
+    {
+     "method": "Unplug the probe USB for 10 s",
+     "kind": "hands",
+     "status": "untested",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": null,
+     "note": ""
+    },
+    {
+     "method": "A pin-triggered ROM bootloader (button held during reset)",
+     "kind": "hands",
+     "status": "untested",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": null,
+     "note": "works only if the CCFG turned the pin trigger on"
+    },
+    {
+     "method": "J-Link, which TRM section 9.2.4.1 and SEGGER describe for an empty CC2745 configuration",
+     "kind": "remote",
+     "status": "untested",
+     "evidence": [
+      "docs/remote-board-recovery.md"
+     ],
+     "date": null,
+     "note": ""
+    }
+   ],
+   "restore": {
+    "tool": "cc2755p10/recovery/saci_program.js; cc2755p10/restore.sh builds the image (not run since the SCFG was added)",
+    "regions": "main flash, CCFG 0x4E020000 (2 kB), SCFG 0x4E040000 (1 kB); HSM firmware through UniFlash if missing (not the SDK's 3.5.0 file)",
+    "evidence": [
+     "cc2755p10/restore.sh",
+     "docs/remote-board-recovery.md"
+    ]
+   },
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x0",
+      950272
+     ],
+     [
+      "SRAM",
+      "0x20000000",
+      165888
+     ]
+    ],
+    "config": [
+     [
+      "CCFG",
+      "0x4E020000",
+      2048
+     ],
+     [
+      "SCFG",
+      "0x4E040000",
+      1024
+     ]
+    ],
+    "source": "cc2755p10 linker map (F3 SDK 9.21.00.36, portability/three-ways tidrivers build, 2026-10-25): FLASH 0xE8000, SRAM 0x28800"
+   }
+  },
+  "cc35x1": {
+   "name": "LP-EM-CC35X1",
+   "family": "CC35xx",
+   "folders": [
+    "cc35x1"
+   ],
+   "checked": "2026-10-25",
+   "lockups": [
+    {
+     "how": "The board looks dead at 115200 baud while the CSI image prints at 921600",
+     "evidence": [
+      "cc35x1/FAQ.md"
+     ],
+     "date": null
+    }
+   ],
+   "methods": [
+    {
+     "method": "Read the serial port at the image's rate (921600 for the CSI program)",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "cc35x1/FAQ.md"
+     ],
+     "date": null,
+     "note": ""
+    },
+    {
+     "method": "Press S1 or xds110reset -s <serial> after a Toolbox flash (it does not reset the board)",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "cc35x1/AGENTS.md"
+     ],
+     "date": null,
+     "note": "xds110reset is remote; S1 is hands"
+    },
+    {
+     "method": "Restore a saved signed bundle: full_flash_erase, then programming with the bundle's tool_settings.json, then xds110reset (needed after any over-the-air update, which moves the running slot)",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "ports/xiaozhi/target-cc35x1/README.md"
+     ],
+     "date": "2026-11-02",
+     "note": "the Sparky 0.0.33.0 image was erased and reprogrammed twice from its backup bundle: banner 0.0.33.0, Wi-Fi joined, wake turn reached the voice server"
+    }
+   ],
+   "restore": null,
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x14002000",
+      2752512
+     ],
+     [
+      "FLASH_HEADER",
+      "0x14000000",
+      8192
+     ],
+     [
+      "SRAM_TCM",
+      "0x20000000",
+      131072
+     ],
+     [
+      "SRAM",
+      "0x28000000",
+      524288
+     ],
+     [
+      "TCM_CRAM",
+      "0x00000000",
+      32768
+     ]
+    ],
+    "source": "cc35x1 linker map (Wi-Fi SDK 10.20.00.39, ota_example build, 2026-10-24): FLASH_INT_VEC + FLASH_NON_SECURE 0x2A2000 at 0x14000000, one vendor slot of the two-slot layout; the image header fills the first 0x2000 and the vector table starts at 0x14002000. TCM_DRAM 0x20000 at 0x20000000, DRAM 0x80000 at 0x28000000, and TCM_CRAM 0x8000 at 0x0, where code copied from flash runs"
+   }
+  },
+  "f28p65x": {
+   "name": "LAUNCHXL-F28P65X",
+   "family": "C2000",
+   "folders": [
+    "c2000-launchpad"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [],
+   "methods": [],
+   "restore": null
+  },
+  "iwrl6432boost": {
+   "name": "IWRL6432BOOST",
+   "family": "mmWave radar",
+   "folders": [
+    "iwrl6432boost"
+   ],
+   "checked": "2026-11-03",
+   "lockups": [
+    {
+     "how": "TI's people-tracking config at 100 ms frames (frameCfg 2 0 200 64 100 0) on the shipped 05.04 Presence_Demo image: frames stop after about 31 and the CLI stops answering",
+     "evidence": [
+      "iwrl6432boost/live/README.md"
+     ],
+     "date": "2026-11-03"
+    }
+   ],
+   "methods": [
+    {
+     "method": "xds110reset -s <probe serial>, then resend the config",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "iwrl6432boost/live/README.md"
+     ],
+     "date": "2026-11-03",
+     "note": "also clears a CLI hung by a failed sensorStart; the CLI answers 'version' about 6 s after the reset"
+    }
+   ],
+   "restore": null
+  },
+  "am263p": {
+   "name": "LP-AM263P",
+   "family": "AM263P",
+   "folders": [
+    "am263p"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "TI's lockstep connection file leaves both R5F clusters' FORCE_WFI at 0x7; each load then reruns the previous program",
+     "evidence": [
+      "am263p/FAQ.md"
+     ],
+     "date": "2026-10-11"
+    }
+   ],
+   "methods": [
+    {
+     "method": "xds110reset",
+     "kind": "remote",
+     "status": "failed",
+     "evidence": [
+      "am263p/FAQ.md"
+     ],
+     "date": "2026-10-11",
+     "note": ""
+    },
+    {
+     "method": "Debugger System Reset (tools/sysreset.js), then load again",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "am263p/FAQ.md"
+     ],
+     "date": "2026-10-11",
+     "note": ""
+    }
+   ],
+   "restore": null
+  },
+  "tda4": {
+   "name": "SK-TDA4VM",
+   "family": "TDA4VM",
+   "folders": [
+    "tda4"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [],
+   "methods": [
+    {
+     "method": "No card reader: UART boot (SW1 1 ON, 2 OFF, 3 ON), tools/uart_boot.py, then write the image from a USB stick; SW1 all OFF and power cycle",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "tda4/FAQ.md"
+     ],
+     "date": null,
+     "note": "switch settings are hands; the transfer is remote"
+    }
+   ],
+   "restore": null
+  },
+  "am62l-evm": {
+   "name": "TMDS62LEVM (AM62L EVM)",
+   "family": "AM62L32",
+   "folders": [
+    "am62l-evm"
+   ],
+   "checked": "2026-10-24",
+   "lockups": [
+    {
+     "how": "No bootable SD card: the boot ROM waits silently on the shipped SD-primary setting",
+     "evidence": [
+      "am62l-evm/FAQ.md"
+     ],
+     "date": null
+    },
+    {
+     "how": "After jailhouse disable and reboot, UART boot sends tiboot3.bin but SPL never pings for tispl.bin (330 s, three tries)",
+     "evidence": [
+      "am62l-evm/AGENTS.md",
+      "docs/experiments/2026-10-22-am62l-jailhouse.md"
+     ],
+     "date": "2026-10-22"
+    },
+    {
+     "how": "A UART boot sent more than 5 minutes after power gets receiver cancelled; a cut-off transfer leaves the ROM silent for about 4 minutes",
+     "evidence": [
+      "am62l-evm/AGENTS.md",
+      "am62l-evm/FAQ.md"
+     ],
+     "date": "2026-10-24"
+    },
+    {
+     "how": "booti without setenv bootargs prints Starting kernel and nothing else",
+     "evidence": [
+      "am62l-evm/AGENTS.md"
+     ],
+     "date": null
+    },
+    {
+     "how": "SD boot stalls after BL1 (console: ROM C, BL1 notices, ENTERING WFI, then silence, repeating) when SW4 is left in a no-boot setting and the card is not pushed in; U-Boot then prints MMC: no card present while the boot ROM still reads the card",
+     "evidence": [
+      "am62l-evm/FAQ.md",
+      "docs/experiments/2026-10-24-am62l-sd-boot-stall.md"
+     ],
+     "date": "2026-10-24"
+    }
+   ],
+   "methods": [
+    {
+     "method": "Unplug and replug J17 (full power cycle); SW7 warm reset does not re-read the boot switches",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "am62l-evm/AGENTS.md",
+      "am62l-evm/FAQ.md"
+     ],
+     "date": null,
+     "note": "clears the SPL silence after jailhouse disable; cause not found"
+    },
+    {
+     "method": "UART boot: SW3.4 ON, 3.3 ON, 3.2 ON, 3.1 OFF, power cycle, uart_boot.py, plug J17",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "am62l-evm/AGENTS.md"
+     ],
+     "date": "2026-10-22",
+     "note": "about 7 minutes to the U-Boot prompt"
+    },
+    {
+     "method": "reboot from default Linux returns to the ROM ping",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "am62l-evm/README.md"
+     ],
+     "date": null,
+     "note": ""
+    },
+    {
+     "method": "Boot from the micro-SD slot: SW4 ON ON OFF OFF OFF OFF ON OFF, SW2 OFF ON OFF OFF, SW3 all OFF, push the card fully in, full power cycle; if U-Boot shows MMC: no card present, seat the card, then mmc rescan and boot",
+     "kind": "hands",
+     "status": "proven",
+     "evidence": [
+      "am62l-evm/FAQ.md",
+      "docs/experiments/2026-10-24-am62l-sd-boot-stall.md"
+     ],
+     "date": "2026-10-24",
+     "note": "119 GB card with the SDK 12.01 default image reached login after seating the card; the 2026-10-22 timeouts were with a different card"
+    },
+    {
+     "method": "uhubctl cycle of the J17 power port",
+     "kind": "remote",
+     "status": "untested",
+     "evidence": [],
+     "date": null
+    }
+   ],
+   "restore": null
+  },
+  "beagley-ai": {
+   "name": "BeagleY-AI (TI AM67A)",
+   "family": "AM67A (J722S)",
+   "folders": [
+    "beagley-ai"
+   ],
+   "checked": "2026-11-03",
+   "lockups": [
+    {
+     "how": "A model load on the C7x never returns and later model loads hang too; seen once",
+     "evidence": [
+      "beagley-ai/FAQ.md"
+     ],
+     "date": "2026-11-03"
+    },
+    {
+     "how": "ffmpeg h264_v4l2m2m encode does not finish and ignores SIGTERM; kill -9 ends it and the codec still works",
+     "evidence": [
+      "beagley-ai/bench/video/ffmpeg-encode-hang-dmesg.log",
+      "beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log",
+      "beagley-ai/FAQ.md"
+     ],
+     "date": "2026-11-03"
+    },
+    {
+     "how": "gst-launch-1.0 prints 'Caught SIGSEGV' and waits instead of exiting when v4l2h264dec has capture-io-mode set or the videoconvert after it has n-threads; a pipeline that converts before it scales runs at 6.5 fps and looks hung",
+     "evidence": [
+      "beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log",
+      "beagley-ai/bench/seam/v4l2-after-reboot.log",
+      "beagley-ai/FAQ.md"
+     ],
+     "date": "2026-11-03"
+    },
+    {
+     "how": "The USB webcam drops off USB (-71, then disconnect) at 1080p or on a gimbal move, and returns about 5 s later with its aim reset; 7 drops in 35 min",
+     "evidence": [
+      "beagley-ai/bench/camera-usb-drops-2026-11-03.log"
+     ],
+     "date": "2026-11-03"
+    }
+   ],
+   "methods": [
+    {
+     "method": "Reboot over ssh (`reboot`); the board answered ssh again about 45 s later",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "beagley-ai/bench/seam/v4l2-after-reboot.log"
+     ],
+     "date": "2026-11-03",
+     "note": "clears a hung C7x; not needed for the Wave5 pipelines, which recover when the process is killed"
+    },
+    {
+     "method": "Run one model per process with a timeout so a hung load costs one model",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "beagley-ai/bench/zoo/zoo_bench.py"
+     ],
+     "date": "2026-11-03",
+     "note": ""
+    },
+    {
+     "method": "Unplug and replug the USB-C power cable when ssh no longer answers",
+     "kind": "hands",
+     "status": "untested",
+     "evidence": [
+      "beagley-ai/FAQ.md"
+     ],
+     "date": null,
+     "note": "never needed"
+    }
+   ],
+   "restore": null
+  }
+ }
+}

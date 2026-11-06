@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260" width="600" height="260" font-family="Barlow, Helvetica Neue, Arial, sans-serif" role="img" aria-label="The setup for Measure how far a radio reaches: Board, then radio, then Board, room by room">
+<rect width="600" height="260" fill="#F4EFE9"/>
+<rect x="20" y="103" width="150" height="54" rx="10" fill="#B42418" stroke="#B42418" stroke-width="2"/>
+<text x="95.0" y="131" text-anchor="middle" font-size="20" font-weight="600" fill="#F7F3EC">Board</text>
+<rect x="430" y="91" width="150" height="78" rx="10" fill="#F7F3EC" stroke="#161312" stroke-width="2"/>
+<text x="505.0" y="119" text-anchor="middle" font-size="20" font-weight="500" fill="#161312">Board, room</text>
+<text x="505.0" y="143" text-anchor="middle" font-size="20" font-weight="500" fill="#161312">by room</text>
+<path d="M286.0 116 A14 14 0 0 1 314.0 116" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="1.0"/>
+<path d="M272.0 102 A28 28 0 0 1 328.0 102" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+<path d="M258.0 88 A42 42 0 0 1 342.0 88" fill="none" stroke="#161312" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+<circle cx="300.0" cy="126" r="3" fill="#161312"/>
+<text x="300.0" y="180" text-anchor="middle" font-size="17" fill="#6B625B">radio</text>
+<text x="588" y="250" text-anchor="end" font-size="12" fill="#6B625B">drawing of the setup</text>
+</svg>

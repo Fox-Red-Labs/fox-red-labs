@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radar Room View</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1114;--panel:#181b20;--line:#2a2f37;--text:#e8eaed;--dim:#8b929c;--accent:#ff6a2b;--still:#4ea3ff;--move:#ffb02e;--ok:#3ccf7a;--bad:#ff4d4d;--held:#ffb02e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Barlow,system-ui,sans-serif}
+.wrap{display:grid;grid-template-columns:1fr 310px;grid-template-rows:calc(100vh - 32px);gap:16px;padding:16px;height:100vh}
+@media (max-width:820px){.wrap{grid-template-columns:1fr;grid-template-rows:auto;height:auto}.map{height:70vh}.side{max-height:none}}
+.map{background:var(--panel);border:1px solid var(--line);border-radius:10px;position:relative;min-height:420px}
+canvas{width:100%;height:100%;display:block}
+.side{display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:calc(100vh - 32px)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+.label{color:var(--dim);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.big{font-size:36px;font-weight:700;line-height:1.1}
+.sub{color:var(--dim);font-size:14px}
+.state{font-size:26px;font-weight:700}
+.state.on{color:var(--ok)} .state.off{color:var(--dim)} .state.held{color:var(--held)}
+.row{display:flex;justify-content:space-between;font-size:15px;padding:3px 0}
+.row span:last-child{font-weight:600}
+.legend{font-size:13px;color:var(--dim);line-height:1.7}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.ring{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;border:2px solid var(--held)}
+#tl{width:100%;height:70px}
+.banner{position:absolute;top:10px;left:14px;right:14px;font-size:14px;padding:6px 10px;border-radius:6px;display:none}
+.banner.bad{display:block;background:rgba(255,77,77,.15);color:#ffb3b3;border:1px solid rgba(255,77,77,.5)}
+.banner.info{display:block;background:rgba(78,163,255,.12);color:#cfe3ff;border:1px solid rgba(78,163,255,.4)}
+button,.btn{font:600 14px Barlow;background:var(--accent);color:#0f1114;border:0;border-radius:6px;padding:7px 11px;cursor:pointer;text-decoration:none;display:inline-block;margin:2px 2px 2px 0}
+button.quiet,.btn.quiet{background:#2a2f37;color:var(--text)}
+button:disabled{opacity:.4;cursor:default}
+details summary{cursor:pointer;color:var(--dim);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+a.small{color:var(--accent);font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="map"><div class="banner" id="banner"></div><canvas id="c"></canvas></div>
+  <div class="side">
+    <div class="card">
+      <div class="label">Room</div><div class="state off" id="pres">Waiting for the radar</div>
+      <div class="sub" id="link">–</div>
+    </div>
+    <div class="card">
+      <div class="label">People now</div><div class="big" id="count">0</div>
+      <div class="sub" id="countsub">–</div>
+    </div>
+    <div class="card">
+      <div class="row"><span>Came in</span><span id="nin">–</span></div>
+      <div class="row"><span>Left</span><span id="nout">–</span></div>
+      <div class="row"><span>Seats in use</span><span id="seat">–</span></div>
+      <div class="sub" id="since">–</div>
+    </div>
+    <div class="card"><div class="label">People, last 2 minutes</div><canvas id="tl"></canvas>
+      <div class="legend">Green: occupied. Amber: someone still, not moving.</div></div>
+    <div class="card">
+      <div class="label">Map</div>
+      <button id="learned" class="quiet">Show the learned map</button>
+      <button id="adjust" class="quiet">Adjust doors and seats</button>
+      <a class="btn quiet" href="#" data-route="/review">Review the day</a>
+      <div class="legend" id="mapnote" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <div class="label">Set up</div>
+      <button id="connect">Connect radar (Chrome)</button> <button id="setup" disabled>Run setup (2 min, spoken)</button>
+      <a id="dl" download="calibrated.cfg" style="display:none" class="small">Save settings</a>
+      <div id="step" class="legend" style="margin-top:6px">With the room server running, the radar is already connected. Without it, plug the radar into USB and press Connect.</div>
+    </div>
+    <div class="card legend">
+      <div><span class="dot" style="background:var(--accent)"></span>person, with trail</div>
+      <div><span class="ring"></span>person sitting or standing still (held)</div>
+      <div><span class="dot" style="background:var(--ok)"></span>door, with how many trips it was learned from</div>
+      <div><span class="dot" style="background:#b48cff"></span>seat</div>
+      <div>Radar at the bottom, 1 m rings, field of view ±70°.</div>
+    </div>
+    <details class="card"><summary>Advanced</summary>
+      <div class="row"><span>Frames a second</span><span id="fps">–</span></div>
+      <div class="row"><span>Frame</span><span id="fnum">–</span></div>
+      <div class="row"><span>Points this frame</span><span id="npts">–</span></div>
+      <div class="row"><span>Frames lost</span><span id="lost">–</span></div>
+      <div class="row"><span>Recoveries</span><span id="recov">–</span></div>
+      <div class="row"><span>Data blocks</span><span id="tlvs">–</span></div>
+      <label class="legend"><input type="checkbox" id="rawpts" checked> show raw points</label>
+    </details>
+  </div>
+</div>
+<script src="radar.js"></script>
+<script>
+// Routes the radar host serves (not files): set at load so a static copy of this page has no dead link.
+document.querySelectorAll("[data-route]").forEach(function (a) { a.href = a.dataset.route; });
+const RMAX=7.5, FOV=70*Math.PI/180, $=id=>document.getElementById(id);
+const c=$('c'), x=c.getContext('2d'), tl=$('tl'), tx=tl.getContext('2d');
+let last=null, fade=[], trails={}, hist=[], times=[], room={}, showLearned=true, webMode=false, adjust=false, drag=null, server=null;
+let geo=null;  // current map transform, for dragging
+const loadRoom=()=>webMode?0:fetch(showLearned?'/room-learned':'/room').then(r=>r.json()).then(j=>{ if(!adjust) room=j; noteMap(); }).catch(()=>{});
+function noteMap(){ const d=room.door_detail||[]; $('mapnote').textContent=showLearned
+  ? (room.frames?`Learned from ${Math.round((room.frames+(room.frames_before||0))/4/60)} minutes of radar. `:'Nothing learned yet. ')+(d.length?d.map((q,i)=>`door ${i+1}: ${q.n} trips${q.pinned?' (placed by hand)':''}`).join(', '):'')
+  : 'The room from the spoken setup.'; }
+loadRoom(); setInterval(loadRoom,10000);
+function fit(cv){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;cv.getContext('2d').setTransform(d,0,0,d,0,0);return r}
+function doorsOf(r){ return r.doors&&r.doors.length?r.doors:(r.door?[r.door]:[]); }
+function seatsOf(r){ return r.seats&&r.seats.length?r.seats.filter(q=>q.seconds>=60).map(q=>[q.x,q.y]):(r.seat?[r.seat]:[]); }
+function draw(){
+  const r=fit(c), W=r.width, H=r.height, ceil=(server&&server.health&&server.health.mount==='ceiling')||room.mount==='ceiling';
+  const R2=ceil?3.5:RMAX, s=ceil?Math.min(H,W)/2/R2*0.92:Math.min((H-30)/RMAX, W/2/(RMAX*Math.sin(FOV))), ox=W/2, oy=ceil?H/2:H-16;
+  const P=(px,py)=>[ox+px*s, oy-py*s]; geo={s,ox,oy};
+  x.clearRect(0,0,W,H);
+  x.strokeStyle='#2a2f37'; x.fillStyle='#8b929c'; x.font='12px Barlow'; x.lineWidth=1;
+  if(ceil){ for(let m=1;m<=R2;m++){x.beginPath();x.arc(ox,oy,m*s,0,2*Math.PI);x.stroke();x.fillText(m+' m from below the radar',ox+4,oy-m*s+14)} }
+  else { for(let m=1;m<=RMAX;m++){x.beginPath();x.arc(ox,oy,m*s,-Math.PI/2-FOV,-Math.PI/2+FOV);x.stroke();x.fillText(m+' m',ox+4,oy-m*s+14)}
+    x.beginPath();x.moveTo(ox,oy);x.lineTo(...P(RMAX*Math.sin(-FOV),RMAX*Math.cos(FOV)));x.moveTo(ox,oy);x.lineTo(...P(RMAX*Math.sin(FOV),RMAX*Math.cos(FOV)));x.stroke(); }
+  if(room.heat){ const mx=Math.max(...room.heat.map(h=>h[2])); room.heat.forEach(h=>{ const [px,py]=P(h[0]-0.125,h[1]+0.125);
+      x.fillStyle='rgba(78,163,255,'+(0.06+0.4*Math.sqrt(h[2]/mx)).toFixed(2)+')'; x.fillRect(px,py,0.25*s,0.25*s); }); }
+  (room.interference||[]).forEach(q=>{const [px,py]=P(q.x-0.25,q.y+0.25);x.strokeStyle='rgba(255,77,77,.7)';x.strokeRect(px,py,0.5*s,0.5*s)});
+  if(room.outline&&room.outline.length>2&&!room.heat){ x.strokeStyle='rgba(60,207,122,.8)';x.lineWidth=2;x.setLineDash([6,4]);x.beginPath();
+    room.outline.forEach((q,i)=>{const [px,py]=P(q[0],q[1]);i?x.lineTo(px,py):x.moveTo(px,py)});x.closePath();x.stroke();x.setLineDash([]); }
+  const dd=room.door_detail||[];
+  doorsOf(room).forEach((d,i)=>{ const [px,py]=P(d[0],d[1]); x.fillStyle='#3ccf7a'; x.fillRect(px-8,py-8,16,16);
+    if(adjust){x.strokeStyle='#fff';x.strokeRect(px-10,py-10,20,20);} x.font='13px Barlow';
+    x.fillText('door '+(i+1)+(dd[i]&&dd[i].n!=null?' · '+dd[i].n+' trips':''),px+12,py+4); });
+  seatsOf(room).forEach(q=>{ const [px,py]=P(q[0],q[1]); x.fillStyle='#b48cff'; x.fillRect(px-7,py-7,14,14); if(adjust){x.strokeStyle='#fff';x.strokeRect(px-9,py-9,18,18);} x.font='13px Barlow'; x.fillText('seat',px+11,py+4); });
+  if($('rawpts').checked) fade.forEach((pts,i)=>{const a=(i+1)/fade.length;pts.forEach(p=>{const [px,py]=P(p[0],p[1]);x.globalAlpha=a*0.8;x.fillStyle=Math.abs(p[3])>0.15?'#ffb02e':'#4ea3ff';x.beginPath();x.arc(px,py,2.5,0,7);x.fill()})});
+  x.globalAlpha=1;
+  Object.values(trails).forEach(t=>{ x.strokeStyle='rgba(255,106,43,.5)';x.lineWidth=2;x.beginPath();t.forEach((q,i)=>{const [px,py]=P(q.x,q.y);i?x.lineTo(px,py):x.moveTo(px,py)});x.stroke(); });
+  (last?.tracks||[]).forEach(t=>{const [px,py]=P(t.x,t.y);x.fillStyle='#ff6a2b';x.beginPath();x.arc(px,py,11,0,7);x.fill();
+    x.fillStyle='#e8eaed';x.font='12px Barlow';x.fillText(Math.hypot(t.x,t.y).toFixed(1)+' m',px+14,py+4)});
+  (server?.held_xy||[]).forEach(h=>{const [px,py]=P(h[0],h[1]);x.strokeStyle='#ffb02e';x.lineWidth=3;x.beginPath();x.arc(px,py,11,0,7);x.stroke();
+    x.fillStyle='#ffb02e';x.font='12px Barlow';x.fillText('still '+fmtS(h[2]),px+14,py+4)});
+  x.fillStyle='#ff6a2b'; if(ceil){x.beginPath();x.arc(ox,oy,7,0,7);x.fill();} else x.fillRect(ox-9,oy-4,18,8);
+  // people, last 2 minutes
+  const tr=fit(tl);tx.clearRect(0,0,tr.width,tr.height);const now=Date.now();
+  { const W2=tr.width, H2=tr.height, top=6, bot=H2-14, mx=Math.max(2,...hist.map(h=>h.n)), X=t=>W2-(now-t)/120000*W2, Y=n=>bot-(bot-top)*n/mx;
+    hist.forEach((h,i)=>{ const nx=i+1<hist.length?X(hist[i+1].t):W2; if(h.n>0){ tx.fillStyle=h.held?'rgba(255,176,46,.22)':'rgba(60,207,122,.18)'; tx.fillRect(X(h.t),top,nx-X(h.t)+0.5,bot-top);} });
+    tx.strokeStyle='#3ccf7a'; tx.lineWidth=2; tx.beginPath(); hist.forEach((h,i)=>{ const x0=X(h.t); i?tx.lineTo(x0,Y(h.n)):tx.moveTo(x0,Y(h.n)); tx.lineTo(i+1<hist.length?X(hist[i+1].t):W2,Y(h.n)); }); tx.stroke();
+    tx.fillStyle='#8b929c'; tx.font='11px Barlow'; tx.fillText('2 min ago',0,H2-2); tx.fillText('now',W2-20,H2-2); tx.fillText(mx+' people',2,top+8); }
+  requestAnimationFrame(draw);
+}
+const fmtS=s=>s>=3600?(s/3600).toFixed(1)+' h':s>=60?Math.round(s/60)+' min':Math.round(s)+' s';
+function show(st){  // one place that writes the cards, from the server's room state
+  const pe=$('pres'), held=st.held>0&&st.tracked===0;
+  if(st.link==='down'){ pe.textContent='Radar not responding'; pe.className='state off';
+    $('banner').className='banner bad'; $('banner').textContent='The radar stopped sending. It is being reset and set up again; counts are paused.'; }
+  else if(st.moved_at&&!adjust){ $('banner').className='banner info';
+    $('banner').innerHTML=`The radar may have been moved at ${st.moved_at}. Run setup again, or walk out each door once so the doors can be placed again. <a class="small" id="movedok">It did not move</a>`;
+    $('movedok').onclick=()=>fetch('/occupancy/moved-ok'); pe.textContent=st.people?'Occupied':'Empty'; pe.className='state '+(st.people?'on':'off'); }
+  else { if(!adjust) $('banner').className='banner'; pe.textContent=st.people?(held?'Occupied, still':'Occupied'):'Empty'; pe.className='state '+(st.people?(held?'held':'on'):'off'); }
+  $('link').textContent=st.link==='down'?'Radar link down':'Radar connected'+(st.health&&st.health.recoveries?` · recovered ${st.health.recoveries}×`:'');
+  $('count').textContent=st.people;
+  $('countsub').textContent=st.people?`${st.tracked} moving or tracked, ${st.held} still`:'nobody seen';
+  $('nin').textContent=st.doors?st.entries:'no doors yet'; $('nout').textContent=st.doors?st.exits:'no doors yet';
+  $('seat').textContent=st.seats?`${st.seats_used} of ${st.seats}`:'no seats yet';
+  $('since').innerHTML=`Counting since ${st.since} today · <a class="small" id="reset">reset</a>`;
+  $('reset').onclick=()=>fetch('/occupancy/reset');
+  if(st.health){ $('lost').textContent=st.health.lost_frames; $('recov').textContent=st.health.recoveries; }
+}
+function onMsg(m){
+  if(m.link==='down'){ show({...(server||{}),link:'down'}); return; }
+  last=m; fade.push(m.points); if(fade.length>4) fade.shift();
+  const live=new Set(m.tracks.map(t=>t.id));
+  m.tracks.forEach(t=>{(trails[t.id]=trails[t.id]||[]).push({x:t.x,y:t.y}); if(trails[t.id].length>40) trails[t.id].shift()});
+  Object.keys(trails).forEach(k=>{if(!live.has(+k)) delete trails[k]});
+  if(m.room_state){ server={...(server||{}),...m.room_state}; show(server); }
+  else { const n=m.tracks.length; show({link:'up',people:n,tracked:n,held:0,doors:0,seats:0,since:'connect',entries:0,exits:0}); }
+  const n=server?server.people:m.tracks.length;
+  hist.push({t:Date.now(),n,held:!!(server&&server.held&&!server.tracked)}); hist=hist.filter(h=>Date.now()-h.t<120000);
+  times.push(Date.now()); times=times.filter(t=>Date.now()-t<5000);
+  $('npts').textContent=m.points.length; $('fnum').textContent=m.frame; $('fps').textContent=(times.length/5).toFixed(1);
+  $('tlvs').textContent=[...new Set(m.tlvs)].join(' ');
+}
+// health every 5 s (frames lost, recoveries)
+setInterval(()=>{ if(!webMode) fetch('/occupancy').then(r=>r.json()).then(j=>{ if(j.health) server={...(server||{}),...j}; if(server) show(server); }).catch(()=>{}); },5000);
+// the room server's stream, or Chrome's Web Serial straight to the board
+let es=null, queue=[];
+if(location.protocol.startsWith('http')){ es=new EventSource('/events'); es.onmessage=e=>onMsg(JSON.parse(e.data));
+  es.onerror=()=>{ if(!webMode){ $('pres').textContent='No room server'; $('step').textContent='No room server is running. Plug the radar into USB and press Connect.'; } }; }
+const say=t=>{$('step').textContent=t};
+$('connect').onclick=async()=>{
+  if(!('serial' in navigator)){ say('This browser has no Web Serial. Use Chrome or Edge on a computer.'); return; }
+  try{ if(es){es.close(); es=null;} webMode=true; server=null;
+    await Radar.connect(); Radar.link.onFrame=f=>{ onMsg(f); queue.push(f); if(queue.length>400) queue.shift(); };
+    Radar.link.onLog=l=>say(l);
+    const v=await Radar.cli('version'); say(/XWRL6432/.test(v)?'Radar found. Sending settings.':'Connected, but the radar did not answer. Press its reset button (S2) and connect again.');
+    const cfg=await (await fetch('cfg/people-count-250ms.cfg')).text(); cur.cfg=cfg;
+    const bad=await Radar.sendCfg(cfg);
+    say(bad.length?'The radar refused: '+bad[0]+'. Press its reset button (S2), then Connect again.':'Radar running. Run setup to teach it the room.');
+    $('setup').disabled=false;
+  }catch(e){ say('Could not connect: '+e.message); }
+};
+const cur={cfg:''};
+$('setup').onclick=async()=>{
+  $('setup').disabled=true;
+  const r=await Radar.calibrate(()=>queue.splice(0), say);
+  if(r){ room=r; const cfg=Radar.roomCfg(cur.cfg,r); const a=$('dl'); a.href=URL.createObjectURL(new Blob([cfg],{type:'text/plain'})); a.style.display='inline';
+    const bad=await Radar.sendCfg(cfg); say(bad.length?'The radar refused the room settings: '+bad[0]:'Room set and running: '+(r.xmax-r.xmin).toFixed(1)+' m wide, '+r.ymax.toFixed(1)+' m deep.'); }
+  $('setup').disabled=false;
+};
+$('learned').textContent='Show the setup map';
+$('learned').onclick=()=>{ showLearned=!showLearned; $('learned').textContent=showLearned?'Show the setup map':'Show the learned map'; loadRoom(); };
+// Adjust: drag doors and seats, then save; hand-placed ones stay put while learning adds to them
+const toM=(e)=>{ const b=c.getBoundingClientRect(); return [(e.clientX-b.left-geo.ox)/geo.s, (geo.oy-(e.clientY-b.top))/geo.s]; };
+$('adjust').onclick=async()=>{
+  if(!adjust){ adjust=true; $('adjust').textContent='Save doors and seats'; $('banner').className='banner info';
+    $('banner').textContent='Drag a door or seat to move it. Double-click the map to add a door, Shift + double-click to add a seat, double-click one to remove it.'; return; }
+  adjust=false; $('adjust').textContent='Adjust doors and seats'; $('banner').className='banner';
+  const res=await (await fetch('/api/room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({doors:doorsOf(room),seats:seatsOf(room)})})).json().catch(e=>({ok:false,error:e.message}));
+  say(res.ok?'Saved. Hand-placed doors and seats stay where you put them; learning keeps adding to their counts.':'Could not save: '+res.error); loadRoom();
+};
+function pick(m){ const all=[...doorsOf(room).map((d,i)=>({k:'door',i,d})),...seatsOf(room).map((d,i)=>({k:'seat',i,d}))];
+  return all.find(o=>Math.hypot(o.d[0]-m[0],o.d[1]-m[1])<0.4); }
+function setSeats(list){ room.seats=list.map(([sx,sy])=>({x:sx,y:sy,seconds:3600,visits:1,pinned:true})); room.seat=list[0]||null; }
+c.onmousedown=e=>{ if(!adjust) return; const o=pick(toM(e)); if(o) drag=o; };
+c.onmousemove=e=>{ if(!adjust||!drag) return; const m=toM(e); if(drag.k==='door'){ const ds=doorsOf(room).slice(); ds[drag.i]=m; room.doors=ds; room.door_detail=ds.map((d,i)=>({...(room.door_detail||[])[i],x:d[0],y:d[1]})); }
+  else { const ss=seatsOf(room).slice(); ss[drag.i]=m; setSeats(ss); } };
+c.onmouseup=()=>{ drag=null; };
+c.ondblclick=e=>{ if(!adjust) return; const m=toM(e), o=pick(m);
+  if(o&&o.k==='door'){ const ds=doorsOf(room).filter((_,i)=>i!==o.i); room.doors=ds; room.door_detail=(room.door_detail||[]).filter((_,i)=>i!==o.i); }
+  else if(o){ setSeats(seatsOf(room).filter((_,i)=>i!==o.i)); }
+  else if(e.shiftKey){ setSeats([...seatsOf(room),m]); }
+  else { room.doors=[...doorsOf(room),m]; room.door_detail=[...(room.door_detail||[]),{x:m[0],y:m[1],n:0}]; } };
+draw();
+</script>
+</body>
+</html>

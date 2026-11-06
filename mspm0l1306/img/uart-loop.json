@@ -1,0 +1,107 @@
+{
+ "image": "source-lp-mspm0l1306-slau869e.png",
+ "margin_left": 200,
+ "margin_right": 1250,
+ "title": "UART loop: the chip texts itself",
+ "warning": "When done: move J16 and J17 back to XDS (right)",
+ "credit": "Board drawing: TI SLAU869E, leader lines removed",
+ "steps": [
+  {
+   "label": [
+    "Unplug USB. Move J16 and J17 to BP (left)",
+    "PA8 and PA9 are the chip's serial pins.",
+    "These two jumpers are a switch for where",
+    "those pins are connected:",
+    "XDS (right, as shipped): to the USB debug chip,",
+    "so the Mac can show the text the chip prints",
+    "BP (left): to the header pins, where your wire is"
+   ],
+   "side": "right",
+   "label_y": 700,
+   "marks": [
+    {
+     "box": [
+      416,
+      866,
+      546,
+      953
+     ]
+    }
+   ]
+  },
+  {
+   "label": [
+    "One wire: J1 pin 4 (PA8) to J1 pin 3 (PA9)",
+    "PA8 sends serial data (TX = transmit),",
+    "PA9 receives it (RX = receive).",
+    "Wired together, every byte the chip sends",
+    "comes straight back, so it can check them.",
+    "Then plug USB back in."
+   ],
+   "side": "right",
+   "label_y": 1180,
+   "marks": [
+    {
+     "wire": [
+      [
+       113,
+       1088
+      ],
+      [
+       70,
+       1088
+      ],
+      [
+       70,
+       1044
+      ],
+      [
+       113,
+       1044
+      ]
+     ]
+    },
+    {
+     "pin": [
+      113,
+      1044
+     ],
+     "r": 22,
+     "tag": "PA9 RX",
+     "tag_side": "left"
+    },
+    {
+     "pin": [
+      113,
+      1088
+     ],
+     "r": 22,
+     "tag": "PA8 TX",
+     "tag_side": "left"
+    }
+   ],
+   "badge": [
+    245,
+    1066
+   ]
+  }
+ ],
+ "board": "../../docs/boards/lp-mspm0l1306.json",
+ "task_facts": {
+  "head": "For this test",
+  "items": [
+   [
+    "What it does",
+    "Sends 2,048 random bytes at each speed and counts what comes back right"
+   ],
+   [
+    "While wired",
+    "The Mac's serial window stays empty: the pins go to the wire, not the debug chip. Results are read over the debugger"
+   ],
+   [
+    "What we found",
+    "Every byte right up to 4.5 Mbaud and from 6.4 to 10.67 Mbaud. 5 to 6 Mbaud fails, the same dead band as the larger MSPM0G3507 chip, so pick a speed outside it"
+   ]
+  ]
+ }
+}

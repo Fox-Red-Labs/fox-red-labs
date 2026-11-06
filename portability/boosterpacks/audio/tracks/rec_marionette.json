@@ -1,0 +1,15 @@
+{
+ "name": "rec_marionette",
+ "title": "Funeral March of a Marionette (Gounod)",
+ "rate": 10000,
+ "nsamples": 340000,
+ "bytes": 170000,
+ "start_s": 8.0,
+ "length_s": 34.0,
+ "credit": "San Francisco Symphony, Alfred Hertz, HMV D1286",
+ "license": "Public domain",
+ "source": "https://commons.wikimedia.org/wiki/File:PDP-CH_-_San_Francisco_Symphony_-_Alfred_Hertz_-_Funeral_March_of_a_Marionette_-_Charles_Gounod_-_Hmv-d1286-5-0602.flac",
+ "source_sha256": "a7be0b5e671cc46d18fa4ef3deb59659177ad03cb0821e7a03d2d9b5aaa7d88f",
+ "adpcm_rms_error": 218.2,
+ "filter": "highpass=f=120,lowpass=f=4500,acompressor=threshold=-24dB:ratio=3:attack=5:release=120:makeup=2, peak -1 dBFS, 0.3 s fades"
+}

@@ -1,0 +1,10 @@
+/* Self-hosted fonts (no request to any other server). Latin subsets of the brand kit's Barlow and
+   JetBrains Mono, and STIX Two Text for formulas (Latin, Greek and math symbols), all SIL Open Font License 1.1 (OFL-*.txt beside this file). Rebuild: tools/build_fonts.sh */
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 400; font-display: swap; src: url("barlow-regular.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 500; font-display: swap; src: url("barlow-medium.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 600; font-display: swap; src: url("barlow-semibold.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-style: normal; font-weight: 700; font-display: swap; src: url("barlow-bold.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; font-display: swap; src: url("barlow-condensed-bold.woff2") format("woff2"); }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("jetbrains-mono-regular.woff2") format("woff2"); }
+@font-face { font-family: "STIX Two Text"; font-style: normal; font-weight: 400; font-display: swap; src: url("stix-two-text-regular.woff2") format("woff2"); }
+@font-face { font-family: "STIX Two Text"; font-style: italic; font-weight: 400; font-display: swap; src: url("stix-two-text-italic.woff2") format("woff2"); }

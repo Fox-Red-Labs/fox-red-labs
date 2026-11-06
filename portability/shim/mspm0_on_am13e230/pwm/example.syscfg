@@ -1,0 +1,13 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * SysConfig for the AM13E2x has no module for a general-purpose timer in PWM mode (release notes 26.01.00.03,
+ * "What Is Not Supported"), so this file sets only the clock. The timer is set up in pwm_init.c.
+ */
+const sysctl = scripting.addModule("/drivers/sysctl");
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+sysctl.peripheral.$suggestSolution       = "SYSCTL";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";

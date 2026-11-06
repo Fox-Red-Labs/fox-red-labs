@@ -1,0 +1,78 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+// BOOSTXL-DRV8323RS register read-back on the LP-AM13E230 Rev E2. Plain GPIO only: no PWM peripheral is set up.
+// Gate inputs (TI's MCPWM4 pins in the RH example) held low as outputs: INHA PB3, INLA PA7, INHB PB1, INLB PA2, INHC PB2, INLC PA25.
+// ENABLE PA3. nFAULT PB4 (input, pull-up). SPI bit-banged: SCLK PB5, SDI to the driver PB10, SDO from the driver PA20, nSCS PB12.
+const gpio   = scripting.addModule("/drivers/gpio", {}, false);
+const gLed   = gpio.addInstance();
+const gGate  = gpio.addInstance();
+const gGateA = gpio.addInstance();
+const gDrv   = gpio.addInstance();
+const gSpiB  = gpio.addInstance();
+const gSpiA  = gpio.addInstance();
+const gId    = gpio.addInstance();
+const adc    = scripting.addModule("/drivers/adc", {}, false);
+const adc0   = adc.addInstance();
+const adc1   = adc.addInstance();
+const adc2   = adc.addInstance();
+const sysctl = scripting.addModule("/drivers/sysctl");
+// Board outputs read as inputs (pins per SLVUB01C tables 2 and 3 and SLVUDH9 figure 2-9): EVM ID J4-17 (LaunchPad J4-32, PA12,
+// high for DRV8323x) and J4-19 (J4-31, PA11, high for the SPI variant), both behind switches S4/S6 at BP; Halls A PA21, B PB15, C PB18.
+gId.$name = "BRD";
+gId.associatedPins.create(5);
+gId.associatedPins[0].$name = "ID323"; gId.associatedPins[0].direction = "INPUT"; gId.associatedPins[0].pin.$assign = "PA12";
+gId.associatedPins[1].$name = "IDSPI"; gId.associatedPins[1].direction = "INPUT"; gId.associatedPins[1].pin.$assign = "PA11";
+gId.associatedPins[2].$name = "HALLA"; gId.associatedPins[2].direction = "INPUT"; gId.associatedPins[2].pin.$assign = "PA21";
+gId.associatedPins[3].$name = "HALLB"; gId.associatedPins[3].direction = "INPUT"; gId.associatedPins[3].pin.$assign = "PB15";
+gId.associatedPins[4].$name = "HALLC"; gId.associatedPins[4].direction = "INPUT"; gId.associatedPins[4].pin.$assign = "PB18";
+// ADC, software triggered, channels as in TI's AM13 DRV8323RH example: VSENVM PA26, VSENA PA16, VSENB PA18, VSENC PA28,
+// ISENA PA30, ISENB PA27, ISENC PA17.
+adc0.$name = "ADC_0"; adc0.enableSEQs = true; adc0.numberOfSEQs = 1; adc0.numberOfSOCs = 2; adc0.SEQ1.numberOfSOCs = 2;
+adc0.SOC0.channel = "PA16"; adc0.SOC1.channel = "PA17";
+adc1.$name = "ADC_1"; adc1.adcBase = "ADC1"; adc1.enableSEQs = true; adc1.numberOfSEQs = 1; adc1.numberOfSOCs = 2; adc1.SEQ1.numberOfSOCs = 2;
+adc1.SOC0.channel = "PA18"; adc1.SOC1.channel = "PA27";
+adc2.$name = "ADC_2"; adc2.adcBase = "ADC2"; adc2.enableSEQs = true; adc2.numberOfSEQs = 1; adc2.numberOfSOCs = 3; adc2.SEQ1.numberOfSOCs = 3;
+adc2.SOC0.channel = "PA26"; adc2.SOC1.channel = "PA28"; adc2.SOC2.channel = "PA30";
+
+gLed.$name                          = "GPIO_LED";
+gLed.associatedPins[0].$name        = "LED4";
+gLed.associatedPins[0].initialValue = "SET";
+gLed.associatedPins[0].pin.$assign  = "PA5";
+
+gGate.$name = "GATE_B";
+gGate.associatedPins.create(3);
+gGate.associatedPins[0].$name = "INHA"; gGate.associatedPins[0].pin.$assign = "PB3";
+gGate.associatedPins[1].$name = "INHB"; gGate.associatedPins[1].pin.$assign = "PB1";
+gGate.associatedPins[2].$name = "INHC"; gGate.associatedPins[2].pin.$assign = "PB2";
+
+gGateA.$name = "GATE_A";
+gGateA.associatedPins.create(3);
+gGateA.associatedPins[0].$name = "INLA"; gGateA.associatedPins[0].pin.$assign = "PA7";
+gGateA.associatedPins[1].$name = "INLB"; gGateA.associatedPins[1].pin.$assign = "PA2";
+gGateA.associatedPins[2].$name = "INLC"; gGateA.associatedPins[2].pin.$assign = "PA25";
+
+gDrv.$name = "DRV";
+gDrv.associatedPins.create(2);
+gDrv.associatedPins[0].$name = "ENABLE"; gDrv.associatedPins[0].pin.$assign = "PA3";
+gDrv.associatedPins[1].$name = "NFAULT"; gDrv.associatedPins[1].direction = "INPUT";
+gDrv.associatedPins[1].internalResistor = "PULL_UP"; gDrv.associatedPins[1].pin.$assign = "PB4";
+
+gSpiB.$name = "SPIB";
+gSpiB.associatedPins.create(3);
+gSpiB.associatedPins[0].$name = "SCLK"; gSpiB.associatedPins[0].pin.$assign = "PB5";
+gSpiB.associatedPins[1].$name = "SDI";  gSpiB.associatedPins[1].pin.$assign = "PB10";
+gSpiB.associatedPins[2].$name = "NSCS"; gSpiB.associatedPins[2].initialValue = "SET"; gSpiB.associatedPins[2].pin.$assign = "PB12";
+
+gSpiA.$name = "SPIA";
+gSpiA.associatedPins[0].$name = "SDO"; gSpiA.associatedPins[0].direction = "INPUT";
+gSpiA.associatedPins[0].internalResistor = "PULL_UP"; gSpiA.associatedPins[0].pin.$assign = "PA20";
+
+sysctl.VREFSource         = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
+sysctl.peripheral.$assign = "SYSCTL";
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";

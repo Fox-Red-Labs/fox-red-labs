@@ -1,0 +1,123 @@
+/*
+ * Out-of-tree Zephyr board for the LP-MSPM0L1306 LaunchPad development kit.
+ * Shape copied from Zephyr 4.4.2 boards/ti/lp_mspm0l2228. Fox Red Labs, 2026-10-06.
+ *
+ * Pin facts, all from public TI material:
+ *   UART0 backchannel: TX PA8 (PINCM9, function 2), RX PA9 (PINCM10, function 2).
+ *     Source: MSPM0 SDK 2.11 mspm0l130x.h, IOMUX_PINCM9_PF_UART0_TX and IOMUX_PINCM10_PF_UART0_RX.
+ *   LED1 red: PA0, active low. PA0 is a 5 V tolerant open-drain pin. Needs jumper J2 on and the
+ *     J10 pull-up jumper (2:3 for 3.3 V). SDK example READMEs for LP_MSPM0L1306.
+ *   LED2 RGB, active high: red PA26 (J12), green PA13 (J3), blue PA27 (J13).
+ *   S1: PA18, to VCC with an external pull-down (J11 on). Active high.
+ *     PA18 is also the bootloader (BSL) invoke pin: holding S1 through a reset starts the
+ *     ROM bootloader instead of this program.
+ *   S2: PA14, to GND, no external pull resistor. Needs the internal pull-up. Active low.
+ *   SWD: PA19 SWDIO, PA20 SWCLK. Left alone.
+ *
+ * Clock: nothing set here. The l-series dtsi runs MCLK from SYSOSC at 32 MHz and ULPCLK at
+ * 32 MHz, which the clock-control driver sets with DL_SYSCTL_setSYSOSCFreq(BASE) only.
+ * cpu0 clock-frequency below is a description of that, not a register setting.
+ *
+ * Nothing in this board writes NONMAIN (BCR or BSL configuration).
+ */
+
+/dts-v1/;
+
+#include <ti/mspm0/l/mspm0l1306.dtsi>
+#include <zephyr/dt-bindings/pinctrl/mspm0-pinctrl.h>
+#include <zephyr/dt-bindings/clock/mspm0_clock.h>
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+	model = "TI LP_MSPM0L1306/MSPM0L1306";
+	compatible = "ti,mspm0l1306";
+
+	aliases {
+		led0 = &led0;
+		led1 = &led1;
+		led2 = &led2;
+		led3 = &led3;
+		sw0 = &button0;
+		sw1 = &button1;
+	};
+
+	chosen {
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zephyr,console = &uart0;
+		zephyr,shell-uart = &uart0;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led0: led_0 {
+			gpios = <&gpioa 0 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+			label = "LED1 red (PA0)";
+		};
+
+		led1: led_1 {
+			gpios = <&gpioa 26 GPIO_ACTIVE_HIGH>;
+			label = "LED2 red (PA26)";
+		};
+
+		led2: led_2 {
+			gpios = <&gpioa 13 GPIO_ACTIVE_HIGH>;
+			label = "LED2 green (PA13)";
+		};
+
+		led3: led_3 {
+			gpios = <&gpioa 27 GPIO_ACTIVE_HIGH>;
+			label = "LED2 blue (PA27)";
+		};
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+
+		button0: button_0 {
+			gpios = <&gpioa 18 GPIO_ACTIVE_HIGH>;
+			label = "S1 (PA18, also BSL invoke)";
+			zephyr,code = <INPUT_KEY_0>;
+		};
+
+		button1: button_1 {
+			gpios = <&gpioa 14 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>;
+			label = "S2 (PA14)";
+			zephyr,code = <INPUT_KEY_1>;
+		};
+	};
+};
+
+&cpu0 {
+	clock-frequency = <DT_FREQ_M(32)>;
+};
+
+/*
+ * hal_ti in Zephyr 4.4.2 ships pinctrl files for MSPM0L110x and MSPM0L222x only, not L130x.
+ * These two nodes are written by hand from the SDK header.
+ */
+&pinctrl {
+	status = "okay";
+
+	uart0_tx_pa8: uart0_tx_pa8 {
+		pinmux = <MSP_PINMUX(9, MSPM0_PIN_FUNCTION_2)>;
+	};
+
+	uart0_rx_pa9: uart0_rx_pa9 {
+		pinmux = <MSP_PINMUX(10, MSPM0_PIN_FUNCTION_2)>;
+		input-enable;
+	};
+};
+
+&gpioa {
+	status = "okay";
+};
+
+&uart0 {
+	status = "okay";
+	current-speed = <115200>;
+	pinctrl-0 = <&uart0_tx_pa8 &uart0_rx_pa9>;
+	pinctrl-names = "default";
+};

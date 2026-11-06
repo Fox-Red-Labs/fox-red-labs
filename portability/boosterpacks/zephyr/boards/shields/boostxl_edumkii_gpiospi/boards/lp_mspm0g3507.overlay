@@ -1,0 +1,8 @@
+/*
+ * BOOSTXL-EDUMKII on the LP-MSPM0G3507 with the screen bus on GPIO pins.
+ * Joystick axes are left out (the ADC driver is not in Zephyr 4.4.2 either).
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <boosterpack/lp_mspm0g3507_gpiospi.dtsi>
+#include "../../boostxl_edumkii/common.dtsi"

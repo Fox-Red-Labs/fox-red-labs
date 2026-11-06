@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Post-quantum key exchange on the LP-CC1354P10-1: a Mac and a board agree a key and decrypt a message</title>
+<meta name="description" content="Post-quantum key exchange (ML-KEM) and signatures (ML-DSA) on the MSPM0, CC1354 and CC2340 LaunchPad boards: the dates, the sizes, what is measured and the demo.">
+<!-- seo -->
+<link rel="canonical" href="https://foxredlabs.dev/site/security.html">
+<meta property="og:site_name" content="Fox Red Labs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Post-quantum key exchange on the LP-CC1354P10-1: a Mac and a board agree a key and decrypt a message">
+<meta property="og:description" content="Post-quantum key exchange (ML-KEM) and signatures (ML-DSA) on the MSPM0, CC1354 and CC2340 LaunchPad boards: the dates, the sizes, what is measured and the demo.">
+<meta property="og:url" content="https://foxredlabs.dev/site/security.html">
+<meta property="og:image" content="https://foxredlabs.dev/site/media/og-image.png">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Post-quantum key exchange on the LP-CC1354P10-1: a Mac and a board agree a key and decrypt a message", "description": "Post-quantum key exchange (ML-KEM) and signatures (ML-DSA) on the MSPM0, CC1354 and CC2340 LaunchPad boards: the dates, the sizes, what is measured and the demo.", "url": "https://foxredlabs.dev/site/security.html", "author": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "publisher": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "license": "https://creativecommons.org/licenses/by/4.0/", "isPartOf": {"@type": "WebSite", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}}</script>
+<!-- /seo -->
+<link rel="icon" href="media/favicon.svg">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="motion.css?v=20261030-home">
+<script src="motion.js?v=20261030-home" defer></script>
+<style>
+/* Brand tokens and base */
+:root {
+ --frl-red: #B42418;
+ --frl-ember: #8E1C13;
+ --frl-ink: #161312;
+ --frl-stone: #6B625B;
+ --frl-paper: #FAFAF7;   /* the page ground (site review 2026-10-15, png/R4System.png); tan lives only inside cards */
+ --frl-tan: #F4EFE9;
+ --frl-cream: #F7F3EC;
+ --frl-line: #E2D8C9;
+ --ok: #2F6B4F;
+ --frl-font: "Barlow", "Helvetica Neue", Arial, sans-serif;
+ --frl-mono: "Barlow", "Helvetica Neue", Arial, sans-serif;   /* labels, captions and numbers in Barlow; the token name stays so 500 label rules need no edit */
+ --frl-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace;   /* code, commands and file names only */
+ --frl-ease: 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+* { box-sizing: border-box; }
+code, pre, kbd, samp, code *, pre * { font-family: var(--frl-code) !important; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--frl-paper); color: var(--frl-ink); font: 400 18px/28px var(--frl-font); -webkit-font-smoothing: antialiased; }
+a { color: var(--frl-red); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+a:hover { color: var(--frl-ember); }
+:focus-visible { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 600px) { .wrap { padding: 0 16px; } }
+h1, h2, h3 { margin: 0; font-weight: 700; }
+.display { font-size: 56px; line-height: 60px; letter-spacing: -0.005em; }
+h2 { font-size: 32px; line-height: 38px; }
+h3 { font-size: 24px; line-height: 30px; font-weight: 600; }
+@media (max-width: 700px) { .display { font-size: 40px; line-height: 44px; } h2 { font-size: 26px; line-height: 32px; } h3 { font-size: 20px; line-height: 26px; } body { font-size: 17px; } }
+.eyebrow { font-weight: 500; font-size: 14px; line-height: 20px; letter-spacing: .12em; text-transform: uppercase; color: var(--frl-red); margin-bottom: 12px; }
+.small { font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+.lede { max-width: 680px; color: var(--frl-stone); margin: 12px 0 0; }
+section { padding: 96px 0; }
+@media (max-width: 700px) { section { padding: 64px 0; } }
+/* draft strip */
+.draft { background: var(--frl-ink); color: var(--frl-cream); font-size: 13px; text-align: center; padding: 6px 16px; letter-spacing: .02em; }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 8px; font: 600 16px var(--frl-font); cursor: pointer; text-decoration: none; transition: background var(--frl-ease), border-color var(--frl-ease), color var(--frl-ease); white-space: nowrap; }
+.btn-primary { background: var(--frl-red); color: var(--frl-cream); border: 0; }
+.btn-primary:hover { background: var(--frl-ember); color: var(--frl-cream); }
+.btn-secondary { background: transparent; color: var(--frl-ink); border: 1.5px solid var(--frl-ink); }
+.btn-secondary:hover { background: var(--frl-cream); color: var(--frl-ink); }
+.btn svg.lucide { width: 18px; height: 18px; }
+.try-ai { margin: 22px 0 0; max-width: 640px; border: 1px solid var(--frl-line); border-radius: 12px; background: #fff; padding: 16px 18px; }
+.try-ai .ta-h { font: 600 15px/20px var(--frl-font); margin: 0 0 8px; }
+.try-ai pre { margin: 0; padding: 12px 14px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/21px var(--frl-mono, 'JetBrains Mono', monospace); }
+.try-ai .ta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 0; }
+.try-ai .ta-note { font-size: 14px; line-height: 20px; color: var(--frl-stone); margin: 10px 0 0; }
+
+
+
+/* Redesign chrome */
+:root { --logo-h: 48px; --frl-ok: #2F6B4F; --frl-amber: #C98500; /* success and the one amber: graphics, score tints and chart series only */ }
+body > header { position: sticky; top: 0; z-index: 30; background: rgba(250,250,247,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--frl-line); }
+/* inner pages: the header is Ink with Cream text; the home page keeps the light one above its dark hero */
+body > header.dark { background: rgba(22,19,18,.96); border-bottom-color: rgba(247,243,236,0.12); color: var(--frl-cream); }
+header.dark .logo-head { color: var(--frl-cream); }
+header.dark nav > a, header.dark nav .ni > a { color: var(--frl-cream); }
+header.dark nav > a:hover, header.dark nav .ni > a:hover { color: #F0563F; }
+header.dark nav a[aria-current="page"] { color: var(--frl-cream); border-bottom-color: #F0563F; }
+header.dark .ni-btn { color: rgba(247,243,236,.72); } header.dark .ni-btn:hover { color: var(--frl-cream); background: rgba(247,243,236,0.08); }
+header.dark .hsearch { background: rgba(247,243,236,0.05); border-color: rgba(247,243,236,0.14); } header.dark .hsearch:focus-within { border-color: var(--frl-cream); }
+header.dark .hsearch input { color: var(--frl-cream); } header.dark .hsearch input::placeholder { color: #6B625B; } header.dark .hsearch button { color: var(--frl-cream); }
+header.dark .menu-btn { border-color: var(--frl-cream); color: var(--frl-cream); }
+header.dark.nav-open nav { background: var(--frl-ink); border-bottom-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav > a, header.dark.nav-open nav .ni { border-top-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav .menu .mi b { color: var(--frl-cream); } header.dark.nav-open nav .menu .mi span { color: rgba(247,243,236,.72); }
+header .wrap { display: flex; align-items: center; gap: 32px; height: 72px; }
+.logo { display: block; width: auto; }
+.logo-head { height: var(--logo-h); color: var(--frl-red); }
+.logo-foot { height: 48px; color: var(--frl-red); }
+header .brand { display: flex; align-items: center; flex: none; }
+header nav { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+header nav > a, header nav .ni > a { color: var(--frl-ink); text-decoration: none; font-weight: 500; font-size: 16px; white-space: nowrap; padding: 4px 0; border-bottom: 2px solid transparent; }
+header nav > a:hover, header nav .ni > a:hover { color: var(--frl-red); }
+header nav a[aria-current="page"] { font-weight: 700; border-bottom-color: var(--frl-red); color: var(--frl-ink); }
+/* the Build item: a link, a chevron button, and the subject panel (open on hover, focus or tap) */
+.ni { position: relative; display: flex; align-items: center; gap: 2px; }
+.ni-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--frl-stone); cursor: pointer; padding: 0; }
+.ni-btn svg { width: 16px; height: 16px; transition: transform var(--frl-ease); }
+.ni-btn:hover { color: var(--frl-ink); background: var(--frl-cream); }
+.ni-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.menu { display: none; position: absolute; top: calc(100% + 14px); left: -24px; width: 720px; max-width: calc(100vw - 32px); background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 12px; padding: 22px 24px 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; z-index: 31; }
+#build-menu, #hardware-menu { left: -24px; } #software-menu { left: -200px; } #about-menu { left: auto; right: -90px; width: 560px; }
+.menu::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
+.ni:hover .menu, .ni:focus-within .menu, .ni.open .menu { display: grid; }
+.menu .mi { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--frl-ink); padding: 6px 8px; margin: -6px -8px; border-radius: 8px; }
+.menu .mi:hover, .menu .mi:focus-visible { background: var(--frl-paper); }
+.menu .mi b { font-weight: 700; font-size: 16px; line-height: 22px; }
+.menu .mi span { font-size: 13px; line-height: 18px; color: var(--frl-stone); }
+.menu .menu-note { grid-column: 1 / -1; margin: 0; border-top: 1px solid var(--frl-line); padding-top: 12px; font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.menu .menu-note a { color: var(--frl-ink); font-size: inherit; font-weight: 500; padding: 0; border: 0; }
+.menu .mi, .menu .mi b, .menu .mi span { white-space: normal; }  /* hand-made pages carry an older nowrap nav rule */
+/* phone menu: under 760 px the nav folds behind a Menu button (aria-expanded), opened by tap or Enter, closed by Escape */
+.menu-btn { display: none; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--frl-ink); background: transparent; color: var(--frl-ink); font: 600 16px var(--frl-font); cursor: pointer; }
+.menu-btn svg { width: 18px; height: 18px; }
+.menu-btn .mb-x { display: none; }
+.menu-btn[aria-expanded="true"] .mb-x { display: block; } .menu-btn[aria-expanded="true"] .mb-o { display: none; }
+/* site search in the header: the form goes to search.html?q=; under 760 px only the icon shows */
+.hsearch { display: flex; align-items: center; height: 40px; border: 1.5px solid var(--frl-line); border-radius: 8px; background: #fff; padding: 0 4px 0 12px; }
+.hsearch:focus-within { border-color: var(--frl-ink); }
+.hsearch input { border: 0; outline: 0; background: transparent; font: 500 15px var(--frl-font); color: var(--frl-ink); width: 150px; min-width: 0; }
+.hsearch button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 4px; background: transparent; color: var(--frl-ink); cursor: pointer; }
+.hsearch button:hover { color: var(--frl-red); } .hsearch button svg { width: 18px; height: 18px; }
+/* GitHub link beside the Digital Lab button: the repository one click from every page */
+.gh-link { display: inline-flex; align-items: center; gap: 6px; color: var(--frl-cream); text-decoration: none; font: 600 15px var(--frl-font); margin-right: 12px; opacity: .9; white-space: nowrap; }
+.gh-link:hover { opacity: 1; color: #fff; }
+header:not(.dark) .gh-link { color: var(--frl-ink); } header:not(.dark) .gh-link:hover { color: var(--frl-red); }
+.gh-link svg { width: 18px; height: 18px; }
+@media (max-width: 1180px) { .gh-link span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+/* the red "Plug in a board" button: opens the browser bench */
+.plug-btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 6px; background: var(--frl-red); color: #fff; font: 600 15px var(--frl-font); text-decoration: none; white-space: nowrap; flex: none; }
+.plug-btn:hover { background: var(--frl-ember); color: #fff; }
+.plug-btn svg { width: 17px; height: 17px; }
+header nav a.nav-lab, .plug-btn .plug-s { display: none; }
+@media (max-width: 480px) { .gh-link { display: none; } }
+@media (max-width: 1180px) { .plug-btn { padding: 0 11px; min-width: 44px; height: 44px; justify-content: center; } .plug-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+@media (max-width: 1000px) and (min-width: 761px) { header nav { gap: 6px !important; } .ni-btn { width: 20px; } header nav > a, header nav .ni > a { font-size: 15px; } header .wrap { gap: 12px !important; } }
+@media (max-width: 1100px) { header .wrap { gap: 20px; } header nav { gap: 18px; } .hsearch input { width: 90px; } }
+@media (max-width: 900px) { header nav > a, header nav .ni > a { font-size: 15px; } header nav { gap: 14px; } .hsearch { padding: 0 4px; border-color: transparent; background: transparent; } .hsearch input { display: none; } }
+@media (max-width: 760px) {
+  header .wrap { gap: 10px; position: relative; }
+  .menu-btn { display: inline-flex; }
+  .hsearch { margin-left: auto; }
+  .plug-btn { height: 44px; min-width: 44px; justify-content: center; gap: 6px; padding: 0 12px; } .plug-btn .plug-s { display: inline; font-style: normal; }
+  header.nav-open nav > a.nav-lab { display: block; color: var(--frl-red); font-weight: 600; }
+  header nav { display: none; }
+  header.nav-open nav { max-height: calc(100dvh - var(--menu-top, 144px)); overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; align-items: stretch; gap: 0; position: absolute; top: 100%; left: 0; right: 0; margin: 0; padding: 8px 16px 16px; background: var(--frl-paper); border-bottom: 1px solid var(--frl-line); box-shadow: 0 12px 24px rgba(22,19,18,.12); }
+  header.nav-open nav > a, header.nav-open nav .ni > a { display: block; padding: 12px 4px; font-size: 18px; border-top: 1px solid var(--frl-line); border-bottom: 0; }
+  header.nav-open nav .ni { display: grid; grid-template-columns: 1fr 44px; align-items: center; gap: 0; border-top: 1px solid var(--frl-line); }
+  header.nav-open nav .ni > a { grid-column: 1; border-top: 0; }
+  header.nav-open nav .ni-btn { display: inline-flex; grid-column: 2; grid-row: 1; width: 40px; height: 40px; justify-self: end; }
+  header.nav-open nav .ni:not(.open) .menu { display: none; }
+  header.nav-open nav .ni.open .menu { display: grid; grid-column: 1 / -1; position: static; width: auto; max-width: none; grid-template-columns: 1fr; gap: 4px; padding: 0 0 12px 16px; border: 0; background: transparent; }
+  header.nav-open nav .menu .mi { margin: 0; padding: 8px 8px; }
+  header.nav-open nav .menu .menu-note { display: none; }
+}
+@media (max-width: 380px) { .menu-btn { padding: 0 10px; } }
+/* footer: light, so a page has at most three dark bands (png/R4System.png): the lockup in Fox Red, the sections, About, the disclosure */
+footer { background: var(--frl-paper); color: var(--frl-stone); border-top: 1px solid var(--frl-line); padding: 56px 0 48px; font-size: 15px; line-height: 22px; }
+footer .wrap { display: grid; grid-template-columns: 1.3fr repeat(var(--fcols, 4), minmax(0, 1fr)); gap: 32px; }
+footer h2 { color: var(--frl-ink); line-height: 1.3; font-weight: 600; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 12px; }
+footer a { color: var(--frl-stone); display: block; text-decoration: none; padding: 3px 0; }
+footer a:hover { color: var(--frl-ink); }
+footer .f-brand p { margin: 16px 0 0; max-width: 360px; }
+footer .f-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 24px; border-top: 1px solid var(--frl-line); padding-top: 20px; margin-top: 8px; }
+footer .f-meta a { display: inline; padding: 0; color: var(--frl-ink); font-weight: 500; }
+footer .f-meta .disc { flex-basis: 100%; margin: 8px 0 0; max-width: 680px; }
+@media (max-width: 1000px) { footer .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); } footer .f-brand { grid-column: 1 / -1; } }
+@media (max-width: 520px) { footer .wrap { grid-template-columns: 1fr; } }
+/* the Sources line that replaced the Run details fold */
+.srcline { margin: 40px 0 0; padding-top: 14px; border-top: 1px solid var(--frl-line); font-size: 14px; line-height: 21px; color: var(--frl-stone); }
+.srcline p, .srcline li { font-size: 14px; line-height: 21px; } .srcline .srcline-h { font-weight: 600; color: var(--frl-ink); margin: 0 0 6px; }
+/* the tab strip of a section's pages (site_chrome.tabs) */
+.subtabs { display: flex; flex-wrap: wrap; gap: 4px 24px; border-bottom: 1px solid var(--frl-line); margin: 0 0 28px; }
+.subtabs a { padding: 10px 0; color: var(--frl-stone); text-decoration: none; font-weight: 600; font-size: 16px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.subtabs a:hover { color: var(--frl-ink); } .subtabs a[aria-current="page"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+/* narrow screens: long paths wrap, wide tables scroll inside themselves, never the page */
+main code { overflow-wrap: break-word; } main td code, main dd code { overflow-wrap: anywhere; }
+main select { max-width: 100%; }
+main pre { overflow-x: auto; max-width: 100%; }
+/* inner pages: the home page's 96 px band padding is for its full-width bands, not for sections inside a page */
+:where(main > .wrap) section { padding: 0; }
+:where(main > .wrap) section.blk { padding-top: 48px; }
+@media (max-width: 700px) { :where(main > .wrap) section.blk { padding-top: 36px; } }
+@media (max-width: 760px) {
+  main table { display: block; max-width: 100%; -webkit-overflow-scrolling: touch; }
+  /* every wide table scrolls inside itself, even one whose own style clips it for rounded corners; edge shadows show only
+     while there is more to scroll to (a white table sets --scroll-cover and --scroll-bg to #fff) */
+  main table:not(.ww), main .ww-wrap { overflow-x: auto !important;
+    background: linear-gradient(to right, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) left / 44px 100% no-repeat local,
+                linear-gradient(to left, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) right / 44px 100% no-repeat local,
+                radial-gradient(farthest-side at 0 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) left / 22px 100% no-repeat scroll,
+                radial-gradient(farthest-side at 100% 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) right / 22px 100% no-repeat scroll,
+                var(--scroll-bg, transparent) !important; }
+  main table th, main table td { min-width: 120px; } main table th:first-child, main table td:first-child { min-width: 120px; }
+}
+
+/* Shared pieces */
+
+/* shared pieces */
+.chip { display: inline-block; font: 600 11px/18px var(--frl-font); letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; white-space: nowrap; vertical-align: middle; border: 1.5px solid transparent; }
+.c-run { background: var(--frl-ink); color: var(--frl-cream); border-color: var(--frl-ink); }
+.c-part, .c-build { background: var(--frl-line); color: var(--frl-ink); border-color: var(--frl-line); }
+.c-no { background: #fff; color: var(--frl-ink); border-color: var(--frl-ink); }   /* red only on buttons and one key mark per graphic (step 7) */
+.c-wait { background: #fff; color: var(--frl-stone); border-color: color-mix(in srgb,#6B625B 45%,#fff); }
+.chip-key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; line-height: 20px; color: var(--frl-stone); margin: 12px 0 0; }
+.chip-key span { display: inline-flex; align-items: center; gap: 8px; }
+
+.stats { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 16px; margin: 28px 0 0; }
+.stat { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; min-width: 0; }
+.stat-n { font-size: 40px; line-height: 44px; font-weight: 700; color: var(--frl-red); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.stat-n a { color: inherit; text-decoration: none; } .stat-n a:hover { text-decoration: underline; }
+.stat-l { font-weight: 600; font-size: 16px; line-height: 22px; margin-top: 6px; color: var(--frl-ink); }
+.stat-s { font-size: 14px; line-height: 20px; color: var(--frl-stone); margin-top: 4px; }
+@media (max-width: 900px) { .stats { grid-template-columns: 1fr 1fr; } .stat-n { font-size: 32px; line-height: 36px; } }
+@media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
+
+.g { display: grid; grid-template-columns: minmax(170px, 1.1fr) repeat(var(--n), minmax(0, 1.4fr)); background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; margin-top: 16px; }
+.g > div { padding: 12px 14px; border-top: 1px solid var(--frl-line); min-width: 0; }
+.g .g-h { background: var(--frl-cream); border-top: 0; font-size: 15px; line-height: 20px; color: var(--frl-stone); }
+.g .g-h b { display: block; color: var(--frl-ink); font-weight: 600; } .g .g-h span { display: block; font-size: 13px; }
+.g .g-n { font-weight: 600; font-size: 16px; line-height: 22px; } .g .g-n a { color: var(--frl-ink); }
+.g .g-c { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 21px; }
+.g .g-c .chip { flex: none; margin-top: 1px; } .g .g-c .g-t { min-width: 0; overflow-wrap: anywhere; } .g .g-c a { color: var(--frl-ink); }
+.g .g-lab { display: none; }
+@media (max-width: 820px) {
+  .g { grid-template-columns: 1fr; }
+  .g .g-h { display: none; }
+  .g .g-n { background: var(--frl-cream); }
+  .g .g-c { border-top: 0; padding-top: 6px; padding-bottom: 6px; flex-wrap: wrap; }
+  .g .g-c:last-child, .g .g-c:has(+ .g-n) { padding-bottom: 12px; }
+  .g .g-lab { display: inline; width: 100%; font-size: 13px; color: var(--frl-stone); font-weight: 600; }
+  .g .g-empty { display: none; }
+}
+
+table.glance-t { border-collapse: separate; border-spacing: 0; width: 100%; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; font-size: 15px; line-height: 21px; }
+table.glance-t th, table.glance-t td { padding: 10px 14px; border-top: 1px solid var(--frl-line); text-align: left; vertical-align: top; }
+table.glance-t thead th { border-top: 0; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; }
+table.glance-t tbody th { font-weight: 600; color: var(--frl-stone); white-space: nowrap; }
+
+.bars { margin: 20px 0 0; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; }
+.bars figcaption { margin: 0 0 14px; } .bars figcaption b { display: block; font-size: 18px; line-height: 24px; }
+.bars figcaption span { display: block; font-size: 14px; line-height: 20px; color: var(--frl-stone); margin-top: 2px; }
+.bars-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--frl-ink); margin: 0 0 12px; }
+.bars-legend span { display: inline-flex; align-items: center; gap: 7px; } .bars-legend i { width: 12px; height: 12px; border-radius: 3px; }
+.bars-body { position: relative; }
+.bar-cat { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 12px; align-items: center; padding: 7px 0; border-top: 1px solid var(--frl-line); }
+.bar-cat:first-of-type { border-top: 0; }
+.bar-l { font-size: 15px; line-height: 20px; font-weight: 600; } .bar-l span { display: block; font-weight: 400; font-size: 13px; color: var(--frl-stone); }
+.bar-m { display: grid; gap: 4px; }
+.bar-track { position: relative; height: 20px; min-width: 0; }
+.bars, .bars-body, .bar-m, .bar-cat { min-width: 0; max-width: 100%; }
+.bar { position: absolute; top: 2px; height: 16px; border-radius: 0 4px 4px 0; min-width: 2px; }
+.bar-v { position: absolute; top: 0; margin-left: 8px; max-width: 28%; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 20px; font-weight: 600; color: var(--frl-ink); white-space: nowrap; }
+.bar-none { font-size: 13px; line-height: 20px; color: var(--frl-stone); font-style: italic; }
+.bar-axis { position: absolute; top: -4px; bottom: -4px; width: 1px; background: var(--frl-stone); }
+@media (max-width: 560px) { .bar-cat { grid-template-columns: 1fr; gap: 4px; } }
+
+.fold { margin-top: 12px; }
+.fold > summary { cursor: pointer; font-weight: 600; font-size: 16px; color: var(--frl-ink); padding: 8px 0; }
+.fold[open] > summary { margin-bottom: 8px; }
+
+table.score { border-collapse: separate; border-spacing: 0; width: 100%; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; font-size: 15px; line-height: 20px; }
+table.score th, table.score td { padding: 9px 12px; border-top: 1px solid var(--frl-line); text-align: left; vertical-align: middle; }
+table.score thead th { border-top: 0; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; }
+table.score thead th span { display: block; font-weight: 400; font-size: 12px; color: rgba(247,243,236,.72); }
+table.score tbody th { font-weight: 500; color: var(--frl-ink); }
+table.score tbody th small { display: block; font-size: 12px; color: var(--frl-stone); font-weight: 400; }
+table.score tr.cat th { background: var(--frl-cream); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--frl-stone); padding: 7px 12px; }
+table.score td { white-space: nowrap; }
+table.score td b { font-weight: 600; font-variant-numeric: tabular-nums; }
+table.score td .rk { display: block; font-size: 11px; line-height: 14px; letter-spacing: .06em; text-transform: uppercase; }
+table.score td.best { background: color-mix(in srgb,#2F6B4F 12%,#fff); color: #2F6B4F; } table.score td.best .rk { color: #2F6B4F; }
+table.score td.worst { background: color-mix(in srgb,#B42418 9%,#fff); color: #8E1C13; } table.score td.worst .rk { color: #B42418; }
+table.score td.mid { background: color-mix(in srgb,#C98500 14%,#fff); color: #161312; }
+table.score td.none { color: var(--frl-stone); font-style: italic; }
+table.score td .chip { font-size: 10px; }
+.score-key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--frl-stone); margin: 10px 0 0; }
+.score-key i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; border: 1px solid var(--frl-line); }
+
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px 8px 10px; border: 1px solid var(--frl-line); border-radius: 10px; background: #fff; color: var(--frl-ink); text-decoration: none; font-size: 15px; line-height: 20px; font-weight: 500; }
+.badge:hover { border-color: var(--frl-ink); color: var(--frl-ink); }
+.badge .ic { color: var(--frl-red); flex: none; }
+.badge .b-s { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 6px; background: var(--frl-cream); color: var(--frl-stone); border: 1px solid var(--frl-line); }
+.badge.b-works .b-s { background: var(--frl-ink); color: var(--frl-cream); border-color: var(--frl-ink); }
+.badge.b-partial .b-s { background: var(--frl-line); color: var(--frl-ink); border-color: var(--frl-line); }
+.badge.b-building .b-s, .badge.b-planned .b-s { background: #fff; color: var(--frl-stone); border-color: color-mix(in srgb,#6B625B 45%,#fff); }
+.badge.b-no .b-s { background: var(--frl-red); color: var(--frl-cream); border-color: var(--frl-red); }
+.badge-inline { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+.badge-inline .ic { color: var(--frl-red); }
+
+/* This page */
+
+/* community pieces */
+.codebox .cb-clone { margin: 0 0 14px; padding: 12px 16px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 6px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/22px var(--frl-mono, 'JetBrains Mono', monospace); }
+.codebox .cb-clone code { color: inherit; background: none; padding: 0; }
+.cb-folders { margin: 0; padding-left: 20px; } .cb-folders > li { margin: 8px 0; font-size: 16px; line-height: 24px; } .cb-folders ul { padding-left: 18px; margin: 4px 0 0; } .cb-folders ul li { margin: 3px 0; font-size: 15px; line-height: 22px; }
+.cb-more { list-style: none; margin-left: -20px; } .cb-more summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+.cb-src, .cb-lic { font-size: 14px; line-height: 20px; color: var(--frl-ink-2, #6B625B); margin: 12px 0 0; }
+.rp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.rp-card { display: block; padding: 14px 16px; border: 1.5px solid var(--frl-line); border-radius: 8px; text-decoration: none; color: var(--frl-ink); background: var(--frl-paper); }
+.rp-card:hover { border-color: var(--frl-red); } .rp-card b { display: block; font-size: 17px; margin-bottom: 4px; } .rp-card span { font-size: 14px; line-height: 20px; color: var(--frl-ink-2, #6B625B); }
+.rp-list { margin: 0; padding-left: 20px; } .rp-list li { margin: 8px 0; font-size: 15px; line-height: 22px; } .rp-date { font: 600 12px/18px var(--frl-mono, monospace); color: var(--frl-ink-2, #6B625B); margin-right: 6px; } .rp-status { font-style: normal; color: var(--frl-red); font-weight: 600; margin-left: 6px; }
+
+header nav a[aria-current] { color: var(--frl-red); }
+main { padding: 40px 0 96px; }
+.crumb { font-size: 15px; line-height: 22px; color: var(--frl-stone); margin: 0 0 20px; }
+.crumb a { color: var(--frl-stone); }
+h1.q { font-size: 36px; line-height: 42px; letter-spacing: -0.01em; max-width: 30ch; }
+.q-sub { font-size: 20px; line-height: 28px; color: var(--frl-stone); margin: 6px 0 0; max-width: 60ch; }
+@media (max-width: 700px) { h1.q { font-size: 28px; line-height: 34px; } .q-sub { font-size: 17px; line-height: 24px; } }
+.blk { padding-top: 72px; }
+.blk, #numbers { scroll-margin-top: 88px; }
+td a[href^="board-"] { white-space: nowrap; }
+.blk#sources { padding-top: 40px; } #sources + .blk { padding-top: 4px; }
+@media (max-width: 700px) { .blk { padding-top: 56px; } }
+.blk > h2 { margin-bottom: 8px; }
+.blk > .lede { margin: 0 0 24px; }
+.card { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 24px; }
+details > summary { cursor: pointer; font-weight: 600; font-size: 16px; color: var(--frl-ink); margin: 16px 0 0; }
+details[open] > summary { margin-bottom: 12px; }
+.note { font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+table.t { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 22px; }
+table.t th, table.t td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--frl-line); vertical-align: top; }
+table.t th { font-weight: 600; color: var(--frl-stone); }
+.tw { overflow-x: auto; }
+.glossary { padding: 0; }
+.glossary dl { display: grid; grid-template-columns: minmax(140px, max-content) 1fr; gap: 8px 20px; font-size: 15px; line-height: 22px; }
+.glossary dt { font-weight: 600; } .glossary dd { margin: 0; color: var(--frl-stone); }
+@media (max-width: 560px) { .glossary dl { grid-template-columns: 1fr; } .glossary dd { margin-bottom: 8px; } }
+
+/* yes / no / partly marks: icon plus a word, never color alone */
+.mark { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; flex: none; }
+.mark svg { width: 16px; height: 16px; }
+.m-yes { background: color-mix(in srgb,#2F6B4F 12%,#fff); color: var(--ok); }
+.m-no { background: color-mix(in srgb,#B42418 9%,#fff); color: var(--frl-red); }
+.m-partial { background: color-mix(in srgb,#C98500 14%,#fff); color: #161312; }
+.m-untested { background: transparent; color: var(--frl-stone); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+
+/* the spectrum */
+.need-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 32px 0 8px; }
+.need-bar b { font-weight: 600; margin-right: 4px; width: 100%; }
+.need { font: 500 16px var(--frl-font); height: 40px; padding: 0 16px; border-radius: 4px; border: 1.5px solid var(--frl-line); background: #fff; color: var(--frl-ink); cursor: pointer; }
+.need:hover { border-color: var(--frl-ink); }
+.need[aria-pressed="true"] { background: var(--frl-ink); border-color: var(--frl-ink); color: var(--frl-cream); }
+.need-result { min-height: 28px; font-weight: 600; margin: 8px 0 0; }
+.lane { margin-top: 32px; }
+.lane-name { font-weight: 700; font-size: 20px; line-height: 26px; margin: 0; }
+.lane-sub { margin: 2px 0 16px; }
+.rail { display: grid; gap: 16px; grid-template-columns: repeat(min(var(--n), 4), minmax(0, 1fr)); position: relative; }
+.rail.wrap::before { display: none; }
+.rail.wrap .stop::before { content: ""; position: absolute; left: 14px; right: -16px; top: 13px; height: 3px; background: var(--frl-stone); opacity: .35; border-radius: 2px; }
+.rail.wrap .stop:nth-child(4n)::before, .rail.wrap .stop:last-child::before { display: none; }
+.lane.radio .rail.wrap .stop::before { background: var(--frl-red); opacity: .5; }
+.rail { align-items: start; }
+.rail::before { content: ""; position: absolute; left: 14px; right: 14px; top: 13px; height: 3px; background: var(--frl-stone); opacity: .35; border-radius: 2px; }
+.lane.radio .rail::before { background: var(--frl-red); opacity: .5; }
+.stop { position: relative; display: flex; flex-direction: column; transition: opacity var(--frl-ease); }
+.stop .dot { width: 29px; height: 29px; border-radius: 50%; background: var(--frl-paper); border: 3px solid var(--frl-stone); position: relative; z-index: 1; display: grid; place-items: center; font-weight: 700; font-size: 13px; line-height: 1; }
+.lane.radio .stop .dot { border-color: var(--frl-red); }
+.stop .card { margin-top: 14px; padding: 20px; display: flex; flex-direction: column; }
+.stop.me .card { border: 2px solid var(--frl-red); }
+.stop.dim { opacity: .3; }
+.step-name { color: var(--frl-red); font-weight: 600; font-size: 15px; line-height: 20px; margin: 0 0 4px; }
+.lane:not(.radio) .step-name { color: var(--frl-stone); }
+.board-name { font-weight: 700; font-size: 20px; line-height: 26px; margin: 0 0 8px; overflow-wrap: anywhere; }
+.stop p.plain { margin: 0 0 14px; font-size: 16px; line-height: 23px; }
+.meters { display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; align-items: center; font-size: 14px; line-height: 18px; margin: 0 0 14px; }
+.meters dt { color: var(--frl-stone); }
+.meters dd { margin: 0; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.pips { display: inline-flex; gap: 3px; }
+.pips i { width: 10px; height: 8px; border-radius: 2px; background: var(--frl-line); }
+.pips i.on { background: var(--frl-ink); }
+.lane.radio .pips i.on { background: var(--frl-red); }
+.delta { list-style: none; padding: 0; margin: 0 0 14px; font-size: 15px; line-height: 21px; }
+.delta li { padding: 3px 0 3px 20px; position: relative; }
+.delta li::before { position: absolute; left: 1px; top: 2px; font-weight: 700; }
+.delta li.add::before { content: "+"; color: var(--ok); }
+.delta li.drop::before { content: "\2212"; color: var(--frl-red); }
+.can { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.can .tag { position: relative; z-index: 2; font: 500 13px/18px var(--frl-font); padding: 3px 9px; border-radius: 3px; background: var(--frl-cream); border: 1px solid var(--frl-line); color: var(--frl-ink); cursor: pointer; }
+button.tag:hover { border-color: var(--frl-ink); }
+span.tag { cursor: default; }
+.can .tag[aria-pressed="true"] { background: var(--frl-ink); border-color: var(--frl-ink); color: var(--frl-cream); }
+.board-name a.whole { color: var(--frl-ink); text-decoration: none; }
+.board-name a.whole::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 12px; }
+.stop .card { position: relative; }
+.stop .card:hover { border-color: var(--frl-ink); }
+.stop .card:has(a.whole:focus-visible) { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.stop .foot a.price { position: relative; z-index: 2; display: block; color: var(--frl-ink); }
+.stop .foot .status { display: block; color: var(--frl-ink); font-weight: 500; }
+.stop .foot .status.quiet { color: var(--frl-stone); font-weight: 400; }
+.stop .foot { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--frl-line); font-size: 15px; line-height: 21px; }
+.stop .price { font-weight: 600; }
+@media (max-width: 1000px) {
+  .rail { grid-template-columns: 1fr; gap: 0; padding-left: 44px; }
+  .rail::before, .rail.wrap::before { display: block; left: 13px; right: auto; top: 14px; bottom: 14px; width: 3px; height: auto; }
+  .rail.wrap .stop::before { display: none; }
+  .stop { padding-bottom: 16px; }
+  .stop .dot { position: absolute; left: -44px; top: 18px; }
+  .stop .card { margin-top: 0; }
+}
+
+/* projects by board */
+.pgrid { display: grid; grid-template-columns: minmax(180px, 1.2fr) repeat(var(--n), minmax(0, 1fr)); background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; }
+.pgrid > div { padding: 14px 16px; border-top: 1px solid var(--frl-line); display: flex; gap: 10px; align-items: flex-start; }
+.pgrid .ph { font-weight: 600; background: var(--frl-cream); align-items: center; border-top: 0; }
+.pgrid .pt { font-weight: 600; }
+.pgrid .pg { grid-column: 1 / -1; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; font-size: 15px; padding: 8px 16px; }
+.pgrid .pc > span:last-child { font-size: 15px; line-height: 21px; padding-top: 3px; }
+.pgrid .pc .dim-text { color: var(--frl-stone); }
+.pgrid .cell-label { display: none; }
+@media (max-width: 760px) {
+  .pgrid { grid-template-columns: 1fr; }
+  .pgrid .ph { display: none; }
+  .pgrid .pt { background: var(--frl-cream); }
+  .pgrid .pc { border-top: 0; padding-top: 8px; padding-bottom: 8px; }
+  .pgrid .cell-label { display: inline; font-weight: 600; color: var(--frl-ink); }
+}
+.key { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 14px 0 0; font-size: 15px; }
+.key span { display: inline-flex; gap: 8px; align-items: center; }
+.key .mark { width: 22px; height: 22px; } .key .mark svg { width: 13px; height: 13px; }
+
+/* board page: numbers first */
+.glance { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 32px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 12px; overflow: hidden; }
+.glance > div { padding: 24px 20px; border-left: 1px solid rgba(247,243,236,0.12); }
+.glance > div:first-child { border-left: 0; }
+.glance .n { font-size: 40px; line-height: 44px; font-weight: 700; }
+.glance .l { font-weight: 600; margin-top: 4px; font-size: 16px; line-height: 22px; }
+.glance .d { color: rgba(247,243,236,.72); font-size: 14px; line-height: 20px; margin-top: 4px; }
+@media (max-width: 900px) { .glance { grid-template-columns: 1fr 1fr; } .glance > div { border-left: 0; border-top: 1px solid rgba(247,243,236,0.12); } .glance > div:first-child, .glance > div:nth-child(2) { border-top: 0; } }
+.glance.g4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) { .glance.g4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .glance.g4 { grid-template-columns: 1fr; } }
+.verdict .delta { margin: 0; }
+@media (max-width: 480px) { .glance { grid-template-columns: 1fr; } .glance > div:nth-child(2) { border-top: 1px solid rgba(247,243,236,0.12); } }
+.jump { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 24px 0 0; font-size: 15px; }
+.jump a { font-size: 15px; font-weight: 500; color: var(--frl-stone); text-decoration: none; padding: 2px 0; border-bottom: 1.5px solid transparent; }
+.jump a:hover { color: var(--frl-ink); border-bottom-color: var(--frl-ink); }
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .verdict { grid-template-columns: 1fr; } }
+.verdict h3 { font-size: 20px; line-height: 26px; margin: 0 0 12px; display: flex; gap: 10px; align-items: center; }
+.verdict ul { margin: 0; padding-left: 20px; } .verdict li { margin: 6px 0; }
+.verdict .buy { grid-column: 1 / -1; background: var(--frl-cream); }
+
+/* will my code fit */
+.fit { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 40px; }
+@media (max-width: 860px) { .fit { grid-template-columns: 1fr; gap: 24px; } }
+.fit-label { font-weight: 600; margin: 0 0 10px; }
+.picks { display: flex; flex-direction: column; gap: 6px; }
+.pick { text-align: left; font: 500 15px/20px var(--frl-font); padding: 8px 12px 8px 36px; border-radius: 8px; border: 1.5px solid var(--frl-line); background: #fff; color: var(--frl-ink); cursor: pointer; position: relative; }
+.pick::before { content: ""; position: absolute; left: 11px; top: 10px; width: 14px; height: 14px; border: 1.5px solid var(--frl-stone); border-radius: 4px; }
+.pick:hover { border-color: var(--frl-ink); }
+.pick[aria-pressed="true"] { border-color: var(--frl-ink); background: var(--frl-cream); }
+.pick[aria-pressed="true"]::before { background: var(--frl-ink); border-color: var(--frl-ink); box-shadow: inset 0 0 0 2.5px var(--frl-cream); }
+.mbar-wrap { position: relative; }
+.mbar-wrap .mbar { margin-bottom: 22px; }
+.mbar-wrap i.cap { position: absolute; top: -6px; height: 48px; width: 3px; margin-left: -1.5px; background: var(--frl-ink); border-radius: 2px; }
+.fit-warn { margin: 16px 0 0; padding: 12px 14px; background: var(--frl-cream); border-radius: 8px; }
+.room { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0 0; }
+.room > div { background: var(--frl-cream); border-radius: 10px; padding: 14px 16px; }
+.room .n { font-size: 32px; line-height: 36px; font-weight: 700; white-space: nowrap; } @media (max-width: 520px) { .room .n { font-size: 26px; line-height: 30px; } }
+.room .l { font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.fit-say { font-weight: 600; font-size: 20px; line-height: 26px; margin: 0 0 20px; }
+.mbar-label { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font-size: 15px; margin: 0 0 6px; }
+.mbar-label b { font-weight: 600; }
+.mbar { display: flex; gap: 2px; height: 36px; margin: 0 0 22px; }
+.mbar span { display: block; height: 100%; min-width: 3px; }
+.mbar span:first-child { border-radius: 6px 0 0 6px; }
+.mbar span.free { border-radius: 0 6px 6px 0; background: repeating-linear-gradient(135deg, #fff 0 6px, var(--frl-cream) 6px 12px); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+.mlegend { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 10px; font-size: 15px; line-height: 21px; }
+.mlegend li { display: grid; grid-template-columns: 16px 1fr; gap: 10px; }
+.mlegend i { width: 16px; height: 16px; border-radius: 4px; margin-top: 3px; }
+.mlegend i.free { background: repeating-linear-gradient(135deg, #fff 0 4px, var(--frl-cream) 4px 8px); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+.mlegend small { display: block; color: var(--frl-stone); font-size: 14px; line-height: 20px; }
+.tip { position: fixed; pointer-events: none; background: var(--frl-ink); color: var(--frl-cream); font-size: 14px; line-height: 20px; padding: 6px 10px; border-radius: 6px; display: none; z-index: 40; max-width: 280px; }
+
+/* rows of results */
+.rows { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .rows { grid-template-columns: 1fr; } }
+.rowc { display: grid; grid-template-columns: 28px 1fr; gap: 14px; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 18px; }
+.rowc h3 { font-size: 18px; line-height: 24px; margin: 2px 0 2px; } .rowc h3 a { color: inherit; text-decoration: none; } .rowc h3 a:hover { text-decoration: underline; }
+.rowc .say { font-weight: 600; margin: 0 0 4px; font-size: 16px; line-height: 22px; color: var(--frl-ink); }
+.rowc p { margin: 0; font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 24px; margin: 16px 0 0; font-size: 16px; line-height: 23px; }
+.facts dt { color: var(--frl-stone); } .facts dd { margin: 0; }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr; gap: 0; } .facts dd { margin-bottom: 10px; } }
+.gotchas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.gotchas li { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 16px 18px; min-width: 0; overflow-wrap: anywhere; }
+.gotchas b { display: block; font-weight: 600; margin-bottom: 2px; }
+.srcs { font-size: 14px; line-height: 20px; color: var(--frl-stone); overflow-wrap: anywhere; }
+.srcs li { margin: 2px 0; }
+dl.qa { margin: 0; } dl.qa dt { font-weight: 600; margin-top: 14px; } dl.qa dd { margin: 4px 0 0; font-size: 16px; line-height: 24px; color: var(--frl-stone); }
+
+/* board page header: the fact card left, three stat cards right */
+.hero { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; margin-top: 28px; scroll-margin-top: 88px; }
+.hero .meet h2 { font-size: 22px; line-height: 28px; margin: 0 0 8px; }
+.hero .meet > p { margin: 0; font-size: 16px; line-height: 23px; }
+.hero .meet .facts { margin-top: 14px; font-size: 15px; line-height: 21px; gap: 6px 18px; }
+.hero .meet .buyline { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--frl-line); }
+.hero .meet .fam { margin-top: 8px; }
+.hero-stats { display: grid; gap: 16px; align-content: start; }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; } .hero-stats { order: -1; grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .hero-stats { grid-template-columns: 1fr; } }
+.blk h3.sub { font-size: 20px; line-height: 26px; margin: 40px 0 4px; scroll-margin-top: 88px; }
+.g .g-h a { color: var(--frl-ink); }
+
+/* experiment cards */
+.xcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.xcard { position: relative; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.xcard:hover { border-color: var(--frl-ink); }
+.xcard:has(a:focus-visible) { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.xcard h3 { font-size: 18px; line-height: 24px; margin: 0; }
+.xcard h3 a { color: var(--frl-ink); text-decoration: none; }
+.xcard h3 a::after { content: ""; position: absolute; inset: 0; border-radius: 12px; }
+.xcard p { margin: 0; font-size: 15px; line-height: 22px; }
+.xcard .xline { color: var(--frl-stone); }
+.ladder { list-style: none; display: flex; gap: 3px; padding: 0; margin: auto 0 0; font-size: 11px; line-height: 14px; }
+.ladder li { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: center; padding: 4px 1px; border-radius: 4px; background: var(--frl-cream); color: var(--frl-stone); }
+.ladder li.on { background: var(--frl-ink); color: var(--frl-cream); }
+
+/* sticky "On this page" bar and back-to-top, built by OTP_JS from the page's own contents list */
+.otp { position: fixed; left: 0; right: 0; z-index: 25; background: rgba(250,250,247,.97); backdrop-filter: blur(8px); border-bottom: 1px solid var(--frl-line); opacity: 0; visibility: hidden; transition: opacity 160ms ease-out, visibility 160ms; }
+.otp.on { opacity: 1; visibility: visible; }
+.otp .wrap { display: flex; align-items: center; gap: 4px; height: 44px; overflow-x: auto; scrollbar-width: none; }
+.otp .wrap::-webkit-scrollbar { display: none; }
+.otp b { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--frl-stone); margin-right: 8px; white-space: nowrap; font-weight: 600; }
+.otp a { font-size: 15px; font-weight: 500; color: var(--frl-stone); text-decoration: none; white-space: nowrap; padding: 10px 10px; border-radius: 0; border-bottom: 2px solid transparent; }
+.otp a:hover { color: var(--frl-ink); }
+.otp a.cur { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+body.has-otp [id] { scroll-margin-top: 132px; }
+.totop { position: fixed; right: 16px; bottom: 16px; z-index: 25; width: 44px; height: 44px; border-radius: 6px; border: 1.5px solid var(--frl-ink); background: var(--frl-paper); color: var(--frl-ink); display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 6px 16px rgba(22,19,18,.12); }
+.totop.on { display: inline-flex; } .totop svg { width: 20px; height: 20px; }
+@media print { .otp, .totop { display: none !important; } }
+
+</style>
+</head>
+<body>
+
+<header class="dark">
+  <div class="wrap">
+    <a href="index.html" class="brand"><svg class="logo logo-head" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg></a>
+    <nav id="site-nav" aria-label="Main"><div class="ni"><a href="projects.html">Builds</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="build-menu" aria-label="Build filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="build-menu"><a class="mi" href="projects.html?f=smart-home"><b>Smart home</b><span>Home Assistant, Matter, Apple Home</span></a><a class="mi" href="projects.html?f=ai"><b>Edge AI</b><span>Occupancy, digits, vision on Linux</span></a><a class="mi" href="projects.html?f=radio"><b>Radio and range</b><span>Walkie-talkie, key finder, far shed sensor</span></a><a class="mi" href="projects.html?f=motors"><b>Motors, power and sensing</b><span>Control loops, radar presence, sensors</span></a><a class="mi" href="projects.html?f=screens"><b>Screens</b><span>Touch displays on a development kit</span></a><a class="mi" href="security.html"><b>Security</b><span>Post-quantum key exchange, AES</span></a><p class="menu-note">New here? <a href="project-blink.html">Blink an LED first</a>, or <a href="projects.html">see all 33 builds</a>.</p></div></div><div class="ni"><a href="hardware.html">Hardware</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="hardware-menu" aria-label="Hardware pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="hardware-menu"><a class="mi" href="hardware.html"><b>The kits</b><span>Every kit a build ran on, what ran, where to get it</span></a><a class="mi" href="addons.html"><b>Add-ons and parts</b><span>Screens, sensors, radios, motors and probes, from any maker</span></a></div></div><div class="ni"><a href="portability.html" aria-current="page">Software</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="software-menu" aria-label="Software pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="software-menu"><a class="mi" href="portability.html"><b>Bring your code</b><span>Arduino, ESPHome, Zephyr, MicroPython, STM32, ESP32 and Pico code on a TI board</span></a><a class="mi" href="ports.html"><b>Every port</b><span>What ran, what only built, what changed, with the code</span></a><a class="mi" href="one-app-eleven-boards.html"><b>One app, eleven boards</b><span>The same C file from an MSPM0 to AM62L Linux</span></a><a class="mi" href="project-build-from-terminal.html"><b>Build from the terminal</b><span>TI&#x27;s SDK examples with GCC and a makefile, no IDE</span></a><a class="mi" href="benchmarks.html"><b>Measured</b><span>Every board on the same tests, with the method</span></a><a class="mi" href="edge-ai.html"><b>Edge AI</b><span>Where to start, and the measured numbers</span></a></div></div><div class="ni"><a href="community.html">Community</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="about-menu" aria-label="Community pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="about-menu"><a class="mi" href="community.html"><b>Community</b><span>Post what you built or ported; it gets a page here</span></a><a class="mi" href="https://github.com/Fox-Red-Labs/fox-red-labs"><b>Get the code</b><span>The repository: board folders, ports and portable code</span></a></div></div></nav>
+    <form class="hsearch" action="search.html" role="search"><input name="q" type="search" placeholder="Search" aria-label="Search the site" title="Search the site (press /)"><button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></form>
+    <a class="gh-link" href="https://github.com/Fox-Red-Labs/fox-red-labs" aria-label="Fox Red Labs on GitHub"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
+    
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><svg class="mb-o" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="mb-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Menu</button>
+  </div>
+<script>
+(function () {
+  var h = document.currentScript.closest("header"), b = h.querySelector(".menu-btn");
+  function set(open) { if (open) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); h.classList.toggle("nav-open", open); b.setAttribute("aria-expanded", open ? "true" : "false"); }
+  window.addEventListener("resize", function () { if (h.classList.contains("nav-open")) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); });
+  b.addEventListener("click", function () { set(b.getAttribute("aria-expanded") !== "true"); });
+  h.querySelectorAll("nav a").forEach(function (a) { a.addEventListener("click", function () { set(false); }); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (h.classList.contains("nav-open")) { set(false); b.focus(); } h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  document.addEventListener("click", function (e) { if (!h.contains(e.target)) { set(false); h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  h.querySelectorAll(".ni-btn").forEach(function (t) {
+    t.addEventListener("click", function () { var n = t.closest(".ni"), open = !n.classList.contains("open"); n.classList.toggle("open", open); t.setAttribute("aria-expanded", open ? "true" : "false"); });
+  });
+  var f = h.querySelector(".hsearch"), q = f && f.querySelector("input");
+  if (f) f.addEventListener("submit", function (e) { if (getComputedStyle(q).display === "none" || !q.value.trim()) { e.preventDefault(); location.href = "search.html"; } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || /input|textarea|select/i.test(e.target.tagName) || e.target.isContentEditable) return;
+    e.preventDefault(); var s = document.getElementById("sq");
+    if (s) s.focus(); else if (q && getComputedStyle(q).display !== "none") q.focus(); else location.href = "search.html";
+  });
+})();
+</script>
+</header>
+<main><div class="wrap">
+<style>
+/* shared pieces */
+.chip { display: inline-block; font: 600 11px/18px var(--frl-font); letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; white-space: nowrap; vertical-align: middle; border: 1.5px solid transparent; }
+.c-run { background: var(--frl-ink); color: var(--frl-cream); border-color: var(--frl-ink); }
+.c-part, .c-build { background: var(--frl-line); color: var(--frl-ink); border-color: var(--frl-line); }
+.c-no { background: #fff; color: var(--frl-ink); border-color: var(--frl-ink); }   /* red only on buttons and one key mark per graphic (step 7) */
+.c-wait { background: #fff; color: var(--frl-stone); border-color: color-mix(in srgb,#6B625B 45%,#fff); }
+.chip-key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; line-height: 20px; color: var(--frl-stone); margin: 12px 0 0; }
+.chip-key span { display: inline-flex; align-items: center; gap: 8px; }
+
+.stats { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 16px; margin: 28px 0 0; }
+.stat { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; min-width: 0; }
+.stat-n { font-size: 40px; line-height: 44px; font-weight: 700; color: var(--frl-red); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.stat-n a { color: inherit; text-decoration: none; } .stat-n a:hover { text-decoration: underline; }
+.stat-l { font-weight: 600; font-size: 16px; line-height: 22px; margin-top: 6px; color: var(--frl-ink); }
+.stat-s { font-size: 14px; line-height: 20px; color: var(--frl-stone); margin-top: 4px; }
+@media (max-width: 900px) { .stats { grid-template-columns: 1fr 1fr; } .stat-n { font-size: 32px; line-height: 36px; } }
+@media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
+
+.g { display: grid; grid-template-columns: minmax(170px, 1.1fr) repeat(var(--n), minmax(0, 1.4fr)); background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; margin-top: 16px; }
+.g > div { padding: 12px 14px; border-top: 1px solid var(--frl-line); min-width: 0; }
+.g .g-h { background: var(--frl-cream); border-top: 0; font-size: 15px; line-height: 20px; color: var(--frl-stone); }
+.g .g-h b { display: block; color: var(--frl-ink); font-weight: 600; } .g .g-h span { display: block; font-size: 13px; }
+.g .g-n { font-weight: 600; font-size: 16px; line-height: 22px; } .g .g-n a { color: var(--frl-ink); }
+.g .g-c { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 21px; }
+.g .g-c .chip { flex: none; margin-top: 1px; } .g .g-c .g-t { min-width: 0; overflow-wrap: anywhere; } .g .g-c a { color: var(--frl-ink); }
+.g .g-lab { display: none; }
+@media (max-width: 820px) {
+  .g { grid-template-columns: 1fr; }
+  .g .g-h { display: none; }
+  .g .g-n { background: var(--frl-cream); }
+  .g .g-c { border-top: 0; padding-top: 6px; padding-bottom: 6px; flex-wrap: wrap; }
+  .g .g-c:last-child, .g .g-c:has(+ .g-n) { padding-bottom: 12px; }
+  .g .g-lab { display: inline; width: 100%; font-size: 13px; color: var(--frl-stone); font-weight: 600; }
+  .g .g-empty { display: none; }
+}
+
+table.glance-t { border-collapse: separate; border-spacing: 0; width: 100%; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; font-size: 15px; line-height: 21px; }
+table.glance-t th, table.glance-t td { padding: 10px 14px; border-top: 1px solid var(--frl-line); text-align: left; vertical-align: top; }
+table.glance-t thead th { border-top: 0; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; }
+table.glance-t tbody th { font-weight: 600; color: var(--frl-stone); white-space: nowrap; }
+
+.bars { margin: 20px 0 0; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; }
+.bars figcaption { margin: 0 0 14px; } .bars figcaption b { display: block; font-size: 18px; line-height: 24px; }
+.bars figcaption span { display: block; font-size: 14px; line-height: 20px; color: var(--frl-stone); margin-top: 2px; }
+.bars-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--frl-ink); margin: 0 0 12px; }
+.bars-legend span { display: inline-flex; align-items: center; gap: 7px; } .bars-legend i { width: 12px; height: 12px; border-radius: 3px; }
+.bars-body { position: relative; }
+.bar-cat { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 12px; align-items: center; padding: 7px 0; border-top: 1px solid var(--frl-line); }
+.bar-cat:first-of-type { border-top: 0; }
+.bar-l { font-size: 15px; line-height: 20px; font-weight: 600; } .bar-l span { display: block; font-weight: 400; font-size: 13px; color: var(--frl-stone); }
+.bar-m { display: grid; gap: 4px; }
+.bar-track { position: relative; height: 20px; min-width: 0; }
+.bars, .bars-body, .bar-m, .bar-cat { min-width: 0; max-width: 100%; }
+.bar { position: absolute; top: 2px; height: 16px; border-radius: 0 4px 4px 0; min-width: 2px; }
+.bar-v { position: absolute; top: 0; margin-left: 8px; max-width: 28%; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 20px; font-weight: 600; color: var(--frl-ink); white-space: nowrap; }
+.bar-none { font-size: 13px; line-height: 20px; color: var(--frl-stone); font-style: italic; }
+.bar-axis { position: absolute; top: -4px; bottom: -4px; width: 1px; background: var(--frl-stone); }
+@media (max-width: 560px) { .bar-cat { grid-template-columns: 1fr; gap: 4px; } }
+
+.fold { margin-top: 12px; }
+.fold > summary { cursor: pointer; font-weight: 600; font-size: 16px; color: var(--frl-ink); padding: 8px 0; }
+.fold[open] > summary { margin-bottom: 8px; }
+
+table.score { border-collapse: separate; border-spacing: 0; width: 100%; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; font-size: 15px; line-height: 20px; }
+table.score th, table.score td { padding: 9px 12px; border-top: 1px solid var(--frl-line); text-align: left; vertical-align: middle; }
+table.score thead th { border-top: 0; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; }
+table.score thead th span { display: block; font-weight: 400; font-size: 12px; color: rgba(247,243,236,.72); }
+table.score tbody th { font-weight: 500; color: var(--frl-ink); }
+table.score tbody th small { display: block; font-size: 12px; color: var(--frl-stone); font-weight: 400; }
+table.score tr.cat th { background: var(--frl-cream); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--frl-stone); padding: 7px 12px; }
+table.score td { white-space: nowrap; }
+table.score td b { font-weight: 600; font-variant-numeric: tabular-nums; }
+table.score td .rk { display: block; font-size: 11px; line-height: 14px; letter-spacing: .06em; text-transform: uppercase; }
+table.score td.best { background: color-mix(in srgb,#2F6B4F 12%,#fff); color: #2F6B4F; } table.score td.best .rk { color: #2F6B4F; }
+table.score td.worst { background: color-mix(in srgb,#B42418 9%,#fff); color: #8E1C13; } table.score td.worst .rk { color: #B42418; }
+table.score td.mid { background: color-mix(in srgb,#C98500 14%,#fff); color: #161312; }
+table.score td.none { color: var(--frl-stone); font-style: italic; }
+table.score td .chip { font-size: 10px; }
+.score-key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--frl-stone); margin: 10px 0 0; }
+.score-key i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; border: 1px solid var(--frl-line); }
+
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px 8px 10px; border: 1px solid var(--frl-line); border-radius: 10px; background: #fff; color: var(--frl-ink); text-decoration: none; font-size: 15px; line-height: 20px; font-weight: 500; }
+.badge:hover { border-color: var(--frl-ink); color: var(--frl-ink); }
+.badge .ic { color: var(--frl-red); flex: none; }
+.badge .b-s { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 6px; background: var(--frl-cream); color: var(--frl-stone); border: 1px solid var(--frl-line); }
+.badge.b-works .b-s { background: var(--frl-ink); color: var(--frl-cream); border-color: var(--frl-ink); }
+.badge.b-partial .b-s { background: var(--frl-line); color: var(--frl-ink); border-color: var(--frl-line); }
+.badge.b-building .b-s, .badge.b-planned .b-s { background: #fff; color: var(--frl-stone); border-color: color-mix(in srgb,#6B625B 45%,#fff); }
+.badge.b-no .b-s { background: var(--frl-red); color: var(--frl-cream); border-color: var(--frl-red); }
+.badge-inline { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+.badge-inline .ic { color: var(--frl-red); }
+
+#sec-measured ~ .tw table td:first-child, #sec-measured ~ div table td:first-child { white-space: nowrap; }
+#security.blk { padding-top: 0; } main { padding-top: 24px; } .crumb { margin-bottom: 12px; } h1.q { max-width: none; }
+.sec-lede { font-size: 18px; line-height: 26px; margin: 8px 0 12px; max-width: 70ch; } .sec-ex { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; line-height: 19px; }
+.sec-cap { font-size: 14px; line-height: 20px; color: var(--frl-stone); margin: 6px 0 12px; } .sec-act { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin: 0; }
+.sec-warn { font-size: 16px; line-height: 22px; flex: 1 1 260px; } .sec-take li { margin-top: 10px; } .sec-cond { display: block; color: var(--frl-stone); }
+.sec-take { font-size: 16px; line-height: 24px; padding-left: 22px; }
+@media (max-width: 700px) { .sec-lede { font-size: 16px; line-height: 23px; } .sec-ex { font-size: 12px; line-height: 17px; padding: 8px 10px; } .sec-act .btn { width: 100%; justify-content: center; } }
+.sec-dates { margin: 8px 0 0; padding-left: 20px; font-size: 15px; line-height: 22px; } .sec-dates li { margin-top: 6px; }
+.sec-tx, pre.sec-tx { background: var(--frl-ink); color: var(--frl-cream); padding: 12px 14px; border-radius: 8px; overflow-x: auto; max-width: 100%; box-sizing: border-box; white-space: pre; text-indent: 0; font: 13px/20px var(--frl-mono, monospace); margin: 10px 0 0; } pre.sec-ex { white-space: pre-wrap; } .sec-hint { display: none; font-size: 13px; line-height: 18px; color: var(--frl-stone); margin: 4px 0 0; } @media (max-width: 700px) { .sec-hint { display: block; } }
+.sec-see { margin: 8px 0 0; font-size: 16px; line-height: 24px; overflow-wrap: anywhere; } .sec-see code, .sec-steps li > .st-say + .sec-see code { font-size: 14px; }
+.st-say { position: relative; margin: 10px 0 0; } .st-say pre { margin: 0; padding: 12px 70px 12px 14px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 8px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; text-indent: 0; font: 14px/21px var(--frl-mono); } .st-say code { background: none; color: inherit; padding: 0; font-size: inherit; }
+.st-copy { position: absolute; top: 6px; right: 6px; min-height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid #6B625B; background: transparent; color: var(--frl-cream); font: 600 13px var(--frl-font); cursor: pointer; }
+.sec-lead { font-weight: 600; } .sec-eyebrow { margin-bottom: 8px; } details.fold[id] { scroll-margin-top: 88px; } .sec-steps li { margin-top: 10px; } .sec-demo { margin-top: 16px; } .sec-demo ol, .sec-demo ul { font-size: 15px; line-height: 22px; margin: 6px 0 0; padding-left: 22px; }
+.blk h2.sub { font-size: 20px; line-height: 26px; margin: 40px 0 4px; scroll-margin-top: 88px; } .blk h3:not(.sub) { font-size: 17px; line-height: 24px; margin: 20px 0 6px; }
+</style>
+<style>
+table.t .unit { display: block; font-weight: 400; font-size: 13px; line-height: 18px; color: var(--frl-stone); }
+h4 .unit { font-weight: 400; font-size: 14px; color: var(--frl-stone); margin-left: 8px; }
+table.t td.v { font-family: var(--frl-mono); font-size: 13px; color: var(--frl-stone); white-space: nowrap; }
+table.t td.ok b { font-weight: 600; }
+table.t td.na { color: var(--frl-stone); font-style: italic; }
+table.t .cond { display: block; font-size: 12px; line-height: 16px; color: var(--frl-stone); }
+table.t code { font-family: var(--frl-mono); font-size: 12px; word-break: break-all; }
+.answer { font-size: 20px; line-height: 30px; max-width: 62ch; margin: 20px 0 0; }
+.test { margin-top: 28px; }
+.test h4 { margin: 0 0 8px; font-size: 18px; }
+.test .srcs { margin-top: 6px; font-family: var(--frl-mono); font-size: 12px; word-break: break-all; }
+.cov { margin-top: 16px; }
+.cov h3 { margin: 0 0 8px; }
+.cov p { margin: 6px 0 0; font-size: 15px; line-height: 22px; }
+.legend { columns: 2; column-gap: 32px; font-size: 15px; line-height: 22px; margin: 0; padding-left: 20px; }
+@media (max-width: 700px) { .legend { columns: 1; } }
+details.cls > summary { font-size: 18px; margin-top: 24px; }
+.fold.big > summary { font-size: 22px; line-height: 28px; padding: 14px 0; border-top: 1px solid var(--frl-line); }
+dl.qa { margin: 0; } dl.qa dt { font-weight: 600; margin-top: 16px; } dl.qa dd { margin: 4px 0 0; font-size: 16px; line-height: 24px; color: var(--frl-stone); }
+.jump .jl { font-size: 15px; color: var(--frl-stone); padding: 6px 4px 6px 0; }
+.keeps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.fix, .keep { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; min-width: 0; }
+.fix { display: flex; gap: 16px; align-items: flex-start; }
+.fix-n { flex: none; width: 36px; height: 36px; border-radius: 50%; background: var(--frl-red); color: var(--frl-cream); font-weight: 700; font-size: 18px; line-height: 36px; text-align: center; }
+.fix b, .keep b { display: block; font-size: 17px; line-height: 23px; }
+.fix p, .keep p { margin: 6px 0 0; font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+.keep { background: var(--frl-cream); }
+@media (max-width: 900px) { .keeps { grid-template-columns: 1fr 1fr; } }
+/* scorecard: scroll box with sticky header row and first column; cards under 760 px */
+.score-box { max-height: 72vh; overflow: auto; border: 1px solid var(--frl-line); border-radius: 4px; background: #fff; margin-top: 16px; scroll-margin-top: 140px; }
+.score-box table.score { border: 0; border-radius: 0; overflow: visible; width: max-content; }
+.score-box table.score thead th { position: sticky; top: 0; z-index: 3; }
+.score-box table.score thead th:first-child { left: 0; z-index: 5; }
+.score-box table.score tbody th[scope=row] { position: sticky; left: 0; z-index: 2; background: #fff; white-space: normal; border-right: 1px solid var(--frl-line); }
+.score-box table.score tr.cat th { position: sticky; left: 0; z-index: 2; }
+.score-box table.score td { white-space: normal; overflow-wrap: break-word; vertical-align: top; }
+.score-box .sc-build { margin-top: 5px; }
+.score-box .sc-build summary { color: var(--frl-stone); cursor: pointer; font-size: 11px; line-height: 16px; }
+.score-box .sc-build[open] .vr { margin-top: 4px; }
+table.score td .vr { display: block; font-family: var(--frl-mono); font-size: 11px; line-height: 14px; color: var(--frl-stone); font-weight: 400; word-break: break-word; }
+table.score td.best .vr, table.score td.worst .vr { color: inherit; opacity: .85; }
+table.score td .vr.un { font-family: var(--frl-font); font-style: italic; }
+.score-cards { display: none; }
+.sc-toggle { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.sc-late-l { display: inline-block; margin-top: 12px; padding: 6px 12px; border: 1px solid var(--frl-line); border-radius: 4px; background: #fff; font-size: 14px; line-height: 20px; cursor: pointer; }
+.sc-toggle:focus-visible + .sc-late-l { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.sc-toggle:checked + .sc-late-l { background: var(--frl-cream); }
+.sc-toggle:not(:checked) ~ .score-box .late, .sc-toggle:not(:checked) ~ .score-cards .late { display: none; }
+.sc { background: #fff; border: 1px solid var(--frl-line); border-radius: 4px; padding: 14px 16px; margin-top: 12px; }
+.sc h4 { margin: 0; font-size: 16px; line-height: 22px; } .sc p.note { margin: 2px 0 8px; }
+.sc ul { list-style: none; margin: 0; padding: 0; } .sc li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; padding: 8px; border-top: 1px solid var(--frl-line); border-radius: 4px; }
+.sc li .bn { font-size: 14px; overflow-wrap: break-word; } .sc li .bv { text-align: right; font-size: 14px; max-width: 155px; } .sc li .bv b { font-weight: 600; font-variant-numeric: tabular-nums; }
+.sc li .sc-build { margin-top: 3px; } .sc li .sc-build summary { cursor: pointer; font-size: 11px; color: var(--frl-stone); }
+.sc li.best { background: color-mix(in srgb,#2F6B4F 12%,#fff); color: #2F6B4F; } .sc li.worst { background: color-mix(in srgb,#B42418 9%,#fff); color: #8E1C13; } .sc li.mid { background: color-mix(in srgb,#C98500 14%,#fff); color: #161312; }
+.sc li .rk { display: inline; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; margin-left: 6px; }
+.sc li .vr { display: block; font-family: var(--frl-mono); font-size: 11px; color: var(--frl-stone); }
+@media (max-width: 760px) { .score-box { display: none; } .score-cards { display: block; } .score-key { display: none; } }
+/* winners strip */
+.stats.win { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 20px; gap: 12px; }
+.stats.win .stat { padding: 12px 14px; } .stats.win .stat-n { font-size: 28px; line-height: 32px; } .stats.win .stat-l { font-size: 14px; line-height: 19px; margin-top: 2px; } .stats.win .stat-s { font-size: 13px; line-height: 17px; margin-top: 2px; }
+@media (max-width: 900px) { .stats.win { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .stats.win { grid-template-columns: 1fr 1fr; } .stats.win .stat-n { font-size: 24px; line-height: 28px; } }
+/* explainers */
+.fam, .fam-link { scroll-margin-top: 88px; }
+details.fam { border-top: 1px solid var(--frl-line); } details.fam:last-of-type { border-bottom: 1px solid var(--frl-line); }
+details.fam > summary { cursor: pointer; padding: 12px 0; font-size: 16px; line-height: 24px; } details.fam > summary b { font-size: 17px; }
+.fam-b { padding: 0 0 16px; } .fam-b > .ex-b { margin-top: 0; }
+.fam-link { margin-top: 14px; font-size: 16px; line-height: 24px; }
+details.ex { background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 4px; padding: 10px 14px; margin: 6px 0 0; }
+details.ex > summary { cursor: pointer; font-size: 15px; line-height: 22px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+details.ex[open] > summary { display: block; overflow: visible; }
+.ex-b { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 8px 24px; align-items: center; margin-top: 8px; }
+.ex-t p { margin: 6px 0 0; font-size: 15px; line-height: 22px; } .ex-g { min-width: 0; }
+@media (max-width: 760px) { .ex-b { grid-template-columns: 1fr; } }
+svg.exg { width: 100%; height: auto; display: block; } svg.exg .t { font: 10px var(--frl-font); fill: var(--frl-ink); } svg.exg .t.b { font-weight: 700; }
+svg.exg .bar { fill: #161312; } svg.exg .ref { stroke: var(--frl-red); stroke-width: 1.5; } svg.exg text.t { paint-order: stroke; }
+svg.exg .box { fill: #fff; stroke: var(--frl-line); stroke-width: 1.5; } svg.exg .box.hot { stroke: var(--frl-red); }
+.fold.sec > summary { font-size: 20px; line-height: 26px; padding: 12px 0; border-top: 1px solid var(--frl-line); }
+.fam .fold > summary { font-size: 15px; }
+ul.srcs { font-size: 15px; line-height: 22px; } ul.srcs code { font-family: var(--frl-mono); font-size: 13px; word-break: break-all; }
+</style>
+<p class="crumb"><a href="index.html">Fox Red Labs</a> / <a href="benchmarks.html" aria-current="page">Benchmarks</a> / Security</p>
+<p class="eyebrow sec-eyebrow">Benchmarks</p>
+<h1 class="q">Exchange a key. Send an encrypted message.</h1>
+<p class="q-sub">Post-quantum key exchange and signatures on the LaunchPad boards: what ran and what it costs.</p>
+<div class="blk" id="security">
+
+<p class="sec-lede" id="sec-demo">A Mac and a CC1354P10-1 LaunchPad board agree a key, then the board decrypts a message sent over USB. The key exchange is ML-KEM-768, a post-quantum algorithm. The message is AES-128-GCM. The key check line shows the first 4 bytes of a hash of the agreed key. They match, so both sides hold the same key.</p>
+<pre class="sec-tx sec-ex">   board&gt; join: key pair ready, offering the public key
+   key check  Mac d01a2f61  board d01a2f61  MATCH
+   board&gt; R,pqc,join_decrypt,119689,ok,AES-128-GCM, 76 bytes
+   board&gt; DECRYPTED (76 bytes, tag ok): Hello from the Mac: this line was encrypted with a key agreed by ML-KEM-768.</pre>
+<p class="sec-cap">Excerpt of the saved result from 2026-10-08 on the CC1354P10-1, 4 of its lines, unedited. </p>
+<p class="sec-act"><a class="btn btn-primary" href="#sec-build">Build this demo</a> <span class="sec-warn"><b>Demonstration only.</b> The exchange does not authenticate either endpoint: nothing proves who is on the other end.</span></p>
+
+<nav class="jump" aria-label="On this page"><span class="jl">On this page:</span><a href="#sec-build">Build it</a><a href="#sec-run">Run it</a><a href="#sec-design">Your project</a><a href="#sec-evidence">Which boards</a><a href="#sec-measured">Measurements</a><a href="#sec-protocol">The exchange</a><a href="#sec-plan">Other boards</a><a href="#sec-hw">Hardware blocks</a><a href="#sec-published">Published figures</a><a href="#sec-why">Why now</a><a href="#sec-evidence-kinds">How it was measured</a></nav>
+<h2 class="sub" id="sec-build">Build this demo: the board and what you need</h2>
+<p><b>Board:</b> CC1354P10-1 LaunchPad development kit. It is the only board that has run the whole path: 296 kB of RAM and a Cortex-M33 at 48 MHz. One USB cable.</p>
+<div class="tw"><table class="t"><thead><tr><th>Need</th><th>Detail</th></tr></thead><tbody><tr><td><b>Board</b></td><td>CC1354P10-1 LaunchPad development kit with a CC1354P10, a Cortex-M33 at 48 MHz. One USB cable to the Mac.</td></tr><tr><td><b>Board tools</b></td><td>CCStudio 21.0.1, TI Arm Clang 5.1.1.LTS and the SimpleLink CC13xx/CC26xx SDK 8.33.00.16 (NoRTOS), for the build and the load.</td></tr><tr><td><b>Repository</b></td><td>The cc1354p10/pqc-join folder of the repository.</td></tr><tr><td><b>Mac</b></td><td>A Mac. The scripts use macOS paths and CCStudio&#x27;s command-line scripting; the run was on macOS 15.7 (Intel).</td></tr><tr><td><b>Host tools</b></td><td>A C compiler, Python 3 with the cryptography package, and OpenSSL 3.5 or newer first on your PATH. Install the package with pip install cryptography. The Mac&#x27;s built-in /usr/bin/openssl is LibreSSL and cannot do ML-KEM, so check openssl version. The run used OpenSSL 3.6.4. The host test needs only these, no board.</td></tr><tr><td><b>USB hub</b></td><td>A USB hub whose ports uhubctl can power-switch, because this board&#x27;s debugger connects only just after power-on. Setup or handling. run.sh cuts power to the port for 6 s just before each load, as cc1354p10/FAQ.md describes. On the test setup that was the USB-A port of Apple&#x27;s USB-C Digital AV Multiport Adapter, as cc1354p10/FAQ.md describes. No manual unplug and replug was done in place of the hub.</td></tr><tr><td><b>Your board&#x27;s name</b></td><td>run.sh and the CCStudio target file cc1354p10/CC1354P10.ccxml name the test board by its debug-probe serial number. Edit both for yours.</td></tr><tr><td><b>Flash is rewritten</b></td><td>run.sh backs up the board&#x27;s flash and boot settings, loads the demo, then restores the image named in RESTORE_IMG and reads flash back. Name an image you want left on the board before you run it.</td></tr></tbody></table></div>
+
+<h2 class="sub" id="sec-run">Run it and what you should see</h2>
+<ol class="sec-steps"><li>Run the host test. It needs no board; it builds the board code for the Mac and runs both known-answer sets and the whole exchange against mac_side.py.<div class="st-say"><pre><code>portability/pqc-join/test/run.sh</code></pre><button type="button" class="st-copy" data-copy="portability/pqc-join/test/run.sh">Copy</button></div><p class="sec-see">You should see: <code>pqc-join host test: OK</code></p></li><li>Build the board image. It touches no hardware. It took 19.5 s on 2026-10-08 with the SysConfig output already generated, and longer the first time.<div class="st-say"><pre><code>cc1354p10/pqc-join/build.sh -O3</code></pre><button type="button" class="st-copy" data-copy="cc1354p10/pqc-join/build.sh -O3">Copy</button></div><p class="sec-see">You should see: <code>a .out file; 272,999 B for the whole -O3 image</code></p></li><li>Load and run it. run.sh power-cycles the USB port, backs up flash and the boot-settings page, and loads the image. It runs mac_side.py on the UART, then restores the image you name and reads flash back. Replace the UHUB value with your hub and port from uhubctl.<div class="st-say"><pre><code>UHUB=&lt;hub:port from uhubctl&gt; RESTORE_IMG=&lt;path to the .out to leave running&gt; cc1354p10/pqc-join/run.sh -O3</code></pre><button type="button" class="st-copy" data-copy="UHUB=&lt;hub:port from uhubctl&gt; RESTORE_IMG=&lt;path to the .out to leave running&gt; cc1354p10/pqc-join/run.sh -O3">Copy</button></div><p class="sec-see">You should see: <code>the transcript above, then READBACK MATCHES BACKUP (2 minutes 22 seconds on 2026-10-08)</code></p><p class="sec-see"><b>If it stops:</b> If the board stops at &quot;join: making an ML-KEM-768 key pair&quot; with the CPU in an exception handler, call TRNG_init() before TRNG_open(). Stop with a message if TRNG_open() returns NULL. The debugger showed PC 0x100006f4 and LR 0xfffffff9. This was observed on 2026-10-08 and not saved. The SDK&#x27;s Board_init() starts only the power and GPIO drivers, so the image has to start the TRNG itself; cc1354p10/pqc-join/README.md, the TRNG section, has the fix.</p></li></ol>
+<p class="note">Full write-up, with every step timed and the files listed: <a href="../cc1354p10/pqc-join/" title="cc1354p10/pqc-join/README.md">LP-CC1354P10-1 PQC join notes</a>. The shared code is in <a href="../portability/pqc-join/">portability/pqc-join</a>.</p>
+<h3>The whole run, as saved</h3>
+<pre class="sec-tx">   board&gt; I,results,kat pass
+   board&gt; join: making an ML-KEM-768 key pair
+   board&gt; R,pqc,join_trng_64_bytes,967756,ok,64 random bytes for the key pair
+   board&gt; R,pqc,join_keygen,1002199,ok,ML-KEM-768 key pair from the random bytes
+   board&gt; join: key pair ready, offering the public key
+   board&gt; R,pqc,join_decaps_kdf,1430503,ok,decapsulate, HKDF-SHA256 to the AES key, key check
+   key check  Mac d01a2f61  board d01a2f61  MATCH
+   board&gt; R,pqc,join_decrypt,119689,ok,AES-128-GCM, 76 bytes
+   board&gt; DECRYPTED (76 bytes, tag ok): Hello from the Mac: this line was encrypted with a key agreed by ML-KEM-768.</pre>
+<p class="sec-hint">Scroll sideways inside the box to read the long lines.</p>
+<p class="note">Source: <code>cc1354p10/pqc-join/results/load4-join.txt</code>. Lines 54 to 62 of the saved result file, unedited. Board lines start with board&gt;. The key check line is the Mac&#x27;s. The hex frames are not in this file; the exchange as JSON is in cc1354p10/pqc-join/results/load4-join.json.</p>
+<h3>What this shows</h3><ul><li>The two sides derived the same AES-128 key: the key check is d01a2f61 on the Mac and on the board, and the line reads MATCH.</li><li>The board decrypted one message and its tag verified under the agreed key. Neither side is authenticated, so anyone in the middle of the exchange would hold that key too. This does not say who sent it.</li><li>NIST known-answer vectors for ML-KEM-768 and ML-DSA-44 passed on the board before the exchange. See the &quot;kat pass&quot; line in the same file.</li></ul>
+<h3>What it leaves open</h3><ul><li>No protection against power-analysis or fault attacks is claimed by the libraries or by the demo code.</li><li>It is a demonstration of the math and its cost, not a hardened product. Do not use the keys for anything real, and do not reuse them.</li><li>It ran once over one wired transport, with no radio link. The join has no signature step, so neither side is authenticated. It has not been reviewed or tested for side channels.</li><li>The known-answer vectors check the arithmetic against NIST&#x27;s fixed inputs. They do not show the code is safe to ship.</li></ul>
+
+<h2 class="sub" id="sec-design">What this means for your project</h2>
+<ol class="sec-take"><li><span class="sec-lead">Key agreement fits in about 20 kB of stack on a part with room to spare.</span> <span class="sec-cond">On this 296 kB board, ML-KEM-768 peaked at 14.7 kB of stack for key generation, 20 kB for encapsulation and 18.7 kB for decapsulation. That is mlkem-native in portable C at -O3. ML-DSA-44 signing peaked at 50.1 kB. A 32 kB board should fit key agreement but was not tested. Signing there needs mldsa-native&#x27;s low-RAM mode.</span></li><li><span class="sec-lead">The wire set the pace.</span> <span class="sec-cond">The board&#x27;s own work for the whole join was about 73 ms at 48 MHz. The wire took about 420 ms at 115,200 baud (computed, not measured). That time is long because the host and board exchange the keys, ciphertext and message as hex text, which doubles the bytes on the wire. A radio would add its own cost.</span></li><li><span class="sec-lead">A product needs signatures and a review.</span> <span class="sec-cond">This join has no signature step, so neither side is authenticated. The code has had no side-channel or fault testing, review or certification. A product would sign or pin the keys, test for those attacks and have the design reviewed.</span></li></ol>
+<details class="fold"><summary>More: flash, wire size and integration</summary><ul><li>Flash. Flash at -O3 is 80.5 kB for ML-KEM-768 and 106.7 kB for ML-DSA-44. Built for size (-Os, built, not run) it is 9.4 kB and 13.3 kB.</li><li>Wire size. 2.2 kB crosses the wire (<span class="ex" title="1,184 B">1.2 kB</span> public key plus <span class="ex" title="1,088 B">1.1 kB</span> ciphertext) against 64 B for X25519 (32 B each way). Over a radio with small packets that is many more packets: about 10 Bluetooth LE packets of 244 B against 2 (computed, not measured).</li><li>Integration. Initialize the TRNG driver yourself; the SDK&#x27;s Board_init() does not. The libraries (mlkem-native 2.0.0, mldsa-native 2.0.0) are unmodified portable C and keep their working buffers on the stack by default. ML-DSA signing time varies from message to message (77 to 361 ms over 16 messages, mean 154 ms) because it retries until a check passes.</li></ul></details>
+
+<h2 class="sub" id="sec-evidence">Which boards can do it</h2>
+<p>Post-quantum cryptography is key exchange and signatures built to survive a large quantum computer. Such a computer could break today&#x27;s RSA and elliptic curves. NIST, the U.S. standards body, standardized ML-KEM for key exchange and ML-DSA for signatures in 2024. TI publishes ML-KEM-768 key generation, encapsulation and decapsulation at 27, 31 and 36 ms on the MSPM0G3519 at 80 MHz and 11, 12 and 14 ms on the MSPM33C321A at 160 MHz. Those times use its MSP Crypto Library.</p>
+<h3>Key agreement (ML-KEM-768)</h3><ul><li><span class="chip c-run" title="Tested with this setup">Works</span> CC1354P10-1: the demonstration above, about 20 kB of stack.</li><li><span class="chip c-no" title="Does not fit">Not for this chip</span> MSPM0 C1104: one <span class="ex" title="1,184 B">1.2 kB</span> key exceeds its 1 kB of RAM.</li></ul><h3>Signing (ML-DSA-44)</h3><ul><li><span class="chip c-run" title="Tested with this setup">Works</span> CC1354P10-1: ML-DSA-44 signing measured with 50 kB of stack, in an image with a 64 kB stack.</li></ul>
+<h2 class="sub" id="sec-measured">Measured by us</h2>
+<p class="note">1 kB = 1,024 bytes. Cycles from the CPU's own counter, converted to milliseconds at the clock shown; peak stack from painting the stack before each call. Rows come from <code>data/results/</code>.</p>
+<div class="tw"><table class="t"><thead><tr><th>Board</th><th>Operation</th><th>Implementation</th><th>Result</th><th>Peak stack</th><th>Source</th></tr></thead><tbody><tr><td>CC1354P10-1</td><td>ML-KEM-768 key generation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>20.8 ms at 48 MHz</td><td>14.7 kB</td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>ML-KEM-768 encapsulation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>24.0 ms at 48 MHz</td><td>20 kB</td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>ML-KEM-768 decapsulation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>29.1 ms at 48 MHz</td><td>18.7 kB</td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>Code in flash, ML-KEM-768 at -O3</td><td>mlkem-native, TI Arm Clang, -O3</td><td>80.5 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>Code in flash, ML-KEM-768 at -Os, built not run</td><td>mlkem-native, TI Arm Clang, -Os</td><td>9.4 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>ML-DSA-44 key generation</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>49.5 ms at 48 MHz</td><td>32 kB</td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>ML-DSA-44 sign</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>154.3 ms at 48 MHz, mean</td><td>50.1 kB</td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>ML-DSA-44 verify</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>50.5 ms at 48 MHz</td><td>30.2 kB</td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, TI Arm Clang, -O3</td><td>106.7 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC1354P10-1</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, TI Arm Clang, -Os</td><td>13.3 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>CC2755P10</td><td>Code in flash, ML-KEM-768 at -O3</td><td>mlkem-native, TI Arm Clang, -O3</td><td>80.5 kB</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, TI Arm Clang, -O3</td><td>106.7 kB</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>Code in flash, ML-KEM-768 at -Os, built not run</td><td>mlkem-native, TI Arm Clang, -Os</td><td>9.4 kB</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, TI Arm Clang, -Os</td><td>13.3 kB</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>ML-KEM-768 key generation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>10.0 ms at 96 MHz</td><td>13.7 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-KEM-768 encapsulation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>11.6 ms at 96 MHz</td><td>16.8 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-KEM-768 decapsulation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>14.1 ms at 96 MHz</td><td>17.7 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-DSA-44 key generation</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>23.9 ms at 96 MHz</td><td>31.3 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-DSA-44 sign</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>49.7 ms at 96 MHz, mean</td><td>48.3 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-DSA-44 verify</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>24.3 ms at 96 MHz</td><td>29.2 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-KEM-768 key generation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>10.3 ms at 96 MHz</td><td>13.7 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-KEM-768 encapsulation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>11.9 ms at 96 MHz</td><td>16.8 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-KEM-768 decapsulation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>14.6 ms at 96 MHz</td><td>17.7 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-DSA-44 key generation</td><td>mldsa-native, TI Arm Clang, -Os, code in flash</td><td>23.4 ms at 96 MHz</td><td>31.3 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-DSA-44 sign</td><td>mldsa-native, TI Arm Clang, -Os, code in flash</td><td>47.3 ms at 96 MHz, mean</td><td>48.3 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ML-DSA-44 verify</td><td>mldsa-native, TI Arm Clang, -Os, code in flash</td><td>23.7 ms at 96 MHz</td><td>29.2 kB</td><td></td></tr><tr><td>CC2755P10</td><td>ECDSA P-256 sign</td><td>micro-ecc, plain C, TI Arm Clang, -O2</td><td>115.1 ms at 96 MHz</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>ECDSA P-256 verify</td><td>micro-ecc, plain C, TI Arm Clang, -O2</td><td>131.4 ms at 96 MHz</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>ECDSA P-256 sign</td><td>micro-ecc, assembly, TI Arm Clang, -O2</td><td>81.2 ms at 96 MHz</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>ECDSA P-256 verify</td><td>micro-ecc, assembly, TI Arm Clang, -O2</td><td>94.1 ms at 96 MHz</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>ECDSA P-256 sign</td><td>TI library, driver, hsm, TI Arm Clang, -O2</td><td>24.3 ms at 96 MHz</td><td></td><td></td></tr><tr><td>CC2755P10</td><td>ECDSA P-256 verify</td><td>TI library, driver, hsm, TI Arm Clang, -O2</td><td>41.7 ms at 96 MHz</td><td></td><td></td></tr><tr><td>MSPM0 G3519</td><td>ML-KEM-768 key generation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>24.6 ms at 80 MHz</td><td>14.6 kB</td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-KEM-768 encapsulation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>29.1 ms at 80 MHz</td><td>20 kB</td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-KEM-768 decapsulation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>35.6 ms at 80 MHz</td><td>18.8 kB</td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-DSA-44 key generation</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>82.2 ms at 80 MHz</td><td>14.7 kB</td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-DSA-44 sign</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>317.4 ms at 80 MHz</td><td>17.2 kB</td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-DSA-44 verify</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>95.5 ms at 80 MHz</td><td>11.4 kB</td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-DSA-44 sign</td><td>mldsa-native, TI Arm Clang, -O3, code in flash, 16 messages</td><td>515.7 ms at 80 MHz, mean</td><td>17.2 kB</td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>Code in flash, ML-KEM-768 at -O3</td><td>mlkem-native, TI Arm Clang, -O3</td><td>88.5 kB</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>Code in flash, ML-KEM-768 at -Os, built not run</td><td>mlkem-native, TI Arm Clang, -Os</td><td>11.2 kB</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, TI Arm Clang, -O3</td><td>192.2 kB</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, TI Arm Clang, -Os</td><td>16.2 kB</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ECDSA P-256 sign</td><td>TI library, example, software, TI Arm Clang, -O2</td><td>417.3 ms at 80 MHz</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ECDSA P-256 verify</td><td>TI library, example, software, TI Arm Clang, -O2</td><td>749.8 ms at 80 MHz</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ECDSA P-256 sign</td><td>micro-ecc, assembly, TI Arm Clang, -O2</td><td>208.1 ms at 80 MHz</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ECDSA P-256 verify</td><td>micro-ecc, assembly, TI Arm Clang, -O2</td><td>233.1 ms at 80 MHz</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ECDSA P-256 sign</td><td>micro-ecc, plain C, TI Arm Clang, -O2</td><td>477.0 ms at 80 MHz</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ECDSA P-256 verify</td><td>micro-ecc, plain C, TI Arm Clang, -O2</td><td>528.8 ms at 80 MHz</td><td></td><td><code>portability/boards/mspm0g3519/PORT.md</code></td></tr><tr><td>MSPM0 G3519</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3</td><td>115.8 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>MSPM0 G3519</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, low-RAM, TI Arm Clang, -Os</td><td>15.1 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-DSA-44 key generation</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3, code in flash</td><td>84.0 ms at 80 MHz</td><td>14.7 kB</td><td><code>portability/pqc-join/lowram_build.sh</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-DSA-44 sign</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3, code in flash</td><td>308.8 ms at 80 MHz, mean</td><td>17.2 kB</td><td><code>portability/pqc-join/lowram_build.sh</code></td></tr><tr><td>MSPM0 G3519</td><td>ML-DSA-44 verify</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3, code in flash</td><td>97.4 ms at 80 MHz</td><td>11.4 kB</td><td><code>portability/pqc-join/lowram_build.sh</code></td></tr><tr><td>MSPM0 G5187</td><td>ECDSA P-256 sign</td><td>TI library, TI Arm Clang, -O2, code in flash</td><td>417.3 ms at 80 MHz</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>ECDSA P-256 verify</td><td>TI library, TI Arm Clang, -O2, code in flash</td><td>749.9 ms at 80 MHz</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>ECDSA P-256 sign</td><td>micro-ecc, assembly, TI Arm Clang, -O2, code in flash</td><td>208.1 ms at 80 MHz</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>ECDSA P-256 verify</td><td>micro-ecc, assembly, TI Arm Clang, -O2, code in flash</td><td>233.1 ms at 80 MHz</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>ECDSA P-256 sign</td><td>micro-ecc, plain C, TI Arm Clang, -O2, code in flash</td><td>482.8 ms at 80 MHz</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>ECDSA P-256 verify</td><td>micro-ecc, plain C, TI Arm Clang, -O2, code in flash</td><td>535.3 ms at 80 MHz</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>ML-KEM-768 key generation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>24.9 ms at 80 MHz</td><td>13.8 kB</td><td></td></tr><tr><td>MSPM0 G5187</td><td>ML-KEM-768 encapsulation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>29.8 ms at 80 MHz</td><td>16.8 kB</td><td></td></tr><tr><td>MSPM0 G5187</td><td>ML-KEM-768 decapsulation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>36.4 ms at 80 MHz</td><td>17.7 kB</td><td></td></tr><tr><td>MSPM0 G5187</td><td>Code in flash, ML-KEM-768 at -Os, built not run</td><td>mlkem-native, TI Arm Clang, -Os</td><td>11.2 kB</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>Code in flash, ML-KEM-768 at -O3</td><td>mlkem-native, TI Arm Clang, -O3</td><td>88.5 kB</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, TI Arm Clang, -Os</td><td>16.2 kB</td><td></td><td></td></tr><tr><td>MSPM0 G5187</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3</td><td>115.8 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>MSPM0 G5187</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, low-RAM, TI Arm Clang, -Os</td><td>15.1 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>MSPM0 G5187</td><td>ML-DSA-44 key generation</td><td>mldsa-native, low-RAM, TI Arm Clang, -Os, code in flash</td><td>83.6 ms at 80 MHz</td><td>12.2 kB</td><td></td></tr><tr><td>MSPM0 G5187</td><td>ML-DSA-44 verify</td><td>mldsa-native, low-RAM, TI Arm Clang, -Os, code in flash</td><td>99.3 ms at 80 MHz</td><td>10.9 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 key generation</td><td>TI library, example, TI Arm Clang, -O2, code in flash</td><td>46.3 ms at 32 MHz</td><td>13.7 kB</td><td><code>mspm33c321a/tools/build_crypto.sh</code></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 encapsulation</td><td>TI library, example, TI Arm Clang, -O2, code in flash</td><td>53.7 ms at 32 MHz</td><td>16.8 kB</td><td><code>mspm33c321a/tools/build_crypto.sh</code></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 decapsulation</td><td>TI library, example, TI Arm Clang, -O2, code in flash</td><td>62.1 ms at 32 MHz</td><td>17.7 kB</td><td><code>mspm33c321a/tools/build_crypto.sh</code></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 key generation</td><td>TI library, example, TI Arm Clang, -O2, code in flash</td><td>85.4 ms at 32 MHz</td><td>14.6 kB</td><td><code>mspm33c321a/tools/build_crypto.sh</code></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 sign</td><td>TI library, example, TI Arm Clang, -O2, code in flash</td><td>724.7 ms at 32 MHz</td><td>16.9 kB</td><td><code>mspm33c321a/tools/build_crypto.sh</code></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 verify</td><td>TI library, example, TI Arm Clang, -O2, code in flash</td><td>108.5 ms at 32 MHz</td><td>11.4 kB</td><td><code>mspm33c321a/tools/build_crypto.sh</code></td></tr><tr><td>MSPM33 C321A</td><td>ECDSA P-256 sign</td><td>TI library, example, TI Arm Clang, -O2, code in flash</td><td>162.9 ms at 32 MHz</td><td></td><td><code>mspm33c321a/tools/build_crypto.sh</code></td></tr><tr><td>MSPM33 C321A</td><td>ECDSA P-256 verify</td><td>TI library, example, TI Arm Clang, -O2, code in flash</td><td>328.2 ms at 32 MHz</td><td></td><td><code>mspm33c321a/tools/build_crypto.sh</code></td></tr><tr><td>MSPM33 C321A</td><td>Code in flash, ML-KEM-768 at -O3</td><td>mlkem-native, TI Arm Clang, -O3</td><td>80.5 kB</td><td></td><td></td></tr><tr><td>MSPM33 C321A</td><td>Code in flash, ML-KEM-768 at -Os, built not run</td><td>mlkem-native, TI Arm Clang, -Os</td><td>9.4 kB</td><td></td><td></td></tr><tr><td>MSPM33 C321A</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, TI Arm Clang, -O3</td><td>106.7 kB</td><td></td><td></td></tr><tr><td>MSPM33 C321A</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, TI Arm Clang, -Os</td><td>13.3 kB</td><td></td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 key generation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>8.1 ms at 160 MHz</td><td>13.7 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 encapsulation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>9.2 ms at 160 MHz</td><td>16.8 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 decapsulation</td><td>mlkem-native, TI Arm Clang, -O3, code in flash</td><td>11.3 ms at 160 MHz</td><td>17.7 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 key generation</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>19.1 ms at 160 MHz</td><td>14.6 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 verify</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>19.5 ms at 160 MHz</td><td>11.4 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 key generation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>8.3 ms at 160 MHz</td><td>13.7 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 encapsulation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>9.4 ms at 160 MHz</td><td>16.8 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-KEM-768 decapsulation</td><td>mlkem-native, TI Arm Clang, -Os, code in flash</td><td>11.5 ms at 160 MHz</td><td>17.7 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 key generation</td><td>mldsa-native, TI Arm Clang, -Os, code in flash</td><td>18.9 ms at 160 MHz</td><td>14.6 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 verify</td><td>mldsa-native, TI Arm Clang, -Os, code in flash</td><td>19.0 ms at 160 MHz</td><td>11.4 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 sign</td><td>mldsa-native, TI Arm Clang, -O3, code in flash</td><td>58.1 ms at 160 MHz, mean</td><td>16.9 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 sign</td><td>mldsa-native, TI Arm Clang, -Os, code in flash</td><td>55.4 ms at 160 MHz, mean</td><td>16.9 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3</td><td>88.1 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>MSPM33 C321A</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, low-RAM, TI Arm Clang, -Os</td><td>12.7 kB</td><td></td><td><code>cc1354p10/pqc-join/README.md</code></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 key generation</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3, code in flash</td><td>19.4 ms at 160 MHz</td><td>14.6 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 sign</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3, code in flash</td><td>54.4 ms at 160 MHz, mean</td><td>16.9 kB</td><td></td></tr><tr><td>MSPM33 C321A</td><td>ML-DSA-44 verify</td><td>mldsa-native, low-RAM, TI Arm Clang, -O3, code in flash</td><td>19.6 ms at 160 MHz</td><td>11.4 kB</td><td></td></tr><tr><td>NUCLEO-U083RC</td><td>Code in flash, ML-KEM-768 at -O3</td><td>mlkem-native, GCC 14, -O3</td><td>20.5 kB</td><td></td><td></td></tr><tr><td>NUCLEO-U083RC</td><td>Code in flash, ML-KEM-768 at -Os, built not run</td><td>mlkem-native, GCC 14, -Os</td><td>9.9 kB</td><td></td><td></td></tr><tr><td>NUCLEO-U083RC</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, GCC 14, -O3</td><td>32.3 kB</td><td></td><td></td></tr><tr><td>NUCLEO-U083RC</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, GCC 14, -Os</td><td>13.8 kB</td><td></td><td></td></tr><tr><td>NUCLEO-U083RC</td><td>Code in flash, ML-DSA-44 at -O3</td><td>mldsa-native, low-RAM, GCC 14, -O3</td><td>29.4 kB</td><td></td><td><code>portability/pqc-join/boards/nucleo-u083rc/build.sh -O3 dsa-lowram</code></td></tr><tr><td>NUCLEO-U083RC</td><td>Code in flash, ML-DSA-44 at -Os, built not run</td><td>mldsa-native, low-RAM, GCC 14, -Os</td><td>13.1 kB</td><td></td><td><code>portability/pqc-join/boards/nucleo-u083rc/build.sh -Os dsa-lowram</code></td></tr><tr><td>SK-TDA4VM</td><td>ML-KEM-768 key generation</td><td>mlkem-native, GCC, -O3, a72</td><td>0.1 ms at 2000 MHz</td><td></td><td></td></tr><tr><td>SK-TDA4VM</td><td>ML-KEM-768 encapsulation</td><td>mlkem-native, GCC, -O3, a72</td><td>0.1 ms at 2000 MHz</td><td></td><td></td></tr><tr><td>SK-TDA4VM</td><td>ML-KEM-768 decapsulation</td><td>mlkem-native, GCC, -O3, a72</td><td>0.1 ms at 2000 MHz</td><td></td><td></td></tr><tr><td>SK-TDA4VM</td><td>ML-DSA-44 key generation</td><td>mldsa-native, GCC, -O3, a72</td><td>0.2 ms at 2000 MHz</td><td></td><td></td></tr><tr><td>SK-TDA4VM</td><td>ML-DSA-44 sign</td><td>mldsa-native, GCC, -O3, a72</td><td>0.6 ms at 2000 MHz</td><td></td><td></td></tr><tr><td>SK-TDA4VM</td><td>ML-DSA-44 verify</td><td>mldsa-native, GCC, -O3, a72</td><td>0.2 ms at 2000 MHz</td><td></td><td></td></tr></tbody></table></div>
+<details class="fold" id="sec-protocol"><summary>The exchange, step by step</summary><p>ML-KEM-768 key agreement between the board and a Mac, then one line the Mac encrypted with AES-128-GCM under the agreed key, decrypted and authenticated on the board.</p>
+<p><b>Transport.</b> USB serial through the board&#x27;s built-in XDS110 debugger (its backchannel UART), 115,200 baud, 8N1. Every byte is sent as two hex characters, so <span class="ex" title="2,381 B">2.3 kB</span> of payload in all (the 2.2 kB of key material plus the encrypted message) took 4,864 characters on the wire. Frame format: @PK, @CT, @KEY, @MSG, @DONE lines, each with a CRC-32 (portability/pqc-join/core/pqc_join.h). The Mac side is <code>tools/pqc_join/mac_side.py</code> with OpenSSL 3.5 or newer (the Mac&#x27;s built-in /usr/bin/openssl is LibreSSL and cannot do ML-KEM).</p>
+<ol><li>The board makes an ML-KEM-768 key pair from 64 bytes of its hardware random-number generator (20 ms for the bytes, 21 ms for the key pair); the <span class="ex" title="2,400 B">2.3 kB</span> private key stays on the chip</li><li>The board sends its <span class="ex" title="1,184 B">1.2 kB</span> public key (2,389 characters as hex, about 207 ms at 115,200 baud, computed)</li><li>The Mac wraps a fresh secret with that key (58.6 ms, including starting OpenSSL) and sends back the <span class="ex" title="1,088 B">1.1 kB</span> ciphertext</li><li>The board unwraps it and turns the secret into an AES-128 key with HKDF-SHA-256 (29.8 ms on the board); both sides show the first 4 bytes of a hash of that key, and they match</li><li>The Mac sends one 76-byte line encrypted with AES-128-GCM; the board decrypts it in software (2.5 ms), checks the tag and prints it</li></ol>
+</details>
+<details class="fold" id="sec-plan"><summary>Board by board: estimated and measured</summary><p class="note">One row per board, one cell per operation. RAM needs differ by code. About 14 kB is the peak stack measured for PQClean on the RP2040 (arXiv 2603.19340). About 19 kB is an estimate for mlkem-native: its published <span class="ex" title="14,336 B">14 kB</span> plus the <span class="ex" title="2,400 B">2.3 kB</span>, <span class="ex" title="1,184 B">1.2 kB</span> and <span class="ex" title="1,088 B">1.1 kB</span> keys and ciphertext. Cells without a measured row are estimated from cycle counts published for other cores. Each cell cites its source.</p><div class="g" style="--n:3"><div class="g-h g-first">Board</div><div class="g-h"><b>ML-KEM-768 encapsulation</b><span>post-quantum key exchange</span></div><div class="g-h"><b>ML-DSA-44 sign</b><span>post-quantum signature</span></div><div class="g-h"><b>ECDSA P-256 sign</b><span>the classical signature it replaces</span></div><div class="g-n">LP-CC1354P10-1 (Cortex-M33, 48 MHz, 296 kB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-run">Works</span><span class="g-t">mlkem-native-ticlang-o3-flash: 1.15M cycles. 24.0 ms at 48 MHz, median of 3 loads, NIST known-answer tests pass first; mlkem-native 2.0.0, TI Arm Clang -O3, code in flash.</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span><span class="chip c-run">Works</span><span class="g-t">mldsa-native, portable C: 7.41M cycles. 154 ms mean at 48 MHz over 16 messages (77 to 361 ms, because signing retries a random number of times). Verify 50.5 ms, key generation 49.5 ms. 50.1 kB of stack to sign. NIST known-answer tests pass first. mldsa-native 2.0.0, TI Arm Clang -O3, code in flash.</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span></div><div class="g-n">LP-EM-CC2340R5 (Cortex-M0+, 48 MHz, 36 kB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-no" title="No: RAM">Not for this chip</span><span class="g-t">mlkem-native beside TI&#x27;s Bluetooth example: expected to have room only without the Bluetooth stack (from RAM figures, not a build): about 19 kB needed (an estimate, same basis as the LP-MSPM0G3507 figure). 5.1 kB of RAM left with TI&#x27;s basic BLE example (data/results/cc2340r5.csv).</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span></div><div class="g-n">LP-EM-CC2755P10 (Cortex-M33, 96 MHz, 162 kB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-run">Works</span><span class="g-t">mlkem-native, portable C: 1.11M cycles. 11.6 ms at 96 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span><span class="chip c-run">Works</span><span class="g-t">mldsa-native, portable C: 4.77M cycles. 49.7 ms at 96 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span><span class="chip c-run">Works</span><span class="g-t">micro-ecc-c-ticlang-o2: 11.1M cycles. 115.1 ms at 96 MHz; NIST&#x27;s known-answer test passed on the board first. micro-ecc-asm-ticlang-o2: 7.79M cycles. 81.2 ms at 96 MHz; NIST&#x27;s known-answer test passed on the board first. ti-driver-hsm-ticlang-o2: 2.33M cycles. 24.3 ms at 96 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-n">LP-MSPM0C1104 (Cortex-M0+, 24 MHz, 1 kB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-no" title="No: RAM">Not for this chip</span><span class="g-t">No implementation found fits: 1 kB of RAM. One 1.2 kB encapsulation key exceeds it, and about 14 kB of working RAM is needed (PQClean, arXiv 2603.19340: 14.2 kB peak stack).</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span><span class="chip c-no" title="No: RAM">Not for this chip</span><span class="g-t">No implementation found fits: 1 kB of RAM.</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span></div><div class="g-n">LP-MSPM0G3519 (Cortex-M0+, 80 MHz, 128 kB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-run">Works</span><span class="g-t">mlkem-native, portable C: 2.33M cycles. 29.1 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span><span class="chip c-run">Works</span><span class="g-t">mldsa-native, portable C: 25.4M cycles. 317.4 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span><span class="chip c-run">Works</span><span class="g-t">TI&#x27;s library, in software: 33.4M cycles. 417.3 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first. micro-ecc-asm-ticlang-o2: 16.6M cycles. 208.1 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first. micro-ecc-c-ticlang-o2: 38.2M cycles. 477.0 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-n">LP-MSPM0G5187 (Cortex-M0+ with NPU, 80 MHz, 32 kB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-run">Works</span><span class="g-t">mlkem-native, portable C: 2.38M cycles. 29.8 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span><span class="chip c-run">Works</span><span class="g-t">ti-ticlang-o2-flash: 33.4M cycles. 417.3 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first. uecc-asm-ticlang-o2-flash: 16.6M cycles. 208.1 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first. uecc-c-ticlang-o2-flash: 38.6M cycles. 482.8 ms at 80 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-n">LP-MSPM0L1306 (Cortex-M0+, 32 MHz, 4 kB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-no" title="No: RAM">Not for this chip</span><span class="g-t">Expected: no implementation found fits (from published RAM needs, not built here): 4 kB of RAM. The smallest portable ML-KEM-768 found needs about 14 kB (PQClean, arXiv 2603.19340: 14.2 kB peak stack). Even pqm4&#x27;s Cortex-M4-only assembly low-stack build plus one ciphertext is about 3.9 kB (an estimate).</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span><span class="chip c-no" title="No: RAM">Not for this chip</span><span class="g-t">Expected: no implementation found fits (from published RAM needs, not built here): 4 kB of RAM; the signature alone is 2.4 kB.</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span></div><div class="g-n">LP-MSPM33C321A (Cortex-M33, 160 MHz, 256 kB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-run">Works</span><span class="g-t">TI&#x27;s MSP Crypto Library example: 1.72M cycles. 53.7 ms at 32 MHz; NIST&#x27;s known-answer test passed on the board first. mlkem-native, portable C: 1.48M cycles. 9.2 ms at 160 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span><span class="chip c-run">Works</span><span class="g-t">TI&#x27;s MSP Crypto Library example: 23.2M cycles. 724.7 ms at 32 MHz; NIST&#x27;s known-answer test passed on the board first. mldsa-native, portable C: 9.3M cycles. 58.1 ms at 160 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span><span class="chip c-run">Works</span><span class="g-t">TI&#x27;s MSP Crypto Library example: 5.21M cycles. 162.9 ms at 32 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-n">SK-TDA4VM (2x Cortex-A72 + C7x/MMA + 2x C66x + 6x R5F, 2000 MHz, 4 GB RAM, board in hand)</div><div class="g-c"><span class="g-lab">ML-KEM-768 encapsulation</span><span class="chip c-run">Works</span><span class="g-t">mlkem-native-gcc-o3-a72: 160k cycles. 0.1 ms at 2000 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ML-DSA-44 sign</span><span class="chip c-run">Works</span><span class="g-t">mldsa-native-gcc-o3-a72: 1.18M cycles. 0.6 ms at 2000 MHz; NIST&#x27;s known-answer test passed on the board first.</span></div><div class="g-c"><span class="g-lab">ECDSA P-256 sign</span></div></div><p class="chip-key"><span><span class="chip c-no" title="No: RAM">Not for this chip</span> the chip does not have the RAM for it</span><span><span class="chip c-run">Works</span> measured on a board; the detail is in the table above. Every other cell is estimated.</span></p></details>
+<details class="fold" id="sec-hw"><summary>What the hardware blocks buy</summary><p class="note">Chips with an AES block run it far faster than software: the MSPM33 C321A runs AES 41.7 to 41.9 times faster at 1 kB. A block's win is largest on large data and shrinks on a single 16-byte block. The CRC block gains a few times, because the CPU still feeds it word by word. Each figure is hardware cycles against a software library on the same chip, from <code>data/results/</code>. A row range means the rows differ by key-setup handling or code variant.</p><div class="tw"><table class="t"><thead><tr><th>Board</th><th>AES on 1 kB, hardware over software</th><th>CRC on 1 kB, hardware over software</th></tr></thead><tbody><tr><td>AM13E230</td><td>29.8 to 29.9 times</td><td>1.89 times</td></tr><tr><td>CC1354P10-1</td><td>45.8 to 51.1 times</td><td>no measured row</td></tr><tr><td>CC2340R5</td><td>128.2 to 131.5 times</td><td>no measured row</td></tr><tr><td>ESP32-C6-DevKitC-1-N8</td><td>0.83 times</td><td>no measured row</td></tr><tr><td>FRDM-MCXA153</td><td>no measured row</td><td>7.06 times</td></tr><tr><td>MSPM0 C1104</td><td>no measured row</td><td>3 times</td></tr><tr><td>MSPM0 G3507</td><td>20.3 times</td><td>13.5 times</td></tr><tr><td>MSPM0 G3519</td><td>45.8 times</td><td>8.09 times</td></tr><tr><td>MSPM0 G5187</td><td>45.5 times</td><td>8.12 times</td></tr><tr><td>MSPM0 L1306</td><td>no measured row</td><td>10.9 times</td></tr><tr><td>MSPM33 C321A</td><td>41.7 to 41.9 times</td><td>2.75 times</td></tr><tr><td>NUCLEO-U083RC</td><td>19.6 to 93.9 times</td><td>8.34 times</td></tr><tr><td>Raspberry Pi Pico 2 H</td><td>no measured row</td><td>5.63 to 5.71 times</td></tr></tbody></table></div></details>
+<details class="fold" id="sec-published"><summary>Published by others, not measured by us</summary><p class="note">In TI&#x27;s tables a post-quantum signature check (ML-DSA-44 verify, 98 ms) is faster on the MSPM0G3519&#x27;s Cortex-M0+ than the classical one it replaces done in software (ECDSA P-256 verify, 716 ms). The cost is size: keys and ciphertexts of 800 to <span class="ex" title="4,627 B">4.5 kB</span> instead of 32 to 64, and tens of kilobytes of RAM.</p><figure class="bars"><figcaption><b>TI&#x27;s published figures: post-quantum against classical, milliseconds</b><span>Lower is better. Published by TI in the MSP Crypto Library 0.33.00.07 user guide (MSPM0 SDK 2.11.00.07), not measured by us. Milliseconds are TI&#x27;s kilocycles divided by the clock. Compare the two verify bars with each other: both check a signature. The key-exchange bar is a different job.</span></figcaption><div class="bars-legend"><span><i style="background:#B42418"></i>ML-KEM-768, the whole exchange (keygen + encaps + decaps)</span><span><i style="background:#161312"></i>ML-DSA-44 verify</span><span><i style="background:#C98500"></i>ECDSA P-256 verify</span></div><div class="bars-body"><div class="bar-cat"><div class="bar-l">MSPM0G3519<span>Cortex-M0+, 80 MHz; ECDSA in software</span></div><div class="bar-m"><div class="bar-row"><div class="bar-track"><i class="bar" style="left:0.00%;width:9.48%;background:#B42418;border-radius:0 4px 4px 0" data-tip="ML-KEM-768, the whole exchange (keygen + encaps + decaps): 94.2 ms"></i><b class="bar-v" style="left:9.48%" data-tip="ML-KEM-768, the whole exchange (keygen + encaps + decaps): 94.2 ms">94.2 ms</b></div></div><div class="bar-row"><div class="bar-track"><i class="bar" style="left:0.00%;width:9.84%;background:#161312;border-radius:0 4px 4px 0" data-tip="ML-DSA-44 verify: 97.8 ms"></i><b class="bar-v" style="left:9.84%" data-tip="ML-DSA-44 verify: 97.8 ms">97.8 ms</b></div></div><div class="bar-row"><div class="bar-track"><i class="bar" style="left:0.00%;width:72.00%;background:#C98500;border-radius:0 4px 4px 0" data-tip="ECDSA P-256 verify: 716 ms"></i><b class="bar-v" style="left:72.00%" data-tip="ECDSA P-256 verify: 716 ms">716 ms</b></div></div></div></div><div class="bar-cat"><div class="bar-l">MSPM33C321A<span>Cortex-M33, 160 MHz; ECDSA with the PKA</span></div><div class="bar-m"><div class="bar-row"><div class="bar-track"><i class="bar" style="left:0.00%;width:3.73%;background:#B42418;border-radius:0 4px 4px 0" data-tip="ML-KEM-768, the whole exchange (keygen + encaps + decaps): 37.1 ms"></i><b class="bar-v" style="left:3.73%" data-tip="ML-KEM-768, the whole exchange (keygen + encaps + decaps): 37.1 ms">37.1 ms</b></div></div><div class="bar-row"><div class="bar-track"><i class="bar" style="left:0.00%;width:2.30%;background:#161312;border-radius:0 4px 4px 0" data-tip="ML-DSA-44 verify: 22.9 ms"></i><b class="bar-v" style="left:2.30%" data-tip="ML-DSA-44 verify: 22.9 ms">22.9 ms</b></div></div><div class="bar-row"><div class="bar-track"><i class="bar" style="left:0.00%;width:13.19%;background:#C98500;border-radius:0 4px 4px 0" data-tip="ECDSA P-256 verify: 131 ms"></i><b class="bar-v" style="left:13.19%" data-tip="ECDSA P-256 verify: 131 ms">131 ms</b></div></div></div></div></div></figure></details>
+<details class="fold"><summary>Published figures for comparable cores</summary><p class="note">Published figures for these operations on comparable cores, as each source states it. Different code, compilers and clocks, so compare cycles within one source before comparing across sources.</p><div class="tw"><table class="t"><thead><tr><th>Published by</th><th>Chip</th><th>Clock</th><th>Code</th><th>Operation</th><th>Result</th><th>Source</th></tr></thead><tbody><tr><td>TI</td><td>MSPM0G3519 (Cortex-M0+)</td><td>80 MHz</td><td>MSP Crypto Library 0.33.00.07</td><td>ML-KEM-768 keygen / encaps / decaps</td><td><span class="ex" title="2,162k">2.16M</span> / <span class="ex" title="2,514k">2.51M</span> / <span class="ex" title="2,864k">2.86M</span> cycles (27 / 31 / 36 ms)</td><td><code>MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput</code></td></tr><tr><td>TI</td><td>MSPM0G3519 (Cortex-M0+)</td><td>80 MHz</td><td>MSP Crypto Library 0.33.00.07</td><td>ML-DSA-44 keygen / sign (mean of 16) / verify</td><td><span class="ex" title="6,688k">6.69M</span> / <span class="ex" title="33,871k">33.9M</span> / <span class="ex" title="7,825k">7.83M</span> cycles (84 / 423 / 98 ms)</td><td><code>MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput</code></td></tr><tr><td>TI</td><td>MSPM0G3519 (Cortex-M0+)</td><td>80 MHz</td><td>MSP Crypto Library 0.33.00.07, software</td><td>ECDSA P-256 sign / verify</td><td><span class="ex" title="31,390k">31.4M</span> / <span class="ex" title="57,261k">57.3M</span> cycles (392 / 716 ms)</td><td><code>MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput</code></td></tr><tr><td>TI</td><td>MSPM33C321A (Cortex-M33)</td><td>160 MHz</td><td>MSP Crypto Library 0.33.00.07</td><td>ML-KEM-768 keygen / encaps / decaps</td><td><span class="ex" title="1,756k">1.76M</span> / <span class="ex" title="1,958k">1.96M</span> / <span class="ex" title="2,221k">2.22M</span> cycles (11 / 12 / 14 ms)</td><td><code>MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput</code></td></tr><tr><td>TI</td><td>MSPM33C321A (Cortex-M33)</td><td>160 MHz</td><td>MSP Crypto Library 0.33.00.07</td><td>ML-DSA-44 keygen / sign (mean of 16) / verify</td><td><span class="ex" title="3,575k">3.58M</span> / <span class="ex" title="21,278k">21.3M</span> / <span class="ex" title="3,660k">3.66M</span> cycles (22 / 133 / 23 ms)</td><td><code>MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput</code></td></tr><tr><td>TI</td><td>MSPM33C321A (Cortex-M33)</td><td>160 MHz</td><td>MSP Crypto Library 0.33.00.07, PKA</td><td>ECDSA P-256 sign / verify</td><td><span class="ex" title="10,440k">10.4M</span> / <span class="ex" title="20,975k">21M</span> cycles (65 / 131 ms)</td><td><code>MSPM0 SDK 2.11.00.07, MSP Crypto Library 0.33.00.07 user guide, Performance and Throughput</code></td></tr><tr><td>pqm4 project</td><td>STMicroelectronics STM32L4R5 (Cortex-M4)</td><td>24 MHz</td><td>reference C (clean)</td><td>ML-KEM-768 keygen / encaps / decaps</td><td>989k / 1.14M / 1.39M cycles</td><td><a href="https://github.com/mupq/pqm4/blob/master/benchmarks.md">github.com</a></td></tr><tr><td>pqm4 project</td><td>STMicroelectronics STM32L4R5 (Cortex-M4)</td><td>24 MHz</td><td>Cortex-M4 assembly (m4fspeed)</td><td>ML-KEM-768 keygen / encaps / decaps</td><td>642k / 659k / 708k cycles</td><td><a href="https://github.com/mupq/pqm4/blob/master/benchmarks.md">github.com</a></td></tr><tr><td>Chhetri, arXiv 2603.19340</td><td>Raspberry Pi RP2040 (Cortex-M0+)</td><td>133 MHz</td><td>PQClean reference C, GCC -Os</td><td>ML-KEM-768 keygen / encaps / decaps</td><td>2.13M / 2.47M / 2.93M cycles (16.0 / 18.6 / 22.0 ms)</td><td><a href="https://arxiv.org/html/2603.19340v2">arxiv.org</a></td></tr><tr><td>Chhetri, arXiv 2603.19340</td><td>Raspberry Pi RP2040 (Cortex-M0+)</td><td>133 MHz</td><td>PQClean reference C, GCC -Os</td><td>ML-DSA-44 keygen / sign (mean) / verify</td><td>39.8 / 158.9 / 44.0 ms (21.1 million cycles to sign; sign time varies 66 to 73 percent between runs)</td><td><a href="https://arxiv.org/html/2603.19340v2">arxiv.org</a></td></tr><tr><td>wolfSSL</td><td>STMicroelectronics STM32F439 (Cortex-M4)</td><td>168 MHz</td><td>wolfCrypt with Thumb-2 assembly</td><td>ML-KEM-768 keygen / encaps / decaps</td><td>6.5 / 6.6 / 8.3 ms</td><td><a href="https://www.wolfssl.com/updated-post-quantum-benchmarks-for-ml-kem-and-ml-dsa-on-stm32/">wolfssl.com</a></td></tr><tr><td>Karcz et al., PLOS One 2026</td><td>Espressif ESP32-C6 (RISC-V)</td><td>160 MHz</td><td>liboqs on ESP-IDF 5.5.1</td><td>ML-KEM-768 keygen / encaps / decaps</td><td>171 / 171 / 205 ms</td><td><a href="https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0355179">journals.plos.org</a></td></tr></tbody></table></div></details>
+<details class="fold" id="sec-why"><summary>Why a chip buyer cares now</summary><details class="fold"><summary>The dates that set the deadlines</summary><p class="note">From the standards bodies and governments themselves. NIST is the U.S. standards body; FIPS numbers are its standards; CNSA 2.0 is the U.S. National Security Agency's list of required algorithms. A device sold in 2027 may still be in the field after 2035.</p><ul class="sec-dates"><li><b>2024-04-11</b>: European Commission Recommendation on a coordinated roadmap for the move to post-quantum cryptography. <a href="https://digital-strategy.ec.europa.eu/en/library/coordinated-implementation-roadmap-transition-post-quantum-cryptography">digital-strategy.ec.europa.eu</a></li><li><b>2024-08-13</b>: NIST publishes the final FIPS 203 (ML-KEM), FIPS 204 (ML-DSA) and FIPS 205 (SLH-DSA), ready for immediate use. <a href="https://www.nist.gov/news-events/news/2024/08/nist-releases-first-3-finalized-post-quantum-encryption-standards">nist.gov</a></li><li><b>2024-11-12</b>: NIST IR 8547 draft: 112-bit ECDSA, ECDH and RSA deprecated after 2030; all quantum-vulnerable public-key algorithms, P-256 included, disallowed after 2035 (still a draft). <a href="https://csrc.nist.gov/pubs/ir/8547/ipd">csrc.nist.gov</a></li><li><b>2024-12</b>: NSA CNSA 2.0 FAQ version 2.1: ML-KEM-1024 and ML-DSA-87 for U.S. national security systems. <a href="https://media.defense.gov/2022/Sep/07/2003071836/-1/-1/0/CSI_CNSA_2.0_FAQ_.PDF">media.defense.gov</a></li><li><b>2025-06-23</b>: EU member states&#x27; roadmap: start by the end of 2026, high-risk uses by the end of 2030 with quantum-safe firmware upgrades on by default, everything by the end of 2035. <a href="https://digital-strategy.ec.europa.eu/en/news/eu-reinforces-its-cybersecurity-post-quantum-cryptography">digital-strategy.ec.europa.eu</a></li><li><b>2027</b>: NSA: from 2027 all new commercial national security systems must support quantum-resistant algorithms; legacy systems that cannot are phased out by 2030. <a href="https://www.nsa.gov/Press-Room/Press-Releases-Statements/Press-Release-View/Article/4615285/nsa-announces-post-quantum-cryptography-measures-to-safeguard-national-security/">nsa.gov</a></li><li><b>2030 to 2033</b>: CNSA 2.0: firmware and software signing exclusively post-quantum by 2030; constrained devices support and prefer by 2030, exclusively by 2033. <a href="https://media.defense.gov/2025/May/30/2003728741/-1/-1/0/CSA_CNSA_2.0_ALGORITHMS.PDF">media.defense.gov</a></li></ul></details></details>
+<details class="fold" id="sec-algos"><summary>The two algorithms, and the sizes they bring</summary><details class="fold"><summary>Key, ciphertext and signature sizes</summary><p class="note">ML-KEM replaces the key exchange, ML-DSA the signature. The last two rows are the classical algorithms they replace, for scale. "NIST category" is NIST's strength scale from 1 to 5: higher is stronger, and bigger.</p><div class="tw"><table class="t"><thead><tr><th>Algorithm</th><th>What it is</th><th>Public key</th><th>Ciphertext or signature</th><th>Source</th></tr></thead><tbody><tr><td>ML-KEM-512</td><td>Post-quantum key exchange, NIST category 1 (the lowest of five strength levels)</td><td>800</td><td>768</td><td><a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf">nvlpubs.nist.gov</a></td></tr><tr><td>ML-KEM-768</td><td>Post-quantum key exchange, NIST category 3; NIST&#x27;s recommended default</td><td><span class="ex" title="1,184 B">1.2 kB</span></td><td><span class="ex" title="1,088 B">1.1 kB</span></td><td><a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf">nvlpubs.nist.gov</a></td></tr><tr><td>ML-KEM-1024</td><td>Post-quantum key exchange, NIST category 5; the size CNSA 2.0 requires</td><td><span class="ex" title="1,568 B">1.5 kB</span></td><td><span class="ex" title="1,568 B">1.5 kB</span></td><td><a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf">nvlpubs.nist.gov</a></td></tr><tr><td>ML-DSA-44</td><td>Post-quantum signature, NIST category 2</td><td><span class="ex" title="1,312 B">1.3 kB</span></td><td><span class="ex" title="2,420 B">2.4 kB</span></td><td><a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf">nvlpubs.nist.gov</a></td></tr><tr><td>ML-DSA-65</td><td>Post-quantum signature, NIST category 3</td><td><span class="ex" title="1,952 B">1.9 kB</span></td><td><span class="ex" title="3,309 B">3.2 kB</span></td><td><a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf">nvlpubs.nist.gov</a></td></tr><tr><td>ML-DSA-87</td><td>Post-quantum signature, NIST category 5; the size CNSA 2.0 requires</td><td><span class="ex" title="2,592 B">2.5 kB</span></td><td><span class="ex" title="4,627 B">4.5 kB</span></td><td><a href="https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.204.pdf">nvlpubs.nist.gov</a></td></tr><tr><td>X25519</td><td>Classical key exchange it replaces (the other side&#x27;s public key is the reply)</td><td>32</td><td>32</td><td><code>MSPM0 SDK 2.11.00.07 source/ti/crypto/include/curve25519/curve25519.h (X25519_KEY_LENGTH)</code></td></tr><tr><td>ECDSA P-256</td><td>Classical signature it replaces (public key as x and y coordinates)</td><td>64</td><td>64</td><td><code>MSPM0 SDK 2.11.00.07 source/ti/crypto/include/ec/ec.h (32-byte coordinates and r, s)</code></td></tr></tbody></table></div></details></details>
+<details class="fold"><summary>Questions about this section</summary><dl class="qa">
+<dt>Why does the board stop at "join: making an ML-KEM-768 key pair"?</dt><dd>Call TRNG_init() before TRNG_open(), and stop with a message if TRNG_open() returns NULL. An image that skips TRNG_init() stops here; the SDK's Board_init() starts only the power and GPIO drivers. The TRNG is the chip's hardware random-number generator, which the key pair needs. The debugger showed the CPU in an exception handler, PC 0x100006f4 and LR 0xfffffff9 (observed 2026-10-08, not saved). cc1354p10/pqc-join/README.md, the TRNG section.</dd>
+<dt>Can someone in the middle read the message?</dt><dd>Someone who only listens cannot. They see the public key and the ciphertext, and ML-KEM-768 is built so that does not give away the key. Someone who can change bytes on the wire can. They answer the board with their own key and the Mac with theirs, and each side agrees a key with them. Do not ship it as is: the demonstration has no signature step. A product signs or pins the keys, for example with ML-DSA-44, whose signing is measured above.</dd>
+<dt>What does the key check line mean, and what would MISMATCH mean?</dt><dd>Each side prints the first 4 bytes of a hash of the key it holds (tools/pqc_join/mac_side.py). MATCH means the two are equal, so both sides almost certainly hold the same key, and the decryption tag passing confirms it. MISMATCH would mean they derived different keys and the board's decryption would fail its tag check. Every saved run printed MATCH; a MISMATCH has not been seen here.</dd>
+<dt>Why does the demo need a USB hub the Mac can switch?</dt><dd>This board's debugger connects only in the first seconds after power-on, so run.sh switches the port off for 6 s and on again before each load. Install uhubctl (brew install uhubctl) and run it alone to list hubs; one marked ppps can switch its ports. Here that was the USB-A port of Apple's USB-C Digital AV Multiport Adapter. No manual unplug and replug was done. cc1354p10/FAQ.md.</dd>
+<dt>Are any of these numbers measured by Fox Red Labs?</dt><dd>Some are. Measured by us: 111 results on 7 boards (CC1354P10-1, CC2755P10, MSPM0 G3519, MSPM0 G5187, MSPM33 C321A, NUCLEO-U083RC, SK-TDA4VM), in the Measured by us table above, with 47 peak-stack measurements shown beside them. The other times are TI&#x27;s published figures or estimates. Every cell marked Not run is TI's published figure or an estimated range, and the "published by others" table is exactly that.</dd>
+<dt>Why can the MSPM0 L1306 and MSPM0 C1104 not do post-quantum key exchange?</dt><dd>RAM. The smallest portable ML-KEM-768 found needs about 14 kB of working RAM (PQClean on the RP2040, arXiv 2603.19340); the MSPM0 L1306 has 4 kB and the MSPM0 C1104 has 1 kB, less than one <span class="ex" title="1,184 B">1.2 kB</span> public key. The answer is no for the MSPM0 C1104 (its RAM is below the size of one public key). For the MSPM0 L1306 the answer is expected to be no: it comes from published RAM needs, not from a build.</dd>
+<dt>Why does the CC2340R5 fit ML-KEM alone but not beside Bluetooth?</dt><dd>ML-KEM-768 with mlkem-native needs about 19 kB of working RAM (an estimate). TI's basic Bluetooth example leaves <span class="ex" title="5,175 B">5.1 kB</span> of the chip's 36 kB. So room is expected only without the Bluetooth stack. That is one TI example configuration; a trimmed Bluetooth build or a lower-RAM ML-KEM was not built.</dd>
+<dt>Is post-quantum slower than what it replaces?</dt><dd>In TI's own tables, not for checking signatures: ML-DSA-44 verify is faster than ECDSA P-256 verify on both chips TI lists. Signing is slower. Every key, ciphertext and signature is 20 to 72 times bigger, which costs more on a radio link.</dd>
+<dt>Why do ML-DSA signing times differ so much between TI's cores and runs?</dt><dd>Signing repeats an internal try until a check passes, so its time varies from run to run. The RP2040 paper saw 66 to 73 percent spread, and TI averages only 16 signs. TI's own ML-DSA-44 sign mean is <span class="ex" title="40,449k">40.4M</span> cycles at 32 MHz but <span class="ex" title="33,871k">33.9M</span> cycles at 80 MHz on the same chip (TI's MSP Crypto Library 0.33.00.07 user guide, MSPM0 SDK 2.11.00.07, performance tables). The difference is probably run-to-run noise (suspected, not repeated). Verification time is fixed. TI's runs were not repeated here.</dd>
+<dt>Why does the MSPM0 G3507 fit ML-DSA signing only in low-RAM mode?</dt><dd>The default mode of mldsa-native needs <span class="ex" title="44,448 B">43.4 kB</span> for signing, more than the chip's 32 kB. Its low-RAM mode needs <span class="ex" title="9,792 B">9.6 kB</span>, or about <span class="ex" title="14,772 B">14.4 kB</span> with the <span class="ex" title="2,560 B">2.5 kB</span> private key and <span class="ex" title="2,420 B">2.4 kB</span> signature added, and trades speed for memory by an amount nobody has published. This is an estimate from published figures, not a build.</dd>
+<dt>Why does this page give both 14 kB and 19 kB for ML-KEM-768?</dt><dd>They are different code. About 14 kB is the peak stack measured for PQClean on the RP2040 (arXiv 2603.19340). About 19 kB is an estimate for mlkem-native: its published <span class="ex" title="14,336 B">14 kB</span> for decapsulation plus the keys and ciphertext (<span class="ex" title="2,400 B">2.3 kB</span>, <span class="ex" title="1,184 B">1.2 kB</span> and <span class="ex" title="1,088 B">1.1 kB</span>).</dd>
+<dt>What does "No estimate" mean?</dt><dd>There is no estimate or test for that board and operation.</dd>
+</dl></details>
+<details class="fold" id="sec-evidence-kinds"><summary>How it was measured: kinds of evidence and how to read the tags</summary><p>Measured by us: 111 results on 7 boards (CC1354P10-1, CC2755P10, MSPM0 G3519, MSPM0 G5187, MSPM33 C321A, NUCLEO-U083RC, SK-TDA4VM), in the Measured by us table above, with 47 peak-stack measurements shown beside them. The other times are TI&#x27;s published figures or estimates. Researched 2026-10-09; each figure cites its source. Terms: <a href="../docs/vocab.html">vocabulary</a>.</p>
+<h3>Four kinds of evidence on this page</h3><ul><li>Demonstration, ran end to end: The exchange above, on one board, once, on 2026-10-08.</li><li>Known-answer check, NIST vectors passed: ML-KEM-768 and ML-DSA-44 outputs match NIST&#x27;s fixed inputs byte for byte, on the board, before timing.</li><li>Measurement, cycles and stack: Times from the CPU cycle counter and stack from painting it, in the Measured by us table above.</li><li>Assurance, none claimed: No side-channel testing, no certification (such as FIPS 140-3), no review. Nothing here says the project is secure.</li></ul>
+<p class="note">A cell marked "Chip limit" means the chip cannot hold the code in its RAM or flash. Only rows marked as measured are measurements made here; none of them is a security claim.</p>
+</details>
+<details class="fold"><summary>Words in this section</summary><p class="note">Words used below, once: Cortex-M0+ is a small Arm core with no FPU (floating-point unit); Cortex-M33 is a faster Arm core; C28x is TI&#x27;s control-processor core; PKA is hardware that speeds up elliptic-curve math. Encapsulation: the sender wraps a fresh secret with the receiver&#x27;s public key, which gives a ciphertext (the wrapped secret); decapsulation unwraps it. kcycles means thousands of clock cycles. pqm4 is an open-source collection of post-quantum code for Cortex-M4 chips (m4fspeed is its speed-tuned assembly build); liboqs is an open-source post-quantum library; uint8_t is C&#x27;s 8-bit integer type. 1 kB = 1,024 bytes.</p><dl class="qa">
+<dt>ML-KEM (Kyber)</dt><dd>NIST's post-quantum key exchange (FIPS 203). One side publishes a public key; the other uses it to wrap a fresh shared secret (encapsulation) and sends back a ciphertext; the first side unwraps it (decapsulation). The number (512, 768, 1024) is the strength level.</dd>
+<dt>ML-DSA (Dilithium)</dt><dd>NIST's post-quantum signature (FIPS 204), used to prove firmware or a message came from the right key. 44, 65 and 87 are its strength levels.</dd>
+<dt>ECDSA P-256, X25519</dt><dd>Today's elliptic-curve signature and key exchange; a large enough quantum computer could break both.</dd>
+<dt>TRNG</dt><dd>True random-number generator: the chip's hardware source of random bytes, which the key pair needs.</dd>
+<dt>HKDF-SHA-256</dt><dd>A standard way to turn the shared secret from the exchange into an AES key of the right length.</dd>
+<dt>PKA</dt><dd>Public-key accelerator: hardware on the MSPM33C321A that speeds up the elliptic-curve math.</dd>
+<dt>kcycles</dt><dd>Thousands of clock cycles. Divide by the clock in MHz to get milliseconds.</dd>
+<dt>mlkem-native, mldsa-native</dt><dd>Portable open-source C versions of ML-KEM and ML-DSA that run on any of these cores; TI's library covers only the MSPM0G3519 and MSPM33C321A.</dd>
+</dl></details>
+</div>
+
+</div></main>
+<footer>
+  <div class="wrap" style="--fcols:4">
+    <div class="f-brand"><svg class="logo logo-foot" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg><p>Build it. Share it. Open demos and ports for embedded work, with the numbers.</p></div>
+    <div><h2>Builds</h2><a href="projects.html">All builds</a><a href="project-blink.html">First blink</a><a href="projects.html?f=smart-home">Smart home</a><a href="projects.html?f=ai">Edge AI</a><a href="projects.html?f=radio">Radio and range</a><a href="projects.html?f=motors">Motors, power and sensing</a><a href="projects.html?f=screens">Screens</a><a href="security.html">Security</a></div><div><h2>Hardware</h2><a href="hardware.html">The kits</a><a href="addons.html">Add-ons and parts</a></div><div><h2>Software</h2><a href="portability.html">Bring your code</a><a href="ports.html">Every port</a><a href="one-app-eleven-boards.html">One app, eleven boards</a><a href="project-build-from-terminal.html">Build from the terminal</a><a href="benchmarks.html">Measured</a><a href="edge-ai.html">Edge AI</a></div><div><h2>Community</h2><a href="community.html">Community</a><a href="https://github.com/Fox-Red-Labs/fox-red-labs">Get the code</a></div>
+    <div class="f-meta"><a href="benchmarks.html#method">Method</a><p class="disc pwr">Powered by Zephyr, GCC and OpenOCD. </p><p class="disc">Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors&#x27; projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.</p></div>
+  </div>
+</footer>
+<div class="tip" id="tip"></div>
+<script>
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest('[data-tip]');
+  if (!t) { tip.style.display = 'none'; return; }
+  tip.textContent = t.dataset.tip; tip.style.display = 'block';
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - 300) + 'px'; tip.style.top = (e.clientY + 16) + 'px';
+});
+function openHash() { var e = location.hash && document.getElementById(location.hash.slice(1)); while (e) { if (e.tagName === 'DETAILS') { e.open = true; } e = e.parentElement; } } window.addEventListener('hashchange', openHash); openHash(); document.querySelectorAll('.st-copy').forEach(function (b) { b.addEventListener('click', function () { var t = b.getAttribute('data-copy'); var done = function () { b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1500); }; if (navigator.clipboard) { navigator.clipboard.writeText(t).then(done, function () {}); } }); });
+
+(function () {
+  // The page's own contents list, or one built from its sections, as a bar that sticks under the
+  // header once the list scrolls away; the section on screen is marked. Plus a back-to-top button.
+  var src = document.querySelector('nav.jump[aria-label="On this page"], p.toc');
+  var links = [];
+  if (src) src.querySelectorAll('a[href^="#"]').forEach(function (a) { links.push([a.getAttribute('href').slice(1), a.textContent.trim()]); });
+  else document.querySelectorAll('main [id]').forEach(function (el) {
+    var h = el.firstElementChild; if (el.tagName === 'H2') h = el;
+    if (h && h.tagName === 'H2' && !el.closest('details:not([open])')) links.push([el.id, h.textContent.trim().replace(/\s+/g, ' ').slice(0, 40)]);
+  });
+  links = links.filter(function (l) { return document.getElementById(l[0]); });
+  var top = document.createElement('button');
+  top.className = 'totop'; top.type = 'button'; top.setAttribute('aria-label', 'Back to top');
+  top.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+  document.body.appendChild(top);
+  var bar = null, hdr = document.querySelector('header');
+  if (links.length >= 3 && !document.querySelector('.btabs2')) {   // a page with tabs has its own navigation
+    bar = document.createElement('nav'); bar.className = 'otp'; bar.setAttribute('aria-label', 'Sections');
+    bar.innerHTML = '<div class="wrap"><b>On this page</b>' + links.map(function (l) { return '<a href="#' + l[0] + '">' + l[1].replace(/[<&]/g, '') + '</a>'; }).join('') + '</div>';
+    document.body.appendChild(bar); document.body.classList.add('has-otp');
+  }
+  var targets = links.map(function (l) { return document.getElementById(l[0]); });
+  function tick() {
+    var y = scrollY, h = hdr ? hdr.getBoundingClientRect().height : 72;
+    top.classList.toggle('on', y > innerHeight * 1.5);
+    if (!bar) return;
+    bar.style.top = h + 'px';
+    var past = src ? src.getBoundingClientRect().bottom < h : y > innerHeight * 0.8;
+    bar.classList.toggle('on', past);
+    var cur = -1;
+    targets.forEach(function (t, i) { if (t.getBoundingClientRect().top < h + 140) cur = i; });
+    bar.querySelectorAll('a').forEach(function (a, i) {
+      var on = i === cur; if (on !== a.classList.contains('cur')) { a.classList.toggle('cur', on); if (on) a.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+    });
+  }
+  var queued = false;
+  addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(function () { queued = false; tick(); }); } }, { passive: true });
+  addEventListener('resize', tick); tick();
+})();
+
+</script>
+</body>
+</html>

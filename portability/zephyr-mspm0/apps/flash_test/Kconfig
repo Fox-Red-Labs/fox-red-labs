@@ -1,0 +1,4 @@
+config APP_LEAVE_PATTERN
+	bool "Leave the pattern programmed in the last sector at the end"
+
+source "Kconfig.zephyr"

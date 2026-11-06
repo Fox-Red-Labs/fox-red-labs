@@ -1,0 +1,6 @@
+board:
+  name: lp_am263p
+  full_name: TI LP-AM263P LaunchPad (Fox Red Labs out-of-tree port)
+  vendor: ti
+  socs:
+  - name: am263p4

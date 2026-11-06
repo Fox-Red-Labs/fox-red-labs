@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Add-ons and parts</title>
+<meta name="description" content="45 plug-on boards, displays, sensors, motor drivers, inputs, cables and kits used in Fox Red Labs projects: what each is for, how to hook it up and where to buy it.">
+<!-- seo -->
+<link rel="canonical" href="https://foxredlabs.dev/site/addons.html">
+<meta property="og:site_name" content="Fox Red Labs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Add-ons and parts">
+<meta property="og:description" content="45 plug-on boards, displays, sensors, motor drivers, inputs, cables and kits used in Fox Red Labs projects: what each is for, how to hook it up and where to buy it.">
+<meta property="og:url" content="https://foxredlabs.dev/site/addons.html">
+<meta property="og:image" content="https://foxredlabs.dev/site/media/xds110-probe.jpg">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "Add-ons and parts", "description": "45 plug-on boards, displays, sensors, motor drivers, inputs, cables and kits used in Fox Red Labs projects: what each is for, how to hook it up and where to buy it.", "url": "https://foxredlabs.dev/site/addons.html", "author": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "publisher": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "license": "https://creativecommons.org/licenses/by/4.0/", "isPartOf": {"@type": "WebSite", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}}</script>
+<!-- /seo -->
+<link rel="icon" href="media/favicon.svg">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="motion.css?v=20261030-home">
+<script src="motion.js?v=20261030-home" defer></script>
+<style>
+/* Brand tokens and base */
+:root {
+ --frl-red: #B42418;
+ --frl-ember: #8E1C13;
+ --frl-ink: #161312;
+ --frl-stone: #6B625B;
+ --frl-paper: #FAFAF7;   /* the page ground (site review 2026-10-15, png/R4System.png); tan lives only inside cards */
+ --frl-tan: #F4EFE9;
+ --frl-cream: #F7F3EC;
+ --frl-line: #E2D8C9;
+ --ok: #2F6B4F;
+ --frl-font: "Barlow", "Helvetica Neue", Arial, sans-serif;
+ --frl-mono: "Barlow", "Helvetica Neue", Arial, sans-serif;   /* labels, captions and numbers in Barlow; the token name stays so 500 label rules need no edit */
+ --frl-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace;   /* code, commands and file names only */
+ --frl-ease: 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+* { box-sizing: border-box; }
+code, pre, kbd, samp, code *, pre * { font-family: var(--frl-code) !important; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--frl-paper); color: var(--frl-ink); font: 400 18px/28px var(--frl-font); -webkit-font-smoothing: antialiased; }
+a { color: var(--frl-red); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+a:hover { color: var(--frl-ember); }
+:focus-visible { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 600px) { .wrap { padding: 0 16px; } }
+h1, h2, h3 { margin: 0; font-weight: 700; }
+.display { font-size: 56px; line-height: 60px; letter-spacing: -0.005em; }
+h2 { font-size: 32px; line-height: 38px; }
+h3 { font-size: 24px; line-height: 30px; font-weight: 600; }
+@media (max-width: 700px) { .display { font-size: 40px; line-height: 44px; } h2 { font-size: 26px; line-height: 32px; } h3 { font-size: 20px; line-height: 26px; } body { font-size: 17px; } }
+.eyebrow { font-weight: 500; font-size: 14px; line-height: 20px; letter-spacing: .12em; text-transform: uppercase; color: var(--frl-red); margin-bottom: 12px; }
+.small { font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+.lede { max-width: 680px; color: var(--frl-stone); margin: 12px 0 0; }
+section { padding: 96px 0; }
+@media (max-width: 700px) { section { padding: 64px 0; } }
+/* draft strip */
+.draft { background: var(--frl-ink); color: var(--frl-cream); font-size: 13px; text-align: center; padding: 6px 16px; letter-spacing: .02em; }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 8px; font: 600 16px var(--frl-font); cursor: pointer; text-decoration: none; transition: background var(--frl-ease), border-color var(--frl-ease), color var(--frl-ease); white-space: nowrap; }
+.btn-primary { background: var(--frl-red); color: var(--frl-cream); border: 0; }
+.btn-primary:hover { background: var(--frl-ember); color: var(--frl-cream); }
+.btn-secondary { background: transparent; color: var(--frl-ink); border: 1.5px solid var(--frl-ink); }
+.btn-secondary:hover { background: var(--frl-cream); color: var(--frl-ink); }
+.btn svg.lucide { width: 18px; height: 18px; }
+.try-ai { margin: 22px 0 0; max-width: 640px; border: 1px solid var(--frl-line); border-radius: 12px; background: #fff; padding: 16px 18px; }
+.try-ai .ta-h { font: 600 15px/20px var(--frl-font); margin: 0 0 8px; }
+.try-ai pre { margin: 0; padding: 12px 14px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/21px var(--frl-mono, 'JetBrains Mono', monospace); }
+.try-ai .ta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 0; }
+.try-ai .ta-note { font-size: 14px; line-height: 20px; color: var(--frl-stone); margin: 10px 0 0; }
+
+
+
+/* Redesign chrome */
+:root { --logo-h: 48px; --frl-ok: #2F6B4F; --frl-amber: #C98500; /* success and the one amber: graphics, score tints and chart series only */ }
+body > header { position: sticky; top: 0; z-index: 30; background: rgba(250,250,247,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--frl-line); }
+/* inner pages: the header is Ink with Cream text; the home page keeps the light one above its dark hero */
+body > header.dark { background: rgba(22,19,18,.96); border-bottom-color: rgba(247,243,236,0.12); color: var(--frl-cream); }
+header.dark .logo-head { color: var(--frl-cream); }
+header.dark nav > a, header.dark nav .ni > a { color: var(--frl-cream); }
+header.dark nav > a:hover, header.dark nav .ni > a:hover { color: #F0563F; }
+header.dark nav a[aria-current="page"] { color: var(--frl-cream); border-bottom-color: #F0563F; }
+header.dark .ni-btn { color: rgba(247,243,236,.72); } header.dark .ni-btn:hover { color: var(--frl-cream); background: rgba(247,243,236,0.08); }
+header.dark .hsearch { background: rgba(247,243,236,0.05); border-color: rgba(247,243,236,0.14); } header.dark .hsearch:focus-within { border-color: var(--frl-cream); }
+header.dark .hsearch input { color: var(--frl-cream); } header.dark .hsearch input::placeholder { color: #6B625B; } header.dark .hsearch button { color: var(--frl-cream); }
+header.dark .menu-btn { border-color: var(--frl-cream); color: var(--frl-cream); }
+header.dark.nav-open nav { background: var(--frl-ink); border-bottom-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav > a, header.dark.nav-open nav .ni { border-top-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav .menu .mi b { color: var(--frl-cream); } header.dark.nav-open nav .menu .mi span { color: rgba(247,243,236,.72); }
+header .wrap { display: flex; align-items: center; gap: 32px; height: 72px; }
+.logo { display: block; width: auto; }
+.logo-head { height: var(--logo-h); color: var(--frl-red); }
+.logo-foot { height: 48px; color: var(--frl-red); }
+header .brand { display: flex; align-items: center; flex: none; }
+header nav { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+header nav > a, header nav .ni > a { color: var(--frl-ink); text-decoration: none; font-weight: 500; font-size: 16px; white-space: nowrap; padding: 4px 0; border-bottom: 2px solid transparent; }
+header nav > a:hover, header nav .ni > a:hover { color: var(--frl-red); }
+header nav a[aria-current="page"] { font-weight: 700; border-bottom-color: var(--frl-red); color: var(--frl-ink); }
+/* the Build item: a link, a chevron button, and the subject panel (open on hover, focus or tap) */
+.ni { position: relative; display: flex; align-items: center; gap: 2px; }
+.ni-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--frl-stone); cursor: pointer; padding: 0; }
+.ni-btn svg { width: 16px; height: 16px; transition: transform var(--frl-ease); }
+.ni-btn:hover { color: var(--frl-ink); background: var(--frl-cream); }
+.ni-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.menu { display: none; position: absolute; top: calc(100% + 14px); left: -24px; width: 720px; max-width: calc(100vw - 32px); background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 12px; padding: 22px 24px 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; z-index: 31; }
+#build-menu, #hardware-menu { left: -24px; } #software-menu { left: -200px; } #about-menu { left: auto; right: -90px; width: 560px; }
+.menu::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
+.ni:hover .menu, .ni:focus-within .menu, .ni.open .menu { display: grid; }
+.menu .mi { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--frl-ink); padding: 6px 8px; margin: -6px -8px; border-radius: 8px; }
+.menu .mi:hover, .menu .mi:focus-visible { background: var(--frl-paper); }
+.menu .mi b { font-weight: 700; font-size: 16px; line-height: 22px; }
+.menu .mi span { font-size: 13px; line-height: 18px; color: var(--frl-stone); }
+.menu .menu-note { grid-column: 1 / -1; margin: 0; border-top: 1px solid var(--frl-line); padding-top: 12px; font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.menu .menu-note a { color: var(--frl-ink); font-size: inherit; font-weight: 500; padding: 0; border: 0; }
+.menu .mi, .menu .mi b, .menu .mi span { white-space: normal; }  /* hand-made pages carry an older nowrap nav rule */
+/* phone menu: under 760 px the nav folds behind a Menu button (aria-expanded), opened by tap or Enter, closed by Escape */
+.menu-btn { display: none; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--frl-ink); background: transparent; color: var(--frl-ink); font: 600 16px var(--frl-font); cursor: pointer; }
+.menu-btn svg { width: 18px; height: 18px; }
+.menu-btn .mb-x { display: none; }
+.menu-btn[aria-expanded="true"] .mb-x { display: block; } .menu-btn[aria-expanded="true"] .mb-o { display: none; }
+/* site search in the header: the form goes to search.html?q=; under 760 px only the icon shows */
+.hsearch { display: flex; align-items: center; height: 40px; border: 1.5px solid var(--frl-line); border-radius: 8px; background: #fff; padding: 0 4px 0 12px; }
+.hsearch:focus-within { border-color: var(--frl-ink); }
+.hsearch input { border: 0; outline: 0; background: transparent; font: 500 15px var(--frl-font); color: var(--frl-ink); width: 150px; min-width: 0; }
+.hsearch button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 4px; background: transparent; color: var(--frl-ink); cursor: pointer; }
+.hsearch button:hover { color: var(--frl-red); } .hsearch button svg { width: 18px; height: 18px; }
+/* GitHub link beside the Digital Lab button: the repository one click from every page */
+.gh-link { display: inline-flex; align-items: center; gap: 6px; color: var(--frl-cream); text-decoration: none; font: 600 15px var(--frl-font); margin-right: 12px; opacity: .9; white-space: nowrap; }
+.gh-link:hover { opacity: 1; color: #fff; }
+header:not(.dark) .gh-link { color: var(--frl-ink); } header:not(.dark) .gh-link:hover { color: var(--frl-red); }
+.gh-link svg { width: 18px; height: 18px; }
+@media (max-width: 1180px) { .gh-link span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+/* the red "Plug in a board" button: opens the browser bench */
+.plug-btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 6px; background: var(--frl-red); color: #fff; font: 600 15px var(--frl-font); text-decoration: none; white-space: nowrap; flex: none; }
+.plug-btn:hover { background: var(--frl-ember); color: #fff; }
+.plug-btn svg { width: 17px; height: 17px; }
+header nav a.nav-lab, .plug-btn .plug-s { display: none; }
+@media (max-width: 480px) { .gh-link { display: none; } }
+@media (max-width: 1180px) { .plug-btn { padding: 0 11px; min-width: 44px; height: 44px; justify-content: center; } .plug-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+@media (max-width: 1000px) and (min-width: 761px) { header nav { gap: 6px !important; } .ni-btn { width: 20px; } header nav > a, header nav .ni > a { font-size: 15px; } header .wrap { gap: 12px !important; } }
+@media (max-width: 1100px) { header .wrap { gap: 20px; } header nav { gap: 18px; } .hsearch input { width: 90px; } }
+@media (max-width: 900px) { header nav > a, header nav .ni > a { font-size: 15px; } header nav { gap: 14px; } .hsearch { padding: 0 4px; border-color: transparent; background: transparent; } .hsearch input { display: none; } }
+@media (max-width: 760px) {
+  header .wrap { gap: 10px; position: relative; }
+  .menu-btn { display: inline-flex; }
+  .hsearch { margin-left: auto; }
+  .plug-btn { height: 44px; min-width: 44px; justify-content: center; gap: 6px; padding: 0 12px; } .plug-btn .plug-s { display: inline; font-style: normal; }
+  header.nav-open nav > a.nav-lab { display: block; color: var(--frl-red); font-weight: 600; }
+  header nav { display: none; }
+  header.nav-open nav { max-height: calc(100dvh - var(--menu-top, 144px)); overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; align-items: stretch; gap: 0; position: absolute; top: 100%; left: 0; right: 0; margin: 0; padding: 8px 16px 16px; background: var(--frl-paper); border-bottom: 1px solid var(--frl-line); box-shadow: 0 12px 24px rgba(22,19,18,.12); }
+  header.nav-open nav > a, header.nav-open nav .ni > a { display: block; padding: 12px 4px; font-size: 18px; border-top: 1px solid var(--frl-line); border-bottom: 0; }
+  header.nav-open nav .ni { display: grid; grid-template-columns: 1fr 44px; align-items: center; gap: 0; border-top: 1px solid var(--frl-line); }
+  header.nav-open nav .ni > a { grid-column: 1; border-top: 0; }
+  header.nav-open nav .ni-btn { display: inline-flex; grid-column: 2; grid-row: 1; width: 40px; height: 40px; justify-self: end; }
+  header.nav-open nav .ni:not(.open) .menu { display: none; }
+  header.nav-open nav .ni.open .menu { display: grid; grid-column: 1 / -1; position: static; width: auto; max-width: none; grid-template-columns: 1fr; gap: 4px; padding: 0 0 12px 16px; border: 0; background: transparent; }
+  header.nav-open nav .menu .mi { margin: 0; padding: 8px 8px; }
+  header.nav-open nav .menu .menu-note { display: none; }
+}
+@media (max-width: 380px) { .menu-btn { padding: 0 10px; } }
+/* footer: light, so a page has at most three dark bands (png/R4System.png): the lockup in Fox Red, the sections, About, the disclosure */
+footer { background: var(--frl-paper); color: var(--frl-stone); border-top: 1px solid var(--frl-line); padding: 56px 0 48px; font-size: 15px; line-height: 22px; }
+footer .wrap { display: grid; grid-template-columns: 1.3fr repeat(var(--fcols, 4), minmax(0, 1fr)); gap: 32px; }
+footer h2 { color: var(--frl-ink); line-height: 1.3; font-weight: 600; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 12px; }
+footer a { color: var(--frl-stone); display: block; text-decoration: none; padding: 3px 0; }
+footer a:hover { color: var(--frl-ink); }
+footer .f-brand p { margin: 16px 0 0; max-width: 360px; }
+footer .f-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 24px; border-top: 1px solid var(--frl-line); padding-top: 20px; margin-top: 8px; }
+footer .f-meta a { display: inline; padding: 0; color: var(--frl-ink); font-weight: 500; }
+footer .f-meta .disc { flex-basis: 100%; margin: 8px 0 0; max-width: 680px; }
+@media (max-width: 1000px) { footer .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); } footer .f-brand { grid-column: 1 / -1; } }
+@media (max-width: 520px) { footer .wrap { grid-template-columns: 1fr; } }
+/* the Sources line that replaced the Run details fold */
+.srcline { margin: 40px 0 0; padding-top: 14px; border-top: 1px solid var(--frl-line); font-size: 14px; line-height: 21px; color: var(--frl-stone); }
+.srcline p, .srcline li { font-size: 14px; line-height: 21px; } .srcline .srcline-h { font-weight: 600; color: var(--frl-ink); margin: 0 0 6px; }
+/* the tab strip of a section's pages (site_chrome.tabs) */
+.subtabs { display: flex; flex-wrap: wrap; gap: 4px 24px; border-bottom: 1px solid var(--frl-line); margin: 0 0 28px; }
+.subtabs a { padding: 10px 0; color: var(--frl-stone); text-decoration: none; font-weight: 600; font-size: 16px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.subtabs a:hover { color: var(--frl-ink); } .subtabs a[aria-current="page"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+/* narrow screens: long paths wrap, wide tables scroll inside themselves, never the page */
+main code { overflow-wrap: break-word; } main td code, main dd code { overflow-wrap: anywhere; }
+main select { max-width: 100%; }
+main pre { overflow-x: auto; max-width: 100%; }
+/* inner pages: the home page's 96 px band padding is for its full-width bands, not for sections inside a page */
+:where(main > .wrap) section { padding: 0; }
+:where(main > .wrap) section.blk { padding-top: 48px; }
+@media (max-width: 700px) { :where(main > .wrap) section.blk { padding-top: 36px; } }
+@media (max-width: 760px) {
+  main table { display: block; max-width: 100%; -webkit-overflow-scrolling: touch; }
+  /* every wide table scrolls inside itself, even one whose own style clips it for rounded corners; edge shadows show only
+     while there is more to scroll to (a white table sets --scroll-cover and --scroll-bg to #fff) */
+  main table:not(.ww), main .ww-wrap { overflow-x: auto !important;
+    background: linear-gradient(to right, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) left / 44px 100% no-repeat local,
+                linear-gradient(to left, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) right / 44px 100% no-repeat local,
+                radial-gradient(farthest-side at 0 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) left / 22px 100% no-repeat scroll,
+                radial-gradient(farthest-side at 100% 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) right / 22px 100% no-repeat scroll,
+                var(--scroll-bg, transparent) !important; }
+  main table th, main table td { min-width: 120px; } main table th:first-child, main table td:first-child { min-width: 120px; }
+}
+
+/* Shared pieces */
+
+/* shared pieces */
+.chip { display: inline-block; font: 600 11px/18px var(--frl-font); letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; white-space: nowrap; vertical-align: middle; border: 1.5px solid transparent; }
+.c-run { background: var(--frl-ink); color: var(--frl-cream); border-color: var(--frl-ink); }
+.c-part, .c-build { background: var(--frl-line); color: var(--frl-ink); border-color: var(--frl-line); }
+.c-no { background: #fff; color: var(--frl-ink); border-color: var(--frl-ink); }   /* red only on buttons and one key mark per graphic (step 7) */
+.c-wait { background: #fff; color: var(--frl-stone); border-color: color-mix(in srgb,#6B625B 45%,#fff); }
+.chip-key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; line-height: 20px; color: var(--frl-stone); margin: 12px 0 0; }
+.chip-key span { display: inline-flex; align-items: center; gap: 8px; }
+
+.stats { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 16px; margin: 28px 0 0; }
+.stat { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; min-width: 0; }
+.stat-n { font-size: 40px; line-height: 44px; font-weight: 700; color: var(--frl-red); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.stat-n a { color: inherit; text-decoration: none; } .stat-n a:hover { text-decoration: underline; }
+.stat-l { font-weight: 600; font-size: 16px; line-height: 22px; margin-top: 6px; color: var(--frl-ink); }
+.stat-s { font-size: 14px; line-height: 20px; color: var(--frl-stone); margin-top: 4px; }
+@media (max-width: 900px) { .stats { grid-template-columns: 1fr 1fr; } .stat-n { font-size: 32px; line-height: 36px; } }
+@media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
+
+.g { display: grid; grid-template-columns: minmax(170px, 1.1fr) repeat(var(--n), minmax(0, 1.4fr)); background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; margin-top: 16px; }
+.g > div { padding: 12px 14px; border-top: 1px solid var(--frl-line); min-width: 0; }
+.g .g-h { background: var(--frl-cream); border-top: 0; font-size: 15px; line-height: 20px; color: var(--frl-stone); }
+.g .g-h b { display: block; color: var(--frl-ink); font-weight: 600; } .g .g-h span { display: block; font-size: 13px; }
+.g .g-n { font-weight: 600; font-size: 16px; line-height: 22px; } .g .g-n a { color: var(--frl-ink); }
+.g .g-c { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 21px; }
+.g .g-c .chip { flex: none; margin-top: 1px; } .g .g-c .g-t { min-width: 0; overflow-wrap: anywhere; } .g .g-c a { color: var(--frl-ink); }
+.g .g-lab { display: none; }
+@media (max-width: 820px) {
+  .g { grid-template-columns: 1fr; }
+  .g .g-h { display: none; }
+  .g .g-n { background: var(--frl-cream); }
+  .g .g-c { border-top: 0; padding-top: 6px; padding-bottom: 6px; flex-wrap: wrap; }
+  .g .g-c:last-child, .g .g-c:has(+ .g-n) { padding-bottom: 12px; }
+  .g .g-lab { display: inline; width: 100%; font-size: 13px; color: var(--frl-stone); font-weight: 600; }
+  .g .g-empty { display: none; }
+}
+
+table.glance-t { border-collapse: separate; border-spacing: 0; width: 100%; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; font-size: 15px; line-height: 21px; }
+table.glance-t th, table.glance-t td { padding: 10px 14px; border-top: 1px solid var(--frl-line); text-align: left; vertical-align: top; }
+table.glance-t thead th { border-top: 0; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; }
+table.glance-t tbody th { font-weight: 600; color: var(--frl-stone); white-space: nowrap; }
+
+.bars { margin: 20px 0 0; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; }
+.bars figcaption { margin: 0 0 14px; } .bars figcaption b { display: block; font-size: 18px; line-height: 24px; }
+.bars figcaption span { display: block; font-size: 14px; line-height: 20px; color: var(--frl-stone); margin-top: 2px; }
+.bars-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--frl-ink); margin: 0 0 12px; }
+.bars-legend span { display: inline-flex; align-items: center; gap: 7px; } .bars-legend i { width: 12px; height: 12px; border-radius: 3px; }
+.bars-body { position: relative; }
+.bar-cat { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 12px; align-items: center; padding: 7px 0; border-top: 1px solid var(--frl-line); }
+.bar-cat:first-of-type { border-top: 0; }
+.bar-l { font-size: 15px; line-height: 20px; font-weight: 600; } .bar-l span { display: block; font-weight: 400; font-size: 13px; color: var(--frl-stone); }
+.bar-m { display: grid; gap: 4px; }
+.bar-track { position: relative; height: 20px; min-width: 0; }
+.bars, .bars-body, .bar-m, .bar-cat { min-width: 0; max-width: 100%; }
+.bar { position: absolute; top: 2px; height: 16px; border-radius: 0 4px 4px 0; min-width: 2px; }
+.bar-v { position: absolute; top: 0; margin-left: 8px; max-width: 28%; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 20px; font-weight: 600; color: var(--frl-ink); white-space: nowrap; }
+.bar-none { font-size: 13px; line-height: 20px; color: var(--frl-stone); font-style: italic; }
+.bar-axis { position: absolute; top: -4px; bottom: -4px; width: 1px; background: var(--frl-stone); }
+@media (max-width: 560px) { .bar-cat { grid-template-columns: 1fr; gap: 4px; } }
+
+.fold { margin-top: 12px; }
+.fold > summary { cursor: pointer; font-weight: 600; font-size: 16px; color: var(--frl-ink); padding: 8px 0; }
+.fold[open] > summary { margin-bottom: 8px; }
+
+table.score { border-collapse: separate; border-spacing: 0; width: 100%; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; font-size: 15px; line-height: 20px; }
+table.score th, table.score td { padding: 9px 12px; border-top: 1px solid var(--frl-line); text-align: left; vertical-align: middle; }
+table.score thead th { border-top: 0; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; }
+table.score thead th span { display: block; font-weight: 400; font-size: 12px; color: rgba(247,243,236,.72); }
+table.score tbody th { font-weight: 500; color: var(--frl-ink); }
+table.score tbody th small { display: block; font-size: 12px; color: var(--frl-stone); font-weight: 400; }
+table.score tr.cat th { background: var(--frl-cream); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--frl-stone); padding: 7px 12px; }
+table.score td { white-space: nowrap; }
+table.score td b { font-weight: 600; font-variant-numeric: tabular-nums; }
+table.score td .rk { display: block; font-size: 11px; line-height: 14px; letter-spacing: .06em; text-transform: uppercase; }
+table.score td.best { background: color-mix(in srgb,#2F6B4F 12%,#fff); color: #2F6B4F; } table.score td.best .rk { color: #2F6B4F; }
+table.score td.worst { background: color-mix(in srgb,#B42418 9%,#fff); color: #8E1C13; } table.score td.worst .rk { color: #B42418; }
+table.score td.mid { background: color-mix(in srgb,#C98500 14%,#fff); color: #161312; }
+table.score td.none { color: var(--frl-stone); font-style: italic; }
+table.score td .chip { font-size: 10px; }
+.score-key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--frl-stone); margin: 10px 0 0; }
+.score-key i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; border: 1px solid var(--frl-line); }
+
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px 8px 10px; border: 1px solid var(--frl-line); border-radius: 10px; background: #fff; color: var(--frl-ink); text-decoration: none; font-size: 15px; line-height: 20px; font-weight: 500; }
+.badge:hover { border-color: var(--frl-ink); color: var(--frl-ink); }
+.badge .ic { color: var(--frl-red); flex: none; }
+.badge .b-s { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 6px; background: var(--frl-cream); color: var(--frl-stone); border: 1px solid var(--frl-line); }
+.badge.b-works .b-s { background: var(--frl-ink); color: var(--frl-cream); border-color: var(--frl-ink); }
+.badge.b-partial .b-s { background: var(--frl-line); color: var(--frl-ink); border-color: var(--frl-line); }
+.badge.b-building .b-s, .badge.b-planned .b-s { background: #fff; color: var(--frl-stone); border-color: color-mix(in srgb,#6B625B 45%,#fff); }
+.badge.b-no .b-s { background: var(--frl-red); color: var(--frl-cream); border-color: var(--frl-red); }
+.badge-inline { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+.badge-inline .ic { color: var(--frl-red); }
+
+/* This page */
+
+/* community pieces */
+.codebox .cb-clone { margin: 0 0 14px; padding: 12px 16px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 6px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/22px var(--frl-mono, 'JetBrains Mono', monospace); }
+.codebox .cb-clone code { color: inherit; background: none; padding: 0; }
+.cb-folders { margin: 0; padding-left: 20px; } .cb-folders > li { margin: 8px 0; font-size: 16px; line-height: 24px; } .cb-folders ul { padding-left: 18px; margin: 4px 0 0; } .cb-folders ul li { margin: 3px 0; font-size: 15px; line-height: 22px; }
+.cb-more { list-style: none; margin-left: -20px; } .cb-more summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+.cb-src, .cb-lic { font-size: 14px; line-height: 20px; color: var(--frl-ink-2, #6B625B); margin: 12px 0 0; }
+.rp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.rp-card { display: block; padding: 14px 16px; border: 1.5px solid var(--frl-line); border-radius: 8px; text-decoration: none; color: var(--frl-ink); background: var(--frl-paper); }
+.rp-card:hover { border-color: var(--frl-red); } .rp-card b { display: block; font-size: 17px; margin-bottom: 4px; } .rp-card span { font-size: 14px; line-height: 20px; color: var(--frl-ink-2, #6B625B); }
+.rp-list { margin: 0; padding-left: 20px; } .rp-list li { margin: 8px 0; font-size: 15px; line-height: 22px; } .rp-date { font: 600 12px/18px var(--frl-mono, monospace); color: var(--frl-ink-2, #6B625B); margin-right: 6px; } .rp-status { font-style: normal; color: var(--frl-red); font-weight: 600; margin-left: 6px; }
+
+header nav a[aria-current] { color: var(--frl-red); }
+main { padding: 40px 0 96px; }
+.crumb { font-size: 15px; line-height: 22px; color: var(--frl-stone); margin: 0 0 20px; }
+.crumb a { color: var(--frl-stone); }
+h1.q { font-size: 36px; line-height: 42px; letter-spacing: -0.01em; max-width: 30ch; }
+.q-sub { font-size: 20px; line-height: 28px; color: var(--frl-stone); margin: 6px 0 0; max-width: 60ch; }
+@media (max-width: 700px) { h1.q { font-size: 28px; line-height: 34px; } .q-sub { font-size: 17px; line-height: 24px; } }
+.blk { padding-top: 72px; }
+.blk, #numbers { scroll-margin-top: 88px; }
+td a[href^="board-"] { white-space: nowrap; }
+.blk#sources { padding-top: 40px; } #sources + .blk { padding-top: 4px; }
+@media (max-width: 700px) { .blk { padding-top: 56px; } }
+.blk > h2 { margin-bottom: 8px; }
+.blk > .lede { margin: 0 0 24px; }
+.card { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 24px; }
+details > summary { cursor: pointer; font-weight: 600; font-size: 16px; color: var(--frl-ink); margin: 16px 0 0; }
+details[open] > summary { margin-bottom: 12px; }
+.note { font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+table.t { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 22px; }
+table.t th, table.t td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--frl-line); vertical-align: top; }
+table.t th { font-weight: 600; color: var(--frl-stone); }
+.tw { overflow-x: auto; }
+.glossary { padding: 0; }
+.glossary dl { display: grid; grid-template-columns: minmax(140px, max-content) 1fr; gap: 8px 20px; font-size: 15px; line-height: 22px; }
+.glossary dt { font-weight: 600; } .glossary dd { margin: 0; color: var(--frl-stone); }
+@media (max-width: 560px) { .glossary dl { grid-template-columns: 1fr; } .glossary dd { margin-bottom: 8px; } }
+
+/* yes / no / partly marks: icon plus a word, never color alone */
+.mark { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; flex: none; }
+.mark svg { width: 16px; height: 16px; }
+.m-yes { background: color-mix(in srgb,#2F6B4F 12%,#fff); color: var(--ok); }
+.m-no { background: color-mix(in srgb,#B42418 9%,#fff); color: var(--frl-red); }
+.m-partial { background: color-mix(in srgb,#C98500 14%,#fff); color: #161312; }
+.m-untested { background: transparent; color: var(--frl-stone); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+
+/* the spectrum */
+.need-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 32px 0 8px; }
+.need-bar b { font-weight: 600; margin-right: 4px; width: 100%; }
+.need { font: 500 16px var(--frl-font); height: 40px; padding: 0 16px; border-radius: 4px; border: 1.5px solid var(--frl-line); background: #fff; color: var(--frl-ink); cursor: pointer; }
+.need:hover { border-color: var(--frl-ink); }
+.need[aria-pressed="true"] { background: var(--frl-ink); border-color: var(--frl-ink); color: var(--frl-cream); }
+.need-result { min-height: 28px; font-weight: 600; margin: 8px 0 0; }
+.lane { margin-top: 32px; }
+.lane-name { font-weight: 700; font-size: 20px; line-height: 26px; margin: 0; }
+.lane-sub { margin: 2px 0 16px; }
+.rail { display: grid; gap: 16px; grid-template-columns: repeat(min(var(--n), 4), minmax(0, 1fr)); position: relative; }
+.rail.wrap::before { display: none; }
+.rail.wrap .stop::before { content: ""; position: absolute; left: 14px; right: -16px; top: 13px; height: 3px; background: var(--frl-stone); opacity: .35; border-radius: 2px; }
+.rail.wrap .stop:nth-child(4n)::before, .rail.wrap .stop:last-child::before { display: none; }
+.lane.radio .rail.wrap .stop::before { background: var(--frl-red); opacity: .5; }
+.rail { align-items: start; }
+.rail::before { content: ""; position: absolute; left: 14px; right: 14px; top: 13px; height: 3px; background: var(--frl-stone); opacity: .35; border-radius: 2px; }
+.lane.radio .rail::before { background: var(--frl-red); opacity: .5; }
+.stop { position: relative; display: flex; flex-direction: column; transition: opacity var(--frl-ease); }
+.stop .dot { width: 29px; height: 29px; border-radius: 50%; background: var(--frl-paper); border: 3px solid var(--frl-stone); position: relative; z-index: 1; display: grid; place-items: center; font-weight: 700; font-size: 13px; line-height: 1; }
+.lane.radio .stop .dot { border-color: var(--frl-red); }
+.stop .card { margin-top: 14px; padding: 20px; display: flex; flex-direction: column; }
+.stop.me .card { border: 2px solid var(--frl-red); }
+.stop.dim { opacity: .3; }
+.step-name { color: var(--frl-red); font-weight: 600; font-size: 15px; line-height: 20px; margin: 0 0 4px; }
+.lane:not(.radio) .step-name { color: var(--frl-stone); }
+.board-name { font-weight: 700; font-size: 20px; line-height: 26px; margin: 0 0 8px; overflow-wrap: anywhere; }
+.stop p.plain { margin: 0 0 14px; font-size: 16px; line-height: 23px; }
+.meters { display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; align-items: center; font-size: 14px; line-height: 18px; margin: 0 0 14px; }
+.meters dt { color: var(--frl-stone); }
+.meters dd { margin: 0; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.pips { display: inline-flex; gap: 3px; }
+.pips i { width: 10px; height: 8px; border-radius: 2px; background: var(--frl-line); }
+.pips i.on { background: var(--frl-ink); }
+.lane.radio .pips i.on { background: var(--frl-red); }
+.delta { list-style: none; padding: 0; margin: 0 0 14px; font-size: 15px; line-height: 21px; }
+.delta li { padding: 3px 0 3px 20px; position: relative; }
+.delta li::before { position: absolute; left: 1px; top: 2px; font-weight: 700; }
+.delta li.add::before { content: "+"; color: var(--ok); }
+.delta li.drop::before { content: "\2212"; color: var(--frl-red); }
+.can { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.can .tag { position: relative; z-index: 2; font: 500 13px/18px var(--frl-font); padding: 3px 9px; border-radius: 3px; background: var(--frl-cream); border: 1px solid var(--frl-line); color: var(--frl-ink); cursor: pointer; }
+button.tag:hover { border-color: var(--frl-ink); }
+span.tag { cursor: default; }
+.can .tag[aria-pressed="true"] { background: var(--frl-ink); border-color: var(--frl-ink); color: var(--frl-cream); }
+.board-name a.whole { color: var(--frl-ink); text-decoration: none; }
+.board-name a.whole::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 12px; }
+.stop .card { position: relative; }
+.stop .card:hover { border-color: var(--frl-ink); }
+.stop .card:has(a.whole:focus-visible) { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.stop .foot a.price { position: relative; z-index: 2; display: block; color: var(--frl-ink); }
+.stop .foot .status { display: block; color: var(--frl-ink); font-weight: 500; }
+.stop .foot .status.quiet { color: var(--frl-stone); font-weight: 400; }
+.stop .foot { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--frl-line); font-size: 15px; line-height: 21px; }
+.stop .price { font-weight: 600; }
+@media (max-width: 1000px) {
+  .rail { grid-template-columns: 1fr; gap: 0; padding-left: 44px; }
+  .rail::before, .rail.wrap::before { display: block; left: 13px; right: auto; top: 14px; bottom: 14px; width: 3px; height: auto; }
+  .rail.wrap .stop::before { display: none; }
+  .stop { padding-bottom: 16px; }
+  .stop .dot { position: absolute; left: -44px; top: 18px; }
+  .stop .card { margin-top: 0; }
+}
+
+/* projects by board */
+.pgrid { display: grid; grid-template-columns: minmax(180px, 1.2fr) repeat(var(--n), minmax(0, 1fr)); background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; }
+.pgrid > div { padding: 14px 16px; border-top: 1px solid var(--frl-line); display: flex; gap: 10px; align-items: flex-start; }
+.pgrid .ph { font-weight: 600; background: var(--frl-cream); align-items: center; border-top: 0; }
+.pgrid .pt { font-weight: 600; }
+.pgrid .pg { grid-column: 1 / -1; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; font-size: 15px; padding: 8px 16px; }
+.pgrid .pc > span:last-child { font-size: 15px; line-height: 21px; padding-top: 3px; }
+.pgrid .pc .dim-text { color: var(--frl-stone); }
+.pgrid .cell-label { display: none; }
+@media (max-width: 760px) {
+  .pgrid { grid-template-columns: 1fr; }
+  .pgrid .ph { display: none; }
+  .pgrid .pt { background: var(--frl-cream); }
+  .pgrid .pc { border-top: 0; padding-top: 8px; padding-bottom: 8px; }
+  .pgrid .cell-label { display: inline; font-weight: 600; color: var(--frl-ink); }
+}
+.key { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 14px 0 0; font-size: 15px; }
+.key span { display: inline-flex; gap: 8px; align-items: center; }
+.key .mark { width: 22px; height: 22px; } .key .mark svg { width: 13px; height: 13px; }
+
+/* board page: numbers first */
+.glance { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 32px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 12px; overflow: hidden; }
+.glance > div { padding: 24px 20px; border-left: 1px solid rgba(247,243,236,0.12); }
+.glance > div:first-child { border-left: 0; }
+.glance .n { font-size: 40px; line-height: 44px; font-weight: 700; }
+.glance .l { font-weight: 600; margin-top: 4px; font-size: 16px; line-height: 22px; }
+.glance .d { color: rgba(247,243,236,.72); font-size: 14px; line-height: 20px; margin-top: 4px; }
+@media (max-width: 900px) { .glance { grid-template-columns: 1fr 1fr; } .glance > div { border-left: 0; border-top: 1px solid rgba(247,243,236,0.12); } .glance > div:first-child, .glance > div:nth-child(2) { border-top: 0; } }
+.glance.g4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) { .glance.g4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .glance.g4 { grid-template-columns: 1fr; } }
+.verdict .delta { margin: 0; }
+@media (max-width: 480px) { .glance { grid-template-columns: 1fr; } .glance > div:nth-child(2) { border-top: 1px solid rgba(247,243,236,0.12); } }
+.jump { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 24px 0 0; font-size: 15px; }
+.jump a { font-size: 15px; font-weight: 500; color: var(--frl-stone); text-decoration: none; padding: 2px 0; border-bottom: 1.5px solid transparent; }
+.jump a:hover { color: var(--frl-ink); border-bottom-color: var(--frl-ink); }
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .verdict { grid-template-columns: 1fr; } }
+.verdict h3 { font-size: 20px; line-height: 26px; margin: 0 0 12px; display: flex; gap: 10px; align-items: center; }
+.verdict ul { margin: 0; padding-left: 20px; } .verdict li { margin: 6px 0; }
+.verdict .buy { grid-column: 1 / -1; background: var(--frl-cream); }
+
+/* will my code fit */
+.fit { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 40px; }
+@media (max-width: 860px) { .fit { grid-template-columns: 1fr; gap: 24px; } }
+.fit-label { font-weight: 600; margin: 0 0 10px; }
+.picks { display: flex; flex-direction: column; gap: 6px; }
+.pick { text-align: left; font: 500 15px/20px var(--frl-font); padding: 8px 12px 8px 36px; border-radius: 8px; border: 1.5px solid var(--frl-line); background: #fff; color: var(--frl-ink); cursor: pointer; position: relative; }
+.pick::before { content: ""; position: absolute; left: 11px; top: 10px; width: 14px; height: 14px; border: 1.5px solid var(--frl-stone); border-radius: 4px; }
+.pick:hover { border-color: var(--frl-ink); }
+.pick[aria-pressed="true"] { border-color: var(--frl-ink); background: var(--frl-cream); }
+.pick[aria-pressed="true"]::before { background: var(--frl-ink); border-color: var(--frl-ink); box-shadow: inset 0 0 0 2.5px var(--frl-cream); }
+.mbar-wrap { position: relative; }
+.mbar-wrap .mbar { margin-bottom: 22px; }
+.mbar-wrap i.cap { position: absolute; top: -6px; height: 48px; width: 3px; margin-left: -1.5px; background: var(--frl-ink); border-radius: 2px; }
+.fit-warn { margin: 16px 0 0; padding: 12px 14px; background: var(--frl-cream); border-radius: 8px; }
+.room { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0 0; }
+.room > div { background: var(--frl-cream); border-radius: 10px; padding: 14px 16px; }
+.room .n { font-size: 32px; line-height: 36px; font-weight: 700; white-space: nowrap; } @media (max-width: 520px) { .room .n { font-size: 26px; line-height: 30px; } }
+.room .l { font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.fit-say { font-weight: 600; font-size: 20px; line-height: 26px; margin: 0 0 20px; }
+.mbar-label { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font-size: 15px; margin: 0 0 6px; }
+.mbar-label b { font-weight: 600; }
+.mbar { display: flex; gap: 2px; height: 36px; margin: 0 0 22px; }
+.mbar span { display: block; height: 100%; min-width: 3px; }
+.mbar span:first-child { border-radius: 6px 0 0 6px; }
+.mbar span.free { border-radius: 0 6px 6px 0; background: repeating-linear-gradient(135deg, #fff 0 6px, var(--frl-cream) 6px 12px); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+.mlegend { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 10px; font-size: 15px; line-height: 21px; }
+.mlegend li { display: grid; grid-template-columns: 16px 1fr; gap: 10px; }
+.mlegend i { width: 16px; height: 16px; border-radius: 4px; margin-top: 3px; }
+.mlegend i.free { background: repeating-linear-gradient(135deg, #fff 0 4px, var(--frl-cream) 4px 8px); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+.mlegend small { display: block; color: var(--frl-stone); font-size: 14px; line-height: 20px; }
+.tip { position: fixed; pointer-events: none; background: var(--frl-ink); color: var(--frl-cream); font-size: 14px; line-height: 20px; padding: 6px 10px; border-radius: 6px; display: none; z-index: 40; max-width: 280px; }
+
+/* rows of results */
+.rows { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .rows { grid-template-columns: 1fr; } }
+.rowc { display: grid; grid-template-columns: 28px 1fr; gap: 14px; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 18px; }
+.rowc h3 { font-size: 18px; line-height: 24px; margin: 2px 0 2px; } .rowc h3 a { color: inherit; text-decoration: none; } .rowc h3 a:hover { text-decoration: underline; }
+.rowc .say { font-weight: 600; margin: 0 0 4px; font-size: 16px; line-height: 22px; color: var(--frl-ink); }
+.rowc p { margin: 0; font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 24px; margin: 16px 0 0; font-size: 16px; line-height: 23px; }
+.facts dt { color: var(--frl-stone); } .facts dd { margin: 0; }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr; gap: 0; } .facts dd { margin-bottom: 10px; } }
+.gotchas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.gotchas li { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 16px 18px; min-width: 0; overflow-wrap: anywhere; }
+.gotchas b { display: block; font-weight: 600; margin-bottom: 2px; }
+.srcs { font-size: 14px; line-height: 20px; color: var(--frl-stone); overflow-wrap: anywhere; }
+.srcs li { margin: 2px 0; }
+dl.qa { margin: 0; } dl.qa dt { font-weight: 600; margin-top: 14px; } dl.qa dd { margin: 4px 0 0; font-size: 16px; line-height: 24px; color: var(--frl-stone); }
+
+/* board page header: the fact card left, three stat cards right */
+.hero { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; margin-top: 28px; scroll-margin-top: 88px; }
+.hero .meet h2 { font-size: 22px; line-height: 28px; margin: 0 0 8px; }
+.hero .meet > p { margin: 0; font-size: 16px; line-height: 23px; }
+.hero .meet .facts { margin-top: 14px; font-size: 15px; line-height: 21px; gap: 6px 18px; }
+.hero .meet .buyline { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--frl-line); }
+.hero .meet .fam { margin-top: 8px; }
+.hero-stats { display: grid; gap: 16px; align-content: start; }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; } .hero-stats { order: -1; grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .hero-stats { grid-template-columns: 1fr; } }
+.blk h3.sub { font-size: 20px; line-height: 26px; margin: 40px 0 4px; scroll-margin-top: 88px; }
+.g .g-h a { color: var(--frl-ink); }
+
+/* experiment cards */
+.xcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.xcard { position: relative; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.xcard:hover { border-color: var(--frl-ink); }
+.xcard:has(a:focus-visible) { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.xcard h3 { font-size: 18px; line-height: 24px; margin: 0; }
+.xcard h3 a { color: var(--frl-ink); text-decoration: none; }
+.xcard h3 a::after { content: ""; position: absolute; inset: 0; border-radius: 12px; }
+.xcard p { margin: 0; font-size: 15px; line-height: 22px; }
+.xcard .xline { color: var(--frl-stone); }
+.ladder { list-style: none; display: flex; gap: 3px; padding: 0; margin: auto 0 0; font-size: 11px; line-height: 14px; }
+.ladder li { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: center; padding: 4px 1px; border-radius: 4px; background: var(--frl-cream); color: var(--frl-stone); }
+.ladder li.on { background: var(--frl-ink); color: var(--frl-cream); }
+
+/* sticky "On this page" bar and back-to-top, built by OTP_JS from the page's own contents list */
+.otp { position: fixed; left: 0; right: 0; z-index: 25; background: rgba(250,250,247,.97); backdrop-filter: blur(8px); border-bottom: 1px solid var(--frl-line); opacity: 0; visibility: hidden; transition: opacity 160ms ease-out, visibility 160ms; }
+.otp.on { opacity: 1; visibility: visible; }
+.otp .wrap { display: flex; align-items: center; gap: 4px; height: 44px; overflow-x: auto; scrollbar-width: none; }
+.otp .wrap::-webkit-scrollbar { display: none; }
+.otp b { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--frl-stone); margin-right: 8px; white-space: nowrap; font-weight: 600; }
+.otp a { font-size: 15px; font-weight: 500; color: var(--frl-stone); text-decoration: none; white-space: nowrap; padding: 10px 10px; border-radius: 0; border-bottom: 2px solid transparent; }
+.otp a:hover { color: var(--frl-ink); }
+.otp a.cur { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+body.has-otp [id] { scroll-margin-top: 132px; }
+.totop { position: fixed; right: 16px; bottom: 16px; z-index: 25; width: 44px; height: 44px; border-radius: 6px; border: 1.5px solid var(--frl-ink); background: var(--frl-paper); color: var(--frl-ink); display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 6px 16px rgba(22,19,18,.12); }
+.totop.on { display: inline-flex; } .totop svg { width: 20px; height: 20px; }
+@media print { .otp, .totop { display: none !important; } }
+
+</style>
+</head>
+<body>
+
+<header class="dark">
+  <div class="wrap">
+    <a href="index.html" class="brand"><svg class="logo logo-head" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg></a>
+    <nav id="site-nav" aria-label="Main"><div class="ni"><a href="projects.html">Builds</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="build-menu" aria-label="Build filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="build-menu"><a class="mi" href="projects.html?f=smart-home"><b>Smart home</b><span>Home Assistant, Matter, Apple Home</span></a><a class="mi" href="projects.html?f=ai"><b>Edge AI</b><span>Occupancy, digits, vision on Linux</span></a><a class="mi" href="projects.html?f=radio"><b>Radio and range</b><span>Walkie-talkie, key finder, far shed sensor</span></a><a class="mi" href="projects.html?f=motors"><b>Motors, power and sensing</b><span>Control loops, radar presence, sensors</span></a><a class="mi" href="projects.html?f=screens"><b>Screens</b><span>Touch displays on a development kit</span></a><a class="mi" href="security.html"><b>Security</b><span>Post-quantum key exchange, AES</span></a><p class="menu-note">New here? <a href="project-blink.html">Blink an LED first</a>, or <a href="projects.html">see all 33 builds</a>.</p></div></div><div class="ni"><a href="hardware.html" aria-current="page">Hardware</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="hardware-menu" aria-label="Hardware pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="hardware-menu"><a class="mi" href="hardware.html"><b>The kits</b><span>Every kit a build ran on, what ran, where to get it</span></a><a class="mi" href="addons.html"><b>Add-ons and parts</b><span>Screens, sensors, radios, motors and probes, from any maker</span></a></div></div><div class="ni"><a href="portability.html">Software</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="software-menu" aria-label="Software pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="software-menu"><a class="mi" href="portability.html"><b>Bring your code</b><span>Arduino, ESPHome, Zephyr, MicroPython, STM32, ESP32 and Pico code on a TI board</span></a><a class="mi" href="ports.html"><b>Every port</b><span>What ran, what only built, what changed, with the code</span></a><a class="mi" href="one-app-eleven-boards.html"><b>One app, eleven boards</b><span>The same C file from an MSPM0 to AM62L Linux</span></a><a class="mi" href="project-build-from-terminal.html"><b>Build from the terminal</b><span>TI&#x27;s SDK examples with GCC and a makefile, no IDE</span></a><a class="mi" href="benchmarks.html"><b>Measured</b><span>Every board on the same tests, with the method</span></a><a class="mi" href="edge-ai.html"><b>Edge AI</b><span>Where to start, and the measured numbers</span></a></div></div><div class="ni"><a href="community.html">Community</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="about-menu" aria-label="Community pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="about-menu"><a class="mi" href="community.html"><b>Community</b><span>Post what you built or ported; it gets a page here</span></a><a class="mi" href="https://github.com/Fox-Red-Labs/fox-red-labs"><b>Get the code</b><span>The repository: board folders, ports and portable code</span></a></div></div></nav>
+    <form class="hsearch" action="search.html" role="search"><input name="q" type="search" placeholder="Search" aria-label="Search the site" title="Search the site (press /)"><button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></form>
+    <a class="gh-link" href="https://github.com/Fox-Red-Labs/fox-red-labs" aria-label="Fox Red Labs on GitHub"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
+    
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><svg class="mb-o" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="mb-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Menu</button>
+  </div>
+<script>
+(function () {
+  var h = document.currentScript.closest("header"), b = h.querySelector(".menu-btn");
+  function set(open) { if (open) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); h.classList.toggle("nav-open", open); b.setAttribute("aria-expanded", open ? "true" : "false"); }
+  window.addEventListener("resize", function () { if (h.classList.contains("nav-open")) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); });
+  b.addEventListener("click", function () { set(b.getAttribute("aria-expanded") !== "true"); });
+  h.querySelectorAll("nav a").forEach(function (a) { a.addEventListener("click", function () { set(false); }); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (h.classList.contains("nav-open")) { set(false); b.focus(); } h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  document.addEventListener("click", function (e) { if (!h.contains(e.target)) { set(false); h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  h.querySelectorAll(".ni-btn").forEach(function (t) {
+    t.addEventListener("click", function () { var n = t.closest(".ni"), open = !n.classList.contains("open"); n.classList.toggle("open", open); t.setAttribute("aria-expanded", open ? "true" : "false"); });
+  });
+  var f = h.querySelector(".hsearch"), q = f && f.querySelector("input");
+  if (f) f.addEventListener("submit", function (e) { if (getComputedStyle(q).display === "none" || !q.value.trim()) { e.preventDefault(); location.href = "search.html"; } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || /input|textarea|select/i.test(e.target.tagName) || e.target.isContentEditable) return;
+    e.preventDefault(); var s = document.getElementById("sq");
+    if (s) s.focus(); else if (q && getComputedStyle(q).display !== "none") q.focus(); else location.href = "search.html";
+  });
+})();
+</script>
+</header>
+<main><div class="wrap">
+<style>
+.ad-lead { font-size: 20px; line-height: 30px; color: var(--frl-stone); max-width: 760px; margin: 10px 0 0; }
+.ad-cat { padding-top: 56px; margin-top: 8px; scroll-margin-top: 90px; }
+.ad-cat > h2 { margin: 0 0 4px; } .ad-cat > .sub { color: var(--frl-stone); margin: 0 0 16px; font-size: 15px; line-height: 22px; }
+.ad-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }   /* the last row's cards grow to fill it */
+.ad { flex: 1 1 320px; min-width: 0; background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; scroll-margin-top: 90px; }
+.ad .pic { display: block; height: 210px; background: var(--frl-paper); border-bottom: 1px solid var(--frl-line); overflow: hidden; }
+.ad .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.ad .pic.none { display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--frl-stone); }
+.ad .body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
+.ad h3 { margin: 0; font-size: 19px; line-height: 24px; }
+.ad p { margin: 0; font-size: 15px; line-height: 22px; }
+.ad p.what { color: var(--frl-stone); }
+.ad dl { margin: 0; display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; font-size: 14px; line-height: 20px; }
+.ad dt { color: var(--frl-stone); } .ad dd { margin: 0; }
+.ad ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 20px; }
+.ad .uses { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 6px; }
+.ad .uses a { font: 500 13px/18px var(--frl-font); color: var(--frl-ink); text-decoration: none; border: 1px solid var(--frl-line); border-radius: 6px; padding: 4px 8px; background: var(--frl-paper); }
+.ad .uses a:hover { border-color: var(--frl-ink); }
+.ad .buy { font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.ad summary { cursor: pointer; list-style: none; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px; } .ad summary::-webkit-details-marker { display: none; } .ad summary::after { content: "Show details"; font-size: 14px; font-weight: 600; color: var(--frl-red); } .ad details[open] > summary::after { content: "Hide details"; } .ad details[open] > summary { border-bottom: 1px solid var(--frl-line); }
+.ad .status { font: 600 11px/16px var(--frl-font); letter-spacing: .06em; text-transform: uppercase; color: var(--frl-stone); }
+</style><p class="crumb"><a href="index.html">Fox Red Labs</a> / <a href="hardware.html">Hardware</a> / Add-ons and parts</p>
+<h1 class="q">Add-ons and parts, from any maker</h1><p class="q-sub">The screens, sensors, motor drivers, probes and cables the builds use, whoever makes them, and where to get them.</p>
+<p class="ad-lead">45 parts, each used in a project here. A card gives what it is for, how to hook it up, where to buy it and which projects use it. The boards are on <a href="hardware.html">Hardware</a>.</p>
+<p class="note">Every board here runs at 3.3 V; a part that needs 5 V says so. A seller is a link only when that page was opened and the part was found there. <a href="../docs/vocab.html">Terms</a>.</p>
+<nav class="jump" aria-label="On this page"><a href="#cat-plugon">Plug-on boards (BoosterPack plug-in modules) and debuggers</a><a href="#cat-kit">Starter kits</a><a href="#cat-display">Displays</a><a href="#cat-sensor">Sensors</a><a href="#cat-motor">Motors and motor drivers</a><a href="#cat-input">Buttons, knobs and other inputs</a><a href="#cat-wiring">Cables, power supplies and antennas</a><a href="#cat-gear">Bench gear: hubs, power, cameras</a><a href="#cat-home">Smart home radio</a></nav>
+<section class="ad-cat" id="cat-plugon"><h2>Plug-on boards (BoosterPack plug-in modules) and debuggers</h2><div class="ad-grid"><article class="ad" id="lp-xds110et"><details><summary><span class="status">ordered 2026-10-04.</span><h3>LP-XDS110ET debugger</h3><p class="what">TI&#x27;s stand-alone debug probe with EnergyTrace: powers, programs and measures the current of boards that have no built-in debugger, such as the LP-EM radio boards.</p></summary><span class="pic"><img src="media/xds110-probe.jpg" alt="LP-XDS110ET debugger" loading="lazy"></span><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Programming CC2340R5, CC2755 and CC35xx boards</li><li>Measuring a board&#x27;s current with EnergyTrace (700 nA to 400 mA per TI&#x27;s quick start guide)</li><li>A serial port to the Mac for the board&#x27;s text output</li></ul></dd><dt>Hook it up</dt><dd>USB-C to the Mac (cable in the box). The LP-EM board&#x27;s 20-pin edge goes into the probe&#x27;s 20-pin socket. TGT VDD jumper on XDS when the probe powers the board (CC2340R5, CC2755P10, and needed for EnergyTrace); on EXT when the board powers itself (CC35X1). One LP-EM board at a time.</dd></dl><p class="buy">Where to buy: <a href="https://www.ti.com/tool/LP-XDS110ET" rel="noopener">TI.com</a>, LP-XDS110ET.</p><div class="uses"><a href="project-print-a-message.html">Print a message from the board on your computer</a><a href="project-bluetooth-sensor.html">Send a sensor reading to a phone over Bluetooth</a><a href="project-zigbee-light.html">Switch a board&#x27;s LED from Home Assistant over Zigbee</a><a href="project-wifi-presence.html">Detect a person in a room with Wi-Fi</a><a href="project-ota-update.html">Update a board&#x27;s firmware over the air</a><a href="project-speed-test.html">Measure how fast a chip runs (CoreMark)</a><a href="project-reaction-time.html">How fast a chip reacts to a signal</a><a href="project-build-from-terminal.html">Build and flash from the terminal in one command</a><a href="project-run-zephyr.html">Run the Zephyr real-time operating system</a><a href="project-run-freertos.html">Run the FreeRTOS real-time operating system</a><a href="project-arduino.html">Run Arduino&#x27;s own sketches on a TI chip</a><a href="project-micropython.html">Program a TI chip in Python (MicroPython)</a><a href="project-esphome.html">Configure a TI radio chip with ESPHome</a><a href="project-tool-telemetry.html">Asset tracking over Bluetooth</a><a href="project-ble-gamepad.html">Make a Bluetooth game controller from a LaunchPad</a><a href="project-dns-ad-blocker.html">A DNS ad blocker on a Wi-Fi board</a></div></div></details></article><article class="ad" id="boostxl-edumkii"><details><summary><span class="status">in hand, stacked on the LP-MSPM33C321A.</span><h3>BOOSTXL-EDUMKII Educational BoosterPack MKII</h3><p class="what">A plug-on board full of inputs and outputs.</p></summary><div class="body"><dl><dt>More</dt><dd>a 128 x 128 color screen, joystick, two buttons, buzzer, color LED, microphone, accelerometer, light sensor and a servo header.</dd><dt>Use it for</dt><dd><ul><li>Games and menus on the color screen</li><li>Joystick and button demos</li><li>Sound and light demos</li></ul></dd><dt>Hook it up</dt><dd>Needs 3.3 V and 5 V. Plugs straight onto the MSPM0 G3507 (pull J8, J9, J16 to J18; J21 and J22 down) and nearly onto the G3519, CC1354P10, MSPM33C321A and AM13E230. The L1306, CC2340R5 and F2800137 lose parts and need a wire for the screen (pin 31). Does not fit the C1104. Jumper J5 on the board: 2-3 for the screen backlight.</dd></dl><p class="buy">Where to buy: TI.com, BOOSTXL-EDUMKII.</p><div class="uses"><a href="project-doom.html">Doom on a TI board</a><a href="project-arcade.html">Retro games on a TI LaunchPad</a>Snake is drawn on the Educational BoosterPack screen from the LP-MSPM33C321AThree Arduboy games and a Game Boy emulator run on the Educational BoosterPack screen from an LP-MSPM33C321AA Game Boy game plays at full console speed on the Educational BoosterPack screen</div></div></details></article><article class="ad" id="bp-bassensorsmkii"><details><summary><span class="status">in hand, stacked on the LP-MSPM0G5187.</span><h3>BP-BASSENSORSMKII Sensors BoosterPack plug-in module</h3><p class="what">A plug-on board of TI and Bosch sensors on one I2C bus.</p></summary><span class="pic"><img src="media/parts/bp-bassensorsmkii.jpg" alt="BP-BASSENSORSMKII Sensors BoosterPack plug-in module" loading="lazy"></span><div class="body"><dl><dt>Status</dt><dd>in hand, stacked on the MSPM0 G5187: humidity and temperature, light and the magnet sensor read live; the BMI160 did not answer and the TMP117 needs its ribbon cable; see its guide.</dd><dt>More</dt><dd>The TMP117 reads temperature and sits on a break-away board with a ribbon cable. The HDC2080 reads temperature and humidity, the OPT3001 light, the BMI160 motion, with a BMM150 compass behind it, and the DRV5055 a magnet. Red and green LEDs.</dd><dt>Use it for</dt><dd><ul><li>Weather and room-comfort demos</li><li>Motion and tilt demos</li><li>The same sensor demo on every MSPM0 board</li></ul></dd><dt>Hook it up</dt><dd>Plugs on (I2C on pins 9, 10; pull-ups on the board). Plug the ribbon cable into J5 and J6 or the TMP117 reads nothing. All six sensors on the G3507 (five jumpers out), G3519 and CC1354P10; the L1306 needs two wires to power the OPT3001 and TMP117; the C1104 reads two of six; the CC2755P10 needs TI&#x27;s three wires; the F2800137 has no I2C on these pins.</dd></dl><p class="buy">Where to buy: TI.com, BP-BASSENSORSMKII.</p><div class="uses"><a href="project-sensor-boosterpack.html">Read six sensors on one plug-in board</a><a href="project-sub-ghz-link.html">Send sensor readings over a sub-1 GHz radio</a><a href="project-sub-ghz-demos.html">Sub-1 GHz home radio demos</a></div></div></details></article><article class="ad" id="boostxl-sharp128"><details><summary><span class="status">in hand.</span><h3>BOOSTXL-SHARP128 display BoosterPack plug-in module</h3><p class="what">A plug-on 128 x 128 black-and-white Sharp memory display with a microSD slot.</p></summary><div class="body"><dl><dt>More</dt><dd>It draws almost no power and keeps its image.</dd><dt>Use it for</dt><dd><ul><li>The one display that plugs onto most boards here</li><li>Clocks, sensor readouts, battery-powered screens</li></ul></dd><dt>Hook it up</dt><dd>Uses pins 2, 5, 6, 7, 15 for the screen (8, 14, 17 for the SD card). Plugs on with no wires on the G3507, L1306, G3519, C1104, CC1354P10, MSPM33C321A and AM13E230; one wire on the F2800137 (6 to 13). The CC2340R5 and CC2755P10 need resistor work for the screen and one wire for the SD card. 3.3 V only. Pin 19 is not used as shipped.</dd></dl><p class="buy">Where to buy: DigiKey, 296-50808-ND; TI.com, BOOSTXL-SHARP128.</p><div class="uses">The Sharp128 memory screen runs from an LP-MSPM0C1104 with no frame buffer</div></div></details></article><article class="ad" id="boostxl-audio"><details><summary><span class="status">in hand.</span><h3>BOOSTXL-AUDIO audio BoosterPack plug-in module</h3><p class="what">A plug-on speaker board: a DAC8311 16-bit DAC and a TPA301 amplifier driving a small speaker, plus an electret microphone with a preamp.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Sound out from a board with no audio of its own</li><li>Chiptune, tones and voice prompts</li><li>Microphone input for level meters and wake words</li></ul></dd><dt>Hook it up</dt><dd>DAC8311 on SPI (pins 7, 15, 12), microphone on pin 6. Jumper J5 picks what drives the amplifier: the SPI DAC (default), the board&#x27;s own DAC on pin 30, or PWM on pin 19. Plugs on with no clash on the MSPM33C321A and AM13E230; pin 6 clashes on the G3507, pins 13 and 30 on the L1306. Pins 12 and 13 are low confidence until measured.</dd></dl><p class="buy">Where to buy: TI.com, BOOSTXL-AUDIO.</p><div class="uses"><a href="project-jack-o-lantern-jukebox.html">Jack-o&#x27;-Lantern Jukebox</a><a href="project-audio-boosterpack.html">Audio BoosterPack on a LaunchPad</a></div></div></details></article><article class="ad" id="bp-cc1407p-9-fe"><details><summary><span class="status">in hand.</span><h3>BP-CC1407P-9-FE sub-1 GHz radio BoosterPack plug-in module</h3><p class="what">A sub-1 GHz radio on a plug-on board, with no processor of its own: a LaunchPad kit drives it over SPI.</p></summary><div class="body"><dl><dt>Status</dt><dd>in hand: first host: CC1354P10-1.</dd><dt>More</dt><dd>Up to +22 dBm, SMA antenna socket, red and green LEDs. (CC1407P, 902 to 928 MHz on this board)</dd><dt>Use it for</dt><dd><ul><li>Long-range radio links where 2.4 GHz does not reach</li><li>A radio for a host chip that has none (MSPM0, MSPM33)</li><li>Range tests at 915 MHz</li></ul></dd><dt>Hook it up</dt><dd>Plugs onto a LaunchPad kit (pins 1, 7, 14, 15, 18, 23, 36). TI supports the CC1354P10-1 and four other CC13xx/CC26xx boards with its TRX plug-in, and the CC2745R10 with a Zephyr shield. On the CC2755P10: one wire (23 to 10) and its red LED jumper off. Needs a 915 MHz SMA antenna, not in the kit.</dd></dl><p class="buy">Where to buy: TI.com, BP-CC1407P-9-FE.</p><div class="uses"><a href="project-radio-range.html">Measure how far a radio reaches</a><a href="project-sub-ghz-link.html">Send sensor readings over a sub-1 GHz radio</a><a href="project-walkie-talkies.html">Walkie-talkie over a 915 MHz radio</a><a href="project-sub-ghz-demos.html">Sub-1 GHz home radio demos</a></div></div></details></article></div></section><section class="ad-cat" id="cat-kit"><h2>Starter kits</h2><div class="ad-grid"><article class="ad" id="freenove-fnk0058"><details><summary><span class="status">in hand.</span><h3>Freenove Ultimate Starter Kit for Raspberry Pi Pico, board not included (FNK0058)</h3><p class="what">A box of the classic hobby parts with a breadboard and wires.</p></summary><span class="pic"><img src="media/parts/freenove-kit-contents.jpg" alt="Freenove Ultimate Starter Kit for Raspberry Pi Pico, board not included (FNK0058)" loading="lazy"></span><div class="body"><dl><dt>More</dt><dd>Made for the Pico, and most parts work at 3.3 V. The HC-SR04 and the L293D need 5 V; the LED module and LCD1602 were not checked.</dd><dt>Use it for</dt><dd><ul><li>IR remote control</li><li>7-segment counters and an 8 x 8 LED matrix</li><li>Keypad lock, servo, DC motor and stepper</li><li>DHT11 temperature and humidity, the most popular hobby demo</li><li>RFID, PIR motion, ultrasonic distance, LCD1602 screen</li></ul></dd><dt>In the box</dt><dd>I2C LCD1602, IR remote and receiver, 4-digit and 1-digit 7-segment displays with two 74HC595, 8 x 8 LED matrix, 8-LED WS2812-type module, 4 x 4 keypad, active and passive buzzers, L293D, DC motor, servo, stepper with driver board, DHT11, thermistor, photoresistor, joystick, PIR, HC-SR04, MPU6050, RFID, relay, breadboard power module, breadboard, jumper wires (Freenove&#x27;s parts list).</dd><dt>Hook it up</dt><dd>Breadboard and jumper wires. Motors and the LED module run from the breadboard power module or the LaunchPad kit&#x27;s 5 V pin, grounds tied together. The HC-SR04 is a 5 V part: use the RCWL-1601 instead.</dd></dl><p class="buy">Where to buy: Amazon, B09H2SV5XB.</p><div class="uses"><a href="board-am13e230.html">Spin the kit stepper through its ULN2003 board</a></div></div></details></article></div></section><section class="ad-cat" id="cat-display"><h2>Displays</h2><div class="ad-grid"><article class="ad" id="waveshare-35-touch"><details><summary><span class="status">in hand.</span><h3>Waveshare 3.5 inch capacitive touch LCD</h3><p class="what">A 320 x 480 color screen with a finger-touch panel, wired to the board by hand.</p></summary><span class="pic"><img src="media/parts/waveshare-35-touch.jpg" alt="Waveshare 3.5 inch capacitive touch LCD (ST7796S screen, FT6336U touch)" loading="lazy"></span><div class="body"><dl><dt>Also</dt><dd>ST7796S screen, FT6336U touch.</dd><dt>Use it for</dt><dd><ul><li>Touchscreen demos: draw a digit and the board reads it</li><li>Photo and graphics demos</li><li>LVGL user interfaces</li></ul></dd><dt>Hook it up</dt><dd>12 jumper wires (13 with MISO) to the MSPM0 G3507 (SPI for the screen, software I2C for touch on PB3 and PB2). Chip select needs 10 microseconds high between commands.</dd></dl><p class="buy">Where to buy: Amazon, B0DNQJD7BV.</p><div class="uses"><a href="project-small-screen.html">Show colors and read touch on a small screen</a><a href="project-handwritten-digits.html">Recognize a handwritten digit on the chip</a><a href="project-arcade.html">Retro games on a TI LaunchPad</a></div></div></details></article><article class="ad" id="freenove-ws2812-8led"><details><summary><span class="status">in hand.</span><h3>Freenove 8-LED RGB ring module, WS2812 type</h3><p class="what">Eight color LEDs in a ring on one data wire, labelled D1 to D8 on the board.</p></summary><span class="pic"><img src="media/parts/freenove-ws2812-module.jpg" alt="Freenove 8-LED RGB ring module, WS2812 type (from the Freenove kit)" loading="lazy"></span><div class="body"><dl><dt>Also</dt><dd>from the Freenove kit.</dd><dt>More</dt><dd>Each LED is set to any color from software.</dd><dt>Use it for</dt><dd><ul><li>Color status light</li><li>Spinner and progress ring</li><li>Testing a WS2812 driver on a chip with no library for it</li></ul></dd><dt>Hook it up</dt><dd>3 pins: 5 V power, GND, data in. Read the pin names on the board before wiring. Whether its data pin accepts 3.3 V logic on a 5 V supply is unknown.</dd></dl><p class="buy">Where to buy: Amazon (inside the Freenove kit), B09H2SV5XB.</p></div></details></article><article class="ad" id="elegoo-ssd1306"><details><summary><span class="status">in hand.</span><h3>ELEGOO 0.96 inch OLED, 128 x 64, SSD1306, 3 pack</h3><p class="what">The most-used small hobby screen: sharp white-on-black text and graphics.</p></summary><span class="pic"><img src="media/parts/oled-ssd1306.jpg" alt="ELEGOO 0.96 inch OLED, 128 x 64, SSD1306, 3 pack" loading="lazy"></span><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Sensor readouts</li><li>Tiny games</li><li>Status screens on any board</li></ul></dd><dt>Hook it up</dt><dd>4 wires, pins as printed on the board in this order: GND, VCC, SCL, SDA. Power it from 3.3 V (I2C address 0x3C). The order differs between makers, so wire by the printed names.</dd></dl><p class="buy">Where to buy: Amazon, B0D2RMQQHR.</p></div></details></article><article class="ad" id="diyables-tm1637"><details><summary><span class="status">in hand.</span><h3>DIYables TM1637 4-digit 7-segment display with colon, 2 pack</h3><p class="what">Four big LED digits with a colon, driven over two wires.</p></summary><span class="pic"><img src="media/parts/tm1637.jpg" alt="DIYables TM1637 4-digit 7-segment display with colon, 2 pack" loading="lazy"></span><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Clocks</li><li>Timers and countdowns</li><li>Counters and scoreboards</li></ul></dd><dt>Hook it up</dt><dd>4 wires: power, GND, CLK, DIO (2-wire protocol of its own, not I2C). The pin names are not readable in the photo; read them on the board before wiring. Power it from 3.3 V: the TM1637 datasheet only tests 4.5 to 5.5 V, but Seeed rates its TM1637 module for 3.3 to 5.5 V.</dd></dl><p class="buy">Where to buy: Amazon, B0BXKLZJMV.</p></div></details></article></div></section><section class="ad-cat" id="cat-sensor"><h2>Sensors</h2><div class="ad-grid"><article class="ad" id="hc-sr501-pir"><details><summary><span class="status">in hand.</span><h3>PIR motion sensor module, HC-SR501 type</h3><p class="what">Sees warm bodies move in front of it with a clear dome lens.</p></summary><span class="pic"><img src="media/parts/pir-hc-sr501.jpg" alt="PIR motion sensor module, HC-SR501 type (from the Freenove kit)" loading="lazy"></span><div class="body"><dl><dt>Also</dt><dd>from the Freenove kit.</dd><dt>More</dt><dd>Two trim pots set how far it sees and how long its output stays high. Made for 5 V power; its output pin is 3.3 V.</dd><dt>Use it for</dt><dd><ul><li>Motion-triggered light or alarm</li><li>Presence detection to compare against the mmWave radar</li><li>Wake-on-motion for a battery project</li></ul></dd><dt>Hook it up</dt><dd>3 pins: power, OUT, GND. The pin names are not readable in the photo; read them on the board before wiring. Power from 5 V (the LaunchPad kit&#x27;s 5 V pin or the breadboard power module); the output pin swings to 3.3 V, safe for the LaunchPad. Give it about a minute to settle after power-up.</dd></dl><p class="buy">Where to buy: Amazon (inside the Freenove kit), B09H2SV5XB.</p></div></details></article><article class="ad" id="adafruit-vl53l1x"><details><summary><span class="status">in hand.</span><h3>Adafruit VL53L1X laser distance sensor, STEMMA QT</h3><p class="what">Measures distance with an invisible laser, about 3 cm to 4 m.</p></summary><div class="body"><dl><dt>Also</dt><dd>Adafruit 3967.</dd><dt>Use it for</dt><dd><ul><li>Presence and proximity</li><li>Gesture and hand-wave demos</li><li>A laser ruler</li></ul></dd><dt>Hook it up</dt><dd>Qwiic cable (I2C, address 0x29). Works from 3.3 V.</dd></dl><p class="buy">Where to buy: DigiKey, 1528-3967-ND.</p></div></details></article><article class="ad" id="adafruit-rcwl1601"><details><summary><span class="status">in hand.</span><h3>Adafruit RCWL-1601 ultrasonic distance sensor</h3><p class="what">Bounces sound off things to measure distance; a 3.3 V-safe version of the classic HC-SR04.</p></summary><span class="pic"><img src="media/parts/rcwl-1601.jpg" alt="Adafruit RCWL-1601 ultrasonic distance sensor (Adafruit 4007)" loading="lazy"></span><div class="body"><dl><dt>Also</dt><dd>Adafruit 4007.</dd><dt>Use it for</dt><dd><ul><li>Parking sensor</li><li>Robot obstacle detection</li><li>The HC-SR04 projects, on a 3.3 V board</li></ul></dd><dt>Hook it up</dt><dd>4 pins, as printed left to right (photo, front): VCC, Trig/Rx, Echo/Tx, Gnd. The board also prints SCL and SDA beside Trig/Rx and Echo/Tx for its I2C and serial modes; for the HC-SR04 style use Trig and Echo. Works at 3 V or 5 V.</dd></dl><p class="buy">Where to buy: DigiKey, 1528-2832-ND.</p></div></details></article><article class="ad" id="iwrl6432boost"><details><summary><span class="status">in hand.</span><h3>IWRL6432BOOST 60 GHz mmWave radar evaluation module</h3><p class="what">TI&#x27;s low-power 60 GHz radar sensor board.</p></summary><div class="body"><dl><dt>More</dt><dd>a radar chip with three receive and two transmit antennas on the circuit board, its own Arm Cortex-M4F at 160 MHz and a hardware accelerator for FFTs, 1 MB of RAM, an XDS110 debugger and a micro-USB port. It finds people by their motion, even small motion, and sends a point cloud and presence flags over a serial port.</dd><dt>Use it for</dt><dd><ul><li>Presence sensing that sees a person sitting still, for Home Assistant</li><li>Finding out how small a host MCU can run the processor side of a radar</li><li>Low-power sensing: duty-cycled deep sleep, about 1 to 2 mW on the chip&#x27;s rails per TI</li></ul></dd><dt>Hook it up</dt><dd>Micro-USB cable (in the box) to the Mac: powers the board and gives two serial ports and JTAG. The board ships in run-from-flash mode (S1 position 1 ON, position 2 OFF); for flashing, move only S1 position 1 to OFF. There is also a reset button. BoosterPack connectors J8 and J9 for a host LaunchPad. Keep 20 cm between the board and a person. Do not drive any pin from a powered host while the board is unpowered.</dd></dl><p class="buy">Where to buy: <a href="https://www.ti.com/tool/IWRL6432BOOST" rel="noopener">TI.com</a>, IWRL6432BOOST.</p></div></details></article></div></section><section class="ad-cat" id="cat-motor"><h2>Motors and motor drivers</h2><div class="ad-grid"><article class="ad" id="hiletgo-drv8833"><details><summary><span class="status">in hand.</span><h3>HiLetgo DRV8833 dual motor driver, 3 pack</h3><p class="what">Lets a LaunchPad kit&#x27;s pin run a DC motor forward, backward and at any speed.</p></summary><span class="pic"><img src="media/parts/drv8833.jpg" alt="HiLetgo DRV8833 dual motor driver, 3 pack (TI DRV8833 chip)" loading="lazy"></span><div class="body"><dl><dt>Status</dt><dd>in hand: header pins loose, not soldered.</dd><dt>Also</dt><dd>TI DRV8833 chip.</dd><dt>Use it for</dt><dd><ul><li>Spinning the kit&#x27;s DC motor</li><li>Small robots and fans</li></ul></dd><dt>Hook it up</dt><dd>Two pins per motor from the LaunchPad kit (3.3 V logic). Motor power from the breadboard power module, grounds tied together. Two rows of 8 holes with no header fitted; the pin names are on the back of the board, which is not in the photo: read them before wiring.</dd></dl><p class="buy">Where to buy: Amazon, B00UYIFYCW.</p></div></details></article><article class="ad" id="drv8376evm"><details><summary><span class="status">in hand.</span><h3>DRV8376EVM three-phase motor driver evaluation module</h3><p class="what">TI&#x27;s evaluation board for the DRV8376.</p></summary><div class="body"><dl><dt>Status</dt><dd>in hand: 2026-10-15, with the motor wired.</dd><dt>More</dt><dd>a three-phase brushless motor driver with the six power transistors inside one chip, current sensing built in, and 3.3 V and 5 V regulators on the chip. The board is a 40-pin BoosterPack: it plugs onto a LaunchPad, which does the commutation; the chip does not spin a motor on its own. Screw terminals for the motor supply (VBAT, PGND) and the three phases (OUT A, B, C); a five-way terminal block for Hall sensors with a jumper that picks their supply. The PWM mode (6x or 3x), slew rate, current-sense gain and overcurrent level are set by resistors on the board; the program finds the PWM mode at start. (4.5 to 65 V, 4.5 A peak) (3.3 V, 5 V or external)</dd><dt>Use it for</dt><dd><ul><li>Spinning a Hall-sensor brushless motor from the AM13E230 (six-step, the bench program)</li><li>TI&#x27;s three-shunt Hall FOC solution on the AM13, once ported from the DRV8323RH BoosterPack</li><li>Current-loop and bearing-fault work on a real motor</li></ul></dd><dt>Hook it up</dt><dd>Plug onto the LaunchPad kit&#x27;s BoosterPack headers with the screw terminals pointing away from the USB connector: the Hall-block socket (EVM J8) on J2/J4, the nFAULT-side socket (EVM J9) on J1/J3 with its pin 20 (3.3 V) on J1 pin 1. Then its INHA/INLA, INHB/INLB and INHC/INLC are J4 pins 40 to 35 (MCPWM4 1A to 3B on the AM13E230), Hall A, B, C are J4 pins 34, 33, 32 (PB7, PB6, PA12), nSLEEP J1 pin 9 (PA23), nFAULT J1 pin 10 (PA22), DRVOFF J2 pin 13 (PB18), phase-voltage senses J3 pins 26, 25, 24 and bus sense J3 pin 23 (PA17, PA28, PA18, PA16), current senses J3 pins 27 to 29. Motor supply 4.5 to 65 V DC on VBAT and PGND (reverse-polarity protected). Hall supply jumper J13: GVDD (5 V) for most motors. On the AM13E230, switches S6 and S4 must sit at BP so PB6, PB7, PA11 and PA12 reach the headers.</dd></dl><p class="buy">Where to buy: TI.com, DRV8376EVM.</p><div class="uses"><a href="project-bldc-spin.html">Spin a brushless motor</a></div></div></details></article><article class="ad" id="anaheim-bly17"><details><summary><span class="status">in hand (2026-10-15).</span><h3>Anaheim Automation BLY171S-24V-4000 brushless motor</h3><p class="what">A small three-phase brushless DC motor in the NEMA 17 frame with three Hall sensors inside.</p></summary><div class="body"><dl><dt>Also</dt><dd>NEMA 17, Hall sensors.</dd><dt>More</dt><dd>24 V, 4,000 rpm, 26 W, 1.8 A rated, 27 oz-in peak torque, 1.5 ohm and 2.1 mH line to line, 4.96 oz-in per A, 2.45 V per 1,000 rpm, delta winding, eight poles, Halls at 120 electrical degrees. Eight wires: three phases and five Hall lines. Locked-rotor current at full voltage would be 16 A, so the driver&#x27;s 4.5 A overcurrent limit and the program&#x27;s duty cap do the protecting. (four pole pairs) (product sheet L010228; label read 2026-10-15, dated 10/21) (yellow A, red B, black C) (red supply 4.5 to 28 V, black ground, blue A, green B, white C; open-collector outputs)</dd><dt>Use it for</dt><dd><ul><li>First brushless spin on the DRV8376EVM from the AM13E230</li><li>Hall-sensored FOC and speed control</li><li>A bearing-fault or load-change data set for the NPU</li></ul></dd><dt>Hook it up</dt><dd>Phases to OUT A, OUT B, OUT C on the driver board (any order; the program learns the Hall table). Hall wires to the five-way block: red to HALL POWER, black to HALL GROUND, blue, green and white to HALL A, B, C.</dd></dl><p class="buy">Where to buy: <a href="https://anaheimautomation.com/brushless-dc/brushless-motors/brushless-motors/bly17" rel="noopener">Anaheim Automation</a>, BLY171S-24V-4000.</p><div class="uses"><a href="project-bldc-spin.html">Spin a brushless motor</a></div></div></details></article><article class="ad" id="qiwo-57bl-70w"><details><summary><span class="status">in hand (2026-10-17).</span><h3>QIWO QW57F2H03N3070 57 mm brushless motor</h3><p class="what">A 57 mm frame three-phase brushless DC motor with Hall sensors inside.</p></summary><div class="body"><dl><dt>Also</dt><dd>24 V, 70 W, Hall sensors.</dd><dt>More</dt><dd>Label: 24 V, 70 W, 3000 r/min, 0.22 N.m, dated 2026/06/13, Changsha Qiwo Electronic Technology. There is no data sheet: pole pairs, winding resistance, inductance, back-EMF constant, Hall supply range and Hall output type are not known and are the first measurements. Two cables: a thick one with three phase wires and a thin shielded one with five Hall wires. (photo 2026-10-17) (yellow, green, blue) (red, blue, green, yellow and one more; roles to confirm)</dd><dt>Use it for</dt><dd><ul><li>The larger motor on the AM13 motor bench, after the 26 W BLY171S</li><li>Power-tool class tests on a cordless battery</li><li>Measuring an unknown motor: Hall order, pole pairs, Rs, Ls, flux, then predict, measure and attribute</li></ul></dd><dt>Hook it up</dt><dd>Phases (thick cable) to the driver&#x27;s OUT A, B, C in any order. Hall cable to the driver&#x27;s Hall block: supply, ground, A, B, C. Start the Hall supply at 5 V; the 3.3 V of the BOOSTXL-DRV8323RS may not be enough.</dd></dl><p class="buy">Where to buy: Amazon (Changsha Qiwo Electronic Technology), QW57F2H03N3070 listing chosen 2026-10-14.</p></div></details></article><article class="ad" id="boostxl-drv8323rs"><details><summary><span class="status">in hand.</span><h3>BOOSTXL-DRV8323RS (SPI) three-phase motor driver BoosterPack</h3><p class="what">TI&#x27;s BoosterPack with a DRV8323 smart gate driver and three CSD88584Q5DC power transistors: 6 to 54 V supply and up to 15 A drive current.</p></summary><div class="body"><dl><dt>More</dt><dd>The RS variant is configured over SPI where the RH uses resistors. A buck converter on the board makes the 3.3 V that feeds the Hall inputs. (user&#x27;s guide SLVUB01C) (gain, gate drive strength, overcurrent)</dd><dt>Use it for</dt><dd><ul><li>The 15 A step up from the DRV8376EVM on the AM13 motor bench</li><li>TI&#x27;s three-shunt FOC on the AM13E230 (needs an SPI setup routine: a port)</li><li>Same suite on the BLY171S and the QIWO motor</li></ul></dd><dt>Hook it up</dt><dd>Plug onto the LaunchPad BoosterPack headers. Supply on J1 (+VM, GND; polarity matters), motor phases on J5, Hall sensors on J2. SPI on the AM13E230 Rev E2: PB5 SCLK, PB10 PICO, PA20 POCI, chip select PB12. Observe the Hall supply is 3.3 V only.</dd></dl><p class="buy">Where to buy: TI.com, BOOSTXL-DRV8323RS.</p></div></details></article></div></section><section class="ad-cat" id="cat-input"><h2>Buttons, knobs and other inputs</h2><div class="ad-grid"><article class="ad" id="taiss-ky040"><details><summary><span class="status">in hand.</span><h3>Taiss KY-040 rotary encoder with push button, 5 pack</h3><p class="what">A clicky knob that turns forever: the board counts clicks and direction, and the knob also pushes like a button.</p></summary><span class="pic"><img src="media/parts/ky040.jpg" alt="Taiss KY-040 rotary encoder with push button, 5 pack" loading="lazy"></span><div class="body"><dl><dt>Status</dt><dd>in hand: knob separate.</dd><dt>Use it for</dt><dd><ul><li>Menus and volume knobs</li><li>Setting a timer or a motor speed</li><li>The G3507&#x27;s hardware knob-counting input (QEI)</li></ul></dd><dt>Hook it up</dt><dd>5 pins, as printed top to bottom: GND, + (power), SW (push switch), DT, CLK. Power it from 3.3 V. The knob presses onto the shaft.</dd></dl><p class="buy">Where to buy: Amazon, B07F26CT6B.</p></div></details></article></div></section><section class="ad-cat" id="cat-wiring"><h2>Cables, power supplies and antennas</h2><div class="ad-grid"><article class="ad" id="adafruit-qwiic-female"><details><summary><span class="status">in hand.</span><h3>Adafruit STEMMA QT / Qwiic cable to female sockets, 150 mm</h3><p class="what">Plugs any Qwiic sensor onto a LaunchPad kit&#x27;s header pins with no soldering.</p></summary><div class="body"><dl><dt>Also</dt><dd>Adafruit 4397.</dd><dt>Use it for</dt><dd><ul><li>Adding Qwiic sensors to any board here</li></ul></dd><dt>Hook it up</dt><dd>Black GND, red 3.3 V, blue SDA, yellow SCL, onto the LaunchPad kit&#x27;s I2C header pins.</dd></dl><p class="buy">Where to buy: DigiKey, 1528-4397-ND.</p></div></details></article><article class="ad" id="adafruit-qwiic-male"><details><summary><span class="status">in hand.</span><h3>Adafruit STEMMA QT / Qwiic cable to male pins, 150 mm</h3><p class="what">The same cable with pins instead of sockets, for the C1104&#x27;s socket header or a breadboard.</p></summary><div class="body"><dl><dt>Also</dt><dd>Adafruit 4209.</dd><dt>Use it for</dt><dd><ul><li>Qwiic sensors on the MSPM0 C1104</li><li>Qwiic sensors on a breadboard</li></ul></dd><dt>Hook it up</dt><dd>Same colors as above.</dd></dl><p class="buy">Where to buy: DigiKey, 1528-4209-ND.</p></div></details></article><article class="ad" id="elegoo-jumpers"><details><summary><span class="status">in hand.</span><h3>ELEGOO jumper wires</h3><p class="what">Male and female breadboard wires for connecting anything to anything.</p></summary><span class="pic"><img src="media/parts/elegoo-jumpers.jpg" alt="ELEGOO jumper wires (120-piece pack)" loading="lazy"></span><div class="body"><dl><dt>Also</dt><dd>120-piece pack.</dd><dt>Use it for</dt><dd><ul><li>Wiring displays and modules</li><li>Loop tests that wire a board&#x27;s pins to each other</li></ul></dd><dt>Hook it up</dt><dd>Push onto header pins or into a breadboard.</dd></dl><p class="buy">Where to buy: Amazon.</p><div class="uses"><a href="project-print-a-message.html">Print a message from the board on your computer</a><a href="project-read-a-voltage.html">Read a knob or a voltage</a><a href="project-pwm-dim.html">Dim an LED or move a servo</a><a href="project-small-screen.html">Show colors and read touch on a small screen</a><a href="project-handwritten-digits.html">Recognize a handwritten digit on the chip</a><a href="project-sub-ghz-link.html">Send sensor readings over a sub-1 GHz radio</a><a href="project-thread-border-router.html">Build a Thread border router from two chips, with no Linux</a><a href="project-walkie-talkies.html">Walkie-talkie over a 915 MHz radio</a><a href="project-sub-ghz-demos.html">Sub-1 GHz home radio demos</a></div></div></details></article><article class="ad" id="usb-c-pd-20v-supply"><details><summary><span class="status">to order only if you have no 20 V USB-C charger.</span><h3>USB-C power supply that gives 20 V at 3 A or more (60 W class), for the SK-TDA4VM</h3><p class="what">A USB Power Delivery wall charger that can negotiate 20 V.</p></summary><div class="body"><dl><dt>More</dt><dd>TI&#x27;s user guide lists two tested models: GlobTek TR9CZ3000USBCG2R6BF2 and Qualtek QADC-65-20-08CB (65 W). A 5 V charger can reset the board during boot.</dd><dt>Use it for</dt><dd><ul><li>Powering the SK-TDA4VM</li></ul></dd><dt>Hook it up</dt><dd>Charger to the board&#x27;s USB-C power port J14 (its status LED is LD3). Do not use the USB-C data port J12 for power.</dd></dl><p class="buy">Where to buy: DigiKey (TI&#x27;s tested part), Qualtek QADC-65-20-08CB.</p><div class="uses"><a href="project-linux-vision.html">Run a vision model on a Linux board&#x27;s AI accelerator</a></div></div></details></article><article class="ad" id="antenna-915-sma"><details><summary><span class="status">in hand: one came in the BP-CC1407P-9-FE box (2026-10-08).</span><h3>915 MHz SMA whip antenna</h3><p class="what">A tilt-and-swivel whip antenna for 900 to 930 MHz, 1.2 dBi, SMA male plug.</p></summary><div class="body"><dl><dt>Also</dt><dd>TE / Linx ANT-916-CW-HWR-SMA.</dd><dt>Use it for</dt><dd><ul><li>The BP-CC1407P-9-FE radio, which ships with an SMA socket and no antenna</li></ul></dd><dt>Hook it up</dt><dd>Screws onto the BoosterPack&#x27;s SMA socket J7. Fit it before the radio is powered.</dd></dl><p class="buy">Where to buy: authorized distributors (Octopart listing), ANT-916-CW-HWR-SMA.</p></div></details></article><article class="ad" id="anker-prime-240w-cables"><details><summary><span class="status">in hand.</span><h3>Anker Prime USB-C to USB-C cables, 240 W, 3 ft and 6 ft</h3><p class="what">Braided USB-C cables rated for 240 W, so any board or charger here gets its full power.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Powering high-current boards from the 160 W charger</li><li>Long runs from the charger to the bench</li></ul></dd><dt>Hook it up</dt><dd>USB-C at both ends.</dd></dl><p class="buy">Where to buy: Anker store.</p></div></details></article><article class="ad" id="agvee-usbc-microusb"><details><summary><span class="status">in hand.</span><h3>AGVEE USB-C to micro-USB cables, 3.3 ft, 2 pack</h3><p class="what">Cables for the many LaunchPad development kits that still use micro-USB, straight from a USB-C laptop or hub.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Connecting micro-USB boards to a USB-C-only computer without an adapter</li></ul></dd><dt>Hook it up</dt><dd>USB-C to the computer or hub, micro-USB to the board.</dd></dl><p class="buy">Where to buy: Amazon, ASIN B0DJY122Z7.</p></div></details></article><article class="ad" id="syntech-usbc-usba"><details><summary><span class="status">in hand.</span><h3>Syntech USB-C to USB-A adapters, 2 pack</h3><p class="what">Adapters that let a USB-A cable or device plug into a USB-C port.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Using the USB-A cable that came in a board&#x27;s box on a USB-C laptop</li></ul></dd><dt>Hook it up</dt><dd>USB-C side into the computer or hub.</dd></dl><p class="buy">Where to buy: Amazon, ASIN B07CVX3516.</p></div></details></article><article class="ad" id="cr2032-duracell"><details><summary><span class="status">in hand.</span><h3>Duracell CR2032 lithium coin cell, 3 V (4 pack)</h3><p class="what">A 3 V coin cell, about 225 mAh, for a board that wakes once a minute.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>The L1306 once-a-minute clock on a coin cell (the battery-life project)</li><li>Bluetooth beacons and BTHome sensors running off the USB cable</li></ul></dd><dt>Hook it up</dt><dd>A CR2032 holder wired to the board&#x27;s 3V3 and GND pins, with the USB power jumper removed so the probe does not back-feed it.</dd></dl><p class="buy">Where to buy: MacKay Hardware and Rental (Ace), SKU 3414794.</p></div></details></article><article class="ad" id="alligator-clips-2in"><details><summary><span class="status">in hand.</span><h3>Insulated alligator clips, 2 in (2 pack)</h3><p class="what">Clips for a quick probe ground, a test lead on a pin, or holding a wire during a measurement.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Scope or meter ground on a board</li><li>Hold the thermocouple lead while it is taped down</li></ul></dd><dt>Hook it up</dt><dd>Clip onto a test point or a header pin; never across two adjacent pins.</dd></dl><p class="buy">Where to buy: MacKay Hardware and Rental (Ace), SKU 3011970.</p></div></details></article></div></section><section class="ad-cat" id="cat-gear"><h2>Bench gear: hubs, power, cameras</h2><div class="ad-grid"><article class="ad" id="rshtech-h10c"><details><summary><span class="status">in hand.</span><h3>RSHTECH 10-port powered USB-C 3.2 hub (RSH-H10C)</h3><p class="what">A powered hub with ten USB ports on its own supply, so a row of boards draws power from the wall instead of the laptop.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Keeping six to ten boards and probes plugged in at once</li><li>Stable power for boards that brown out on a laptop port</li><li>Leaving boards connected between sessions</li></ul></dd><dt>Hook it up</dt><dd>Its own power adapter, one USB-C cable to the computer. Each board&#x27;s debug USB goes into a port.</dd></dl><p class="buy">Where to buy: Amazon, ASIN B0H2P2SW6Q.</p></div></details></article><article class="ad" id="acer-usbc-hub"><details><summary><span class="status">in hand.</span><h3>Acer 10 Gbps USB-C hub, 4 USB-C ports plus 100 W pass-through</h3><p class="what">A small unpowered hub that splits one USB-C port into four, with a charging input so the laptop keeps its power.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>A second set of USB-C ports beside the powered hub</li><li>Charging the laptop through the hub while boards stay connected</li></ul></dd><dt>Hook it up</dt><dd>One USB-C cable to the computer; a USB-C charger into the power-delivery port.</dd></dl><p class="buy">Where to buy: Amazon, ASIN B0F5HSNDXF.</p></div></details></article><article class="ad" id="anker-prime-160w"><details><summary><span class="status">in hand.</span><h3>Anker Prime charger, 160 W, 3 ports, with display</h3><p class="what">A three-port USB-C charger that shows the power each port is delivering on a small screen.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Powering a hungry board such as the SK-TDA4VM (20 V at 3 A) from one brick</li><li>Reading a board&#x27;s power draw at a glance</li></ul></dd><dt>Hook it up</dt><dd>USB-C to the board&#x27;s power input. Check that the board takes USB-C power delivery and what voltage it asks for.</dd></dl><p class="buy">Where to buy: Anker store, WSPDV2HZNOFF.</p></div></details></article><article class="ad" id="anker-nano-45w"><details><summary><span class="status">in hand.</span><h3>Anker Nano charger, 45 W, with display</h3><p class="what">A small single-port USB-C charger with a power readout.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Powering one board away from the computer</li><li>A second power source for a two-board demo</li></ul></dd><dt>Hook it up</dt><dd>USB-C to the board.</dd></dl><p class="buy">Where to buy: Anker store, WS24CNCZYG9B.</p></div></details></article><article class="ad" id="tessan-tower-strip"><details><summary><span class="status">in hand.</span><h3>TESSAN tower power strip with surge protection, 10 ft flat cord</h3><p class="what">A vertical power strip that takes the hub supply and the chargers in one place.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>One switched power source for the whole bench</li></ul></dd><dt>Hook it up</dt><dd>Wall outlet; the hub supply and chargers plug into it.</dd></dl><p class="buy">Where to buy: Amazon.</p></div></details></article><article class="ad" id="logitech-c310"><details><summary><span class="status">in hand.</span><h3>Logitech USB webcam</h3><p class="what">A plain USB webcam that works with no driver.</p></summary><div class="body"><dl><dt>Also</dt><dd>C310 class, 720p.</dd><dt>More</dt><dd>Placed close to one board it reads small displays and LED colors.</dd><dt>Use it for</dt><dd><ul><li>A close-up of one board</li><li>A camera that needs no network or account</li></ul></dd><dt>Hook it up</dt><dd>USB-A into the computer or hub.</dd></dl></div></details></article><article class="ad" id="insta360-link-2-pro"><details><summary><span class="status">in hand.</span><h3>Insta360 Link 2 Pro USB webcam</h3><p class="what">A UVC webcam with a motorised pan-tilt gimbal and 4x digital zoom that Linux drives through standard V4L2 controls, so a program can aim it.</p></summary><div class="body"><dl><dt>Also</dt><dd>4K, pan-tilt gimbal.</dd><dt>More</dt><dd>MJPEG and H.264 up to 3840x2160, plus a USB microphone.</dd><dt>Use it for</dt><dd><ul><li>Camera input for the BeagleY-AI vision demos (people count, body-pose game)</li><li>An overhead bench camera a script can aim at one board</li></ul></dd><dt>Hook it up</dt><dd>USB-C on the camera to a USB-A port through a USB-C-to-A adapter. On the BeagleY-AI it drops off USB at 1080p and on gimbal moves when powered from the board&#x27;s port (beagley-ai/bench/camera-usb-drops-2026-11-03.log); 720p without moves is stable.</dd></dl></div></details></article><article class="ad" id="dc-supply-12v"><details><summary><span class="status">in hand.</span><h3>12 V DC power supply, 0.5 A or more</h3><p class="what">Motor power for the brushless motor bench: the DRV8376EVM takes 4.5 to 65 V DC on two screw terminals and is reverse-polarity protected.</p></summary><div class="body"><dl><dt>Status</dt><dd>in hand: model not recorded.</dd><dt>Also</dt><dd>any wall adapter; model not recorded.</dd><dt>More</dt><dd>The bench used a 12 V, 0.5 A adapter, read at 12.4 V on the board with the motor unloaded; it never sagged.</dd><dt>Use it for</dt><dd><ul><li>Motor power for the DRV8376EVM with the BLY171S motor, unloaded</li></ul></dd><dt>Hook it up</dt><dd>Positive to VBAT, negative to PGND on the DRV8376EVM screw terminals. An adapter with a barrel plug needs the plug cut off or a barrel-to-screw-terminal adapter; the bench notes do not say which was used.</dd></dl><p class="buy">Where to buy: any.</p></div></details></article><article class="ad" id="dewalt-20v-adapter"><details><summary><span class="status">on order.</span><h3>DeWalt 20V MAX battery adapter with switch and inline fuse</h3><p class="what">A dock for DeWalt 20V MAX packs with a power switch, an inline blade fuse holder and two leads.</p></summary><div class="body"><dl><dt>Status</dt><dd>on order: arrival not confirmed.</dd><dt>More</dt><dd>The pack is five Li-ion cells: 18 V nominal, about 20 V full, about 15 V empty. Ships with a 30 A fuse; swapped for 10 A before first use. (treat 15 V as the floor)</dd><dt>Use it for</dt><dd><ul><li>Battery power for the motor bench, replacing the 12 V adapter</li><li>The power-tool story: a real cordless pack driving a Hall motor</li></ul></dd><dt>Hook it up</dt><dd>Red lead to the driver&#x27;s VM (motor supply) terminal, black to PGND, switch off, 10 A fuse fitted. Nothing switched on until the firmware for battery power is flashed. Never short the leads, never leave a pack connected unattended.</dd></dl><p class="buy">Where to buy: Amazon, B0B63LPYN5.</p></div></details></article><article class="ad" id="clamp-lamp-bench"><details><summary><span class="status">in hand.</span><h3>Clamp lamp, 6 ft cord, with a 60 W-equivalent LED bulb (two)</h3><p class="what">Bench lighting: even light over the boards for photographs.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Straight-down board photographs on plain paper</li></ul></dd><dt>Hook it up</dt><dd>Clamps to the shelf edge; aim from two sides to kill the shadows of the boards and cables.</dd></dl><p class="buy">Where to buy: MacKay Hardware and Rental (Ace), LAMP CLAMP 18/2 SPT-2 6 ft, SKU 31860; LED G25, SKU 3908175.</p></div></details></article></div></section><section class="ad-cat" id="cat-home"><h2>Smart home radio</h2><div class="ad-grid"><article class="ad" id="ha-connect-zbt2"><details><summary><span class="status">in use.</span><h3>Home Assistant Connect ZBT-2</h3><p class="what">Home Assistant&#x27;s own USB radio for Zigbee and Thread, the coordinator for every Zigbee and Thread board test in the house network.</p></summary><div class="body"><dl><dt>Use it for</dt><dd><ul><li>Joining Zigbee boards to Home Assistant</li><li>Running a Thread network that Matter devices use</li></ul></dd><dt>Hook it up</dt><dd>USB into the machine that runs Home Assistant, on an extension cable away from USB 3 ports and Wi-Fi.</dd></dl><p class="buy">Where to buy: Amazon, ASIN B0G34ZTW51; <a href="https://www.home-assistant.io/connect/zbt-2" rel="noopener">Home Assistant</a>.</p></div></details></article><article class="ad" id="thirdreality-plug-gen2"><details><summary><span class="status">in hand.</span><h3>ThirdReality Smart Plug Gen2</h3><p class="what">A Zigbee wall plug that switches a lamp or fan and reports its power draw; Home Assistant sees it through ZHA.</p></summary><div class="body"><dl><dt>Status</dt><dd>in hand: 2026-10-14; already in the house.</dd><dt>Also</dt><dd>Zigbee, power metering.</dd><dt>Use it for</dt><dd><ul><li>Switch a real lamp from a board (voice or radar)</li><li>Turn a fan on from a CO2 reading</li></ul></dd><dt>Hook it up</dt><dd>Plugs into the wall; pairs to the Home Assistant Zigbee coordinator (the ZBT-2). No wires to the LaunchPad.</dd></dl><p class="buy">Where to buy: thirdreality.com, Smart Plug Gen2.</p></div></details></article><article class="ad" id="zigbee-plug-amazon"><details><summary><span class="status">in hand ; model, ASIN and price not recorded.</span><h3>Zigbee smart plug</h3><p class="what">A mains-powered Zigbee wall plug.</p></summary><div class="body"><dl><dt>Also</dt><dd>bought on Amazon; model not recorded.</dd><dt>More</dt><dd>It switches a lamp from Home Assistant, and because it stays plugged in it also acts as a Zigbee relay for the network: on this bench every join of the CC1354P10-1 sleepy sensor went through it, because the ZBT-2 coordinator was out of that board&#x27;s range.</dd><dt>Use it for</dt><dd><ul><li>Switching a real lamp from Home Assistant, to check the coordinator path on its own</li><li>A mains-powered Zigbee relay that extends the network so a battery-class board can join</li></ul></dd><dt>Hook it up</dt><dd>Plugs into the wall; pairs to Home Assistant through the ZBT-2 (Settings, Devices and services, Zigbee Home Automation, Add device). No wires to a LaunchPad.</dd></dl><p class="buy">Where to buy: Amazon, model and ASIN not recorded.</p></div></details></article><article class="ad" id="smart-bulb-br30-cc"><details><summary><span class="status">in hand ; paired and in Home Assistant through the Feit cloud 2026-10-20.</span><h3>Feit Electric Smart WiFi Bulb, BR30, color changing, 8 W</h3><p class="what">A color bulb controlled from a phone app, Google Home and Alexa.</p></summary><div class="body"><dl><dt>Status</dt><dd>in hand ; paired and in Home Assistant through the Feit cloud 2026-10-20: 20 toggles median 698 ms.</dd><dt>More</dt><dd>The demo light for the smart-home builds: a board turns it on, a sensor changes its color.</dd><dt>Use it for</dt><dd><ul><li>Radar presence turns the light on, empty room turns it off</li><li>A LaunchPad button or knob sets the color through Home Assistant</li><li>The same light shown in Google Home, Alexa and Apple Home at once</li></ul></dd><dt>Hook it up</dt><dd>Screws into a lamp; joins Wi-Fi through the Feit Electric phone app (an account is required; installation guide feit.com/smartwifibulb). No HomeKit code in the box guide. Home Assistant reaches it through a cloud integration or local control; Apple Home through Home Assistant&#x27;s HomeKit Bridge. No wires to the LaunchPad. Constant power to the socket is required.</dd></dl><p class="buy">Where to buy: MacKay Hardware and Rental (Ace), BULB LED SMRT BR30 CC 8W, SKU 3925617.</p></div></details></article></div></section>
+<p class="note" style="margin-top:40px">Source: the <a href="../data/parts.json">parts list</a>.</p>
+
+</div></main>
+<footer>
+  <div class="wrap" style="--fcols:4">
+    <div class="f-brand"><svg class="logo logo-foot" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg><p>Build it. Share it. Open demos and ports for embedded work, with the numbers.</p></div>
+    <div><h2>Builds</h2><a href="projects.html">All builds</a><a href="project-blink.html">First blink</a><a href="projects.html?f=smart-home">Smart home</a><a href="projects.html?f=ai">Edge AI</a><a href="projects.html?f=radio">Radio and range</a><a href="projects.html?f=motors">Motors, power and sensing</a><a href="projects.html?f=screens">Screens</a><a href="security.html">Security</a></div><div><h2>Hardware</h2><a href="hardware.html">The kits</a><a href="addons.html">Add-ons and parts</a></div><div><h2>Software</h2><a href="portability.html">Bring your code</a><a href="ports.html">Every port</a><a href="one-app-eleven-boards.html">One app, eleven boards</a><a href="project-build-from-terminal.html">Build from the terminal</a><a href="benchmarks.html">Measured</a><a href="edge-ai.html">Edge AI</a></div><div><h2>Community</h2><a href="community.html">Community</a><a href="https://github.com/Fox-Red-Labs/fox-red-labs">Get the code</a></div>
+    <div class="f-meta"><a href="benchmarks.html#method">Method</a><p class="disc pwr">Powered by Zephyr, GCC and OpenOCD. </p><p class="disc">Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors&#x27; projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.</p></div>
+  </div>
+</footer>
+<div class="tip" id="tip"></div>
+<script>
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest('[data-tip]');
+  if (!t) { tip.style.display = 'none'; return; }
+  tip.textContent = t.dataset.tip; tip.style.display = 'block';
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - 300) + 'px'; tip.style.top = (e.clientY + 16) + 'px';
+});
+function frlOpenHash() { var h = location.hash.slice(1); if (!h) return; var e = document.getElementById(decodeURIComponent(h)); if (!e) return; for (var n = e; n; n = n.parentElement) { if (n.tagName === 'DETAILS') n.open = true; } var d = e.querySelector('details'); if (d) d.open = true; e.scrollIntoView(); }
+window.addEventListener('hashchange', frlOpenHash); window.addEventListener('load', frlOpenHash); frlOpenHash();
+
+
+(function () {
+  // The page's own contents list, or one built from its sections, as a bar that sticks under the
+  // header once the list scrolls away; the section on screen is marked. Plus a back-to-top button.
+  var src = document.querySelector('nav.jump[aria-label="On this page"], p.toc');
+  var links = [];
+  if (src) src.querySelectorAll('a[href^="#"]').forEach(function (a) { links.push([a.getAttribute('href').slice(1), a.textContent.trim()]); });
+  else document.querySelectorAll('main [id]').forEach(function (el) {
+    var h = el.firstElementChild; if (el.tagName === 'H2') h = el;
+    if (h && h.tagName === 'H2' && !el.closest('details:not([open])')) links.push([el.id, h.textContent.trim().replace(/\s+/g, ' ').slice(0, 40)]);
+  });
+  links = links.filter(function (l) { return document.getElementById(l[0]); });
+  var top = document.createElement('button');
+  top.className = 'totop'; top.type = 'button'; top.setAttribute('aria-label', 'Back to top');
+  top.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+  document.body.appendChild(top);
+  var bar = null, hdr = document.querySelector('header');
+  if (links.length >= 3 && !document.querySelector('.btabs2')) {   // a page with tabs has its own navigation
+    bar = document.createElement('nav'); bar.className = 'otp'; bar.setAttribute('aria-label', 'Sections');
+    bar.innerHTML = '<div class="wrap"><b>On this page</b>' + links.map(function (l) { return '<a href="#' + l[0] + '">' + l[1].replace(/[<&]/g, '') + '</a>'; }).join('') + '</div>';
+    document.body.appendChild(bar); document.body.classList.add('has-otp');
+  }
+  var targets = links.map(function (l) { return document.getElementById(l[0]); });
+  function tick() {
+    var y = scrollY, h = hdr ? hdr.getBoundingClientRect().height : 72;
+    top.classList.toggle('on', y > innerHeight * 1.5);
+    if (!bar) return;
+    bar.style.top = h + 'px';
+    var past = src ? src.getBoundingClientRect().bottom < h : y > innerHeight * 0.8;
+    bar.classList.toggle('on', past);
+    var cur = -1;
+    targets.forEach(function (t, i) { if (t.getBoundingClientRect().top < h + 140) cur = i; });
+    bar.querySelectorAll('a').forEach(function (a, i) {
+      var on = i === cur; if (on !== a.classList.contains('cur')) { a.classList.toggle('cur', on); if (on) a.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+    });
+  }
+  var queued = false;
+  addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(function () { queued = false; tick(); }); } }, { passive: true });
+  addEventListener('resize', tick); tick();
+})();
+
+</script>
+</body>
+</html>

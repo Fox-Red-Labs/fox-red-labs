@@ -1,0 +1,85 @@
+/**
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+// Microstepping the kit 28BYJ-48 through its ULN2003 board, same six wires as ../stepper.syscfg:
+// IN1 PB3 = MCPWM4 1A, IN2 PB1 = MCPWM4 2A, IN3 PB2 = MCPWM4 3A, IN4 PB7 = MCPWM1 2A (PB7 has no free MCPWM4 output).
+// Both modules count up 10,000 clocks at 200 MHz = 20 kHz. MCPWM4's zero event interrupts at 20 kHz and the handler
+// writes the next four duties. LED4 (PA5, low = on) while the shaft moves.
+const gpio   = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1  = gpio.addInstance();
+const mcpwm  = scripting.addModule("/drivers/mcpwm", {}, false);
+const mcpwm1 = mcpwm.addInstance();
+const mcpwm2 = mcpwm.addInstance();
+const sysctl = scripting.addModule("/drivers/sysctl");
+
+gpio1.$name                          = "GPIO_LED";
+gpio1.associatedPins[0].$name        = "LED4";
+gpio1.associatedPins[0].initialValue = "SET";
+gpio1.associatedPins[0].pin.$assign  = "PA5";
+
+mcpwm1.$name                                     = "COILS";
+mcpwm1.mcpwmBase                                 = "MCPWM4";
+mcpwm1.pinList                                   = ["1A","2A","3A"];
+mcpwm1.enablePWM1B                               = false;
+mcpwm1.enablePWM2B                               = false;
+mcpwm1.enablePWM3B                               = false;
+mcpwm1.enableEventTrigger                        = true;
+mcpwm1.registerInterrupt                         = true;
+mcpwm1.timeBase.$name                            = "drivers_mcpwm_v0_mcpwm_timeBase0";
+mcpwm1.timeBase.counterMode                      = "DL_MCPWM_COUNTER_MODE_UP";
+mcpwm1.timeBase.periodValue                      = 9999;
+mcpwm1.timeBase.emulationMode                    = "DL_MCPWM_EMULATION_FREE_RUN";
+mcpwm1.counterCompare.$name                      = "drivers_mcpwm_v0_mcpwm_counterCompare0";
+mcpwm1.counterCompare.PWM1_CMPA                  = 1;
+mcpwm1.counterCompare.PWM2_CMPA                  = 1;
+mcpwm1.counterCompare.PWM3_CMPA                  = 1;
+mcpwm1.actionQualifier.$name                     = "drivers_mcpwm_v0_mcpwm_actionQualifier0";
+mcpwm1.actionQualifier.PWM1A.$name               = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents0";
+mcpwm1.actionQualifier.PWM1A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM1A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM2A.$name               = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents2";
+mcpwm1.actionQualifier.PWM2A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM2A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.actionQualifier.PWM3A.$name               = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents4";
+mcpwm1.actionQualifier.PWM3A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm1.actionQualifier.PWM3A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm1.loadMode.$name                            = "drivers_mcpwm_v0_mcpwm_loadMode0";
+mcpwm1.eventTrigger.$name                        = "drivers_mcpwm_v0_mcpwm_eventTrigger0";
+mcpwm1.eventTrigger.ET1_eventSource              = "DL_MCPWM_EVT_TBCTR_ZERO";
+mcpwm1.eventTrigger.ET2_eventPeriod              = 0;
+mcpwm1.eventTrigger.intSources                   = ["DL_MCPWM_INT_ET_1"];
+mcpwm1.peripheral["1A"].$assign                  = "PB3";
+mcpwm1.peripheral["2A"].$assign                  = "PB1";
+mcpwm1.peripheral["3A"].$assign                  = "PB2";
+
+mcpwm2.$name                                     = "COIL4";
+mcpwm2.mcpwmBase                                 = "MCPWM1";
+mcpwm2.pinList                                   = ["2A"];
+mcpwm2.enablePWM1A                               = false;
+mcpwm2.enablePWM1B                               = false;
+mcpwm2.enablePWM2B                               = false;
+mcpwm2.enablePWM3A                               = false;
+mcpwm2.enablePWM3B                               = false;
+mcpwm2.timeBase.$name                            = "drivers_mcpwm_v0_mcpwm_timeBase1";
+mcpwm2.timeBase.counterMode                      = "DL_MCPWM_COUNTER_MODE_UP";
+mcpwm2.timeBase.periodValue                      = 9999;
+mcpwm2.timeBase.emulationMode                    = "DL_MCPWM_EMULATION_FREE_RUN";
+mcpwm2.counterCompare.$name                      = "drivers_mcpwm_v0_mcpwm_counterCompare1";
+mcpwm2.counterCompare.PWM2_CMPA                  = 1;
+mcpwm2.actionQualifier.$name                     = "drivers_mcpwm_v0_mcpwm_actionQualifier1";
+mcpwm2.actionQualifier.PWM2A.$name               = "drivers_mcpwm_v0_mcpwm_actionQualifierEvents6";
+mcpwm2.actionQualifier.PWM2A.actionAtZero        = "DL_MCPWM_AQ_OUTPUT_HIGH";
+mcpwm2.actionQualifier.PWM2A.actionAtCountUpCmpA = "DL_MCPWM_AQ_OUTPUT_LOW";
+mcpwm2.loadMode.$name                            = "drivers_mcpwm_v0_mcpwm_loadMode1";
+mcpwm2.peripheral["2A"].$assign                  = "PB7";
+
+sysctl.VREFSource         = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
+sysctl.peripheral.$assign = "SYSCTL";
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+mcpwm1.peripheral.$suggestSolution = "MCPWM4";
+mcpwm2.peripheral.$suggestSolution = "MCPWM1";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";

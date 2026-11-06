@@ -1,0 +1,693 @@
+{
+ "_doc": "One profile per TI board that is a port target. hw: the peripherals and blocks the board has, in vocab.json tags. hw_from_sdk means the tag is backed by a SysConfig module in that board's own SDK examples (inventory.py computes the union; feasibility.py merges it in). hw_extra lists tags the SDK examples do not show but the board has, each with its public source. hw_missing lists tags the examples might suggest but the board does not have. layers: the software layers an example can land on, with how (native: the board's own SDK ships it; shim: a header in portability/shim/ maps the names; partial: some blocks share names, others do not; size: fits only on paper, check RAM). flash_kb and ram_kb from data/boards.csv. zephyr: upstream, fork, out-of-tree or none (docs/research/portability-approaches-2026-10-06.md, 2026-10-06 reading). bridges: for a (layer, from family, to family) the port mechanism and the evidence row in portability/matrix.csv.",
+ "boards": {
+  "mspm0c1104": {
+   "name": "LP-MSPM0C1104",
+   "sdk_board": "LP_MSPM0C1104",
+   "family": "MSPM0",
+   "core": "Cortex-M0+",
+   "flash_kb": 16,
+   "ram_kb": 1,
+   "fpu": false,
+   "layers": {
+    "driverlib_msp": "native",
+    "tidrivers": "size",
+    "rtos_freertos": "size"
+   },
+   "hw_extra": {},
+   "hw_missing": [
+    "AES",
+    "DAC",
+    "OPA",
+    "MATHACL",
+    "CAN",
+    "COMP",
+    "RTC",
+    "TRNG"
+   ],
+   "zephyr": "out-of-tree (this repo)",
+   "probe": "MC110001",
+   "notes": "1 KB of RAM is the wall: FreeRTOS and TI Drivers images do not fit (experiment 2026-10-08-mspm0c1104-1kb-ram). 20-pin package runs out of pins on ports (X4, X18). TI's own C1104 driver examples show no CAN or COMP module."
+  },
+  "mspm0l1306": {
+   "name": "LP-MSPM0L1306",
+   "sdk_board": "LP_MSPM0L1306",
+   "family": "MSPM0",
+   "core": "Cortex-M0+",
+   "flash_kb": 64,
+   "ram_kb": 4,
+   "fpu": false,
+   "layers": {
+    "driverlib_msp": "native",
+    "tidrivers": "partial",
+    "rtos_freertos": "size"
+   },
+   "hw_extra": {},
+   "hw_missing": [
+    "AES",
+    "DAC",
+    "MATHACL",
+    "CAN",
+    "RTC",
+    "TRNG",
+    "NPU"
+   ],
+   "zephyr": "out-of-tree (this repo)",
+   "probe": "ML130001",
+   "notes": "TI Drivers libraries ship for L13xx but no example and no board config (X23). FreeRTOS does not fit 4 KB with TI's settings (X23)."
+  },
+  "mspm0g3507": {
+   "name": "LP-MSPM0G3507",
+   "sdk_board": "LP_MSPM0G3507",
+   "family": "MSPM0",
+   "core": "Cortex-M0+",
+   "flash_kb": 128,
+   "ram_kb": 32,
+   "fpu": false,
+   "layers": {
+    "driverlib_msp": "native",
+    "tidrivers": "native",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {},
+   "hw_missing": [
+    "NPU",
+    "USB",
+    "I2S"
+   ],
+   "zephyr": "upstream",
+   "probe": "MG350001",
+   "notes": "Borrowed; not answering the debugger since 2026-10-05. The G3519 stands in for it."
+  },
+  "mspm0g3519": {
+   "name": "LP-MSPM0G3519",
+   "sdk_board": "LP_MSPM0G3519",
+   "family": "MSPM0",
+   "core": "Cortex-M0+",
+   "flash_kb": 512,
+   "ram_kb": 128,
+   "fpu": false,
+   "layers": {
+    "driverlib_msp": "native",
+    "tidrivers": "native",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {},
+   "hw_missing": [
+    "NPU",
+    "USB",
+    "I2S"
+   ],
+   "zephyr": "upstream",
+   "probe": "MG000001",
+   "notes": "Largest MSPM0 on the bench; the natural landing board for every MSPM0 example (X: G3507 to G3519 185 of 270 built, roadmap P8)."
+  },
+  "mspm0g5187": {
+   "name": "LP-MSPM0G5187",
+   "sdk_board": "LP_MSPM0G5187",
+   "family": "MSPM0",
+   "core": "Cortex-M0+ with NPU",
+   "flash_kb": 128,
+   "ram_kb": 32,
+   "fpu": false,
+   "layers": {
+    "driverlib_msp": "native",
+    "tidrivers": "partial",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {
+    "NPU": "TI product page MSPM0G5187 (NPU); 12 edgeAI NPU examples in the SDK",
+    "USB": "SDK usb examples (TinyUSB)",
+    "I2S": "SDK i2s examples"
+   },
+   "hw_missing": [
+    "DAC",
+    "MATHACL"
+   ],
+   "zephyr": "none found",
+   "probe": "MG020001",
+   "notes": "TI Drivers: the SDK ships the libraries; examples per board not checked (partial)."
+  },
+  "mspm33c321a": {
+   "name": "LP-MSPM33C321A",
+   "sdk_board": "LP_MSPM33C321A",
+   "family": "MSPM33",
+   "core": "Cortex-M33",
+   "flash_kb": 1024,
+   "ram_kb": 256,
+   "fpu": true,
+   "layers": {
+    "driverlib_msp": "partial",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {},
+   "hw_missing": [
+    "MATHACL",
+    "DAC",
+    "OPA",
+    "NPU"
+   ],
+   "zephyr": "upstream (lp_mspm33c321a)",
+   "probe": "M3010001",
+   "notes": "No TI Drivers at all (X6). DriverLib shares every GPIO, UART and timer name with MSPM0; SPI, I2C and ADC are new blocks, UNICOMM and HSADC (X7). PKA, SHA, AESADV, TRNG on chip. Whether its ai examples use an NPU or the CPU is not confirmed here; NPU left out of hw until read from TI's page."
+  },
+  "cc2340r5": {
+   "name": "LP-EM-CC2340R5",
+   "sdk_board": "LP_EM_CC2340R5",
+   "family": "F3",
+   "core": "Cortex-M0+",
+   "flash_kb": 512,
+   "ram_kb": 36,
+   "fpu": false,
+   "layers": {
+    "tidrivers": "native",
+    "rtos_freertos": "native",
+    "driverlib_msp": "none"
+   },
+   "hw_extra": {
+    "RADIO_THREAD": "F3 SDK 9.21 ships thread examples for the CC2340R5 (experiment 2026-10-05-cc2340r5-thread-full-device)"
+   },
+   "hw_missing": [
+    "DAC",
+    "DMA",
+    "CAN",
+    "MATHACL",
+    "NPU",
+    "OPA",
+    "QEI",
+    "LIN",
+    "I2S",
+    "PKA",
+    "USB"
+   ],
+   "zephyr": "upstream (lp_em_cc2340r5)",
+   "probe": "LS470GTU",
+   "notes": "The house Zigbee light runs on it: any silicon run backs up and restores (boards.json). CAN seen once in its SDK (a can example) but the chip has no CAN controller: the example drives an external one; treat CAN as missing."
+  },
+  "cc2755p10": {
+   "name": "LP-EM-CC2755P10",
+   "sdk_board": "LP_EM_CC2755P10",
+   "family": "F3",
+   "core": "Cortex-M33",
+   "flash_kb": 1024,
+   "ram_kb": 162,
+   "fpu": true,
+   "layers": {
+    "tidrivers": "native",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {
+    "RADIO_THREAD": "F3 SDK thread examples; OpenThread FTD ran 2026-10-09",
+    "HSM": "CC27xx HSM (TI product page); cc2755p10/recovery notes",
+    "DMA": "CC27xx has a DMA (uDMA) per TI product page; no SysConfig module in the driver examples"
+   },
+   "hw_missing": [
+    "DAC",
+    "CAN",
+    "MATHACL",
+    "NPU",
+    "OPA",
+    "QEI",
+    "LIN",
+    "USB"
+   ],
+   "zephyr": "none upstream (no CC27xx directory, 2026-10-06 reading)",
+   "probe": "LS5600RE (standalone LP-XDS110)",
+   "notes": "Same F3 SDK as the CC2340R5: 33 of 33 driver examples build for both (X11)."
+  },
+  "cc1354p10": {
+   "name": "LP-CC1354P10-1",
+   "sdk_board": "LP_EM_CC1354P10_1",
+   "family": "F2",
+   "core": "Cortex-M33",
+   "flash_kb": 1024,
+   "ram_kb": 296,
+   "fpu": true,
+   "layers": {
+    "tidrivers": "native",
+    "rtos_freertos": "native"
+   },
+   "hw_from_sdk_override": [
+    "GPIO",
+    "UART",
+    "SPI",
+    "I2C",
+    "ADC",
+    "PWM",
+    "TIMER",
+    "WDT",
+    "AES",
+    "SHA",
+    "TRNG",
+    "PKA",
+    "KEYSTORE",
+    "NVS",
+    "SD",
+    "RADIO_BLE",
+    "RADIO_ZIGBEE",
+    "RADIO_THREAD",
+    "RADIO_RF",
+    "COMP",
+    "DMA",
+    "I2S"
+   ],
+   "hw_extra": {
+    "RADIO_RF": "Sub-1 GHz and 2.4 GHz multi-band (TI product page)"
+   },
+   "hw_missing": [
+    "I2C_TARGET",
+    "DAC",
+    "CAN",
+    "MATHACL",
+    "NPU",
+    "OPA",
+    "QEI",
+    "LIN",
+    "USB"
+   ],
+   "zephyr": "none",
+   "probe": "LS45013A",
+   "notes": "Its SDK (F2, simplelink_cc13xx_cc26xx_sdk 8.33) is not installed on this Mac any more (1.8 GB), so its own examples are not in the inventory; the hw list is set by hand from the 253-of-261 build sweep in cc1354p10/sweep/examples.csv and X12 to X14. F2 has no I2CTarget driver (X14)."
+  },
+  "cc35x1": {
+   "name": "LP-EM-CC35X1",
+   "sdk_board": "LP_EM_CC35X1",
+   "family": "WIFI",
+   "core": "Cortex-M33",
+   "flash_kb": 8192,
+   "ram_kb": 1126,
+   "fpu": true,
+   "layers": {
+    "tidrivers": "native",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {
+    "DMA": "SimpleLink Wi-Fi SDK uses uDMA under the drivers; no SysConfig module in the examples",
+    "QSPI": "external 8 MB flash IS25WJ064F on the board (inventory.md)"
+   },
+   "hw_missing": [
+    "DAC",
+    "MATHACL",
+    "NPU",
+    "OPA",
+    "QEI",
+    "LIN",
+    "TRNG_MODULE_NOTE",
+    "RADIO_ZIGBEE",
+    "RADIO_THREAD",
+    "RADIO_RF",
+    "USB"
+   ],
+   "zephyr": "none",
+   "probe": "E10000FQ (LP-XDS110ET)",
+   "notes": "Wi-Fi 6 plus BLE. Its SDK is the smallest tree here (32 examples per board), all TI Drivers and FreeRTOS. Matter runs over Wi-Fi, not Thread."
+  },
+  "am13e230": {
+   "name": "LP-AM13E230",
+   "sdk_board": "LP_AM13E230",
+   "family": "AM13",
+   "core": "Cortex-M33 with TMU and NPU",
+   "flash_kb": 512,
+   "ram_kb": 128,
+   "fpu": true,
+   "layers": {
+    "am13_driverlib": "native",
+    "driverlib_msp": "shim",
+    "stm32_hal": "native",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {
+    "NPU": "12 TI AI examples ran on the NPU 2026-10-09 (roadmap)",
+    "TMU": "AM13E230 TMU (SDK mathlib and TMU experiments)"
+   },
+   "hw_missing": [
+    "DAC",
+    "MATHACL",
+    "RTC",
+    "I2S",
+    "USB",
+    "PKA",
+    "SHA"
+   ],
+   "zephyr": "upstream (lp_am13e230; experiment 2026-10-09-am13e230-zephyr-upstream)",
+   "probe": "AL130001",
+   "notes": "Prototype silicon, short-term SDK 26.01.00.03. AM13 driverlib carries about 530 MSPM0-name redirect macros (X8), and the SDK ships an STM32G4 HAL compatibility layer (X9). No SysConfig module for timer PWM (X8)."
+  },
+  "am263p": {
+   "name": "LP-AM263P",
+   "sdk_board": "LP_AM263P",
+   "family": "AM263P",
+   "core": "4x Cortex-R5F",
+   "flash_kb": 32768,
+   "ram_kb": 3072,
+   "fpu": true,
+   "layers": {
+    "mcuplus_drivers": "native",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {},
+   "hw_missing": [
+    "MATHACL",
+    "NPU",
+    "RADIO_BLE",
+    "RADIO_ZIGBEE",
+    "RADIO_THREAD",
+    "RADIO_RF",
+    "WIFI",
+    "USB",
+    "OPA",
+    "I2S",
+    "AES",
+    "TRNG",
+    "SHA",
+    "PKA"
+   ],
+   "zephyr": "none (no AM263 in upstream boards, 2026-10-06 reading)",
+   "probe": "S26E0426",
+   "notes": "Crypto is behind the HSM client, not AES or SHA driver modules. Flash is external OSPI (32 MB); RAM is the 3 MB on-chip figure from data/boards.csv. RADIO_THREAD seen once in its SDK is a networking example name, not a radio: treated as missing. Probe dropped off USB 2026-10-09 22:25."
+  },
+  "f2800137": {
+   "name": "LAUNCHXL-F2800137",
+   "sdk_board": "LAUNCHXL_F2800137",
+   "family": "C2000",
+   "core": "C28x",
+   "flash_kb": 256,
+   "ram_kb": 36,
+   "fpu": true,
+   "layers": {
+    "c2000_driverlib": "native"
+   },
+   "hw_extra": {
+    "DAC": "F280013x has no buffered DAC (TI data sheet: CMPSS DAC only); left missing",
+    "CMPSS": "COMP via cmpss"
+   },
+   "hw_missing": [
+    "DAC",
+    "DMA",
+    "AES",
+    "TRNG",
+    "SHA",
+    "PKA",
+    "MATHACL",
+    "NPU",
+    "OPA",
+    "RTC",
+    "I2S",
+    "USB",
+    "LIN",
+    "CAN_FD_NOTE"
+   ],
+   "zephyr": "none",
+   "probe": "CL371081",
+   "notes": "Different instruction set (C28x) and compiler (TI C2000 25.11): only Plain C moves without a rewrite; every Arm layer is Does not exist here. CAN: F280013x has one CAN (DCAN) per TI; the C2000Ware can examples build for it. Not plugged in right now (2026-10-10 21:30)."
+  },
+  "f28p65x": {
+   "name": "LAUNCHXL-F28P65X",
+   "sdk_board": "LAUNCHXL_F28P65X",
+   "family": "C2000",
+   "core": "2x C28x + CLA",
+   "flash_kb": 1280,
+   "ram_kb": 248,
+   "fpu": true,
+   "layers": {
+    "c2000_driverlib": "native"
+   },
+   "hw_from_sdk_override": [
+    "GPIO",
+    "UART",
+    "SPI",
+    "I2C",
+    "ADC",
+    "DAC",
+    "PWM",
+    "TIMER",
+    "QEI",
+    "DMA",
+    "CAN",
+    "COMP",
+    "SDFM",
+    "XBAR",
+    "MULTICORE",
+    "AES",
+    "ETHERNET"
+   ],
+   "hw_extra": {},
+   "hw_missing": [
+    "MATHACL",
+    "NPU",
+    "OPA",
+    "RTC",
+    "I2S",
+    "USB_NOTE",
+    "TRNG",
+    "SHA",
+    "PKA"
+   ],
+   "zephyr": "none",
+   "probe": "CL650001",
+   "notes": "C2000Ware on this Mac has device_support and driverlib for f280013x only, so the F28P65x examples are not installed and not in the inventory; the hw list is by hand from the F28P65x data sheet summary (dual C28x, CLA, 16-bit ADCs, DACs, FSI, EtherCAT not counted). Not plugged in right now (2026-10-10 21:30)."
+  },
+  "tda4": {
+   "name": "SK-TDA4VM",
+   "sdk_board": "SK_TDA4VM",
+   "family": "TDA4",
+   "core": "2x Cortex-A72 (Linux) + C7x + R5F",
+   "flash_kb": 65536,
+   "ram_kb": 4194304,
+   "fpu": true,
+   "layers": {},
+   "hw_from_sdk_override": [
+    "GPIO",
+    "UART",
+    "SPI",
+    "I2C",
+    "ETHERNET",
+    "USB",
+    "DISPLAY",
+    "NPU",
+    "MULTICORE",
+    "AES",
+    "SHA",
+    "TRNG"
+   ],
+   "hw_extra": {},
+   "hw_missing": [
+    "MATHACL",
+    "RADIO_BLE",
+    "RADIO_ZIGBEE",
+    "RADIO_THREAD",
+    "RADIO_RF",
+    "WIFI",
+    "CAN_NOTE"
+   ],
+   "zephyr": "none for the A72 Linux path",
+   "probe": "none (CP2108 console, Linux)",
+   "notes": "Linux processor board: TI's examples for it live in the Processor SDK on the board, not in any SDK on this Mac, so it is a target only, and only the Plain C layer reaches it (X33). Hardware list from the kit's documents, not from SDK examples."
+  },
+  "iwrl6432": {
+   "name": "IWRL6432BOOST",
+   "sdk_board": "IWRL6432BOOST",
+   "family": "MMWAVE",
+   "core": "Cortex-M4F (APPSS) with HWA",
+   "flash_kb": 2048,
+   "ram_kb": 1024,
+   "fpu": true,
+   "layers": {
+    "mcuplus_drivers": "native",
+    "rtos_freertos": "native"
+   },
+   "hw_extra": {
+    "RADAR": "60 GHz front end, IWRL6432 data sheet",
+    "RADAR_HWA": "hardware accelerator for FFT and CFAR (SDK hwa driver examples)"
+   },
+   "hw_missing": [
+    "MATHACL",
+    "NPU",
+    "RADIO_BLE",
+    "RADIO_ZIGBEE",
+    "RADIO_THREAD",
+    "RADIO_RF",
+    "WIFI",
+    "USB",
+    "AES",
+    "SHA",
+    "TRNG",
+    "PKA",
+    "DAC",
+    "OPA",
+    "ETHERNET",
+    "MULTICORE"
+   ],
+   "zephyr": "none",
+   "probe": "RI32RI32 (XDS110 on the board; flashing goes through the SOP switches and arprog over the serial port)",
+   "notes": "MMWAVE-L-SDK 05.05.04.02 installed 2026-10-11 (Linux-only installer, run in an Ubuntu 22.04 x86_64 VM on a Mac, tree copied to ~/ti on this Mac without docs). The SDK is MCU+ derived: same /drivers/* and /kernel/dpl SysConfig modules and makefile layout as the AM263Px SDK, so AM263P driver examples are the cross-family candidates. Flash backup is not possible (no read-back tool, RD1); the restore image is TI's Motion and Presence 2D prebuilt from the Radar Toolbox, which the board carries now. Flashing needs S1 position 1 off then S2 (a hand on the board)."
+  }
+ },
+ "bridges": {
+  "_doc": "Port mechanism per (layer, from family, to family). kind: same_sdk (retarget device and board in SysConfig, app untouched), shim (header in portability/shim, app untouched), partial (names shared for some blocks), rewrite (nothing shared), none (layer absent on the target). evidence: matrix.csv row or page.",
+  "driverlib_msp": {
+   "MSPM0->MSPM0": {
+    "kind": "same_sdk",
+    "tool": "mspm0g3507/example-sweep/port_mspm0.py",
+    "evidence": "X3, X4, X15 to X18"
+   },
+   "MSPM0->MSPM33": {
+    "kind": "partial",
+    "tool": "portability/everywhere/crossport_mspm0_mspm33.py",
+    "shared": [
+     "GPIO",
+     "UART",
+     "TIMER",
+     "PWM",
+     "WDT",
+     "CRC",
+     "VREF",
+     "COMP",
+     "AES",
+     "TRNG",
+     "QEI",
+     "SPI_POLL"
+    ],
+    "evidence": "X28 (drop-in: 20 of 82 built, 19 ran) and X29 (configuration port: 43 of 83 built, run on the board); DMA, I2C and SPI-with-DMA differ (UNICOMM, DMA0)"
+   },
+   "MSPM33->MSPM0": {
+    "kind": "partial",
+    "shared": [
+     "GPIO",
+     "UART",
+     "TIMER",
+     "PWM",
+     "WDT",
+     "CRC",
+     "DMA",
+     "VREF",
+     "COMP",
+     "AES",
+     "TRNG",
+     "QEI"
+    ],
+    "evidence": "none; the reverse of X28 is not run"
+   },
+   "MSPM0->AM13": {
+    "kind": "shim",
+    "tool": "portability/everywhere/crossport_mspm0_am13.py (SysConfig translation) with portability/shim/mspm0_on_am13e230/",
+    "shared": [
+     "GPIO",
+     "UART",
+     "TIMER",
+     "PWM",
+     "I2C"
+    ],
+    "evidence": "X8 (3 of 3 ran) and X31 (10 of 31 GPIO, UART, SysTick examples build, 8 of 8 ran clean, LEDs seen toggling)"
+   },
+   "MSPM33->AM13": {
+    "kind": "partial",
+    "shared": [
+     "GPIO",
+     "UART",
+     "TIMER"
+    ],
+    "evidence": "none; inferred from X7 and X8"
+   }
+  },
+  "tidrivers": {
+   "F3->F3": {
+    "kind": "same_sdk",
+    "tool": "portability/crossbuild/f3_to_f3.sh",
+    "evidence": "X11 (33 of 33 built)"
+   },
+   "F3->F2": {
+    "kind": "same_sdk",
+    "evidence": "X12 (8 of 8 built; F2 lacks I2CTarget)"
+   },
+   "F3->WIFI": {
+    "kind": "same_sdk",
+    "evidence": "none yet; same /ti/drivers module names (UART2, GPIO, SPI, I2C, Display) in both SDKs (inventory)"
+   },
+   "WIFI->F3": {
+    "kind": "same_sdk",
+    "evidence": "none yet; same module names"
+   },
+   "WIFI->F2": {
+    "kind": "same_sdk",
+    "evidence": "none yet"
+   },
+   "F3->MSPM0": {
+    "kind": "shim",
+    "tool": "portability/shim/f3_on_mspm0/",
+    "evidence": "X2 (5 of 10 unchanged, 5 with shim)"
+   },
+   "F2->MSPM0": {
+    "kind": "shim",
+    "tool": "portability/shim/f3_on_mspm0/",
+    "evidence": "inferred from X2 and X12"
+   },
+   "WIFI->MSPM0": {
+    "kind": "shim",
+    "tool": "portability/shim/f3_on_mspm0/",
+    "evidence": "none yet"
+   },
+   "MSPM0->F3": {
+    "kind": "shim",
+    "tool": "portability/shim/mspm0_on_f3/",
+    "evidence": "X1 (5 of 10 ran)"
+   },
+   "MSPM0->F2": {
+    "kind": "shim",
+    "tool": "portability/shim/mspm0_on_f3/",
+    "evidence": "X13 (4 of 8 ran)"
+   },
+   "MSPM0->WIFI": {
+    "kind": "shim",
+    "tool": "portability/shim/mspm0_on_f3/",
+    "evidence": "none yet"
+   }
+  },
+  "am13_driverlib": {
+   "AM13->AM13": {
+    "kind": "same_sdk",
+    "evidence": "n/a"
+   }
+  },
+  "mcuplus_drivers": {
+   "AM263P->AM263P": {
+    "kind": "same_sdk",
+    "evidence": "n/a"
+   },
+   "AM263P->MMWAVE": {
+    "kind": "same_sdk",
+    "evidence": "none yet; same /drivers module ids and makefile layout (inventory 2026-10-11); cores differ (R5F to M4F), DMA is EDMA on both"
+   },
+   "MMWAVE->AM263P": {
+    "kind": "same_sdk",
+    "evidence": "none yet; radar and HWA examples Do not make sense on the AM263P"
+   },
+   "MMWAVE->MMWAVE": {
+    "kind": "same_sdk",
+    "evidence": "n/a"
+   }
+  },
+  "c2000_driverlib": {
+   "C2000->C2000": {
+    "kind": "same_sdk",
+    "tool": "c2000-launchpad/sweep/port-from-f280015x",
+    "evidence": "C2000 sweep README"
+   }
+  },
+  "stm32_hal": {
+   "AM13->AM13": {
+    "kind": "same_sdk",
+    "evidence": "X9"
+   }
+  },
+  "rtos_freertos": {
+   "*": {
+    "kind": "same_sdk",
+    "evidence": "FreeRTOS is in every SDK here except C2000Ware core; the port files differ per core"
+   }
+  }
+ },
+ "size_rules": {
+  "_doc": "An example fits on paper when its native text+data is under the target flash and data+bss under the target RAM, each with 10 percent headroom. Sizes come from this repo's sweeps (341 of 3,302 examples have one, 2026-10-10)."
+ }
+}

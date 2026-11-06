@@ -1,0 +1,75 @@
+/**
+ * BOOSTXL-AUDIO on the LP-AM13E230 (BoosterPack pins from SLVUDH9 Figure 2-9, pack pins from SLAU670A Figure 12):
+ *   pin 7  PB5   DAC8311 SCLK        pin 12 PB12  DAC8311 SYNC       pin 15 PB10  DAC8311 DIN
+ *   pin 13 PB18  amplifier shutdown  pin 5  PA3   microphone power   pin 6  PA31  microphone out (AIN33)
+ * The three DAC lines are driven as plain GPIO so the frame is exactly what the core writes.
+ * SysTick at 8 kHz paces the samples, UC4 is the backchannel UART (PA0 TX, PA1 RX) at 115200.
+ * @cliArgs --device "AM13E230x" --part "AM13E230x" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ * @v2CliArgs --device "AM13E23019" --package "LQFP64_G" --product "AM13E2X SDK@26.01.00"
+ */
+const adc     = scripting.addModule("/drivers/adc", {}, false);
+const adc1    = adc.addInstance();
+const gpio    = scripting.addModule("/drivers/gpio", {}, false);
+const gpio1   = gpio.addInstance();
+const gpio2   = gpio.addInstance();
+const sysctl  = scripting.addModule("/drivers/sysctl");
+const systick = scripting.addModule("/drivers/systick");
+const uart    = scripting.addModule("/drivers/uart", {}, false);
+const uart1   = uart.addInstance();
+
+adc1.numberOfSOCs      = 1;
+adc1.enableSEQs        = true;
+adc1.numberOfSEQs      = 1;
+adc1.$name             = "MIC_ADC";
+adc1.adcBase           = "ADC1";
+adc1.SOC0.channel      = "PA31";
+adc1.SEQ1.numberOfSOCs = 1;
+
+gpio1.$name                          = "DAC";
+gpio1.associatedPins.create(4);
+gpio1.associatedPins[0].$name        = "SYNC";
+gpio1.associatedPins[0].initialValue = "SET";
+gpio1.associatedPins[0].pin.$assign  = "PB12";
+gpio1.associatedPins[1].$name        = "SCLK";
+gpio1.associatedPins[1].pin.$assign  = "PB5";
+gpio1.associatedPins[2].$name        = "DIN";
+gpio1.associatedPins[2].pin.$assign  = "PB10";
+gpio1.associatedPins[3].$name        = "AMP";
+gpio1.associatedPins[3].initialValue = "SET";
+gpio1.associatedPins[3].pin.$assign  = "PB18";
+
+gpio2.$name                          = "MICPWR";
+gpio2.associatedPins[0].$name        = "ON";
+gpio2.associatedPins[0].pin.$assign  = "PA3";
+
+systick.periodEnable    = true;
+systick.period          = 25000;
+systick.interruptEnable = true;
+systick.registerInt     = true;
+systick.systickEnable   = true;
+
+uart1.$name                            = "UART_0";
+uart1.enableFIFO                       = true;
+uart1.targetBaudRate                   = 115200;
+uart1.peripheral.$assign               = "UC4";
+uart1.peripheral.rxPin.$assign         = "PA1";
+uart1.peripheral.txPin.$assign         = "PA0";
+uart1.txPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig0";
+uart1.txPinConfig.direction            = scripting.forceWrite("OUTPUT");
+uart1.txPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.txPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.txPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+uart1.rxPinConfig.$name                = "drivers_gpio_v0_gpioPinConfig1";
+uart1.rxPinConfig.hideOutputInversion  = scripting.forceWrite(false);
+uart1.rxPinConfig.onlyInternalResistor = scripting.forceWrite(false);
+uart1.rxPinConfig.passedPeripheralType = scripting.forceWrite("Digital");
+
+sysctl.VREFSource   = "DL_SYSCTL_VREF_INTERNAL_3_3_V";
+sysctl.useHFCLK     = true;
+sysctl.SYSPLLSource = "DL_SYSCTL_SYSPLL_REF_HFCLK";
+sysctl.SYSPLL_Qdiv  = 32;
+sysctl.peripheral.$suggestSolution       = "SYSCTL";
+sysctl.peripheral.x1Pin.$suggestSolution = "PC16_X1";
+sysctl.peripheral.x2Pin.$suggestSolution = "PC17_X2";
+adc1.SOC0.peripheral.$suggestSolution      = "ANALOG";
+adc1.SOC0.peripheral.AIN33.$suggestSolution = "PA31";

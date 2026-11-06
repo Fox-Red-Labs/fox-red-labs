@@ -1,0 +1,1 @@
+EEMBC CoreMark, unmodified source files from https://github.com/eembc/coremark at commit 1f483d5b8316753a742cbf5590caf5bd0a4e4777 (2025-05-01). core_portme.c and core_portme.h are this project's port. See LICENSE.md.

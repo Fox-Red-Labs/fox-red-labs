@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Copy of CCStudio 21.0.1 boards/AM62L_SK_EVM.xml with both GEL File properties empty, so connecting runs no PLL, PSC or DDR init
+     (the stock A53 GEL AM62L_DDRSS/AM62L_SK_EVM.gel runs Set_MAIN_PLL0_HSDIV2_CLKOUT_400MHz, PD_DDR_PowerUp and DDR_Init in OnTargetConnect).
+     A53_0 is listed first so DSLite core index 0 is the A53. Used only through load_sram.sh, which places it in a generated targetdb. -->
+<board id="AM62L_TMDS62LEVM_nogel" XML_version="1" desc="AM62L_TMDS62LEVM_nogel" description="TMDS62LEVM, no GEL: no DDR init">
+	<instance XML_version="1.2" desc="AM62L_0" href="devices/AM62L.xml" id="AM62L_0" xml="AM62L.xml" xmlpath="devices"/>
+	<device HW_revision="1.0" XML_version="1.2" description="AM62L - Cortex A53 Sitara(tm) Embedded Processor" id="AM62L_0" partnum="AM62L">
+		<router HW_revision="1.0" XML_version="1.2" description="CS_DAP Router" id="CS_DAP_0" isa="CS_DAP">
+			<subpath id="ComputeCluster_A53_0_0">
+				<cpu HW_revision="1.0" XML_version="1.2" description="CortexA53_0" deviceSim="false" id="CortexA53_0" isa="CortexA53">
+					<property Type="filepathfield" Value="" id="GEL File"/>
+				</cpu>
+			</subpath>
+			<subpath id="SMS_CM4_0_TIFS">
+				<cpu HW_revision="1.0" XML_version="1.2" desc="SMS_CM4_0_TIFS" description="Cortex_M4F CPU" deviceSim="false" id="SMS_CM4_0_TIFS" isa="Cortex_M4F">
+					<property Type="filepathfield" Value="" id="GEL File"/>
+				</cpu>
+			</subpath>
+		</router>
+	</device>
+</board>

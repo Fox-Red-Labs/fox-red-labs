@@ -1,0 +1,6 @@
+55c55,57
+< ble.deviceName = "Basic BLE project";
+---
+> ble.deviceName = "FRL text edit";
+> ble.advSet1.advParam1.primIntMin = 20;
+> ble.advSet1.advParam1.primIntMax = 20;

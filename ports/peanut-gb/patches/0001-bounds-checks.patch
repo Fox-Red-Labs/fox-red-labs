@@ -1,0 +1,31 @@
+--- a/peanut_gb.h	2026-10-20 21:17:29
++++ b/peanut_gb.h	2026-10-20 21:17:29
+@@ -814,7 +814,7 @@
+ 
+ 	case 0xA:
+ 	case 0xB:
+-		if(gb->mbc == 3 && gb->cart_ram_bank >= 0x08)
++		if(gb->mbc == 3 && gb->cart_ram_bank >= 0x08 && gb->cart_ram_bank <= 0x0C)
+ 		{
+ 			return gb->rtc_latched.bytes[gb->cart_ram_bank - 0x08];
+ 		}
+@@ -997,7 +997,7 @@
+ 
+ 	case 0xA:
+ 	case 0xB:
+-		if(gb->mbc == 3 && gb->cart_ram_bank >= 0x08)
++		if(gb->mbc == 3 && gb->cart_ram_bank >= 0x08 && gb->cart_ram_bank <= 0x0C)
+ 		{
+ 			const uint8_t rtc_reg_mask[5] = {
+ 				0x3F, 0x3F, 0x1F, 0xFF, 0xC1
+@@ -3769,6 +3769,10 @@
+ 			return GB_INIT_CARTRIDGE_UNSUPPORTED;
+ 	}
+ 
++	/* Fox Red Labs patch: header bytes come from the ROM and index tables. */
++	if(gb->gb_rom_read(gb, bank_count_location) >= PEANUT_GB_ARRAYSIZE(num_rom_banks_mask) ||
++			gb->gb_rom_read(gb, ram_size_location) >= PEANUT_GB_ARRAYSIZE(num_ram_banks))
++		return GB_INIT_CARTRIDGE_UNSUPPORTED;
+ 	gb->num_rom_banks_mask = num_rom_banks_mask[gb->gb_rom_read(gb, bank_count_location)] - 1;
+ 	gb->cart_ram = cart_ram[gb->gb_rom_read(gb, mbc_location)];
+ 	gb->num_ram_banks = num_ram_banks[gb->gb_rom_read(gb, ram_size_location)];

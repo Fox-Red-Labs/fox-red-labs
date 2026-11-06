@@ -1,0 +1,37 @@
+From c7cb314a4042a834e6fd5ff1edd8236267d910f0 Mon Sep 17 00:00:00 2001
+From: Contributor Name <contributor@example.invalid>
+Date: Sun, 25 Oct 2026 07:45:38 -0400
+Subject: [PATCH] boards: ti: lp_mspm0g3519: enable i2c2 on the BoosterPack
+ pins
+
+Enable i2c2 at 100 kHz on PC2 (SCL) and PC3 (SDA), BoosterPack pins 9
+and 10, using the pin groups added earlier.
+
+Assisted-by: Claude:claude-sonnet-5-5
+---
+ boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts b/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
+index b35cd82ea..2a55e6dad 100644
+--- a/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
++++ b/boards/ti/lp_mspm0g3519/lp_mspm0g3519.dts
+@@ -11,6 +11,7 @@
+ #include <ti/mspm0/g/mspm0g1x0x_g3x0x-pinctrl.dtsi>
+ #include <zephyr/dt-bindings/clock/mspm0_clock.h>
+ #include <zephyr/dt-bindings/gpio/gpio.h>
++#include <zephyr/dt-bindings/i2c/i2c.h>
+ #include <zephyr/dt-bindings/input/input-event-codes.h>
+ 
+ / {
+@@ -191,3 +192,10 @@
+ 	pinctrl-names = "default";
+ 	status = "disabled";
+ };
++
++&i2c2 {
++	pinctrl-0 = <&i2c2_scl_pc2 &i2c2_sda_pc3>;
++	pinctrl-names = "default";
++	clock-frequency = <I2C_BITRATE_STANDARD>;
++	status = "okay";
++};

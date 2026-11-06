@@ -1,0 +1,13 @@
+diff --git a/ports/zephyr/machine_pwm.c b/ports/zephyr/machine_pwm.c
+index f8ba9f8..4fec87b 100644
+--- a/ports/zephyr/machine_pwm.c
++++ b/ports/zephyr/machine_pwm.c
+@@ -51,7 +51,7 @@ static void configure_pwm(machine_pwm_obj_t *self) {
+     }
+ 
+     if (self->duty_ns == VALUE_NOT_SET) {
+-        self->duty_ns = (self->duty_u16 * period) / UINT16_MAX;
++        self->duty_ns = ((uint64_t)self->duty_u16 * period) / UINT16_MAX;
+     }
+ 
+     if (self->duty_ns < 0) {

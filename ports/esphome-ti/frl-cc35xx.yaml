@@ -1,0 +1,34 @@
+# ESPHome on the TI LP-EM-CC35X1 (CC3551E, Wi-Fi 6 and Bluetooth LE) through the external platform `cc35xx`.
+# The red LED is GPIO34 (green GPIO30 is TI's Wi-Fi status light in the board glue). Put the network in secrets.yaml
+# beside this file:  wifi_ssid: "..."  and  wifi_password: "..."
+# Native API without encryption for now (the platform's random numbers are not cryptographic yet).
+esphome:
+  name: frl-cc35x1
+
+external_components:
+  - source: {type: local, path: components}
+    components: [cc35xx]
+
+cc35xx:
+  board: LP_EM_CC35X1
+  # probe_serial: E10000FQ     # or pass --device <serial> to esphome upload
+  # api_self_test: true        # an ESPHome API client on the board itself, over loopback, every 5 minutes
+
+logger:
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  power_save_mode: none        # these three keys have no platform default yet on cc35xx
+socket:
+  implementation: lwip_sockets
+api:
+  max_connections: 4
+  max_send_queue: 8
+
+switch:
+  - {platform: gpio, name: "LED", pin: GPIO34}
+
+sensor:
+  - {platform: uptime, name: "Uptime"}
+  - {platform: wifi_signal, name: "Wi-Fi signal"}

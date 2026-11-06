@@ -1,0 +1,81 @@
+{
+ "api": "esp-idf",
+ "vendor": "Espressif",
+ "detect": "idf_component_register|esp_err\\.h|app_main",
+ "symbol_re": "\\b(?:gpio_[a-z_]+|uart_[a-z_]+|esp_timer_[a-z_]+|ledc_[a-z_]+|esp_log_[a-z_]+|ESP_LOG[A-Z]|adc_oneshot_[a-z_]+)\\b",
+ "calls_only": true,
+ "entries": [
+  {
+   "match": "gpio_set_level",
+   "idiom": "gpio.write",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "gpio_get_level",
+   "idiom": "gpio.read",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "gpio_config|gpio_set_direction|gpio_set_pull_mode|gpio_reset_pin",
+   "idiom": "gpio.config_pin",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "gpio_install_isr_service|gpio_isr_handler_add|gpio_set_intr_type",
+   "idiom": "gpio.input_irq_edge",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "uart_driver_install|uart_param_config|uart_set_pin|uart_set_baudrate",
+   "idiom": "uart.init_8n1",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "uart_write_bytes",
+   "idiom": "uart.tx_blocking",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "uart_read_bytes",
+   "idiom": "uart.rx_byte_blocking",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "esp_timer_get_time",
+   "idiom": "time.tick_us",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "esp_timer_create|esp_timer_start_periodic",
+   "idiom": "time.periodic_irq",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "ledc_[a-z_]+",
+   "idiom": "pwm.config_channel",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "adc_oneshot_[a-z_]+",
+   "idiom": "adc.start_conversion",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  },
+  {
+   "match": "ESP_LOG[A-Z]|esp_log_[a-z_]+",
+   "idiom": "console.print",
+   "note": "",
+   "from": "ESP-IDF programming guide (public); no port here has run an ESP-IDF project"
+  }
+ ]
+}

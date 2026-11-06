@@ -1,0 +1,105 @@
+{
+ "board": "mspm0g5187",
+ "launchpad": "LP-MSPM0G5187",
+ "family": "mspm0",
+ "sysconfig_head": [
+  "--device \"MSPM0G518X\" --package \"LQFP-64(PM)\" --part \"Default\"",
+  "--device \"MSPM0G5187\" --package \"LQFP-64(PM)\""
+ ],
+ "lcd": true,
+ "gpio": {
+  "LCD_CS": "PA30",
+  "LCD_DC": "PA1",
+  "LCD_RST": "PB23",
+  "BL_RED": "PB5",
+  "LED_GREEN": "PB0",
+  "LED_BLUE": "PB1",
+  "BUZZER": "PB4",
+  "S1": "PA11",
+  "S2": "PA0",
+  "JOY_SEL": "PB21",
+  "I2C_SCL": "PA9",
+  "I2C_SDA": "PA8"
+ },
+ "spi": {
+  "sclk": "PB18",
+  "mosi": "PB17",
+  "miso": "PB19",
+  "bitrate": 8000000
+ },
+ "uart": {
+  "tx": "PA10",
+  "baud": 115200
+ },
+ "adc": {
+  "kind": "adc12",
+  "map": {
+   "JOY_X": [
+    "ADC0",
+    2,
+    "PA25"
+   ],
+   "JOY_Y": [
+    "ADC0",
+    14,
+    "PA16"
+   ],
+   "MIC": [
+    "ADC0",
+    24,
+    "PB22"
+   ],
+   "ACC_X": [
+    "ADC0",
+    21,
+    "PB14"
+   ],
+   "ACC_Y": [
+    "ADC0",
+    20,
+    "PB15"
+   ],
+   "ACC_Z": [
+    "ADC0",
+    19,
+    "PB16"
+   ]
+  }
+ },
+ "bp": {
+  "2": "PA25",
+  "5": "PB21",
+  "6": "PB22",
+  "7": "PB18",
+  "9": "PA9",
+  "10": "PA8",
+  "13": "PA30",
+  "15": "PB17",
+  "17": "PB23",
+  "23": "PB14",
+  "24": "PB15",
+  "25": "PB16",
+  "26": "PA16",
+  "31": "PA1",
+  "32": "PA0",
+  "33": "PA11",
+  "34": "PA10",
+  "37": "PB1",
+  "38": "PB0",
+  "39": "PB5",
+  "40": "PB4"
+ },
+ "notes": {
+  "15": "PB17 also drives the on-board RGB red LED through J12: pull J12 or the screen data line loads the LED",
+  "26": "PA16 is also the audio codec I2S master clock net (R36): not isolated by a jumper",
+  "31": "PA1 is I2C0 SCL, also used as the screen data/command line here",
+  "32": "PA0 is also the red LED through J9: pull J9",
+  "33": "PA11 is the XDS110 backchannel RX with no routing jumper",
+  "34": "PA10 is the XDS110 backchannel TX with no routing jumper: the gator-clip pin carries the console",
+  "13": "SPI2 chip-select 2; the microSD slot shares SPI2 (pins 13 to 15) when a card is inserted: leave the slot empty"
+ },
+ "sysctl": [
+  "forceDefaultClkConfig = true",
+  "clockTreeEn = true"
+ ]
+}

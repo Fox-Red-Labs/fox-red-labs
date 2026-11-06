@@ -1,0 +1,8 @@
+/*
+ * BOOSTXL-SHARP128 on the lp_mspm33c321a: connector and SPI labels.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <boosterpack/lp_mspm33c321a.dtsi>
+
+#include "../common.dtsi"

@@ -1,0 +1,13 @@
+/*
+ * BOOSTXL-AUDIO on the lp_em_cc2340r5: connector and SPI labels.
+ * Pin 5 (microphone power) is not connected on this LaunchPad, so the
+ * microphone supply node is deleted. The DAC, SYNC (pin 12) and amplifier
+ * (pin 13) pins are present.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <boosterpack/lp_em_cc2340r5.dtsi>
+
+#include "../common.dtsi"
+
+/delete-node/ &audio_mic_power;

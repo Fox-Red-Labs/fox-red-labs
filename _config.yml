@@ -1,0 +1,36 @@
+# GitHub Pages builds this repository with Jekyll. The site/ folder is finished HTML and passes
+# through untouched; every markdown page (README files, docs/, FAQ.md) is rendered to HTML at the
+# same path, and links to .md files are rewritten to the rendered pages by jekyll-relative-links,
+# which GitHub Pages ships. Nothing else is needed for the pages to work.
+title: Fox Red Labs
+description: "An independent lab for makers: make it, break it, prove it. Projects, code and measured results on development kits."
+url: ""   # becomes https://foxredlabs.dev once the domain is registered and a CNAME file is added (decided 2026-10-07: Fox-Red-Labs on GitHub, foxredlabs.dev for the site)
+theme: jekyll-theme-minimal
+plugins:
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-readme-index
+  - jekyll-titles-from-headings
+relative_links:
+  enabled: true
+  collections: false
+optional_front_matter:
+  remove_originals: true
+titles_from_headings:
+  enabled: true
+  strip_title: true
+readme_index:
+  enabled: true
+include:
+  - llms.txt
+  - llms-full.txt
+  - _headers   # soft edition only: Cloudflare Pages headers (tools/publish/templates-soft/_headers); absent in the others
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - tools/deck/
+  - functions/   # soft edition only: the Pages Function source (tools/publish/templates-soft/functions); wrangler reads it from the repo root, never as a page
+# Everything else is copied as a static file (CSV rows, build-folder text evidence, scripts), because the
+# pages link them as the source of a number. Checked on a real build 2026-10-13: excluding tools/ and *.csv
+# broke 300 links.

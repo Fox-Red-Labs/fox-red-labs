@@ -1,0 +1,1122 @@
+{
+    "motorVars_M1.outVars.motorState": {
+        "index": 0,
+        "type": "uint16",
+        "permissions": "R",
+        "streamable": false,
+        "page": [
+            1,
+            3,
+            4,
+            5,
+            10,
+            7,
+            8,
+            2,
+            23
+        ]
+    },
+    "motorVars_M1.outVars.faultMtrNow": {
+        "index": 1,
+        "type": "uint16",
+        "permissions": "R",
+        "streamable": false,
+        "page": [
+            1,
+            3,
+            4,
+            5,
+            10,
+            23,
+            7,
+            8,
+            2
+        ]
+    },
+    "motorVars_M1.inputCtrl.startupMode": {
+        "index": 2,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            2
+        ]
+    },
+    "motorVars_M1.inputCtrl.estimatorMode": {
+        "index": 3,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            8
+        ]
+    },
+    "motorVars_M1.inputCtrl.svmMode": {
+        "index": 4,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            8
+        ]
+    },
+    "frlGuard.version": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 5,
+        "type": "uint16"
+    },
+    "frlGuard.state": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 6,
+        "type": "uint16"
+    },
+    "frlGuard.reason": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 7,
+        "type": "uint16"
+    },
+    "frlGuard.heartbeat": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 8,
+        "type": "uint16"
+    },
+    "frlGuard.hall": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 9,
+        "type": "uint16"
+    },
+    "frlGuard.hallEdgesA": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 10,
+        "type": "uint16"
+    },
+    "frlGuard.hallEdgesB": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 11,
+        "type": "uint16"
+    },
+    "frlGuard.hallEdgesC": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 12,
+        "type": "uint16"
+    },
+    "frlGuard.nFault": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 13,
+        "type": "uint16"
+    },
+    "hallSensorData.state": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 14,
+        "type": "uint16"
+    },
+    "frlGuard.obsMode": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 15,
+        "type": "uint16"
+    },
+    "frlGuard.onObs": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 16,
+        "type": "uint16"
+    },
+    "frlGuard.hallFree": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 17,
+        "type": "uint16"
+    },
+    "frlGuard.capChan[0]": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 18,
+        "type": "uint16"
+    },
+    "frlGuard.capChan[1]": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 19,
+        "type": "uint16"
+    },
+    "frlGuard.capChan[2]": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 20,
+        "type": "uint16"
+    },
+    "frlGuard.capChan[3]": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 21,
+        "type": "uint16"
+    },
+    "frlGuard.capDecim": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 22,
+        "type": "uint16"
+    },
+    "frlGuard.capTrig": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 23,
+        "type": "uint16"
+    },
+    "frlGuard.capArm": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 24,
+        "type": "uint16"
+    },
+    "frlGuard.capState": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 25,
+        "type": "uint16"
+    },
+    "frlGuard.capWinMs": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 26,
+        "type": "uint16"
+    },
+    "frlGuard.hallPll": {
+        "index": 27,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.hallTable": {
+        "index": 28,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.hallTableOk": {
+        "index": 29,
+        "type": "uint16",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.ilimMode": {
+        "index": 30,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.ilimOk": {
+        "index": 31,
+        "type": "uint16",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.dirRotor": {
+        "index": 32,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.testMode": {
+        "index": 33,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.ilimCode": {
+        "index": 34,
+        "type": "uint16",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "motorVars_M1.ISRCount": {
+        "index": 37,
+        "type": "uint32",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            1,
+            3,
+            4,
+            5,
+            10,
+            22,
+            23,
+            7,
+            8,
+            2
+        ]
+    },
+    "frlGuard.runMs": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 38,
+        "type": "uint32"
+    },
+    "frlGuard.capMs": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 39,
+        "type": "uint32"
+    },
+    "frlGuard.hostPackets": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 40,
+        "type": "uint32"
+    },
+    "frlGuard.capLen": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 41,
+        "type": "uint32"
+    },
+    "frlGuard.capPre": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 42,
+        "type": "uint32"
+    },
+    "frlGuard.capCount": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 43,
+        "type": "uint32"
+    },
+    "frlGuard.capStart": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 44,
+        "type": "uint32"
+    },
+    "frlGuard.capIndex": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 45,
+        "type": "uint32"
+    },
+    "frlGuard.capWinIdxA": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 46,
+        "type": "uint32"
+    },
+    "frlGuard.capWinIdxB": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 47,
+        "type": "uint32"
+    },
+    "frlGuard.dirFlips": {
+        "index": 48,
+        "type": "uint32",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "motorVars_M1.statusVars.flagMotorIdentified": {
+        "index": 49,
+        "type": "bool",
+        "permissions": "R",
+        "streamable": false,
+        "page": [
+            23
+        ]
+    },
+    "motorVars_M1.inputCtrl.flagEnableRunAndIdentify": {
+        "index": 50,
+        "type": "bool",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            10,
+            7,
+            8,
+            22,
+            23
+        ]
+    },
+    "motorVars_M1.inputCtrl.flagClearFaults": {
+        "index": 51,
+        "type": "bool",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            2
+        ]
+    },
+    "motorVars_M1.inputCtrl.flagEnableFlyingStart": {
+        "index": 52,
+        "type": "bool",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            2
+        ]
+    },
+    "motorVars_M1.inputCtrl.flagEnableDTC": {
+        "index": 53,
+        "type": "bool",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            8
+        ]
+    },
+    "motorVars_M1.inputCtrl.flagEnableFWC": {
+        "index": 54,
+        "type": "bool",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            8
+        ]
+    },
+    "motorVars_M1.inputCtrl.flagEnableMTPA": {
+        "index": 55,
+        "type": "bool",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            8
+        ]
+    },
+    "motorVars_M1.inputCtrl.flagStartHallCal": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 56,
+        "type": "bool"
+    },
+    "hallSensorData.flagCalValid": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 57,
+        "type": "bool"
+    },
+    "hallSensorData.flagCalDone": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 58,
+        "type": "bool"
+    },
+    "motorVars_M1.outVars.speed_Hz": {
+        "index": 59,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            1,
+            3,
+            4,
+            5,
+            10,
+            22,
+            7,
+            8,
+            2,
+            23
+        ]
+    },
+    "motorVars_M1.outVars.Is_A": {
+        "index": 60,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": [
+            1,
+            3,
+            4,
+            5,
+            10,
+            22,
+            7,
+            8,
+            23
+        ]
+    },
+    "motorVars_M1.statusVars.Irms_A[0]": {
+        "index": 61,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": [
+            23
+        ]
+    },
+    "motorVars_M1.outVars.Idq_in_A.value[1]": {
+        "index": 62,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            22
+        ]
+    },
+    "motorVars_M1.outVars.Idq_in_A.value[0]": {
+        "index": 63,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            22
+        ]
+    },
+    "motorVars_M1.statusVars.angleObs_rad": {
+        "index": 64,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            23
+        ]
+    },
+    "motorVars_M1.inputCtrl.speedRef_Hz": {
+        "index": 65,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": true,
+        "page": [
+            1,
+            3,
+            4,
+            5,
+            10,
+            2,
+            23
+        ]
+    },
+    "motorSetVars_M1.Kp_spd": {
+        "index": 66,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            3
+        ]
+    },
+    "motorSetVars_M1.Ki_spd": {
+        "index": 67,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            3
+        ]
+    },
+    "motorSetVars_M1.overVoltageFault_V": {
+        "index": 68,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            5
+        ]
+    },
+    "motorSetVars_M1.underVoltageFault_V": {
+        "index": 69,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            5
+        ]
+    },
+    "motorSetVars_M1.Kp_fwc": {
+        "index": 70,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            8
+        ]
+    },
+    "motorSetVars_M1.Ki_fwc": {
+        "index": 71,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            8
+        ]
+    },
+    "motorSetVars_M1.Kp_Id": {
+        "index": 72,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            3,
+            4
+        ]
+    },
+    "motorSetVars_M1.Ki_Id": {
+        "index": 73,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            3,
+            4
+        ]
+    },
+    "motorSetVars_M1.Kp_Iq": {
+        "index": 74,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            3,
+            4
+        ]
+    },
+    "motorSetVars_M1.Ki_Iq": {
+        "index": 75,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            3,
+            4
+        ]
+    },
+    "motorSetVars_M1.maxCurrent_A": {
+        "index": 76,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            5
+        ]
+    },
+    "motorSetVars_M1.overCurrent_A": {
+        "index": 77,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            5
+        ]
+    },
+    "motorSetVars_M1.accelerationMax_Hzps": {
+        "index": 78,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            5
+        ]
+    },
+    "halFOCDataObj_M1.adcData.VdcBus_V": {
+        "index": 79,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            1,
+            4,
+            5,
+            10,
+            22,
+            7,
+            2,
+            23
+        ]
+    },
+    "halFOCDataObj_M1.adcData.I_A.value[0]": {
+        "index": 82,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            22
+        ]
+    },
+    "halFOCDataObj_M1.adcData.I_A.value[1]": {
+        "index": 83,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            22
+        ]
+    },
+    "halFOCDataObj_M1.adcData.I_A.value[2]": {
+        "index": 84,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            22
+        ]
+    },
+    "halFOCDataObj_M1.adcData.V_V.value[0]": {
+        "index": 85,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            22
+        ]
+    },
+    "halFOCDataObj_M1.adcData.V_V.value[1]": {
+        "index": 86,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            22
+        ]
+    },
+    "halFOCDataObj_M1.adcData.V_V.value[2]": {
+        "index": 87,
+        "type": "float",
+        "permissions": "R",
+        "streamable": true,
+        "page": [
+            22
+        ]
+    },
+    "motorSetVars_M1.olSpeedThr": {
+        "index": 88,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            7
+        ]
+    },
+    "motorSetVars_M1.accelerationStart_Hzps": {
+        "index": 89,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            7
+        ]
+    },
+    "motorSetVars_M1.startCurrent_A": {
+        "index": 90,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": [
+            7
+        ]
+    },
+    "frlGuard.peak_A": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 91,
+        "type": "float"
+    },
+    "frlGuard.limit_A": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 92,
+        "type": "float"
+    },
+    "frlGuard.speedMax_Hz": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 93,
+        "type": "float"
+    },
+    "frlGuard.handover_Hz": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 94,
+        "type": "float"
+    },
+    "frlGuard.obsSpeed_Hz": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 95,
+        "type": "float"
+    },
+    "frlGuard.obsErr_deg": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 96,
+        "type": "float"
+    },
+    "frlGuard.obsErrPk_deg": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 97,
+        "type": "float"
+    },
+    "frlGuard.obsTrim_deg": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 98,
+        "type": "float"
+    },
+    "frlGuard.obsTrimSet_deg": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 99,
+        "type": "float"
+    },
+    "frlGuard.angleAdj_deg": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 100,
+        "type": "float"
+    },
+    "frlGuard.busMin_V": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 101,
+        "type": "float"
+    },
+    "frlGuard.busMax_V": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 102,
+        "type": "float"
+    },
+    "frlGuard.isrUs_avg": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 103,
+        "type": "float"
+    },
+    "frlGuard.isrUs_max": {
+        "permissions": "RW",
+        "streamable": false,
+        "page": [],
+        "index": 104,
+        "type": "float"
+    },
+    "frlGuard.cpuLoad_pct": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 105,
+        "type": "float"
+    },
+    "frlGuard.capScale[0]": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 106,
+        "type": "float"
+    },
+    "frlGuard.capScale[1]": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 107,
+        "type": "float"
+    },
+    "frlGuard.capScale[2]": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 108,
+        "type": "float"
+    },
+    "frlGuard.capScale[3]": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 109,
+        "type": "float"
+    },
+    "frlGuard.capWin[0]": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 110,
+        "type": "float"
+    },
+    "frlGuard.capWin[1]": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 111,
+        "type": "float"
+    },
+    "frlGuard.capWin[2]": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 112,
+        "type": "float"
+    },
+    "frlGuard.capWin[3]": {
+        "permissions": "R",
+        "streamable": false,
+        "page": [],
+        "index": 113,
+        "type": "float"
+    },
+    "frlGuard.pllSpeed_Hz": {
+        "index": 114,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.pllErr_deg": {
+        "index": 115,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calFwd_deg[0]": {
+        "index": 116,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calFwd_deg[1]": {
+        "index": 117,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calFwd_deg[2]": {
+        "index": 118,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calFwd_deg[3]": {
+        "index": 119,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calFwd_deg[4]": {
+        "index": 120,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calFwd_deg[5]": {
+        "index": 121,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calRev_deg[0]": {
+        "index": 122,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calRev_deg[1]": {
+        "index": 123,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calRev_deg[2]": {
+        "index": 124,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calRev_deg[3]": {
+        "index": 125,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calRev_deg[4]": {
+        "index": 126,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calRev_deg[5]": {
+        "index": 127,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.calSpread_deg": {
+        "index": 128,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.ilim_V": {
+        "index": 129,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.dirNow": {
+        "index": 130,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.testAngle_deg": {
+        "index": 131,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.testId_A": {
+        "index": 132,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.testRamp_Aps": {
+        "index": 133,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.testVd_V": {
+        "index": 134,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.testIdNow_A": {
+        "index": 135,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.cmpLimit_A": {
+        "index": 136,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.drvReset": {
+        "index": 35,
+        "type": "uint16",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.drvResets": {
+        "index": 36,
+        "type": "uint16",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "motorVars_M1.outVars.Vdq_out_V.value[0]": {
+        "index": 137,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "motorVars_M1.outVars.Vdq_out_V.value[1]": {
+        "index": 138,
+        "type": "float",
+        "permissions": "R",
+        "streamable": false,
+        "page": []
+    },
+    "frlGuard.ilimTest_V": {
+        "index": 139,
+        "type": "float",
+        "permissions": "RW",
+        "streamable": false,
+        "page": []
+    }
+}

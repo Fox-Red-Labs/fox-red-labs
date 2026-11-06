@@ -1,0 +1,36 @@
+{
+ "name": "NXP FRDM-MCXA153 development board",
+ "sources": "MCXA153 data sheet MCXAP64M96FS3 Rev. 5.1, 16 October 2024 (features, no FPU, no AES or TRNG); FRDM-MCXA153 board user manual UM12012 Rev. 2.0, 12 February 2025 (kit contents, jumpers JP2, JP8, JP10, JP19, JP20, Figure 11 Arduino pinout, Table 8 current measurement); MCUXpresso SDK 26.09.00 driver list for frdmmcxa153 (crc, cdog, glikey; no crypto driver). All read 2026-10-07. Not measured on a board yet",
+ "columns": [
+  {
+   "head": "The chip: MCXA153VLH",
+   "items": [
+    ["Processor: Arm Cortex-M33", "Runs the program, up to 96 million steps a second (96 MHz). No floating-point unit, no DSP instructions"],
+    ["Flash: 128 kB", "Holds the program, with error correction. Kept when the power is off"],
+    ["RAM: 32 kB", "Working memory; 8 kB of it can have error correction. Same flash and RAM as the TI MSPM0G3507"],
+    ["Power: 3.3 V on this board", "The chip accepts 1.71 to 3.6 V"]
+   ]
+  },
+  {
+   "head": "Connections inside the chip",
+   "items": [
+    ["GPIO: 52 pins", "Plain on/off pins on this 64-pin package. Most reach the Arduino, mikroBUS and Pmod headers"],
+    ["UART: 3", "Serial text. LPUART0 goes to the USB debug chip, LPUART2 to the Arduino header D0 and D1"],
+    ["I2C: 1 / SPI: 2", "Sensor bus / fast bus for displays. Plus one I3C bus with a temperature sensor on it"],
+    ["ADC: 1", "16-bit, 3.2 million samples a second (4 million at 12-bit). No DAC to make a voltage"],
+    ["PWM: 6 outputs", "One FlexPWM with three pairs for a 3-phase motor, plus a quadrature encoder input"],
+    ["Timers: 3", "32-bit timers for timing and PWM, plus low-power and wake timers"]
+   ]
+  },
+  {
+   "head": "On the board, and missing",
+   "items": [
+    ["Debug probe", "MCU-Link on its own USB-C port (J15): flashing, debugging and a USB serial port"],
+    ["On the board", "Second USB-C (J8) for the chip's own USB, RGB LED, reset, ISP and wake buttons, I3C temperature sensor"],
+    ["Headers", "Arduino Uno layout (J1 to J4, sockets), mikroBUS (J5, J6). Pmod J7 not fitted"],
+    ["Not on the chip", "No floating-point unit, no AES, no random-number generator, no TrustZone, no radio. Hardware CRC only"],
+    ["Watch out", "Every float sum is a library call, like the M0+ parts. JP2 must stay fitted or the chip has no power"]
+   ]
+  }
+ ]
+}

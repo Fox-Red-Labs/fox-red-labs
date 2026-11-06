@@ -1,0 +1,28 @@
+{
+  "note": "The shared application catalog (design: docs/superpowers/specs/2026-10-11-evidence-product-design.md, section 3 decision 5). One entry per application a builder wants, with the options that change a measured quantity. No numbers live here: tools/applications.py assesses each board from data/results/ and the evidence files named in 'evidence', and renders the block on every board page and the catalog page site/applications.html. An option choice maps to result variants; a choice with 'needs' is unavailable on a chip whose core (data/boards.csv) or extras (site/data/portfolio.json) do not name it.",
+  "applications": [
+    {
+      "id": "occupancy",
+      "title": "Room occupancy on the chip",
+      "outcome": "Tell an occupied room from an empty one from a short window of sensor readings, on the microcontroller itself, with no cloud.",
+      "question": "Will the room-occupancy model fit on this board, does it give the right answers, and how long does one answer take?",
+      "what_it_is": "Four sizes of the same small neural network (about 500 to 30,000 parameters), trained on a public occupancy dataset (temperature, humidity, light, CO2). Each build runs 20 known windows and must classify all 20 right.",
+      "pass_test": "20 of 20 known windows classified right",
+      "options": [
+        {"id": "model", "label": "Model size", "choices": [
+          {"id": "occ_cnn_500", "label": "500 parameters"},
+          {"id": "occ_cnn_2k", "label": "2k parameters"},
+          {"id": "occ_cnn_8k", "label": "8k parameters", "default": true},
+          {"id": "occ_cnn_30k", "label": "30k parameters"}]},
+        {"id": "impl", "label": "How it runs", "choices": [
+          {"id": "c-small", "label": "Plain C, smallest code", "variants": ["c-os", "gcc12-os"]},
+          {"id": "c-fast", "label": "Plain C, fastest code", "default": true, "variants": ["c-o3", "c-o4s5-flash", "c-o4-flash", "c-o4s0-flash", "c-o2-flash", "gcc12-o3", "stgcc14-o3", "c-gcc-o3-a72", "c-o4s5-ram", "c-o4-ram", "c-o4s0-ram", "c-o2-ram", "c-o3-32mhz"]},
+          {"id": "nnc-cpu", "label": "TI's neural network compiler, on the CPU", "variants": ["nnc-cpu", "nnc-cpu-src-m33", "nnc-cpu-ram", "nnc-cpu-32mhz"]},
+          {"id": "accel", "label": "On the chip's neural network accelerator", "needs": "NPU", "variants": ["nnc-npu", "npu", "nnc-cde", "nnc-npu-32mhz"]}]}
+      ],
+      "evidence": {"fit": "ai_occ_fit", "latency": "ai_occ_latency", "sizes": "data/ai-model-sizes.csv"},
+      "method": "mspm0g3507/mcu-bench/edgeai/",
+      "project": "small-ai-model"
+    }
+  ]
+}

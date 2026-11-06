@@ -1,0 +1,7 @@
+Memory region         Used Size  Region Size  %age Used
+           FLASH:      113172 B       512 KB     21.59%
+             RAM:       31188 B        36 KB     84.60%
+      FLASH_CCFG:          2 KB         2 KB    100.00%
+        IDT_LIST:          0 GB        32 KB      0.00%
+CONFIG line from the build's zephyr/.config:
+CONFIG_COMMON_LIBC_MALLOC_ARENA_SIZE=2048

@@ -1,0 +1,8 @@
+$ python3 tools/demo_flash.py flash LP_EM_CC2340R5 basic_ble_app
+# run 2026-10-07 12:41 EDT on this Mac; dry run, no --yes, touches no board
+board   LP_EM_CC2340R5 (probe LS470GTU)
+demo    basic_ble_app  533 kB hex from simplelink_lowpower_f3_sdk_9_21_00_36_LTS
+backup  would read: 0x0 for 524288 bytes, 0x4e020000 for 2048 bytes
+command /Applications/ti/uniflash_9.6.0/dslite.sh --mode flash -c <repo>/cc2340r5/CC2340R5.ccxml -e -f -u /Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS/examples/rtos/LP_EM_CC2340R5/ble/prebuilt_hexfiles/basic_ble_app.hex
+
+DRY RUN: nothing was read or written. Add --yes to back up, flash and print the restore command.
