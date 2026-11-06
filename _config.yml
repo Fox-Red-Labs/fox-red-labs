@@ -1,33 +1,10 @@
-# GitHub Pages builds this repository with Jekyll. The site/ folder is finished HTML and passes
-# through untouched; every markdown page (README files, docs/, FAQ.md) is rendered to HTML at the
-# same path, and links to .md files are rewritten to the rendered pages by jekyll-relative-links,
-# which GitHub Pages ships. Nothing else is needed for the pages to work.
+# The site is the finished HTML under site/; Jekyll only copies files. Markdown is not rendered into pages
+# (maintainer, 2026-11-06): README, FAQ and docs files are served as plain .md files, for assistants and
+# crawlers (llms.txt and each page's rel=alternate link point at them), and links to them from the site's
+# pages go to the same file on GitHub (tools/publish/publish.py, fix_links). No theme and no plugin is needed.
 title: Fox Red Labs
 description: "An independent lab for makers: make it, break it, prove it. Projects, code and measured results on development kits."
-url: ""   # becomes https://foxredlabs.dev once the domain is registered and a CNAME file is added (decided 2026-10-07: Fox-Red-Labs on GitHub, foxredlabs.dev for the site)
-theme: jekyll-theme-minimal
-plugins:
-  - jekyll-relative-links
-  - jekyll-optional-front-matter
-  - jekyll-readme-index
-  - jekyll-titles-from-headings
-relative_links:
-  enabled: true
-  collections: false
-optional_front_matter:
-  remove_originals: false   # the .md files are served beside the rendered pages: llms.txt and each page's rel=alternate link point at them
-titles_from_headings:
-  enabled: true
-  strip_title: true
-readme_index:
-  enabled: true
-# Every rendered markdown page gets the site frame (_layouts/default.html, written by tools/publish/render_md_layout.py).
-# Plain Jekyll has no default layout, and a page without one is a bare fragment with no title.
-defaults:
-  - scope:
-      path: ""
-    values:
-      layout: default
+url: ""
 include:
   - llms.txt
   - llms-full.txt
