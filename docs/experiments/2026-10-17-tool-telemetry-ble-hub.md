@@ -13,7 +13,7 @@ stop: none; the equipment was simulated over USB, and the hub's web server timed
 
 Terms: [vocab](../vocab.md), [CC2340R5 FAQ](../../cc2340r5/FAQ.md), [CC35X1 FAQ](../../cc35x1/FAQ.md). Wire formats: [PROTOCOL.md](../../tool-telemetry/PROTOCOL.md).
 
-![The phone app served by the hub: one machine's trend, live values, load mix and recent run events](../../tool-telemetry/img/app-tool.png)
+![The hub's dashboard on a phone, replaying recorded bench runs: each asset tag with its run count, overcurrent trips, run lengths and a runs-per-10-s chart](../../site/media/tool-telemetry-dashboard-phone.png)
 
 **Question.** Can a machine's motor MCU hand its counters to a cheap Bluetooth tag over a UART, can the tag advertise them for any phone (legacy) and in full for a Bluetooth 5 hub (extended) at once, and can a Wi-Fi hub collect every machine nearby and serve a phone with no internet?
 

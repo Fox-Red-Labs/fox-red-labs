@@ -1,41 +1,41 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-03",
+ "generated": "2026-11-06",
  "files": {
   "boards.json": {
-   "rows": 23,
+   "rows": 24,
    "source": "data/boards.csv",
-   "sha256": "9472e4b267cb65fc8b8dd0ae031426771fffc8a0a627b909da779cb4907a6135"
+   "sha256": "9335dfee08fcac6e3daa0ae3d981d13ceb7b582f84eff105ce96a2938abbfe36"
   },
   "results.json": {
-   "rows": 7368,
+   "rows": 7531,
    "source": "data/results/*.csv",
-   "sha256": "5259101c563250cecb4a2354fbdeccc8d125d704a3801aed3553e5890e6bfb44"
+   "sha256": "3cbca0b1c46873c648e198bd4348481ef9c4920c990b4d19ef1b2ad8dd14f529"
   },
   "parts.json": {
-   "rows": 66,
+   "rows": 67,
    "source": "data/parts.json",
-   "sha256": "0a99d68771eaf51624897c00e263d804f66a4ddee61f5400625f3e557005915a"
+   "sha256": "3b9e77ea7c04f63cfc666e3418d4efb383acdc3ad595d8d16046b5ba8d0a9288"
   },
   "ports.json": {
-   "rows": 72,
+   "rows": 76,
    "source": "site/data/ports.json",
-   "sha256": "c795b46efeca2ed48de718c9a23e077f7b524b237a44e29c9bf36f74a5659c6d"
+   "sha256": "50a43bd090775af859992e0be84ccc5a2852aa29ec6ad325cca9a8be16980d4a"
   },
   "milestones.json": {
-   "rows": 107,
+   "rows": 118,
    "source": "data/milestones.json",
-   "sha256": "f60b343a57dbbc2d29141abcc7139b118155a3245cb186f7b4040618dc3a167b"
+   "sha256": "4b8c6b69728148dce9a0b87477fede03c1bd20d667631cca672941d6fa1f2125"
   },
   "support-matrix.json": {
    "rows": 6,
    "source": "data/support-matrix.json",
-   "sha256": "ca649c4951aed5cca2723d729bc4eeccc75bc423c6b1274e188f7f7cb7e51d59"
+   "sha256": "07bc9b43c59db2ad9ea170363db1987554d79caa30bd2b0f07334745af197617"
   },
   "questions.json": {
    "rows": 10,
    "source": "data/questions.json",
-   "sha256": "72bee792fe6661c438e1a537768c6289e9caa84ddc38932d569af14cc1a11106"
+   "sha256": "5e10349b9adb94180750cf56c4970b324b21957f703aa5af97420791d3f5588a"
   }
  },
  "doc": "docs/api-v1.md",

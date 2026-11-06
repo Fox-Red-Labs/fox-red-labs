@@ -48,8 +48,8 @@ Sources for the pack rows: [PINS.md](../../portability/boosterpacks/PINS.md). Th
 
 ## What each chip did
 
-<details>
-<summary><strong>LP-MSPM0C1104</strong> (16 kB flash, 1 kB RAM): 1 kB RAM, SPI bands, no SysTick</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0C1104</strong> (16 kB flash, 1 kB RAM): 1 kB RAM, SPI bands, no SysTick</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -62,8 +62,8 @@ The microSD video path is built and simulated, not run (no card fitted).
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM0L1306</strong> (64 kB flash, 4 kB RAM): GPIO, UART, ADC, flash write, STANDBY0</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0L1306</strong> (64 kB flash, 4 kB RAM): GPIO, UART, ADC, flash write, STANDBY0</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -76,8 +76,8 @@ The microSD video path is built and simulated, not run (no card fitted).
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM0G3507</strong> (128 kB flash, 32 kB RAM): what the builds show</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0G3507</strong> (128 kB flash, 32 kB RAM): what the builds show</summary>
 
 Build results for this chip:
 
@@ -89,8 +89,8 @@ Build results for this chip:
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM0G3519</strong> (512 kB flash, 128 kB RAM): SPI at 40 MHz, software I2C, SRAM banks, no FPU</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0G3519</strong> (512 kB flash, 128 kB RAM): SPI at 40 MHz, software I2C, SRAM banks, no FPU</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -105,8 +105,8 @@ Build results for this chip:
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM0G5187</strong> (128 kB flash, 32 kB RAM): NPU, I2C sensors, UART named UC0</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0G5187</strong> (128 kB flash, 32 kB RAM): NPU, I2C sensors, UART named UC0</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -119,8 +119,8 @@ Build results for this chip:
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM33C321A</strong> (1 MB flash, 256 kB RAM): FPU, QSPI, SPI with DMA, 160 MHz</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM33C321A</strong> (1 MB flash, 256 kB RAM): FPU, QSPI, SPI with DMA, 160 MHz</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -134,8 +134,8 @@ Build results for this chip:
 
 </details>
 
-<details>
-<summary><strong>LP-AM13E230</strong> (512 kB flash, 128 kB RAM): GPIO-driven DAC, ADC, SLEEP, flash tools</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-AM13E230</strong> (512 kB flash, 128 kB RAM): GPIO-driven DAC, ADC, SLEEP, flash tools</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -149,8 +149,8 @@ The TMU and NPU were not used by any port. Flash write and the persistent-counte
 
 </details>
 
-<details>
-<summary><strong>LP-EM-CC35X1</strong> (8 MB external flash, 1,126 kB RAM): Wi-Fi, memory-mapped flash, FreeRTOS</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-EM-CC35X1</strong> (8 MB external flash, 1,126 kB RAM): Wi-Fi, memory-mapped flash, FreeRTOS</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|

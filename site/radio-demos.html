@@ -654,7 +654,9 @@ document.addEventListener('mousemove', e => {
   tip.style.left = Math.min(e.clientX + 14, innerWidth - 300) + 'px'; tip.style.top = (e.clientY + 16) + 'px';
 });
 (function(){
-  var D = JSON.parse(document.getElementById('hw-data').textContent);
+  var src = document.getElementById('hw-data');
+  if (!src) return;   // pages that share this script without the board rail (radio-demos.html)
+  var D = JSON.parse(src.textContent);
   var stops = document.querySelectorAll('.hw-stop'), panel = document.getElementById('hw-panel');
   if (!stops.length || !panel) return;
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }

@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-04",
+ "generated": "2026-11-06",
  "source": "data/support-matrix.json",
  "what_a_row_is": "the works-with grid per TI family: ran, partial, built, ships, early, community, untried, with evidence",
  "row_fields": [
@@ -213,7 +213,7 @@
        "c2000": [
         "gap",
         "No IAR compiler for C28x",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "radar": [
         "gap",
@@ -669,27 +669,27 @@
        "mspm33": [
         "gap",
         "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "wifi": [
         "gap",
         "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "am13": [
         "gap",
         "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "am26": [
         "gap",
         "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "c2000": [
         "gap",
         "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "radar": [
         "gap",
@@ -710,37 +710,37 @@
        "mspm0": [
         "community",
         "One third-party platform",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "radio": [
         "gap",
         "None in the registry",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "wifi": [
         "gap",
         "None in the registry",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "mspm33": [
         "gap",
         "None in the registry 17 Oct 2026; its only TI platform is MSP430",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "am13": [
         "gap",
         "None in the registry 17 Oct 2026; its only TI platform is MSP430",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "am26": [
         "gap",
         "None in the registry 17 Oct 2026; its only TI platform is MSP430",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "c2000": [
         "gap",
         "None in the registry 17 Oct 2026; its only TI platform is MSP430",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "radar": [
         "gap",
@@ -778,7 +778,7 @@
        "wifi": [
         "gap",
         "No port found",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "mspm33": [
         "ran",
@@ -823,7 +823,7 @@
        "mspm0": [
         "community",
         "embassy-mspm0, git only",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "radio": [
         "community",
@@ -833,32 +833,32 @@
        "mspm33": [
         "gap",
         "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "wifi": [
         "gap",
         "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "am13": [
         "gap",
         "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "am26": [
         "gap",
         "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "c2000": [
         "gap",
         "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "radar": [
         "gap",
         "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
-        "../data/toolchains/README.md#how-we-searched-14-oct-2026"
+        "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
        ],
        "linux": [
         "untried",

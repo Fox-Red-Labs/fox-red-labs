@@ -16,7 +16,7 @@ Terms: XDS110 probe, SWD, UniFlash, SysConfig and CCFG are defined in [docs/voca
 
 Status, 2026-10-06: Works. TI's SDK example on FreeRTOS blinked the red LED, confirmed by eye; Zephyr 4.4.2 blinky then blinked the green LED ([zephyr/README.md](zephyr/README.md)).
 
-Contents: [the board](#the-board), [what is in this folder](#whats-in-this-folder), [what you need](#what-you-need-before-you-start), [ten-minute path](#ten-minute-path), [build](#one-command-build), [flash](#flash-7-seconds), [gotchas](#gotchas-so-far), [what was measured](#what-was-measured), [if you see this](#if-you-see-this).
+Contents: [the board](#the-board), [what is in this folder](#whats-in-this-folder), [what you need](#what-you-need-before-you-start), [ten-minute path](#ten-minute-path), [build](#one-command-build), [flash](#flash-7-seconds), [gotchas](#gotchas), [what was measured](#what-was-measured), [if you see this](#if-you-see-this).
 
 ## What is in this folder, and what is not
 

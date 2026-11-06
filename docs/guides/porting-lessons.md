@@ -25,8 +25,8 @@ Short forms and terms:
 
 Each group has the ports it applied to. Open a group for the before and after numbers.
 
-<details>
-<summary><strong>1. Memory placement</strong>: Doom, ZX Spectrum, llama2.c, Game Boy, wasm3, MicroPython, MP3, uLisp</summary>
+<details markdown="1">
+<summary markdown="span"><strong>1. Memory placement</strong>: Doom, ZX Spectrum, llama2.c, Game Boy, wasm3, MicroPython, MP3, uLisp</summary>
 
 The question is always which region holds which bytes. Measure the cost per region before blaming the code.
 
@@ -45,8 +45,8 @@ The question is always which region holds which bytes. Measure the cost per regi
 
 </details>
 
-<details>
-<summary><strong>2. Display streaming without a frame buffer</strong>: Sharp panel, touch games, Arduboy, Game Boy, ZX Spectrum, CHIP-8, Doom</summary>
+<details markdown="1">
+<summary markdown="span"><strong>2. Display streaming without a frame buffer</strong>: Sharp panel, touch games, Arduboy, Game Boy, ZX Spectrum, CHIP-8, Doom</summary>
 
 A color frame is larger than the RAM of most of these chips (a 320 x 480 RGB565 frame is 300 kB). Every port that drew a screen sent bands, dirty rows or tiles.
 
@@ -64,8 +64,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>3. Clock and timers</strong>: Game Boy, MicroPython, MP3, llama2.c, C1104, CC35X1</summary>
+<details markdown="1">
+<summary markdown="span"><strong>3. Clock and timers</strong>: Game Boy, MicroPython, MP3, llama2.c, C1104, CC35X1</summary>
 
 - **The 32 MHz default.** The SysConfig clock tree on the MSPM33C321A gave 32 MHz. The first Game Boy image ran there at 6.7 frames/s (8 to 13 percent of the console). Setting `PLL_QDIV` 10 and `EXTDIVMCLK` divide value 1 gave 160 MHz. An extra divide by 2 after the PLL gives 80 MHz even with the PLL set, so read `CPUCLK_FREQ` in the generated header.
 - **PLL lock.** The MSPM0G3519 MicroPython port retries the PLL up to 20 times (the SYSPLL errata loop) and falls back to 32 MHz. It computes the baud divisor from the real clock.
@@ -75,8 +75,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>4. Flashing traps</strong>: G3519, CC35X1, M33, C1104, AM13</summary>
+<details markdown="1">
+<summary markdown="span"><strong>4. Flashing traps</strong>: G3519, CC35X1, M33, C1104, AM13</summary>
 
 | Symptom | Cause tag and fix | Port |
 |---|---|---|
@@ -89,8 +89,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>5. Numeric differences</strong>: llama2.c, MP3, NPU filters, Doom</summary>
+<details markdown="1">
+<summary markdown="span"><strong>5. Numeric differences</strong>: llama2.c, MP3, NPU filters, Doom</summary>
 
 - **libm drift.** The Arm C library differs from the Mac's in the last bits. In llama2.c, with activations re-quantized to int8, logits differed by up to 0.12 by token 38. Greedy output matched for 128 tokens; sampled output split at token 39. Compare greedy first.
 - **SIMD against scalar.** minimp3's SSE path differs from its scalar path by 1 in a few hundred samples. The M33 build (no fused multiply-add) matched the scalar Mac build: 194 of 194 frame checksums, maximum sample error 0.
@@ -100,8 +100,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>6. Licenses and data files</strong>: Doom, ZX Spectrum, Game Boy, CHIP-8, DNS blocker</summary>
+<details markdown="1">
+<summary markdown="span"><strong>6. Licenses and data files</strong>: Doom, ZX Spectrum, Game Boy, CHIP-8, DNS blocker</summary>
 
 - Ports commit converters and build scripts, not data. The Doom engine is GPL-2.0 and lives in `ports/doom/` only; the shareware game file is fetched, SHA-1 checked and never committed. The converted file is made by a host tool.
 - The ZX Spectrum 16 kB system ROM is copyrighted. The build takes `ZX_ROM=<file>` from the reader and otherwise runs a ROM-less test image.
@@ -110,8 +110,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>7. Upstream bugs the ports found</strong>: Doom, Game Boy, wasm3</summary>
+<details markdown="1">
+<summary markdown="span"><strong>7. Upstream bugs the ports found</strong>: Doom, Game Boy, wasm3</summary>
 
 | Project | Bug | Evidence | Fix |
 |---|---|---|---|
@@ -123,8 +123,8 @@ wasm3's default native stack budget is about 8 MB and never trips on a part with
 
 </details>
 
-<details>
-<summary><strong>8. Low-power traps</strong>: MSP430 examples on L1306 and AM13</summary>
+<details markdown="1">
+<summary markdown="span"><strong>8. Low-power traps</strong>: MSP430 examples on L1306 and AM13</summary>
 
 
 
@@ -136,8 +136,8 @@ wasm3's default native stack budget is about 8 MB and never trips on a part with
 
 </details>
 
-<details>
-<summary><strong>9. Security fixes in network code</strong>: DNS blocker on CC35X1</summary>
+<details markdown="1">
+<summary markdown="span"><strong>9. Security fixes in network code</strong>: DNS blocker on CC35X1</summary>
 
 Each forwarded query uses its own socket on a random port with a random-case name (0x20 encoding). A reply is accepted only on that socket, from the upstream on port 53, with a matching ID and an exact-case question. Queries from outside the board's subnet are dropped and relayed replies are capped at 1.2 kB. Blocked names still answered in a median 6 ms and forwarded names in 67 to 76 ms, with a 71,492-domain table of 349 kB. See [the DNS blocker experiment](../../docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md). The lwIP raw UDP callbacks run on the tcpip thread, so no blocking calls go inside them.
 

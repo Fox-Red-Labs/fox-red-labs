@@ -58,9 +58,9 @@ The second job prints your own text over the USB cable: `./start.sh mspm0l1306 p
 The commands below need more than the sparse clone has, and Python 3.12 or newer (`.python-version` names the tested 3.14; `python3 -m pip install -r requirements.txt`). Add it with `git sparse-checkout add tools data mac-setup`, or clone without `--sparse` (about 500 MB).
 
 <!-- routes:other-boards (written by tools/start/route_summary.py; do not edit by hand) -->
-**Other boards:** `./start.sh <board id> <job>` drives 11 kits. With a recorded hardware run: LP-AM13E230 (`am13e230`: `blink`); LP-CC1354P10-1 (`cc1354p10`: `blink`); LP-EM-CC2340R5 (`cc2340r5`: `blink`, `print-a-message`); LP-EM-CC2755P10 (`cc2755p10`: `blink`); LP-EM-CC35X1 (`cc35x1`: `print-a-message`); LAUNCHXL-F2800137 (`f2800137`: `blink`); LP-MSPM0C1104 (`mspm0c1104`: `blink`); LP-MSPM0G3519 (`mspm0g3519`: `blink`); LP-MSPM0G5187 (`mspm0g5187`: `blink`); LP-MSPM0L1306 (`mspm0l1306`: `blink`, `print-a-message`); LP-MSPM33C321A (`mspm33c321a`: `blink`).
+**Other boards:** `./start.sh <board id> <job>` drives 11 kits. With a recorded hardware run: LP-AM13E230 (`am13e230`: `blink`); LP-CC1354P10-1 (`cc1354p10`: `blink`); LP-EM-CC2340R5 (`cc2340r5`: `blink`, `print-a-message`); LP-EM-CC35X1 (`cc35x1`: `print-a-message`); LAUNCHXL-F2800137 (`f2800137`: `blink`); LP-MSPM0C1104 (`mspm0c1104`: `blink`); LP-MSPM0G3519 (`mspm0g3519`: `blink`); LP-MSPM0G5187 (`mspm0g5187`: `blink`); LP-MSPM0L1306 (`mspm0l1306`: `blink`, `print-a-message`); LP-MSPM33C321A (`mspm33c321a`: `blink`). Listed, with no hardware run of the guided route recorded: LP-EM-CC2755P10 (`cc2755p10`).
 
-13 other boards with a folder have a manual path: `bash mac-setup/bootstrap.sh --check` lists the missing tools and their disk space, then follow the ten-minute path in the board folder's `README.md`. Each board's tools, probe, check, backup and recovery, and what is not yet tested: [docs/setup-coverage.md](docs/setup-coverage.md). For a kit not in the folder map, `python3 tools/frl/frl.py identify "<name printed on the board>"` returns TI's page for it. Board cores, memory and prices are in `data/boards.csv`; `site/hardware.html` compares them.
+12 other boards with a folder have a manual path: `bash mac-setup/bootstrap.sh --check` lists the missing tools and their disk space, then follow the ten-minute path in the board folder's `README.md`. Each board's tools, probe, check, backup and recovery, and what is not yet tested: [docs/setup-coverage.md](docs/setup-coverage.md). For a kit not in the folder map, `python3 tools/frl/frl.py identify "<name printed on the board>"` returns TI's page for it. Board cores, memory and prices are in `data/boards.csv`; `site/hardware.html` compares them.
 <!-- /routes:other-boards -->
 
 Other boards on Linux and Windows: expected, not run ([docs/portability-of-the-recipes.md](docs/portability-of-the-recipes.md)).
@@ -1543,8 +1543,8 @@ Sources for the pack rows: [PINS.md](../../portability/boosterpacks/PINS.md). Th
 
 ## What each chip did
 
-<details>
-<summary><strong>LP-MSPM0C1104</strong> (16 kB flash, 1 kB RAM): 1 kB RAM, SPI bands, no SysTick</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0C1104</strong> (16 kB flash, 1 kB RAM): 1 kB RAM, SPI bands, no SysTick</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -1557,8 +1557,8 @@ The microSD video path is built and simulated, not run (no card fitted).
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM0L1306</strong> (64 kB flash, 4 kB RAM): GPIO, UART, ADC, flash write, STANDBY0</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0L1306</strong> (64 kB flash, 4 kB RAM): GPIO, UART, ADC, flash write, STANDBY0</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -1571,8 +1571,8 @@ The microSD video path is built and simulated, not run (no card fitted).
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM0G3507</strong> (128 kB flash, 32 kB RAM): what the builds show</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0G3507</strong> (128 kB flash, 32 kB RAM): what the builds show</summary>
 
 Build results for this chip:
 
@@ -1584,8 +1584,8 @@ Build results for this chip:
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM0G3519</strong> (512 kB flash, 128 kB RAM): SPI at 40 MHz, software I2C, SRAM banks, no FPU</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0G3519</strong> (512 kB flash, 128 kB RAM): SPI at 40 MHz, software I2C, SRAM banks, no FPU</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -1600,8 +1600,8 @@ Build results for this chip:
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM0G5187</strong> (128 kB flash, 32 kB RAM): NPU, I2C sensors, UART named UC0</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM0G5187</strong> (128 kB flash, 32 kB RAM): NPU, I2C sensors, UART named UC0</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -1614,8 +1614,8 @@ Build results for this chip:
 
 </details>
 
-<details>
-<summary><strong>LP-MSPM33C321A</strong> (1 MB flash, 256 kB RAM): FPU, QSPI, SPI with DMA, 160 MHz</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-MSPM33C321A</strong> (1 MB flash, 256 kB RAM): FPU, QSPI, SPI with DMA, 160 MHz</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -1629,8 +1629,8 @@ Build results for this chip:
 
 </details>
 
-<details>
-<summary><strong>LP-AM13E230</strong> (512 kB flash, 128 kB RAM): GPIO-driven DAC, ADC, SLEEP, flash tools</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-AM13E230</strong> (512 kB flash, 128 kB RAM): GPIO-driven DAC, ADC, SLEEP, flash tools</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -1644,8 +1644,8 @@ The TMU and NPU were not used by any port. Flash write and the persistent-counte
 
 </details>
 
-<details>
-<summary><strong>LP-EM-CC35X1</strong> (8 MB external flash, 1,126 kB RAM): Wi-Fi, memory-mapped flash, FreeRTOS</summary>
+<details markdown="1">
+<summary markdown="span"><strong>LP-EM-CC35X1</strong> (8 MB external flash, 1,126 kB RAM): Wi-Fi, memory-mapped flash, FreeRTOS</summary>
 
 | Feature | What a port did | Number | Limit |
 |---|---|---|---|
@@ -2788,8 +2788,8 @@ Short forms and terms:
 
 Each group has the ports it applied to. Open a group for the before and after numbers.
 
-<details>
-<summary><strong>1. Memory placement</strong>: Doom, ZX Spectrum, llama2.c, Game Boy, wasm3, MicroPython, MP3, uLisp</summary>
+<details markdown="1">
+<summary markdown="span"><strong>1. Memory placement</strong>: Doom, ZX Spectrum, llama2.c, Game Boy, wasm3, MicroPython, MP3, uLisp</summary>
 
 The question is always which region holds which bytes. Measure the cost per region before blaming the code.
 
@@ -2808,8 +2808,8 @@ The question is always which region holds which bytes. Measure the cost per regi
 
 </details>
 
-<details>
-<summary><strong>2. Display streaming without a frame buffer</strong>: Sharp panel, touch games, Arduboy, Game Boy, ZX Spectrum, CHIP-8, Doom</summary>
+<details markdown="1">
+<summary markdown="span"><strong>2. Display streaming without a frame buffer</strong>: Sharp panel, touch games, Arduboy, Game Boy, ZX Spectrum, CHIP-8, Doom</summary>
 
 A color frame is larger than the RAM of most of these chips (a 320 x 480 RGB565 frame is 300 kB). Every port that drew a screen sent bands, dirty rows or tiles.
 
@@ -2827,8 +2827,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>3. Clock and timers</strong>: Game Boy, MicroPython, MP3, llama2.c, C1104, CC35X1</summary>
+<details markdown="1">
+<summary markdown="span"><strong>3. Clock and timers</strong>: Game Boy, MicroPython, MP3, llama2.c, C1104, CC35X1</summary>
 
 - **The 32 MHz default.** The SysConfig clock tree on the MSPM33C321A gave 32 MHz. The first Game Boy image ran there at 6.7 frames/s (8 to 13 percent of the console). Setting `PLL_QDIV` 10 and `EXTDIVMCLK` divide value 1 gave 160 MHz. An extra divide by 2 after the PLL gives 80 MHz even with the PLL set, so read `CPUCLK_FREQ` in the generated header.
 - **PLL lock.** The MSPM0G3519 MicroPython port retries the PLL up to 20 times (the SYSPLL errata loop) and falls back to 32 MHz. It computes the baud divisor from the real clock.
@@ -2838,8 +2838,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>4. Flashing traps</strong>: G3519, CC35X1, M33, C1104, AM13</summary>
+<details markdown="1">
+<summary markdown="span"><strong>4. Flashing traps</strong>: G3519, CC35X1, M33, C1104, AM13</summary>
 
 | Symptom | Cause tag and fix | Port |
 |---|---|---|
@@ -2852,8 +2852,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>5. Numeric differences</strong>: llama2.c, MP3, NPU filters, Doom</summary>
+<details markdown="1">
+<summary markdown="span"><strong>5. Numeric differences</strong>: llama2.c, MP3, NPU filters, Doom</summary>
 
 - **libm drift.** The Arm C library differs from the Mac's in the last bits. In llama2.c, with activations re-quantized to int8, logits differed by up to 0.12 by token 38. Greedy output matched for 128 tokens; sampled output split at token 39. Compare greedy first.
 - **SIMD against scalar.** minimp3's SSE path differs from its scalar path by 1 in a few hundred samples. The M33 build (no fused multiply-add) matched the scalar Mac build: 194 of 194 frame checksums, maximum sample error 0.
@@ -2863,8 +2863,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>6. Licenses and data files</strong>: Doom, ZX Spectrum, Game Boy, CHIP-8, DNS blocker</summary>
+<details markdown="1">
+<summary markdown="span"><strong>6. Licenses and data files</strong>: Doom, ZX Spectrum, Game Boy, CHIP-8, DNS blocker</summary>
 
 - Ports commit converters and build scripts, not data. The Doom engine is GPL-2.0 and lives in `ports/doom/` only; the shareware game file is fetched, SHA-1 checked and never committed. The converted file is made by a host tool.
 - The ZX Spectrum 16 kB system ROM is copyrighted. The build takes `ZX_ROM=<file>` from the reader and otherwise runs a ROM-less test image.
@@ -2873,8 +2873,8 @@ On the G3519, polled sending and DMA gave the same full-screen fill, 67.2 ms, at
 
 </details>
 
-<details>
-<summary><strong>7. Upstream bugs the ports found</strong>: Doom, Game Boy, wasm3</summary>
+<details markdown="1">
+<summary markdown="span"><strong>7. Upstream bugs the ports found</strong>: Doom, Game Boy, wasm3</summary>
 
 | Project | Bug | Evidence | Fix |
 |---|---|---|---|
@@ -2886,8 +2886,8 @@ wasm3's default native stack budget is about 8 MB and never trips on a part with
 
 </details>
 
-<details>
-<summary><strong>8. Low-power traps</strong>: MSP430 examples on L1306 and AM13</summary>
+<details markdown="1">
+<summary markdown="span"><strong>8. Low-power traps</strong>: MSP430 examples on L1306 and AM13</summary>
 
 Source: [porting lessons of the MSP430 port](../../ports/msp430-to-mspm0/PORTING-LESSONS.md).
 
@@ -2899,8 +2899,8 @@ Source: [porting lessons of the MSP430 port](../../ports/msp430-to-mspm0/PORTING
 
 </details>
 
-<details>
-<summary><strong>9. Security fixes in network code</strong>: DNS blocker on CC35X1</summary>
+<details markdown="1">
+<summary markdown="span"><strong>9. Security fixes in network code</strong>: DNS blocker on CC35X1</summary>
 
 Each forwarded query uses its own socket on a random port with a random-case name (0x20 encoding). A reply is accepted only on that socket, from the upstream on port 53, with a matching ID and an exact-case question. Queries from outside the board's subnet are dropped and relayed replies are capped at 1.2 kB. Blocked names still answered in a median 6 ms and forwarded names in 67 to 76 ms, with a 71,492-domain table of 349 kB. See [the DNS blocker experiment](../../docs/experiments/2026-10-20-cc35x1-dns-sinkhole.md). The lwIP raw UDP callbacks run on the tcpip thread, so no blocking calls go inside them.
 
@@ -13583,9 +13583,9 @@ stop: none; open loop in duty, unloaded
 
 Terms: [vocab](../vocab.md), [LP-AM13E230 FAQ](../../am13e230/FAQ.md). Six-step is the simplest brushless drive, two phases on at a time, switched by the three Hall sensors; FOC is the smooth version TI's SDK solutions use. Board page: [LP-AM13E230 README](../../am13e230/README.md). Program page: [bldc-drv8376 README](../../am13e230/bldc-drv8376/README.md).
 
-![The DRV8376EVM with the Hall block, motor and supply terminals marked](../arrivals/img/drv8376evm-wiring.png)
+![The DRV8376EVM with the Hall block, motor and supply terminals marked](../../site/media/wiring/drv8376evm-wiring.png)
 
-![The LP-AM13E230 with the switches, the EVM sockets and the pins it uses marked](../arrivals/img/am13e230-bldc-drv8376.png)
+![The LP-AM13E230 with the switches, the EVM sockets and the pins it uses marked](../../site/media/wiring/am13e230-bldc-drv8376.png)
 
 **Question.** The EVM was made for the LAUNCHXL-F280049C with TI's GUI firmware. The AM13 SDK's four motor solutions all want a BOOSTXL-DRV8323RH or DRV8329A. Can the EVM run from the LP-AM13E230 at all, and how much code does a first run take?
 
@@ -13618,7 +13618,7 @@ stop: none; the equipment was simulated over USB, and the hub's web server timed
 
 Terms: [vocab](../vocab.md), [CC2340R5 FAQ](../../cc2340r5/FAQ.md), [CC35X1 FAQ](../../cc35x1/FAQ.md). Wire formats: [PROTOCOL.md](../../tool-telemetry/PROTOCOL.md).
 
-![The phone app served by the hub: one machine's trend, live values, load mix and recent run events](../../tool-telemetry/img/app-tool.png)
+![The hub's dashboard on a phone, replaying recorded bench runs: each asset tag with its run count, overcurrent trips, run lengths and a runs-per-10-s chart](../../site/media/tool-telemetry-dashboard-phone.png)
 
 **Question.** Can a machine's motor MCU hand its counters to a cheap Bluetooth tag over a UART, can the tag advertise them for any phone (legacy) and in full for a Bluetooth 5 hub (extended) at once, and can a Wi-Fi hub collect every machine nearby and serve a phone with no internet?
 
@@ -16760,8 +16760,6 @@ The text of [site/software.html](../site/software.html), from `tools/render_soft
 - **Arduino sketches on the LP-EM-CC2340R5 and LP-MSPM0G3519 through the Zephyr-based core: Blink and AnalogReadSerial** (Works): Arduino's stock Blink and AnalogReadSerial run unchanged on the LP-EM-CC2340R5 and LP-MSPM0G3519 through the Zephyr-based core.
 - **Renesas FSP examples (UART, ADC, I2C, GPT timer) on the LP-MSPM0G3519** (Works): Four of five Renesas FSP examples (FSP is Renesas's driver layer) run on the LP-MSPM0G3519 on a layer that maps FSP calls onto DriverLib, TI's register-level driver library.
 - **Raspberry Pi Pico SDK examples on the LP-MSPM0G3519** (Works): Raspberry Pi pico-examples (serial hello, I2C bus scan, blink, PWM fade, ADC read) run unchanged on the LP-MSPM0G3519 over a thin layer on DriverLib.
-- **Zephyr on the AM62L's Cortex-A53: from on-chip SRAM, and on one core beside Linux** (Works): Zephyr's upstream am62l_evm board runs with no DDR, no TF-A and no TIFS: a 124 KB hello world in the 144 KB of on-chip SRAM, started over JTAG at EL3.
-- **TI's Jailhouse hypervisor on the AM62L: bare-metal and Linux cells beside Linux** (Works): TI's documented Jailhouse flow from Linux SDK 12.01.00.05.03 ran as written on the AM62L EVM: the hypervisor enabled in 0.27 s, the uart and gic demo cells printed within a second, and a second Linux reached a login about 20 s after its cell started.
 
 ==============================================================================
 FILE: docs/builds/README.md | Builds, as text
@@ -24389,7 +24387,7 @@ Terms: XDS110 probe, SWD, UniFlash, SysConfig and CCFG are defined in [docs/voca
 
 Status, 2026-10-06: Works. TI's SDK example on FreeRTOS blinked the red LED, confirmed by eye; Zephyr 4.4.2 blinky then blinked the green LED ([zephyr/README.md](zephyr/README.md)).
 
-Contents: [the board](#the-board), [what is in this folder](#whats-in-this-folder), [what you need](#what-you-need-before-you-start), [ten-minute path](#ten-minute-path), [build](#one-command-build), [flash](#flash-7-seconds), [gotchas](#gotchas-so-far), [what was measured](#what-was-measured), [if you see this](#if-you-see-this).
+Contents: [the board](#the-board), [what is in this folder](#whats-in-this-folder), [what you need](#what-you-need-before-you-start), [ten-minute path](#ten-minute-path), [build](#one-command-build), [flash](#flash-7-seconds), [gotchas](#gotchas), [what was measured](#what-was-measured), [if you see this](#if-you-see-this).
 
 ## What is in this folder, and what is not
 

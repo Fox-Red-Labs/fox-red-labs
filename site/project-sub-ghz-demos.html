@@ -886,6 +886,7 @@ h2.t-h { font: 700 26px/32px var(--frl-font); margin: 0 0 12px; }
 .t-facts span + span::before { content: "\00b7"; margin: 0 8px; }
 .t-fig { margin: 0; } .t-fig img, .t-fig video { width: 100%; border-radius: 12px; display: block; }
 .t-fig figcaption { font-size: 13px; color: var(--frl-stone); margin-top: 6px; }
+.t-hero > * { min-width: 0; } .t-fig figcaption code { overflow-wrap: anywhere; }   /* a long command in a caption must wrap, not widen the page on a phone */
 .t-fig .pic-il { display: flex; align-items: center; justify-content: center; min-height: 240px; border-radius: 12px; background: var(--frl-ink); overflow: hidden; position: relative; }
 .t-fig .pic-il.il-draw { background: var(--frl-cream); } .t-fig .pic-il.il-draw img { border-radius: 0; max-height: 300px; object-fit: contain; padding: 10px; box-sizing: border-box; }
 .t-fig .pic-il .il-dg { height: 200px; width: 210px; } .t-fig .pic-il .il-mini { height: 210px; width: 210px; background: var(--frl-cream); border-radius: 50%; padding: 6px; box-sizing: border-box; }

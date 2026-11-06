@@ -15,12 +15,19 @@ relative_links:
   enabled: true
   collections: false
 optional_front_matter:
-  remove_originals: true
+  remove_originals: false   # the .md files are served beside the rendered pages: llms.txt and each page's rel=alternate link point at them
 titles_from_headings:
   enabled: true
   strip_title: true
 readme_index:
   enabled: true
+# Every rendered markdown page gets the site frame (_layouts/default.html, written by tools/publish/render_md_layout.py).
+# Plain Jekyll has no default layout, and a page without one is a bare fragment with no title.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
 include:
   - llms.txt
   - llms-full.txt
