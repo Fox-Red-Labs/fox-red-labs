@@ -30,8 +30,8 @@ git sparse-checkout add am13e230
 
 ### Before you start
 
-- A Mac with TI AM13 SDK 26.01.00.03, SysConfig 1.28.0 and TI Arm Clang 5.1.1.LTS installed where the build scripts expect them (the FOC script reads the SDK under /Applications/ti). Checked on one Intel Mac only.
-- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`. It holds the scripts and firmware named in the steps.
+- The code is in this repository. Clone it first: `git clone --depth 1 --filter=blob:none https://github.com/Fox-Red-Labs/fox-red-labs.git` (about 300 MB on disk; the sparse clone on the start page is smaller). This page calls the folder you clone it into `<repository folder>`. Every command below runs from inside it.
+- Four free TI tools, each under /Applications/ti on a Mac or named by an environment variable the build script reads: the AM13E230x SDK 26.01.00.03 (https://www.ti.com/tool/LP-AM13E230, myTI login, about 0.4 GB; `FRL_AM13_SDK`), SysConfig 1.28.0 (https://www.ti.com/tool/SYSCONFIG, about 0.15 GB; `FRL_SYSCONFIG`), TI Arm Clang 5.1.1.LTS (https://www.ti.com/tool/ARM-CGT, about 0.3 GB, or the copy inside CCStudio; `FRL_TICLANG`) and, for the flash step, DSLite from UniFlash (https://www.ti.com/tool/UNIFLASH, about 0.5 GB, or the copy inside CCStudio; `FRL_DSLITE`). `python3 tools/frl/frl.py doctor --board am13e230` lists what is missing. The build script stops with the tool's name and download page when one is absent. Checked on one Intel Mac only; nothing is installed by the script.
 
 ### Wiring
 
@@ -59,11 +59,15 @@ The 40-pin edge is four 10-pin headers. Hold the board with the USB connector at
 
    If every Hall line later reads state 7, the J13 jumper is missing or the Hall ground lead is open.
 
-2. **Terminal.** Build and flash the six-step program: `cd am13e230/bldc-drv8376 && ./build.sh --flash`
+2. **Terminal.** Build and flash the six-step program. With one LaunchPad on USB the script finds its probe and writes the connection file it needs; with more than one it lists their serials and asks for `./build.sh --flash <serial>`.
+
+   ```text
+   cd am13e230/bldc-drv8376 && ./build.sh --flash
+   ```
 
    You should see: About 3 s to build and 5 s to flash over the LaunchPad kit's own probe; 32 kB of flash.
 
-   If the build cannot find its tools, install the SDK, SysConfig and compiler versions in step 1.
+   If the build cannot find its tools, install the AM13E230x SDK 26.01.00.03, SysConfig 1.28.0 and TI Arm Clang 5.1.1.LTS where the script expects them (the paths are at the top of build.sh); `python3 tools/frl/frl.py doctor --board am13e230` lists what is missing with download links.
 
 3. **Bench.** Plug in USB-C, then switch the motor supply on. Open the LaunchPad kit's serial port at 115200 baud and type `v`.
 
@@ -143,8 +147,8 @@ git sparse-checkout add am13e230 tools/motorlink tools/frl
 
 ### Before you start
 
-- A Mac with TI AM13 SDK 26.01.00.03, SysConfig 1.28.0 and TI Arm Clang 5.1.1.LTS installed where the build scripts expect them (the FOC script reads the SDK under /Applications/ti). Checked on one Intel Mac only.
-- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`. It holds the scripts and firmware named in the steps.
+- The code is in this repository. Clone it first: `git clone --depth 1 --filter=blob:none https://github.com/Fox-Red-Labs/fox-red-labs.git` (about 300 MB on disk; the sparse clone on the start page is smaller). This page calls the folder you clone it into `<repository folder>`. Every command below runs from inside it.
+- Four free TI tools, each under /Applications/ti on a Mac or named by an environment variable the build script reads: the AM13E230x SDK 26.01.00.03 (https://www.ti.com/tool/LP-AM13E230, myTI login, about 0.4 GB; `FRL_AM13_SDK`), SysConfig 1.28.0 (https://www.ti.com/tool/SYSCONFIG, about 0.15 GB; `FRL_SYSCONFIG`), TI Arm Clang 5.1.1.LTS (https://www.ti.com/tool/ARM-CGT, about 0.3 GB, or the copy inside CCStudio; `FRL_TICLANG`) and, for the flash step, DSLite from CCStudio (https://www.ti.com/tool/CCSTUDIO, 1.9 GB; `am13e230/tools/run_image.py` uses it). `python3 tools/frl/frl.py doctor --board am13e230` lists what is missing. The build script stops with the tool's name and download page when one is absent. Checked on one Intel Mac only; nothing is installed by the script.
 - Chrome or Edge on a computer, if you use the motor console (it reads the board over Web Serial).
 
 ### Wiring
@@ -256,7 +260,7 @@ The motor holds a set electrical speed in closed loop on TI's FOC, stops on its 
 |---|---|---|
 | Step response | rise 10 to 90 percent 50 ms median with raised gains against 91 ms with TI's defaults; settle to a 1.25 Hz band 82 ms against 151 ms |  |
 | Live link | TI's MotorVision protocol at 9.2 Mbaud over the LaunchPad kit's USB serial; guard version 6 | `tools/motorlink/README.md` |
-| Port | TI's 3sh_hall_sen_foc_drv8323rh solution, 20 kHz PWM, 2.0 us minimum compare, 0.4 A software torque ceiling | `am13e230/foc-drv8376/README.md` |
+| Port | TI's 3sh_hall_sen_foc_drv8323rh solution, 20 kHz PWM, 2.0 Âµs minimum compare, 0.4 A software torque ceiling | `am13e230/foc-drv8376/README.md` |
 
 ## FOC with no sensor in the loop
 
@@ -282,8 +286,8 @@ git sparse-checkout add am13e230 tools/frl
 
 ### Before you start
 
-- A Mac with TI AM13 SDK 26.01.00.03, SysConfig 1.28.0 and TI Arm Clang 5.1.1.LTS installed where the build scripts expect them (the FOC script reads the SDK under /Applications/ti). Checked on one Intel Mac only.
-- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`. It holds the scripts and firmware named in the steps.
+- The code is in this repository. Clone it first: `git clone --depth 1 --filter=blob:none https://github.com/Fox-Red-Labs/fox-red-labs.git` (about 300 MB on disk; the sparse clone on the start page is smaller). This page calls the folder you clone it into `<repository folder>`. Every command below runs from inside it.
+- Four free TI tools, each under /Applications/ti on a Mac or named by an environment variable the build script reads: the AM13E230x SDK 26.01.00.03 (https://www.ti.com/tool/LP-AM13E230, myTI login, about 0.4 GB; `FRL_AM13_SDK`), SysConfig 1.28.0 (https://www.ti.com/tool/SYSCONFIG, about 0.15 GB; `FRL_SYSCONFIG`), TI Arm Clang 5.1.1.LTS (https://www.ti.com/tool/ARM-CGT, about 0.3 GB, or the copy inside CCStudio; `FRL_TICLANG`) and, for the flash step, DSLite from CCStudio (https://www.ti.com/tool/CCSTUDIO, 1.9 GB; `am13e230/tools/run_image.py` uses it). `python3 tools/frl/frl.py doctor --board am13e230` lists what is missing. The build script stops with the tool's name and download page when one is absent. Checked on one Intel Mac only; nothing is installed by the script.
 - The FOC firmware built, flashed and Hall-calibrated as in the previous version (its steps 1 to 5). The Halls stay wired as a referee.
 
 ### Wiring

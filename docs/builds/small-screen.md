@@ -1,4 +1,4 @@
-# Put colors and touch on a small screen
+# Colors and touch on a small screen
 
 Wire a 3.5 inch touch screen to a LaunchPad kit with 11 jumper wires and run a 7.4 kB program that paints colors, bars and a dot under your finger.
 

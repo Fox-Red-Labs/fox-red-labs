@@ -1,4 +1,4 @@
-# Build a Thread border router from two chips, with no Linux
+# Thread border router from two chips, no Linux
 
 Thread devices reaching the home network through two small chips and no Linux computer.
 

@@ -420,9 +420,12 @@
    "ram_kb": 32,
    "radios": [],
    "extras": [
-    "Segment LCD on the board",
-    "Battery backup pin (VBAT)",
-    "AES"
+    "Segment LCD controller (up to 8 x 51 segments), glass on the board",
+    "VBAT island: RTC, tamper pins, 32-byte backup memory, super-capacitor charger",
+    "AES (GCM, CCM, CBC, CTR) with four-key storage, TRNG, CRC-16 and CRC-32",
+    "12-bit ADC 1.68 Msps, up to 26 channels; comparator with 8-bit DAC",
+    "5 UART (two with LIN, IrDA, DALI), 2 I2C, 2 SPI; 7 DMA channels",
+    "106 uA/MHz run (data sheet CoreMark figure)"
    ],
    "board_price": "$18.69",
    "probe": "onboard",
@@ -430,8 +433,11 @@
    "sources": [
     "https://www.ti.com/tool/LP-MSPM0L2228",
     "https://www.ti.com/product/MSPM0L2228",
-    "docs/research/ti-portfolio-gaps-2026-10-06.md"
-   ]
+    "https://www.ti.com/lit/ds/symlink/mspm0l2228.pdf",
+    "https://www.ti.com/lit/ug/slau928a/slau928a.pdf"
+   ],
+   "standby": "1.2 uA (STANDBY with the RTC on, data sheet)",
+   "board_note": "On the bench since 2026-11-09 (Rev. A). The tool page showed no price without a login that day; $18.69 is the earlier read."
   },
   {
    "part": "CC3235SF",

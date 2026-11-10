@@ -1,6 +1,6 @@
 # Espressif ESP32-C6-DevKitC-1-N8 on a Mac: 184 s to a changed blink, CoreMark, Thread, Zigbee and Bluetooth
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 A plugged-in ESP32-C6-DevKitC-1-N8 reached a changed blink in 184 s with ESP-IDF v6.1 installed and the blink project already built (the clock includes a failed rebuild and a 97 s full rebuild on a busy Mac; starting from the copy step adds the first clean build, 67 s here), flashed over the chip's own USB port with no probe and no button. Its RISC-V core gives 437 CoreMark per second at 160 MHz (GCC -O3, code in flash), it joined the house Thread network in 4.55 s and Home Assistant's Zigbee network as a router light, and it runs as the house Bluetooth proxy. Measured 2026-10-11 on macOS Intel 15.7; every number is a row, with its conditions, in `data/results/esp32c6.csv`.
 

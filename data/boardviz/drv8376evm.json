@@ -1,0 +1,720 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts found by tools/boardviz/pads_from_drawing.py, drawn but never labelled.",
+ "board": "DRV8376EVM",
+ "id": "drv8376evm",
+ "source": "Positions read from the board drawing in the module's user guide (SLVUD20, figure 2-1), scale set from the 2.54 mm pitch of the two LaunchPad sockets.",
+ "size": [
+  73.8,
+  63.1
+ ],
+ "color": "#17703a",
+ "corner": 1.5,
+ "holes": [
+  [
+   2.23,
+   60.3,
+   3.2
+  ],
+  [
+   70.7,
+   2.96,
+   3.2
+  ]
+ ],
+ "silk": [
+  {
+   "t": "DRV8376EVM",
+   "x": 30.4,
+   "y": 11.5,
+   "s": 2.0,
+   "rot": 90
+  },
+  {
+   "t": "OUT C",
+   "x": 24.5,
+   "y": 45.9,
+   "s": 1.4
+  },
+  {
+   "t": "OUT B",
+   "x": 30.0,
+   "y": 45.9,
+   "s": 1.4
+  },
+  {
+   "t": "OUT A",
+   "x": 35.1,
+   "y": 45.9,
+   "s": 1.4
+  },
+  {
+   "t": "VM",
+   "x": 63.1,
+   "y": 41.5,
+   "s": 2.4
+  },
+  {
+   "t": "J13",
+   "x": 4.0,
+   "y": 34.0,
+   "s": 1.3
+  },
+  {
+   "t": "PGND",
+   "x": 44.7,
+   "y": 63.0,
+   "s": 1.4
+  }
+ ],
+ "parts": [
+  {
+   "id": "j8",
+   "type": "femaleheader",
+   "x": 20.91,
+   "y": 14.3,
+   "cols": 2,
+   "rows": 10,
+   "side": "bottom",
+   "label": "J8 socket",
+   "title": "J8, LaunchPad socket",
+   "text": "From underneath, this socket presses onto the LaunchPad kit's right-hand headers, J4 and J2. The Hall block is on this side.",
+   "key": true
+  },
+  {
+   "id": "j9",
+   "type": "femaleheader",
+   "x": 64.09,
+   "y": 14.3,
+   "cols": 2,
+   "rows": 10,
+   "side": "bottom",
+   "label": "J9 socket",
+   "title": "J9, LaunchPad socket",
+   "text": "From underneath, this socket presses onto the LaunchPad kit's left-hand headers, J1 and J3. Its far pin lands on the 3V3 pin."
+  },
+  {
+   "id": "out",
+   "type": "terminal",
+   "x": 29.5,
+   "y": 59.2,
+   "ways": 3,
+   "names": [
+    "OUT C",
+    "OUT B",
+    "OUT A"
+   ],
+   "label": "Motor phases",
+   "title": "Motor phase terminal",
+   "text": "Three screw terminals for the motor's phase wires. Any order works; the program works out the order.",
+   "key": true
+  },
+  {
+   "id": "vbat",
+   "type": "terminal",
+   "x": 44.7,
+   "y": 59.2,
+   "ways": 2,
+   "names": [
+    "PGND",
+    "VBAT"
+   ],
+   "label": "Motor supply",
+   "title": "Supply terminal",
+   "text": "Ground (PGND) on the left, positive (VBAT) on the right, 4.5 to 65 volts. A backwards supply does nothing.",
+   "key": true
+  },
+  {
+   "id": "hall",
+   "type": "hallblock",
+   "x": 4.5,
+   "y": 15.3,
+   "ways": 5,
+   "pitch": 5.0,
+   "w": 9,
+   "d": 9,
+   "names": [
+    "HALL A",
+    "HALL B",
+    "HALL C",
+    "HALL POWER",
+    "HALL GROUND"
+   ],
+   "label": "Hall sensors",
+   "title": "Hall block",
+   "text": "The green plug takes the motor's five Hall sensor wires: ground, power, then Hall A, B and C. A, B and C can go in any order.",
+   "key": true
+  },
+  {
+   "id": "j13",
+   "type": "header",
+   "x": 6.7,
+   "y": 35.1,
+   "cols": 1,
+   "rows": 3,
+   "rot": 90,
+   "shunts": "top",
+   "label": "Hall power jumper",
+   "title": "J13, Hall power select",
+   "text": "Chooses what powers the Hall sensors. With the jumper on the GVDD pair they get the driver's 5 V."
+  },
+  {
+   "id": "cap",
+   "type": "bigcap",
+   "x": 54.0,
+   "y": 41.9,
+   "d": 10,
+   "h": 14,
+   "color": "#1f3b8a",
+   "label": "Bulk capacitor",
+   "title": "C17, bulk capacitor",
+   "text": "A large electrolytic capacitor that smooths the motor supply when the motor pulls current in bursts."
+  },
+  {
+   "id": "drv",
+   "type": "qfn",
+   "x": 34.4,
+   "y": 36.0,
+   "size": 7,
+   "label": "Motor driver",
+   "title": "DRV8376",
+   "text": "The three-phase driver: six power transistors in one chip, 4.5 to 65 V. The LaunchPad kit's PWM signals say when each one switches.",
+   "key": true
+  },
+  {
+   "id": "ind",
+   "type": "qfn",
+   "x": 65.9,
+   "y": 55.2,
+   "size": 10.5,
+   "label": "Inductor",
+   "title": "Power-supply inductor",
+   "text": "A large inductor in the board's own power supply section."
+  },
+  {
+   "id": "led_vm",
+   "type": "led",
+   "x": 64.4,
+   "y": 46.3,
+   "rot": 0,
+   "color": "#35d36b",
+   "name": "VM",
+   "label": "VM",
+   "title": "VM LED",
+   "text": "Lights when the motor supply is on."
+  },
+  {
+   "id": "led_avdd",
+   "type": "led",
+   "x": 22.8,
+   "y": 34.8,
+   "rot": 0,
+   "color": "#35d36b",
+   "name": "AVDD",
+   "label": "AVDD",
+   "title": "AVDD LED",
+   "text": "Lights when the driver's 3.3 V supply is up."
+  },
+  {
+   "id": "led_gvdd",
+   "type": "led",
+   "x": 23.6,
+   "y": 31.1,
+   "rot": 0,
+   "color": "#35d36b",
+   "name": "GVDD",
+   "label": "GVDD",
+   "title": "GVDD LED",
+   "text": "Lights when the driver's 5 V supply is up."
+  },
+  {
+   "id": "led_mcu",
+   "type": "led",
+   "x": 15.6,
+   "y": 25.2,
+   "rot": 90,
+   "color": "#ff9a2a",
+   "name": "MCU",
+   "label": "MCU",
+   "title": "MCU LED",
+   "text": "Lit by the LaunchPad. Our motor program turns it on while it runs."
+  },
+  {
+   "id": "led_nfault",
+   "type": "led",
+   "x": 70.7,
+   "y": 16.5,
+   "rot": 90,
+   "color": "#ffcc20",
+   "name": "NFAULT",
+   "label": "NFAULT",
+   "title": "NFAULT LED",
+   "text": "Lights when the driver reports a fault, such as too much current or too little voltage."
+  },
+  {
+   "type": "ring",
+   "x": 24.3,
+   "y": 48.61,
+   "d": 2.4,
+   "name": "OUT C"
+  },
+  {
+   "type": "ring",
+   "x": 29.68,
+   "y": 48.42,
+   "d": 2.4,
+   "name": "OUT B"
+  },
+  {
+   "type": "ring",
+   "x": 34.88,
+   "y": 48.42,
+   "d": 2.4,
+   "name": "OUT A"
+  },
+  {
+   "type": "ring",
+   "x": 57.51,
+   "y": 26.34,
+   "d": 2.4,
+   "name": "ISENA"
+  },
+  {
+   "type": "ring",
+   "x": 57.7,
+   "y": 22.26,
+   "d": 2.4,
+   "name": "ISENB"
+  },
+  {
+   "type": "ring",
+   "x": 57.51,
+   "y": 18.37,
+   "d": 2.4,
+   "name": "ISENC"
+  },
+  {
+   "type": "ring",
+   "x": 67.9,
+   "y": 41.74,
+   "d": 2.4,
+   "name": "VM"
+  },
+  {
+   "type": "ring",
+   "x": 9.09,
+   "y": 32.65,
+   "d": 2.4,
+   "name": "TP12"
+  },
+  {
+   "type": "ring",
+   "x": 27.64,
+   "y": 5.2,
+   "d": 2.4,
+   "name": "VREF"
+  },
+  {
+   "type": "ring",
+   "x": 31.35,
+   "y": 5.2,
+   "d": 2.4,
+   "name": "SO"
+  },
+  {
+   "type": "ring",
+   "x": 45.45,
+   "y": 5.2,
+   "d": 2.4,
+   "name": "ILIMIT"
+  },
+  {
+   "type": "ring",
+   "x": 69.94,
+   "y": 7.24,
+   "d": 2.4,
+   "name": "TP16"
+  },
+  {
+   "type": "ring",
+   "x": 14.66,
+   "y": 59.74,
+   "d": 2.4,
+   "name": "C TAP"
+  },
+  {
+   "type": "header",
+   "x": 38.2,
+   "y": 4.4,
+   "cols": 3,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 51.9,
+   "y": 4.4,
+   "cols": 3,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 47.3,
+   "y": 23.0,
+   "cols": 1,
+   "rows": 3
+  },
+  {
+   "type": "qfn",
+   "x": 58.6,
+   "y": 13.3,
+   "size": 3
+  },
+  {
+   "type": "standoff",
+   "x": 2.23,
+   "y": 60.3
+  },
+  {
+   "type": "standoff",
+   "x": 70.7,
+   "y": 2.96
+  }
+ ],
+ "decor": [
+  {
+   "type": "chip",
+   "x": 42.51,
+   "y": 28.12,
+   "rot": 90,
+   "len": 2.25,
+   "w": 0.86
+  },
+  {
+   "type": "chip",
+   "x": 41.81,
+   "y": 30.2,
+   "rot": 0,
+   "len": 2.25,
+   "w": 0.83
+  },
+  {
+   "type": "chip",
+   "x": 50.87,
+   "y": 19.6,
+   "rot": 0,
+   "len": 2.35,
+   "w": 0.83
+  },
+  {
+   "type": "chip",
+   "x": 41.8,
+   "y": 26.05,
+   "rot": 0,
+   "len": 2.28,
+   "w": 0.83
+  },
+  {
+   "type": "chip",
+   "x": 50.88,
+   "y": 26.16,
+   "rot": 0,
+   "len": 2.38,
+   "w": 0.83
+  },
+  {
+   "type": "chip",
+   "x": 50.85,
+   "y": 22.78,
+   "rot": 0,
+   "len": 2.31,
+   "w": 0.83
+  },
+  {
+   "type": "chip",
+   "x": 36.75,
+   "y": 26.03,
+   "rot": 0,
+   "len": 2.16,
+   "w": 0.79
+  },
+  {
+   "type": "chip",
+   "x": 36.07,
+   "y": 28.15,
+   "rot": 90,
+   "len": 2.23,
+   "w": 0.62
+  },
+  {
+   "type": "chip",
+   "x": 14.72,
+   "y": 17.35,
+   "rot": 0,
+   "len": 2.13,
+   "w": 0.76
+  },
+  {
+   "type": "chip",
+   "x": 37.46,
+   "y": 28.14,
+   "rot": 90,
+   "len": 2.08,
+   "w": 0.69
+  },
+  {
+   "type": "chip",
+   "x": 41.11,
+   "y": 28.14,
+   "rot": 90,
+   "len": 2.1,
+   "w": 0.69
+  },
+  {
+   "type": "chip",
+   "x": 15.02,
+   "y": 6.25,
+   "rot": 0,
+   "len": 2.14,
+   "w": 0.83
+  },
+  {
+   "type": "chip",
+   "x": 14.87,
+   "y": 11.12,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 36.77,
+   "y": 30.2,
+   "rot": 0,
+   "len": 2.01,
+   "w": 0.76
+  },
+  {
+   "type": "chip",
+   "x": 40.05,
+   "y": 21.66,
+   "rot": 90,
+   "len": 1.93,
+   "w": 0.69
+  },
+  {
+   "type": "chip",
+   "x": 51.76,
+   "y": 28.62,
+   "rot": 90,
+   "len": 2.01,
+   "w": 0.79
+  },
+  {
+   "type": "chip",
+   "x": 64.81,
+   "y": 30.77,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.76
+  },
+  {
+   "type": "chip",
+   "x": 37.01,
+   "y": 21.56,
+   "rot": 90,
+   "len": 2.15,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 35.16,
+   "y": 23.79,
+   "rot": 0,
+   "len": 2.18,
+   "w": 0.69
+  },
+  {
+   "type": "chip",
+   "x": 38.5,
+   "y": 21.56,
+   "rot": 90,
+   "len": 2.16,
+   "w": 0.79
+  },
+  {
+   "type": "chip",
+   "x": 64.82,
+   "y": 29.33,
+   "rot": 0,
+   "len": 2.19,
+   "w": 0.76
+  },
+  {
+   "type": "chip",
+   "x": 41.57,
+   "y": 21.54,
+   "rot": 90,
+   "len": 2.22,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 21.46,
+   "y": 31.13,
+   "rot": 0,
+   "len": 2.17,
+   "w": 1.07
+  },
+  {
+   "type": "chip",
+   "x": 34.21,
+   "y": 1.8,
+   "rot": 0,
+   "len": 2.03,
+   "w": 0.66
+  },
+  {
+   "type": "chip",
+   "x": 18.06,
+   "y": 47.92,
+   "rot": 90,
+   "len": 2.54,
+   "w": 0.41
+  },
+  {
+   "type": "chip",
+   "x": 18.01,
+   "y": 40.37,
+   "rot": 90,
+   "len": 2.34,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 45.05,
+   "y": 40.09,
+   "rot": 0,
+   "len": 2.4,
+   "w": 0.24
+  },
+  {
+   "type": "chip",
+   "x": 17.92,
+   "y": 44.89,
+   "rot": 90,
+   "len": 2.01,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 56.48,
+   "y": 59.02,
+   "rot": 0,
+   "len": 2.2,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 62.44,
+   "y": 37.25,
+   "rot": 90,
+   "len": 2.52,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 58.67,
+   "y": 14.6,
+   "rot": 0,
+   "len": 1.67,
+   "w": 0.41
+  },
+  {
+   "type": "chip",
+   "x": 16.02,
+   "y": 4.03,
+   "rot": 90,
+   "len": 2.32,
+   "w": 0.14
+  },
+  {
+   "type": "chip",
+   "x": 44.98,
+   "y": 42.16,
+   "rot": 0,
+   "len": 2.34,
+   "w": 0.17
+  },
+  {
+   "type": "chip",
+   "x": 39.75,
+   "y": 9.67,
+   "rot": 0,
+   "len": 2.15,
+   "w": 0.34
+  },
+  {
+   "type": "chip",
+   "x": 58.72,
+   "y": 11.93,
+   "rot": 0,
+   "len": 1.65,
+   "w": 0.28
+  },
+  {
+   "type": "chip",
+   "x": 53.42,
+   "y": 22.19,
+   "rot": 90,
+   "len": 1.6,
+   "w": 0.17
+  },
+  {
+   "type": "chip",
+   "x": 37.4,
+   "y": 1.86,
+   "rot": 0,
+   "len": 2.24,
+   "w": 0.24
+  },
+  {
+   "type": "chip",
+   "x": 65.44,
+   "y": 35.42,
+   "rot": 90,
+   "len": 2.1,
+   "w": 0.34
+  },
+  {
+   "type": "chip",
+   "x": 58.77,
+   "y": 6.06,
+   "rot": 0,
+   "len": 1.82,
+   "w": 0.14
+  },
+  {
+   "type": "chip",
+   "x": 41.18,
+   "y": 8.25,
+   "rot": 0,
+   "len": 2.03,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 64.41,
+   "y": 36.43,
+   "rot": 0,
+   "len": 1.52,
+   "w": 0.07
+  },
+  {
+   "type": "chip",
+   "x": 56.38,
+   "y": 54.09,
+   "rot": 0,
+   "len": 1.47,
+   "w": 0.07
+  }
+ ]
+}

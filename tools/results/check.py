@@ -110,6 +110,9 @@ def main():
                 errors.append(f"{where}: computed row needs a note saying how it was computed")
         if r["status"] == "not_applicable" and not r["note"]:
             errors.append(f"{where}: not_applicable row needs a note naming the block the chip does not have")
+        if r["status"] in ("not_run", "waiting", "not_supported", "does_not_fit", "failed") and not (r["note"].strip() or r["conditions"].strip()):
+            # a gap is a result only when it says what stood in the way (data/README.md): the bench, a tool, a login, the chip
+            errors.append(f"{where}: {r['status']} row needs the reason in note or conditions (what stood in the way)")
         if tests.get(r["test"], {}).get("superseded_by") and r["status"] == "measured":
             errors.append(f"{where}: test '{r['test']}' is superseded by {tests[r['test']]['superseded_by']}; "
                           "record the new tests, or mark this row computed")

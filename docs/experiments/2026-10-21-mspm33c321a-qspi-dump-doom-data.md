@@ -2,7 +2,7 @@
 id: E27
 board: LP-MSPM33C321A
 date: 2026-10-21
-status: in progress
+status: parked
 reached: run
 line: The board's QSPI flash was read twice with the SDK read path (identical, 16 MB part), the Doom data file was written into a blank run of it without touching the out-of-box video, and the rp2040-doom engine ran all three demos from it on the chip with the same frame checksums as the emulator. Frame time is 45.7 ms with a 16 kB cache and 50.3 ms with 8 kB (21.9 and 19.9 frames a second) with the display and sound stubbed; the QSPI wait is 8.6 and 13.1 ms of it.
 stop: speed

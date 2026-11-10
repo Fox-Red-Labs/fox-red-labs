@@ -3,7 +3,7 @@ id: E295
 board: TMDS62LEVM (AM62L evaluation module)
 date: 2026-11-01
 status: works
-reached: run
+reached: verified
 line: With no X server, no container and no OpenGL, a 300-line libretro frontend that draws straight onto the HDMI connector through DRM/KMS runs Snes9x 2005 at a locked 60 fps at every HDMI mode up to 1920x1080 (core 2.5 to 3.6 ms of the 16.7 ms frame, with audio and with a video thread), and PCSX-ReARMed at 60 fps on PlayStation test programs. The same Gambatte core that managed 48 fps and 10.4 fps in the showcase runs at 60 fps at 640x480 and at 1080p here. The display path was the problem, not the cores.
 stop: none for the cores; only free homebrew and test programs were run, so commercial-sized loads are not measured; the plane cannot scale, so the CPU scales
 -->
@@ -73,7 +73,7 @@ Headroom, from free-run (`-n`, no vblank wait): the heaviest SNES program here (
 - Sound out of the speaker. The audio stream was accepted by ALSA but nobody listened at the codec. (Input was added the same day: see "Play on the TV" below. The benchmark rows above still used scripted button pulses.)
 - Three runs per row from one board; no second builder.
 
-**Verdict.** SNES: full speed on this chip, at every HDMI mode the monitor offers, with audio and with a video thread; 4.6 times headroom on the heaviest free program. PlayStation: full speed on the free test programs; the chip's capability for commercial titles is not measured. Both need a frontend that writes to DRM directly: RetroArch on X or a container is the wrong stack for this chip.
+**The line.** SNES: full speed on this chip, at every HDMI mode the monitor offers, with audio and with a video thread; 4.6 times headroom on the heaviest free program. PlayStation: full speed on the free test programs; the chip's capability for commercial titles is not measured. Both need a frontend that writes to DRM directly: RetroArch on X or a container is the wrong stack for this chip.
 
 **If you try it.** Build the three pieces on the board, then run:
 

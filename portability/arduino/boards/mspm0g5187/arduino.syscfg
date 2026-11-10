@@ -1,0 +1,27 @@
+//@cliArgs --device "MSPM0G518X" --package "LQFP-64(PM)" --part "Default"
+//@v2CliArgs --device "MSPM0G5187" --package "LQFP-64(PM)"
+// @cliArgs --board /ti/boards/LP_MSPM0G5187 --rtos nortos
+// SysConfig for the Arduino compatibility layer on the LP-MSPM0G5187.
+// Same shape as the LP-MSPM0G3507 file: one SPI port on the J20 header pins (PB6 to PB9 are the UC3 block here),
+// the backchannel UART (UC0, PA10 and PA11) and the default 32 MHz clock tree. GPIO is set up at run time by pinMode().
+const SPI    = scripting.addModule("/ti/driverlib/SPI", {}, false);
+const SPI1   = SPI.addInstance();
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const Board  = scripting.addModule("/ti/driverlib/Board", {}, false);
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL", {}, false);
+
+SPI1.$name                      = "ARD_SPI";
+SPI1.targetBitRate              = 8000000;
+SPI1.frameFormat                = "MOTO3";
+SPI1.peripheral.sclkPin.$assign = "PB9";
+SPI1.peripheral.mosiPin.$assign = "PB8";
+SPI1.peripheral.misoPin.$assign = "PB7";
+
+UART1.$name                     = "ARD_UART";
+UART1.targetBaudRate            = 115200;
+UART1.peripheral.rxPin.$assign  = "PA11";
+UART1.peripheral.txPin.$assign  = "PA10";
+
+SYSCTL.forceDefaultClkConfig = true;
+SYSCTL.clockTreeEn           = true;

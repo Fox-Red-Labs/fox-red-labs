@@ -8,7 +8,7 @@ FILE: cc2340r5/README.md | How do you blink an LED on a TI LP-EM-CC2340R5 Launch
 
 # How do you blink an LED on a TI LP-EM-CC2340R5 LaunchPad development kit from a Mac?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 Clip an XDS110 debug probe onto the board, build TI's `drivers/empty` example from the SimpleLink Low Power F3 SDK 9.21.00.36 with `make`, and flash it with UniFlash 9.6.0: when nothing goes wrong, the build takes 22 seconds and the flash 7 seconds. On an Intel MacBook (macOS 15.7.9) on 2026-10-05 the whole run took about 9 minutes of machine time and 3 minutes hands-on, and most of it went to a connection error that cleared once the probe was pulled off and pressed back on (gotcha 5).
 
@@ -48,6 +48,7 @@ Sources: this README as run on 2026-10-05 and 2026-10-06, `zephyr/README.md`, `F
 - [oad/](oad/README.md): over-the-air updates of the blink image.
 - [ble-light/](ble-light/README.md): a Bluetooth light.
 - [zigbee-alarm/](zigbee-alarm/README.md): a Zigbee smoke and CO alarm.
+- [SWEEP.md](SWEEP.md): every F3 SDK example built from the terminal (106 of 108 TI Arm Clang variants) and 34 of them run, with the cause of each one not run. Data in `sweep/`.
 - `src/`: the copy of TI's blink example built below.
 
 ## What you need before you start
@@ -149,6 +150,8 @@ Do not add `-v` (verify) for now. With `-v`, UniFlash reports one mismatch in th
 | RAM left with a Zigbee end device | 6.2 kB | TI's `onoff_switch` | measured | `radio_ram_left` (zigbee-end-device) |
 | RAM left with a Zigbee router | 799 bytes | TI's `onoff_light`, logging on | measured | `radio_ram_left` (zigbee-router) |
 | Zigbee light toggled from Home Assistant | Median 95 ms; 20 of 20 toggles landed | First pairing; about 5 s after a re-pairing about two hours later | measured | `radio_cmd_latency`, `radio_cmd_success` (zigbee-home-assistant) |
+| Every SDK example, built and run by script | 106 of 108 TI Arm Clang variants build; 34 no-wiring variants (23 examples) flashed and started with no fault | F3 SDK 9.21.00.36, SysConfig 1.28.0, DSLite, 6 s each; backup restored and read back equal | measured | `examples_built`, `examples_ran_clean` (f3-sdk-9.21), [SWEEP.md](SWEEP.md) |
+| PWM example from another SDK, read from the timer | Load register 47999 (1000 us at 48 MHz), compare 0 to 43200 in 4800 steps over 8 reads | Wi-Fi SDK `pwmled1.c` built unchanged here; LGPT3 read with DSLite | measured | `port_example_behavior` (from-cc35x1-pwmled1) |
 
 More rows, with the recipes: [matrix/](matrix/README.md), [baremetal/](baremetal/README.md), [zigbee/](zigbee/README.md).
 
@@ -304,6 +307,14 @@ With each example's own settings: Bluetooth (`basic_ble`) 5.1 kB; Zigbee end dev
 ### Why are your Zephyr timings 48 times off on the CC2340R5?
 
 Upstream Zephyr's config says the cycle counter runs at 48 MHz; the driver reads a 1 MHz register. **Tag: Third-party behavior.** This is upstream Zephyr 4.4.2, `drivers/timer/cc23x0_systim_timer.c`. Read `SYSTIM TIME250N` (4 MHz) instead; `mspm0g3507/mcu-bench/src/main.c` shows how. The same board file also lists 80 kB of RAM; the chip has 36 kB.
+
+### Does the CC2340R5 have a hardware random number generator? My build says `undefined symbol RNG_init`
+
+Not a general-purpose one. **Tag: Unknown (suspected: Chip limit).** TI's RNG driver for the CC23x0 draws on radio noise, and the driver library of SDK 9.21.00.36 linked into a no-radio image has no RNG symbols, so adding `/ti/drivers/RNG` to the SysConfig file gives `undefined symbol RNG_init`. For timing work a fixed-seed generator is enough; say so in the report. ML-KEM-768 and ML-DSA-44 ran this way with the same cycle counts (`portability/pqc-join/boards/cc2340r5/PORT.md`, run 2026-11-09).
+
+### My C++ sketch fails on the CC2340R5 with `use of undeclared identifier 'strcasecmp'`, and `strings.h` does not compile
+
+The compiler's C library header `strings.h` does not compile as C++, so the include is not a fix. **Tag: Third-party behavior.** Declare `int strcasecmp(const char *, const char *);` in a small header, pass it with `-include`, and define the function in a C file. `ports/ulisp/boards/cc2340r5/compat.h` and `board.c` show it; uLisp then builds and runs (measured 2026-11-09).
 
 ## Zephyr
 
@@ -607,6 +618,18 @@ Press a button once with the page in front. **Tag: Third-party behavior.** Chrom
 
 It prints `R,embench,st,10314129,FAIL` because the compiler's software double add is sometimes one step low. **Tag: Tool or docs.** On this core (no FPU) TI Arm Clang 5.1.1 links its own `__aeabi_dadd`, which rounds down in about 1 in 36 random additions where IEEE 754 rounds up; `st` checks its sums to 1e-13 and they come out 9.09e-13 and 1.82e-12 off. The same code passes on a Mac and with GCC.
 
+### How do you build every F3 SDK example for this board with one script, and what runs without wiring?
+
+Run `python3 tools/board_sweep/find_examples.py LP_EM_CC2340R5 <out>/examples.csv`, then `build_all.py` on it. **Tag: Tool or docs.** The script names SysConfig 1.26.3; if only 1.28.0 is installed, point it there (the F3 9.21 examples build with it). 106 of 108 TI Arm Clang variants built, about 9 seconds each for drivers and 15 to 50 for Zigbee and Bluetooth. Two did not: `mcuboot` (`DeviceFamily_XYZ undefined`) and `basic_ble_multistep_oad` (its pre-build step looks for `gmake` at `/utils/bin/gmake`). `run_all.py` then flashed 34 no-wiring variants and all 34 started. `SWEEP.md`, `sweep/`.
+
+### The first serial lines of a sweep run belong to the example before it
+
+The capture window starts when the flash starts, and the old program keeps printing until the new image loads (about 10 seconds). **Tag: Our mistake.** The `uart2echo` run shows `Current temperature` lines from `temperatureNotify`. Trust a run by its banner line or its GPIO registers, not by lines near the start.
+
+### How do you tell that a PWM example works without watching the LED?
+
+Read the timer back with DSLite while the example runs: `DSLite memory -c CC2340R5.ccxml -r 0x4006313C,1 -o <file>` for LGPT3's load register and `-r 0x40063148,1` for channel 2's compare. **Tag: Third-party behavior.** TI's `pwmled1` gave 47999 (1000 us at 48 MHz) every time and a compare that stepped through multiples of 4800 (the 100 us duty steps); the LED pin is DIO14 on LGPT3 channel 2 in this example. A read halts the core for a moment, so sample, do not poll in a tight loop.
+
 ### Can the CC2340R5 run a Q15 digital-power PID loop at 100 kHz?
 
 Not quite: with no missed period in 1,000 it holds 97.4 kHz at -O2 and 113.5 kHz at -O3 (48 MHz, code in flash). **Tag: Unknown (suspected: Chip limit).** At exactly 100 kHz the -O2 build's loop runs past some of its periods. The float version holds 21.8 kHz. Only builds from flash were tried. The limit lies between 480 and 493 timer counts; the timing checks were expected to lower it, and they did not. Why is not known; one suspect is that the checks run while the ADC is still sampling the next trigger.
@@ -739,7 +762,10 @@ $DSLITE flash -c $CCXML -e -f -u $BK/restore.hex
 | MicroPython `PWM(duty_u16=...)` duty far too small at 1 kHz | 32-bit overflow in MicroPython 1.29.0 `machine_pwm.c` | `duty_ns`, or `ports/micropython/zephyr-cc2340r5/pwm-duty-u16-overflow.patch` (run 2026-10-25) | C2CC = duty x 48000 / 65535 |
 | An I2C scan on Zephyr finds nothing, but a register read at the same address works | The scan sends an empty write, which fails on Zephyr 4.4.2 CC23x0 I2C driver (cause not traced) | Probe with a one-byte register read | 0x44 answers reads on the Sensors BoosterPack (`portability/arduino/zephyr/README.md`, run 2026-10-25) |
 | The Mac lists the Nordic image ("FRL Nordic") but a bleak connect times out, then `system_profiler SPBluetoothDataType` shows `State: Off` | macOS `bluetoothd` stopped by its XPC watchdog during the connect; cause not found (run 2026-10-25) | Turn Bluetooth off and on in Control Center, or `sudo pkill bluetoothd`; remove old pairings of this board ("CC2340R5 Gamepad") in System Settings, Bluetooth | `State: On`, then the connect returns |
+| Serial text at the start of a sweep run is from the previous example | The capture starts before the new image loads | Judge a run by its banner or GPIO registers (`cc2340r5/FAQ.md`, sweep 2026-11-08) | Banner matches the example |
 | ``make`` cannot find `sysconfig_1.26.3/sysconfig_cli.sh` | That SysConfig version is not installed | Pass `SYSCONFIG_TOOL=/Applications/ti/sysconfig_1.28.0/sysconfig_cli.sh`; the F3 9.21 examples build with it (`docs/experiments/2026-10-24-cc2340r5-cc35x1-driver-twins.md`) | Build passes |
+| `undefined symbol RNG_init` after adding the RNG driver to a SysConfig file | The CC23x0 has no general-purpose TRNG and the driver library as shipped has no RNG; TI's RNG driver there draws on radio noise | Use a fixed-seed generator for timing work (keygen and encaps time does not depend on the bytes); say so in the report (`portability/pqc-join/boards/cc2340r5/PORT.md`, run 2026-11-09) | Link passes |
+| `use of undeclared identifier 'strcasecmp'` building Arduino-style C++ sketches with TI Arm Clang, and `#include <strings.h>` fails with `cannot initialize return object of type 'char *'` | The compiler's C library header `strings.h` does not compile as C++ | Declare `int strcasecmp(const char*, const char*)` in a small header (`-include`) and define it in a C file (`ports/ulisp/boards/cc2340r5/compat.h`, `board.c`, run 2026-11-09) | uLisp builds and runs |
 
 Traps shared with other boards: TRAPS.md.
 
@@ -771,6 +797,8 @@ The two link failures are tagged Unknown, suspected chip limit: only TI's config
 | Interrupt latency | 28 to 29 cycles from pend to handler, bare metal | `data/results/cc2340r5.csv` (`irq_latency`) |
 | Dhrystone and FFT | 0.602 DMIPS/MHz; 256-point q15 FFT in 1.685 ms | `data/results/cc2340r5.csv` (`dhrystone`, `fft256`) |
 | Q15 PID loop | 97.4 kHz at -O2 and 113.5 kHz at -O3 with no missed period in 1,000 | `cc2340r5/FAQ.md` |
+| Example sweep | 106 of 108 F3 SDK TI Arm Clang variants build; 34 no-wiring variants flashed and started with no fault, backup restored and read back equal. `build_all.py` names SysConfig 1.26.3, so pass 1.28.0 if that is what is installed (`cc2340r5/SWEEP.md`) |
+| PWM check without watching | `DSLite memory -r 0x4006313C,1` (LGPT3 load, 47999) and `-r 0x40063148,1` (channel 2 compare) read back while `pwmled1` ran: compare stepped 0 to 43200 in 4800 steps (`cc2340r5/sweep/pwmled1-lgpt3-readback.txt`) |
 
 <!-- ports:start (tools/render_ports.py) -->
 ## Ports that ran here
@@ -785,6 +813,8 @@ Code written for other chips and tools, brought to this board. The files to copy
 | MicroPython 1.29.0 on the LP-EM-CC2340R5 through upstream's Zephyr port | Works | MicroPython's own Zephyr port runs on the 36 kB LP-EM-CC2340R5: a >>> prompt, with Pin, ADC, PWM, SPI and I2C from Python. | `ports/micropython/zephyr-cc2340r5/README.md` |
 | Nordic's nRF Blinky and UART services on the LP-EM-CC2340R5 | Works | TI's basic_ble with two 8-line service descriptions shows Nordic's LED Button and UART services to a Mac on the LP-EM-CC2340R5. | `ports/nordic-apps/README.md` |
 | OpenOCD flash driver for the LP-EM-CC2340R5 and LP-EM-CC2755P10 | Works | OpenOCD erases, writes, verifies and restarts a blink on the LP-EM-CC2340R5 over the XDS110, with no CCStudio or UniFlash. | `docs/experiments/2026-10-18-openocd-cc23xx-driver.md` |
+| Post-quantum key exchange and signatures on seven boards: LP-CC1354P10-1, LP-EM-CC2340R5, LP-AM243, LP-MSPM0G3519, LP-MSPM33C321A, LP-EM-CC2755P10 and LP-MSPM0G5187 | Works | ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on seven boards, from a 36 kB Cortex-M0+ to an 800 MHz Cortex-R5F; the LP-CC1354P10-1 also agrees a key with a Mac. | `cc1354p10/pqc-join/README.md` |
+| uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507, LP-MSPM0G3519, LP-EM-CC2340R5, LP-EM-CC2755P10, LP-MSPM33C321A, LP-AM243 and LAUNCHXL-F2800137 | Works | uLisp, an Arduino sketch, gives a Lisp prompt on the serial port of the LP-MSPM0G5187, LP-EM-CC2340R5 and LP-EM-CC2755P10: 19 of 19 REPL (type-and-run loop) checks pass on each. | `ports/ulisp/README.md` |
 | Zigbee smoke and CO alarm on the LP-EM-CC2340R5 | Works | A Zigbee smoke and CO alarm joins Home Assistant as one device on the LP-EM-CC2340R5, with no custom Home Assistant code. | `cc2340r5/zigbee-alarm/README.md` |
 | Bluetooth media remote (HID) on the LP-EM-CC2340R5 | Could work | A hand-written HID service on TI's basic_ble builds for the LP-EM-CC2340R5, and a Mac sees it as a keyboard-class device and starts pairing. | `ports/ble-hid-remote/README.md` |
 | MSPM0 code on the CC2340R5 and CC1354P10 radio chips | Could work | MSPM0 driver examples build for the CC2340R5 with a 47-line shim, the first 5 ran with the same pin states as TI's own build, and 4 of 4 ran on the CC1354P10. | `portability/README.md` |

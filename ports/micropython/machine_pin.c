@@ -9,6 +9,10 @@
 
 #if defined(FRL_G3519)
 #include "boards/pins_g3519.h"
+#elif defined(FRL_G5187)
+#include "boards/pins_g5187.h"
+#elif defined(FRL_L1306)
+#include "boards/pins_l1306.h"
 #else
 #include "boards/pins_g3507.h"
 #endif
@@ -148,7 +152,11 @@ static MP_DEFINE_CONST_FUN_OBJ_1(pin_off_obj, pin_off);
 
 static mp_obj_t pin_toggle(mp_obj_t self_in) {
     mp_hal_pin_obj_t pin = MP_OBJ_TO_PTR(self_in);
+    #ifdef FRL_L1306
+    GPIO_Regs *r = GPIOA;
+    #else
     GPIO_Regs *r = pin->port == 0 ? GPIOA : GPIOB;
+    #endif
     #ifdef FRL_G3519
     if (pin->port == 2) {
         r = GPIOC;

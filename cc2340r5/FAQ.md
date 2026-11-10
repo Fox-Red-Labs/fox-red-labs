@@ -131,6 +131,14 @@ With each example's own settings: Bluetooth (`basic_ble`) 5.1 kB; Zigbee end dev
 
 Upstream Zephyr's config says the cycle counter runs at 48 MHz; the driver reads a 1 MHz register. This is upstream Zephyr 4.4.2, `drivers/timer/cc23x0_systim_timer.c`. Read `SYSTIM TIME250N` (4 MHz) instead; `mspm0g3507/mcu-bench/src/main.c` shows how. The same board file also lists 80 kB of RAM; the chip has 36 kB.
 
+### Does the CC2340R5 have a hardware random number generator? My build says `undefined symbol RNG_init`
+
+Not a general-purpose one. TI's RNG driver for the CC23x0 draws on radio noise, and the driver library of SDK 9.21.00.36 linked into a no-radio image has no RNG symbols, so adding `/ti/drivers/RNG` to the SysConfig file gives `undefined symbol RNG_init`. For timing work a fixed-seed generator is enough; say so in the report. ML-KEM-768 and ML-DSA-44 ran this way with the same cycle counts (`portability/pqc-join/boards/cc2340r5/PORT.md`, run 2026-11-09).
+
+### My C++ sketch fails on the CC2340R5 with `use of undeclared identifier 'strcasecmp'`, and `strings.h` does not compile
+
+The compiler's C library header `strings.h` does not compile as C++, so the include is not a fix. Declare `int strcasecmp(const char *, const char *);` in a small header, pass it with `-include`, and define the function in a C file. `ports/ulisp/boards/cc2340r5/compat.h` and `board.c` show it; uLisp then builds and runs (measured 2026-11-09).
+
 ## Zephyr
 
 ### On Zephyr, a pin interrupt stops firing after the pin is configured again. Why?
@@ -432,6 +440,18 @@ Press a button once with the page in front. Chrome and Edge hand a gamepad to a 
 ### Why does Embench `st` fail its own check on the CC2340R5 with TI Arm Clang?
 
 It prints `R,embench,st,10314129,FAIL` because the compiler's software double add is sometimes one step low. On this core (no FPU) TI Arm Clang 5.1.1 links its own `__aeabi_dadd`, which rounds down in about 1 in 36 random additions where IEEE 754 rounds up; `st` checks its sums to 1e-13 and they come out 9.09e-13 and 1.82e-12 off. The same code passes on a Mac and with GCC.
+
+### How do you build every F3 SDK example for this board with one script, and what runs without wiring?
+
+Run `python3 tools/board_sweep/find_examples.py LP_EM_CC2340R5 <out>/examples.csv`, then `build_all.py` on it. The script names SysConfig 1.26.3; if only 1.28.0 is installed, point it there (the F3 9.21 examples build with it). 106 of 108 TI Arm Clang variants built, about 9 seconds each for drivers and 15 to 50 for Zigbee and Bluetooth. Two did not: `mcuboot` (`DeviceFamily_XYZ undefined`) and `basic_ble_multistep_oad` (its pre-build step looks for `gmake` at `/utils/bin/gmake`). `run_all.py` then flashed 34 no-wiring variants and all 34 started. `SWEEP.md`, `sweep/`.
+
+### The first serial lines of a sweep run belong to the example before it
+
+The capture window starts when the flash starts, and the old program keeps printing until the new image loads (about 10 seconds). The `uart2echo` run shows `Current temperature` lines from `temperatureNotify`. Trust a run by its banner line or its GPIO registers, not by lines near the start.
+
+### How do you tell that a PWM example works without watching the LED?
+
+Read the timer back with DSLite while the example runs: `DSLite memory -c CC2340R5.ccxml -r 0x4006313C,1 -o <file>` for LGPT3's load register and `-r 0x40063148,1` for channel 2's compare. TI's `pwmled1` gave 47999 (1000 us at 48 MHz) every time and a compare that stepped through multiples of 4800 (the 100 us duty steps); the LED pin is DIO14 on LGPT3 channel 2 in this example. A read halts the core for a moment, so sample, do not poll in a tight loop.
 
 ### Can the CC2340R5 run a Q15 digital-power PID loop at 100 kHz?
 

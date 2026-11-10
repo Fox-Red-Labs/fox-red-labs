@@ -41,6 +41,32 @@ def with_pattern(text, ms, src):
     return LOOP.sub(lambda m: PATTERN_LOOP, text, count=1)
 
 
+MSG_MARK = "// Fox Red Labs message (frl prepare --message): printed with a counter once a second"
+MSG_LOOP = """    {
+        unsigned int frlCount = 0;                // declared first: the C2000 compiler builds this example as C89
+        static const char frlMessage[] = "%s";
+        for(;;)
+        {
+            printf("> %%s %%u\\r\\n", frlMessage, frlCount++);
+            DEVICE_DELAY_US(1000000UL);
+        }
+    }
+}
+"""
+
+
+def with_message(text, ms, src):
+    """TI's launchxl_f2800137 demo (SCIA on GPIO28 and GPIO29, 115200 baud, the XDS110's serial port): print
+    "> <message> <count>" once a second in place of the ASCII logo and the ADC readout. Returns (new text, edited line)."""
+    line = f'static const char frlMessage[] = "{ms}";'
+    if MSG_MARK in text:
+        return re.sub(r'static const char frlMessage\[\] = "[^"\n]*";', lambda m: line, text, count=1), line
+    cut = text.find("    //\n    // Print a TI Logo to STDOUT")
+    if cut < 0 or "setvbuf(stdout, NULL, _IONBF, 0);" not in text[:cut]:
+        return None, line
+    return text[:cut] + "    " + MSG_MARK + "\n" + MSG_LOOP % ms, line
+
+
 def build(proj, t, r, log):
     """Compile and link proj for flash with the tools t (sdk = C2000Ware, compiler = cl2000, sysconfig). Returns the .out."""
     c2k, cgt = Path(t["sdk"]["path"]), Path(t["compiler"]["path"])
@@ -65,17 +91,19 @@ def build(proj, t, r, log):
               "--define=DEBUG", f"--define={c28['board_define']}", f"--define={c28['family_define']}=1", "--define=CPU1", *defs,
               "--diag_warning=225", "--diag_suppress=10063", f"--include_path={cgt / 'include'}", f"--include_path={c2k / 'device_support' / dev / 'common' / 'include'}",
               f"--include_path={c2k / 'driverlib' / dev / 'driverlib'}", f"--include_path={c2k}", f"--include_path={gen}", f"--include_path={proj}"]
-    syscfg = next(proj.glob("*.syscfg"))
-    step([t["sysconfig"]["path"], "--product", c2k / ".metadata" / "sdk.json", "-o", gen, syscfg])
+    syscfgs = sorted(proj.glob("*.syscfg"))
+    if syscfgs:                                           # the launchxl demo has none: device.c from the SDK stands in
+        step([t["sysconfig"]["path"], "--product", c2k / ".metadata" / "sdk.json", "-o", gen, syscfgs[0]])
     cflags += [f"--cmd_file={o}" for o in sorted(gen.glob("*.opt"))]   # SysConfig's own options (device_cmd.opt sets CMDTOOL: copy tables, not Ramfuncs symbols)
     lnk = gen / "device_cmd.cmd"
     if not lnk.is_file():
         lnk = c2k / "device_support" / dev / "common" / "cmd" / f"{dev[1:]}_generic_flash_lnk.cmd"
-    srcs = [*sorted(proj.glob("*.c")), *sorted(gen.glob("*.c")), c2k / "device_support" / dev / "common" / "source" / f"{dev}_codestartbranch.asm"]
+    extra = [] if syscfgs else [c2k / "device_support" / dev / "common" / "source" / "device.c"]
+    srcs = [*sorted(proj.glob("*.c")), *sorted(gen.glob("*.c")), *extra, c2k / "device_support" / dev / "common" / "source" / f"{dev}_codestartbranch.asm"]
     for f in srcs:
         step([cgt / "bin" / "cl2000", *cflags, "-c", f, f"--output_file={Path(f).stem}.obj"])
-    image = out / "blink.out"
-    step([cgt / "bin" / "cl2000", *cflags, "-z", "--entry_point", "code_start", "--stack_size=0x200", "--heap_size=0x100", *defs,
-          f"-i{cgt / 'lib'}", f"-i{c2k}", f"-i{gen}", "--reread_libs", "--rom_model", f"-m{out / 'blink.map'}", f"-o{image}",
+    image = out / Path(r["image"]).name
+    step([cgt / "bin" / "cl2000", *cflags, "-z", "--entry_point", "code_start", "--stack_size=0x200", f"--heap_size={r.get('heap', '0x100')}", *defs,
+          f"-i{cgt / 'lib'}", f"-i{c2k}", f"-i{gen}", "--reread_libs", "--rom_model", f"-m{out / (image.stem + '.map')}", f"-o{image}",
           *sorted(str(p) for p in obj.glob("*.obj")), lnk, f"-l{c2k / 'driverlib' / dev / 'driverlib' / 'ccs' / 'Release' / 'driverlib.lib'}", "-llibc.a"])
     return image

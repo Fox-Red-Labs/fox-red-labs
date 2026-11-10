@@ -5,7 +5,8 @@ usage: build_f2_libs.py <f2 sdk dir>   (writes the libraries where SysConfig's g
 import os, re, subprocess, sys, glob
 from concurrent.futures import ThreadPoolExecutor
 SDK = os.path.abspath(sys.argv[1])
-CC = "/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS/bin"
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tools", "frl")); import toolfind  # noqa: E402
+CC = os.path.join(os.environ.get("FRL_TICLANG") or toolfind.find("ticlang", ["5.1.1.LTS"])["path"], "bin")   # standalone or inside CCStudio
 FLAGS = ["-mcpu=cortex-m33", "-mfloat-abi=hard", "-mfpu=fpv5-sp-d16", "-mthumb", "-Oz", "-ffunction-sections", "-fdata-sections",
          "-DDeviceFamily_CC13X4", "-w",
          "-I" + SDK + "/source", "-I" + SDK + "/kernel/nortos", "-I" + SDK + "/kernel/nortos/posix",

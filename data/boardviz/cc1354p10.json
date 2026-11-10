@@ -1,0 +1,917 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts placed by hand from the drawing, drawn but never labelled.",
+ "board": "LP-EM-CC1354P10-1",
+ "id": "cc1354p10",
+ "source": "Positions read from the board overview and BoosterPack pinout figures in the kit's quick start guide (SPRUIZ8, page 1 pinout and page 2 overview, the top-down render), scale set from the 2.54 mm BoosterPack header pitch. The guide is for the LP-EM-CC1354P10-1 (no probe on the board); the bench LP-CC1354P10-1 adds an on-board XDS110 section that no picture in the guide shows, so it is left out. Not checked against a photo of the real board: none is in the repo. The RF shield lid is see-through in the render, so the parts under it are drawn bare; which user LED is red and which green is not shown.",
+ "size": [
+  58.6,
+  89.7
+ ],
+ "color": "#a8101a",
+ "corner": 2.5,
+ "holes": [
+  [
+   2.7,
+   3.0,
+   3.2
+  ],
+  [
+   55.9,
+   3.0,
+   3.2
+  ],
+  [
+   2.7,
+   86.67,
+   3.2
+  ],
+  [
+   55.9,
+   86.67,
+   3.2
+  ],
+  [
+   2.0,
+   7.24,
+   2.4
+  ],
+  [
+   56.6,
+   7.24,
+   2.4
+  ],
+  [
+   7.0,
+   87.53,
+   2.4
+  ]
+ ],
+ "silk": [],
+ "parts": [
+  {
+   "id": "mcu",
+   "type": "qfn",
+   "x": 29.89,
+   "y": 52.99,
+   "size": 8.0,
+   "label": "The chip",
+   "title": "CC1354P10",
+   "text": "A 48 MHz Arm Cortex-M33 with 1 MB of flash and a radio that covers both the 2.4 GHz band and the 868 and 915 MHz Sub-1 GHz band, for Bluetooth Low Energy, Zigbee, Thread, Wi-SUN and proprietary links. Part CC1354P106T0RSK, with an RF shield lid over it.",
+   "key": true
+  },
+  {
+   "id": "xtal32",
+   "type": "xtalbox",
+   "x": 38.39,
+   "y": 45.17,
+   "w": 1.6,
+   "h": 3.2,
+   "label": "Crystal",
+   "title": "Crystal",
+   "text": "A small crystal below and to the right of the chip, part of the chip's clock."
+  },
+  {
+   "type": "xtalbox",
+   "x": 21.03,
+   "y": 50.63,
+   "w": 2.5,
+   "h": 2.5,
+   "rot": 45
+  },
+  {
+   "type": "qfn",
+   "x": 30.86,
+   "y": 38.45,
+   "size": 1.8
+  },
+  {
+   "type": "block",
+   "x": 29.31,
+   "y": 21.15,
+   "w": 1.95,
+   "h": 9.2,
+   "d": 0.1,
+   "color": "#d8cfc8"
+  },
+  {
+   "type": "block",
+   "x": 20.23,
+   "y": 17.56,
+   "w": 20.11,
+   "h": 2.01,
+   "d": 0.1,
+   "color": "#d8cfc8"
+  },
+  {
+   "type": "block",
+   "x": 11.18,
+   "y": 15.11,
+   "w": 2.01,
+   "h": 6.9,
+   "d": 0.1,
+   "color": "#d8cfc8"
+  },
+  {
+   "type": "block",
+   "x": 29.22,
+   "y": 12.53,
+   "w": 38.1,
+   "h": 2.07,
+   "d": 0.1,
+   "color": "#d8cfc8",
+   "id": "ant",
+   "label": "Antenna",
+   "title": "Printed antenna",
+   "text": "The antenna is a trace on the circuit board itself, with no part to buy. Keep metal and hands away from this end while you test range."
+  },
+  {
+   "type": "block",
+   "x": 47.27,
+   "y": 10.17,
+   "w": 2.01,
+   "h": 6.78,
+   "d": 0.1,
+   "color": "#d8cfc8"
+  },
+  {
+   "type": "block",
+   "x": 29.22,
+   "y": 7.64,
+   "w": 38.1,
+   "h": 1.95,
+   "d": 0.1,
+   "color": "#d8cfc8"
+  },
+  {
+   "type": "block",
+   "x": 11.18,
+   "y": 4.97,
+   "w": 2.01,
+   "h": 7.3,
+   "d": 0.1,
+   "color": "#d8cfc8"
+  },
+  {
+   "type": "block",
+   "x": 29.22,
+   "y": 2.33,
+   "w": 38.1,
+   "h": 2.01,
+   "d": 0.1,
+   "color": "#d8cfc8"
+  },
+  {
+   "id": "led_a",
+   "type": "led",
+   "x": 26.15,
+   "y": 71.03,
+   "rot": 0,
+   "color": "#e8e2c4",
+   "name": "User LED",
+   "label": "User LEDs",
+   "title": "Red and green user LEDs",
+   "text": "Two user lights beside the small jumper block: a red one on DIO6 and a green one on DIO7. The kit's picture does not show which is which."
+  },
+  {
+   "type": "led",
+   "x": 26.15,
+   "y": 68.68,
+   "rot": 0,
+   "color": "#e8e2c4",
+   "name": "User LED"
+  },
+  {
+   "id": "btn1",
+   "type": "button",
+   "x": 2.44,
+   "y": 75.98,
+   "w": 3.7,
+   "h": 7.4,
+   "side": "left",
+   "label": "BTN-1",
+   "title": "Button 1 on DIO15",
+   "text": "A user button on the left edge, on DIO15."
+  },
+  {
+   "id": "btn2",
+   "type": "button",
+   "x": 56.2,
+   "y": 75.98,
+   "w": 3.7,
+   "h": 7.4,
+   "side": "right",
+   "label": "BTN-2",
+   "title": "Button 2 on DIO14",
+   "text": "The second user button, on the right edge, on DIO14."
+  },
+  {
+   "id": "jdbg",
+   "type": "header",
+   "x": 29.3,
+   "y": 86.29,
+   "cols": 10,
+   "rows": 2,
+   "label": "Debug connector",
+   "title": "20-pin LP-EM debug connector",
+   "text": "The black plug on the top edge is where an LP-XDS110 or LP-XDS110ET probe clips on. It carries power, SWD programming and a serial port, so the board needs no USB of its own.",
+   "key": true
+  },
+  {
+   "type": "block",
+   "x": 29.3,
+   "y": 91.05,
+   "w": 31.4,
+   "h": 3.6,
+   "d": 7.0,
+   "color": "#1c1c1e"
+  },
+  {
+   "id": "jtag",
+   "type": "boxheader",
+   "x": 46.9,
+   "y": 75.57,
+   "cols": 2,
+   "rows": 5,
+   "rot": 90,
+   "label": "Arm 10-pin",
+   "title": "10-pin debug header",
+   "text": "A standard Arm Cortex-M 10-pin header for an outside debug probe. It carries SWD only, so wire the serial port yourself and power the board separately."
+  },
+  {
+   "type": "header",
+   "x": 19.31,
+   "y": 70.17,
+   "cols": 2,
+   "rows": 2
+  },
+  {
+   "id": "j1",
+   "type": "ringheader",
+   "x": 7.6,
+   "y": 57.47,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "3V3",
+     "5V"
+    ],
+    [
+     "DIO23 A0",
+     "GND"
+    ],
+    [
+     "DIO12 RXD",
+     "DIO25 A2"
+    ],
+    [
+     "DIO13 TXD",
+     "DIO26 A3"
+    ],
+    [
+     "DIO22",
+     "DIO27 A4"
+    ],
+    [
+     "DIO24 A1",
+     "DIO28 A5"
+    ],
+    [
+     "DIO10 SPI_CLK",
+     "DIO29 A6"
+    ],
+    [
+     "DIO21",
+     "DIO30 A7"
+    ],
+    [
+     "DIO4 I2C_SCL",
+     "DIO43"
+    ],
+    [
+     "DIO5 I2C_SDA",
+     "DIO44"
+    ]
+   ],
+   "pinno": [
+    [
+     1,
+     21
+    ],
+    [
+     2,
+     22
+    ],
+    [
+     3,
+     23
+    ],
+    [
+     4,
+     24
+    ],
+    [
+     5,
+     25
+    ],
+    [
+     6,
+     26
+    ],
+    [
+     7,
+     27
+    ],
+    [
+     8,
+     28
+    ],
+    [
+     9,
+     29
+    ],
+    [
+     10,
+     30
+    ]
+   ],
+   "label": "BoosterPack J1, J3",
+   "title": "Left BoosterPack headers",
+   "text": "J1 is the outer column, pins 1 to 10 from the top. J3 is the inner column, pins 21 to 30. Plug-on boards stack on these.",
+   "key": true
+  },
+  {
+   "id": "j2",
+   "type": "ringheader",
+   "x": 51.0,
+   "y": 57.47,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "DIO47",
+     "GND"
+    ],
+    [
+     "DIO46",
+     "DIO19"
+    ],
+    [
+     "DIO20",
+     "DIO11 SPI_CS"
+    ],
+    [
+     "DIO45 CTS",
+     "DIO14 BTN_2"
+    ],
+    [
+     "DIO18 RTS",
+     "LP_RST"
+    ],
+    [
+     "RESET",
+     "DIO9 SPI_MOSI"
+    ],
+    [
+     "TMS",
+     "DIO8 SPI_MISO"
+    ],
+    [
+     "TCK",
+     "DIO42"
+    ],
+    [
+     "DIO16 TDO",
+     "DIO41"
+    ],
+    [
+     "DIO17 TDI",
+     "DIO15 BTN_1"
+    ]
+   ],
+   "pinno": [
+    [
+     40,
+     20
+    ],
+    [
+     39,
+     19
+    ],
+    [
+     38,
+     18
+    ],
+    [
+     37,
+     17
+    ],
+    [
+     36,
+     16
+    ],
+    [
+     35,
+     15
+    ],
+    [
+     34,
+     14
+    ],
+    [
+     33,
+     13
+    ],
+    [
+     32,
+     12
+    ],
+    [
+     31,
+     11
+    ]
+   ],
+   "label": "BoosterPack J4, J2",
+   "title": "Right BoosterPack headers",
+   "text": "J4 is the inner column, pins 40 to 31 from the top. J2 is the outer column, pins 20 to 11."
+  },
+  {
+   "id": "pwl",
+   "type": "header",
+   "x": 6.2,
+   "y": 38.28,
+   "cols": 1,
+   "rows": 3,
+   "label": "Power pins, left",
+   "title": "GND, GND, 5V",
+   "text": "Three pins on the left edge: two grounds and the 5 V rail."
+  },
+  {
+   "type": "header",
+   "x": 10.9,
+   "y": 38.28,
+   "cols": 2,
+   "rows": 3
+  },
+  {
+   "id": "pwr",
+   "type": "header",
+   "x": 52.4,
+   "y": 38.28,
+   "cols": 1,
+   "rows": 3,
+   "label": "Power pins, right",
+   "title": "GND, GND, 3V3",
+   "text": "Three pins on the right edge: two grounds and the 3.3 V rail."
+  },
+  {
+   "type": "header",
+   "x": 47.5,
+   "y": 38.28,
+   "cols": 2,
+   "rows": 3
+  },
+  {
+   "id": "sma",
+   "type": "block",
+   "x": 38.97,
+   "y": 30.63,
+   "w": 7.3,
+   "h": 7.3,
+   "d": 2.5,
+   "color": "#c4a04a",
+   "label": "Antenna socket",
+   "title": "Antenna socket J3",
+   "text": "A gold coaxial socket beside the printed antenna, for an outside antenna or a cable to test gear."
+  },
+  {
+   "type": "sot23",
+   "x": 12.76,
+   "y": 86.09,
+   "rot": 90
+  },
+  {
+   "type": "block",
+   "x": 33.91,
+   "y": 73.16,
+   "w": 2.9,
+   "h": 2.3,
+   "d": 0.8,
+   "color": "#1c1c1e"
+  },
+  {
+   "type": "qfn",
+   "x": 46.26,
+   "y": 82.76,
+   "size": 1.7
+  },
+  {
+   "type": "standoff",
+   "x": 2.59,
+   "y": 86.67
+  },
+  {
+   "type": "standoff",
+   "x": 2.59,
+   "y": 3.05
+  },
+  {
+   "type": "standoff",
+   "x": 55.86,
+   "y": 3.05
+  },
+  {
+   "type": "standoff",
+   "x": 21.67,
+   "y": 22.59
+  },
+  {
+   "type": "standoff",
+   "x": 37.07,
+   "y": 22.59
+  },
+  {
+   "type": "standoff",
+   "x": 55.9,
+   "y": 86.67
+  }
+ ],
+ "decor": [
+  {
+   "type": "chip",
+   "x": 23.56,
+   "y": 71.03,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 23.56,
+   "y": 68.68,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 30.75,
+   "y": 73.74,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 33.05,
+   "y": 75.17,
+   "rot": 0,
+   "len": 2.0,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 38.62,
+   "y": 73.74,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 31.32,
+   "y": 69.71,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 32.93,
+   "y": 69.71,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 34.54,
+   "y": 69.71,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 36.09,
+   "y": 69.71,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 37.76,
+   "y": 69.71,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 39.37,
+   "y": 69.71,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 40.98,
+   "y": 69.71,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 42.53,
+   "y": 69.71,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 5.75,
+   "y": 73.74,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 55.52,
+   "y": 70.57,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 4.14,
+   "y": 47.3,
+   "rot": 0,
+   "len": 2.0,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 4.02,
+   "y": 44.71,
+   "rot": 0,
+   "len": 2.0,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 10.23,
+   "y": 43.1,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 23.07,
+   "y": 59.51,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 25.14,
+   "y": 59.66,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 28.65,
+   "y": 59.66,
+   "rot": 90,
+   "len": 2.0,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 27.16,
+   "y": 59.66,
+   "rot": 90,
+   "len": 2.5,
+   "w": 1.5
+  },
+  {
+   "type": "chip",
+   "x": 23.99,
+   "y": 56.49,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 18.45,
+   "y": 56.93,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 19.11,
+   "y": 57.93,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 24.43,
+   "y": 51.61,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 24.43,
+   "y": 50.89,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 24.57,
+   "y": 49.54,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 35.2,
+   "y": 55.86,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 35.06,
+   "y": 55.29,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 35.2,
+   "y": 49.17,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 36.84,
+   "y": 49.6,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 27.64,
+   "y": 47.64,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 28.28,
+   "y": 47.64,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 27.7,
+   "y": 46.15,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 28.28,
+   "y": 46.15,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 27.64,
+   "y": 44.6,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 28.28,
+   "y": 44.6,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 27.87,
+   "y": 42.59,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 28.1,
+   "y": 41.72,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 34.89,
+   "y": 42.41,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 34.6,
+   "y": 41.55,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 34.89,
+   "y": 40.69,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 28.62,
+   "y": 40.57,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 29.31,
+   "y": 40.57,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 29.94,
+   "y": 40.57,
+   "rot": 0,
+   "len": 1.8,
+   "w": 1.0
+  },
+  {
+   "type": "chip",
+   "x": 39.94,
+   "y": 45.75,
+   "rot": 90,
+   "len": 1.8,
+   "w": 1.0
+  }
+ ]
+}

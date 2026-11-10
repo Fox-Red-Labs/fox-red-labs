@@ -2,7 +2,7 @@
 id: E22
 board: LP-MSPM0G5187
 date: 2026-10-13
-status: in progress
+status: waiting
 reached: run
 line: TI's wake-word model runs on the board's NPU from a rebuilt I2S microphone input and detected a synthetic "OK Kilby" 120 of 120 times across six macOS voices (replay through the serial port); the board's own microphone has not been heard because two CC1407P wires still sit on the microphone's clock pins.
 stop: this repo

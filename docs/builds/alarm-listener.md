@@ -1,4 +1,4 @@
-# Detect a smoke alarm's beep pattern on the LP-MSPM0G5187
+# Hear a smoke alarm's beep pattern
 
 It has heard only recorded alarm sounds from a laptop speaker and over USB; a real alarm was not tested.
 

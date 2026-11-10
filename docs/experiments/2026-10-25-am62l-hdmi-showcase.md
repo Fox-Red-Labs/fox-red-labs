@@ -6,6 +6,7 @@ status: line found
 reached: run
 line: On the AM62L's own HDMI output, with no GPU, a looping showcase runs five things in turn: Doom straight to the framebuffer, TI's LVGL demo, Android 12 (Redroid) through scrcpy, SuperTuxKart and a RetroArch Game Boy core. 2D software paths are smooth (Doom 186 to 193 fps, RetroArch 48 fps at a 640x480 HDMI mode); anything that goes through software 3D or a video round trip is a slide show (SuperTuxKart 2 fps, Android about 1 frame a second on screen).
 stop: none for the showcase; Android and SuperTuxKart run but are not usable at these frame rates
+page: none
 -->
 # What can the AM62L show on its HDMI screen besides Doom?
 
@@ -15,9 +16,13 @@ stop: none for the showcase; Android and SuperTuxKart run but are not usable at 
 
 Terms: [vocab](../vocab.md). **Redroid** is Android in a Docker container; it needs the binder driver from the [E285 kernel](2026-10-25-am62l-kvm-binder-kernel.md). **scrcpy** mirrors an Android screen over adb as an H.264 stream. **llvmpipe** is Mesa's software OpenGL. **modesetting** is the generic Xorg driver for a KMS display. Scripts: `am62l-evm/showcase/`; rows in `data/results/am62l-evm.csv`.
 
+**Question.** What can the AM62L show on its HDMI screen besides Doom?
+
+**What we tried.** Five things were run in turn from one loop script on the HDMI output, each timed once.
+
 **Expectation (before the runs).** From the Doom framebuffer test (E275) and the open-games test (E286): LVGL and Doom smooth; SuperTuxKart about 4.5 fps at 640x480 (offscreen number); Android a few frames a second because every frame is rendered in software, encoded to H.264 and decoded again; a Game Boy core at full speed.
 
-## Results
+**How far it got.**
 
 | Item | How it reaches the screen | Result |
 |---|---|---|
@@ -45,7 +50,7 @@ Measured on this board with no GPU, best first. "Playable" means 25 fps or more.
 
 The loop in `run.sh` plays the games first: SuperTuxKart, dsda-doom, RetroArch, then Android, Doom on the framebuffer and the LVGL demo.
 
-## What it shows and what it does not
+**The line.**
 
 It shows the display paths that work without a GPU: direct framebuffer writes and a CPU-drawn X screen at a low HDMI mode, where the monitor does the scaling for free. Switching the HDMI mode to 640x480 took RetroArch from 10.4 to 48 fps, because llvmpipe no longer scales every frame to 1080p. It does not show sound, input latency, or why SuperTuxKart draws 2 fps on the panel against 4.5 fps offscreen in E286 (Xorg's shadow framebuffer copy is one suspect, not tested). Android's rate is set by its software renderer (450 ms a frame) before scrcpy's encode and decode add their share.
 

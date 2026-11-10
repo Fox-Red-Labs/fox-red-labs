@@ -1,0 +1,1595 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts found by tools/boardviz/pads_from_drawing.py, drawn but never labelled.",
+ "board": "LP-AM13E230",
+ "id": "am13e230",
+ "source": "Positions read from the board drawing in the kit's user guide (SLVUDH9, figure 1-1), scale set from the 2.54 mm header pitch.",
+ "size": [
+  58.4,
+  91.4
+ ],
+ "color": "#a8101a",
+ "corner": 3.0,
+ "holes": [
+  [
+   2.3,
+   2.3,
+   3.2
+  ],
+  [
+   56.0,
+   2.3,
+   3.2
+  ],
+  [
+   2.3,
+   89.6,
+   3.2
+  ],
+  [
+   56.0,
+   89.8,
+   3.2
+  ]
+ ],
+ "silk": [
+  {
+   "t": "LP-AM13E230",
+   "x": 18.9,
+   "y": 46.5,
+   "s": 2.2
+  },
+  {
+   "t": "J1",
+   "x": 3.9,
+   "y": 40.3,
+   "s": 1.5
+  },
+  {
+   "t": "J3",
+   "x": 11.05,
+   "y": 40.3,
+   "s": 1.5
+  },
+  {
+   "t": "J4",
+   "x": 47.0,
+   "y": 39.8,
+   "s": 1.5
+  },
+  {
+   "t": "J2",
+   "x": 53.4,
+   "y": 39.8,
+   "s": 1.5
+  },
+  {
+   "t": "USB1",
+   "x": 5.5,
+   "y": 86,
+   "s": 1.4
+  },
+  {
+   "t": "U15",
+   "x": 43.1,
+   "y": 89.0,
+   "s": 1.4
+  },
+  {
+   "t": "U1",
+   "x": 32.3,
+   "y": 22.3,
+   "s": 1.4
+  },
+  {
+   "t": "J7",
+   "x": 36.5,
+   "y": 51.1,
+   "s": 1.3
+  },
+  {
+   "t": "J12",
+   "x": 39.5,
+   "y": 66.4,
+   "s": 1.3
+  },
+  {
+   "t": "S4",
+   "x": 31.5,
+   "y": 16.5,
+   "s": 1.3
+  },
+  {
+   "t": "S6",
+   "x": 40.0,
+   "y": 25.5,
+   "s": 1.3
+  },
+  {
+   "t": "WAKE",
+   "x": 3.0,
+   "y": 50.5,
+   "s": 1.8,
+   "rot": 90
+  },
+  {
+   "t": "nRST",
+   "x": 55.0,
+   "y": 67.5,
+   "s": 1.6
+  }
+ ],
+ "parts": [
+  {
+   "id": "usbc",
+   "type": "usbc",
+   "x": 12.9,
+   "y": 87.2,
+   "rot": 0,
+   "label": "USB-C",
+   "title": "USB-C port",
+   "text": "One cable powers the board, programs it and carries its text output through the debug chip.",
+   "key": true
+  },
+  {
+   "id": "xds",
+   "type": "qfp",
+   "x": 43.1,
+   "y": 80.1,
+   "body": 14,
+   "pins": 28,
+   "label": "Debug probe",
+   "title": "XDS110 debug chip",
+   "text": "The big chip at the top is the debugger. It flashes the AM13E230 over SWD and gives your computer a serial port, with no extra probe to buy."
+  },
+  {
+   "id": "mcu",
+   "type": "qfp",
+   "x": 32.3,
+   "y": 32.5,
+   "body": 9.6,
+   "pins": 20,
+   "rot": -137,
+   "label": "The chip",
+   "title": "AM13E230",
+   "text": "An Arm Cortex-M33 at 200 MHz with 512 kB of flash and 128 kB of RAM, a math accelerator and five motor PWM modules.",
+   "key": true
+  },
+  {
+   "type": "qfn",
+   "x": 22.0,
+   "y": 77.9,
+   "size": 8
+  },
+  {
+   "type": "qfn",
+   "x": 25.6,
+   "y": 13.3,
+   "size": 7
+  },
+  {
+   "type": "qfn",
+   "x": 33.2,
+   "y": 56.4,
+   "size": 3.2
+  },
+  {
+   "type": "qfn",
+   "x": 39.4,
+   "y": 68.4,
+   "size": 2.5
+  },
+  {
+   "type": "qfn",
+   "x": 31.3,
+   "y": 80.4,
+   "size": 3.4
+  },
+  {
+   "type": "soic",
+   "x": 40.6,
+   "y": 8.3,
+   "pins": 8,
+   "rot": 0
+  },
+  {
+   "type": "sot223",
+   "x": 31.8,
+   "y": 69.6,
+   "rot": 0
+  },
+  {
+   "type": "xtalbox",
+   "x": 42.2,
+   "y": 38.9,
+   "w": 5.0,
+   "h": 3.2,
+   "rot": -40
+  },
+  {
+   "type": "xtalbox",
+   "x": 54.8,
+   "y": 82.3,
+   "w": 3.2,
+   "h": 2.5,
+   "rot": 90
+  },
+  {
+   "id": "s4",
+   "type": "slideswitch",
+   "x": 34.6,
+   "y": 13.7,
+   "w": 4.0,
+   "h": 6.0,
+   "label": "BP / CAN switch",
+   "title": "S4, BP or CAN",
+   "text": "Slide it to BP to send its signal to the header pin, or to CAN to send it to the CAN chip instead. Motor boards need BP.",
+   "key": true
+  },
+  {
+   "id": "s6",
+   "type": "slideswitch",
+   "x": 43.4,
+   "y": 22.0,
+   "w": 3.0,
+   "h": 6.0,
+   "label": "BP / CAN switch",
+   "title": "S6, BP or CAN",
+   "text": "The second BP or CAN switch. Slide it to BP for the header pins; to CAN it goes to the CAN chip."
+  },
+  {
+   "id": "s3",
+   "type": "slideswitch",
+   "x": 24.7,
+   "y": 22.1,
+   "w": 3.0,
+   "h": 6.0,
+   "label": "VREF switch",
+   "title": "S3, internal or external reference",
+   "text": "Picks the voltage reference the converters use: INT VREF from inside the chip, or EXT VREF from outside."
+  },
+  {
+   "id": "led1",
+   "type": "led",
+   "x": 3.7,
+   "y": 79.7,
+   "rot": 90,
+   "color": "#f5f1e0",
+   "name": "LED1",
+   "label": "LED1",
+   "title": "LED1",
+   "text": "A status light on the left of the board, below the USB-C port."
+  },
+  {
+   "id": "led2",
+   "type": "led",
+   "x": 9.0,
+   "y": 49.5,
+   "rot": 90,
+   "color": "#f5f1e0",
+   "name": "LED2",
+   "label": "LED2",
+   "title": "LED2",
+   "text": "A status light beside the wake button."
+  },
+  {
+   "type": "led",
+   "x": 6.2,
+   "y": 49.5,
+   "rot": 90,
+   "color": "#f5f1e0",
+   "name": "LED3"
+  },
+  {
+   "id": "led4",
+   "type": "led",
+   "x": 49.7,
+   "y": 54.6,
+   "rot": 90,
+   "color": "#ff3020",
+   "name": "LED4",
+   "label": "LED4",
+   "title": "Red LED on PA5",
+   "text": "The red user LED, on pin PA5. Blinking it is the first project on this board."
+  },
+  {
+   "type": "led",
+   "x": 45.9,
+   "y": 54.7,
+   "rot": 90,
+   "color": "#f5f1e0",
+   "name": "LED5"
+  },
+  {
+   "type": "led",
+   "x": 32.3,
+   "y": 88.0,
+   "rot": 90,
+   "color": "#f5f1e0",
+   "name": "LED6"
+  },
+  {
+   "type": "led",
+   "x": 30.2,
+   "y": 88.0,
+   "rot": 90,
+   "color": "#f5f1e0",
+   "name": "LED7"
+  },
+  {
+   "id": "s2",
+   "type": "button",
+   "x": 2.6,
+   "y": 61.0,
+   "w": 5,
+   "h": 7.8,
+   "side": "left",
+   "label": "Wake",
+   "title": "S2, wake button",
+   "text": "A user button marked WAKE. It wakes the chip from low-power sleep."
+  },
+  {
+   "id": "s1",
+   "type": "button",
+   "x": 55.5,
+   "y": 61.0,
+   "w": 5,
+   "h": 7.8,
+   "side": "right",
+   "label": "Reset",
+   "title": "S1, reset button",
+   "text": "Restarts the program from the top. Marked nRST."
+  },
+  {
+   "id": "s5",
+   "type": "button",
+   "x": 55.5,
+   "y": 50.6,
+   "w": 5,
+   "h": 7.8,
+   "side": "right",
+   "label": "BSL",
+   "title": "S5, bootloader button",
+   "text": "Hold it while the chip resets to start the serial bootloader."
+  },
+  {
+   "id": "j7",
+   "type": "boxheader",
+   "x": 32.3,
+   "y": 51.1,
+   "cols": 2,
+   "rows": 5,
+   "rot": 90,
+   "label": "Debug header",
+   "title": "J7, Arm 10-pin debug",
+   "text": "A standard 10-pin debug header. An outside probe can use it once the on-board debug chip is cut off at J12."
+  },
+  {
+   "id": "j12",
+   "type": "header",
+   "x": 38.9,
+   "y": 62.8,
+   "cols": 8,
+   "rows": 2,
+   "shunts": "all",
+   "label": "Isolation jumpers",
+   "title": "J12 isolation block",
+   "text": "Eight jumpers join the debug chip to the AM13E230: boot loader, the debug lines, reset and the serial pair. Pull one to disconnect that line."
+  },
+  {
+   "type": "header",
+   "x": 49.5,
+   "y": 49.5,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 49.5,
+   "y": 43.2,
+   "cols": 2,
+   "rows": 2
+  },
+  {
+   "id": "j9",
+   "type": "header",
+   "x": 10.7,
+   "y": 65.2,
+   "cols": 2,
+   "rows": 1,
+   "label": "Power in",
+   "title": "J9, 7 to 12 V input",
+   "text": "An optional 7 to 12 volt supply input for the board. USB-C is enough for most projects."
+  },
+  {
+   "type": "header",
+   "x": 10.6,
+   "y": 60.3,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 7.6,
+   "y": 43.2,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 4.05,
+   "y": 69.6,
+   "cols": 2,
+   "rows": 3,
+   "shunts": "all"
+  },
+  {
+   "type": "header",
+   "x": 19.9,
+   "y": 63.1,
+   "cols": 2,
+   "rows": 2,
+   "shunts": "all"
+  },
+  {
+   "type": "header",
+   "x": 17.7,
+   "y": 40.6,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h"
+  },
+  {
+   "type": "header",
+   "x": 12.7,
+   "y": 8.5,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h"
+  },
+  {
+   "type": "header",
+   "x": 12.7,
+   "y": 5.8,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h"
+  },
+  {
+   "type": "header",
+   "x": 12.8,
+   "y": 3.9,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 25.4,
+   "y": 3.6,
+   "cols": 5,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 38.0,
+   "y": 3.6,
+   "cols": 3,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 46.5,
+   "y": 3.6,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 6.3,
+   "y": 7.8,
+   "cols": 1,
+   "rows": 3
+  },
+  {
+   "type": "header",
+   "x": 52.1,
+   "y": 7.8,
+   "cols": 1,
+   "rows": 3
+  },
+  {
+   "type": "ring",
+   "x": 18.3,
+   "y": 52.5,
+   "d": 2.6,
+   "name": "3V3"
+  },
+  {
+   "type": "ring",
+   "x": 21.7,
+   "y": 52.6,
+   "d": 2.6,
+   "name": "GND"
+  },
+  {
+   "type": "ring",
+   "x": 24.9,
+   "y": 52.6,
+   "d": 2.6,
+   "name": "GND"
+  },
+  {
+   "type": "ring",
+   "x": 2.1,
+   "y": 48.3,
+   "d": 2.6,
+   "name": "5V0"
+  },
+  {
+   "type": "ring",
+   "x": 21.7,
+   "y": 41.2,
+   "d": 2.6,
+   "name": "VDDA"
+  },
+  {
+   "type": "ring",
+   "x": 32.6,
+   "y": 8.0,
+   "d": 2.6,
+   "name": "CANTX"
+  },
+  {
+   "type": "ring",
+   "x": 36.4,
+   "y": 8.0,
+   "d": 2.6,
+   "name": "CANRX"
+  },
+  {
+   "id": "j1",
+   "type": "ringheader",
+   "x": 7.62,
+   "y": 26.76,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "3V3",
+     "5V"
+    ],
+    [
+     "PA26",
+     "GND"
+    ],
+    [
+     "PA9",
+     "PA16"
+    ],
+    [
+     "PA10",
+     "PA18"
+    ],
+    [
+     "PA3",
+     "PA28"
+    ],
+    [
+     "PA31",
+     "PA17"
+    ],
+    [
+     "PB5",
+     "PA27"
+    ],
+    [
+     "PB4",
+     "PA30"
+    ],
+    [
+     "PA23",
+     "PA29"
+    ],
+    [
+     "PA22",
+     "PA4"
+    ]
+   ],
+   "pinno": [
+    [
+     1,
+     21
+    ],
+    [
+     2,
+     22
+    ],
+    [
+     3,
+     23
+    ],
+    [
+     4,
+     24
+    ],
+    [
+     5,
+     25
+    ],
+    [
+     6,
+     26
+    ],
+    [
+     7,
+     27
+    ],
+    [
+     8,
+     28
+    ],
+    [
+     9,
+     29
+    ],
+    [
+     10,
+     30
+    ]
+   ],
+   "label": "BoosterPack J1, J3",
+   "title": "Left BoosterPack headers",
+   "text": "J1 is the outer column, pins 1 to 10 from the top. J3 is the inner column, pins 21 to 30. Plug-on boards stack on these.",
+   "key": true
+  },
+  {
+   "id": "j2",
+   "type": "ringheader",
+   "x": 50.8,
+   "y": 26.76,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "PB3",
+     "GND"
+    ],
+    [
+     "PA7",
+     "PA21"
+    ],
+    [
+     "PB1",
+     "PB15"
+    ],
+    [
+     "PA2",
+     "PA24"
+    ],
+    [
+     "PB2",
+     "nRST"
+    ],
+    [
+     "PA25",
+     "PB10"
+    ],
+    [
+     "PB7",
+     "PA20"
+    ],
+    [
+     "PB6",
+     "PB18"
+    ],
+    [
+     "PA12",
+     "PB12"
+    ],
+    [
+     "PA11",
+     "PB11"
+    ]
+   ],
+   "pinno": [
+    [
+     40,
+     20
+    ],
+    [
+     39,
+     19
+    ],
+    [
+     38,
+     18
+    ],
+    [
+     37,
+     17
+    ],
+    [
+     36,
+     16
+    ],
+    [
+     35,
+     15
+    ],
+    [
+     34,
+     14
+    ],
+    [
+     33,
+     13
+    ],
+    [
+     32,
+     12
+    ],
+    [
+     31,
+     11
+    ]
+   ],
+   "label": "BoosterPack J4, J2",
+   "title": "Right BoosterPack headers",
+   "text": "J4 is the inner column, pins 40 to 31 from the top. J2 is the outer column, pins 20 to 11. Motor boards plug onto these.",
+   "key": true
+  },
+  {
+   "type": "standoff",
+   "x": 2.3,
+   "y": 2.3
+  },
+  {
+   "type": "standoff",
+   "x": 56.0,
+   "y": 2.3
+  },
+  {
+   "type": "standoff",
+   "x": 2.3,
+   "y": 89.6
+  },
+  {
+   "type": "standoff",
+   "x": 56.0,
+   "y": 89.8
+  }
+ ],
+ "decor": [
+  {
+   "type": "chip",
+   "x": 31.54,
+   "y": 89.25,
+   "rot": 0,
+   "len": 3.43,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 31.54,
+   "y": 86.82,
+   "rot": 0,
+   "len": 3.34,
+   "w": 0.93
+  },
+  {
+   "type": "chip",
+   "x": 32.09,
+   "y": 12.75,
+   "rot": 90,
+   "len": 2.8,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 36.83,
+   "y": 12.74,
+   "rot": 90,
+   "len": 2.75,
+   "w": 0.55
+  },
+  {
+   "type": "chip",
+   "x": 4.42,
+   "y": 76.95,
+   "rot": 0,
+   "len": 3.05,
+   "w": 1.06
+  },
+  {
+   "type": "chip",
+   "x": 10.91,
+   "y": 76.3,
+   "rot": 0,
+   "len": 2.56,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 31.38,
+   "y": 47.91,
+   "rot": 0,
+   "len": 1.99,
+   "w": 0.93
+  },
+  {
+   "type": "chip",
+   "x": 29.24,
+   "y": 19.32,
+   "rot": 90,
+   "len": 2.98,
+   "w": 1.02
+  },
+  {
+   "type": "chip",
+   "x": 7.14,
+   "y": 45.73,
+   "rot": 0,
+   "len": 2.92,
+   "w": 1.02
+  },
+  {
+   "type": "chip",
+   "x": 17.14,
+   "y": 55.77,
+   "rot": 90,
+   "len": 2.89,
+   "w": 1.02
+  },
+  {
+   "type": "chip",
+   "x": 8.91,
+   "y": 52.93,
+   "rot": 90,
+   "len": 2.7,
+   "w": 0.93
+  },
+  {
+   "type": "chip",
+   "x": 14.27,
+   "y": 50.25,
+   "rot": 0,
+   "len": 2.79,
+   "w": 1.02
+  },
+  {
+   "type": "chip",
+   "x": 10.94,
+   "y": 78.43,
+   "rot": 0,
+   "len": 2.56,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 14.88,
+   "y": 55.13,
+   "rot": 0,
+   "len": 1.5,
+   "w": 1.06
+  },
+  {
+   "type": "chip",
+   "x": 13.93,
+   "y": 52.23,
+   "rot": 0,
+   "len": 1.59,
+   "w": 1.06
+  },
+  {
+   "type": "chip",
+   "x": 9.41,
+   "y": 81.92,
+   "rot": 0,
+   "len": 2.3,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 53.17,
+   "y": 77.69,
+   "rot": 90,
+   "len": 2.35,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 16.96,
+   "y": 29.31,
+   "rot": 0,
+   "len": 2.22,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 40.69,
+   "y": 11.56,
+   "rot": 0,
+   "len": 2.17,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 16.96,
+   "y": 31.46,
+   "rot": 0,
+   "len": 2.21,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 16.95,
+   "y": 25.02,
+   "rot": 0,
+   "len": 2.15,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 16.95,
+   "y": 27.16,
+   "rot": 0,
+   "len": 2.16,
+   "w": 0.72
+  },
+  {
+   "type": "chip",
+   "x": 28.57,
+   "y": 88.09,
+   "rot": 90,
+   "len": 2.5,
+   "w": 0.85
+  },
+  {
+   "type": "chip",
+   "x": 16.97,
+   "y": 16.46,
+   "rot": 0,
+   "len": 2.24,
+   "w": 0.68
+  },
+  {
+   "type": "chip",
+   "x": 16.96,
+   "y": 14.32,
+   "rot": 0,
+   "len": 2.22,
+   "w": 0.68
+  },
+  {
+   "type": "chip",
+   "x": 16.96,
+   "y": 20.72,
+   "rot": 0,
+   "len": 2.31,
+   "w": 0.68
+  },
+  {
+   "type": "chip",
+   "x": 16.95,
+   "y": 22.88,
+   "rot": 0,
+   "len": 2.29,
+   "w": 0.68
+  },
+  {
+   "type": "chip",
+   "x": 47.1,
+   "y": 69.63,
+   "rot": 90,
+   "len": 2.3,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 20.73,
+   "rot": 0,
+   "len": 2.39,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 16.95,
+   "y": 18.61,
+   "rot": 0,
+   "len": 2.17,
+   "w": 0.68
+  },
+  {
+   "type": "chip",
+   "x": 28.92,
+   "y": 6.78,
+   "rot": 90,
+   "len": 1.97,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 27.47,
+   "y": 6.79,
+   "rot": 90,
+   "len": 1.97,
+   "w": 0.55
+  },
+  {
+   "type": "chip",
+   "x": 25.38,
+   "y": 7.41,
+   "rot": 0,
+   "len": 1.53,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 53.17,
+   "y": 73.83,
+   "rot": 90,
+   "len": 1.73,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 51.69,
+   "y": 69.53,
+   "rot": 90,
+   "len": 1.93,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 51.68,
+   "y": 67.01,
+   "rot": 90,
+   "len": 1.93,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 16.97,
+   "y": 33.61,
+   "rot": 0,
+   "len": 2.23,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 15.29,
+   "y": 75.33,
+   "rot": 90,
+   "len": 1.88,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 30.27,
+   "y": 75.35,
+   "rot": 90,
+   "len": 1.9,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 4.86,
+   "y": 57.57,
+   "rot": 0,
+   "len": 1.96,
+   "w": 0.55
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 16.47,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 15.16,
+   "y": 56.61,
+   "rot": 0,
+   "len": 2.33,
+   "w": 0.8
+  },
+  {
+   "type": "chip",
+   "x": 30.85,
+   "y": 77.88,
+   "rot": 0,
+   "len": 2.1,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 28.7,
+   "y": 75.35,
+   "rot": 90,
+   "len": 1.89,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 40.11,
+   "y": 9.67,
+   "rot": 0,
+   "len": 1.78,
+   "w": 1.02
+  },
+  {
+   "type": "chip",
+   "x": 40.11,
+   "y": 6.8,
+   "rot": 0,
+   "len": 1.78,
+   "w": 1.02
+  },
+  {
+   "type": "chip",
+   "x": 25.36,
+   "y": 6.14,
+   "rot": 0,
+   "len": 1.76,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 40.76,
+   "y": 9.7,
+   "rot": 0,
+   "len": 1.76,
+   "w": 1.02
+  },
+  {
+   "type": "chip",
+   "x": 30.46,
+   "y": 6.78,
+   "rot": 90,
+   "len": 1.93,
+   "w": 0.68
+  },
+  {
+   "type": "chip",
+   "x": 40.76,
+   "y": 6.77,
+   "rot": 0,
+   "len": 1.76,
+   "w": 1.02
+  },
+  {
+   "type": "chip",
+   "x": 23.3,
+   "y": 6.79,
+   "rot": 90,
+   "len": 1.97,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 30.46,
+   "y": 84.92,
+   "rot": 90,
+   "len": 2.08,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 32.63,
+   "y": 84.93,
+   "rot": 90,
+   "len": 2.05,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 6.41,
+   "y": 52.94,
+   "rot": 90,
+   "len": 2.04,
+   "w": 0.64
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 33.59,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 29.32,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 27.16,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 25.05,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 22.88,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 18.61,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 31.44,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 14.33,
+   "y": 14.33,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 13.73,
+   "y": 75.34,
+   "rot": 90,
+   "len": 1.88,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 49.28,
+   "y": 6.63,
+   "rot": 90,
+   "len": 2.33,
+   "w": 0.8
+  },
+  {
+   "type": "chip",
+   "x": 50.14,
+   "y": 69.54,
+   "rot": 90,
+   "len": 1.86,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 50.14,
+   "y": 67.0,
+   "rot": 90,
+   "len": 1.86,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 43.84,
+   "y": 8.92,
+   "rot": 0,
+   "len": 1.5,
+   "w": 0.3
+  },
+  {
+   "type": "chip",
+   "x": 9.81,
+   "y": 83.68,
+   "rot": 0,
+   "len": 1.29,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 11.31,
+   "y": 83.67,
+   "rot": 0,
+   "len": 1.29,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 14.3,
+   "y": 83.68,
+   "rot": 0,
+   "len": 1.29,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 13.81,
+   "y": 83.68,
+   "rot": 0,
+   "len": 1.29,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 11.8,
+   "y": 83.68,
+   "rot": 0,
+   "len": 1.29,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 36.82,
+   "y": 9.5,
+   "rot": 0,
+   "len": 1.67,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 33.13,
+   "y": 9.5,
+   "rot": 0,
+   "len": 1.6,
+   "w": 0.59
+  },
+  {
+   "type": "chip",
+   "x": 43.84,
+   "y": 7.56,
+   "rot": 0,
+   "len": 1.51,
+   "w": 0.25
+  },
+  {
+   "type": "chip",
+   "x": 14.88,
+   "y": 81.67,
+   "rot": 90,
+   "len": 1.48,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 14.88,
+   "y": 79.89,
+   "rot": 90,
+   "len": 1.48,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 27.41,
+   "y": 49.45,
+   "rot": 90,
+   "len": 1.48,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 12.81,
+   "y": 82.97,
+   "rot": 90,
+   "len": 1.92,
+   "w": 0.25
+  },
+  {
+   "type": "chip",
+   "x": 53.16,
+   "y": 81.65,
+   "rot": 90,
+   "len": 1.52,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 9.42,
+   "y": 80.59,
+   "rot": 0,
+   "len": 1.52,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 53.16,
+   "y": 84.31,
+   "rot": 90,
+   "len": 1.52,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 29.15,
+   "y": 82.3,
+   "rot": 0,
+   "len": 1.52,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 29.06,
+   "y": 79.72,
+   "rot": 0,
+   "len": 1.52,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 12.83,
+   "y": 56.6,
+   "rot": 0,
+   "len": 1.48,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 49.28,
+   "y": 8.68,
+   "rot": 90,
+   "len": 1.48,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 33.15,
+   "y": 56.42,
+   "rot": 0,
+   "len": 1.97,
+   "w": 0.34
+  },
+  {
+   "type": "chip",
+   "x": 39.37,
+   "y": 68.38,
+   "rot": 90,
+   "len": 1.99,
+   "w": 0.3
+  },
+  {
+   "type": "chip",
+   "x": 31.31,
+   "y": 81.28,
+   "rot": 0,
+   "len": 1.68,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 38.51,
+   "y": 68.37,
+   "rot": 90,
+   "len": 1.31,
+   "w": 0.25
+  },
+  {
+   "type": "chip",
+   "x": 28.58,
+   "y": 84.92,
+   "rot": 90,
+   "len": 1.37,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 33.16,
+   "y": 55.53,
+   "rot": 0,
+   "len": 1.31,
+   "w": 0.25
+  },
+  {
+   "type": "chip",
+   "x": 40.23,
+   "y": 68.37,
+   "rot": 90,
+   "len": 1.31,
+   "w": 0.25
+  },
+  {
+   "type": "chip",
+   "x": 12.31,
+   "y": 80.96,
+   "rot": 0,
+   "len": 1.41,
+   "w": 0.17
+  },
+  {
+   "type": "chip",
+   "x": 33.15,
+   "y": 57.25,
+   "rot": 0,
+   "len": 1.24,
+   "w": 0.25
+  },
+  {
+   "type": "chip",
+   "x": 31.32,
+   "y": 78.98,
+   "rot": 0,
+   "len": 1.67,
+   "w": 0.17
+  },
+  {
+   "type": "chip",
+   "x": 39.37,
+   "y": 68.38,
+   "rot": 0,
+   "len": 1.99,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 12.55,
+   "y": 82.26,
+   "rot": 0,
+   "len": 1.76,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 33.15,
+   "y": 56.39,
+   "rot": 90,
+   "len": 1.99,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 12.3,
+   "y": 81.6,
+   "rot": 90,
+   "len": 1.51,
+   "w": 0.25
+  },
+  {
+   "type": "chip",
+   "x": 13.8,
+   "y": 81.61,
+   "rot": 90,
+   "len": 1.52,
+   "w": 0.21
+  },
+  {
+   "type": "chip",
+   "x": 55.36,
+   "y": 81.12,
+   "rot": 0,
+   "len": 2.03,
+   "w": 0.04
+  },
+  {
+   "type": "chip",
+   "x": 31.52,
+   "y": 82.29,
+   "rot": 0,
+   "len": 1.18,
+   "w": 0.51
+  },
+  {
+   "type": "chip",
+   "x": 31.29,
+   "y": 80.12,
+   "rot": 90,
+   "len": 2.37,
+   "w": 0.3
+  }
+ ]
+}

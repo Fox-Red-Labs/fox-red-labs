@@ -5,7 +5,8 @@ Symbol addresses come from the image's linker map (<image>.map beside it, or <na
 Prints each symbol as hex; use --text to print a symbol as text. Only the given probe serial is touched."""
 import argparse, glob, os, re, subprocess, sys, tempfile, time
 HERE = os.path.dirname(os.path.abspath(__file__))
-DSL = "/Applications/ti/uniflash_9.6.0/deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/DSLite"
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tools", "frl")); import toolfind  # noqa: E402
+DSL = os.environ.get("FRL_DSLITE") or toolfind.find("dslite")["exe"]   # UniFlash or CCStudio; FRL_DSLITE names another
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("image"); ap.add_argument("wait", type=float); ap.add_argument("syms", nargs="*")

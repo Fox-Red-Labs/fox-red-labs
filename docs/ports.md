@@ -3,7 +3,9 @@
 
 Coming from STM32, Arduino, ESPHome, MicroPython, Zephyr or another vendor's SDK? Pick yours below.
 
-57 ports run on 15 TI kits and 2 other boards. Plus 64 chip-to-chip tests inside TI's families (51 run on the board): [portability/matrix.csv](../portability/matrix.csv). Site page: [site/ports.html](../site/ports.html).
+57 ports run on 16 TI kits and 2 other boards. Plus 66 chip-to-chip tests inside TI's families (53 run on the board): [portability/matrix.csv](../portability/matrix.csv). Site page: [site/ports.html](../site/ports.html).
+
+17 of these ports change another project's code: 0 merged there, 0 with a pull request open, 17 in this repository only. 13 more came from code that takes no outside changes.
 
 Terms: [vocab](vocab.md). 1 kB = 1,024 bytes.
 
@@ -32,6 +34,8 @@ python3.12 -m venv venv && ./venv/bin/pip install "cbor2<6" esphome==2026.9.1
 
 You see: The device appears in ZHA, Home Assistant's built-in Zigbee support, with an LED switch and a chip temperature sensor.
 
+Upstream: in this repository only; not sent to ESPHome
+
 Measured: A repeat compile takes 27 s and the image is 262.7 kB of flash with 124.4 kB of RAM free. The LED switches at a median of 85 to 92.5 ms.
 
 Limits: Zigbee only, no Wi-Fi. After a second flash, remove the old device from Home Assistant first, or it does not rejoin.
@@ -54,6 +58,8 @@ python3.12 -m venv venv && ./venv/bin/pip install "cbor2<6" esphome==2026.9.1
 ```
 
 You see: The end device joins Home Assistant's Zigbee integration (ZHA) with an LED switch and a chip temperature sensor.
+
+Upstream: in this repository only; not sent to ESPHome
 
 Measured: The image is 219.9 kB of flash, with 4.0 kB of the chip's 36 kB of RAM free. Over five runs 93 of 100 commands passed.
 
@@ -79,6 +85,8 @@ printf 'wifi_ssid: "%s"\nwifi_password: "%s"\n' "$SSID" "$WIFIPW" > secrets.yaml
 ```
 
 You see: The board joins Wi-Fi after a reset and logs "[I][wifi]: Connected" on its serial port at 115200 baud.
+
+Upstream: in this repository only; not sent to ESPHome
 
 Measured: A repeat compile takes 23 s. A 24-hour soak confirmed 5,616 of 5,620 commands and rode out 22 access-point drops.
 
@@ -107,11 +115,13 @@ portability/arduino/zephyr/build-cc2340r5.sh Blink
 
 You see: Blink toggles the board's LED pin; AnalogReadSerial prints 10-bit readings at 9600 baud on the probe's serial port.
 
+Upstream: in this repository only; not sent to ArduinoCore-zephyr
+
 Measured: Images are 22.8 to 38.3 kB of flash and 4.8 to 6.1 kB of RAM. On the LP-MSPM0G3519, Wire reads the touch controller 100 of 100 times and SPI loopback returns 256 of 256 bytes.
 
 [See the run](../site/project-arduino.html)
 
-**Arduino display libraries on the LP-MSPM0G3507** · Works · LP-MSPM0G3507
+**Arduino display libraries on the LP-MSPM0G3507, and the core layer on the LP-MSPM0G5187** · Works · LP-MSPM0G3507, LP-MSPM0G5187
 
 You get: Arduino_GFX's graphics test draws on an ST7796S screen on the LP-MSPM0G3507, through a 649-line Arduino API layer under the unmodified libraries.
 
@@ -129,9 +139,9 @@ Limits: The touch chip answers software I2C but not the chip's I2C block. This i
 
 [See the run](../site/project-arduino.html)
 
-**uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507 and LP-MSPM0G3519** · Works · LP-MSPM0G5187, LP-MSPM0G3507, LP-MSPM0G3519
+**uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507, LP-MSPM0G3519, LP-EM-CC2340R5, LP-EM-CC2755P10, LP-MSPM33C321A, LP-AM243 and LAUNCHXL-F2800137** · Works · LP-MSPM0G5187, LP-MSPM0G3507, LP-MSPM0G3519, LP-EM-CC2340R5, LP-EM-CC2755P10, am243x, LAUNCHXL-F2800137, LP-MSPM33C321A
 
-You get: uLisp, an Arduino sketch, gives a Lisp prompt on the LP-MSPM0G5187's serial port: 19 of 19 REPL (type-and-run loop) checks pass.
+You get: uLisp, an Arduino sketch, gives a Lisp prompt on the serial port of the LP-MSPM0G5187, LP-EM-CC2340R5 and LP-EM-CC2755P10: 19 of 19 REPL (type-and-run loop) checks pass on each.
 
 Copy these files: [ports/ulisp](../ports/ulisp)
 
@@ -141,9 +151,11 @@ Run this command:
 ports/ulisp/build.sh
 ```
 
+Upstream: in this repository only; not sent to uLisp
+
 Measured: The image is 98.8 kB of flash and 23.1 kB of RAM. (tak 18 12 6) takes 7.5 s at 80 MHz.
 
-Limits: Analog read, tone, SPI and I2C are stubs. The same source builds for the LP-MSPM0G3507 and LP-MSPM0G3519 and is flashed only on the LP-MSPM0G5187.
+Limits: Analog read, tone, SPI and I2C are stubs. The same source builds for the LP-MSPM0G3507 and LP-MSPM0G3519 and is flashed on the LP-MSPM0G5187, LP-EM-CC2340R5 and LP-EM-CC2755P10.
 
 [See the run](../site/project-ulisp.html)
 
@@ -164,6 +176,8 @@ ports/micropython/zephyr-cc2340r5/build.sh
 ```
 
 You see: The probe's serial port at 115200 baud shows the banner "MicroPython v1.29.0 ... zephyr-lp_em_cc2340r5 with cc2340r5" and a >>> prompt; print(1+1) prints 2.
+
+Upstream: in this repository only; not sent to MicroPython and Zephyr
 
 Measured: The image is 174.8 kB of flash and 29.9 kB of RAM with a 20 kB heap; the stock settings overflow the RAM by 46.8 kB. Pin.irq saw 10 of 10 edges.
 
@@ -188,13 +202,15 @@ MP="$PWD/mp" ZW="$PWD/zw" OUT="$PWD/out" KIND=uart ./build.sh
 
 You see: The probe's serial port at 115200 baud shows the banner "MicroPython v1.29.0 ... zephyr-lp_mspm33c321a with mspm33c321a" and a >>> prompt; print(1+1) prints 2.
 
+Upstream: in this repository only; not sent to Zephyr
+
 Measured: The image is 292.3 kB of flash and 83.6 kB of RAM with a 48 kB heap.
 
 Limits: I2C reads hang until a hardware reset. The chip has no Zephyr ADC or PWM driver.
 
 [See the run](../site/project-micropython.html)
 
-**MicroPython 1.29.0 on the LP-MSPM0G3519 and LP-MSPM0G3507** · Works · LP-MSPM0G3519, LP-MSPM0G3507
+**MicroPython 1.29.0 on the LP-MSPM0G3519, LP-MSPM0G3507 and LP-MSPM0G5187** · Works · LP-MSPM0G3519, LP-MSPM0G3507, LP-MSPM0G5187
 
 You get: A new MicroPython port boots on the LP-MSPM0G3519 with the MicroPython banner and drives a 3.5 inch touch screen from Python.
 
@@ -205,6 +221,8 @@ Run this command:
 ```bash
 ports/micropython/build_all.sh
 ```
+
+Upstream: in this repository only; not sent to MicroPython
 
 Measured: The full build uses 174 kB of flash and leaves 119 kB of heap free. Hardware SPI fills 320 by 480 pixels in 147 ms and the touch chip reads in 1.43 ms.
 
@@ -223,6 +241,8 @@ Copy these files: [am62l-evm/zephyr](../am62l-evm/zephyr)
 Run this command: [See the folder's README](../am62l-evm/zephyr/README.md)
 
 You see: UART0 prints *** Booting Zephyr OS build a915b2f12675 *** and Hello World! am62l_evm/am62l3/a53 with the DDR never initialized; beside Linux, /dev/mem reads tick lines from core 1's console ring.
+
+Upstream: in this repository only; not sent to Zephyr
 
 Measured: 124 KB image in a 144 KB SRAM map, 20 KB spare. Beside Linux: 44.0 kB in DDR, started by PSCI CPU_ON, 66 console bytes in 3 s while Linux runs; 552.5 mW for the board with both.
 
@@ -245,6 +265,8 @@ cd mspm0l1306/zephyr
 
 You see: hello_world and blinky run on the board; the console is UART0 at 115200 baud.
 
+Upstream: in this repository only; not sent to Zephyr
+
 Measured: Standard CoreMark fits with 16 bytes of RAM left and scores 1.87 per MHz. It needs the board file, a corrected GPIO driver, hand-written UART pins and one heap setting.
 
 Limits: Most other Zephyr samples need 6 to 17 kB of RAM and do not fit.
@@ -258,6 +280,8 @@ You get: Zephyr's hello_world reaches main and an image toggles the LED on the L
 Copy these files: [am13e230/zephyr](../am13e230/zephyr)
 
 Run this command: [See the write-up](../docs/experiments/2026-10-09-am13e230-zephyr-upstream.md)
+
+Upstream: in this repository only; not sent to Zephyr
 
 Limits: Zephyr has no LED, GPIO or serial driver for this chip, so Zephyr's own blinky does not build. The build clones Zephyr's main branch, so a later checkout can differ from the one that ran (commit 11808e9ea).
 
@@ -448,6 +472,8 @@ cd ports/bitnetmcu/mspm0
 
 You see: run.sh flashes the board, runs it and prints the answers, the cycle count and the stack depth.
 
+Upstream: in this repository only; not sent to BitNetMCU
+
 Measured: At 32 MHz the most accurate model (99.55% on MNIST) takes 2.64M cycles on the LP-MSPM0G3507, 3.5% fewer than the author's 2.74M on the CH32V002. The 64-wide model also runs in the LP-MSPM0L1306's 4 kB of RAM.
 
 [See the run](../site/project-handwritten-digits.html)
@@ -466,6 +492,8 @@ ports/bitnetmcu/c2000/build.sh RAM
 
 You see: All 10 test digits come out right.
 
+Upstream: in this repository only; not sent to BitNetMCU
+
 Measured: 2.55M cycles from RAM (21.3 ms) and 2,897,585 from flash (24.1 ms) at 120 MHz, 6.7% fewer than the author's CH32V002 count.
 
 Limits: The C28x has no 8-bit type, so the port needed three code fixes.
@@ -479,6 +507,8 @@ You get: The 1k handwriting model reads all 10 test digits right in 804 B of RAM
 Copy these files: [ports/bitnetmcu/mspm0](https://github.com/Fox-Red-Labs/fox-red-labs/tree/main/ports/bitnetmcu/mspm0)
 
 Run this command: [See the write-up](../docs/experiments/2026-10-08-mspm0c1104-1kb-ram.md)
+
+Upstream: in this repository only; not sent to BitNetMCU
 
 Limits: The 16-channel CNN links but overruns the stack and never finishes. `mspm0c1104/prebuild.sh bitnet` builds the LP-MSPM0C1104 images; flashing them and reading the answers back are not scripted for this board.
 
@@ -525,9 +555,9 @@ Limits: Baseline streams only; main-profile streams are refused.
 
 [See the run](../portability/h264/SOURCE.md)
 
-**Post-quantum key exchange and signatures on the LP-CC1354P10-1** · Works · LP-CC1354P10-1
+**Post-quantum key exchange and signatures on seven boards: LP-CC1354P10-1, LP-EM-CC2340R5, LP-AM243, LP-MSPM0G3519, LP-MSPM33C321A, LP-EM-CC2755P10 and LP-MSPM0G5187** · Works · LP-CC1354P10-1, LP-EM-CC2340R5, am243x, LP-MSPM0G3519, LP-MSPM33C321A, LP-EM-CC2755P10, LP-MSPM0G5187
 
-You get: ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on the LP-CC1354P10-1.
+You get: ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on seven boards, from a 36 kB Cortex-M0+ to an 800 MHz Cortex-R5F; the LP-CC1354P10-1 also agrees a key with a Mac.
 
 Copy these files: [portability/pqc-join](../portability/pqc-join)
 
@@ -640,6 +670,8 @@ Run this command:
 ports/wasm3/build_all.sh
 ```
 
+Upstream: in this repository only; not sent to wasm3
+
 Measured: fib(20) runs 43.5 times and a 20,000-pass loop 28.9 times slower than the same C. The heap stays flat at 6.9 kB of 16 kB over 14 passes.
 
 Limits: Only the LP-MSPM0G3519 is flashed; the other two kits build.
@@ -722,6 +754,8 @@ git apply "$FRL/ports/openocd-cc23xx/0001-flash-nor-cc23xx-ti-cc23xx-cc27xx.patc
 
 You see: On the LP-EM-CC2340R5, openocd -f board/ti_lp_em_cc2340r5.cfg -c "program blink.hex verify reset exit" erases, writes, verifies and restarts the blink, and the LED pin toggles.
 
+Upstream: in this repository only; not sent to OpenOCD
+
 Measured: It programs TI's blink in 0.37 s. A 511 kB image writes in 10.5 s and reads back identical.
 
 Limits: On the LP-EM-CC2755P10 the driver builds and has no board result. Chip erase and CCFG changes are refused.
@@ -785,7 +819,7 @@ Limits: Apple Home was the only controller used. The board must be fully erased 
 
 [See the run](../site/project-matter-device.html#e169)
 
-**ESP32-BLE-Gamepad (a Bluetooth HID gamepad library) on TI, ST and C2000 boards** · Works · LP-MSPM0G3519, LAUNCHXL-F2800137, LP-EM-CC2340R5, LP-EM-CC35X1, NUCLEO-U083RC
+**ESP32-BLE-Gamepad (a Bluetooth HID gamepad library) on TI, ST and C2000 boards** · Works · LP-MSPM0G3519, LAUNCHXL-F2800137, LP-EM-CC2340R5, NUCLEO-U083RC
 
 You get: The ESP32-BLE-Gamepad descriptor and reports match the library's output byte for byte on four boards, and 15 of 15 button changes from the LP-EM-CC2340R5 reached a Mac as gamepad reports.
 
@@ -829,9 +863,9 @@ Limits: Decode only; no audio plays. The LP-MSPM0G3519 cannot keep up in real ti
 
 [See the run](../ports/minimp3/README.md)
 
-**2048 and Minesweeper on the LP-MSPM0G3519 with a 3.5 inch touch display** · Works · LP-MSPM0G3519, LP-MSPM0G3507, LP-MSPM33C321A
+**2048 and Minesweeper on the LP-MSPM0G3519 with a 3.5 inch touch display (also built for the LP-MSPM0G3507 and LP-MSPM33C321A)** · Works · LP-MSPM0G3519, LP-MSPM0G3507, LP-MSPM33C321A
 
-You get: 2048 and Minesweeper run on the LP-MSPM0G3519 with a 3.5 inch touch display.
+You get: 2048 and Minesweeper run on the LP-MSPM0G3519 with a 3.5 inch touch display. The same source builds for the LP-MSPM0G3507 (10.8 kB of flash) and, with a stub screen, for the LP-MSPM33C321A (8.1 kB).
 
 Copy these files: [ports/touch-games](../ports/touch-games)
 
@@ -856,6 +890,8 @@ You get: The rp2040-doom design plays all three shareware demos on the LP-EM-CC3
 Copy these files: [ports/doom](../ports/doom)
 
 Run this command: [README: 2 steps](../ports/doom/README.md)
+
+Upstream: in this repository only; not sent to doomgeneric
 
 Measured: 39.2 frames per second on the LP-EM-CC35X1 and 22.7 on the LP-MSPM33C321A's Educational BoosterPack screen. The converted game data is 1.7 MB, read in place from flash.
 
@@ -935,7 +971,7 @@ The same source moved between MSPM0, MSPM33, CC23xx, CC27xx, CC35xx, C2000, AM13
 
 You get: TI's documented Jailhouse flow from Linux SDK 12.01.00.05.03 ran as written on the AM62L EVM: the hypervisor enabled in 0.27 s, the uart and gic demo cells printed within a second, and a second Linux reached a login about 20 s after its cell started.
 
-Copy these files: [am62l-evm/tools](https://github.com/Fox-Red-Labs/fox-red-labs/tree/main/am62l-evm/tools)
+Copy these files: [am62l-evm/README.md](../am62l-evm/README.md)
 
 Run this command: [README: 2 steps](../docs/experiments/2026-10-22-am62l-jailhouse.md)
 
@@ -1110,7 +1146,7 @@ No. There is a layer for your own build, and Arduino sketches run through Zephyr
 
 ### Which kit should I buy first?
 
-The LP-MSPM0G3519 runs the most cards on this page: 15 of 57. Next come the LP-MSPM33C321A with 13 and the LP-MSPM0G3507 with 11. For ESPHome, take an LP-EM-CC35X1 for Wi-Fi, or an LP-EM-CC2340R5 or LP-EM-CC2755P10 for Zigbee only. The Board menu above lists the cards for any kit.
+The LP-MSPM0G3519 runs the most cards on this page: 16 of 57. Next come the LP-MSPM33C321A with 15 and the LP-MSPM0G3507 with 11. For ESPHome, take an LP-EM-CC35X1 for Wi-Fi, or an LP-EM-CC2340R5 or LP-EM-CC2755P10 for Zigbee only. The Board menu above lists the cards for any kit.
 
 ### Which kit runs ESPHome on Wi-Fi?
 

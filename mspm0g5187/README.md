@@ -1,6 +1,6 @@
 # TI LP-MSPM0G5187 LaunchPad: NPU speed against the CPU, and the wake-word demo
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Short answer.** On the 8k-parameter room-occupancy model the NPU takes 2.12 ms and the CPU takes 35.27 ms at 80 MHz: 16.7 times faster, with all 20 test vectors giving the right class. The gain is 3.0 times on a 500-parameter model and 1.9 times on a 30k-parameter model. The board shipped with a 424 B program already on it, and a command-line flash and read of the chip works from a Mac with probe firmware 3.0.0.38, even though TI's tool prints a warning on every call. Measured 2026-10-08 and 2026-10-09 on an Intel Mac, macOS 15.7, MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, UniFlash 9.6.0. Also measured 2026-10-09: AES, CRC, Embench, Dhrystone, FFT and the UART loop ([results](RESULTS-mspm0g5187.md)).
 
@@ -75,6 +75,7 @@ Measured 2026-10-08 to 2026-10-10 on one board. Also measured 2026-10-09: Dhryst
 |---|---|---|---|---|
 | Chip: 80 MHz, 128 kB flash, 32 kB RAM, NPU 2.56 billion operations a second | as listed | Vendor figures | claim | TI's published ratings |
 | Blink build, TI makefile | 4.0 s median of 3 | SysConfig and compile | measured | `data/results/mspm0g5187.csv`, test `blink_build` |
+| Blink, one command (`frl run`: build, flash, verify the asked pattern on PA17) | 10.1 s median of 3 (9.4 to 10.5) | Warm run, SysConfig 1.28.0 named with `FRL_SYSCONFIG` (route validated on 1.26.3); image 536 B of flash | measured 2026-11-08 | `data/results/mspm0g5187.csv`, test `time_to_blink` (cli) |
 | Blink flash, DSLite | 4.7 s median of 3 | UniFlash command line | measured | `data/results/mspm0g5187.csv`, test `blink_flash` (dslite) |
 | Blink flash, OpenOCD | 20.7 s once | OpenOCD also works with the G3507 board file | measured | `data/results/mspm0g5187.csv`, test `blink_flash` (openocd) |
 | CoreMark, TI Arm Clang `-O3`, 80 MHz | 182.79 (2.285 per MHz) | `-O2` 122.62, `-Os` 110.00, `-Oz` 98.50; at 32 MHz `-O3` 78.80 (2.462 per MHz) | measured | `data/results/mspm0g5187.csv`, test `coremark` |

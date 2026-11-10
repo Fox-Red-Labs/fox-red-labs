@@ -1,6 +1,6 @@
 # TI LP-MSPM0G3519 LaunchPad from a Mac, compared with the LP-MSPM0G3507
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Measured on 2026-10-08.** The board builds and flashes from a Mac in 8 seconds and holds the LP-MSPM0G3507's numbers at 80 MHz: CoreMark 182.73 per second at -O3 (2.284 per MHz), the same handwriting model in the same 2.64M cycles. TI's Zephyr blinky for it builds and flashes but does not run (see [FAQ](FAQ.md)). Not run: Zephyr benchmarks, power and the AI cost runs. Every number and its recipe is in `data/results/mspm0g3519.csv`; the write-up is [RESULTS-mspm0g3519.md](RESULTS-mspm0g3519.md).
 
@@ -93,6 +93,8 @@ Builds blink, CoreMark at four flag levels and two clocks, the occupancy and han
 | ADC, 1k samples with DMA | 3.93 Msps (8.3k cycles at 32 MHz) | The G3507 took 8.3k | measured | `data/results/mspm0g3519.csv`, test `adc_max_rate` |
 | UART0 loopback, PA10 to PA11 | Clean to 10.67 Mbaud except at 5.5 and 6.0 Mbaud; 12 Mbaud sends nothing | Bytes compared | measured | `data/results/mspm0g3519.csv`, test `uart_max_clean` |
 | Zephyr CoreMark, -O2 with unrolling | 135.26 per second | Zephyr 4.4.2 upstream board, GCC 12.2, 80 MHz | measured | `data/results/mspm0g3519.csv`, test `coremark` (gcc-zephyr-o2unroll) |
+| MicroPython speed, pystone | 1,112 pystones per second (1,111 to 1,114, 3 runs) | MicroPython 1.29.0 full image at 80 MHz, `ports/micropython/tests/pystone_lowmem.py` (list records, 2,000 loops); compare only with other runs of this script | measured | `data/results/mspm0g3519.csv`, test `micropython_pystone` |
+| Blink from one terminal command | 9.5 s warm (9.48, 9.56), 30.0 s for the first, cold run | `python3 tools/frl/frl.py run --board mspm0g3519 --pattern 150,150,150,900 --no-backup`: build, flash, then PB26 timed over 10 levels to the asked pattern; terminal only, no first-power clock | measured | `data/results/mspm0g3519.csv`, test `time_to_blink` (cli) |
 
 ## If you see this
 

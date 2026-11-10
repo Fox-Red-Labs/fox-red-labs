@@ -1,6 +1,6 @@
 {
  "note": "written by tools/code_size_check.py. Self-test, break-it grid, mutants and two-record agreement for the code size estimator. The hash covers the engine, the map, the board table and this script; the result rows themselves are read live by the page renderer.",
- "engine_sha": "fcda38a880b42b0b",
+ "engine_sha": "ef7987fb171415bf",
  "pass": true,
  "tolerance": "zero bytes, set before the run",
  "selftest": [

@@ -16,6 +16,8 @@ OPT="${OPT:--O2}"
 BOARD="${BOARD:-mspm0g3507}"; BD="$HERE/boards/$BOARD"; [ -d "$BD" ] || { echo "no boards/$BOARD"; exit 1; }
 LIB="$HERE/../../third-party/arduino"
 GEN="$BD/gen"
+SYSCFG_DEVICE=MSPM0G350X; STARTUP=startup_mspm0g350x_ticlang.c; BASIC_ONLY=
+[ -f "$BD/board.sh" ] && . "$BD/board.sh"   # per-board device, start-up file, BASIC_ONLY
 OUT="$HERE/out/$BOARD"; OBJ="$OUT/obj"; LOG="$OUT/logs"; mkdir -p "$OBJ" "$LOG"
 
 # 1. SysConfig output (clock, SPI1, UART0). Skipped when gen/ is newer than the .syscfg.
@@ -24,11 +26,11 @@ if [ ! -f "$GEN/ti_msp_dl_config.c" ] || [ "$BD/arduino.syscfg" -nt "$GEN/ti_msp
   while IFS= read -r -d '' a; do case "$a" in SYSCONFIG_TOOL=*) SYSCFG=${a#*=};; esac; done \
     < <(python3 "$HERE/../../tools/frl/toolenv.py" sysconfig)
   [ -n "$SYSCFG" ] || exit 2
-  "$SYSCFG" -s "$SDK/.metadata/product.json" -d MSPM0G350X --compiler ticlang -o "$GEN" "$BD/arduino.syscfg" >/dev/null
+  "$SYSCFG" -s "$SDK/.metadata/product.json" -d "$SYSCFG_DEVICE" --compiler ticlang -o "$GEN" "$BD/arduino.syscfg" >/dev/null
 fi
 
-# 2. Linker command file: SysConfig's, with a 2 KB stack (it asks for 512 bytes) and a 4 KB heap (none by default)
-sed -e 's/--stack_size=512/--stack_size=2048\n--heap_size=4096/' "$GEN/device_linker.cmd" > "$OUT/linker.cmd"
+# 2. Linker command file: SysConfig's, with a 2 KB stack (it asks for 512 bytes, the G5187 file for 256) and a 4 KB heap (none by default)
+sed -e 's/--stack_size=[0-9]*/--stack_size=2048\n--heap_size=4096/' "$GEN/device_linker.cmd" > "$OUT/linker.cmd"
 
 INC="-I$HERE/core -I$BD -I$LIB/ArduinoCore-API -I$LIB/ArduinoCore-API/api/deprecated-avr-comp -I$LIB/ArduinoCore-API/api/deprecated -I$GEN \
  -I$SDK/source/third_party/CMSIS/Core/Include -I$SDK/source \
@@ -55,11 +57,13 @@ group() {     # group <name> <files...>
 GFX=$(ls "$LIB"/Arduino_GFX/src/*.cpp "$LIB"/Arduino_GFX/src/databus/*.cpp "$LIB"/Arduino_GFX/src/display/*.cpp "$LIB"/Arduino_GFX/src/canvas/*.cpp)
 
 group shim   "$HERE"/core/*.cpp "$GEN/ti_msp_dl_config.c"
-compile shim "$SDK/source/ti/devices/msp/m0p/startup_system_files/ticlang/startup_mspm0g350x_ticlang.c"
+compile shim "$SDK/source/ti/devices/msp/m0p/startup_system_files/ticlang/$STARTUP"
 group api    "$LIB"/ArduinoCore-API/api/{Common,Print,Stream,String,IPAddress}.cpp
+if [ -z "$BASIC_ONLY" ]; then
 group gfx    $GFX
 group busio  "$LIB"/Adafruit_BusIO/*.cpp
 group ft6206 "$LIB"/Adafruit_FT6206_Library/Adafruit_FT6206.cpp
+fi
 
 # 3. Sketches
 build_sketch() {   # build_sketch <name> <sketch dir> <main .ino> <library groups> [extra defines]
@@ -73,6 +77,12 @@ build_sketch() {   # build_sketch <name> <sketch dir> <main .ino> <library group
      -Wl,-m,"$O/$name.map" -Wl,--rom_model "-L$CC/lib" -llibc++.a -llibc++abi.a -llibc.a -llibclang_rt.builtins.a -o "$O/$name.out"
   echo "== $name"; "$CC/bin/tiarmsize" "$O/$name.out" | tail -1
 }
+if [ -n "$BASIC_ONLY" ]; then   # boards without the display and touch module: the sketches that need nothing wired
+  build_sketch boardcheck "$HERE/sketches/boardcheck" boardcheck.ino ""
+  build_sketch Blink "$HERE/zephyr/sketches/Blink" Blink.ino ""
+  build_sketch AnalogReadSerial "$HERE/zephyr/sketches/AnalogReadSerial" AnalogReadSerial.ino "" || echo "AnalogReadSerial: build failed (analogRead is not in the layer)"
+  exit 0
+fi
 build_sketch pdqgfx    "$HERE/sketches/pdqgfx"    PDQgraphicstest.ino "gfx"
 build_sketch shimcheck  "$HERE/sketches/shimcheck"  shimcheck.ino      ""
 # same sketch with the library's own SPI mode choice (mode 2 for unknown boards), to test whether it matters

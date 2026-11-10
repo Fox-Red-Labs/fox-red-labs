@@ -1,0 +1,548 @@
+{
+ "_about": "A demo scene for site/boardviz/scene.js. base: the board the frame is measured on (its part table in data/boardviz). boards: more boards placed by mating their sockets onto the base's headers (mate pairs, rot in degrees, lift in mm above the base) or by at. things: loose parts in the base board's millimeter frame (motor, supply). wires: tubes from a place to a place; a place is board.part, board.part.wayN (a terminal way) or thing.wireOut; exit and enter are offsets that leave a hole straight before the wire bends; via adds points. steps: title, text, focus (a place that gets the label), and do: a list of actions run in order: drop/lift a board, show/hide a thing, wire/unwire, switch (pos up or down), shunt (drop a jumper on), led (light or off), spin/stop a motor, view (move the camera: azimuth and elevation in radians, zoom, center [x, y, height] in the base board's millimeters). Every step is one thing the reader does in the real build; the order is the recipe's order. check: what the reader sees when the step is right, or the one test to make before going on. console: a browser tool that drives the build, kept one tap away beside the steps (href, label, note). pins: the signal table from the port's README: signal, driver board pin, LaunchPad pin, what the program does with it.",
+ "id": "bldc-spin",
+ "title": "Brushless motor on the DRV8376EVM",
+ "base": "am13e230",
+ "boards": [
+  {
+   "id": "drv8376evm",
+   "mate": [
+    [
+     "j9",
+     "j1"
+    ],
+    [
+     "j8",
+     "j2"
+    ]
+   ],
+   "rot": 180,
+   "lift": 9
+  }
+ ],
+ "things": [
+  {
+   "id": "motor",
+   "type": "motor",
+   "at": [
+    102,
+    -14,
+    0
+   ],
+   "rot": 20,
+   "len": 60,
+   "rpm": 240,
+   "label": "Motor",
+   "title": "Brushless motor with Hall sensors",
+   "text": "An eight-pole 24 V motor. Three phase wires carry the drive; five thin wires bring back the Hall sensors that say where the rotor is.",
+   "size": 42
+  },
+  {
+   "id": "psu",
+   "type": "block",
+   "at": [
+    -14,
+    -44,
+    0
+   ],
+   "w": 34,
+   "h": 20,
+   "d": 12,
+   "color": "#3b3b40",
+   "text2": "12 V",
+   "ts": 4,
+   "label": "Motor supply",
+   "title": "Motor supply",
+   "text": "4.5 to 65 V DC into VBAT and PGND. Never the LaunchPad kit's own USB. Switch it on last."
+  }
+ ],
+ "wires": [
+  {
+   "id": "hallA",
+   "color": "#f4f4f4",
+   "from": "motor.wireOut",
+   "to": "drv8376evm.hall.way0",
+   "enter": [
+    6,
+    0,
+    0
+   ],
+   "d": 0.6,
+   "ends": [
+    "Motor Hall lead, 5 wires",
+    "HALL A, white"
+   ],
+   "label": "Hall A"
+  },
+  {
+   "id": "hallB",
+   "color": "#2a5bd7",
+   "from": "motor.wireOut",
+   "to": "drv8376evm.hall.way1",
+   "enter": [
+    6,
+    0,
+    0
+   ],
+   "d": 0.6,
+   "ends": [
+    null,
+    "HALL B, blue"
+   ],
+   "label": "Hall B"
+  },
+  {
+   "id": "hallC",
+   "color": "#2fa84f",
+   "from": "motor.wireOut",
+   "to": "drv8376evm.hall.way2",
+   "enter": [
+    6,
+    0,
+    0
+   ],
+   "d": 0.6,
+   "ends": [
+    null,
+    "HALL C, green"
+   ],
+   "label": "Hall C"
+  },
+  {
+   "id": "hallP",
+   "color": "#d7262a",
+   "from": "motor.wireOut",
+   "to": "drv8376evm.hall.way3",
+   "enter": [
+    6,
+    0,
+    0
+   ],
+   "d": 0.6,
+   "ends": [
+    null,
+    "HALL POWER, red"
+   ],
+   "label": "Hall power"
+  },
+  {
+   "id": "hallG",
+   "color": "#1a1a1a",
+   "from": "motor.wireOut",
+   "to": "drv8376evm.hall.way4",
+   "enter": [
+    6,
+    0,
+    0
+   ],
+   "d": 0.6,
+   "ends": [
+    null,
+    "HALL GROUND, black"
+   ],
+   "label": "Hall ground"
+  },
+  {
+   "id": "outA",
+   "color": "#e9c21c",
+   "from": "motor.wireOut",
+   "to": "drv8376evm.out.way2",
+   "enter": [
+    0,
+    -8,
+    0
+   ],
+   "d": 1.0,
+   "ends": [
+    "Motor phase leads",
+    "OUT A, yellow"
+   ],
+   "label": "Phase A"
+  },
+  {
+   "id": "outB",
+   "color": "#d7262a",
+   "from": "motor.wireOut",
+   "to": "drv8376evm.out.way1",
+   "enter": [
+    0,
+    -8,
+    0
+   ],
+   "d": 1.0,
+   "ends": [
+    null,
+    "OUT B, red"
+   ],
+   "label": "Phase B"
+  },
+  {
+   "id": "outC",
+   "color": "#1a1a1a",
+   "from": "motor.wireOut",
+   "to": "drv8376evm.out.way0",
+   "enter": [
+    0,
+    -8,
+    0
+   ],
+   "d": 1.0,
+   "ends": [
+    null,
+    "OUT C, black"
+   ],
+   "label": "Phase C"
+  },
+  {
+   "id": "vbat",
+   "color": "#d7262a",
+   "from": "psu",
+   "to": "drv8376evm.vbat.way1",
+   "enter": [
+    0,
+    -8,
+    0
+   ],
+   "d": 1.0,
+   "ends": [
+    "Supply +",
+    "VBAT, red"
+   ],
+   "label": "Supply positive"
+  },
+  {
+   "id": "pgnd",
+   "color": "#1a1a1a",
+   "from": "psu",
+   "to": "drv8376evm.vbat.way0",
+   "enter": [
+    0,
+    -8,
+    0
+   ],
+   "d": 1.0,
+   "ends": [
+    "Supply −",
+    "PGND, black"
+   ],
+   "label": "Supply ground"
+  }
+ ],
+ "extent": [
+  -32,
+  -56,
+  132,
+  100
+ ],
+ "view": {
+  "azimuth": -0.9,
+  "elevation": 0.8
+ },
+ "steps": [
+  {
+   "title": "Start with the LaunchPad, USB-C out",
+   "text": "The LP-AM13E230 on the bench with no cable in. The driver board goes on before any power.",
+   "focus": "am13e230.usbc",
+   "focus_label": "USB-C out",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.8,
+      "zoom": 1,
+      "center": [
+       45,
+       25,
+       0
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "title": "Switches S4 and S6 to BP",
+   "text": "They sit between the right header and the chip, each marked BP and CAN. BP means BoosterPack: the Hall signals go up to the driver board. On CAN they go to the CAN chip instead and the motor never learns its table.",
+   "focus": "am13e230.s4",
+   "focus_label": "S4 and S6 to BP",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.95,
+      "zoom": 2.4,
+      "center": [
+       42,
+       38,
+       0
+      ]
+     }
+    },
+    {
+     "switch": "am13e230.s4",
+     "pos": "down"
+    },
+    {
+     "switch": "am13e230.s6",
+     "pos": "down"
+    }
+   ]
+  },
+  {
+   "title": "Press the EVM onto J1 to J4",
+   "text": "Screw terminals pointing away from the USB-C. Its Hall-block socket covers J2 and J4, the nFAULT-side socket covers J1 and J3, with its far pin on J1 pin 1.",
+   "focus": "drv8376evm.hall",
+   "focus_label": "Hall block over J2, J4",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.8,
+      "zoom": 1.2,
+      "center": [
+       40,
+       30,
+       8
+      ]
+     }
+    },
+    {
+     "drop": "drv8376evm"
+    }
+   ],
+   "check": "The EVM sits flat with no pin showing between the boards, and its screw terminals point away from the USB-C."
+  },
+  {
+   "title": "Jumper J13 on the GVDD pair",
+   "text": "GVDD is the driver's own 5 V. This motor's Hall sensors need 4.5 V or more, so the 3.3 V choice is too low. The jumper goes on the two pins marked GVDD, not the 3V3 pair.",
+   "focus": "drv8376evm.j13",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.7,
+      "elevation": 1.0,
+      "zoom": 2.6,
+      "center": [
+       40,
+       45,
+       12
+      ]
+     }
+    },
+    {
+     "shunt": "drv8376evm.j13"
+    }
+   ],
+   "check": "J13 covers the GVDD pair. The 3V3 pin stands alone."
+  },
+  {
+   "title": "Hall wires into the green block",
+   "text": "Bottom to top: white HALL A, blue HALL B, green HALL C, red HALL POWER, black HALL GROUND. A Hall sensor is a small switch that flips as a rotor magnet passes it; three of them tell the program which sixth of a turn the rotor is in. A, B and C can be in any order because the program learns the table; power and ground must be right.",
+   "focus": "drv8376evm.hall",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.75,
+      "elevation": 0.95,
+      "zoom": 2.6,
+      "center": "drv8376evm.hall"
+     }
+    },
+    {
+     "wire": [
+      "hallA",
+      "hallB",
+      "hallC",
+      "hallP",
+      "hallG"
+     ]
+    }
+   ],
+   "check": "Five wires in, red at the fourth terminal from the bottom, black at the top. Tug each one."
+  },
+  {
+   "title": "Motor phases into the three-way terminal",
+   "text": "Yellow to OUT A, red to OUT B, black to OUT C. Any order works; the learn step finds the table. Leave the shaft free to turn.",
+   "focus": "drv8376evm.out",
+   "do": [
+    {
+     "view": {
+      "azimuth": -1.0,
+      "elevation": 0.95,
+      "zoom": 2.4,
+      "center": "drv8376evm.out"
+     }
+    },
+    {
+     "wire": [
+      "outA",
+      "outB",
+      "outC"
+     ]
+    }
+   ]
+  },
+  {
+   "title": "Supply into the two-way terminal",
+   "text": "Red to VBAT, black to PGND, supply switched off. 12 V from an adapter with the barrel cut off is the tested supply; 5 V from a cut USB cable on a 2 A charger also spins it. Keep it under 20 V for this motor. For the first power-up use a supply that limits current to about 0.5 A, or an adapter rated no higher.",
+   "focus": "drv8376evm.vbat",
+   "do": [
+    {
+     "view": {
+      "azimuth": -1.0,
+      "elevation": 0.95,
+      "zoom": 2.4,
+      "center": "drv8376evm.vbat"
+     }
+    },
+    {
+     "wire": [
+      "vbat",
+      "pgnd"
+     ]
+    }
+   ],
+   "check": "Before power: a meter between VBAT and PGND reads open, not a short, and red is on VBAT. Swapped supply wires can destroy the driver."
+  },
+  {
+   "title": "USB-C in, then the supply on",
+   "text": "VM, AVDD and GVDD light; MCU lights when the program runs. Open the serial port at 115200, press l to learn the Hall table (the shaft clicks round six steps, about 25 s), then 2 and g to spin. In the animation the yellow dots are supply current, the blue dots the Hall signals coming back, the orange dots the drive going out.",
+   "focus": "motor",
+   "focus_label": "Spinning",
+   "hold": 6000,
+   "do": [
+    {
+     "view": {
+      "azimuth": -1.05,
+      "elevation": 0.7,
+      "zoom": 1.2,
+      "center": [
+       62,
+       -8,
+       20
+      ]
+     }
+    },
+    {
+     "led": [
+      "drv8376evm.led_vm",
+      "drv8376evm.led_avdd",
+      "drv8376evm.led_gvdd",
+      "drv8376evm.led_mcu"
+     ]
+    },
+    {
+     "spin": "motor"
+    },
+    {
+     "flow": [
+      "vbat",
+      "pgnd"
+     ],
+     "kind": "power"
+    },
+    {
+     "flow": [
+      "hallP",
+      "hallG"
+     ],
+     "kind": "power",
+     "dir": -1
+    },
+    {
+     "flow": [
+      "hallA",
+      "hallB",
+      "hallC"
+     ],
+     "kind": "signal"
+    },
+    {
+     "flow": [
+      "outA",
+      "outB",
+      "outC"
+     ],
+     "kind": "drive",
+     "dir": -1
+    }
+   ],
+   "check": "Three lights on and NFAULT off. If NFAULT is on, switch the supply off: a phase wire is loose or shorted, or the supply sagged. Then open the motor console or the serial port."
+  }
+ ],
+ "console": {
+  "href": "motor-console.html",
+  "label": "Open the motor console",
+  "note": "after step 8. Connect, set a speed, Run. STOP stays on screen."
+ },
+ "pins": {
+  "source": "am13e230/foc-drv8376/README.md",
+  "rows": [
+   [
+    "INHA, INLA",
+    "J4 40, 39",
+    "PB3, PA7",
+    "Phase A high and low side PWM, 20 kHz"
+   ],
+   [
+    "INHB, INLB",
+    "J4 38, 37",
+    "PB1, PA2",
+    "Phase B PWM"
+   ],
+   [
+    "INHC, INLC",
+    "J4 36, 35",
+    "PB2, PA25",
+    "Phase C PWM"
+   ],
+   [
+    "HALL A, B, C",
+    "J4 34, 33, 32",
+    "PB7, PB6, PA12",
+    "Inputs; captured for speed"
+   ],
+   [
+    "nSLEEP",
+    "J1 9",
+    "PA23",
+    "Output, high wakes the driver"
+   ],
+   [
+    "nFAULT",
+    "J1 8",
+    "PB4",
+    "Input; trips the PWM in hardware (EVM J9 pin 6)"
+   ],
+   [
+    "DRVOFF",
+    "J2 13",
+    "PB18",
+    "Output, starts high; low turns the outputs on"
+   ],
+   [
+    "ISENA, ISENB, ISENC",
+    "J3 27 to 29",
+    "PA27, PA30, PA29",
+    "Phase current to the ADC and the over-current comparators"
+   ],
+   [
+    "VSENA, VSENVM",
+    "J3 26, 23",
+    "PA17, PA16",
+    "Phase A and bus voltage to the ADC"
+   ],
+   [
+    "HALL POWER",
+    "J13 to GVDD",
+    "",
+    "5 V to the Hall sensors; this motor needs 4.5 V or more"
+   ],
+   [
+    "VBAT, PGND",
+    "screw terminal",
+    "",
+    "Motor supply, 4.5 to 65 V on the EVM; 12 V tested here, keep under 20 V for this motor"
+   ]
+  ]
+ }
+}

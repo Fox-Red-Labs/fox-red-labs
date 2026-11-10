@@ -49,7 +49,7 @@ All numbers are from one LP-MSPM0G3519, 80 MHz CPU, code in flash, display wired
 | Minesweeper long press, plant a flag | 4.9 ms | 8.4 ms |
 | One read of the touch chip (5 bytes, software I2C) | 0.89 ms | 0.89 ms |
 
-The 40 MHz setting is above the panel's rated clock of about 15 MHz; the LVGL demo ran at 40 MHz on this board and was seen on the screen on 2026-10-09 (`data/results/mspm0g3519.csv`). These games have not been looked at on the screen; `RESULTS-ROWS.csv` says so.
+The 40 MHz setting is above the panel's rated clock of about 15 MHz; the LVGL demo ran at 40 MHz on this board and was seen on the screen on 2026-10-09 (`data/results/mspm0g3519.csv`). 2048 was played on the panel with touch on 2026-10-24 (the clip on the home and arcade pages); Minesweeper has not been looked at on the screen, and `RESULTS-ROWS.csv` holds no screen row for either game.
 
 ### Touch to pixel, an estimate
 

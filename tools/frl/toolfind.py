@@ -27,7 +27,7 @@ DOWNLOAD = {
     "wifi_toolbox": "SimpleLink Wi-Fi Toolbox 4.3.23 from https://www.ti.com/tool/SIMPLELINK-WIFI-TOOLBOX (free, myTI login): it signs and programs CC35xx images",
     "f2_sdk": "SimpleLink CC13xx CC26xx SDK 8.33.00.16 from https://www.ti.com/tool/SIMPLELINK-CC13XX-CC26XX-SDK (free, myTI login)",
     "f3_sdk": "SimpleLink Low Power F3 SDK 9.21.00.36 from https://www.ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK (free, myTI login; 0.55 GB download, 2.0 GB installed)",
-    "sysconfig": "SysConfig 1.26.3 from https://www.ti.com/tool/SYSCONFIG (free; 0.96 GB installed on our Mac)",
+    "sysconfig": "SysConfig from https://www.ti.com/tool/SYSCONFIG (free; about 0.15 GB download, 0.96 GB installed): the MSPM0 routes were validated with 1.26.3, the AM13 and MSPM33 builds with 1.28.0",
     "ticlang": "TI Arm Clang 5.1.1.LTS from https://www.ti.com/tool/ARM-CGT (free; also inside CCStudio 21.0.1); Apple Silicon and Linux builds exist",
     "openocd": "xPack OpenOCD 0.12.0-7 (it reports 0.12.0+dev-02228; a newer release is used only if you name it with FRL_OPENOCD) from https://github.com/xpack-dev-tools/openocd-xpack/releases (the first with target/ti_mspm0.cfg; about 10 MB, no login)",
     "ti_openocd": "TI's OpenOCD (CCSTUDIO-OPENOCD 1.5.0, built from github.com/TexasInstruments/ti-openocd) from https://www.ti.com/tool/download/CCSTUDIO-OPENOCD/1.5.0 (it has target/ti_mspm33.cfg, ti_am13e230x.cfg, ti_cc23xx.cfg and ti_cc27xx.cfg, which xPack OpenOCD 0.12.0-7 lacks); unpack it to ~/ti/ti-openocd",
@@ -341,7 +341,8 @@ def find(kind, validated=None, required=True):
     if not cands:
         if not required:
             return None
-        stop("refused", "FRL-E020", f"{kind} not found", f"install {install_line(kind)}" + ("" if kind in ("mspm0_sdk", "mspm33_sdk", "f2_sdk", "f3_sdk", "sysconfig", "ticlang") else f"; or set {ENV[kind]} to where it is"),
+        want = f"{kind} {validated[0]}: " if validated else ""
+        stop("refused", "FRL-E020", f"{kind} not found", f"install {want}{install_line(kind)}" + ("" if kind in ("mspm0_sdk", "mspm33_sdk", "f2_sdk", "f3_sdk", "sysconfig", "ticlang") else f"; or set {ENV[kind]} to where it is"),
              tool=kind, searched=[str(r) for r in ti_roots()])
     if not validated:
         c = dict(cands[0], source="discovered", validated=True, others=[x["path"] for x in cands[1:]])

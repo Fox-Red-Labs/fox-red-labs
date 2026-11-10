@@ -1,6 +1,6 @@
 # Bluetooth desk display (LP-EM-CC2340R5 + SSD1306 OLED)
 
-Status: firmware flashed and booting; Bluetooth echo and display not yet run. Evidence: [experiment page](../../docs/experiments/2026-10-30-cc2340r5-desk-display.md).
+Status: firmware flashed and booting; Bluetooth echo and display not yet run. Evidence: experiment page.
 
 ![Four wires](img/wiring.png)
 

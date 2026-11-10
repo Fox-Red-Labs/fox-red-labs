@@ -1,0 +1,152 @@
+/* The board page built on a data/chip-jobs/<board>.json: the build cards, the build's panel and the chip map (site/chip/chipview.js).
+   The hero (drawn board, dots, photo swap) is site/boardviz/callouts.css. Board red is #a8101a. */
+.cv-page { display: flex; flex-direction: column; gap: 22px; }
+.cv-page button { font-family: var(--frl-font); color: var(--frl-ink); }
+.cv-page h2 { margin: 0; font: 700 22px/28px var(--frl-font); }
+.cv-h { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 10px; }
+.cv-h h1 { margin: 0; font: 700 34px/38px var(--frl-font); overflow-wrap: anywhere; }
+.cv-conn { margin: 0; display: flex; align-items: center; font-size: 16px; color: var(--frl-stone); }
+.cv-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; flex: none; background: var(--frl-stone); opacity: .6; }
+.cv-dot.ok { background: #2F6B4F; opacity: 1; box-shadow: 0 0 0 3px color-mix(in srgb, #2F6B4F 22%, transparent); }
+.cv-page a.btn { display: block; text-align: center; text-decoration: none; }
+.cv-side .cv-btn-red { display: flex; align-items: center; justify-content: center; text-align: center; text-decoration: none; font-weight: 600; }
+.cv-btn-red { background: #a8101a !important; border-color: #a8101a !important; color: #fff !important; }
+
+/* the build cards */
+.cv-sec-h { margin-bottom: 10px; }
+.cv-cards { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; }
+.cv-card { display: flex; flex-direction: column; border: 1.5px solid var(--frl-line); border-radius: 12px; overflow: hidden; background: var(--frl-cream); padding: 0; cursor: pointer; text-align: left; min-width: 0; font: inherit; }
+.cv-card:hover { border-color: var(--frl-stone); }
+.cv-card.sel { border-color: #a8101a; box-shadow: 0 0 0 2px #a8101a; }
+.cv-card:focus-visible { outline: 3px solid #161312; outline-offset: 2px; }
+.cv-card .pic { display: block; background: #161312; }
+.cv-card .pic img { display: block; width: 100%; height: auto; }
+.cv-card .tx { padding: 9px 11px 11px; display: flex; flex-direction: column; gap: 3px; }
+.cv-card .tx b { font-size: 16px; line-height: 19px; }
+.cv-card .tx .ln { font-size: 14px; line-height: 18px; color: var(--frl-stone); }
+.cv-card .tx small { font-size: 13px; line-height: 17px; color: var(--frl-ink); display: flex; align-items: flex-start; }
+.cv-card .tx small i { width: 8px; height: 8px; margin: 5px 6px 0 0; border-radius: 50%; background: var(--frl-stone); flex: none; opacity: .6; }
+.cv-card .tx small i.ran { background: #2F6B4F; opacity: 1; }
+
+/* the panel */
+.cv-panel { border: 1.5px solid var(--frl-ink); border-radius: 14px; background: #fff; overflow: hidden; }
+.cv-panel-h { padding: 10px 14px; border-bottom: 1.5px solid var(--frl-line); }
+.cv-panel-h h2 { font-size: 24px; line-height: 28px; }
+.cv-panel-h p { margin: 2px 0 0; font-size: 15px; color: var(--frl-stone); }
+.cv-wiring { margin: 0; padding: 8px 14px; font-size: 14px; line-height: 20px; color: var(--frl-stone); border-bottom: 1px solid var(--frl-line); }
+.cv-wiring b { color: var(--frl-ink); }
+.cv-grid { display: grid; grid-template-columns: minmax(0, 1fr) 330px; }
+.cv-chipwrap { background: var(--frl-cream); padding: 10px; min-width: 0; }   /* the site's cream, like every other panel */
+.cv-frame { overflow-x: auto; border-radius: 8px; }
+.cv-frame svg { display: block; width: 100%; height: auto; }
+.cv-now { margin: 6px 2px 0; min-height: 44px; font-size: 16px; line-height: 22px; color: var(--frl-stone); }
+.cv-now b { font-weight: 700; color: var(--frl-ink); }
+.cv-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 6px 2px 0; font-size: 13px; color: var(--frl-stone); }
+.cv-legend span { display: inline-flex; align-items: center; }
+.cv-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; }
+.cv-listcol { border-left: 1.5px solid var(--frl-line); padding: 10px 14px 14px; min-width: 0; }
+.cv-listcol h3 { margin: 0 0 6px; font: 700 17px var(--frl-font); }
+.cv-listcol .jg { margin: 0 0 8px; }
+.cv-listcol .jh { display: flex; align-items: center; gap: 8px; font: 700 15px var(--frl-font); margin: 6px 0 2px; }
+.cv-listcol .jh i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.cv-listcol .rw { display: block; padding: 5px 8px; border-radius: 6px; cursor: pointer; border-left: 3px solid var(--c); margin: 2px 0 2px 5px; outline: none; }
+.cv-listcol .rw:hover, .cv-listcol .rw.hi { background: var(--frl-cream); }
+.cv-listcol .rw:focus-visible { box-shadow: 0 0 0 2px #161312; }
+.cv-listcol .rw b { display: block; font-size: 15px; line-height: 19px; }
+.cv-listcol .rw span { display: block; font-size: 14px; line-height: 19px; color: var(--frl-stone); }
+.cv-listcol .rw.dim, .cv-listcol .jh.dim { opacity: .35; }
+
+/* the chip drawing: a dark gray package on the cream stage, gold pins, banks lit */
+.cm .band, .cm .bandl { fill: #6B625B; }
+.cm .bandl { font: 600 10.5px var(--frl-font); letter-spacing: .06em; text-transform: uppercase; }
+.cm .pkg { fill: url(#cvpkg); stroke: #9096a6; stroke-width: 2.5; }
+.cm .pkgin { fill: none; stroke: #5d616e; stroke-width: 1.5; }
+.cm .pkgbev { fill: none; stroke: #5a5e6b; stroke-width: 1; opacity: .9; }
+.cm .pkgdot { fill: #c9ccd6; }
+.cm .gp { fill: #e0b84a; stroke: #8a6a14; stroke-width: .8; }
+.cm .chipname { font: 600 12px var(--frl-font); fill: #a9adb8; letter-spacing: .18em; }
+.cm .bn { font: 600 13px var(--frl-font); fill: #161312; text-anchor: middle; pointer-events: none; }
+.cm .bt { font: 500 11px var(--frl-font); fill: #5c544d; text-anchor: middle; pointer-events: none; }
+.cm .big { font-size: 14.5px; }
+/* three hues on the chip: slate blocks, brand red for what is active and its arrows, gold pins. The groups differ by outline, not hue. */
+.cm .cblk .r { fill: #353841; stroke: #8f8a80; stroke-width: 1.3; transition: opacity .15s; }
+.cm .cblk.idle .r { fill: #2b2e35; stroke: #77726a; }
+.cm .cblk.idle .bt, .cm .cblk.idle .idl { fill: #e4ded2; font-size: 11.5px; opacity: 1; }
+.cm .cblk:not(.on):not(.al) .bn { fill: #f0ebe0; }
+.cm .cblk:not(.on):not(.al) .bt { fill: #d6d0c4; }
+.cm .cblk.on .r { fill: #B42418; stroke: #f3ddd9; stroke-width: 2.5; }
+.cm .cblk.on .bn, .cm .cblk.on .bt { fill: #fff; }
+.cm .cblk.on .bt { font-size: 11.5px; }
+.cm .cblk.al .r { fill: #3a3d46; stroke: #8f8a80; stroke-width: 1.5; }
+.cm .cblk.al .bn, .cm .cblk.al .bt { fill: #eee9de; }
+.cm .cblk[data-k=core] .r { stroke-width: 3; }
+.cm .cblk[data-k=mem] .r { stroke-width: 2; }
+.cm .cblk[data-k=analog] .r { stroke-dasharray: 6 3; }
+.cm .cblk[data-k=timer] .r { stroke-dasharray: 1.5 3; stroke-linecap: round; stroke-width: 2; }
+.cm .cblk[data-k=conn] .r { stroke-width: 1; }
+.cm .cblk[data-k=sys] .r { stroke-dasharray: 10 3 3 3; }
+.cm .cblk[data-k=math] .r { stroke-dasharray: 3 2; stroke-width: 1; }
+.cm .cblk.on[data-k=core] .r { stroke-width: 3.5; }
+.cm .cblk.on[data-k] .r { stroke-dasharray: none; }
+.cm .cell { fill: #23262d; stroke: #4a4d56; stroke-width: .6; }
+.cm .cell-on { fill: #e8e2d4; }
+.cm .cell-stack { fill: #B42418; }
+.cm .pin .pr { fill: #e0b84a; stroke: #8a6a14; stroke-width: 1.5; }
+.cm .pin .bn, .cm .pin .bt { fill: #161312; }
+.cm .part .pt { fill: #161312; stroke: #161312; stroke-width: 1.2; }
+.cm .part .bn, .cm .part .pn { fill: #f1ead9 !important; }
+.cm .flow { fill: none; stroke-width: 2; stroke-dasharray: 14 8; stroke-linejoin: round; stroke-linecap: butt; animation: cv-dash 1s linear infinite; transition: opacity .15s; }
+.cm .flow.al { stroke: #8f8a80; stroke-width: 2; stroke-dasharray: none; animation: none; opacity: .7; filter: none; }
+@keyframes cv-dash { to { stroke-dashoffset: -22; } }
+@media (prefers-reduced-motion: reduce) { .cm .flow { animation: none; } }
+.cm .cblk, .cm .pin, .cm .part { cursor: pointer; outline: none; }
+.cm .cblk:focus .r { stroke: #fff; stroke-width: 3; }
+.cm .pin:focus .pr, .cm .part:focus .pt { stroke: #B42418; stroke-width: 3; }
+.cm.has-sel .dim { opacity: .18; }
+.cm.has-sel .flow.dim { opacity: .1; }
+
+@media (max-width: 1180px) {
+  .cv-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .cv-grid { grid-template-columns: 1fr; }
+  .cv-listcol { border-left: 0; border-top: 1.5px solid var(--frl-line); }
+}
+.cv-frame.focus svg { min-width: 0; }
+@media (max-width: 900px) { .cv-frame:not(.focus) svg { min-width: 980px; } }
+.cv-mode { display: none; gap: 6px; margin: 0 0 8px; }
+.cv-mode button { font: 600 14px var(--frl-font); border: 1.5px solid var(--frl-ink); background: transparent; color: var(--frl-ink); border-radius: 7px; padding: 5px 12px; cursor: pointer; min-height: 34px; }
+.cv-mode button[aria-pressed=true] { background: #161312; color: #fff; border-color: #161312; }
+@media (max-width: 759px) { .cv-mode { display: flex; } }
+@media (max-width: 700px) {
+  .cv-h h1 { font-size: 28px; line-height: 32px; }
+  .cv-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cv-panel-h h2 { font-size: 21px; }
+  .cv-chipwrap { padding: 6px; }
+}
+.cv-lead { margin: -4px 0 12px; font-size: 17px; line-height: 24px; color: var(--frl-ink); max-width: 860px; }
+
+/* the legend: outline styles, not colors */
+.cv-legend i.lk { width: 18px; height: 12px; border-radius: 3px; background: #353841; border: 1px solid #8f8a80; margin-right: 6px; box-sizing: border-box; }
+.cv-legend i.lk-core { border-width: 3px; } .cv-legend i.lk-mem { border-width: 2px; } .cv-legend i.lk-analog { border-style: dashed; } .cv-legend i.lk-timer { border-style: dotted; border-width: 2px; }
+.cv-legend i.lk-conn { border-width: 1px; } .cv-legend i.lk-sys { border-style: double; border-width: 3px; } .cv-legend i.lk-math { border-style: dashed; border-width: 1px; }
+.cv-legend i.lk-on { background: #e8e2d4; border-color: #8f8a80; } .cv-legend i.lk-stack { background: #B42418; border-color: #B42418; } .cv-legend i.lk-pin { background: #e0b84a; border-color: #8a6a14; } .cv-legend i.lk-act { background: #B42418; border-color: #f3ddd9; border-width: 2px; }
+.cv-ctl { display: flex; justify-content: flex-end; margin: 0 0 6px; }
+.cv-playbtn { font: 600 14px var(--frl-font); border: 1.5px solid #161312; background: #fff; color: #161312; border-radius: 4px; padding: 4px 12px; min-height: 32px; cursor: pointer; }
+.cv-playbtn:focus-visible { outline: 3px solid #161312; outline-offset: 2px; }
+
+/* the step change fades (about 200 ms) instead of swapping; the stage ground never changes */
+.cm .cblk, .cm .pin, .cm .part { transition: opacity .2s ease; }
+.cm .cblk .r, .cm .pin .pr, .cm .part .pt { transition: fill .2s ease, stroke .2s ease, stroke-width .2s ease; }
+.cm .flow { transition: opacity .2s ease; }
+.cm .cblk.hit .r { fill: #B42418; stroke: #f3ddd9; stroke-width: 2.5; stroke-dasharray: none; }
+.cm .cblk.hit .bn, .cm .cblk.hit .bt, .cm .cblk.hit .idl { fill: #fff; }
+.cm .cblk.hit .cell { stroke: #f3ddd9; }
+
+/* at rest every block the build uses is lit; the step's own block is red */
+.cm .cblk.on .r { fill: #4a4e59; stroke: #d6d0c4; stroke-width: 2; }
+.cm .cblk.on.hit .r, .cm .cblk.on[data-k].hit .r { fill: #B42418; stroke: #f3ddd9; stroke-width: 2.5; }
+.cm .cblk.on[data-k=core] .r { stroke-width: 3; }
+.cv-ctl { align-items: center; gap: 10px; justify-content: flex-start; } .cv-ctl .cv-bar { flex: 1; }
+.cv-bar { display: flex; gap: 3px; height: 22px; align-items: center; cursor: pointer; touch-action: none; min-width: 80px; }
+.cv-bar i { flex: 1; height: 8px; border-radius: 3px; background: #d9d2c4; display: block; transition: background .2s; }
+.cv-bar i.done { background: #e0a39c; } .cv-bar i.now { background: #B42418; }
+.cv-bar:focus-visible { outline: 3px solid #161312; outline-offset: 2px; }

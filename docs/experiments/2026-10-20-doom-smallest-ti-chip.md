@@ -2,7 +2,7 @@
 id: E235
 board: LP-MSPM33C321A
 date: 2026-10-20
-status: in progress
+status: works
 reached: run
 line: The plain Doom engine links for the LP-MSPM33C321A but needs 164 kB of static data plus an 800 kB zone. The rp2040-doom design (m33-whx) finishes all three shareware demos on the chip's real 256 kB with a software page cache over the QSPI flash: 19.9 frames a second at an 8 kB cache and 21.9 at 16 kB, display and sound stubbed, 98.3 to 99.1 percent cache hits. On the LP-EM-CC35X1 the same design runs them at 39.2 frames a second. The LP-MSPM0G3519 (128 kB) and LP-MSPM0G3507 (32 kB) stop at static data alone.
 stop: flash

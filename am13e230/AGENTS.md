@@ -90,7 +90,7 @@ Code written for other chips and tools, brought to this board. The files to copy
 | STM32 UART DMA receive with idle-line interrupt (MaJerle stm32-usart-uart-dma-rx-tx) on TI boards | Works | MaJerle's STM32 UART DMA example answers every test packet at 115200 baud on the LP-MSPM0G3519, G5187, L1306, C1104 and MSPM33C321A. | `docs/experiments/2026-10-19-stm32-usart-dma-port-matrix.md` |
 | TI AM13 Hall FOC adapted to DRV8376EVM | Works | TI's Hall FOC firmware drives a motor closed loop through a DRV8376EVM, unloaded at 12.4 V, on the LP-AM13E230. | `am13e230/foc-drv8376/COMMISSIONING.md` |
 | Zephyr on the LP-AM13E230 | Works | Zephyr's hello_world reaches main and an image toggles the LED on the LP-AM13E230. | `docs/experiments/2026-10-09-am13e230-zephyr-upstream.md` |
-| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
+| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. The Educational, Sharp128 and Audio builds also build for the LP-MSPM0G3519, and the Educational and Sharp128 builds for the LP-MSPM0G3507. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
 <!-- ports:end -->
 
 ## Where the evidence lives

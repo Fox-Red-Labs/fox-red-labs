@@ -96,7 +96,8 @@
         "portability/arduino/"
       ],
       "learn": "site/board-mspm0g3507.html",
-      "faq": "mspm0g3507/FAQ.md"
+      "faq": "mspm0g3507/FAQ.md",
+      "note": "An own unit arrived 2026-11-09 (probe MG350001); the borrowed unit the first results came from left the bench 2026-10-25."
     },
     {
       "id": "lp-mspm0l1306",
@@ -128,6 +129,34 @@
       ],
       "learn": "mspm0l1306/img/board-tour.png",
       "faq": "mspm0l1306/FAQ.md"
+    },
+    {
+      "id": "lp-mspm0l2228",
+      "cat": "board",
+      "name": "LP-MSPM0L2228 LaunchPad development kit",
+      "what": "TI's 32 MHz Arm Cortex-M0+ board with 256 kB flash and 32 kB RAM, a built-in debugger with EnergyTrace, a 7-segment LCD on the board, an RGB LED, a red LED, two buttons, two crystals and a 100 mF super capacitor on a battery-backed island.",
+      "use_for": [
+        "Segment LCD projects: the chip drives the glass itself",
+        "Battery and super-capacitor projects: real-time clock and tamper pins that live on when the main supply is gone",
+        "Low-power sensor nodes with a readout on the board"
+      ],
+      "connect": "One USB cable powers, programs and debugs it. 40-pin BoosterPack header, 3.3 V logic. J17 and J18 send the chip's UART0 to the USB serial port.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-MSPM0L2228",
+          "price": "",
+          "date": "2026-11-09",
+          "url": "https://www.ti.com/tool/LP-MSPM0L2228",
+          "note": "the tool page showed no price and 'Out of stock on TI.com' without a login on 2026-11-09"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "mspm0l2228/README.md"
+      ],
+      "learn": "site/board-mspm0l2228.html",
+      "faq": "mspm0l2228/FAQ.md"
     },
     {
       "id": "lp-mspm0c1104",
@@ -443,8 +472,12 @@
         {
           "seller": "Amazon",
           "number": "B09H2SV5XB",
-          "price": "$44.95",
-          "date": "2026-10-07"
+          "paid": "$44.95",
+          "paid_date": "2026-10-07",
+          "url": "https://www.amazon.com/dp/B09H2SV5XB",
+          "stock": "in stock (17 left)",
+          "date": "2026-11-09",
+          "price": "$44.95"
         }
       ],
       "status": "arrived 2026-10-09 (box reads 'Freenove Ultimate Starter Kit without Pico', FNK0058 B)",
@@ -501,7 +534,11 @@
       "buy": [
         {
           "seller": "Amazon (inside the Freenove kit)",
-          "number": "B09H2SV5XB"
+          "number": "B09H2SV5XB",
+          "url": "https://www.amazon.com/dp/B09H2SV5XB",
+          "stock": "in stock (kit; 17 left)",
+          "date": "2026-11-09",
+          "note": "in the kit; no separate price"
         }
       ],
       "status": "arrived 2026-10-09 (in the Freenove kit)",
@@ -524,8 +561,12 @@
         {
           "seller": "Amazon",
           "number": "B0D2RMQQHR",
-          "price": "$8.49",
-          "date": "2026-10-07"
+          "paid": "$8.49",
+          "paid_date": "2026-10-07",
+          "url": "https://www.amazon.com/dp/B0D2RMQQHR",
+          "stock": "in stock",
+          "date": "2026-11-09",
+          "price": "$9.99"
         }
       ],
       "status": "arrived 2026-10-09",
@@ -548,8 +589,12 @@
         {
           "seller": "Amazon",
           "number": "B0BXKLZJMV",
-          "price": "$5.99",
-          "date": "2026-10-07"
+          "paid": "$5.99",
+          "paid_date": "2026-10-07",
+          "url": "https://www.amazon.com/dp/B0BXKLZJMV",
+          "stock": "in stock",
+          "date": "2026-11-09",
+          "price": "$5.99"
         }
       ],
       "status": "arrived 2026-10-09",
@@ -571,7 +616,11 @@
       "buy": [
         {
           "seller": "Amazon (inside the Freenove kit)",
-          "number": "B09H2SV5XB"
+          "number": "B09H2SV5XB",
+          "url": "https://www.amazon.com/dp/B09H2SV5XB",
+          "stock": "in stock (kit; 17 left)",
+          "date": "2026-11-09",
+          "note": "in the kit; no separate price"
         }
       ],
       "status": "arrived 2026-10-09 (in the Freenove kit)",
@@ -597,7 +646,16 @@
           "seller": "DigiKey",
           "number": "1528-3967-ND",
           "price": "$14.95",
-          "date": "2026-10-07"
+          "date": "2026-10-07",
+          "note": "page not readable 2026-11-09"
+        },
+        {
+          "seller": "Adafruit",
+          "number": "3967",
+          "url": "https://www.adafruit.com/product/3967",
+          "stock": "in stock",
+          "price": "$14.95",
+          "date": "2026-11-09"
         }
       ],
       "status": "arrived 2026-10-09",
@@ -620,7 +678,16 @@
           "seller": "DigiKey",
           "number": "1528-2832-ND",
           "price": "$3.95",
-          "date": "2026-10-07"
+          "date": "2026-10-07",
+          "note": "DigiKey number 1528-2832-ND matches Adafruit 2832 (a NeoPixel RGBW strip), not Adafruit 4007; page not read, number unverified 2026-11-09"
+        },
+        {
+          "seller": "Adafruit",
+          "number": "4007",
+          "url": "https://www.adafruit.com/product/4007",
+          "stock": "in stock",
+          "price": "$3.95",
+          "date": "2026-11-09"
         }
       ],
       "status": "arrived 2026-10-09 (board reads RCWL-1601 with a 4-pin header fitted)",
@@ -642,8 +709,12 @@
         {
           "seller": "Amazon",
           "number": "B00UYIFYCW",
-          "price": "$7.99",
-          "date": "2026-10-07"
+          "paid": "$7.99",
+          "paid_date": "2026-10-07",
+          "url": "https://www.amazon.com/dp/B00UYIFYCW",
+          "stock": "in stock",
+          "date": "2026-11-09",
+          "price": "$7.99"
         }
       ],
       "status": "arrived 2026-10-09 (header pins loose, not soldered)",
@@ -666,8 +737,12 @@
         {
           "seller": "Amazon",
           "number": "B07F26CT6B",
-          "price": "$8.99",
-          "date": "2026-10-07"
+          "paid": "$8.99",
+          "paid_date": "2026-10-07",
+          "url": "https://www.amazon.com/dp/B07F26CT6B",
+          "stock": "in stock",
+          "date": "2026-11-09",
+          "price": "$8.99"
         }
       ],
       "status": "arrived 2026-10-09 (knob separate)",
@@ -688,8 +763,12 @@
         {
           "seller": "DigiKey",
           "number": "1528-4397-ND",
-          "price": "$0.95 each, bought 4",
-          "date": "2026-10-07"
+          "paid": "$0.95 each, bought 4",
+          "paid_date": "2026-10-07",
+          "url": "https://www.digikey.com/en/products/detail/adafruit-industries-llc/4397/10824270",
+          "stock": "in stock (7,746)",
+          "date": "2026-11-09",
+          "price": "$0.95"
         }
       ],
       "status": "arrived 2026-10-09",
@@ -710,8 +789,12 @@
         {
           "seller": "DigiKey",
           "number": "1528-4209-ND",
-          "price": "$0.95 each, bought 2",
-          "date": "2026-10-07"
+          "paid": "$0.95 each, bought 2",
+          "paid_date": "2026-10-07",
+          "url": "https://www.digikey.com/en/products/detail/adafruit-industries-llc/4209/10230003",
+          "stock": "in stock (4,604)",
+          "date": "2026-11-09",
+          "price": "$0.95"
         }
       ],
       "status": "arrived 2026-10-09",
@@ -943,7 +1026,9 @@
         "mspm33c321a/blink.sh"
       ],
       "learn": "docs/arrivals/mspm33c321a.md",
-      "faq": "mspm33c321a/FAQ.md"
+      "faq": "mspm33c321a/FAQ.md",
+      "qty": 2,
+      "note": "Second unit arrived 2026-11-09 (probe renamed M3010002)."
     },
     {
       "id": "lp-am13e230",
@@ -976,6 +1061,33 @@
       ],
       "learn": "docs/arrivals/am13e230.md",
       "faq": "am13e230/FAQ.md"
+    },
+    {
+      "id": "lp-am243",
+      "cat": "board",
+      "name": "LP-AM243 LaunchPad development kit (AM243x Sitara MCU)",
+      "what": "TI's Arm real-time board with four Cortex-R5F cores at 800 MHz, a Cortex-M4F, two gigabit PRU-ICSSG industrial-Ethernet engines, 2 MB of on-chip RAM, 64 MB of quad SPI flash and two gigabit Ethernet ports.",
+      "use_for": [
+        "Control-loop speed with the same code as the AM263P at twice the clock",
+        "Gigabit and industrial-Ethernet projects",
+        "Custom fast peripherals on PRU cores"
+      ],
+      "connect": "Two cables. A USB Type-C charger of 5 V at 3 A powers the board (not in the box, and it must advertise 3 A: a laptop charger worked, a USB-A adapter cable will not). A micro-B cable to J20 is the debugger and serial port (not in the box). Programs load to RAM with SW4 as shipped. Never run TI's security key writer: it is a one-way change.",
+      "buy": [
+        {
+          "seller": "TI.com",
+          "number": "LP-AM243",
+          "price": "",
+          "date": "2026-11-05",
+          "url": "https://www.ti.com/tool/LP-AM243",
+          "note": "In stock when read; price not shown"
+        }
+      ],
+      "status": "in hand",
+      "used_in": [
+        "am243x/"
+      ],
+      "learn": []
     },
     {
       "id": "lp-am263p",
@@ -1781,6 +1893,98 @@
         }
       ],
       "status": "on hand 2026-10-19",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "sg90-servo",
+      "cat": "motor",
+      "name": "SG90 micro servo (a second one, for the tilt axis)",
+      "what": "A small hobby servo that turns to an angle set by the width of a pulse. The first servo comes in the Freenove kit.",
+      "use_for": [
+        "Pan and tilt",
+        "A robot's distance-sensor neck"
+      ],
+      "connect": "3 wires: signal, power, ground. Power from 5 V; the signal pin is driven from a 3.3 V pin.",
+      "buy": [
+        {
+          "seller": "Adafruit",
+          "number": "169",
+          "url": "https://www.adafruit.com/product/169",
+          "stock": "in stock",
+          "price": "$5.95",
+          "date": "2026-11-09",
+          "note": "Adafruit sells the TowerPro SG92R micro servo (SG90 class), not an SG90 by name"
+        }
+      ],
+      "status": "not ordered",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "chassis-2wd-kit",
+      "cat": "motor",
+      "name": "2WD robot chassis kit with two gear motors and a caster",
+      "what": "A flat plate, two geared DC motors with wheels and a ball caster, the frame of a small wheeled robot.",
+      "use_for": [
+        "Obstacle-avoiding robot car"
+      ],
+      "connect": "Each motor takes two wires to a motor driver output.",
+      "buy": [
+        {
+          "seller": "Adafruit",
+          "number": "3244",
+          "url": "https://www.adafruit.com/product/3244",
+          "stock": "in stock",
+          "price": "$24.95",
+          "date": "2026-11-09",
+          "note": "Mini 3-layer round chassis, 2 DC motors, 2 wheels, caster ball"
+        }
+      ],
+      "status": "not ordered",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "ws2812-strip-60",
+      "cat": "display",
+      "name": "WS2812B addressable LED strip, 60 LEDs",
+      "what": "A flexible strip of color LEDs, each with its own controller, set one after another over a single data wire.",
+      "use_for": [
+        "LED effects",
+        "The 8-LED ring's bigger sibling"
+      ],
+      "connect": "3 wires: 5 V, ground, data in. It needs its own 5 V supply at any real brightness; tie its ground to the LaunchPad ground.",
+      "buy": [],
+      "status": "not ordered",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "lamp-12v-led",
+      "cat": "gear",
+      "name": "12 V low-voltage lamp (LED bulb or strip)",
+      "what": "A lamp that runs from the 12 V supply, switched by a relay. Low voltage only: this build never touches mains.",
+      "use_for": [
+        "Relay lamp"
+      ],
+      "connect": "Two wires, through the relay contacts, to the 12 V supply.",
+      "buy": [],
+      "status": "not ordered",
+      "used_in": [],
+      "learn": ""
+    },
+    {
+      "id": "aa-battery-holder-4",
+      "cat": "gear",
+      "name": "4 x AA battery holder with leads",
+      "what": "Holds four AA cells in series and gives about 6 V on two leads.",
+      "use_for": [
+        "Powering a small robot car's motors"
+      ],
+      "connect": "Two leads: plus and minus, to the motor driver's VM and ground.",
+      "buy": [],
+      "status": "not ordered",
       "used_in": [],
       "learn": ""
     }

@@ -1,0 +1,786 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts found by tools/boardviz/pads_from_drawing.py, drawn but never labelled.",
+ "board": "LP-MSPM0L2228",
+ "id": "mspm0l2228",
+ "source": "Positions first read from the board drawings in the kit's user guide (SLAU928B): figure 4-7 PCB top layer and figure 4-8 PCB top overlay, scale from the 2.54 mm BoosterPack pin pitch, figure 2-1 for which part is which, figure 4-2 for the BoosterPack pin names. Checked part by part against a top-down bench photo of the real board (Rev. A, mspm0l2228/img/board-top-rev-a.jpg) on 2026-11-09: part presence, positions, header pin names and which jumpers carry shunts. Positions are mapped from the photo with the four mounting holes as reference; the tops of tall parts (shunts, pins) lean outward in the photo, so tall parts near the left edge (the RGB jumpers) keep the position that the silkscreen footprint gives. The LCD is drawn as a glass block (a screen) sized from the photo, the super capacitor as a can on its housing. J16's LED5 is not fitted on this board. No two-pad decor: the drawings carry no gold pads for tools/boardviz/pads_from_drawing.py.",
+ "size": [
+  58.5,
+  120.8
+ ],
+ "color": "#a8101a",
+ "corner": 2.5,
+ "holes": [
+  [
+   2.4,
+   2.6,
+   3.2
+  ],
+  [
+   56.1,
+   2.6,
+   3.2
+  ],
+  [
+   2.4,
+   118.3,
+   3.2
+  ],
+  [
+   56.1,
+   118.3,
+   3.2
+  ],
+  [
+   39.1,
+   118.0,
+   2.4
+  ],
+  [
+   55.1,
+   32.7,
+   2.4
+  ],
+  [
+   3.8,
+   32.7,
+   2.4
+  ]
+ ],
+ "silk": [
+  {
+   "t": "LP-MSPM0L2228",
+   "x": 53.2,
+   "y": 87.9,
+   "s": 2.2,
+   "rot": 90
+  },
+  {
+   "t": "XDS110-ET Debug Probe",
+   "x": 21.2,
+   "y": 84.4,
+   "s": 1.5
+  },
+  {
+   "t": "MSPM0L2228",
+   "x": 28.5,
+   "y": 40.8,
+   "s": 1.6
+  },
+  {
+   "t": "S1 (PA18)",
+   "x": 6.0,
+   "y": 72.0,
+   "s": 1.5
+  },
+  {
+   "t": "S2 (PB8)",
+   "x": 52.5,
+   "y": 72.0,
+   "s": 1.5
+  },
+  {
+   "t": "S3 MSP NRST",
+   "x": 48.1,
+   "y": 114.5,
+   "s": 1.5
+  },
+  {
+   "t": "J1",
+   "x": 3.6,
+   "y": 60.0,
+   "s": 1.4
+  },
+  {
+   "t": "J3",
+   "x": 11.3,
+   "y": 60.0,
+   "s": 1.4
+  },
+  {
+   "t": "J4",
+   "x": 48.5,
+   "y": 60.0,
+   "s": 1.4
+  },
+  {
+   "t": "J2",
+   "x": 54.2,
+   "y": 60.0,
+   "s": 1.4
+  },
+  {
+   "t": "J101",
+   "x": 8.4,
+   "y": 82.0,
+   "s": 1.4
+  }
+ ],
+ "parts": [
+  {
+   "id": "usb",
+   "type": "microusb",
+   "x": 10.5,
+   "y": 118.4,
+   "rot": 0,
+   "label": "USB",
+   "title": "Micro-USB",
+   "text": "One cable powers the board, programs it and carries its text output through the debug probe.",
+   "key": true
+  },
+  {
+   "id": "xds",
+   "type": "qfp",
+   "x": 16.7,
+   "y": 98.8,
+   "body": 14,
+   "pins": 32,
+   "rot": 90,
+   "label": "Debug probe",
+   "title": "XDS110 debug probe",
+   "text": "The top half of the board is the debugger, an MSP432E401Y. It flashes the chip over SWD, gives the computer a serial port and measures power with EnergyTrace.",
+   "key": true
+  },
+  {
+   "id": "mcu",
+   "type": "qfp",
+   "x": 28.5,
+   "y": 49.6,
+   "body": 12,
+   "pins": 20,
+   "rot": 180,
+   "label": "The chip",
+   "title": "MSPM0L2228",
+   "text": "A Cortex-M0+ in an 80-pin LQFP, 14 mm across the leads. It drives the 7-segment LCD, has a 32 kHz and a battery-backed low-frequency subsystem, and brings its pins out to the BoosterPack headers.",
+   "key": true
+  },
+  {
+   "id": "s3",
+   "type": "button",
+   "x": 46.0,
+   "y": 119.0,
+   "w": 7.5,
+   "h": 3.6,
+   "label": "Reset",
+   "title": "S3, reset",
+   "text": "Restarts the program from the top. Marked MSP NRST."
+  },
+  {
+   "id": "s1",
+   "type": "button",
+   "x": 0.4,
+   "y": 73.8,
+   "w": 4,
+   "h": 9.5,
+   "side": "left",
+   "label": "Button 1",
+   "title": "S1 on PA18",
+   "text": "A user button on PA18, which is also the bootloader pin. Jumper J19 connects it."
+  },
+  {
+   "id": "s2",
+   "type": "button",
+   "x": 57.4,
+   "y": 74.0,
+   "w": 4,
+   "h": 9.5,
+   "side": "right",
+   "label": "Button 2",
+   "title": "S2 on PB8",
+   "text": "The second user button, on PB8. Jumper J20 connects it."
+  },
+  {
+   "type": "ringheader",
+   "x": 1.4,
+   "y": 102.7,
+   "cols": 1,
+   "rows": 7
+  },
+  {
+   "type": "ring",
+   "x": 40.8,
+   "y": 95.8,
+   "d": 2.4
+  },
+  {
+   "type": "ring",
+   "x": 40.8,
+   "y": 93.2,
+   "d": 2.4
+  },
+  {
+   "type": "ring",
+   "x": 40.8,
+   "y": 90.6,
+   "d": 2.4
+  },
+  {
+   "id": "led1",
+   "type": "led",
+   "x": 2.2,
+   "y": 84.6,
+   "rot": 0,
+   "color": "#ff3020",
+   "name": "LED1",
+   "label": "Probe LEDs",
+   "title": "LED1 and LED2",
+   "text": "Two status lights for the debug probe: LED1 is red and LED2 is green."
+  },
+  {
+   "type": "led",
+   "x": 2.2,
+   "y": 82.3,
+   "rot": 0,
+   "color": "#30d050",
+   "name": "LED2"
+  },
+  {
+   "id": "led3",
+   "type": "led",
+   "x": 56.5,
+   "y": 12.9,
+   "rot": 90,
+   "color": "#ff3020",
+   "name": "LED3",
+   "label": "Red LED",
+   "title": "LED3, red",
+   "text": "A red LED from 3V3 through 470 ohms to PA0. Jumper J9 connects it.",
+   "key": true
+  },
+  {
+   "id": "led4",
+   "type": "led",
+   "x": 1.0,
+   "y": 6.8,
+   "rot": 0,
+   "color": "#ffffff",
+   "name": "LED4",
+   "label": "RGB LED",
+   "title": "LED4, RGB",
+   "text": "Blue on PA16, red on PB10, green on PB9, each through its own resistor. Jumpers J10, J11 and J12 connect them.",
+   "key": true
+  },
+  {
+   "id": "j101",
+   "type": "header",
+   "x": 21.9,
+   "y": 80.2,
+   "cols": 10,
+   "rows": 2,
+   "shunts": "all",
+   "label": "Isolation jumpers",
+   "title": "J101 isolation block",
+   "text": "Jumpers join the debug probe to the chip: ground, 5V, 3V3, RXD, TXD, reset, SWDIO, SWCLK, the bootloader pin and VBAT. Pull one to cut that line."
+  },
+  {
+   "id": "j104",
+   "type": "header",
+   "x": 34.6,
+   "y": 76.4,
+   "cols": 1,
+   "rows": 1,
+   "label": "CAP pin",
+   "title": "CAP and the VBAT select",
+   "text": "The single pin under the last column of J101. A jumper from VBAT to CAP lets the super capacitor feed the chip's battery pin."
+  },
+  {
+   "id": "j19",
+   "type": "header",
+   "x": 6.8,
+   "y": 76.1,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all",
+   "label": "S1 jumper",
+   "title": "J19",
+   "text": "Connects button S1 to PA18. Pull it to free PA18 for something else."
+  },
+  {
+   "id": "j20",
+   "type": "header",
+   "x": 56.3,
+   "y": 64.3,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all",
+   "label": "S2 jumper",
+   "title": "J20",
+   "text": "Connects button S2 to PB8. Pull it to free PB8 for something else."
+  },
+  {
+   "id": "j17",
+   "type": "header",
+   "x": 4.5,
+   "y": 65.2,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "top",
+   "label": "UART jumpers",
+   "title": "J17 and J18",
+   "text": "Top and center (as shipped): PA11 and PA10 go to the debug probe, so the computer sees the chip's text. Move the jumper down and they go to the BoosterPack pins instead."
+  },
+  {
+   "type": "header",
+   "x": 7.7,
+   "y": 65.2,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "top"
+  },
+  {
+   "id": "j15",
+   "type": "header",
+   "x": 37.8,
+   "y": 65.0,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "bottom",
+   "label": "TamperIO jumpers",
+   "title": "J13, J14 and J15",
+   "text": "Center and bottom (as shipped): PB3, PB2 and PA7 connect the BoosterPack pin to the TamperIO. Move one up to free the pin."
+  },
+  {
+   "type": "header",
+   "x": 42.3,
+   "y": 65.0,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "bottom"
+  },
+  {
+   "type": "header",
+   "x": 46.4,
+   "y": 65.0,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "bottom"
+  },
+  {
+   "id": "j16",
+   "type": "header",
+   "x": 49.3,
+   "y": 65.0,
+   "cols": 1,
+   "rows": 1,
+   "label": "LED5 jumper",
+   "title": "J16, LED5 (not fitted)",
+   "text": "A spare red LED to ground through 470 ohms is not fitted. A wire on this pin would drive it."
+  },
+  {
+   "id": "j9",
+   "type": "header",
+   "x": 55.9,
+   "y": 15.8,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h",
+   "label": "Red LED jumper",
+   "title": "J9",
+   "text": "Connects the red LED to PA0. Pull it to free PA0 for I2C."
+  },
+  {
+   "id": "j7",
+   "type": "header",
+   "x": 23.55,
+   "y": 34.0,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h",
+   "label": "I2C pull-ups",
+   "title": "J7 and J8",
+   "text": "Pull-ups for PA0 and PA1 (I2C). Shunts on the right and center pins, as shipped: 4.7k to 5V. Left and center: 2.2k to 3V3."
+  },
+  {
+   "type": "header",
+   "x": 19.75,
+   "y": 34.0,
+   "cols": 1,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 23.55,
+   "y": 30.5,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h"
+  },
+  {
+   "type": "header",
+   "x": 19.75,
+   "y": 30.5,
+   "cols": 1,
+   "rows": 1
+  },
+  {
+   "id": "j10",
+   "type": "header",
+   "x": 3.4,
+   "y": 15.7,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h",
+   "label": "RGB jumpers",
+   "title": "J10, J11 and J12",
+   "text": "Connect the blue, red and green channels of the RGB LED (J10, J11, J12). Pull one to free its pin."
+  },
+  {
+   "type": "header",
+   "x": 3.4,
+   "y": 13.2,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h"
+  },
+  {
+   "type": "header",
+   "x": 3.4,
+   "y": 10.7,
+   "cols": 2,
+   "rows": 1,
+   "shunts": "middle-h"
+  },
+  {
+   "id": "j6",
+   "type": "header",
+   "x": 5.9,
+   "y": 26.6,
+   "cols": 1,
+   "rows": 3,
+   "names": [
+    [
+     "GND"
+    ],
+    [
+     "GND"
+    ],
+    [
+     "3V3"
+    ]
+   ],
+   "pinno": [
+    [
+     3
+    ],
+    [
+     2
+    ],
+    [
+     1
+    ]
+   ],
+   "label": "3V3 power",
+   "title": "J6, 3V3 power header",
+   "text": "Ground, ground and 3V3. Feed the board from here, or take power off it."
+  },
+  {
+   "id": "j5",
+   "type": "header",
+   "x": 52.2,
+   "y": 26.6,
+   "cols": 1,
+   "rows": 3,
+   "names": [
+    [
+     "GND"
+    ],
+    [
+     "GND"
+    ],
+    [
+     "5V"
+    ]
+   ],
+   "pinno": [
+    [
+     3
+    ],
+    [
+     2
+    ],
+    [
+     1
+    ]
+   ],
+   "label": "5V power",
+   "title": "J5, 5V power header",
+   "text": "Ground, ground and 5V. Feed the board from here, or take power off it."
+  },
+  {
+   "id": "j102",
+   "type": "boxheader",
+   "x": 46.2,
+   "y": 84.4,
+   "cols": 2,
+   "rows": 5,
+   "label": "Probe out",
+   "title": "J102, XDS110 out",
+   "text": "A 10-pin debug header that lets the on-board probe program a different board.",
+   "rot": 90
+  },
+  {
+   "id": "j103",
+   "type": "boxheader",
+   "x": 46.3,
+   "y": 75.4,
+   "cols": 2,
+   "rows": 5,
+   "label": "Probe in",
+   "title": "J103, XDS110 in",
+   "text": "A 10-pin header for using an outside probe in place of the on-board one.",
+   "rot": 90
+  },
+  {
+   "id": "y1",
+   "type": "xtalbox",
+   "x": 39.8,
+   "y": 49.1,
+   "w": 2.2,
+   "h": 3.4,
+   "label": "32.768 kHz",
+   "title": "Y1, 32.768 kHz crystal",
+   "text": "The low-frequency crystal (LFXT) for the clock and the low-power counter."
+  },
+  {
+   "id": "y2",
+   "type": "xtalbox",
+   "x": 40.0,
+   "y": 53.5,
+   "w": 2.3,
+   "h": 2.4,
+   "label": "32 MHz",
+   "title": "Y2, 32 MHz crystal",
+   "text": "The high-frequency crystal (HFXT). The chip runs from its own 32 MHz oscillator by default."
+  },
+  {
+   "type": "block",
+   "x": 22.9,
+   "y": 64.3,
+   "w": 14.0,
+   "h": 12.0,
+   "d": 1.6,
+   "color": "#1c1c22"
+  },
+  {
+   "id": "supercap",
+   "type": "bigcap",
+   "x": 23.1,
+   "y": 64.3,
+   "d": 11.2,
+   "h": 5.5,
+   "color": "#b8bcc4",
+   "label": "Super capacitor",
+   "title": "100 mF super capacitor",
+   "text": "Holds the battery pin up when USB is off. A jumper from VBAT to CAP on J101 connects it."
+  },
+  {
+   "id": "lcd",
+   "type": "glass",
+   "x": 29.1,
+   "y": 13.8,
+   "w": 43,
+   "h": 17.5,
+   "d": 3.0,
+   "aw": 41,
+   "ah": 11,
+   "corner": 0.8,
+   "color": "#3a3d3b",
+   "active": "#8d9488",
+   "label": "7-segment LCD",
+   "title": "LCD",
+   "text": "An on-board 7-segment display driven by the chip's own LCD controller, with a charge pump or resistor ladder.",
+   "key": true
+  },
+  {
+   "id": "j1",
+   "type": "ringheader",
+   "x": 7.4,
+   "y": 45.4,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "3V3",
+     "5V"
+    ],
+    [
+     "PA24",
+     "GND"
+    ],
+    [
+     "PA9",
+     "PA18"
+    ],
+    [
+     "PA8",
+     "PA23"
+    ],
+    [
+     "PA15",
+     "NC"
+    ],
+    [
+     "PA22",
+     "NC"
+    ],
+    [
+     "PA17",
+     "NC"
+    ],
+    [
+     "PA21",
+     "NC"
+    ],
+    [
+     "PA1",
+     "PA11"
+    ],
+    [
+     "PA0",
+     "PA10"
+    ]
+   ],
+   "pinno": [
+    [
+     1,
+     21
+    ],
+    [
+     2,
+     22
+    ],
+    [
+     3,
+     23
+    ],
+    [
+     4,
+     24
+    ],
+    [
+     5,
+     25
+    ],
+    [
+     6,
+     26
+    ],
+    [
+     7,
+     27
+    ],
+    [
+     8,
+     28
+    ],
+    [
+     9,
+     29
+    ],
+    [
+     10,
+     30
+    ]
+   ],
+   "label": "BoosterPack J1, J3",
+   "title": "Left BoosterPack headers",
+   "text": "J1 is the outer column, pins 1 to 10 from the top. J3 is the inner column, pins 21 to 30. Plug-on boards stack on these.",
+   "key": true
+  },
+  {
+   "id": "j2",
+   "type": "ringheader",
+   "x": 50.7,
+   "y": 45.4,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "PB3",
+     "GND"
+    ],
+    [
+     "PB2",
+     "PB1"
+    ],
+    [
+     "PA7",
+     "PB0"
+    ],
+    [
+     "NC",
+     "PA30"
+    ],
+    [
+     "NC",
+     "NRST"
+    ],
+    [
+     "PA29",
+     "PB8"
+    ],
+    [
+     "PA28",
+     "PB7"
+    ],
+    [
+     "PA27",
+     "PB6"
+    ],
+    [
+     "PA26",
+     "PB5"
+    ],
+    [
+     "PA25",
+     "PB4"
+    ]
+   ],
+   "pinno": [
+    [
+     40,
+     20
+    ],
+    [
+     39,
+     19
+    ],
+    [
+     38,
+     18
+    ],
+    [
+     37,
+     17
+    ],
+    [
+     36,
+     16
+    ],
+    [
+     35,
+     15
+    ],
+    [
+     34,
+     14
+    ],
+    [
+     33,
+     13
+    ],
+    [
+     32,
+     12
+    ],
+    [
+     31,
+     11
+    ]
+   ],
+   "label": "BoosterPack J4, J2",
+   "title": "Right BoosterPack headers",
+   "text": "J4 is the inner column, pins 40 to 31 from the top. J2 is the outer column, pins 20 to 11.",
+   "key": true
+  }
+ ]
+}

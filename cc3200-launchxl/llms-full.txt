@@ -8,7 +8,7 @@ FILE: cc3200-launchxl/README.md | Why does the used TI CC3200-LAUNCHXL LaunchPad
 
 # Why does the used TI CC3200-LAUNCHXL LaunchPad development kit not answer its debugger?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **The debugger opens, the chip does not answer, so the board is parked and nothing has been built, flashed or run on it.** A used CC3200 LaunchPad development kit, plugged in 2026-10-06: a Wi-Fi MCU (Cortex-M4 application core plus a network processor). Parked until the cause is known.
 

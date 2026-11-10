@@ -1,4 +1,4 @@
-# Send a message from a Bluetooth chip to a satellite
+# Send a message to a satellite
 
 Goal: a message from an LP-EM-CC2755P10 received by a satellite about 550 km up. Not achieved.
 

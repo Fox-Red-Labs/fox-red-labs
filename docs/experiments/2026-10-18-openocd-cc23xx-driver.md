@@ -2,7 +2,7 @@
 id: E206
 board: LP-EM-CC2340R5, LP-EM-CC2755P10
 date: 2026-10-18
-status: in progress
+status: waiting
 reached: verified
 line: On the LP-EM-CC2340R5, upstream OpenOCD with the new cc23xx driver programmed and verified TI's blink in 0.37 s and the LED pin toggled; a 511 kB image took 10.5 s to write and read back identical. An SDK hex fails verify on the 128-byte CCFG user record, and the CC2755P10 path has not run.
 stop: tools; the LP-EM-CC2755P10 was away from the bench, and an SDK hex's CCFG user record differs from a programmed chip's

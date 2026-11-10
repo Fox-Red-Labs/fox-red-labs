@@ -640,6 +640,34 @@ One line each, in the order a newcomer meets them. If a word in any doc in this 
 
 **Replay (this repo's test input).** The Mac sends recorded or synthesized speech to the board's serial port instead of the microphone, so the same model code sees the same audio on every run.
 
+## Reading a running chip (live chip view)
+
+**Debug port.** The wires a debugger uses to look inside a chip. On the LaunchPad kits the on-board XDS110 probe talks to it over USB. A debug port can read memory and registers while the CPU runs, without stopping it, as long as you do not connect to the core itself.
+
+**WebHID.** A Chrome feature that lets a web page talk to a USB device that shows up as a human interface device. The live chip view uses it to reach the XDS110 probe from the browser. Safari and Firefox do not have it.
+
+**DHCSR.** The Arm debug halting control and status register. One bit says whether the CPU is asleep (waiting for an interrupt), which gives the awake share.
+
+**DWT_PCSR.** The Arm register that holds a sample of the program counter, the address of the instruction the CPU is on. Reading it many times a second shows where the CPU spends its time. The Cortex-R5 cores of the AM243 do not have it.
+
+**ICSR.** The Arm interrupt control and state register. Its low bits give the number of the interrupt handler that is running now.
+
+**NVIC_ISER.** The Arm register whose bits say which interrupts are turned on (the interrupt controller is called the NVIC).
+
+**PWREN.** On an MSPM0 chip, the power enable register of a peripheral such as a UART or timer. A peripheral that is off cannot be used, so this register shows which blocks the program turned on.
+
+**PINCM.** On an MSPM0 chip, the pin control register of one pin. It says which function the pin has (GPIO, UART, timer output), and its pull-ups and input enable.
+
+**DOE, DOUT, DIN.** The three MSPM0 GPIO port registers: DOE says which pins are outputs, DOUT is the level the program drives, DIN is the level on the pins.
+
+**PSC.** The AM243's power and sleep controller. Each module has a switch (an LPSC number), and its status register says whether the module has power and a clock.
+
+**OCRAM.** On-chip RAM shared by the AM243's cores, reached through the data cache of an R5F core. A variable read from OCRAM through the debug port can look frozen because the core still holds the new value in its cache.
+
+**WFI.** The Arm instruction "wait for interrupt": the CPU stops until an interrupt arrives. A program that sleeps with WFI shows as asleep in the debug port.
+
+**PWM.** A square wave with a set on-time, used to dim an LED or drive a motor.
+
 ## Power supplies
 
 **GaN.** Gallium nitride: a transistor material that switches faster and wastes less power than silicon. TI's LMG708B0 has GaN switches built in.

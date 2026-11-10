@@ -94,7 +94,7 @@ Code written for other chips and tools, brought to this board. The files to copy
 
 | Port | Status | Result | Evidence |
 |---|---|---|---|
-| Post-quantum key exchange and signatures on the LP-CC1354P10-1 | Works | ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on the LP-CC1354P10-1. | `cc1354p10/pqc-join/README.md` |
+| Post-quantum key exchange and signatures on seven boards: LP-CC1354P10-1, LP-EM-CC2340R5, LP-AM243, LP-MSPM0G3519, LP-MSPM33C321A, LP-EM-CC2755P10 and LP-MSPM0G5187 | Works | ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on seven boards, from a 36 kB Cortex-M0+ to an 800 MHz Cortex-R5F; the LP-CC1354P10-1 also agrees a key with a Mac. | `cc1354p10/pqc-join/README.md` |
 | Sub-1 GHz CC1407P radio on an LP-MSPM0G5187, heard by an LP-CC1354P10-1 | Works | TI's CC1407P sub-1 GHz radio driver runs unchanged on the LP-MSPM0G5187, and an LP-CC1354P10-1 receives its packets: 21,658 of 21,658. | `mspm0g5187/radio/README.md` |
 | MSPM0 code on the CC2340R5 and CC1354P10 radio chips | Could work | MSPM0 driver examples build for the CC2340R5 with a 47-line shim, the first 5 ran with the same pin states as TI's own build, and 4 of 4 ran on the CC1354P10. | `portability/README.md` |
 <!-- ports:end -->

@@ -1,4 +1,4 @@
-# See whether a room is occupied with an IWRL6432BOOST 60 GHz radar
+# Room presence with a 60 GHz radar
 
 TI's IWRL6432BOOST streams presence and range frames over USB with no setup. A short script reads them and a timed test scores detection, delay and false alarms.
 

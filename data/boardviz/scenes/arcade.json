@@ -1,0 +1,123 @@
+{
+ "_about": "Demo scene for the arcade project's Game Boy version: the Educational BoosterPack pressed onto a LaunchPad, no wires. Drawn on the LP-MSPM0G3507 (the only LaunchPad part table so far); the recipe's board is the LP-MSPM33C321A. images holds the picture the screen action shows (a Tobu Tobu Girl frame from site/media/arcade, 128 by 128).",
+ "id": "arcade",
+ "title": "Game Boy game on the Educational BoosterPack",
+ "base": "mspm33c321a",
+ "boards": [
+  {
+   "id": "boostxl-edumkii",
+   "mate": [
+    [
+     "j1",
+     "bp_j1"
+    ],
+    [
+     "j2",
+     "bp_j2"
+    ]
+   ],
+   "rot": 0,
+   "lift": 9.5
+  }
+ ],
+ "extent": [
+  -36,
+  40,
+  95,
+  152
+ ],
+ "images": {
+  "tobu": "data:image/png;base64,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"
+ },
+ "view": {
+  "azimuth": -1.0,
+  "elevation": 0.85
+ },
+ "things": [],
+ "wires": [],
+ "steps": [
+  {
+   "title": "Fetch the game.",
+   "text": "Download the two freely licensed test ROMs and check their hashes. This runs in a terminal on your Mac. The LaunchPad waits on the desk.",
+   "do": [
+    {
+     "view": {
+      "azimuth": -1.0,
+      "elevation": 0.85,
+      "zoom": 1.35,
+      "center": [
+       29,
+       99.17,
+       0
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "title": "Build the 160 MHz image.",
+   "text": "Build the Educational BoosterPack app with the Game Boy emulator at 160 MHz, drawing every second frame. The script prints the folder and the image file you flash next.",
+   "do": [
+    {
+     "view": {
+      "azimuth": -1.0,
+      "elevation": 0.85,
+      "zoom": 1.35,
+      "center": [
+       29,
+       99.17,
+       0
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "title": "Plug the BoosterPack on and flash.",
+   "text": "Stack the Educational BoosterPack on the LaunchPad: its two socket rows go onto the headers, joystick over the left edge, pin 1 at the top left. Flash the image the build printed. The logos run first, and the Tobu Tobu Girl title appears after about 28 seconds.",
+   "focus": "boostxl-edumkii.lcd",
+   "hold": 3200,
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.75,
+      "elevation": 0.95,
+      "zoom": 1.0,
+      "center": [
+       29,
+       102.17,
+       0
+      ]
+     }
+    },
+    {
+     "drop": "boostxl-edumkii"
+    },
+    {
+     "view": {
+      "azimuth": -0.6,
+      "elevation": 1.0,
+      "zoom": 1.6,
+      "center": [
+       29.5,
+       103.17,
+       4
+      ]
+     }
+    },
+    {
+     "led": [
+      "boostxl-edumkii.d3",
+      "boostxl-edumkii.d5"
+     ]
+    },
+    {
+     "screen": "boostxl-edumkii.lcd",
+     "image": "tobu",
+     "w": 26,
+     "h": 26
+    }
+   ]
+  }
+ ]
+}

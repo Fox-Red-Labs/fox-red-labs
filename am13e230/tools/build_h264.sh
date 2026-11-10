@@ -5,7 +5,7 @@
 set -e
 OPT=$1; SET=${SET:-s176}; shift; X="$*"; HERE="$(cd "$(dirname "$0")/.." && pwd)"; REPO="$HERE/.."; P="$REPO/portability/h264"
 OUT0="${OUT:-$PWD/out/am13e230}"; G="$OUT0/gen-coremark"; O="$OUT0/h264-$SET-$OPT${TAG:-}"; rm -rf "$O"; mkdir -p "$O"; cd "$O"
-SDK=/Applications/ti/am13e230x_sdk_26_01_00_03; CC=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
+TP="python3 $REPO/tools/frl/toolpath.py"; SDK="$($TP am13_sdk --path)" || exit 2; CC="$($TP ticlang --version 5.1.1.LTS --path)" || exit 2   # FRL_AM13_SDK and FRL_TICLANG name other places
 W="${W:-$PWD/out/h264/work}"; H=$("$P/fetch_src.sh" "$W")
 ARCH="-mcpu=cortex-m33 -march=armv8.1-m.main+cdecp0 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard"
 INC="-I$SDK/source/compiler/m33_ti_arm_clang -I$SDK/source/device/am13e230x/include -I$SDK/source/device/am13e230x/include/hw \

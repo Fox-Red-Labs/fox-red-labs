@@ -6,6 +6,7 @@ status: works
 reached: verified
 line: The 11 TI Drivers examples that the Wi-Fi SDK (LP-EM-CC35X1) and the F3 SDK (LP-EM-CC2340R5) both ship run on the LP-EM-CC2340R5 with the Wi-Fi SDK app source and no edits: 7 show the behavior the source defines, 3 only their start-up, and the pwmled1 fade was not observed.
 stop: none
+page: none
 -->
 # Do the TI Drivers examples built from the CC35X1 (Wi-Fi SDK) source run on the LP-EM-CC2340R5?
 

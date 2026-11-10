@@ -14,6 +14,8 @@ A board and a Mac agree on a key with ML-KEM-768, derive an AES-128 key from it 
 | `test/run.sh` | The host test: builds, checks the symmetric code against OpenSSL, runs the ML-KEM-768 and ML-DSA-44 known-answer tests, runs the whole exchange against `mac_side.py` |
 | `boards/mspm0g3507/` | Build-only check for the LP-MSPM0G3507 (never flashed) |
 | `boards/nucleo-u083rc/` | Build-only images for the NUCLEO-U083RC (ST GCC 14.3.1, 40 kB RAM): `build.sh -O3 kem` (ML-KEM-768, 24.5 kB stack), `dsa-lowram` (ML-DSA-44 with `MLD_CONFIG_REDUCE_RAM`, 27.5 kB stack); the default ML-DSA-44 build overflows the RAM (`dsa-default <stack>` prints the shortfall). Never flashed |
+| `boards/am243x/` | The LP-AM243 (Cortex-R5F, 800 MHz, 2 MB SRAM), loaded to RAM and run: the default build of both algorithms in one image with a 96 kB stack passes the known-answer tests in 3 of 3 loads; ML-KEM-768 0.95, 1.08 and 1.34 ms, ML-DSA-44 key pair 2.4 ms, sign 5.2 ms, verify 2.5 ms; stack peaks 14 to 49 kB. Build: `boards/am243x/build.sh` |
+| `boards/cc2340r5/` | The LP-EM-CC2340R5 (Cortex-M0+, 48 MHz, 36 kB RAM), flashed and run: ML-KEM-768 and ML-DSA-44 (`MLD_CONFIG_REDUCE_RAM`, signing included) pass the known-answer tests; ML-KEM-768 takes 42, 50 and 61 ms at -Os. See its `PORT.md` |
 
 ML-KEM itself is `third-party/mlkem-native/` (v2.0.0, unmodified), ML-DSA is `third-party/mldsa-native/` (v2.0.0, unmodified, built with `-DMLD_CONFIG_PARAMETER_SET=44 -DMLD_CONFIG_NO_RANDOMIZED_API`). Wire format: `core/pqc_join.h`. Run the host test with `portability/pqc-join/test/run.sh` (needs a C compiler, Python 3 with `cryptography`, and OpenSSL 3.5 or newer; macOS's built-in `/usr/bin/openssl` is LibreSSL and cannot do ML-KEM). It prints `pqc-join host test: OK`.
 

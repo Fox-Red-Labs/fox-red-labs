@@ -2,7 +2,7 @@
 id: E169
 board: LP-EM-CC35X1
 date: 2026-10-10
-status: in progress
+status: waiting
 reached: verified
 line: The Matter thermostat on the LP-EM-CC35X1 (TI's lighting example with a Thermostat and an Occupancy Sensing data model, 1.7 MB, 579 kB of RAM) runs, pairs into Apple Home and takes setpoint changes from the phone (2026-10-11). It never booted before because TI's Wi-Fi CSI image had left the flash laid out differently; a full flash erase before programming fixed it. Google Home, Alexa and Home Assistant are not run.
 stop: none

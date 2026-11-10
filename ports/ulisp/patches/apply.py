@@ -5,7 +5,7 @@ The upstream folder is not changed. Each edit must match exactly once or the scr
 Edit 1 adds a board block (FRL_MSPM0) before the "Board not supported" error: the workspace size comes from -DFRL_WORKSPACE.
 Edit 2 adds the pin-mode keywords for CPU_MSPM0 to the keyword table.
 Edit 3 adds the include of Arduino.h that the Arduino IDE adds on its own, and forward declarations are not needed (checked by the compile)."""
-import sys, pathlib, re
+import sys, pathlib, re, os
 here = pathlib.Path(__file__).resolve().parent
 src = (here / "../../../third-party/ulisp-arm/ulisp-arm.ino").read_text()
 out = pathlib.Path(sys.argv[1]); out.mkdir(parents=True, exist_ok=True)
@@ -15,16 +15,17 @@ def once(s, old, new):
         sys.exit("patch target not found exactly once: " + old[:60])
     return s.replace(old, new)
 
+STACKDIFF = os.environ.get("FRL_STACKDIFF", "320")   # the CC2340R5 build needs more head-room: the driver's UART write path runs below the check
 src = once(src, '#else\n#error "Board not supported!"\n#endif',
 '''// MSPM0 boards (added by ports/ulisp/patches/apply.py) ***************************
 #elif defined(FRL_MSPM0)
   #define WORKSPACESIZE (FRL_WORKSPACE-SDSIZE)   /* Objects (8*bytes) */
-  #define STACKDIFF 320
+  #define STACKDIFF __STACKDIFF__
   #define CPU_MSPM0
 
 #else
 #error "Board not supported!"
-#endif''')
+#endif'''.replace("__STACKDIFF__", STACKDIFF))
 src = once(src, '#elif defined(CPU_RA4M1)\n  { ":input", (fn_ptr_type)INPUT, PINMODE, NULL },\n  { ":input-pullup", (fn_ptr_type)INPUT_PULLUP, PINMODE, NULL },\n  { ":output", (fn_ptr_type)OUTPUT, PINMODE, NULL },\n  { ":output-opendrain"',
 '''#elif defined(CPU_MSPM0)
   { ":input", (fn_ptr_type)INPUT, PINMODE, NULL },
@@ -36,6 +37,13 @@ src = once(src, '#elif defined(CPU_RA4M1)\n  { ":input", (fn_ptr_type)INPUT, PIN
   { ":input-pullup", (fn_ptr_type)INPUT_PULLUP, PINMODE, NULL },
   { ":output", (fn_ptr_type)OUTPUT, PINMODE, NULL },
   { ":output-opendrain"''')
+# Edit 2b (CC2340R5 build only, FRL_ENDSTACK=<symbol>): the stack-depth check compares the stack pointer with the symbol `end`; the TI linker
+# script has no such symbol, so the check is pointed at the linker's stack-floor symbol instead.
+if os.environ.get("FRL_ENDSTACK"):
+    src = once(src, "#define ENDSTACK end\n#endif", "#define ENDSTACK " + os.environ["FRL_ENDSTACK"] + "\n#endif")
+# Edit 2c (same build): Clang only guarantees a named register variable inside an asm operand, so a plain read of `sp` can give 0 and the
+# stack check never fires; read the stack pointer with an explicit mov instead.
+    src = once(src, 'register int *sp asm ("sp");', 'int *sp; __asm volatile ("mov %0, sp" : "=r"(sp));')
 # Edit 3: the Arduino IDE writes a prototype for every function before the first one; do the same.
 defs = re.compile(r"^(?!(?:if|for|while|switch|else|return|typedef|struct|enum|union|using|extern|static\s+const\b))([A-Za-z_][\w \t\*:<>,]*?[ \t\*])(\w+)\s*\(([^;{}()]*(?:\([^()]*\)[^;{}()]*)*)\)\s*\{", re.M)
 protos, first = [], None

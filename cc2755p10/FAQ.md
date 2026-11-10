@@ -40,6 +40,14 @@ TI's OpenThread build (ot-ti, thread-v1.4-ti-2.1) also writes each image as a ra
 
 Not run on a radio (2026-10-24: all four samples flashed and started with no radio fitted, see the next question); it builds without the shield. TI's Zephyr fork (simplelink-zephyr v3.7.0-ti-1.00.01_ga) ships the radio's shield with a board fix-up for the LP-EM-CC2745R10-Q1 only, and the LP-EM-CC2755P10 board file defines `boosterpack_header` but not `boosterpack_spi`. Build with no `--shield` and pass `-DEXTRA_DTC_OVERLAY_FILE=ports/cc1407p-zephyr/boards/lp_em_cc2755p10.overlay`, which declares the radio on SPI0 with the same pins as the CC2745 fix-up. With a cross-compile toolchain instead of the Zephyr SDK (the Intel Mac setup here), also add `-DTOOLCHAIN_HAS_NEWLIB=ON -DCONFIG_NEWLIB_LIBC=y`, because the samples need `strtok`, `sscanf` and `rand`. Four samples build this way; none has run on a radio. The hardware needs the red LED jumper off and one wire from the radio's pin 23 to pin 10. 2026-10-10.
 
+### A program ported from the LP-EM-CC2340R5 runs but its serial console is silent. Why?
+
+The GPIO driver index on the CC27xx is the DIO number, not the position in the SysConfig list. A copy that toggled "pin 0 and pin 1" for the LEDs set DIO1, the UART TX pin, to an input in its start-up code, so the CPU ran (SysTick ticked, the program polled the UART) and nothing came out. Use `CONFIG_GPIO_LED_0` (red, DIO16) and `CONFIG_GPIO_LED_1` (green, DIO12) from `ti_drivers_config.h`. Found with uLisp on 2026-11-09 by reading SysTick and the program counter over the probe; after the change the REPL answered at 115200 baud on the probe's first serial port.
+
+### Can I run Arduino sketches or MicroPython through TI's Zephyr fork on this board?
+
+Not as of 2026-11-09. Both were tried on the fork's `lp_em_cc2755p10` board (Zephyr 3.7.0, tag `v3.7.0-ti-1.00.01_ga`): the ArduinoCore-zephyr module failed with `'const struct device' has no member named 'ops'` and a blobs key the fork's schema rejects, and MicroPython v1.29.0 with `alloca.h: No such file or directory` (the build kept the minimal C library). The fork has no ADC driver for this chip. The errors are in `cc2755p10/bench/zephyr-fork/`. A Lisp prompt does run without Zephyr: `ports/ulisp/boards/cc2755p10/`.
+
 ### A CC1407P host (TI's Zephyr sample or this repo's plain-C one) prints nothing, or stops after its first line, on the LP-EM-CC2755P10. Why?
 
 With no BP-CC1407P connected, TI's host driver waits forever: `TRX_Host_open` ends with `while(TRX_HOST_IS_PENDING(handle));` and has no timeout. On 2026-10-24 the plain-C host (`cc2755p10/host-cc1407p/`) printed `X45 start spi_open=1` and stayed in that call with no fault after one reset pulse, one SPI transfer and two timer one-shots. TI's rf_diagnostics sample printed `RF Diagnostics Example` and stopped; genfsk_tx, genfsk_rx and carrier_wave printed nothing, not even the Zephyr boot line (likely the waiting main thread starves the log thread; not confirmed with a debugger). If you see this, check the radio is on the header, the red LED jumper is off, and one wire joins BoosterPack pin 23 to pin 10; or put your own timeout around the open call.
@@ -56,7 +64,11 @@ Use the probe form: `python3 tools/frl/frl.py identify --probe <serial>` printed
 
 The first is DSLite on this chip's loader: it has no `FlashEraseSetting` (that is the CC2340R5's), and erases by default while keeping the HSM sectors, so the route lists `RetainMainSectors=true` and no chip-erase line. The second is a sampling fault, not a dark LED: each DSLite read takes about 4 s, close to three periods of the 1.35 s default pattern, so back-to-back reads kept landing on one phase. Both are fixed in `tools/frl/lpf3.py` and `data/routes.json` (2026-11-02, three runs in a row passed, `data/results/cc2755p10.csv` row `blink_flash_repeat`). The route backs up main flash, CCFG and SCFG first and refuses an image with no SCFG (`FRL-E036`), because a chip erase clears the SCFG and the debug port stays closed without one.
 
-### How does the portable three-ways app read an ADC input on the LP-EM-CC2755P10 with nothing wired?
+### How fast can the CC2755P10 run a digital-power PID loop, and what changes from the CC2340R5 program?
+
+Q15 holds 331 kHz and float 318 kHz at -O2 (338 and 329 at -O3), with the interrupt entered 128 CPU cycles after the PWM zero and the duty written 282 (Q15) or 294 (float) cycles after it. The CC2340R5 program ports with three changes: take both clocks from `portability/boards/boards.csv` (CPU 96 MHz, LGPT0 and ADC 48 MHz), use ADC pin DIO27_A1, and count the timer ratio over 50k CPU cycles. Build with SysConfig 1.28.0; 1.26.3 is gone and the build says `sysconfig_cli.sh: No such file or directory`. Details: bench/README.md, rows `power_loop*` in `data/results/cc2755p10.csv`.
+
+### How do I read the battery voltage on the LP-EM-CC2755P10 with nothing wired?
 
 Add the ADC instance with the internal battery channel: `adc0.internalSignal = "Battery Channel";` in SysConfig. It samples VDDS/3 and read 1374 to 1375 counts at about 3.3 V (about 1365 expected). The app, unchanged, ran on TI Drivers + FreeRTOS: 12 lines at 115200 on the backchannel port ending in `1`, 1.004 to 1.005 s apart (checked 2026-10-25).
 

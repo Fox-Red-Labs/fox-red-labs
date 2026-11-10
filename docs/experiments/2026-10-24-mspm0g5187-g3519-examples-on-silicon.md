@@ -6,6 +6,7 @@ status: works
 reached: verified
 line: G3519 DriverLib examples retargeted to the LP-MSPM0G5187 run on it: 15 of the 55 that ran show the behavior TI describes, the three DMA examples hang because SysConfig moves them to DMA channel 1, and the port tool's 41 "name" failures were a stale-file trap.
 stop: none
+page: none
 -->
 # Do the G3519 DriverLib examples retargeted to the LP-MSPM0G5187 run, and do they do what TI's example does?
 

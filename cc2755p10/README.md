@@ -1,6 +1,6 @@
 # How do you get a TI LP-EM-CC2755P10 LaunchPad development kit from the box to a changed blink on a Mac?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Measured on one board: the blink built in 14 s and the first changed blink took 41 s of machine time from the command line (2026-10-09, agent-driven, board already mounted on its debugger).** CoreMark ran at 426.31 per second at 96 MHz. The numbers TI's data sheet gives for this chip are listed beside them as claims, not as measurements.
 
@@ -65,6 +65,8 @@ Measured rows were read on one LP-EM-CC2755P10 mounted on an LP-XDS110 debugger.
 | CoreMark, TI Arm Clang -O3, bare metal | 426.31 per second | 96 MHz, code in flash, 3 boots, crc checked; above the 370 expected and unexplained | measured | `coremark` (ticlang-bare-o3), `data/results/cc2755p10.csv` |
 | CoreMark, -Oz | 211.01 per second | same; ratio to -O3 is 0.495 | measured | `coremark` (ticlang-bare-oz), `data/results/cc2755p10.csv` |
 | Bluetooth echo round trip, 20 bytes | 29.2 ms median | Mac as central via bleak, 3 runs of 50, printed antenna, RSSI about -47 | measured | `ble_echo` |
+| Digital-power loop, trigger to duty write | Q15 282 cycles mean, worst 284 (29.6 percent of a 100 kHz period); float 294 mean, worst 342 (35.6 percent) | 96 MHz, -O2, code in flash, FPU on, ADC and LGPT0 at 48 MHz; same PID C code as the LP-EM-CC2340R5 (Q15 410, float 2,016 cycles there) | measured | `power_loop`, `power_loop_worst_pct`, `power_loop_jitter` |
+| Digital-power loop, highest rate | Q15 331 kHz, float 318 kHz (-O3: 338 and 329); CPU load at 100 kHz 23.5 and 26.5 percent | 1,000 periods a trial with no missed interrupt, late duty write or ADC overflow, 3 runs agree to the timer count; the LP-EM-CC2340R5 holds 97 and 22 kHz | measured | `power_loop_max_rate`, `power_loop_cpu_load`, bench/power-loop/ |
 | CoreMark expected, TI Arm Clang -O3 | about 370 per second (3.85 per MHz at 96 MHz) | data sheet figure | claim | TI data sheet SWRS306E |
 | RAM left beside a Zigbee router | about 130 kB (the CC2340R5 had 799 bytes left) | the CC2340R5 numbers plus the RAM difference | claim | CC2340R5 numbers in `data/results/cc2340r5.csv` |
 | Thread full device (`ot-cli-ftd`) | forms its own network; leader within 12 s of `thread start`; the CC2340R5 build failed by 7.5 to 23.8 kB | TI's `ot-ti`, one board | measured | `stack_support` (thread-ftd), [thread/README.md](thread/README.md) |

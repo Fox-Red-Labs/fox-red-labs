@@ -1,4 +1,4 @@
-# Send sensor readings over a sub-1 GHz radio from an LP-MSPM0G5187
+# Sensor readings over a sub-1 GHz radio
 
 A plain MSPM0 with a CC1407P radio plug-in sends temperature, humidity and light at 915 MHz; a CC1354P10 LaunchPad receives them. Tested on one desk; range not measured.
 

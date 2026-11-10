@@ -24,7 +24,7 @@ No fix recorded. What is known: the ID read works and the reset-and-halt step af
 
 ### The probe shows `NOserial` and the ports have no name. How do I restore it?
 
-Write the name back with `xdsdfu -n RI32`. After a DSLite run updated the probe firmware to 3.0.0.43 it showed `NOserial`. `xdsdfu` writes 4 characters onto a 4-character prefix, so the serial became `RI32RI32` and the ports are `/dev/cu.usbmodemRI32RI321` and `4`; use those names in the ten-minute path. Source: `iwrl6432boost/README.md`.
+Write the name back with `xdsdfu -n RI32`. After a DSLite run updated the probe firmware to 3.0.0.43 it showed `NOserial`. `xdsdfu` writes 4 characters onto a 4-character prefix, so the serial became `RI32RI32` and the ports are `/dev/cu.usbmodemRI32RI321` and `4`; use those names in the ten-minute path. A second unit reads `RI32` (firmware 3.0.0.13) from the start, so its ports are `/dev/cu.usbmodemRI321` and `4`; read the name with `ls /dev/cu.usbmodem*` before using either. Source: `iwrl6432boost/README.md`.
 
 ## Building
 

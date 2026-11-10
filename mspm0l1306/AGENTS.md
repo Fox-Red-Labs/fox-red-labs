@@ -92,13 +92,15 @@ After a flash, prove the LED pin is toggling through the debugger: `python3 tool
 <!-- recovery:start -->
 ## When the board stops answering
 
-Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+Checked 2026-11-08. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
 
 How it locks up:
 
 - An image enters SHUTDOWN right after boot: DAP Connection Error, low power mode (`mspm0l1306/FAQ.md`)
 - A window-watchdog example resets the chip every few milliseconds: Could not find MEM-AP (`mspm0l1306/FAQ.md`, `ports/cms32/README.md`)
 - A deep-sleep port with only the watchdog timer as wake source (ran, woke every 0.997 s) (`ports/msp430-to-mspm0/lpm3-wake/PORT.md`, 2026-10-21)
+- TI timx_timer_mode_periodic_standby enters STANDBY: every debugger read answers ack 4, and a reset pulse with a halt does not catch it (`docs/experiments/2026-11-06-mspm0l1306-live-chip-view.md`, 2026-11-06)
+- Found silent: OpenOCD could not attach (FRL-E006), frl identify saw no answer on SWD or JTAG (FRL-E010), an OpenOCD reset halt returned nothing; the same signature as the STANDBY lockup. Which image was on the board is not known (the last recorded run was the 2026-11-06 live chip view). Recovered the same day with the DSLite method below: the chip answered after the write; DSLite's own verify step fails with 'Memory map prevented reading 0x0000FFF8', so the proof is an OpenOCD read-back (backup.py save), which matched the written image (`mspm0l1306/FAQ.md`, 2026-11-08)
 
 Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
 
@@ -108,6 +110,7 @@ Try in this order. Remote means the Mac does it with the board in place; hands m
 | OpenOCD mailbox mass erase (mspm0_mass_erase) (for the watchdog reset loop) | remote | proven | `mspm0l1306/FAQ.md`, date not recorded |
 | OpenOCD mailbox mass erase (for the SHUTDOWN lockup: OpenOCD exits when the debug port fails to answer) | remote | failed | `mspm0l1306/FAQ.md`, date not recorded |
 | uhubctl power-off of the probe port (the tick counter restarted; the hub location is not recorded) | remote | proven | 2026-10-21 |
+| DSLite flash from UniFlash 9.6.0 with a non-sleeping image and the board ccxml (for the STANDBY lockup; the first try worked, no hands; second success 2026-11-08 (the 2026-11-02 backup image written back; expect DSLite's verify to fail at 0xFFF8 and check with backup.py instead; the image path must contain no space)) | remote | proven | `docs/experiments/2026-11-06-mspm0l1306-live-chip-view.md`, 2026-11-08 |
 
 USB hub ports recorded for this board:
 
@@ -131,6 +134,6 @@ Code written for other chips and tools, brought to this board. The files to copy
 | STM32 UART DMA receive with idle-line interrupt (MaJerle stm32-usart-uart-dma-rx-tx) on TI boards | Works | MaJerle's STM32 UART DMA example answers every test packet at 115200 baud on the LP-MSPM0G3519, G5187, L1306, C1104 and MSPM33C321A. | `docs/experiments/2026-10-19-stm32-usart-dma-port-matrix.md` |
 | TI's MSPM0 DriverLib examples built and run with GCC | Works | TI's MSPM0 DriverLib examples build and run with GCC from a terminal: all 224 no-RTOS examples with a GCC makefile built unchanged. | `portability/toolchains/gcc-mspm0/README.md` |
 | Zephyr in 4 kB of RAM on the LP-MSPM0L1306 | Works | Zephyr runs on the LP-MSPM0L1306 in 4 kB of RAM: hello_world, blinky and CoreMark. | `docs/experiments/2026-10-06-mspm0l1306-zephyr-4kb.md` |
-| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
-| One app, three ways: DriverLib, TI Drivers and Zephyr | Could work | The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings. | `portability/three-ways/README.md` |
+| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. The Educational, Sharp128 and Audio builds also build for the LP-MSPM0G3519, and the Educational and Sharp128 builds for the LP-MSPM0G3507. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
+| One app, three ways: DriverLib, TI Drivers and Zephyr | Could work | The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings. It builds on the LP-MSPM0G3507 too. | `portability/three-ways/README.md` |
 <!-- ports:end -->

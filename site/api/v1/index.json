@@ -1,41 +1,41 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-06",
+ "generated": "2026-11-10",
  "files": {
   "boards.json": {
-   "rows": 24,
+   "rows": 26,
    "source": "data/boards.csv",
-   "sha256": "9335dfee08fcac6e3daa0ae3d981d13ceb7b582f84eff105ce96a2938abbfe36"
+   "sha256": "201ef28074f3f053eeff0aa679b082cfb95c1a8a8e0e925364d280ee32ae922c"
   },
   "results.json": {
-   "rows": 7531,
+   "rows": 7941,
    "source": "data/results/*.csv",
-   "sha256": "3cbca0b1c46873c648e198bd4348481ef9c4920c990b4d19ef1b2ad8dd14f529"
+   "sha256": "fe9099c9881042b75882dffe1248103898235cc053604c841eec01eb26510581"
   },
   "parts.json": {
-   "rows": 67,
+   "rows": 74,
    "source": "data/parts.json",
-   "sha256": "3b9e77ea7c04f63cfc666e3418d4efb383acdc3ad595d8d16046b5ba8d0a9288"
+   "sha256": "bc6f7f8cb66aab812a62255d45c645b117b4ae66232c7c60ea62a8ce61bddc8c"
   },
   "ports.json": {
    "rows": 76,
    "source": "site/data/ports.json",
-   "sha256": "50a43bd090775af859992e0be84ccc5a2852aa29ec6ad325cca9a8be16980d4a"
+   "sha256": "34fedc34fae853710cd1c5a2e9e3611168277ee373e8455a0bbd7633f01b1a66"
   },
   "milestones.json": {
-   "rows": 118,
+   "rows": 149,
    "source": "data/milestones.json",
-   "sha256": "4b8c6b69728148dce9a0b87477fede03c1bd20d667631cca672941d6fa1f2125"
+   "sha256": "2bcbc71aa8a14014c72ca2957d7621d7c964b008b768665d8e6793ea4ca1e9f2"
   },
   "support-matrix.json": {
    "rows": 6,
    "source": "data/support-matrix.json",
-   "sha256": "07bc9b43c59db2ad9ea170363db1987554d79caa30bd2b0f07334745af197617"
+   "sha256": "3a1b440316c0910eb5c381ac3219e977cdc82ce0a9710b380cd693835996d41b"
   },
   "questions.json": {
    "rows": 10,
    "source": "data/questions.json",
-   "sha256": "5e10349b9adb94180750cf56c4970b324b21957f703aa5af97420791d3f5588a"
+   "sha256": "5aa696ae7f7ad0b975a616178140e1232f2eec1de8ff90dcc374b03cb5e07543"
   }
  },
  "doc": "docs/api-v1.md",

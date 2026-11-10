@@ -1,4 +1,4 @@
-# Run Arduino's own sketches on a TI chip
+# Run Arduino sketches on a TI chip
 
 Arduino's Blink and AnalogReadSerial build unchanged through the Zephyr-based Arduino core and run on the LP-EM-CC2340R5 and the LP-MSPM0G3519. PlatformIO was not run.
 

@@ -1,0 +1,62 @@
+/**
+ * Hobby build 1 (button-knob-dim) on the LP-MSPM0L1306. Written by gen_boards.py from its pin table: do not edit by hand.
+ * UART0 at 115200 on the backchannel pins, GPIO and timer pins from the table, 32 MHz SYSOSC (TI's default clock tree).
+ */
+//@cliArgs --device "MSPM0L130X" --package "VQFN-32(RHB)" --part "Default"
+//@v2CliArgs --device "MSPM0L1306" --package "VQFN-32(RHB)"
+// @cliArgs --board /ti/boards/LP_MSPM0L1306 --rtos nortos
+
+const Board  = scripting.addModule("/ti/driverlib/Board");
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const ADC12  = scripting.addModule("/ti/driverlib/ADC12", {}, false);
+const PWM    = scripting.addModule("/ti/driverlib/PWM", {}, false);
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA9";
+UART1.peripheral.txPin.$assign = "PA8";
+UART1.targetBaudRate           = 115200;
+
+const G_BTN_A = GPIO.addInstance();
+G_BTN_A.$name                         = "GPIO_BTN_A";
+G_BTN_A.port                          = "PORTA";
+G_BTN_A.associatedPins[0].$name       = "BTN_A";
+G_BTN_A.associatedPins[0].assignedPin = "14";
+G_BTN_A.associatedPins[0].direction        = "INPUT";
+G_BTN_A.associatedPins[0].internalResistor = "PULL_UP";
+G_BTN_A.associatedPins[0].pin.$assign = "PA14";
+
+const G_BTN_B = GPIO.addInstance();
+G_BTN_B.$name                         = "GPIO_BTN_B";
+G_BTN_B.port                          = "PORTA";
+G_BTN_B.associatedPins[0].$name       = "BTN_B";
+G_BTN_B.associatedPins[0].assignedPin = "5";
+G_BTN_B.associatedPins[0].direction        = "INPUT";
+G_BTN_B.associatedPins[0].internalResistor = "PULL_UP";
+G_BTN_B.associatedPins[0].pin.$assign = "PA5";
+
+const ADC1 = ADC12.addInstance();
+ADC1.$name                = "ADC12_0";
+ADC1.sampClkSrc           = "DL_ADC12_CLOCK_SYSOSC";
+ADC1.sampClkDiv           = "DL_ADC12_CLOCK_DIVIDE_8";
+ADC1.sampleTime0          = "40 us";
+ADC1.powerDownMode        = "DL_ADC12_POWER_DOWN_MODE_MANUAL";
+ADC1.peripheral.$assign   = "ADC0";
+ADC1.adcMem0chansel       = "DL_ADC12_INPUT_CHAN_2";
+ADC1.peripheral.adcPin2.$assign = "PA25";
+
+const P_LED = PWM.addInstance();
+P_LED.$name                = "PWM_LED";
+P_LED.clockSource          = "BUSCLK";
+P_LED.clockPrescale        = 32;
+P_LED.timerCount           = 20000;
+P_LED.pwmMode              = "EDGE_ALIGN";
+P_LED.ccIndex              = [0];
+P_LED.peripheral.$assign   = "TIMG0";
+P_LED.peripheral.ccp0Pin.$assign = "PA12";
+P_LED.PWM_CHANNEL_0.dutyCycle = 0;
+
+SYSCTL.clockTreeEn = true;

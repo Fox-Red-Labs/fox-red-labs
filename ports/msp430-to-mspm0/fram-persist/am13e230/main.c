@@ -14,7 +14,8 @@
 #include "log.h"
 
 #define DATA_ADDR (0x00040000u + 0x40000u - DL_FLASH_SECTOR_SIZE)     /* last sector of bank 1 */
-#define SLOTS     (DL_FLASH_SECTOR_SIZE / 8u)
+#define SLOT_BYTES 16u              /* DL_Flash_program rejects an address that is not 16-byte aligned (DL_FLASH_ADDR_INVALID_ALIGN), though dl_flash.h says 8 */
+#define SLOTS     (DL_FLASH_SECTOR_SIZE / SLOT_BYTES)
 #ifndef COUNT_ANY_RESET
 #define COUNT_ANY_RESET 1           /* 1: every reset except power-on counts, so a probe or software reset stands in for the button */
 #endif
@@ -40,8 +41,8 @@
 #define CPU_MHZ 200u                /* SysTick runs at the CPU clock */
 #endif
 
-typedef struct { uint32_t count; uint32_t inv; } slot_t;
-#define LOG_SLOT(i) ((const volatile slot_t *) (DATA_ADDR + 8u * (i)))
+typedef struct { uint32_t count; uint32_t inv; uint32_t pad[2]; } slot_t;
+#define LOG_SLOT(i) ((const volatile slot_t *) (DATA_ADDR + SLOT_BYTES * (i)))
 
 static uint32_t gCount, gUsed, gErases;
 static volatile uint8_t gButton;
@@ -50,8 +51,8 @@ static int flash_erase_sector(void) { return DL_Flash_eraseSector(DATA_ADDR) == 
 
 static int flash_program_slot(uint32_t idx, uint32_t count)
 {
-    uint32_t w[2] = { count, ~count };
-    return DL_Flash_program(DATA_ADDR + 8u * idx, (uint8_t *) w, 8u) == DL_FLASH_SUCCESS ? 0 : -1;
+    uint32_t w[4] = { count, ~count, 0xFFFFFFFFu, 0xFFFFFFFFu };
+    return DL_Flash_program(DATA_ADDR + SLOT_BYTES * idx, (uint8_t *) w, SLOT_BYTES) == DL_FLASH_SUCCESS ? 0 : -1;
 }
 
 static void log_scan(void)

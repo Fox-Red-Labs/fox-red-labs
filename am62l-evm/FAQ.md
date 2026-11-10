@@ -4,6 +4,8 @@ Problems hit bringing up the TMDS62LEVM (AM62L32: two Cortex-A53, 160 kB on-chip
 
 Cause tags: Setup or handling (how it was plugged in or set); Tool or docs (a tool or missing instruction); Third-party behavior (macOS, Zephyr, TF-A, Linux); Chip limit; Unknown.
 
+## Console and serial
+
 ### The serial port is silent, or prints junk, though the board is powered. What now?
 
 Read with a program that sets the rate and keeps the port open: `python3 -I am62l-evm/tools/capture.py /dev/cu.usbserial-<id>0 115200 console.log`. `stty -f PORT 115200` followed by `cat PORT` reads at 9600 on macOS, because the setting reverts when `stty` closes the device. Source: `am62l-evm/tools/capture.py`.
@@ -19,6 +21,12 @@ Unplug and replug J17. The SW7 warm reset does not re-read the boot switches.
 ### UART boot never shows the ROM's `C`. Which switches?
 
 Set SW3.4 ON, SW3.3 ON, SW3.2 ON, SW3.1 OFF. The user guide lists SW3.4 first, so a row read left to right gives the reverse. Watch FT4232 port A (suffix 0) at 115200; a lone `C` appears about once a second. Source: `docs/experiments/2026-10-22-am62l-linux-zephyr-amp.md`.
+
+### The Mac lists the XDS110 but no `/dev/cu.usbserial-*` port, so the console is silent.
+
+The console is the FT4232HL on J7, a separate micro-USB cable from the debug probe on J8. If `ioreg -p IOUSB` shows the XDS110 and no FTDI device, J7 is unplugged or unpowered: plug a micro-USB cable from J7 into the Mac or the hub, then four `usbserial` ports appear and the third one is the Linux console at 115200 (2026-11-08).
+
+## Debug probe and DSLite
 
 ### DSLite says "An invalid processor ID has been found". What is wrong?
 
@@ -36,6 +44,8 @@ The warning says DSLite wants 3.0.0.43 and the probe has 3.0.0.32. Connect, halt
 
 The core is powered down. Start it with a PSCI call from U-Boot: `python3 am62l-evm/tools/psci_stub.py cpu_on 0x1 <entry>`, paste the printed lines at `=>`; `rc = 0x0` means started. Source: `docs/experiments/2026-10-22-am62l-linux-zephyr-amp.md`.
 
+## Boot and storage
+
 ### U-Boot prints "Transfer data timeout" or "Card did not respond to voltage select! : -110". Is the board broken?
 
 The micro-SD card is bad or unseated; the eMMC answered on the same board. Boot over UART and use a USB stick for Linux. The card on hand was the suspect; no second card was tried. Source: `docs/experiments/2026-10-22-am62l-linux-zephyr-amp.md`.
@@ -43,6 +53,20 @@ The micro-SD card is bad or unseated; the eMMC answered on the same board. Boot 
 ### U-Boot hangs on `usb start`. What now?
 
 Power cycle with the stick already plugged in. `usb start` after hot-plugging a stick into a running board hung U-Boot.
+
+### The boot ROM takes a 54-block image from `mkphase1.sh` and then pings `C` again.
+
+It refused the image (four certificate variants tried, SoC is HS-FS). It returns to its ping within 3 s. After a transfer cut off part-way it was silent about 4 minutes before pinging. Not resolved. Source: `docs/experiments/2026-10-24-am62l-linux-zephyr-link.md`.
+
+### The AM62L stops after `BL1` and `ENTERING WFI` when booting from the micro-SD card. What now?
+
+Check three things, then power cycle with J17 out for 30 s: SW4 = ON ON OFF OFF OFF OFF ON OFF (not the no-boot setting used for JTAG), SW2 = OFF ON OFF OFF, SW3 all OFF, and the card pushed fully into the slot. With the card half in, U-Boot prints `MMC: no card present` while the boot ROM still read the card for the first stage, so the console shows `C`, BL1 notices and then silence, repeating. After seating the card, `mmc rescan` then `boot` at the `=>` prompt reached the login. Source: `docs/experiments/2026-10-24-am62l-sd-boot-stall.md`.
+
+### I wrote the SDK image to the SD card from Linux and the checksum of the whole card differs from the source.
+
+udev mounts both partitions read-write when the write ends, which changes the ext4 superblock (1 MiB at the start of partition 2). Unmount `/run/media/*mmcblk1*` before the read-back, or compare by chunks and expect one differing megabyte. Source: `docs/experiments/2026-10-24-am62l-sd-card-and-ps5-driver.md`.
+
+## Zephyr on core 1
 
 ### Zephyr in on-chip SRAM beside Linux fails or breaks Linux. Why?
 
@@ -80,17 +104,21 @@ Use SGI 0 to 7. Writes that enable SGI 8 to 15 in core 1's redistributor (`GICR_
 
 If the last run ended with PSCI CPU_OFF inside the SGI handler, that SGI stays active and pending in the redistributor (`ISACTIVER0` and `ISPENDR0` read 0x80 through `/dev/mem`). End the run from the main loop, never inside the handler, and clear both bits at start. Source: `docs/experiments/2026-10-24-am62l-linux-zephyr-link.md`.
 
+## Building and running software on the board
+
 ### How do I build a kernel module on the board?
 
 The board has gcc 15.3 but no kernel headers, flex or bison. Copy the SDK kernel source to the board (about 200 MB without `drivers/*.c`), put the board's `/proc/config.gz` in a build folder with `CONFIG_LOCALVERSION` set so it matches `uname -r` and `LOCALVERSION_AUTO` off, supply `flex` and `bison` as scripts that copy lexer and parser output generated elsewhere, run `make O=... ARCH=arm64 modules_prepare`, then `KBUILD_MODPOST_WARN=1 make ... M=... modules`. `insmod` accepts it because MODVERSIONS is off. Source: `am62l-evm/rpmsg/`.
 
-### The boot ROM takes a 54-block image from `mkphase1.sh` and then pings `C` again.
+### The board shell says `syntax error near unexpected token` for a pipe in parentheses.
 
-It refused the image (four certificate variants tried, SoC is HS-FS). It returns to its ping within 3 s. After a transfer cut off part-way it was silent about 4 minutes before pinging. Not resolved. Source: `docs/experiments/2026-10-24-am62l-linux-zephyr-link.md`.
+The board's `sh` is not bash; send plain pipelines or a script. Root ssh works from your computer at the board's DHCP address. Source: same page.
 
-### The AM62L stops after `BL1` and `ENTERING WFI` when booting from the micro-SD card. What now?
+### whisper.cpp or llama.cpp builds take hours on the board.
 
-Check three things, then power cycle with J17 out for 30 s: SW4 = ON ON OFF OFF OFF OFF ON OFF (not the no-boot setting used for JTAG), SW2 = OFF ON OFF OFF, SW3 all OFF, and the card pushed fully into the slot. With the card half in, U-Boot prints `MMC: no card present` while the boot ROM still read the card for the first stage, so the console shows `C`, BL1 notices and then silence, repeating. After seating the card, `mmc rescan` then `boot` at the `=>` prompt reached the login. Source: `docs/experiments/2026-10-24-am62l-sd-boot-stall.md`.
+Two A53 cores: whisper.cpp about 1 h, llama.cpp about 2.5 h with `-j2`. Stop the build processes with `kill -STOP` while measuring; they cannot run beside a benchmark. Do not `pkill -f` a pattern that appears in your own ssh command line. Source: `docs/experiments/2026-10-24-am62l-edge-ai-cpu.md`.
+
+## Graphics, games and controllers
 
 ### What can the AM62L draw on an HDMI monitor with no GPU?
 
@@ -103,6 +131,14 @@ SDL's `kmsdrm` driver, and SDL on Weston, both end in Mesa llvmpipe (software Op
 ### A wired PS4 controller is `Sony Computer Entertainment Wireless Controller` on the AM62L. Does it work?
 
 Yes through `hid-generic`: `/dev/input/event1` reports left stick `ABS_X`/`ABS_Y` (0 to 255, centered near 120, up is a low `ABS_Y`), the face buttons `BTN_SOUTH`/`BTN_EAST`/`BTN_C`/`BTN_NORTH`, and `BTN_MODE` for the PS button. No PlayStation driver is needed for buttons and sticks (rumble, LEDs and the motion sensor need `hid-playstation`).
+
+### The kernel has no driver for a DualSense or a DualShock 4.
+
+`HID_PLAYSTATION`, `HID_SONY` and `INPUT_UINPUT` are not set. Build `hid-playstation.ko` and `led-class-multicolor.ko` on the board as in the module FAQ above, using the sources from the `ti-linux-6.18.y` branch, then `insmod` both (the second first). A wired DualShock 4 falls back to `hid-generic`. Source: `docs/experiments/2026-10-24-am62l-sd-card-and-ps5-driver.md`.
+
+### RetroArch in the showcase ran a Game Boy game at 48 fps (10.4 fps at 1080p). How do I get 60 fps and SNES or PlayStation speed?
+
+Skip X and the container. A libretro frontend that writes straight to DRM/KMS (`am62l-evm/lean/lean_fe.c`) ran the same Gambatte core at 60 fps in both modes, Snes9x 2005 at 60 fps up to 1920x1080 and PCSX-ReARMed at 60 fps on a PlayStation test program. The slowdown was Mesa llvmpipe scaling on two cores, not the emulator. The display plane cannot scale, so scale integer ratios on the CPU. Source: `docs/experiments/2026-11-01-am62l-lean-emulation.md`.
 
 <!-- recovery:start -->
 ## When the board stops answering
@@ -127,23 +163,3 @@ Try in this order. Remote means the Mac does it with the board in place; hands m
 | Boot from the micro-SD slot: SW4 ON ON OFF OFF OFF OFF ON OFF, SW2 OFF ON OFF OFF, SW3 all OFF, push the card fully in, full power cycle; if U-Boot shows MMC: no card present, seat the card, then mmc rescan and boot (119 GB card with the SDK 12.01 default image reached login after seating the card; the 2026-10-22 timeouts were with a different card) | hands | proven | `am62l-evm/FAQ.md`, `docs/experiments/2026-10-24-am62l-sd-boot-stall.md`, 2026-10-24 |
 
 <!-- recovery:end -->
-
-### I wrote the SDK image to the SD card from Linux and the checksum of the whole card differs from the source.
-
-udev mounts both partitions read-write when the write ends, which changes the ext4 superblock (1 MiB at the start of partition 2). Unmount `/run/media/*mmcblk1*` before the read-back, or compare by chunks and expect one differing megabyte. Source: `docs/experiments/2026-10-24-am62l-sd-card-and-ps5-driver.md`.
-
-### The kernel has no driver for a DualSense or a DualShock 4.
-
-`HID_PLAYSTATION`, `HID_SONY` and `INPUT_UINPUT` are not set. Build `hid-playstation.ko` and `led-class-multicolor.ko` on the board as in the module FAQ above, using the sources from the `ti-linux-6.18.y` branch, then `insmod` both (the second first). A wired DualShock 4 falls back to `hid-generic`. Source: `docs/experiments/2026-10-24-am62l-sd-card-and-ps5-driver.md`.
-
-### whisper.cpp or llama.cpp builds take hours on the board.
-
-Two A53 cores: whisper.cpp about 1 h, llama.cpp about 2.5 h with `-j2`. Stop the build processes with `kill -STOP` while measuring; they cannot run beside a benchmark. Do not `pkill -f` a pattern that appears in your own ssh command line. Source: `docs/experiments/2026-10-24-am62l-edge-ai-cpu.md`.
-
-### The board shell says `syntax error near unexpected token` for a pipe in parentheses.
-
-The board's `sh` is not bash; send plain pipelines or a script. Root ssh works from your computer at the board's DHCP address. Source: same page.
-
-### RetroArch in the showcase ran a Game Boy game at 48 fps (10.4 fps at 1080p). How do I get 60 fps and SNES or PlayStation speed?
-
-Skip X and the container. A libretro frontend that writes straight to DRM/KMS (`am62l-evm/lean/lean_fe.c`) ran the same Gambatte core at 60 fps in both modes, Snes9x 2005 at 60 fps up to 1920x1080 and PCSX-ReARMed at 60 fps on a PlayStation test program. The slowdown was Mesa llvmpipe scaling on two cores, not the emulator. The display plane cannot scale, so scale integer ratios on the CPU. Source: `docs/experiments/2026-11-01-am62l-lean-emulation.md`.

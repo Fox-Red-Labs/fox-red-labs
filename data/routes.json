@@ -19,7 +19,10 @@
    },
    "target": {
     "dslite_ccxml": "mspm0l1306_xds110.ccxml",
-    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "dslite_erase": [
+     "FlashEraseSelection=Erase MAIN memory sectors by range (specify below)",
+     "{range}"
+    ],
     "transport": "openocd",
     "interface_cfg": "interface/xds110.cfg",
     "target_cfg": "target/ti_mspm0.cfg",
@@ -97,8 +100,9 @@
       "sysconfig": {
        "kind": "sysconfig",
        "validated": [
-        "1.26.3"
-       ]
+        "1.28.0"
+       ],
+       "history": "1.28.0 validated 2026-11-08 (frl run with the pin-read check, three runs; print-message three runs on the L1306). 1.26.3 was validated earlier and is no longer installed."
       },
       "compiler": {
        "kind": "ticlang",
@@ -155,8 +159,9 @@
       "sysconfig": {
        "kind": "sysconfig",
        "validated": [
-        "1.26.3"
-       ]
+        "1.28.0"
+       ],
+       "history": "1.28.0 validated 2026-11-08 (frl run with the pin-read check, three runs; print-message three runs on the L1306). 1.26.3 was validated earlier and is no longer installed."
       },
       "compiler": {
        "kind": "ticlang",
@@ -219,7 +224,10 @@
    },
    "target": {
     "dslite_ccxml": "mspm0g3519_xds110.ccxml",
-    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "dslite_erase": [
+     "FlashEraseSelection=Erase MAIN memory sectors by range (specify below)",
+     "{range}"
+    ],
     "transport": "openocd",
     "interface_cfg": "interface/xds110.cfg",
     "target_cfg": "target/ti_mspm0.cfg",
@@ -291,8 +299,9 @@
       "sysconfig": {
        "kind": "sysconfig",
        "validated": [
-        "1.26.3"
-       ]
+        "1.28.0"
+       ],
+       "history": "1.28.0 validated 2026-11-08 (frl run with the pin-read check on LED2 PB26, three runs, 150,150,150,900 ms). 1.26.3 was validated earlier and is no longer installed."
       },
       "compiler": {
        "kind": "ticlang",
@@ -337,6 +346,149 @@
     "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
    }
   },
+  "mspm0l2228": {
+   "kit": "LP-MSPM0L2228",
+   "install_total": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free.",
+   "aliases": [
+    "LP-MSPM0L2228",
+    "MSPM0L2228 LaunchPad",
+    "L2228",
+    "MSPM0L2228"
+   ],
+   "printed": "The kit name LP-MSPM0L2228 is printed on the board.",
+   "official": "https://www.ti.com/tool/LP-MSPM0L2228",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "mspm0l2228_xds110.ccxml",
+    "dslite_erase": [
+     "FlashEraseSelection=Erase MAIN memory sectors by range (specify below)",
+     "{range}"
+    ],
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_mspm0.cfg",
+    "speed_khz": 2500,
+    "connect_under_reset": false,
+    "identity": {
+     "addr": "0x41C40000",
+     "words": 3,
+     "fields": [
+      "traceid",
+      "deviceid",
+      "userid"
+     ],
+     "deviceid_mask": "0x0FFFFFFF",
+     "deviceid": "0x0BB9F02F",
+     "why": "FACTORYREGION DEVICEID 0x1BB9F02F read on our LP-MSPM0L2228 (mspm0l2228/data, results row connect_step); part number 0xBB9F, shared by the L1227, L1228, L2227 and L2228 in CCStudio's files."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00040000"
+     }
+    ],
+    "never_write": "NONMAIN (0x41C00000), the boot configuration. A first demo never erases it or all of flash."
+   },
+   "leds": [
+    {
+     "label": "LED red (PB10)",
+     "port": "B",
+     "bit": 10,
+     "gpio_base": "0x400A2000"
+    },
+    {
+     "label": "LED green (PB9)",
+     "port": "B",
+     "bit": 9,
+     "gpio_base": "0x400A2000"
+    },
+    {
+     "label": "LED blue (PA23)",
+     "port": "A",
+     "bit": 23,
+     "gpio_base": "0x400A0000"
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-MSPM0L2228",
+     "outcome": "The red LED on the board flashes the pattern you asked for, checked by timing the LED pin through the debugger.",
+     "example": "examples/nortos/LP_MSPM0L2228/driverlib/gpio_toggle_output",
+     "source_file": "gpio_toggle_output.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/gpio_toggle_output.out",
+     "led": "LED red (PB10)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "mspm0_sdk",
+       "validated": [
+        "2.11.00.07"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ],
+       "history": "Validated 2026-11-09 on probe ML220001 (frl run: build 3.0 s, OpenOCD write and read back 20.6 s, LED red PB10 timed to 150,150,150,900 ms; the shipped image restored from the run's backup and read back identical). DSLite flashes the same image in 4.2 s (mspm0l2228/STOPWATCH.md)."
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "openocd",
+       "validated": [
+        "0.12.0+dev-02228"
+       ],
+       "needs": "target/ti_mspm0.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "tested",
+     "next": [
+      "run python3 tools/frl/frl.py run --board mspm0l2228 --recipe blink-pattern --probe ML220001 and set tested when it passes"
+     ],
+     "edit": "pattern",
+     "led_macro": "GPIO_LEDS_USER_LED_2_PIN",
+     "clear_macros": [
+      "GPIO_LEDS_USER_LED_1_PIN",
+      "GPIO_LEDS_USER_LED_2_PIN",
+      "GPIO_LEDS_USER_LED_3_PIN",
+      "GPIO_LEDS_USER_TEST_PIN"
+     ],
+     "per_pin_port": true
+    }
+   },
+   "checks_before_flash": "The red LED needs its jumpers on (as shipped) and the XDS110's debugger jumpers on.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port (UART0 on PA10 and PA11 through J17 and J18 on XDS, as shipped), as on the LP-MSPM0G3519."
+   }
+  },
   "mspm0c1104": {
    "kit": "LP-MSPM0C1104",
    "install_total": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free.",
@@ -355,7 +507,10 @@
    },
    "target": {
     "dslite_ccxml": "mspm0c1104_xds110.ccxml",
-    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "dslite_erase": [
+     "FlashEraseSelection=Erase MAIN memory sectors by range (specify below)",
+     "{range}"
+    ],
     "transport": "openocd",
     "interface_cfg": "interface/xds110.cfg",
     "target_cfg": "target/ti_mspm0.cfg",
@@ -477,7 +632,10 @@
    },
    "target": {
     "dslite_ccxml": "mspm0g5187_xds110.ccxml",
-    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "dslite_erase": [
+     "FlashEraseSelection=Erase MAIN memory sectors by range (specify below)",
+     "{range}"
+    ],
     "transport": "openocd",
     "interface_cfg": "interface/xds110.cfg",
     "target_cfg": "target/ti_mspm0.cfg",
@@ -549,8 +707,9 @@
       "sysconfig": {
        "kind": "sysconfig",
        "validated": [
-        "1.26.3"
-       ]
+        "1.28.0"
+       ],
+       "history": "1.28.0 validated 2026-11-08 (frl run with the pin-read check, three runs; print-message three runs on the L1306). 1.26.3 was validated earlier and is no longer installed."
       },
       "compiler": {
        "kind": "ticlang",
@@ -614,7 +773,10 @@
    },
    "target": {
     "dslite_ccxml": "mspm33c321a_xds110.ccxml",
-    "dslite_erase": ["FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "{range}"],
+    "dslite_erase": [
+     "FlashEraseSelection=Erase MAIN memory sectors by range (specify below)",
+     "{range}"
+    ],
     "dslite_range_base": "0x10000000",
     "transport": "openocd",
     "interface_cfg": "interface/xds110.cfg",
@@ -719,6 +881,56 @@
       "GPIO_LEDS_USER_LED_3_PIN"
      ],
      "per_pin_port": true,
+     "sdk_var": "MSPM33_SDK_INSTALL_DIR"
+    },
+    "print-message": {
+     "project": "print-a-message",
+     "title": "Print your own message from the LP-MSPM33C321A",
+     "outcome": "The board prints your message over the USB cable once a second, checked by reading the serial port.",
+     "example": "examples/nortos/LP_MSPM33C321A/driverlib/uart_tx_console_multibyte_repeated_fifo_dma",
+     "source_file": "uart_tx_console_multibyte_repeated_fifo_dma.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/uart_tx_console_multibyte_repeated_fifo_dma.out",
+     "edit": "message",
+     "default_message": "Hello from my LaunchPad",
+     "tools": {
+      "sdk": {
+       "kind": "mspm33_sdk",
+       "validated": [
+        "1.04.00.00"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ]
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "ti_openocd",
+       "needs": "target/ti_mspm33.cfg"
+      }
+     },
+     "verify": {
+      "kind": "uart",
+      "seconds": 4.0
+     },
+     "status": "tested",
+     "next": [
+      {
+       "project": "blink",
+       "why": "no extra parts: make the LED flash a pattern you choose"
+      }
+     ],
      "sdk_var": "MSPM33_SDK_INSTALL_DIR"
     }
    },
@@ -944,7 +1156,9 @@
     "never_write": "anything outside main flash, the CCFG and the SCFG; never the HSM area (0x000E8000 and up), OTP (0x4E020800) or a factory reset. Every write is DSLite's chip erase (main flash, CCFG and SCFG), and a chip with no valid CCFG and SCFG keeps its debug port closed, so frl backs up all three first and the restore writes all three back",
     "write": "dslite_lpf3",
     "ccxml": "cc2755p10_xds110.ccxml",
-    "dslite_erase_settings": ["RetainMainSectors=true"],
+    "dslite_erase_settings": [
+     "RetainMainSectors=true"
+    ],
     "openocd": "ti_openocd"
    },
    "leds": [
@@ -1038,7 +1252,9 @@
    },
    "target": {
     "dslite_ccxml": "am13e230_xds110.ccxml",
-    "dslite_erase": ["FlashEraseSelection=Necessary Bank(s) Only (for Program Load)"],
+    "dslite_erase": [
+     "FlashEraseSelection=Necessary Bank(s) Only (for Program Load)"
+    ],
     "transport": "openocd",
     "interface_cfg": "interface/xds110.cfg",
     "target_cfg": "target/ti_am13e230x.cfg",
@@ -1157,7 +1373,9 @@
    },
    "target": {
     "dslite_ccxml": "c28x_xds110.ccxml",
-    "dslite_erase": ["FlashEraseSelection=Necessary Sectors Only (for Program Load)"],
+    "dslite_erase": [
+     "FlashEraseSelection=Necessary Sectors Only (for Program Load)"
+    ],
     "word_addressed": true,
     "transport": "dss",
     "ccxml": "c28x_xds110.ccxml",
@@ -1239,9 +1457,72 @@
      "status": "tested",
      "next": [],
      "edit": "pattern"
+    },
+    "print-message": {
+     "project": "print-a-message",
+     "title": "Print your own message from the LAUNCHXL-F2800137",
+     "outcome": "The board prints your message over the USB cable once a second, checked by reading the serial port.",
+     "example": "driverlib/f280013x/examples/launchxl_f2800137",
+     "source_file": "launchxl_ex1_f2800137_demo.c",
+     "build_dir": ".",
+     "image": "frl-build/message.out",
+     "builder": "c28",
+     "c28": {
+      "device": "f280013x",
+      "board_define": "_LAUNCHXL_F2800137",
+      "family_define": "F280013x"
+     },
+     "edit": "message",
+     "message_style": "c28",
+     "default_message": "Hello from my LaunchPad",
+     "heap": "0x100",
+     "tools": {
+      "sdk": {
+       "kind": "c2000ware",
+       "validated": [
+        "26.02.00.00"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.1"
+       ]
+      },
+      "compiler": {
+       "kind": "c2000_cgt",
+       "validated": [
+        "25.11.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "debug": {
+       "kind": "ccs_scripting"
+      }
+     },
+     "verify": {
+      "kind": "uart",
+      "seconds": 4.0
+     },
+     "status": "tested",
+     "next": [
+      {
+       "project": "blink",
+       "why": "no extra parts: make the LED flash a pattern you choose"
+      }
+     ]
     }
    },
-   "checks_before_flash": "S3 boot switches set for flash boot (GPIO24 and GPIO32 as shipped); LED4 on GPIO20."
+   "checks_before_flash": "S3 boot switches set for flash boot (GPIO24 and GPIO32 as shipped); LED4 on GPIO20.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, wired to SCIA on GPIO28 (RX) and GPIO29 (TX); TI's out-of-box demo prints on the same port at 115200."
+   }
   },
   "cc1354p10": {
    "kit": "LP-CC1354P10-1",
@@ -1436,6 +1717,146 @@
     }
    },
    "checks_before_flash": "The chip must already be activated (cc35x1/README.md step 3): frl never activates it. The board on an LP-XDS110ET or LP-XDS110 with the TGT VDD jumper on EXT, J4 and J6 on the lower two pins, and the board's own USB-C cable plugged in for power."
+  },
+  "mspm0g3507": {
+   "kit": "LP-MSPM0G3507",
+   "install_total": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free.",
+   "aliases": [
+    "LP-MSPM0G3507",
+    "MSPM0G3507 LaunchPad",
+    "G3507",
+    "MSPM0G3507"
+   ],
+   "printed": "The kit name LP-MSPM0G3507 and its revision (Rev. A on our unit) are printed sideways on the right half of the board, under the J102 and J103 boxes.",
+   "official": "https://www.ti.com/tool/LP-MSPM0G3507",
+   "probe": {
+    "family": "XDS110",
+    "onboard": true,
+    "usb": "0451:bef3"
+   },
+   "target": {
+    "dslite_ccxml": "mspm0g3507_xds110.ccxml",
+    "dslite_erase": [
+     "FlashEraseSelection=Erase MAIN memory sectors by range (specify below)",
+     "{range}"
+    ],
+    "transport": "openocd",
+    "interface_cfg": "interface/xds110.cfg",
+    "target_cfg": "target/ti_mspm0.cfg",
+    "speed_khz": 2500,
+    "connect_under_reset": false,
+    "identity": {
+     "addr": "0x41C40000",
+     "words": 3,
+     "fields": [
+      "traceid",
+      "deviceid",
+      "userid"
+     ],
+     "deviceid_mask": "0x0FFFFFFF",
+     "deviceid": "0x0BB8802F",
+     "why": "FACTORYREGION DEVICEID read on the borrowed LP-MSPM0G3507 (0x0BB8802F) and the own unit (0x2BB8802F, version 2) 2026-11-09; part number 0xBB88; CCStudio's GEL shares it with 11 other parts, so SRAMFLASH (128 kB) picks the chip."
+    },
+    "writable": [
+     {
+      "name": "main flash",
+      "start": "0x00000000",
+      "end": "0x00020000"
+     }
+    ],
+    "never_write": "NONMAIN (0x41C00000), the boot configuration. A first demo never erases it or all of flash."
+   },
+   "leds": [
+    {
+     "label": "LED2 red (PB26)",
+     "port": "B",
+     "bit": 26,
+     "gpio_base": "0x400A2000"
+    },
+    {
+     "label": "LED2 green (PB27)",
+     "port": "B",
+     "bit": 27,
+     "gpio_base": "0x400A2000"
+    },
+    {
+     "label": "LED2 blue (PB22)",
+     "port": "B",
+     "bit": 22,
+     "gpio_base": "0x400A2000"
+    }
+   ],
+   "gpio_offsets": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "recipes": {
+    "blink-pattern": {
+     "project": "blink",
+     "title": "Change the LED pattern on the LP-MSPM0G3507",
+     "outcome": "LED2 red on the board flashes the pattern you asked for, checked by timing the LED pin through the debugger.",
+     "example": "examples/nortos/LP_MSPM0G3507/driverlib/gpio_toggle_output",
+     "source_file": "gpio_toggle_output.c",
+     "build_dir": "ticlang",
+     "image": "ticlang/gpio_toggle_output.out",
+     "led": "LED2 red (PB26)",
+     "default_pattern": "150,150,150,900",
+     "tools": {
+      "sdk": {
+       "kind": "mspm0_sdk",
+       "validated": [
+        "2.11.00.07"
+       ]
+      },
+      "sysconfig": {
+       "kind": "sysconfig",
+       "validated": [
+        "1.28.0"
+       ],
+       "history": "1.28.0 validated 2026-11-09 on the own unit (frl run: build 2.4 s, write and read back 0.6 s, LED2 red PB26 timed to 150,150,150,900 ms, restore matched on read-back)."
+      },
+      "compiler": {
+       "kind": "ticlang",
+       "validated": [
+        "5.1.1.LTS"
+       ]
+      },
+      "make": {
+       "kind": "make"
+      },
+      "openocd": {
+       "kind": "openocd",
+       "validated": [
+        "0.12.0+dev-02228"
+       ],
+       "needs": "target/ti_mspm0.cfg"
+      }
+     },
+     "verify": {
+      "kind": "pattern",
+      "seconds": 4.0,
+      "tolerance_ms": 40
+     },
+     "status": "tested",
+     "next": [],
+     "edit": "pattern",
+     "led_macro": "GPIO_LEDS_USER_LED_2_PIN",
+     "clear_macros": [
+      "GPIO_LEDS_USER_LED_1_PIN",
+      "GPIO_LEDS_USER_LED_2_PIN",
+      "GPIO_LEDS_USER_LED_3_PIN",
+      "GPIO_LEDS_USER_TEST_PIN"
+     ]
+    }
+   },
+   "checks_before_flash": "LED2 needs its jumpers on (as shipped) and the XDS110's debugger jumpers on.",
+   "console": {
+    "baud": 115200,
+    "mac": "/dev/cu.usbmodem{serial}1",
+    "linux": "/dev/serial/by-id/*{serial}*-if00*",
+    "jumpers": "as shipped",
+    "why": "The XDS110's first serial port, as on the LP-MSPM0L1306."
+   }
   }
  },
  "hosts": {

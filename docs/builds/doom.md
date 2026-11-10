@@ -219,5 +219,4 @@ The AM62L draws Doom on its HDMI output with no GPU, and a game pad plays it.
 | | Value | Source |
 |---|---|---|
 | Timing demo | demo1: 185.8 to 192.7 frames a second at 1280 by 1000, 240.6 at 960 by 800, 412.9 at 320 by 200 | `data/results/am62l-evm.csv` |
-| Through Mesa llvmpipe | 6.54 frames a second (Chocolate Doom 3.1.0, one run) | `docs/experiments/2026-10-24-am62l-doom-controller.md` |
 | Build | GCC 14.2.0 -O2 static in a Debian trixie arm64 container, about 75 s on the board | `ports/doom/linux-fb/README.md` |

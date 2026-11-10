@@ -1,4 +1,4 @@
-# Read a machine's run events on a phone, no internet
+# A machine's run events on your phone, no internet
 
 Bluetooth tags on your machines, a Wi-Fi hub and a phone. Read run events, trips and run time with no internet. Built on an LP-EM-CC2340R5 tag and an LP-EM-CC35X1 hub.
 

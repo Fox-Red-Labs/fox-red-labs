@@ -105,7 +105,7 @@ echo "Built in $(( $(date +%s) - START )) s."
 
 # Refuse to flash if the board is not there, or if it is ambiguous which board is meant. Probe serials: CCStudio's
 # xdsdfu when it is installed, else the USB list (system_profiler on macOS, /sys on Linux). The serial is always passed on.
-XDSDFU=/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu
+XDSDFU="${FRL_XDSDFU:-$(python3 "$(cd "$(dirname "$0")/../.." && pwd)/tools/frl/toolpath.py" xdsdfu --optional 2>/dev/null)}"   # CCStudio or UniFlash; absent is fine, the USB list is used
 probe_serials() {
   if [ -x "$XDSDFU" ]; then "$XDSDFU" -e 2>/dev/null | awk '/Serial Num/ {print $3}'; return; fi
   if [ "$OS" = Linux ]; then

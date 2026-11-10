@@ -5,18 +5,22 @@
 //                 the variables named in args (comma list), each read as 32-bit unsigned.
 //                 Also paints the .stack section (from bench.map beside the .out) with 0xA5A5 before
 //                 running and prints stack_used_words (the C28x stack grows up).
+//   mode "go":    load (a flash image is written to flash), start the program, disconnect and leave it running (for a serial console).
 //                 Arg forms: <var>, log:<sym>:<words> (char text), f32:<sym|0xaddr>:<count>:<file> (floats to JSON).
 const { join } = require("path");
 const a = process.argv.slice(process.argv.findIndex(x => x.endsWith(".out")));
 const prog = a[0], mode = a[1] || "blink", args = a[2] || "";
 const ds = initScripting();
-ds.setScriptingTimeout(120000);
+ds.setScriptingTimeout(Number(process.env.C2K_TIMEOUT_MS || 120000));
 ds.configure(join(__dirname, "F2800137_CL371081.ccxml"));
 const s = ds.openSession(/C28xx_CPU1/);
 s.target.connect();
 s.target.reset();
 s.memory.loadProgram(prog);
-if (mode === "blink") {
+if (mode === "go") {
+  s.target.runAsynch();
+  console.log("running");
+} else if (mode === "blink") {
   s.target.run(false);
   const sleep = (ms) => { const t = Date.now(); while (Date.now() - t < ms) {} };
   const out = [];

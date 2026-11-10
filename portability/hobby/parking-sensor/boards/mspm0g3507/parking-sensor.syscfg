@@ -1,0 +1,50 @@
+/**
+ * Hobby build 3 (parking-sensor) on the LP-MSPM0G3507. Written by gen_boards.py from its pin table: do not edit by hand.
+ * UART0 at 115200 on the backchannel pins, GPIO and timer pins from the table, 32 MHz SYSOSC (TI's default clock tree).
+ */
+//@cliArgs --device "MSPM0G350X" --package "LQFP-64(PM)" --part "Default"
+//@v2CliArgs --device "MSPM0G3507" --package "LQFP-64(PM)"
+// @cliArgs --board /ti/boards/LP_MSPM0G3507 --rtos nortos
+
+const Board  = scripting.addModule("/ti/driverlib/Board");
+const SYSCTL = scripting.addModule("/ti/driverlib/SYSCTL");
+const UART   = scripting.addModule("/ti/driverlib/UART", {}, false);
+const UART1  = UART.addInstance();
+const GPIO   = scripting.addModule("/ti/driverlib/GPIO", {}, false);
+const PWM    = scripting.addModule("/ti/driverlib/PWM", {}, false);
+
+UART1.$name                    = "UART_0";
+UART1.peripheral.$assign       = "UART0";
+UART1.peripheral.rxPin.$assign = "PA11";
+UART1.peripheral.txPin.$assign = "PA10";
+UART1.targetBaudRate           = 115200;
+
+const G_TRIG = GPIO.addInstance();
+G_TRIG.$name                         = "GPIO_TRIG";
+G_TRIG.port                          = "PORTB";
+G_TRIG.associatedPins[0].$name       = "TRIG";
+G_TRIG.associatedPins[0].assignedPin = "13";
+G_TRIG.associatedPins[0].pin.$assign = "PB13";
+
+const G_ECHO = GPIO.addInstance();
+G_ECHO.$name                         = "GPIO_ECHO";
+G_ECHO.port                          = "PORTB";
+G_ECHO.associatedPins[0].$name       = "ECHO";
+G_ECHO.associatedPins[0].assignedPin = "20";
+G_ECHO.associatedPins[0].direction        = "INPUT";
+G_ECHO.associatedPins[0].internalResistor = "PULL_UP";
+G_ECHO.associatedPins[0].pin.$assign = "PB20";
+
+const P_BUZZ = PWM.addInstance();
+P_BUZZ.$name                = "PWM_BUZZ";
+P_BUZZ.clockSource          = "BUSCLK";
+P_BUZZ.clockPrescale        = 32;
+P_BUZZ.timerCount           = 20000;
+P_BUZZ.pwmMode              = "EDGE_ALIGN";
+P_BUZZ.ccIndex              = [1];
+P_BUZZ.peripheral.$assign   = "TIMG8";
+P_BUZZ.peripheral.ccp1Pin.$assign = "PB7";
+P_BUZZ.PWM_CHANNEL_1.dutyCycle = 0;
+
+SYSCTL.clockTreeEn = true;
+SYSCTL.forceDefaultClkConfig = true;

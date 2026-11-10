@@ -1,6 +1,6 @@
 # TI IWRL6432BOOST 60 GHz radar on a Mac: the shipped demo's USB stream, parsed in Python
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **It streams presence and point-cloud frames over its USB serial port with no setup: about 4 frames a second, 384 bytes each on the 15 s file, and a few lines of Python parse them.** This folder reads that stream on a Mac. Safety: keep 20 cm between the board and a person while it transmits.
 
@@ -28,7 +28,7 @@ git sparse-checkout add iwrl6432boost tools data
 
 Top silkscreen "PROC117 REV. B"; stickers "IWRL6432BOOST", "ASSY REV A1", "Silicon REV ES2.0". Pictures: `img/top.jpg`, `img/back.jpg`. Switches: S1 (six, SOP0 and SOP1 are positions 1 and 2), S4 (four) and a third one, S5 (two, `XDS_I2C_SW`). As shipped (read 2026-10-09): S1 = 1 ON, 2 OFF, 3 ON, 4 OFF, 5 ON, 6 ON; S4 = 1 OFF, 2 OFF, 3 OFF, 4 ON. SOP0 ON and SOP1 OFF is the application mode, so the demo runs from flash at power-up. Probe: after a DSLite run updated its firmware to 3.0.0.43 it showed `NOserial`; `xdsdfu -n RI32` wrote it back as `RI32RI32` (xdsdfu writes 4 characters onto a 4-character prefix), so the ports are `/dev/cu.usbmodemRI32RI321` and `4`; use those names in the ten-minute path.
 
-Chip ID over JTAG (2026-10-09, DSLite, probe RI32RI32): CFGAP IDCODE 0x2BB8902F (version 2, part 0xBB89, manufacturer TI), DPIDR 0x5BA00477, core Cortex-M4 r0p1 (CPUID 0x410FC241). A dedicated device ID register address is unknown (not in the TRM text). The reset and halt step after the read fails with -2063 and -2062 in the shipped mode.
+Chip ID over JTAG (2026-10-09, DSLite, first unit, probe RI32RI32): CFGAP IDCODE 0x2BB8902F (version 2, part 0xBB89, manufacturer TI), DPIDR 0x5BA00477, core Cortex-M4 r0p1 (CPUID 0x410FC241). A dedicated device ID register address is unknown (not in the TRM text). The reset and halt step after the read fails with -2063 and -2062 in the shipped mode.
 
 Not done: flashing TI's other demos.
 
@@ -58,7 +58,7 @@ There is no build command for this board on a Mac. The shipped image needs no bu
 | Frame rate, shipped Motion and Presence demo | 4.00 frames a second | 115,200 baud, 60 s capture; no frame number missing inside it | measured | `radar_frame_rate` in `data/results/iwrl6432boost.csv`, `iwrl6432boost/captures/2026-10-10-shipped-uart-60s.bin` |
 | Link load of the shipped demo | 1.51 kB/s (about 13 percent of the link) | derived from the 60 s capture; 11.5 kB/s is what 115,200 baud carries | measured | `radar_uart_bandwidth` |
 | Frame size | 384 bytes | shipped demo, 15 s capture, frames 1340 to 1398 back to back | measured | `iwrl6432boost/captures/2026-10-09-shipped-uart-15s.bin` |
-| Chip ID over JTAG | CFGAP IDCODE 0x2BB8902F, DPIDR 0x5BA00477, core Cortex-M4 r0p1 (CPUID 0x410FC241) | DSLite, probe RI32RI32, 2026-10-09 | measured | `iwrl6432boost/IWRL6432.ccxml` |
+| Chip ID over JTAG | CFGAP IDCODE 0x2BB8902F, DPIDR 0x5BA00477, core Cortex-M4 r0p1 (CPUID 0x410FC241) | DSLite, first unit, probe RI32RI32, 2026-10-09 | measured | `iwrl6432boost/IWRL6432.ccxml` |
 | Switch settings as shipped | S1 = 1 ON, 2 OFF, 3 ON, 4 OFF, 5 ON, 6 ON; S4 = 1 OFF, 2 OFF, 3 OFF, 4 ON | read at the bench, 2026-10-09; SOP0 ON and SOP1 OFF is application mode | measured | `img/top.jpg` |
 | Walking-in detection range, 2x3 antenna setting | 6.53 m | Motion and Presence 2D demo, 250 ms frame period, paced walk-in at the first two flagged frames | measured | `radar_detect_range` (presence-walking-2x3) |
 | Seated detection range, 2x3 | 4.0 m | farthest tested distance held in 4 of 5 frames over 40 s; not the 20 of 20 rule | measured | `radar_detect_range` (presence-seated-2x3) |

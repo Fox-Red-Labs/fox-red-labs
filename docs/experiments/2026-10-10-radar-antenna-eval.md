@@ -2,7 +2,7 @@
 id: E178
 board: IWRL6432BOOST
 date: 2026-10-10
-status: in progress
+status: parked
 reached: run
 line: 2x2 and 2x3 ran. The presence demo refuses 1x1 with error -40107. In an empty room neither gave a false alarm in 240 frames. Overnight, 2x3 at a 12-frame hold gave none in 87,602 frames, which is 6.08 h in an empty test room. A person sitting still at 2 m and 4 m was held in 100 percent of frames by both. One pass per cell; walk-in range and hold times are in the write-up.
 stop: tools

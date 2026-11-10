@@ -59,18 +59,22 @@
    "name": "LP-MSPM0L2228",
    "lane": "small",
    "step": "Adds a built-in screen",
-   "plain": "Show numbers on a small LCD, like a meter.",
+   "plain": "Show numbers on the small LCD glass on the board, like a meter, and keep a clock running from a super capacitor.",
    "needs": [
     "display",
     "zephyr"
    ],
    "adds": [
-    "8 times the RAM (32 kB) and 16 times the flash (256 kB)",
-    "Segment LCD on the board",
-    "Zephyr support"
+    "8 times the RAM (32 kB) and 4 times the flash (256 kB) of the L1306",
+    "Segment LCD glass on the board, driven by the chip",
+    "A battery island: real-time clock, tamper pins and a 100 mF super capacitor on the board",
+    "AES and a true random number generator"
    ],
-   "drops": [],
-   "line": "The step up from the L1306 for a meter: a segment LCD on the board, and enough RAM for Zephyr."
+   "drops": [
+    "Still 32 MHz, no FPU and no math accelerator",
+    "Zephyr has the board upstream; not run here yet"
+   ],
+   "line": "The step up from the L1306 for a meter or a clock: a segment LCD on the board, a battery-backed island with a super capacitor, and enough RAM for Zephyr."
   },
   {
    "part": "MSPM0G3507",

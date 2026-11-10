@@ -22,3 +22,5 @@ The text of [site/hardware.html](../site/hardware.html), from `data/boards.csv` 
 | LP-AM263P | 4x Cortex-R5F with TMU | 400 MHz | 32768 kB | 3072 kB | [README](../am263p/README.md) |
 | SK-TDA4VM | 2x Cortex-A72 + C7x/MMA + 2x C66x + 6x R5F | 2000 MHz | 65536 kB | 4194304 kB | [README](../tda4/README.md) |
 | TMDS62LEVM (AM62L EVM) | 2x Cortex-A53 | 1250 MHz | 0 kB | 2097152 kB | [README](../am62l-evm/README.md) |
+| LP-AM243 | 4x Cortex-R5F + Cortex-M4F | 800 MHz | 65536 kB | 2048 kB | [README](../am243x/README.md) |
+| LP-MSPM0L2228 | Cortex-M0+ | 32 MHz | 256 kB | 32 kB | [README](../mspm0l2228/README.md) |

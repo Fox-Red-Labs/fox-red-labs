@@ -1,5 +1,5 @@
 {
- "note": "Words and picks for the home page (tools/render_home.py). Each demo and radio names a project slug in projects.json that has a recipe; the renderer fails if one does not. The rail runs smallest to Linux, with the motor-control F2800137 beside the AM13 (maintainer, 2026-10-30). Each rail stop's id is its row in data/boards.csv (core, clock, flash, RAM for the hover panel); hi is one line on what it is or ran here. Rail lines are the last serial line each board printed in portability/three-ways (shown on site/one-app-eleven-boards.html).",
+ "note": "Words and picks for the home page (tools/render_home.py). clips: the hero mosaic, cut by tools/hero_clips.sh from recordings on project pages (file is the clip name under site/media/hero/clips/). what: the six tiles, each a card drawing from tools/card_anim.py in front and a page picture behind (site/media/home/*.jpg are screenshots of the site's own pages). rail: smallest to Linux, with the motor-control F2800137 beside the AM13 (maintainer, 2026-10-30); id is the row in data/boards.csv, size the drawn board's class, photo the stage picture when no data/boardviz/<id>.json exists, hi one line on what it is or ran here, line the last serial line each board printed in portability/three-ways (site/one-app-eleven-boards.html). demos: six projects with a recipe (the renderer fails if one has none); clip names a hero clip to play on hover. build: the scene the home page scrolls through. drive: the browser tools.",
  "demos": [
   {
    "slug": "doom",
@@ -7,7 +7,8 @@
    "line": "The engine runs on the kit and draws on the BoosterPack's 128 by 128 screen.",
    "board": "LP-MSPM33C321A",
    "img": "media/hero/slides/doom.jpg",
-   "alt": "An LP-MSPM33C321A under the Educational BoosterPack, its small screen showing the Doom title"
+   "alt": "An LP-MSPM33C321A under the Educational BoosterPack, its small screen showing the Doom title",
+   "clip": "doom"
   },
   {
    "slug": "arcade",
@@ -15,7 +16,8 @@
    "line": "Swipe to play 2048 on a 3.5 inch touch screen; Game Boy and more share the project.",
    "board": "LP-MSPM0G3519",
    "img": "media/hero/slides/2048.jpg",
-   "alt": "A finger swiping tiles in 2048 on a 3.5 inch touch screen wired to a development kit"
+   "alt": "A finger swiping tiles in 2048 on a 3.5 inch touch screen wired to a development kit",
+   "clip": "2048"
   },
   {
    "slug": "handwritten-digits",
@@ -23,12 +25,13 @@
    "line": "Draw a digit with your finger and the chip names it on the screen.",
    "board": "LP-MSPM0G3507",
    "img": "media/bitnetmcu-touch-demo-poster.jpg",
-   "alt": "A finger draws a 9 on a small touch screen wired to a LaunchPad; the screen shows its answer"
+   "alt": "A finger draws a 9 on a small touch screen wired to a LaunchPad; the screen shows its answer",
+   "clip": "digit"
   },
   {
    "slug": "radar-presence",
    "title": "Radar presence sensing",
-   "line": "Held a seated person at 2 m and 4 m, one pass each, the farthest distances tried.",
+   "line": "Detected a seated person in every frame at 2 m and 4 m, one pass each, on the two radar settings that ran.",
    "board": "IWRL6432BOOST",
    "img": "media/hero/slides/radar.jpg",
    "alt": "The IWRL6432BOOST radar kit with its LEDs lit"
@@ -36,10 +39,11 @@
   {
    "slug": "linux-vision",
    "title": "A vision model on a Linux board",
-   "line": "14 ready-made vision models run on the board's C7x accelerator; on 8 of them the two Arm CPU cores took 13 to 135 times longer.",
+   "line": "TI's 14 ready-made vision models run on the board's AI accelerator in {{row:tda4/dl_inference_ms/mobilenetv1-mlperf-224-tflitert-tidl-c7x|.0f}} to {{row:tda4/dl_inference_ms/yolox-s-pose-640-onnxrt-tidl-c7x|.0f}} ms each; the 8 that also ran on its two Arm cores took 13 to 135 times longer there.",
    "board": "SK-TDA4VM",
    "img": "media/sk-tda4vm-on-bench.jpg",
-   "alt": "The SK-TDA4VM board with its heatsink, held over the bench with its cables plugged in"
+   "alt": "The SK-TDA4VM board with its heatsink, held over the bench with its cables plugged in",
+   "source": "data/results/tda4.csv"
   },
   {
    "slug": "blink",
@@ -47,13 +51,14 @@
    "line": "Plug in the board, build the blink, then ask for a new pattern in plain English.",
    "board": "LP-MSPM0G3507",
    "img": "media/hero/slides/blink.jpg",
-   "alt": "An MSPM0 G3507 development kit on a wooden bench, USB cable in, a green LED lit"
+   "alt": "An MSPM0 G3507 development kit on a wooden bench, USB cable in, a green LED lit",
+   "clip": "power"
   }
  ],
  "rail": [
   {
    "name": "MSPM0 C1104",
-   "note": "1 kB RAM",
+   "note": "{{board:mspm0c1104/ram_kb}} kB RAM",
    "line": [
     "t=19 adc=549",
     "avg=536"
@@ -62,11 +67,13 @@
    "id": "mspm0c1104",
    "page": "board-mspm0c1104.html",
    "fam": "MSPM0 family",
-   "hi": "The smallest chip here. Blink, a voltage reading and the serial line fit in 1 kB of RAM."
+   "hi": "The smallest chip here. Blink, a voltage reading and the serial line fit in 1 kB of RAM.",
+   "photo": "media/g3507-on-bench.jpg",
+   "photo_alt": "A LaunchPad kit on the bench"
   },
   {
    "name": "MSPM0 L1306",
-   "note": "4 kB RAM",
+   "note": "{{board:mspm0l1306/ram_kb}} kB RAM",
    "line": [
     "t=13 adc=2645",
     "avg=2644"
@@ -75,7 +82,9 @@
    "id": "mspm0l1306",
    "page": "board-mspm0l1306.html",
    "fam": "MSPM0 family",
-   "hi": "The board the start script supports: first blink from a fresh clone."
+   "hi": "The board the start script supports: first blink from a fresh clone.",
+   "photo": "media/start/blink-l1306-usb.jpg",
+   "photo_alt": "An LP-MSPM0L1306 with its USB cable in"
   },
   {
    "name": "MSPM0 G5187",
@@ -88,11 +97,13 @@
    "id": "mspm0g5187",
    "page": "board-mspm0g5187.html",
    "fam": "MSPM0 family",
-   "hi": "An MSPM0 with a neural processing unit; the Sub-1 GHz link and the sensors pack ran here."
+   "hi": "An MSPM0 with a neural processing unit (NPU) for small models; the Sub-1 GHz link and the sensors pack ran here.",
+   "photo": "media/g5187-sensors-boosterpack-bench.jpg",
+   "photo_alt": "The Sensors BoosterPack on an LP-MSPM0G5187"
   },
   {
    "name": "MSPM0 G3519",
-   "note": "128 kB RAM",
+   "note": "{{board:mspm0g3519/ram_kb}} kB RAM",
    "line": [
     "t=14 adc=1085",
     "avg=1085"
@@ -101,11 +112,13 @@
    "id": "mspm0g3519",
    "page": "board-mspm0g3519.html",
    "fam": "MSPM0 family",
-   "hi": "The biggest MSPM0: 2048 on a 3.5 inch touch screen and the thermostat screen ran here."
+   "hi": "The biggest MSPM0 here: 2048 on a 3.5 inch touch screen ran here.",
+   "photo": "media/hero/slides/2048.jpg",
+   "photo_alt": "2048 on a touch screen wired to the LP-MSPM0G3519"
   },
   {
    "name": "MSPM33 C321A",
-   "note": "160 MHz",
+   "note": "{{board:mspm33c321a/clock_mhz}} MHz",
    "line": [
     "t=24 adc=3165",
     "avg=3184"
@@ -114,11 +127,13 @@
    "id": "mspm33c321a",
    "page": "board-mspm33c321a.html",
    "fam": "MSPM33 family",
-   "hi": "A Cortex-M33 at 160 MHz; Doom ran here on the BoosterPack screen."
+   "hi": "A Cortex-M33 at {{board:mspm33c321a/clock_mhz}} MHz; Doom ran here on the BoosterPack screen.",
+   "photo": "media/hero/slides/doom.jpg",
+   "photo_alt": "Doom on the BoosterPack screen on an LP-MSPM33C321A"
   },
   {
    "name": "F2800137",
-   "note": "Motor control, 120 MHz",
+   "note": "Motor control, {{board:f2800137/clock_mhz}} MHz",
    "line": [
     "t=14 adc=2035",
     "avg=2036"
@@ -127,11 +142,13 @@
    "id": "f2800137",
    "page": "board-f2800137.html",
    "fam": "C2000 family",
-   "hi": "A real-time control MCU for motors and power, with its own C28x core instead of an Arm core."
+   "hi": "A real-time control MCU for motors and power, with TI's own C28x processor core instead of an Arm core.",
+   "photo": "media/hero/slides/blink.jpg",
+   "photo_alt": "A LaunchPad kit on the bench"
   },
   {
    "name": "AM13E230",
-   "note": "200 MHz",
+   "note": "{{board:am13e230/clock_mhz}} MHz",
    "line": [
     "t=9 adc=128",
     "avg=128"
@@ -140,7 +157,9 @@
    "id": "am13e230",
    "page": "board-am13e230.html",
    "fam": "AM13 family",
-   "hi": "A real-time control MCU with a neural processing unit; motor control and small models ran here."
+   "hi": "A real-time control MCU with a neural processing unit; motor control and small models ran here.",
+   "photo": "media/am13e230-on-bench.jpg",
+   "photo_alt": "The LP-AM13E230 on the bench"
   },
   {
    "name": "CC2340R5",
@@ -153,7 +172,9 @@
    "id": "cc2340r5",
    "page": "board-cc2340r5.html",
    "fam": "CC23xx radios",
-   "hi": "Bluetooth LE; the gamepad and the asset-tracking tag ran here."
+   "hi": "Bluetooth LE; the gamepad and the asset-tracking tag ran here.",
+   "photo": "media/cc2340r5-blinking.jpg",
+   "photo_alt": "An LP-EM-CC2340R5 beside its probe, LED lit"
   },
   {
    "name": "CC2755P10",
@@ -166,7 +187,9 @@
    "id": "cc2755p10",
    "page": "board-cc2755p10.html",
    "fam": "CC27xx radios",
-   "hi": "Bluetooth LE and 802.15.4 with a +20 dBm radio."
+   "hi": "Bluetooth LE and 802.15.4 with a +20 dBm radio.",
+   "photo": "media/hero/slides/radar.jpg",
+   "photo_alt": "A radio kit on the bench"
   },
   {
    "name": "CC35X1",
@@ -179,7 +202,9 @@
    "id": "cc35x1",
    "page": "board-cc3551e.html",
    "fam": "CC35xx radios",
-   "hi": "Wi-Fi 6 and Bluetooth; the Matter light, the DNS ad blocker and the asset-tracking hub ran here."
+   "hi": "Wi-Fi 6 and Bluetooth; the Matter light, the DNS ad blocker and the asset-tracking hub ran here.",
+   "photo": "media/thermostat-g3519-cc35x1-wired.jpg",
+   "photo_alt": "The LP-EM-CC35X1 wired beside an LP-MSPM0G3519"
   },
   {
    "name": "AM62L",
@@ -192,111 +217,252 @@
    "id": "am62l-evm",
    "page": "board-am62l32.html",
    "fam": "AM62L, Linux",
-   "hi": "Two Arm Cortex-A53 cores running Linux; the same app.c built with GCC and reads the ADC through sysfs."
+   "hi": "Two Arm Cortex-A53 cores running Linux; the same app.c built with GCC and reads its voltage input through a Linux device file.",
+   "photo": "media/am62l/doom-poster.jpg",
+   "photo_alt": "Doom on the AM62L evaluation module"
   }
  ],
- "rail_ends": [
-  "Smallest: 1 kB of RAM, 24 MHz",
-  "Linux: 2 Arm cores, 1.25 GHz"
- ],
- "boards": [
+ "clips": [
   {
-   "name": "LP-MSPM0G3507",
-   "img": "media/g3507-on-bench.jpg",
-   "page": "board-mspm0g3507.html",
-   "alt": "An LP-MSPM0G3507 on a desk with its green power LED on"
+   "file": "doom",
+   "title": "Doom on a Cortex-M33",
+   "board": "LP-MSPM33C321A",
+   "href": "project-doom.html",
+   "alt": "The Doom demo playing on the Educational BoosterPack's small screen on an LP-MSPM33C321A"
   },
   {
-   "name": "LP-EM-CC2340R5",
-   "img": "media/cc2340r5-blinking.jpg",
-   "page": "board-cc2340r5.html",
-   "alt": "An LP-EM-CC2340R5 beside its debug probe, red LED lit"
+   "file": "motor",
+   "title": "A motor spins from a browser",
+   "board": "LP-AM13E230 + DRV8376EVM",
+   "href": "project-bldc-spin.html",
+   "alt": "A small brushless motor turning on the bench, driven by the DRV8376EVM on an LP-AM13E230"
   },
   {
-   "name": "LP-MSPM0G5187",
-   "img": "media/g5187-sensors-boosterpack-bench.jpg",
-   "page": "board-mspm0g5187.html",
-   "alt": "The Sensors BoosterPack plugged on top of an LP-MSPM0G5187"
+   "file": "digit",
+   "title": "Handwriting read on the chip",
+   "board": "LP-MSPM0G3507",
+   "href": "project-handwritten-digits.html",
+   "alt": "A finger draws a digit on a small touch screen and the board names it"
   },
   {
-   "name": "LP-AM13E230",
-   "img": "media/am13e230-on-bench.jpg",
-   "page": "board-am13e230.html",
-   "alt": "An LP-AM13E230 development kit on the bench"
+   "file": "2048",
+   "title": "2048 on a touch screen",
+   "board": "LP-MSPM0G3519",
+   "href": "project-arcade.html",
+   "alt": "A finger swipes tiles in 2048 on a 3.5 inch touch screen wired to a development kit"
   },
   {
-   "name": "IWRL6432BOOST",
-   "img": "media/iwrl6432boost-leds.jpg",
-   "page": "board-iwrl6432.html",
-   "alt": "The IWRL6432BOOST radar board powered over USB, with its antenna area at the left"
+   "file": "jukebox",
+   "title": "A pumpkin that plays songs",
+   "board": "LP-MSPM33C321A + Audio pack",
+   "href": "project-jack-o-lantern-jukebox.html",
+   "alt": "A carved pumpkin lit from inside while the board plays a tune"
   },
   {
-   "name": "LP-EM-CC35X1",
-   "img": "media/thermostat-g3519-cc35x1-wired.jpg",
-   "page": "board-cc3551e.html",
-   "alt": "Development kits wired together on the bench: a Wi-Fi radio kit beside an MSPM0 kit and a radar kit"
+   "file": "gamepad",
+   "title": "A board that is a game controller",
+   "board": "LP-EM-CC2340R5",
+   "href": "project-ble-gamepad.html",
+   "alt": "A Mac's controller test page lights the buttons pressed on the board"
   },
   {
-   "name": "LP-MSPM33C321A",
-   "img": "media/hero/slides/doom.jpg",
-   "page": "board-mspm33c321a.html",
-   "alt": "An LP-MSPM33C321A under the Educational BoosterPack, its small screen showing the Doom title"
+   "file": "power",
+   "title": "First power-up: the blink",
+   "board": "LP-MSPM0G3507",
+   "href": "project-blink.html",
+   "alt": "An LP-MSPM0G3507 plugged in for the first time, its LED blinking"
   },
   {
-   "name": "SK-TDA4VM",
-   "img": "media/sk-tda4vm-on-bench.jpg",
-   "page": "board-tda4.html",
-   "alt": "The SK-TDA4VM board with its heatsink, held over the bench with its cables plugged in"
+   "file": "linuxdoom",
+   "title": "Doom on a Linux processor",
+   "board": "AM62L EVM",
+   "href": "am62l-what-it-runs.html",
+   "alt": "Doom running on the AM62L evaluation module's screen"
   }
  ],
- "radios": [
+ "what": [
   {
-   "slug": "ble-gamepad",
-   "radio": "Bluetooth LE",
-   "title": "Bluetooth gamepad",
-   "line": "A kit that shows up as a game controller on a Mac.",
-   "img": "media/illus/ble-gamepad.svg",
-   "board": "LP-EM-CC2340R5"
+   "verb": "Build a demo",
+   "line": "Each build that ran on a kit has its parts, wiring, steps and the code; one not yet run says so on its page.",
+   "card": "arcade",
+   "href": "projects.html",
+   "back": "media/hero/slides/doom.jpg",
+   "back_cap": "Doom on the MSPM33C321A"
   },
   {
-   "slug": "battery-sensor-home-assistant",
-   "radio": "Zigbee",
-   "title": "Zigbee sensor",
-   "line": "A Zigbee temperature sensor on a CC1354P10 joins Home Assistant and answers 20 of 20 reads. Battery life has no number.",
-   "img": "media/illus/battery-sensor-home-assistant.svg",
-   "board": "LP-CC1354P10-1"
+   "verb": "Bring your code",
+   "line": "Arduino, ESPHome, Zephyr, MicroPython, STM32, ESP32 and Pico code on a TI board: a port is code written for another board, moved over.",
+   "card": "arduino",
+   "href": "ports.html",
+   "back": "media/home/ports.jpg",
+   "back_cap": "Every port: what ran, what changed"
   },
   {
-   "slug": "matter-device",
-   "radio": "Matter over Wi-Fi",
-   "title": "Matter light",
-   "line": "Appears in Apple Home as a light you switch from the phone.",
-   "img": "media/apple-home-matter-light.png",
-   "board": "LP-EM-CC35X1"
+   "verb": "Measure it",
+   "line": "Every board on the same tests, with the method behind each number.",
+   "card": "speed-test",
+   "href": "benchmarks.html",
+   "back": "media/home/benchmarks.jpg",
+   "back_cap": "The benchmarks, by board"
   },
   {
-   "slug": "sub-ghz-link",
-   "radio": "Sub-1 GHz",
-   "title": "Sub-1 GHz link",
-   "line": "Sensor readings at 915 MHz to a second board: 21,658 of 21,658 packets.",
-   "img": "media/illus/sub-ghz-link.svg",
-   "board": "LP-MSPM0G5187 + CC1407P"
+   "verb": "Drive it from the browser",
+   "line": "Flash a board, read its pins and memory, flash a motor demo. Chrome and a USB cable, nothing to install.",
+   "card": "build-from-terminal",
+   "href": "flash/bench/index.html",
+   "back": "media/home/digital-lab.jpg",
+   "back_cap": "The Digital Lab"
   },
   {
-   "slug": "dns-ad-blocker",
-   "radio": "Wi-Fi",
-   "title": "DNS ad blocker",
-   "line": "A Wi-Fi board answers 0.0.0.0 for 71,492 ad and tracker names.",
-   "img": "svg:dns",
-   "board": "LP-EM-CC35X1"
+   "verb": "Run a small model on the chip",
+   "line": "Occupancy, digit and vision models, timed on each board.",
+   "card": "small-ai-model",
+   "href": "edge-ai.html",
+   "back": "media/bitnetmcu-touch-demo-poster.jpg",
+   "back_cap": "A digit read on an MSPM0"
   },
   {
-   "slug": "tool-telemetry",
-   "radio": "Bluetooth LE",
-   "title": "Asset tracking",
-   "line": "A Bluetooth tag on each machine and a Wi-Fi hub carried 283 of 283 events to a phone app, no internet.",
-   "img": "media/illus/tool-telemetry.svg",
-   "board": "LP-EM-CC2340R5 + LP-EM-CC35X1"
+   "verb": "Share what you built",
+   "line": "Post it and it gets a page here, beside the lab's own.",
+   "card": "print-a-message",
+   "href": "community.html",
+   "back": "media/g3507-touch-screen-logo.jpg",
+   "back_cap": "Your build, its page"
+  }
+ ],
+ "build": {
+  "scene": "arcade-touch",
+  "heading": "Every build, step by step",
+  "sub": "Drawn from the recipe's wiring table: thirteen jumper wires from the touch panel to the LaunchPad, in the recipe's order. Scroll and the build keeps pace with the steps.",
+  "href": "project-arcade.html",
+  "go": "The 2048 build"
+ },
+ "drive": [
+  {
+   "img": "media/home/digital-lab.jpg",
+   "title": "Digital Lab",
+   "line": "Plug in a board, pick a demo, read the result off its pins and memory. Chrome and a USB cable, nothing to install.",
+   "href": "flash/bench/index.html",
+   "alt": "The Digital Lab page: connect a board, pick a demo, watch it work"
+  },
+  {
+   "img": "media/home/motor-console.jpg",
+   "title": "Motor console",
+   "line": "Set a speed, watch the phase currents and the speed trace, compare a run to the predicted speed.",
+   "href": "motor-console.html",
+   "alt": "The motor console page with its speed slider and current traces"
+  },
+  {
+   "img": "media/tool-telemetry-dashboard.png",
+   "title": "Tool telemetry dashboard",
+   "line": "Which machine ran, for how long, from a Bluetooth tag on each one.",
+   "href": "project-tool-telemetry.html",
+   "alt": "The tool telemetry dashboard with a row per machine"
+  },
+  {
+   "img": "media/motor-phone-and-console.png",
+   "title": "On your phone",
+   "line": "The console beside the real motor; the same page on a phone drives it.",
+   "href": "motor-console.html",
+   "alt": "A phone showing the motor console beside the motor on the bench"
+  }
+ ],
+ "wall": [
+  {
+   "kind": "clip",
+   "file": "doom",
+   "title": "Doom on a Cortex-M33",
+   "board": "LP-MSPM33C321A",
+   "href": "project-doom.html",
+   "alt": "The Doom demo playing on the Educational BoosterPack's small screen on an LP-MSPM33C321A"
+  },
+  {
+   "kind": "clip",
+   "file": "motor",
+   "title": "A motor spins from a browser",
+   "board": "LP-AM13E230 + DRV8376EVM",
+   "href": "project-bldc-spin.html",
+   "alt": "A small brushless motor turning on the bench, driven by the DRV8376EVM on an LP-AM13E230"
+  },
+  {
+   "kind": "draw",
+   "file": "card-radar-presence",
+   "title": "Presence from a radar",
+   "board": "IWRL6432BOOST",
+   "href": "project-radar-presence.html",
+   "alt": "Drawing: a radar board sends a beam into a room and a person walking in lights the zone"
+  },
+  {
+   "kind": "clip",
+   "file": "digit",
+   "title": "Handwriting read on the chip",
+   "board": "LP-MSPM0G3507",
+   "href": "project-handwritten-digits.html",
+   "alt": "A finger draws a digit on a small touch screen and the board names it"
+  },
+  {
+   "kind": "clip",
+   "file": "2048",
+   "title": "2048 on a touch screen",
+   "board": "LP-MSPM0G3519",
+   "href": "project-arcade.html",
+   "alt": "A finger swipes tiles in 2048 on a 3.5 inch touch screen wired to a development kit"
+  },
+  {
+   "kind": "draw",
+   "file": "card-small-ai-model",
+   "title": "A small model on the chip",
+   "board": "LP-MSPM0G3507",
+   "href": "project-small-ai-model.html",
+   "alt": "Drawing: a kit reads three sensors and a small neural network on the chip names the room's state"
+  },
+  {
+   "kind": "clip",
+   "file": "jukebox",
+   "title": "A pumpkin that plays songs",
+   "board": "LP-MSPM33C321A + Audio pack",
+   "href": "project-jack-o-lantern-jukebox.html",
+   "alt": "A carved pumpkin lit from inside while the board plays a tune"
+  },
+  {
+   "kind": "draw",
+   "file": "card-reaction-time",
+   "title": "Reaction time on a scope",
+   "board": "LP-MSPM0G3507",
+   "href": "project-reaction-time.html",
+   "alt": "Drawing: a kit's button press and LED edge on an oscilloscope, the gap between them measured"
+  },
+  {
+   "kind": "draw",
+   "file": "mspm0g3507-blink",
+   "title": "First blink",
+   "board": "LP-MSPM0G3507",
+   "href": "project-blink.html",
+   "alt": "Drawing: a kit on the bench with its LED lit, the first program running"
+  },
+  {
+   "kind": "clip",
+   "file": "power",
+   "title": "First power-up: the blink",
+   "board": "LP-MSPM0G3507",
+   "href": "project-blink.html",
+   "alt": "An LP-MSPM0G3507 plugged in for the first time, its LED blinking"
+  },
+  {
+   "kind": "draw",
+   "file": "card-walkie-talkies",
+   "title": "Walkie-talkies on two radios",
+   "board": "LP-EM-CC2340R5",
+   "href": "project-walkie-talkies.html",
+   "alt": "Drawing: two handheld radios talking, built on two radio kits"
+  },
+  {
+   "kind": "clip",
+   "file": "linuxdoom",
+   "title": "Doom on a Linux processor",
+   "board": "AM62L EVM",
+   "href": "am62l-what-it-runs.html",
+   "alt": "Doom running on the AM62L evaluation module's screen"
   }
  ]
 }

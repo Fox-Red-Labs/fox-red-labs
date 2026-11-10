@@ -50,7 +50,7 @@ The same tool runs on macOS, Linux and Windows. Only the first command, the inst
 | Board's serial port | `/dev/cu.usbmodem<serial>1` | `/dev/ttyACM0` (by name: `/dev/serial/by-id/*<serial>*-if00*`) | `COM<n>`, named "XDS110 Class Application/User UART" in Device Manager |
 | Tested | the whole route, on the board | the dry run, `doctor`, `detect` and the tests, in a fresh Ubuntu 24.04 container; no board flashed | not run; the reader copy's CI runs the dry run and checks on `windows-latest` |
 
-A tool in another folder: set `FRL_TI_ROOT` to the folder that holds TI's tools, or one variable per tool (`FRL_MSPM0_SDK`, `FRL_SYSCONFIG`, `FRL_TICLANG`, `FRL_OPENOCD`, `FRL_MAKE`). `python3 tools/frl/frl.py doctor --board mspm0l1306` names each missing tool with the folder it expects on your computer. `mac-setup/bootstrap.sh` installs on macOS only; on Linux and Windows it points you to `doctor`.
+A tool in another folder: set `FRL_TI_ROOT` to the folder that holds TI's tools, or one variable per tool (`FRL_MSPM0_SDK`, `FRL_MSPM33_SDK`, `FRL_AM13_SDK`, `FRL_F3_SDK`, `FRL_WIFI_SDK`, `FRL_SYSCONFIG`, `FRL_TICLANG`, `FRL_DSLITE`, `FRL_OPENOCD`, `FRL_TI_OPENOCD`, `FRL_MAKE`). Every build and flash script a project page names reads them, through `python3 tools/frl/toolpath.py <tool>`, so none depends on where this bench installed its tools. `python3 tools/frl/frl.py doctor --board mspm0l1306` names each missing tool with the folder it expects on your computer. `mac-setup/bootstrap.sh` installs on macOS only; on Linux and Windows it points you to `doctor`.
 
 ### Linux: let your user open the probe
 

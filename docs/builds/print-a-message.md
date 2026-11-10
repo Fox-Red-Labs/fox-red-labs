@@ -105,3 +105,323 @@ A line of text from the chip appears in a terminal window on your Mac every time
 | Example | TI's uart_tx_console_multibyte_repeated_fifo_dma for LP_MSPM0L1306: UART0 on PA8 (TX) and PA9 (RX) through the DMA, timer-driven; verdict running, 195 bytes read, flash 2.3 s, in the sweep |  |
 | Serial settings | UART0, 115200 8N1, on the probe port whose name ends in 1 | `mspm0l1306/FAQ.md` |
 | Tools | MSPM0 SDK 2.11.00.07, TI Arm Clang 5.1.1.LTS, xPack OpenOCD 0.12.0-7, Intel Mac on macOS 15.7.9 | `mspm0l1306/README.md` |
+
+## From a terminal, no AI step, on the LP-EM-CC2340R5
+
+One command backs the board up, builds TI's example with your message in it, flashes it and reads the message back on the serial port.
+
+Status: Works. Boards: cc2340r5.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `cc2340r5/AGENTS.md`):
+
+```bash
+git sparse-checkout add cc2340r5 tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-EM-CC2340R5 LaunchPad development kit | 1 | the board (LP-EM-CC2340R5) |
+| LP-XDS110ET debugger | 1 | debug probe |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [SimpleLink Low Power F3 SDK 9.21.00.36](https://www.ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK), [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.28.0](https://www.ti.com/tool/download/SYSCONFIG), [TI OpenOCD (CCSTUDIO-OPENOCD) 1.5.0](https://www.ti.com/tool/download/CCSTUDIO-OPENOCD/1.5.0), [DSLite (in CCStudio or UniFlash) 21.0.0.4166](https://www.ti.com/tool/download/UNIFLASH). The tool sizes were not all recorded. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board cc2340r5` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Connect the LP-XDS110ET probe to the LP-EM board and plug the probe into the Mac with a USB data cable. The probe's serial port that carries the message is the first of its two. Read its serial number with `ls /dev/cu.usbmodem*` or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e`.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the route with your probe's serial number and your message (1 to 40 plain characters, no quotes or backslashes). It backs the board up, copies TI's example (examples/nortos/LP_EM_CC2340R5/drivers/display), puts your text in one line of its source, builds it, flashes it and reads the board's serial port at 115200 baud.
+
+   ```text
+   ./start.sh cc2340r5 print-a-message --probe <serial> --message "Hello from my LaunchPad"
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and says the board printed your message on the serial port, counting how many times it saw it.
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. Every write erases the whole chip, CCFG included; frl says so before writing and the restore writes the backup back.
+
+4. **Terminal.** Run it again with different words. The check looks for the message you asked for, so a message the board is not printing fails.
+
+   ```text
+   ./start.sh cc2340r5 print-a-message --probe <serial> --message "Second message"
+   ```
+
+   You should see: A new `OK:` line with the new words.
+
+   If it answers FRL-E040, the serial port shows other text than the message you asked for.
+
+### Expected result
+
+The board prints your message on its serial port, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's display example builds, flashes and prints your own words on the LP-EM-CC2340R5 from one command.
+- The run reads the board's serial port and checks the words you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The route lists the CC2340R5 print recipe as tested on the bench the page was written on, with one probe.
+- Checked on an Intel Mac on macOS 15.7 only.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| Write | 9.2 s median of three DSLite writes (9.8, 9.2, 8.8 s); build of TI's drivers/display about 10 s | `docs/frl.md` |
+
+## From a terminal, no AI step, on the LP-MSPM33C321A
+
+One command backs the board up, builds TI's UART console example with your message in it, flashes it and reads the message back on the serial port.
+
+Status: Works. Boards: mspm33c321a.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `mspm33c321a/AGENTS.md`):
+
+```bash
+git sparse-checkout add mspm33c321a tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-MSPM33C321A LaunchPad development kit | 1 | the board (LP-MSPM33C321A) |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [MSPM33 SDK 1.04.00.00](https://www.ti.com/tool/download/MSPM33-SDK), [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.28.0](https://www.ti.com/tool/download/SYSCONFIG), [TI OpenOCD (CCSTUDIO-OPENOCD) 1.5.0](https://www.ti.com/tool/download/CCSTUDIO-OPENOCD/1.5.0). The tool sizes were not all recorded. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board mspm33c321a` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Plug the board into the Mac with a data cable. The board shows up as an XDS110 probe with two serial ports; the first carries the message. Read your probe's serial number with `ls /dev/cu.usbmodem*` (the text after `usbmodem`, minus the last digit), or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e`.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the route with your probe's serial number and your message (1 to 40 plain characters, no quotes or backslashes). It backs the board up, copies TI's example (examples/nortos/LP_MSPM33C321A/driverlib/uart_tx_console_multibyte_repeated_fifo_dma), puts your text in one line of its source, builds it, flashes it and reads the board's serial port at 115200 baud.
+
+   ```text
+   ./start.sh mspm33c321a print-a-message --probe <serial> --message "Hello from my LaunchPad"
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and says the board printed your message on the serial port, counting how many times it saw it.
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. xPack OpenOCD 0.12.0-7 has no MSPM33 flash driver; the route needs TI's OpenOCD, unpacked to `~/ti/ti-openocd` or named with `FRL_TI_OPENOCD`. TI's example sends five lines, one a second, then stops, so the check counts a few repeats.
+
+4. **Terminal.** Run it again with different words. The check looks for the message you asked for, so a message the board is not printing fails.
+
+   ```text
+   ./start.sh mspm33c321a print-a-message --probe <serial> --message "Second message"
+   ```
+
+   You should see: A new `OK:` line with the new words.
+
+   If it answers FRL-E040, the serial port shows other text than the message you asked for.
+
+### Expected result
+
+The board prints your message on its serial port, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's UART console example builds, flashes and prints your own words on the LP-MSPM33C321A from one command.
+- The run reads the board's serial port and checks the words you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The route lists the MSPM33C321A print recipe as tested on the bench the page was written on, with one probe.
+- Checked on an Intel Mac on macOS 15.7 only.
+- The recorded runs used a build of TI's OpenOCD `ti-release` branch at commit cb22a31e.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| Write | 0.7 to 0.8 s for the OpenOCD write and read-back (0.7, 0.8, 0.7 s); build 3.2 to 4.2 s; whole route 28 to 30 s with the backup | `data/results/mspm33c321a.csv` |
+
+## From a terminal, no AI step, on the LP-EM-CC35X1
+
+One command backs the board up, builds TI's example with your message in it, flashes it and reads the message back on the serial port.
+
+Status: Works. Boards: cc35x1.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `cc35x1/AGENTS.md`):
+
+```bash
+git sparse-checkout add cc35x1 tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-EM-CC35X1 LaunchPad development kit | 1 | the board (LP-EM-CC35X1) |
+| LP-XDS110ET debugger | 1 | debug probe |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [SimpleLink Wi-Fi SDK 10.20.00.39](https://www.ti.com/tool/download/SIMPLELINK-WIFI-SDK), SimpleLink Wi-Fi Toolbox 4.3.23, [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.28.0](https://www.ti.com/tool/download/SYSCONFIG). The tool sizes were not all recorded. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board cc35x1` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Connect an LP-XDS110ET or LP-XDS110 probe to the LP-EM-CC35X1 and power the board from its own USB-C cable. Plug the probe into the Mac with a USB data cable. Read its serial number with `ls /dev/cu.usbmodem*` or with `xdsdfu -e`.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the route with your probe's serial number and your message (1 to 40 plain characters, no quotes or backslashes). It backs the board up, copies TI's example (examples/rtos/LP_EM_CC35X1/drivers/uart2echo), puts your text in one line of its source, builds it, flashes it and reads the board's serial port at 115200 baud.
+
+   ```text
+   ./start.sh cc35x1 print-a-message --probe <serial> --message "Hello from my LaunchPad"
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and says the board printed your message on the serial port, counting how many times it saw it.
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. The chip keeps its program in external flash behind its security and the Toolbox has no read-back, so the backup saves the fuse report, the chip's unique ID and the running program's banner, and the restore reprograms the image the board had.
+
+4. **Terminal.** Run it again with different words. The check looks for the message you asked for, so a message the board is not printing fails.
+
+   ```text
+   ./start.sh cc35x1 print-a-message --probe <serial> --message "Wi-Fi 6 board says hi"
+   ```
+
+   You should see: A new `OK:` line with the new words.
+
+   If it answers FRL-E040, the serial port shows other text than the message you asked for.
+
+### Expected result
+
+The board prints your message on its serial port, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's uart2echo example builds, flashes and prints your own words on the LP-EM-CC35X1 from one command.
+- The run reads the board's serial port and checks the words you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The chip has no read-back, so the check proves the message on the serial port, not the flash contents.
+- The recipe's status for this board is partial for that reason.
+- Checked on an Intel Mac on macOS 15.7 only.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| Write | Toolbox write 23.3 s median of three (23.9, 24.2, 23.3 s); build and sign about 45 s; whole runs 66, 61 and 71 s | `docs/frl.md` |
+
+## From a terminal, no AI step, on the LAUNCHXL-F2800137
+
+One command backs the board up, builds TI's launchxl_f2800137 demo with your message in it, flashes it and reads the message back on the serial port.
+
+Status: Works. Boards: f2800137.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `c2000-launchpad/AGENTS.md`):
+
+```bash
+git sparse-checkout add c2000-launchpad tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LAUNCHXL-F2800137 LaunchPad development kit | 1 | the board (LAUNCHXL-F2800137) |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [C2000Ware 26.02.00.00](https://www.ti.com/tool/download/C2000WARE), TI C2000 compiler 25.11.1.LTS, [SysConfig 1.28.1](https://www.ti.com/tool/download/SYSCONFIG), [CCStudio 21.0.1](https://www.ti.com/tool/download/CCSTUDIO). OpenOCD has no C28x support, so this route needs CCStudio installed for its scripting; the doctor command lists what is missing. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board <board id>` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Plug the board into the Mac with a USB data cable. Its onboard XDS110 probe shows up with serial ports; there is no driver to install. Read the probe's serial number with `ls /dev/cu.usbmodem*` or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e`.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the route with your probe's serial number and your message (1 to 40 plain characters, no quotes or backslashes). It backs the board up, copies TI's example (driverlib/f280013x/examples/launchxl_f2800137), puts your text in one line of its source, builds it, flashes it and reads the board's serial port at 115200 baud.
+
+   ```text
+   ./start.sh f2800137 print-a-message --probe <serial> --message "Hello from my LaunchPad"
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and says the board printed your message on the serial port, counting how many times it saw it.
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. TI's demo prints a line a second and never stops, so the check counts a few repeats.
+
+4. **Terminal.** Run it again with different words. The check looks for the message you asked for, so a message the board is not printing fails.
+
+   ```text
+   ./start.sh f2800137 print-a-message --probe <serial> --message "Second message"
+   ```
+
+   You should see: A new `OK:` line with the new words.
+
+   If it answers FRL-E040, the serial port shows other text than the message you asked for.
+
+### Expected result
+
+The board prints your message on its serial port, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's LaunchPad demo, edited by the route, prints your own words on the LAUNCHXL-F2800137 from one command.
+- The run reads the board's serial port and checks the words you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The route lists the F2800137 print recipe as tested on the bench the page was written on, with one probe.
+- Checked on an Intel Mac on macOS 15.7 only.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| Write | 11.2 to 14.0 s for the CCStudio flash write and read-back (14.0, 11.2, 12.9 s); build 1.1 to 2.9 s; whole route 67 to 73 s with the backup | `data/results/f2800137.csv` |

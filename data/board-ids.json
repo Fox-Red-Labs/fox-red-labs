@@ -1,24 +1,28 @@
 {
- "note": "The board id is the basename of data/results/<id>.csv (data/README.md, 'Board ids'). This file holds the only exceptions: short ids and page ids that older data files and the renderers still use, each mapped to the real id, and boards that have no results file yet. tools/board_ids.py --check fails on any other id.",
- "aliases": {
-  "g3507": "mspm0g3507",
-  "l1306": "mspm0l1306",
-  "c1104": "mspm0c1104",
-  "g3519": "mspm0g3519",
-  "g5187": "mspm0g5187",
-  "tda4vm": "tda4",
-  "cc3551e": "cc35x1",
-  "iwrl6432aop": "iwrl6432boost",
-  "am62l": "am62l-evm"
- },
- "alias_reasons": {
-  "g3507, l1306, c1104, g3519, g5187": "short ids in site/data/projects.json cells; tools/render_projects.py RESULT_BOARD and the id helper map them to the long ids",
-  "tda4vm": "id in site/data/ports.json; tools/render_ports.py FOLDER_ID maps it",
-  "cc3551e, iwrl6432aop": "board page ids (site/board-cc3551e.html, site/board-iwrl6432aop.html) that site/data/code.json is keyed by; tools/render_ports.py FOLDER_ID maps them",
-  "am62l": "short id used by the Doom and hub data in site/data/projects.json for the TMDS62LEVM (results file am62l-evm.csv)"
- },
- "no_results_yet": [
-  "nucleo-g071rb",
-  "am62l-evm"
- ]
+  "note": "The board id is the basename of data/results/<id>.csv (data/README.md, 'Board ids'). This file holds the only exceptions: short ids and page ids that older data files and the renderers still use, each mapped to the real id, and boards that have no results file yet. tools/board_ids.py --check fails on any other id.",
+  "aliases": {
+    "g3507": "mspm0g3507",
+    "l1306": "mspm0l1306",
+    "c1104": "mspm0c1104",
+    "g3519": "mspm0g3519",
+    "g5187": "mspm0g5187",
+    "l2228": "mspm0l2228",
+    "tda4vm": "tda4",
+    "cc3551e": "cc35x1",
+    "iwrl6432aop": "iwrl6432boost",
+    "am62l": "am62l-evm",
+    "am62l32": "am62l-evm"
+  },
+  "alias_reasons": {
+    "g3507, l1306, c1104, g3519, g5187, l2228": "short ids in site/data/projects.json cells; tools/render_projects.py RESULT_BOARD and the id helper map them to the long ids",
+    "tda4vm": "id in site/data/ports.json; tools/render_ports.py FOLDER_ID maps it",
+    "cc3551e, iwrl6432aop": "board page ids (site/board-cc3551e.html, site/board-iwrl6432aop.html) that site/data/code.json is keyed by; tools/render_ports.py FOLDER_ID maps them",
+    "am62l": "short id used by the Doom and hub data in site/data/projects.json for the TMDS62LEVM (results file am62l-evm.csv)",
+    "am62l32": "board page id (site/board-am62l32.html); tools/render_home.py counts() maps it"
+  },
+  "no_results_yet": [
+    "nucleo-g071rb",
+    "am62l-evm",
+    "am243x"
+  ]
 }

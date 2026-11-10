@@ -1,0 +1,372 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner on the component side (the back of the module), x right, y up. The glass hangs under the board (side bottom). The module has no 40-pin header: it has a 15-way connector (Interface 2) at 1.25 mm pitch, drawn with the fpc part at its real pitch; its pins are the wire ends and tap targets. Positions measured from the lab's photo of the back of the module and Waveshare's dimension drawing.",
+ "board": "Waveshare 3.5 inch capacitive touch LCD",
+ "id": "waveshare-35-touch",
+ "source": "Outline, glass and hole sizes from Waveshare's dimension drawing (3.5inch-Capacitive-Touch-LCD-details-size.jpg, wiki: 3.5inch Capacitive Touch LCD); part positions and colors from the lab's photo of the module's back (site/media/parts/waveshare-35-touch.jpg); pin names from the silkscreen and the wiki's 15-pin table.",
+ "size": [
+  83.44,
+  55.16
+ ],
+ "color": "#163f82",
+ "corner": 2.0,
+ "holes": [
+  [
+   4.8,
+   50.4,
+   3.0
+  ],
+  [
+   78.64,
+   50.4,
+   3.0
+  ],
+  [
+   4.8,
+   4.8,
+   3.0
+  ],
+  [
+   78.64,
+   4.8,
+   3.0
+  ]
+ ],
+ "silk": [
+  {
+   "t": "3.5inch Capacitive Touch LCD",
+   "x": 32.0,
+   "y": 51.0,
+   "s": 2.2
+  },
+  {
+   "t": "320x480 Pixels",
+   "x": 22.0,
+   "y": 47.6,
+   "s": 1.5
+  },
+  {
+   "t": "Interface 2",
+   "x": 3.2,
+   "y": 27.6,
+   "s": 1.4,
+   "rot": 90
+  },
+  {
+   "t": "Interface 1",
+   "x": 79.6,
+   "y": 27.1,
+   "s": 1.3,
+   "rot": 90
+  }
+ ],
+ "parts": [
+  {
+   "id": "screen",
+   "type": "glass",
+   "x": 44.6,
+   "y": 27.6,
+   "w": 92.44,
+   "h": 61.0,
+   "d": 3.0,
+   "color": "#0b0b0e",
+   "side": "bottom",
+   "label": "Screen",
+   "title": "3.5 inch glass and touch panel",
+   "text": "The 320 x 480 color screen with a finger-touch layer on top, in a black glass face 92 x 61 mm. It sits on the far side of this board, so it shows from underneath. The picture area is 73.4 x 49.0 mm.",
+   "aw": 73.44,
+   "ah": 48.96,
+   "corner": 3.0
+  },
+  {
+   "id": "fpc15",
+   "type": "fpc",
+   "x": 6.3,
+   "y": 27.5,
+   "cols": 1,
+   "rows": 15,
+   "names": [
+    [
+     "VCC"
+    ],
+    [
+     "3V3"
+    ],
+    [
+     "GND"
+    ],
+    [
+     "MISO"
+    ],
+    [
+     "MOSI"
+    ],
+    [
+     "SCLK"
+    ],
+    [
+     "SD_CS"
+    ],
+    [
+     "LCD_CS"
+    ],
+    [
+     "LCD_DC"
+    ],
+    [
+     "LCD_RST"
+    ],
+    [
+     "LCD_BL"
+    ],
+    [
+     "TP_SDA"
+    ],
+    [
+     "TP_SCL"
+    ],
+    [
+     "TP_INT"
+    ],
+    [
+     "TP_RST"
+    ]
+   ],
+   "pinno": [
+    [
+     "1"
+    ],
+    [
+     "2"
+    ],
+    [
+     "3"
+    ],
+    [
+     "4"
+    ],
+    [
+     "5"
+    ],
+    [
+     "6"
+    ],
+    [
+     "7"
+    ],
+    [
+     "8"
+    ],
+    [
+     "9"
+    ],
+    [
+     "10"
+    ],
+    [
+     "11"
+    ],
+    [
+     "12"
+    ],
+    [
+     "13"
+    ],
+    [
+     "14"
+    ],
+    [
+     "15"
+    ]
+   ],
+   "label": "Interface 2",
+   "title": "Interface 2, 15-way connector",
+   "text": "The only header you wire to: power, the screen's SPI lines, the touch chip's I2C lines and a memory card select. A 15-way 1.25 mm pitch connector, not a 40-pin Raspberry Pi header; the lab's cable plugs into it with a white housing.",
+   "key": true,
+   "pitch": 1.25,
+   "wall": 1.4,
+   "color": "#efece4"
+  },
+  {
+   "type": "block",
+   "x": 17.6,
+   "y": 11.4,
+   "w": 10.8,
+   "h": 10.6,
+   "d": 0.25,
+   "color": "#c9742a"
+  },
+  {
+   "id": "ft6336u",
+   "type": "qfn",
+   "x": 18.3,
+   "y": 11.8,
+   "size": 5.5,
+   "label": "Touch chip",
+   "title": "FT6336U touch controller",
+   "text": "Reads the touch panel and reports finger positions over I2C (TP_SDA and TP_SCL). TP_INT tells the host a touch is waiting; TP_RST resets it. It sits on the panel's own orange flex tail.",
+   "key": true
+  },
+  {
+   "id": "xlat",
+   "type": "block",
+   "x": 61.1,
+   "y": 42.2,
+   "w": 4.5,
+   "h": 6.5,
+   "d": 1.1,
+   "color": "#2e2f33",
+   "label": "Level translator",
+   "title": "Level translator",
+   "text": "A chip that matches the logic lines to the supply you give it, 3.3 V or 5 V. Waveshare says supply and signal voltage must be the same."
+  },
+  {
+   "id": "sd",
+   "type": "block",
+   "x": 55.5,
+   "y": 6.8,
+   "w": 15.8,
+   "h": 15.0,
+   "d": 2.2,
+   "color": "#c2c5ca",
+   "label": "microSD slot",
+   "title": "microSD card slot",
+   "text": "A memory card socket for pictures and files. Its select line is SD_CS on Interface 2. The 2048 demo does not use it."
+  },
+  {
+   "id": "lcdfpc",
+   "type": "block",
+   "x": 33.9,
+   "y": 36.9,
+   "w": 6.0,
+   "h": 19.4,
+   "d": 2.0,
+   "color": "#e9e7e0",
+   "label": "Screen flex socket",
+   "title": "Screen flex socket, 30 way",
+   "text": "The screen's flat flex cable plugs in here. Nothing to wire."
+  },
+  {
+   "type": "block",
+   "x": 74.5,
+   "y": 25.9,
+   "w": 5.5,
+   "h": 12.0,
+   "d": 2.0,
+   "color": "#e9e7e0"
+  },
+  {
+   "type": "block",
+   "x": 38.3,
+   "y": 13.8,
+   "w": 6.5,
+   "h": 4.8,
+   "d": 1.5,
+   "color": "#e9e7e0"
+  },
+  {
+   "type": "sot23",
+   "x": 49.6,
+   "y": 42.7
+  },
+  {
+   "type": "sot23",
+   "x": 73.4,
+   "y": 14.1,
+   "rot": 0
+  },
+  {
+   "type": "sot23",
+   "x": 60.8,
+   "y": 25.3
+  },
+  {
+   "type": "sot23",
+   "x": 60.8,
+   "y": 21.5
+  },
+  {
+   "type": "bigcap",
+   "x": 4.8,
+   "y": 50.4,
+   "d": 5.0,
+   "h": 6.0,
+   "color": "#b5703a"
+  },
+  {
+   "type": "bigcap",
+   "x": 78.64,
+   "y": 50.4,
+   "d": 5.0,
+   "h": 6.0,
+   "color": "#b5703a"
+  },
+  {
+   "type": "bigcap",
+   "x": 4.8,
+   "y": 4.8,
+   "d": 5.0,
+   "h": 6.0,
+   "color": "#b5703a"
+  },
+  {
+   "type": "bigcap",
+   "x": 78.64,
+   "y": 4.8,
+   "d": 5.0,
+   "h": 6.0,
+   "color": "#b5703a"
+  }
+ ],
+ "decor": [
+  {
+   "type": "chip",
+   "x": 48.0,
+   "y": 44.6,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 48.0,
+   "y": 42.0,
+   "len": 2.0,
+   "w": 1.2,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 57.0,
+   "y": 38.6,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 57.0,
+   "y": 30.6,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 64.8,
+   "y": 30.2,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 66.5,
+   "y": 13.5,
+   "len": 2.0,
+   "w": 1.2
+  },
+  {
+   "type": "chip",
+   "x": 77.0,
+   "y": 13.5,
+   "len": 2.0,
+   "w": 1.2
+  }
+ ]
+}

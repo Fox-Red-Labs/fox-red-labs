@@ -2,45 +2,41 @@
 
 Terms: [docs/vocab.md](../docs/vocab.md). 1 kB = 1,024 bytes. Measured on the board, 2026-10-08.
 
-## Can the MSPM0G3519 be flashed with OpenOCD from a Mac?
+## Connecting and flashing
+
+### Can the MSPM0G3519 be flashed with OpenOCD from a Mac?
 
 Yes. The xPack OpenOCD 0.12.0-7 build used elsewhere in this repo has no MSPM0G3519 in its part table, and prints `Unidentified PART[0x1508]/variant[0x16], unknown DeviceID[0xbba9]. Attempting to proceed as mspm0x.`, but then programs the board: a 600-byte blink took 0.6 s to program and verify (the first run after a UniFlash load took 20.6 s because OpenOCD's CRC check timed out before it fell back to a byte compare). Zephyr's `west flash` for this board uses the same OpenOCD and worked. If you see the "Unidentified PART" line, ignore it.
 
-## DSLite says a firmware update is required for the XDS110 probe. What now?
+### DSLite says a firmware update is required for the XDS110 probe. What now?
 
 A new board can ship with probe firmware 3.0.0.31, and UniFlash 9.6's command line stops with `A firmware update is required for the XDS110 probe` and error -264. Run `xdsdfu -e` to see the firmware. If it is below 3.0.0.43, from `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/` run `./xdsdfu -I <serial> -m`, then `./xdsdfu -I 00000000 -f firmware_3.0.0.43.bin -s <serial> -r`. The probe's serial number reads 00000000 only while the update runs. The update changes the probe, not the chip.
 
-## Zephyr says this board has 256 kB of flash and 64 kB of RAM. Is that right?
-
-The chip has 512 kB of flash and 128 kB of RAM in two banks. Zephyr 4.4.2's `lp_mspm0g3519` board describes the first bank only, so its build summary reads `FLASH: 256 KB` and `RAM: 64 KB`. A Zephyr application has half the memory the chip has.
-
-## The Zephyr blinky builds and flashes, but the LED does not blink. What is wrong?
-
-`west build -b lp_mspm0g3519 samples/basic/blinky` and `west flash` both finish without an error, and nothing blinks. Read the chip with OpenOCD and the program counter sits at `z_SysNmiOnReset`, the active exception is 2 (NMI) and `SYSCTL.NMIIIDX` reads 6, which TI's header names SRAMDED (SRAM double-error detect). A later run (2026-10-25) found the trigger: the NMI follows DSLite's start-after-flash path, and an nRST pulse after the flash (`mspm0_board_reset` in OpenOCD) starts the same image normally (`portability/arduino/zephyr/FAQ.md`). Why that path leaves the SRAM in error is not found (checked 2026-10-08, Zephyr 4.4.2, three builds). The larger benchmark app built for the same board did run. To get a first blink, use TI's SDK example (`gpio_toggle_output`) as in the [README](README.md).
-
-## OpenOCD says `Unknown Device ID[0x0], cannot identify target` and `auto_probe failed`. What now?
-
-OpenOCD could not read the chip's identity, so it refused to program. The same read returns zeros with UniFlash's `DSLite memory` too, so it comes from the chip's state after some programs have run, not from OpenOCD. Load any program with UniFlash (`dslite.sh --mode flash ...`), and OpenOCD can read and program again. It appeared after the timing image ran and intermittently between CoreMark runs.
-
-## UniFlash stops with `Error -260 ... An attempt to connect to the XDS110 failed` although `xdsdfu -e` lists the board. What now?
+### UniFlash stops with `Error -260 ... An attempt to connect to the XDS110 failed` although `xdsdfu -e` lists the board. What now?
 
 Another program was using UniFlash's debug server at that moment (here, other boards being flashed in parallel). Run the command again; a retry loop of up to six tries, a few seconds apart, always got through.
 
-## TI's internal temperature example prints about 507 instead of room temperature. Is the chip broken?
+### OpenOCD says `Unknown Device ID[0x0], cannot identify target` and `auto_probe failed`. What now?
 
-No. On this board `adc12_internal_temp_sensor_mathacl` reads raw ADC codes of about 815 (the LP-MSPM0G3507 reads 811) but its own conversion gives 507, because the factory trim constant it uses is 1881 here against 795 there. The cause is unknown. Treat the raw code as a relative reading until TI explains it (checked 2026-10-08, SDK 2.11.00.07).
+OpenOCD could not read the chip's identity, so it refused to program. The same read returns zeros with UniFlash's `DSLite memory` too, so it comes from the chip's state after some programs have run, not from OpenOCD. Load any program with UniFlash (`dslite.sh --mode flash ...`), and OpenOCD can read and program again. It appeared after the timing image ran and intermittently between CoreMark runs.
 
-## The UART loopback fails at some speeds near 5 to 6 Mbaud. Is that normal?
-
-On this board, with UART0 PA10 wired to PA11 and 2 kB of random bytes per speed, only 5.5 Mbaud (1,453 correct) and 6.0 Mbaud (1,921 correct) failed; 9,600 baud to 5.33 Mbaud and 6.4 to 10.67 Mbaud were clean, and 12 Mbaud sends nothing. The LP-MSPM0G3507 failed at different speeds (5.0 and 5.33 Mbaud as well) in the same test. Repeated twice with identical counts. If you need a speed in that range, test it on your wiring and choose a neighboring speed that passes.
-
-## OpenOCD reads of RAM keep restarting my program on the MSPM0G3519. How do I read results from a running image?
+### OpenOCD reads of RAM keep restarting my program on the MSPM0G3519. How do I read results from a running image?
 
 Every OpenOCD connect through the on-board XDS110 resets this board, so a poll loop that opens OpenOCD each few seconds restarts the image each time and the counters never advance. DSLite's `memory` command (`DSLite memory -c <ccxml> -r 0x20200000,64 -s 8 -o out.bin`) reads RAM without a reset, so the program keeps running. It worked for a 95-second MP3 decode run polled every few seconds (2026-10-21). A DSLite flash starts the image by itself.
 
-## Can the MSPM0G3519 decode an MP3 in real time?
+### DSLite says "Connection to MSPM0 core failed" after a Zephyr image was flashed to the G3519. What now?
 
-No, not with minimp3 in float. At 80 MHz it takes 9.84 times the audio length for a 128 kbps stereo clip and 7.38 for a 64 kbps mono clip, with every frame bit-exact against a Mac build; it would need about 787 MHz to keep up (`ports/minimp3/README.md`). A fixed-point decoder is the way to try it.
+ A running Zephyr image leaves the core hidden from the debugger (OpenOCD says "Could not find MEM-AP"). If you see this, pulse nRST first (`openocd ... -c init -c mspm0_board_reset -c shutdown`), then flash; `portability/zephyr-mspm0/flash.sh <image.hex>` does the pulse, a flash from a `.bin` padded to a multiple of 8 bytes, and a second pulse. DSLite also refuses a block whose length is not a multiple of 8 ("Length of block is 14860, but it should be divisible by 8"). `portability/zephyr-mspm0/README.md`, checked 2026-10-24.
+
+### `frl.py run` stops with FRL-E021 (SysConfig) or FRL-E020 (openocd not found) on the G3519. What now?
+
+ The G3519 blink route is validated with SysConfig 1.28.0 since 2026-11-08 (three frl runs with the pin-read check), as the LP-MSPM0L1306 and LP-MSPM0G5187 routes are; 1.26.3 is no longer installed. An older checkout that still lists 1.26.3 refuses 1.27 and 1.28 with FRL-E021: set `FRL_SYSCONFIG=/Applications/ti/sysconfig_1.28.0` for that run. FRL-E020 means xPack OpenOCD is missing: unpack it to `~/xpack-openocd-0.12.0-7` (the Seagate archive has the tarball).
+
+## TI examples and carried-over code
+
+### TI's internal temperature example prints about 507 instead of room temperature. Is the chip broken?
+
+No. On this board `adc12_internal_temp_sensor_mathacl` reads raw ADC codes of about 815 (the LP-MSPM0G3507 reads 811) but its own conversion gives 507, because the factory trim constant it uses is 1881 here against 795 there. The cause is unknown. Treat the raw code as a relative reading until TI explains it (checked 2026-10-08, SDK 2.11.00.07).
 
 ### A TI MSPM33 `gpio_toggle_output` carried to the G3519 stops with `GPIO_LEDS_USER_LED_2_PORT` undeclared. What now?
 
@@ -53,26 +49,6 @@ It expects a wire from TX to RX. Add `UART1.enableInternalLoopback = true;` to t
 ### TI's UART console example prints nothing on the G3519. What do I check?
 
  The example sends on PA10 and reads on PA11. Those two pins reach the probe's USB serial port only through jumpers J12 and J13 on the XDS side, and a wire on J4 PA10 to PA13 shares them. Take the wires off those pins, leave J12 and J13 on XDS, flash, and read the probe's first port (`/dev/cu.usbmodem<serial>1`) at 115200 8N1 with a capture that holds the port open. You should see `==== MSPM0 Console Test ====` and then `> Testing...0`, `1`, `2` about once a second. On the SDK's SysConfig 1.28.0 the build works but this repo's wrapper refuses it until `FRL_SYSCONFIG` points at it. Checked 2026-10-24.
-
-### A Zephyr PWM, timer or other peripheral pin on the G3519 stays low although the peripheral runs. What is wrong?
-
- Zephyr's `lp_mspm0g3519` board includes the pin file shared with the MSPM0G1x0x and G3x0x chips, and many of its peripheral function numbers are different on the G351x. On PB27, `tima1_ccp1_pb27` selects function 6, which is COMP2.OUT on this chip, so the timer counts and the pin never moves; TIMA1.CCP1 is function 9. If you see this, define the pin group in your overlay from SysConfig's device data (`MSPM0G351X.json`), for example `pinmux = <MSP_PINMUX(58, MSPM0_PIN_FUNCTION_9)>;`. A script check found 136 of 443 entries that differ, including the board file's CAN-FD pins PA12 and PA13; UART0, SPI0, SPI1, I2C1 and the BoosterPack I2C2 pins (PC2, PC3) match (checked 2026-10-25).
-
-### On Zephyr, `FALLING` after `RISING` on the same G3519 pin fires on both edges, and `analogWrite` is inverted. Why?
-
- Zephyr main's MSPM0 GPIO driver adds the new edge bits to the old ones and never clears them, and its PWM driver writes the pulse as the low time. If you see double interrupts, clear the pin's two bits in `POLARITY15_0` (pins 0 to 15) or `POLARITY31_16` before attaching. If you see inverted brightness, write `255 - value` until the driver is fixed. Checked 2026-10-25 on the board (`portability/arduino/zephyr/README.md`).
-
-### DSLite says "Connection to MSPM0 core failed" after a Zephyr image was flashed to the G3519. What now?
-
- A running Zephyr image leaves the core hidden from the debugger (OpenOCD says "Could not find MEM-AP"). If you see this, pulse nRST first (`openocd ... -c init -c mspm0_board_reset -c shutdown`), then flash; `portability/zephyr-mspm0/flash.sh <image.hex>` does the pulse, a flash from a `.bin` padded to a multiple of 8 bytes, and a second pulse. DSLite also refuses a block whose length is not a multiple of 8 ("Length of block is 14860, but it should be divisible by 8"). `portability/zephyr-mspm0/README.md`, checked 2026-10-24.
-
-### On Arduino-on-Zephyr, `SPI.transfer(buf, n)` returns zeros on the G3519, and the SPI loopback bit does nothing. Why?
-
- ArduinoCore-zephyr `af5b8610f9be` runs `spi_write` and then a separate `spi_read`, so the buffer receives the second transfer's input: `transfer(buf, 16)` returned 0 of 16 correct, while 256 of 256 single-byte `transfer(byte)` calls and `transfer16(0xA55A)` came back equal. If you see this, call `SPI.transfer(byte)` in a loop. For a test without a wire, set the SPI block's loopback bit (`CTL1.LBM`) while the block is disabled: clear `ENABLE`, set `LBM`, set `ENABLE` again; set on a running block it has no effect. Checked 2026-10-25 (`portability/arduino/zephyr/README.md`).
-
-### The portable ADC app on the G3519 reads 900 to 2,600 counts on PA25 with nothing connected. Which input is steady?
-
- On the G5187 the same floating PA25 reads a steady 1,450. On this board it swings in a repeating pattern, so something on the header or the stacked BoosterPack drives it. The app's ADC channel 11 is the internal temperature sensor and needs no wire: set `ADC121.adcMem0chansel = "DL_ADC12_INPUT_CHAN_11"` and `ADC121.disChan11 = true` in the `.syscfg`, with the 2.5 V internal reference. It reads 1,085 to 1,086 counts, steady. Checked 2026-10-25.
 
 ### TI's `adc_singlechannel` FreeRTOS example for the G3519 prints only `Starting the adcsinglechannel example`. Is my build wrong?
 
@@ -90,13 +66,67 @@ It expects a wire from TX to RX. Add `UART1.enableInternalLoopback = true;` to t
 
  Three settings, seen on 2026-10-25. In sequence mode the ADC clears its enable bit after one sequence; use repeat mode and set the last conversion in the sequence to wait for the next trigger (`ADC121.repeatMode = true; ADC121.adcMem7trig = "DL_ADC12_TRIGGER_MODE_TRIGGER_NEXT";` in SysConfig). A DMA channel on the ADC trigger sees nothing until the DMA sample count is 1 (`DL_ADC12_setDMASamplesCnt(ADC12_0_INST, 1)`). The ADC clears its DMA enable bit when a transfer finishes, so call `DL_ADC12_enableDMA` again each time you arm the channel. If you put two or more DMA channels on the one ADC trigger, expect them to miss triggers: here a four-channel setup captured half the samples on the first group and none on the second, cause not found; one channel on the trigger captured 99.9 percent of the samples (`ports/renesas-ra-fsp/README.md`).
 
+### A Raspberry Pi Pico SDK example built for the G3519 stops at link with `symbol "puts" redefined`, or its stack is 256 B. What now?
+
+ TI Arm Clang's C library keeps `puts` and `fputs` in one object (`fputs.c.obj`), so a layer that replaces only `printf`, `puts` and `putchar` pulls that object in and the link fails; replace `fputs` too. The SysConfig `device_linker.cmd` sets `--stack_size=256`, and a `-Wl,--stack_size` placed before it on the link line is overridden; put `-Wl,--stack_size=0x800` after it to get the Pico SDK's 2 kB default. With both, `blink_simple`, `hello_world/serial`, `i2c/bus_scan`, `pwm/led_fade` and `adc/hello_adc` build and run with their `.c` files unchanged, and `bus_scan` finds only the touch controller at 0x38 (`ports/pico-sdk/README.md`, checked 2026-10-25).
+
+### The portable ADC app on the G3519 reads 900 to 2,600 counts on PA25 with nothing connected. Which input is steady?
+
+ On the G5187 the same floating PA25 reads a steady 1,450. On this board it swings in a repeating pattern, so something on the header or the stacked BoosterPack drives it. The app's ADC channel 11 is the internal temperature sensor and needs no wire: set `ADC121.adcMem0chansel = "DL_ADC12_INPUT_CHAN_11"` and `ADC121.disChan11 = true` in the `.syscfg`, with the 2.5 V internal reference. It reads 1,085 to 1,086 counts, steady. Checked 2026-10-25.
+
+## Zephyr, Arduino and MicroPython
+
+### Zephyr says this board has 256 kB of flash and 64 kB of RAM. Is that right?
+
+The chip has 512 kB of flash and 128 kB of RAM in two banks. Zephyr 4.4.2's `lp_mspm0g3519` board describes the first bank only, so its build summary reads `FLASH: 256 KB` and `RAM: 64 KB`. A Zephyr application has half the memory the chip has.
+
+### The Zephyr blinky builds and flashes, but the LED does not blink. What is wrong?
+
+`west build -b lp_mspm0g3519 samples/basic/blinky` and `west flash` both finish without an error, and nothing blinks. Read the chip with OpenOCD and the program counter sits at `z_SysNmiOnReset`, the active exception is 2 (NMI) and `SYSCTL.NMIIIDX` reads 6, which TI's header names SRAMDED (SRAM double-error detect). A later run (2026-10-25) found the trigger: the NMI follows DSLite's start-after-flash path, and an nRST pulse after the flash (`mspm0_board_reset` in OpenOCD) starts the same image normally (`portability/arduino/zephyr/FAQ.md`). Why that path leaves the SRAM in error is not found (checked 2026-10-08, Zephyr 4.4.2, three builds). The larger benchmark app built for the same board did run. To get a first blink, use TI's SDK example (`gpio_toggle_output`) as in the [README](README.md).
+
+### A Zephyr PWM, timer or other peripheral pin on the G3519 stays low although the peripheral runs. What is wrong?
+
+ Zephyr's `lp_mspm0g3519` board includes the pin file shared with the MSPM0G1x0x and G3x0x chips, and many of its peripheral function numbers are different on the G351x. On PB27, `tima1_ccp1_pb27` selects function 6, which is COMP2.OUT on this chip, so the timer counts and the pin never moves; TIMA1.CCP1 is function 9. If you see this, define the pin group in your overlay from SysConfig's device data (`MSPM0G351X.json`), for example `pinmux = <MSP_PINMUX(58, MSPM0_PIN_FUNCTION_9)>;`. A script check found 136 of 443 entries that differ, including the board file's CAN-FD pins PA12 and PA13; UART0, SPI0, SPI1, I2C1 and the BoosterPack I2C2 pins (PC2, PC3) match (checked 2026-10-25).
+
+### On Zephyr, `FALLING` after `RISING` on the same G3519 pin fires on both edges, and `analogWrite` is inverted. Why?
+
+ Zephyr main's MSPM0 GPIO driver adds the new edge bits to the old ones and never clears them, and its PWM driver writes the pulse as the low time. If you see double interrupts, clear the pin's two bits in `POLARITY15_0` (pins 0 to 15) or `POLARITY31_16` before attaching. If you see inverted brightness, write `255 - value` until the driver is fixed. Checked 2026-10-25 on the board (`portability/arduino/zephyr/README.md`).
+
+### On Arduino-on-Zephyr, `SPI.transfer(buf, n)` returns zeros on the G3519, and the SPI loopback bit does nothing. Why?
+
+ ArduinoCore-zephyr `af5b8610f9be` runs `spi_write` and then a separate `spi_read`, so the buffer receives the second transfer's input: `transfer(buf, 16)` returned 0 of 16 correct, while 256 of 256 single-byte `transfer(byte)` calls and `transfer16(0xA55A)` came back equal. If you see this, call `SPI.transfer(byte)` in a loop. For a test without a wire, set the SPI block's loopback bit (`CTL1.LBM`) while the block is disabled: clear `ENABLE`, set `LBM`, set `ENABLE` again; set on a running block it has no effect. Checked 2026-10-25 (`portability/arduino/zephyr/README.md`).
+
+### How fast is MicroPython on the G3519?
+
+ 1,112 pystones per second at 80 MHz on the full image, from `ports/micropython/tests/pystone_lowmem.py` (the Pystone 1.2 mix with list records and 2,000 loops; it is not the standard `pystone.py`, which needs classes and more heap). Three runs gave 1,111 to 1,114. Run it with `ports/micropython/tools/paste_raw.py ports/micropython/tests/pystone_lowmem.py` using a Python with pyserial.
+
+## Speed and timing
+
+### The UART loopback fails at some speeds near 5 to 6 Mbaud. Is that normal?
+
+On this board, with UART0 PA10 wired to PA11 and 2 kB of random bytes per speed, only 5.5 Mbaud (1,453 correct) and 6.0 Mbaud (1,921 correct) failed; 9,600 baud to 5.33 Mbaud and 6.4 to 10.67 Mbaud were clean, and 12 Mbaud sends nothing. The LP-MSPM0G3507 failed at different speeds (5.0 and 5.33 Mbaud as well) in the same test. Repeated twice with identical counts. If you need a speed in that range, test it on your wiring and choose a neighboring speed that passes.
+
+### Can the MSPM0G3519 decode an MP3 in real time?
+
+No, not with minimp3 in float. At 80 MHz it takes 9.84 times the audio length for a 128 kbps stereo clip and 7.38 for a 64 kbps mono clip, with every frame bit-exact against a Mac build; it would need about 787 MHz to keep up (`ports/minimp3/README.md`). A fixed-point decoder is the way to try it.
+
 ### A timer period measures about half a percent short on the host clock. Is the timer wrong?
 
  On this board 100 ms, 1 s, 1 ms and 2 ms periods from the 32 MHz oscillator measured 0.4 to 0.65 percent short against the Mac's clock, the same offset at every setting, so the counts are exact and the oscillator runs about 0.55 percent fast. If you see this, check your own board against a reference before relying on the period to better than 1 percent (2026-10-25).
 
-### A Raspberry Pi Pico SDK example built for the G3519 stops at link with `symbol "puts" redefined`, or its stack is 256 B. What now?
+## The Digital Lab page and the 3.5 inch display
 
- TI Arm Clang's C library keeps `puts` and `fputs` in one object (`fputs.c.obj`), so a layer that replaces only `printf`, `puts` and `putchar` pulls that object in and the link fails; replace `fputs` too. The SysConfig `device_linker.cmd` sets `--stack_size=256`, and a `-Wl,--stack_size` placed before it on the link line is overridden; put `-Wl,--stack_size=0x800` after it to get the Pico SDK's 2 kB default. With both, `blink_simple`, `hello_world/serial`, `i2c/bus_scan`, `pwm/led_fade` and `adc/hello_adc` build and run with their `.c` files unchanged, and `bus_scan` finds only the touch controller at 0x38 (`ports/pico-sdk/README.md`, checked 2026-10-25).
+### The Digital Lab page on the G3519 says "The fade did not check out" for the Breathing LED demo. Is the board at fault?
+
+ On 2026-11-08 the page in Chrome 156 wrote the demo and read it back, then its own check reported duty 0 to 100 percent with a largest step of 8 and the pin lit 90 percent of the readings at 80 to 100 percent duty. The same run passed the other seven demos it could check. Cause not found. Treat the demo as unproven on this board, and use the Blink demos or the thermometer to confirm the page works (`mspm0g3519/bench/data/dlab-2026-11-08/EVIDENCE.md`).
+
+### 2048 on the Waveshare 3.5 inch panel draws but does not respond to a swipe. What now?
+
+ The touch chip talks on four wires of its own: TP_SDA to J1 pin 10 (PC3), TP_SCL to J1 pin 9 (PC2), TP_INT to J2 pin 11 (PB14) and TP_RST to J2 pin 12 (PB11). A swipe that does nothing while the screen draws means one of those four is loose or on the wrong pin; the screen's SPI wires are fine. Reseat them against the wiring table on the arcade project page.
+
+### The Waveshare 3.5 inch panel stays dark after the 2048 image is flashed. What now?
+
+ Power comes in on the panel's VCC pin from J1 pin 1 (3V3), with GND on J2 pin 20. The panel's own 3V3 pin stays empty: with VCC on that pin instead, the backlight never comes on. Check the two power wires first, then LCD_BL on J4 pin 38 (PC4), which the program drives high to light the backlight.
 
 <!-- recovery:start -->
 ## When the board stops answering

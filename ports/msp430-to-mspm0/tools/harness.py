@@ -6,6 +6,8 @@
 
 Steps: flash:<image>  reset  wait:<s>  send:<text>  sendslow:<text> (one byte per 0.3 s)  sendraw:<hex>.
 The serial port is opened before the first step and read by a thread; each received line is stored with seconds since open.
+m33: DSLite plus xds110reset (pulses the board's reset line) under tools/frl/lock.py exec; M33_PLAIN_E=1 uses a plain -e (erase all main) on flash,
+otherwise only the image's sectors are erased (DSLite FlashEraseSectors settings).
 l1306: OpenOCD through mspm0l1306/tools/ocd.sh (takes the lock). am13: DSLite under tools/frl/lock.py exec.
 """
 import argparse, glob, os, subprocess, sys, threading, time
@@ -15,7 +17,10 @@ ROOT = Path(__file__).resolve().parents[3]
 BOARDS = {
     "l1306": {"serial": "ML130001", "tty": "/dev/cu.usbmodemML1300011"},
     "am13": {"serial": "AL130001", "tty": "/dev/cu.usbmodemAL1300011"},
+    "m33": {"serial": "M3010001", "tty": "/dev/cu.usbmodemM30100011"},
 }
+XDS110RESET = "/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xds110reset"
+M33_CCXML = str(ROOT / "mspm33c321a/MSPM33C321A_M3010001.ccxml")
 DSLITE = "/Applications/ti/ccs2101/ccs/ccs_base/DebugServer/bin/DSLite"
 # Clears the debug-power requests OpenOCD leaves set; while they are set the chip does not enter STOP or STANDBY.
 RELEASE_DAP = "mspm0x.dap dpreg 0x04 0x00000000" if not os.environ.get("NO_RELEASE") else "echo keep-dap"
@@ -71,7 +76,14 @@ def main():
             ser.write(bytes.fromhex(v)); notes.append(f"[{now:8.3f}] # sent raw {v}")
         elif k == "flash":
             img = str(Path(v).expanduser())
-            if a.board == "l1306":
+            if a.board == "m33":
+                st = []
+                if not os.environ.get("M33_PLAIN_E"):
+                    lo, hi = os.environ.get("M33_ERASE_RANGE", "0,65535").split(",")
+                    st = ["-s", "FlashEraseSelection=Erase MAIN memory sectors by range (specify below)", "-s", f"FlashEraseSectorsStartAddress={lo}", "-s", f"FlashEraseSectorsEndAddress={hi}"]
+                rc, out = run_probe("m33", [DSLITE, "flash", "-c", M33_CCXML, "-e", "-f", "-v", "-u"] + st + [img])
+                ok = rc == 0
+            elif a.board == "l1306":
                 rc, out = run_probe("l1306", ["reset halt", f"program {{{img}}} verify", "reset run", "sleep 100", RELEASE_DAP])
                 ok = "Verified OK" in out
             else:
@@ -81,10 +93,16 @@ def main():
             if not ok:
                 notes.append(out[-600:])
         elif k == "reset":
-            if a.board == "l1306":
+            if a.board == "m33":
+                rc, out = run_probe("m33", [XDS110RESET, "-s", BOARDS["m33"]["serial"], "-a", "toggle", "-d", "200"])
+            elif a.board == "l1306":
                 rc, out = run_probe("l1306", ["reset run", "sleep 100", RELEASE_DAP])
             else:
-                rc, out = run_probe("am13", [DSLITE, "reset", "-c", CCXML, "-r", "1"]) 
+                # DSLite has no reset command; TI's OpenOCD (frl's AM13 route) does a reset run.
+                ocd = os.path.expanduser("~/ti/ti-openocd")
+                rc, out = run_probe("am13", [ocd + "/bin/openocd", "-s", ocd + "/share/openocd/scripts", "-f", "interface/xds110.cfg",
+                                             "-c", "adapter serial " + BOARDS["am13"]["serial"], "-f", "target/ti_am13e230x.cfg",
+                                             "-c", "init; reset run; sleep 100; shutdown"])
             notes.append(f"[{now:8.3f}] # reset rc={rc} ({time.time()-t0-now:.1f} s) " + out.strip().splitlines()[-1][:120] if out.strip() else f"[{now:8.3f}] # reset rc={rc}")
         else:
             raise SystemExit("unknown step " + s)

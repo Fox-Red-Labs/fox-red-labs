@@ -2,7 +2,7 @@
 id: E55
 board: FRDM-MCXA153
 date: 2026-10-11
-status: in progress
+status: parked
 reached: run
 line: On the FRDM-MCXA153 (Cortex-M33, no FPU) NXP's fixed-point RTCESL library does one motor-control step in 448 cycles, against 5.4k cycles for the same job in float; timed only, the output was not compared with the float step.
 stop: none

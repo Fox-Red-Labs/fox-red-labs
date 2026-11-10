@@ -9,6 +9,13 @@ Checks, with how strong each is:
       pointer outside SRAM, a reset vector outside flash, or a linker map whose flash is larger than the chip's.
       Memory regions come from data/recovery.json ("memory", read from the board's own linker map) or, where none is
       recorded, from the flash and RAM sizes in data/boards.csv assuming flash at 0x0 and RAM at 0x20000000 (ARM only).
+      Boards whose program sits in external flash slots (the CC35X1) also record "physical_flash" in "memory". The chip limit is then
+      that flash (8 MB) and the layout is the one the image's own map declares (its FLASH regions, two-slot or single-slot), not the
+      layout the board happens to hold. An image bigger than the physical flash, or a segment loaded outside the slots its own map
+      declares, is REFUSED; the vector table is read at the lowest declared FLASH address.
+      A region list may carry "never_write" (one-time-programmable security areas): a loadable segment that touches one is
+      REFUSED, because a debugger flash load would program those words for good. For C28x the vector-table checks are replaced
+      by an ELF entry-point check, and (a) and (b) are skipped.
   (a) debug pins, WARN, heuristic: the board's SWD pins (data/recovery.json "debug_pins") are reconfigured when the
       disassembly builds or loads the address of their IOMUX pin-control register. Misses code that computes the address
       at run time; can fire on a read of the register.
@@ -21,10 +28,10 @@ Checks, with how strong each is:
 import csv, json, pathlib, re, shutil, struct, subprocess, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-EM = {"arm": 40, "riscv": 243}
+EM = {"arm": 40, "riscv": 243, "c28x": 141}  # 141 = EM_TI_C2000; C28x addresses and region sizes are 16-bit words
 OBJDUMPS = ["arm-none-eabi-objdump", "tiarmobjdump", "llvm-objdump", "objdump",
             "/opt/ST/STM32CubeCLT_1.22.0/GNU-tools-for-STM32/bin/arm-none-eabi-objdump",
-            "/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS/bin/tiarmobjdump"]
+            *sorted(str(p) for r in ("/Applications/ti", pathlib.Path.home() / "ti", "C:/ti") for p in pathlib.Path(r).glob("**/ti-cgt-armllvm_*/bin/tiarmobjdump") if pathlib.Path(r).is_dir())]   # any TI Arm Clang, standalone or inside CCStudio
 GPIO_HANDLER = re.compile(r"^(GPIO[A-Z0-9]*|GROUP\d)_IRQHandler$")
 
 
@@ -58,7 +65,7 @@ def parse_elf(path):
                 nm, val, sz, info, oth, shn = struct.unpack_from("<IIIBBH", d, s["off"] + j * 16)
                 if nm:
                     syms.setdefault(name(nm, strs["off"]), val & ~1)
-    return {"data": d, "machine": machine, "segs": segs, "secs": secs, "syms": syms}
+    return {"entry": struct.unpack_from("<I", d, 24)[0], "data": d, "machine": machine, "segs": segs, "secs": secs, "syms": syms}
 
 
 def read_at(elf, addr, n):
@@ -73,17 +80,19 @@ def regions_for(board, csvrow):
     m = board.get("memory")
     if m:
         fl = [(n, int(a, 16), int(a, 16) + sz) for n, a, sz in m["regions"] if n.startswith("FLASH")]
+        pf_ = [(n, int(a, 16), int(a, 16) + sz) for n, a, sz in m.get("physical_flash", [])]
         ram = [(n, int(a, 16), int(a, 16) + sz) for n, a, sz in m["regions"] if not n.startswith("FLASH")]
         cfg = [(n, int(a, 16), int(a, 16) + sz) for n, a, sz in m.get("config", [])]
-        return fl, ram, cfg, m.get("arch", "arm"), "data/recovery.json memory (" + m["source"] + ")"
+        nw = [(n, int(a, 16), int(a, 16) + sz) for n, a, sz in m.get("never_write", [])]
+        return fl, ram, cfg + nw, m.get("arch", "arm"), "data/recovery.json memory (" + m["source"] + ")", pf_
     try:
         fk, rk = float(csvrow["flash_kb"]), float(csvrow["ram_kb"])
     except (TypeError, ValueError):
-        return [], [], [], None, "no memory sizes recorded"
+        return [], [], [], None, "no memory sizes recorded", []
     if fk <= 0 or "Cortex-M" not in csvrow.get("core", ""):
-        return [], [], [], None, "no usable memory sizes for this core in data/boards.csv"
+        return [], [], [], None, "no usable memory sizes for this core in data/boards.csv", []
     return ([("FLASH", 0, int(fk * 1024))], [("SRAM", 0x20000000, 0x20000000 + int(rk * 1024))], [], "arm",
-            "data/boards.csv sizes, assuming flash at 0x0 and RAM at 0x20000000 (heuristic)")
+            "data/boards.csv sizes, assuming flash at 0x0 and RAM at 0x20000000 (heuristic)", [])
 
 
 def inside(lo, hi, regs):
@@ -156,36 +165,54 @@ def run(board_id, image, mapfile=None, objdump=None):
     except (OSError, ValueError, struct.error) as e:
         raise SystemExit(f"cannot read {image}: {e}")
     F = []  # (level, check, text)
-    fl, ram, cfg, arch, src = regions_for(board, csvrow)
+    fl, ram, cfg, arch, src, phys = regions_for(board, csvrow)
+    mp = mapfile or (str(pathlib.Path(image).with_suffix(".map")) if pathlib.Path(image).with_suffix(".map").exists() else None)
+    maprows = parse_map(mp) if mp else []
+    declared = fl
+    if phys:   # slotted flash: the image's own map declares its layout; the chip limit is the physical flash
+        mf = [(n, a, a + l) for n, a, l in maprows if n.upper().startswith("FLASH") and inside(a, a + 1, phys)]
+        declared = mf or fl
+        fl = declared
+    nwnames = {x[0] for x in (board.get("memory") or {}).get("never_write", [])}
     notes = [f"memory source: {src}"]
 
     # (c) wrong chip
     if arch:
         if elf["machine"] != EM.get(arch, -1):
             F.append((2, "c", f"ELF machine type {elf['machine']} is not {arch} ({EM.get(arch)}) for {board_id}"))
-        allr = fl + ram + cfg
+        allr = (phys or fl) + ram + cfg
         for s in elf["segs"]:
             for what, lo, n in (("load", s["paddr"], s["filesz"]), ("run", s["vaddr"], s["memsz"])):
                 if n and not inside(lo, lo + n, allr):
                     F.append((2, "c", f"segment {what} range 0x{lo:08x}-0x{lo + n:08x} is outside this chip's flash and SRAM"))
-            if s["filesz"] and any(inside(s["paddr"], s["paddr"] + s["filesz"], [r]) for r in cfg):
+            if phys and maprows and s["filesz"] and inside(s["paddr"], s["paddr"] + s["filesz"], phys) \
+                    and not inside(s["paddr"], s["paddr"] + s["filesz"], declared):
+                F.append((2, "c", f"segment load range 0x{s['paddr']:08x}-0x{s['paddr'] + s['filesz']:08x} is outside the flash slots this image's map declares"))
+            for n, a, b in cfg:
+                if n in nwnames and s["filesz"] and s["paddr"] < b and a < s["paddr"] + s["filesz"]:
+                    F.append((2, "c", f"image loads 0x{s['paddr']:08x}-0x{s['paddr'] + s['filesz']:08x}, which touches {n} (0x{a:08x}-0x{b:08x}): one-time-programmable, a flash load would burn those words for good"))
+            if s["filesz"] and any(inside(s["paddr"], s["paddr"] + s["filesz"], [r]) for r in cfg if r[0] not in nwnames):
                 F.append((1, "c", f"image writes a configuration region at 0x{s['paddr']:08x} (NONMAIN, BCR or BSL area); check it is intended"))
-        vt = read_at(elf, fl[0][1], 8) if fl else None
+        if arch == "c28x":
+            if not inside(elf["entry"], elf["entry"] + 1, fl):
+                F.append((2, "c", f"ELF entry point 0x{elf['entry']:08x} is outside this chip's flash"))
+            vt = None
+        else:
+            vt = read_at(elf, min(r[1] for r in fl), 8) if fl else None
         if vt:
             sp, rv = struct.unpack("<II", vt)
             if not any(a < sp <= b for _, a, b in ram):
                 F.append((2, "c", f"vector table: stack pointer 0x{sp:08x} is outside this chip's SRAM"))
             if not (rv & 1) or not inside(rv & ~1, (rv & ~1) + 2, fl):
                 F.append((2, "c", f"vector table: reset vector 0x{rv:08x} is not an odd address inside this chip's flash"))
-        elif fl:
+        elif fl and arch != "c28x":
             F.append((1, "c", "no data loaded at the flash base, so no vector table was checked"))
     else:
         notes.append("check (c) skipped: no memory map for this board")
-    mp = mapfile or (str(pathlib.Path(image).with_suffix(".map")) if pathlib.Path(image).with_suffix(".map").exists() else None)
     if mp and fl:
-        rows = parse_map(mp)
+        rows = maprows
         mflash = sum(l for n, a, l in rows if n.upper().startswith("FLASH"))
-        chip_flash = sum(b - a for _, a, b in fl)
+        chip_flash = sum(b - a for _, a, b in (phys or fl))
         if mflash > chip_flash:
             F.append((2, "c", f"linker map {pathlib.Path(mp).name} describes {mflash // 1024} kB of flash; this chip has {chip_flash // 1024} kB"))
         mram = sum(l for n, a, l in rows if n.upper().startswith(("SRAM", "RAM")))
@@ -197,7 +224,9 @@ def run(board_id, image, mapfile=None, objdump=None):
 
     # (a) and (b) need the disassembly
     od = find_objdump(objdump)
-    if not od:
+    if arch == "c28x":
+        notes.append("checks (a) and (b) skipped: they read Arm/RISC-V disassembly; C28x has no check for debug pins or sleep")
+    elif not od:
         notes.append("checks (a) and (b) skipped: no objdump found")
     else:
         consts, stores, out, has_wfi = constants(od, image)

@@ -11,8 +11,9 @@ RUN="${RUN:-$PWD/out/dns/build-$APP}"
 : "${WIFI_ENV:=$HOME/.config/frl/home-wifi.env}"
 HOME_SSID="${HOME_SSID:-$(ipconfig getsummary en0 | awk -F' : ' '$1 ~ /^ *SSID$/ {print $2; exit}')}"
 [ -n "$HOME_SSID" ] || { echo "set HOME_SSID to the Wi-Fi network name"; exit 2; }
-SDK=/Applications/ti/simplelink_wifi_sdk_10_20_00_39; TB=/Applications/ti/simplelink_wifi_toolbox_macos_4_3_23
-SYSCFG=/Applications/ti/sysconfig_1.28.0/sysconfig_cli.sh; CGT=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
+REPO="$(cd "$HERE/../.." && pwd)"; TP="python3 $REPO/tools/frl/toolpath.py"   # tools found the way frl finds them; FRL_WIFI_SDK, FRL_WIFI_TOOLBOX, FRL_SYSCONFIG, FRL_TICLANG name other places
+SDK="$($TP wifi_sdk --path)" || exit 2; TB="$($TP wifi_toolbox --path)" || exit 2
+SYSCFG="$($TP sysconfig --version 1.28.0)" || exit 2; CGT="$($TP ticlang --version 5.1.1.LTS --path)" || exit 2
 rm -rf "$RUN"; mkdir -p "$RUN"; C="$RUN/ex"; cp -R "$SDK/examples/rtos/LP_EM_CC35X1/demos/mqtt_client" "$C"
 cp "$HERE/firmware/dns_boot.h" "$HERE/firmware/dns_checks.h" "$C/"
 if [ "$APP" = min ]; then cp "$HERE/firmware/dns_min.c" "$C/mqtt_client_app.c"

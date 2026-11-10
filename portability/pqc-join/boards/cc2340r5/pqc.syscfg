@@ -1,0 +1,16 @@
+// @cliArgs --board /ti/boards/LP_EM_CC2340R5 --rtos nortos
+// Post-quantum image for the LP-EM-CC2340R5: the bench's base configuration (LED, backchannel UART) (no RNG: the CC23x0 has no general-purpose TRNG, see PORT.md).
+var Power = scripting.addModule("/ti/drivers/Power");
+
+system.getScript("kernel_config_release.syscfg.js");
+
+var GPIO = scripting.addModule("/ti/drivers/GPIO");
+var gpio = GPIO.addInstance();
+gpio.$hardware = system.deviceData.board.components.LED0;
+gpio.$name = "CONFIG_GPIO_LED_0";
+
+var UART2 = scripting.addModule("/ti/drivers/UART2");
+var uart2 = UART2.addInstance();
+uart2.$hardware = system.deviceData.board.components.XDS110UART;
+uart2.$name = "CONFIG_UART2_0";
+

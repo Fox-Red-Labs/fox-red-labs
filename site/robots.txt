@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://foxredlabs.dev/site/sitemap.xml
+Sitemap: https://foxredlabs.dev/sitemap.xml

@@ -1,0 +1,142 @@
+{
+ "_about": "A demo scene for site/boardviz/scene.js. base: the board the frame is measured on (its part table in data/boardviz). boards: more boards placed by mating their sockets onto the base's headers (mate pairs, rot in degrees, lift in mm above the base). things: loose parts in the base board's millimeter frame (the USB cable end). steps: title, text, focus (a place that gets the label), and do: drop a board, show a thing, sound (a speaker's cone moves) or view (move the camera). Every step is one thing the reader does in the real build; the order is the recipe's order. The recipe's steps that need no board (hear the code on the computer, build, check the algorithms, build the apps image) are not drawn.",
+ "id": "audio-boosterpack",
+ "title": "Audio BoosterPack on the LP-MSPM33C321A",
+ "base": "mspm33c321a",
+ "boards": [
+  {
+   "id": "boostxl-audio",
+   "mate": [
+    [
+     "j1",
+     "bp_j1"
+    ],
+    [
+     "j2",
+     "bp_j2"
+    ]
+   ],
+   "rot": 0,
+   "lift": 9
+  }
+ ],
+ "things": [
+  {
+   "id": "usb",
+   "type": "usbplug",
+   "at": [
+    9.1,
+    151.0,
+    1.6
+   ],
+   "hidden": true,
+   "label": "USB cable",
+   "title": "USB cable to your computer",
+   "text": "One cable powers the LaunchPad, flashes it and carries its text output."
+  }
+ ],
+ "wires": [],
+ "extent": [
+  -8,
+  70,
+  70,
+  175
+ ],
+ "view": {
+  "azimuth": -0.9,
+  "elevation": 0.8
+ },
+ "steps": [
+  {
+   "title": "Plug the pack onto the LaunchPad",
+   "text": "Press the BOOSTXL-AUDIO onto the LaunchPad kit's headers, speaker end toward the USB port. Leave jumper J5 on SPI DAC, the way it ships.",
+   "focus": "boostxl-audio.j1",
+   "focus_label": "Sockets on the headers",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.8,
+      "zoom": 0.95,
+      "center": [
+       30,
+       100,
+       6
+      ]
+     }
+    },
+    {
+     "drop": "boostxl-audio"
+    }
+   ]
+  },
+  {
+   "title": "Plug in USB and flash",
+   "text": "Connect the LaunchPad to your computer and flash the app. The program starts running when the flash ends.",
+   "focus": "usb",
+   "focus_label": "USB cable",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.8,
+      "elevation": 0.75,
+      "zoom": 1.9,
+      "center": [
+       16,
+       140,
+       8
+      ]
+     }
+    },
+    {
+     "show": "usb"
+    }
+   ]
+  },
+  {
+   "title": "Play the tone",
+   "text": "Open the board's serial port at 115200 baud. Press a to switch the amplifier on, then 1 for a 1 kHz tone from the pack's speaker.",
+   "focus": "boostxl-audio.speaker",
+   "focus_label": "Playing",
+   "hold": 4000,
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.95,
+      "zoom": 2.5,
+      "center": [
+       24,
+       130,
+       14
+      ]
+     }
+    },
+    {
+     "sound": "boostxl-audio.speaker"
+    }
+   ]
+  },
+  {
+   "title": "Play the tune and listen back",
+   "text": "Press 2 for the four-voice tune, which loops. Press m to power the microphone, then c to capture what it hears. Keep the volume low so the microphone does not clip.",
+   "focus": "boostxl-audio.mic",
+   "focus_label": "Listening",
+   "hold": 5000,
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.85,
+      "zoom": 1.7,
+      "center": [
+       27,
+       118,
+       12
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

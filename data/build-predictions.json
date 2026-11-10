@@ -1,660 +1,1008 @@
 {
- "note": "Predictions for the Builds by board grid (tools/render_projects.py matrix_rows, shown on portability-proven.html#builds). should_work: a cell nobody has run, predicted from a sibling that Works in the same project (sibling, sibling_result) after a fit check (fit: SDK, memory, peripherals, header); the basis is the cell's hover. not_for_chip: a project the chip or its vendor software cannot run (why_not is a key in site_ui.REASONS; label overrides the hover word). Neither is a measured result: a cell only shows these while it has no run of its own, and the renderer fails if a sibling stops being Works. Added 2026-10-22; method in docs/research/builds-grid-run-plan-2026-10-22.md.",
- "should_work": [
-  {
-   "project": "blink",
-   "board": "g3519",
-   "sibling": "g3507",
-   "sibling_result": "data/results/mspm0g3507.csv time_to_blink",
-   "fit": "Same MSPM0 SDK 2.11, TI Arm Clang and DriverLib gpio_toggle_output; LP-MSPM0G3519 has 512 kB flash and 128 kB RAM against the G3507's 128 kB and 32 kB; LED on the board; blink_build and blink_flash rows measured here (data/results/mspm0g3519.csv, 2026-10-08)",
-   "basis": "Works on the LP-MSPM0G3507 (time_to_blink). On the LP-MSPM0G3519 the same blink built in 3 to 6 s and flashed (blink_build, blink_flash rows); the timed first-blink row and the changed-pattern check were not recorded."
-  },
-  {
-   "project": "blink",
-   "board": "g5187",
-   "sibling": "g3507",
-   "sibling_result": "data/results/mspm0g3507.csv time_to_blink",
-   "fit": "Same MSPM0 SDK 2.11, TI Arm Clang and DriverLib gpio_toggle_output; LP-MSPM0G5187 has 128 kB flash and 32 kB RAM against the G3507's 128 kB and 32 kB; LED on the board; blink_build and blink_flash rows measured here (data/results/mspm0g5187.csv, 2026-10-08)",
-   "basis": "Works on the LP-MSPM0G3507 (time_to_blink). On the LP-MSPM0G5187 the same blink built in 3 to 6 s and flashed (blink_build, blink_flash rows); the timed first-blink row and the changed-pattern check were not recorded."
-  },
-  {
-   "project": "blink",
-   "board": "cc1354p10",
-   "sibling": "cc2755p10",
-   "sibling_result": "data/results/cc2755p10.csv time_to_blink",
-   "fit": "Same SimpleLink LaunchPad flow, TI Arm Clang and an on-board LED; 1024 kB flash against the CC2755P10's 1024 kB; blink image built at 11,780 bytes (blink_flash_bytes, data/results/cc1354p10.csv). Different SDK (CC13xx CC26xx SDK, not the F3 SDK), but images from that SDK already flash and run on this board (Zigbee, Thread, sub-1 GHz receiver)",
-   "basis": "Works on the LP-EM-CC2755P10 (time_to_blink 41 s). This board builds a blink image and runs other flashed images from its own SDK; the blink itself was not timed here."
-  },
-  {
-   "project": "print-a-message",
-   "board": "g3519",
-   "sibling": "l1306",
-   "sibling_result": "Works on LP-MSPM0L1306 and LP-MSPM0G3507 (print-a-message cells in site/data/projects.json)",
-   "fit": "Same MSPM0 SDK 2.11 UART console example (512 kB flash, 128 kB RAM; the console image is small); UART0 runs clean on this board (uart_max_clean, data/results/mspm0g3519.csv); the XDS110 back-channel jumper path was not checked",
-   "basis": "Works on the LP-MSPM0L1306 and LP-MSPM0G3507. The LP-MSPM0G3519 has the same UART peripheral and ran UART loopback clean, so TI's console example should print there; it was not run."
-  },
-  {
-   "project": "print-a-message",
-   "board": "g5187",
-   "sibling": "l1306",
-   "sibling_result": "Works on LP-MSPM0L1306 and LP-MSPM0G3507 (print-a-message cells in site/data/projects.json)",
-   "fit": "Same MSPM0 SDK 2.11 UART console example (128 kB flash, 32 kB RAM; the console image is small); UART0 runs clean on this board (uart_max_clean, data/results/mspm0g5187.csv); the XDS110 back-channel jumper path was not checked",
-   "basis": "Works on the LP-MSPM0L1306 and LP-MSPM0G3507. The LP-MSPM0G5187 has the same UART peripheral and ran UART loopback clean, so TI's console example should print there; it was not run."
-  },
-  {
-   "project": "print-a-message",
-   "board": "c1104",
-   "sibling": "l1306",
-   "sibling_result": "Works on LP-MSPM0L1306 and LP-MSPM0G3507 (print-a-message cells in site/data/projects.json)",
-   "fit": "Same MSPM0 SDK 2.11 UART console example (16 kB flash, 1 kB RAM; the console image is small); UART0 runs clean on this board (uart_max_clean, data/results/mspm0c1104.csv); the XDS110 back-channel jumper path was not checked",
-   "basis": "Works on the LP-MSPM0L1306 and LP-MSPM0G3507. The LP-MSPM0C1104 has the same UART peripheral and ran UART loopback clean, so TI's console example should print there; it was not run."
-  },
-  {
-   "project": "print-a-message",
-   "board": "cc2755p10",
-   "sibling": "cc2340r5",
-   "sibling_result": "Works on LP-EM-CC2340R5 (print-a-message cell in site/data/projects.json)",
-   "fit": "Same SimpleLink Low Power F3 SDK and TI Arm Clang; 1024 kB flash, 162 kB RAM; UART1 ran clean at 3.0 Mbaud through the LP-XDS110ET probe (uart_max_clean, data/results/cc2755p10.csv)",
-   "basis": "Works on the LP-EM-CC2340R5 (serial text through the clip-on probe). The LP-EM-CC2755P10 uses the same F3 SDK and probe and ran UART clean; the console print itself was not run."
-  },
-  {
-   "project": "handwritten-digits",
-   "board": "g5187",
-   "sibling": "g3507",
-   "sibling_result": "data/results/mspm0g3507.csv ai_mnist_cycles",
-   "fit": "Same MSPM0 DriverLib and TI Arm Clang; 128 kB flash and 32 kB RAM, identical to the G3507; the same BitNetMCU C code ran on the G3519 (ai_mnist_cycles, data/results/mspm0g3519.csv). Inference only; the screen and touch pins were not compared",
-   "basis": "Works on the LP-MSPM0G3507 and LP-MSPM0G3519 (ai_mnist_cycles). The LP-MSPM0G5187 has the G3507's memory and core, so the same model should run; not run there."
-  },
-  {
-   "project": "build-from-terminal",
-   "board": "g3519",
-   "sibling": "g3507",
-   "sibling_result": "build-from-terminal cell (Works) and data/results/mspm0l1306.csv blink_build",
-   "fit": "Same MSPM0 SDK 2.11 make route and TI Arm Clang 5.1.1; examples_built 97.0 percent from one make per example on this board; blink built from the CLI in 3.2 s and flashed (data/results/mspm0g3519.csv)",
-   "basis": "Works on the LP-MSPM0G3507 and LP-MSPM0L1306. On the LP-MSPM0G3519 the SDK examples build with one make each and the blink flashed from the terminal; the one-command wrapper was not run here."
-  },
-  {
-   "project": "build-from-terminal",
-   "board": "g5187",
-   "sibling": "g3507",
-   "sibling_result": "build-from-terminal cell (Works) and data/results/mspm0l1306.csv blink_build",
-   "fit": "Same MSPM0 SDK 2.11 make route and TI Arm Clang 5.1.1; examples_built 85.7 percent from one make per example on this board; blink built from the CLI in 4.0 s and flashed (data/results/mspm0g5187.csv)",
-   "basis": "Works on the LP-MSPM0G3507 and LP-MSPM0L1306. On the LP-MSPM0G5187 the SDK examples build with one make each and the blink flashed from the terminal; the one-command wrapper was not run here."
-  },
-  {
-   "project": "build-from-terminal",
-   "board": "mspm33c321a",
-   "sibling": "g3507",
-   "sibling_result": "build-from-terminal cell (Works); own board: data/results/mspm33c321a.csv time_to_blink cli 19 s",
-   "fit": "Same TI Arm Clang 5.1.1 make route; MSPM33 SDK 1.04 builds 100 percent of its examples and the blink ran from the CLI in 19 s on this board (time_to_blink, examples_built); the one-command wrapper was not run",
-   "basis": "Own-board rows show build and flash from the terminal; the repo's one-command wrapper has not been pointed at this board."
-  },
-  {
-   "project": "build-from-terminal",
-   "board": "am13e230",
-   "sibling": "g3507",
-   "sibling_result": "build-from-terminal cell (Works); own board: data/results/am13e230.csv time_to_blink cli 22 s",
-   "fit": "Same TI Arm Clang 5.1.1 make route; AM13E230 SDK 26.01 builds 100 percent of its examples and the blink ran from the CLI in 22 s on this board (time_to_blink, examples_built); the one-command wrapper was not run",
-   "basis": "Own-board rows show build and flash from the terminal; the repo's one-command wrapper has not been pointed at this board."
-  },
-  {
-   "project": "build-from-terminal",
-   "board": "cc1354p10",
-   "sibling": "cc2755p10",
-   "sibling_result": "build-from-terminal cell (Works on LP-EM-CC2755P10)",
-   "fit": "Terminal builds of the CC13xx CC26xx SDK examples at 98.1 percent (examples_built, data/results/cc1354p10.csv) and headless builds already used for its Zigbee and Thread images; different SDK from the CC2755P10's F3 SDK",
-   "basis": "Works on the LP-EM-CC2755P10 and LP-EM-CC35X1. This board builds from a terminal and has flashed images of its own; the one-command wrapper was not run here."
-  }
- ],
- "not_for_chip": [
-  {
-   "project": "bluetooth-sensor",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "bluetooth-sensor",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "bluetooth-sensor",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "bluetooth-sensor",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "bluetooth-sensor",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "battery-sensor-home-assistant",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "battery-sensor-home-assistant",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "battery-sensor-home-assistant",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "battery-sensor-home-assistant",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "battery-sensor-home-assistant",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "zigbee-light",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "zigbee-light",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "zigbee-light",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "zigbee-light",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "zigbee-light",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Zigbee; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "hubble-satellite",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "hubble-satellite",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "hubble-satellite",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "hubble-satellite",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "hubble-satellite",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-border-router",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-border-router",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-border-router",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-border-router",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-border-router",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-device",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-device",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-device",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-device",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "thread-device",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Thread (802.15.4); the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "matter-device",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi or Thread; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "matter-device",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi or Thread; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "matter-device",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi or Thread; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "matter-device",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi or Thread; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "matter-device",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi or Thread; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "two-radios",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE and Zigbee; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "two-radios",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE and Zigbee; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "two-radios",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE and Zigbee; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "two-radios",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE and Zigbee; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "two-radios",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE and Zigbee; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-presence",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-presence",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-presence",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-presence",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-presence",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-sensor",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-sensor",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-sensor",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-sensor",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "wifi-sensor",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Wi-Fi; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "esphome",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs a TI wireless chip; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "esphome",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs a TI wireless chip; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "esphome",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs a TI wireless chip; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "esphome",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs a TI wireless chip; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "esphome",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs a TI wireless chip; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ble-gamepad",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ble-gamepad",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ble-gamepad",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ble-gamepad",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ble-gamepad",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "tool-telemetry",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "tool-telemetry",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "tool-telemetry",
-   "board": "g5187",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "tool-telemetry",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "tool-telemetry",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "This project needs Bluetooth LE; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ota-update",
-   "board": "c1104",
-   "why_not": "no-radio",
-   "basis": "Updating over the air needs a radio; the LP-MSPM0C1104 has none on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ota-update",
-   "board": "g3519",
-   "why_not": "no-radio",
-   "basis": "Updating over the air needs a radio; the LP-MSPM0G3519 has none on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ota-update",
-   "board": "mspm33c321a",
-   "why_not": "no-radio",
-   "basis": "Updating over the air needs a radio; the LP-MSPM33C321A has none on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "ota-update",
-   "board": "am13e230",
-   "why_not": "no-radio",
-   "basis": "Updating over the air needs a radio; the LP-AM13E230 has none on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
-  },
-  {
-   "project": "battery-sensor-home-assistant",
-   "board": "cc35x1",
-   "why_not": "no-radio",
-   "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
-   "label": "No 802.15.4 radio"
-  },
-  {
-   "project": "zigbee-light",
-   "board": "cc35x1",
-   "why_not": "no-radio",
-   "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
-   "label": "No 802.15.4 radio"
-  },
-  {
-   "project": "thread-border-router",
-   "board": "cc35x1",
-   "why_not": "no-radio",
-   "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
-   "label": "No 802.15.4 radio"
-  },
-  {
-   "project": "thread-device",
-   "board": "cc35x1",
-   "why_not": "no-radio",
-   "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
-   "label": "No 802.15.4 radio"
-  },
-  {
-   "project": "two-radios",
-   "board": "cc35x1",
-   "why_not": "no-radio",
-   "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
-   "label": "No 802.15.4 radio"
-  },
-  {
-   "project": "wifi-presence",
-   "board": "cc1354p10",
-   "why_not": "no-radio",
-   "basis": "The LP-CC1354P10-1 radio does Bluetooth LE, Thread, Zigbee and proprietary sub-1 GHz or 2.4 GHz, not Wi-Fi; this build needs Wi-Fi.",
-   "label": "No Wi-Fi radio"
-  },
-  {
-   "project": "wifi-presence",
-   "board": "cc2755p10",
-   "why_not": "no-radio",
-   "basis": "The LP-EM-CC2755P10 radio does Bluetooth LE, Thread, Zigbee and proprietary sub-1 GHz or 2.4 GHz, not Wi-Fi; this build needs Wi-Fi.",
-   "label": "No Wi-Fi radio"
-  },
-  {
-   "project": "wifi-sensor",
-   "board": "cc1354p10",
-   "why_not": "no-radio",
-   "basis": "The LP-CC1354P10-1 radio does Bluetooth LE, Thread, Zigbee and proprietary sub-1 GHz or 2.4 GHz, not Wi-Fi; this build needs Wi-Fi.",
-   "label": "No Wi-Fi radio"
-  },
-  {
-   "project": "wifi-sensor",
-   "board": "cc2755p10",
-   "why_not": "no-radio",
-   "basis": "The LP-EM-CC2755P10 radio does Bluetooth LE, Thread, Zigbee and proprietary sub-1 GHz or 2.4 GHz, not Wi-Fi; this build needs Wi-Fi.",
-   "label": "No Wi-Fi radio"
-  },
-  {
-   "project": "linux-vision",
-   "board": "c1104",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-MSPM0C1104 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "linux-vision",
-   "board": "g3519",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-MSPM0G3519 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "linux-vision",
-   "board": "g5187",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-MSPM0G5187 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "linux-vision",
-   "board": "mspm33c321a",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-MSPM33C321A is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "linux-vision",
-   "board": "am13e230",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-AM13E230 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "linux-vision",
-   "board": "cc1354p10",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-CC1354P10-1 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "linux-vision",
-   "board": "cc2755p10",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-EM-CC2755P10 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "linux-vision",
-   "board": "cc35x1",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-EM-CC35X1 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "linux-vision",
-   "board": "iwrl6432boost",
-   "why_not": "no-software",
-   "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the IWRL6432BOOST is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
-  },
-  {
-   "project": "micropython",
-   "board": "c1104",
-   "why_not": "flash",
-   "basis": "Our minimal MicroPython build is 74,608 bytes of flash (data/results/mspm0g3507.csv port_flash_bytes, micropython-min); the LP-MSPM0C1104 has 16 kB."
-  },
-  {
-   "project": "micropython",
-   "board": "l1306",
-   "why_not": "flash",
-   "basis": "Our minimal MicroPython build is 74,608 bytes of flash (data/results/mspm0g3507.csv port_flash_bytes, micropython-min); the LP-MSPM0L1306 has 64 kB."
-  },
-  {
-   "project": "run-zephyr",
-   "board": "c1104",
-   "why_not": "ram",
-   "basis": "Zephyr's blinky leaves only 200 to 260 bytes free in the LP-MSPM0L1306's 4 kB of RAM (run-zephyr cell); the LP-MSPM0C1104 has 1 kB."
-  }
- ]
+  "note": "Predictions for the Builds by board grid (tools/render_projects.py matrix_rows, shown on portability-proven.html#builds). should_work: a cell nobody has run, predicted from a sibling that Works in the same project (sibling, sibling_result) after a fit check (fit: SDK, memory, peripherals, header); the basis is the cell's hover. not_for_chip: a project the chip or its vendor software cannot run (why_not is a key in site_ui.REASONS; label overrides the hover word). Neither is a measured result: a cell only shows these while it has no run of its own, and the renderer fails if a sibling stops being Works. Added 2026-10-22; method in docs/research/builds-grid-run-plan-2026-10-22.md.",
+  "should_work": [
+    {
+      "project": "blink",
+      "board": "g3519",
+      "sibling": "g3507",
+      "sibling_result": "data/results/mspm0g3507.csv time_to_blink",
+      "fit": "Same MSPM0 SDK 2.11, TI Arm Clang and DriverLib gpio_toggle_output; LP-MSPM0G3519 has 512 kB flash and 128 kB RAM against the G3507's 128 kB and 32 kB; LED on the board; blink_build and blink_flash rows measured here (data/results/mspm0g3519.csv, 2026-10-08)",
+      "basis": "Works on the LP-MSPM0G3507 (time_to_blink). On the LP-MSPM0G3519 the same blink built in 3 to 6 s and flashed (blink_build, blink_flash rows); the timed first-blink row and the changed-pattern check were not recorded."
+    },
+    {
+      "project": "blink",
+      "board": "g5187",
+      "sibling": "g3507",
+      "sibling_result": "data/results/mspm0g3507.csv time_to_blink",
+      "fit": "Same MSPM0 SDK 2.11, TI Arm Clang and DriverLib gpio_toggle_output; LP-MSPM0G5187 has 128 kB flash and 32 kB RAM against the G3507's 128 kB and 32 kB; LED on the board; blink_build and blink_flash rows measured here (data/results/mspm0g5187.csv, 2026-10-08)",
+      "basis": "Works on the LP-MSPM0G3507 (time_to_blink). On the LP-MSPM0G5187 the same blink built in 3 to 6 s and flashed (blink_build, blink_flash rows); the timed first-blink row and the changed-pattern check were not recorded."
+    },
+    {
+      "project": "blink",
+      "board": "cc1354p10",
+      "sibling": "cc2755p10",
+      "sibling_result": "data/results/cc2755p10.csv time_to_blink",
+      "fit": "Same SimpleLink LaunchPad flow, TI Arm Clang and an on-board LED; 1024 kB flash against the CC2755P10's 1024 kB; blink image built at 11,780 bytes (blink_flash_bytes, data/results/cc1354p10.csv). Different SDK (CC13xx CC26xx SDK, not the F3 SDK), but images from that SDK already flash and run on this board (Zigbee, Thread, sub-1 GHz receiver)",
+      "basis": "Works on the LP-EM-CC2755P10 (time_to_blink 41 s). This board builds a blink image and runs other flashed images from its own SDK; the blink itself was not timed here."
+    },
+    {
+      "project": "print-a-message",
+      "board": "g3519",
+      "sibling": "l1306",
+      "sibling_result": "Works on LP-MSPM0L1306 and LP-MSPM0G3507 (print-a-message cells in site/data/projects.json)",
+      "fit": "Same MSPM0 SDK 2.11 UART console example (512 kB flash, 128 kB RAM; the console image is small); UART0 runs clean on this board (uart_max_clean, data/results/mspm0g3519.csv); the XDS110 back-channel jumper path was not checked",
+      "basis": "Works on the LP-MSPM0L1306 and LP-MSPM0G3507. The LP-MSPM0G3519 has the same UART peripheral and ran UART loopback clean, so TI's console example should print there; it was not run."
+    },
+    {
+      "project": "print-a-message",
+      "board": "g5187",
+      "sibling": "l1306",
+      "sibling_result": "Works on LP-MSPM0L1306 and LP-MSPM0G3507 (print-a-message cells in site/data/projects.json)",
+      "fit": "Same MSPM0 SDK 2.11 UART console example (128 kB flash, 32 kB RAM; the console image is small); UART0 runs clean on this board (uart_max_clean, data/results/mspm0g5187.csv); the XDS110 back-channel jumper path was not checked",
+      "basis": "Works on the LP-MSPM0L1306 and LP-MSPM0G3507. The LP-MSPM0G5187 has the same UART peripheral and ran UART loopback clean, so TI's console example should print there; it was not run."
+    },
+    {
+      "project": "print-a-message",
+      "board": "c1104",
+      "sibling": "l1306",
+      "sibling_result": "Works on LP-MSPM0L1306 and LP-MSPM0G3507 (print-a-message cells in site/data/projects.json)",
+      "fit": "Same MSPM0 SDK 2.11 UART console example (16 kB flash, 1 kB RAM; the console image is small); UART0 runs clean on this board (uart_max_clean, data/results/mspm0c1104.csv); the XDS110 back-channel jumper path was not checked",
+      "basis": "Works on the LP-MSPM0L1306 and LP-MSPM0G3507. The LP-MSPM0C1104 has the same UART peripheral and ran UART loopback clean, so TI's console example should print there; it was not run."
+    },
+    {
+      "project": "print-a-message",
+      "board": "cc2755p10",
+      "sibling": "cc2340r5",
+      "sibling_result": "Works on LP-EM-CC2340R5 (print-a-message cell in site/data/projects.json)",
+      "fit": "Same SimpleLink Low Power F3 SDK and TI Arm Clang; 1024 kB flash, 162 kB RAM; UART1 ran clean at 3.0 Mbaud through the LP-XDS110ET probe (uart_max_clean, data/results/cc2755p10.csv)",
+      "basis": "Works on the LP-EM-CC2340R5 (serial text through the clip-on probe). The LP-EM-CC2755P10 uses the same F3 SDK and probe and ran UART clean; the console print itself was not run."
+    },
+    {
+      "project": "handwritten-digits",
+      "board": "g5187",
+      "sibling": "g3507",
+      "sibling_result": "data/results/mspm0g3507.csv ai_mnist_cycles",
+      "fit": "Same MSPM0 DriverLib and TI Arm Clang; 128 kB flash and 32 kB RAM, identical to the G3507; the same BitNetMCU C code ran on the G3519 (ai_mnist_cycles, data/results/mspm0g3519.csv). Inference only; the screen and touch pins were not compared",
+      "basis": "Works on the LP-MSPM0G3507 and LP-MSPM0G3519 (ai_mnist_cycles). The LP-MSPM0G5187 has the G3507's memory and core, so the same model should run; not run there."
+    },
+    {
+      "project": "build-from-terminal",
+      "board": "g3519",
+      "sibling": "g3507",
+      "sibling_result": "build-from-terminal cell (Works) and data/results/mspm0l1306.csv blink_build",
+      "fit": "Same MSPM0 SDK 2.11 make route and TI Arm Clang 5.1.1; examples_built 97.0 percent from one make per example on this board; blink built from the CLI in 3.2 s and flashed (data/results/mspm0g3519.csv)",
+      "basis": "Works on the LP-MSPM0G3507 and LP-MSPM0L1306. On the LP-MSPM0G3519 the SDK examples build with one make each and the blink flashed from the terminal; the one-command wrapper was not run here."
+    },
+    {
+      "project": "build-from-terminal",
+      "board": "g5187",
+      "sibling": "g3507",
+      "sibling_result": "build-from-terminal cell (Works) and data/results/mspm0l1306.csv blink_build",
+      "fit": "Same MSPM0 SDK 2.11 make route and TI Arm Clang 5.1.1; examples_built 85.7 percent from one make per example on this board; blink built from the CLI in 4.0 s and flashed (data/results/mspm0g5187.csv)",
+      "basis": "Works on the LP-MSPM0G3507 and LP-MSPM0L1306. On the LP-MSPM0G5187 the SDK examples build with one make each and the blink flashed from the terminal; the one-command wrapper was not run here."
+    },
+    {
+      "project": "build-from-terminal",
+      "board": "mspm33c321a",
+      "sibling": "g3507",
+      "sibling_result": "build-from-terminal cell (Works); own board: data/results/mspm33c321a.csv time_to_blink cli 19 s",
+      "fit": "Same TI Arm Clang 5.1.1 make route; MSPM33 SDK 1.04 builds 100 percent of its examples and the blink ran from the CLI in 19 s on this board (time_to_blink, examples_built); the one-command wrapper was not run",
+      "basis": "Own-board rows show build and flash from the terminal; the repo's one-command wrapper has not been pointed at this board."
+    },
+    {
+      "project": "build-from-terminal",
+      "board": "am13e230",
+      "sibling": "g3507",
+      "sibling_result": "build-from-terminal cell (Works); own board: data/results/am13e230.csv time_to_blink cli 22 s",
+      "fit": "Same TI Arm Clang 5.1.1 make route; AM13E230 SDK 26.01 builds 100 percent of its examples and the blink ran from the CLI in 22 s on this board (time_to_blink, examples_built); the one-command wrapper was not run",
+      "basis": "Own-board rows show build and flash from the terminal; the repo's one-command wrapper has not been pointed at this board."
+    },
+    {
+      "project": "build-from-terminal",
+      "board": "cc1354p10",
+      "sibling": "cc2755p10",
+      "sibling_result": "build-from-terminal cell (Works on LP-EM-CC2755P10)",
+      "fit": "Terminal builds of the CC13xx CC26xx SDK examples at 98.1 percent (examples_built, data/results/cc1354p10.csv) and headless builds already used for its Zigbee and Thread images; different SDK from the CC2755P10's F3 SDK",
+      "basis": "Works on the LP-EM-CC2755P10 and LP-EM-CC35X1. This board builds from a terminal and has flashed images of its own; the one-command wrapper was not run here."
+    },
+    {
+      "project": "print-a-message",
+      "board": "cc1354p10",
+      "sibling": "cc2755p10",
+      "sibling_result": "Works on the LP-EM-CC2755P10 (print-a-message cell in site/data/projects.json)",
+      "fit": "Same TI Arm Clang and an XDS110 back-channel UART on the LaunchPad; SimpleLink UART2 console example in the CC13xx_CC26xx SDK (a different SDK from the CC2755P10's F3 SDK, so driver names differ); 1024 kB flash and 296 kB RAM against a console image of a few kB; 256 of 261 SDK examples build here and one command writes a blink (data/results/cc1354p10.csv)",
+      "basis": "Works on the LP-EM-CC2755P10. The LP-CC1354P10-1 builds and writes TI's examples from the terminal, but the console message was not printed here."
+    },
+    {
+      "project": "print-a-message",
+      "board": "am13e230",
+      "sibling": "mspm33c321a",
+      "sibling_result": "Works on the LP-MSPM33C321A (print-a-message cell in site/data/projects.json)",
+      "fit": "Both are Cortex-M33 parts built with TI Arm Clang; the AM13 SDK is a different SDK from the MSPM33 one, so the UART call names differ; 512 kB flash and 128 kB RAM against a console image of a few kB; UC0 to UC1 loopback runs clean up to 6.25 Mbaud (uart_max_clean, data/results/am13e230.csv); the XDS110 back-channel path was not checked",
+      "basis": "Works on the LP-MSPM33C321A. The LP-AM13E230 ran UART loopback clean and builds and flashes TI's examples from the terminal, so a console example should print there; it was not run."
+    },
+    {
+      "project": "post-quantum",
+      "board": "am13e230",
+      "sibling": "mspm33c321a",
+      "sibling_result": "Works on the LP-MSPM33C321A (post-quantum cell in site/data/projects.json)",
+      "fit": "Both are Cortex-M33 parts built with TI Arm Clang (a different SDK, but the code is plain C); 512 kB flash and 128 kB RAM against 256 kB RAM on the LP-MSPM33C321A; ML-KEM-768 needs 14 to 20 kB of stack and ML-DSA-44 signing 31 to 52 kB (pqc_stack_peak rows, data/results/mspm33c321a.csv)",
+      "basis": "Both algorithms pass NIST's known-answer vectors on the LP-MSPM33C321A. The LP-AM13E230 has the same core and enough RAM for the measured stack; it was not run."
+    },
+    {
+      "project": "post-quantum",
+      "board": "am62l",
+      "sibling": "tda4",
+      "sibling_result": "Works on the SK-TDA4VM (pqc_mlkem768_* and pqc_mldsa44_* rows in data/results/tda4.csv)",
+      "fit": "Portable C (mlkem-native) built with GCC under Linux; the TMDS62LEVM has GCC 14 on the board (blink_build row, data/results/am62l-evm.csv) and 2 GB of RAM; Cortex-A53 against the TDA4VM's Cortex-A72",
+      "basis": "Works on the SK-TDA4VM: ML-KEM-768 key generation 148,546 cycles on a 2 GHz A72. The same source has not been built on the AM62L."
+    },
+    {
+      "project": "ulisp",
+      "board": "cc2755p10",
+      "sibling": "cc2340r5",
+      "sibling_result": "Works on the LP-EM-CC2340R5 (ulisp cell in site/data/projects.json)",
+      "fit": "Same SimpleLink F3 SDK and TI Arm Clang as the CC2340R5 port; 1024 kB flash and 162 kB RAM against the CC2340R5's 512 kB and 36 kB; the uLisp image is 98.6 kB of flash and 24.6 kB of static RAM",
+      "basis": "Works on the LP-EM-CC2340R5 (19 of 19 REPL checks, 98.6 kB of flash). Same source and workspace size should fit here; the UART and timer shim for this SDK was not written."
+    },
+    {
+      "project": "ulisp",
+      "board": "cc1354p10",
+      "sibling": "cc2340r5",
+      "sibling_result": "Works on the LP-EM-CC2340R5 (ulisp cell in site/data/projects.json)",
+      "fit": "TI Arm Clang; the CC13xx_CC26xx SDK is a different SDK from the CC2340R5's F3 SDK, so the UART and timer calls change; 1024 kB flash and 296 kB RAM; the uLisp image is 98.6 kB of flash and 24.6 kB of static RAM",
+      "basis": "Works on the LP-EM-CC2340R5 (19 of 19 REPL checks, 98.6 kB of flash). Same source and workspace size should fit here; the UART and timer shim for this SDK was not written."
+    },
+    {
+      "project": "ulisp",
+      "board": "cc35x1",
+      "sibling": "cc2340r5",
+      "sibling_result": "Works on the LP-EM-CC2340R5 (ulisp cell in site/data/projects.json)",
+      "fit": "Cortex-M33 against the CC2340R5's Cortex-M0+, same TI Arm Clang; 8192 kB flash and 1126 kB RAM against the 98.6 kB and 24.6 kB image; the Wi-Fi SDK builds TI examples from the terminal here; the UART and timer shim for this SDK is not written",
+      "basis": "Works on the LP-EM-CC2340R5 and LP-MSPM0G5187. The LP-EM-CC35X1 has 11 times the flash the image needs; the port was not built for it."
+    },
+    {
+      "project": "ulisp",
+      "board": "mspm33c321a",
+      "sibling": "g5187",
+      "sibling_result": "Works on the LP-MSPM0G5187 (ulisp cell in site/data/projects.json)",
+      "fit": "MSPM33 is the Cortex-M33 sibling of the MSPM0 line and the LaunchPad has the same UART header; 1024 kB flash and 256 kB RAM against the 101.2 kB and 23.7 kB image (ports/ulisp/results/build-sizes.txt); the MSPM33 SDK calls differ from MSPM0's in the shim",
+      "basis": "Works on the LP-MSPM0G5187 (19 of 19 REPL checks). The LP-MSPM33C321A has the memory and a 160 MHz clock; the shim was not built for it."
+    },
+    {
+      "project": "ulisp",
+      "board": "am13e230",
+      "sibling": "g5187",
+      "sibling_result": "Works on the LP-MSPM0G5187 (ulisp cell in site/data/projects.json)",
+      "fit": "Cortex-M33 at 200 MHz against the G5187's Cortex-M0+; 512 kB flash and 128 kB RAM against the 101.2 kB and 23.7 kB image; the AM13 SDK is a different SDK, so the shim's UART and timer calls change; UART runs clean (uart_max_clean, data/results/am13e230.csv)",
+      "basis": "Works on the LP-MSPM0G5187. The LP-AM13E230 has the memory for the same image; the shim was not built for it."
+    },
+    {
+      "project": "arduino",
+      "board": "am243x",
+      "sibling": "cc2340r5",
+      "sibling_result": "Works on the LP-EM-CC2340R5 (arduino cell in site/data/projects.json; ports.json arduino-zephyr)",
+      "fit": "Upstream Zephyr 4.5.0-rc2 runs hello_world and blinky on the AM243x R5F core 0 (zephyr_support, data/results/am243x.csv); 2 MB of on-chip RAM; the core needs a pin-map overlay and an LED alias for this board",
+      "basis": "Works on the LP-EM-CC2340R5 (Blink, AnalogReadSerial). Zephyr blinky toggles on the LP-AM243; the Arduino core was not built for it and analogRead needs an ADC node that was not checked."
+    },
+    {
+      "project": "micropython",
+      "board": "am243x",
+      "sibling": "cc2340r5",
+      "sibling_result": "Works on the LP-EM-CC2340R5 (micropython cell in site/data/projects.json; ports.json micropython-zephyr-cc2340r5)",
+      "fit": "Upstream Zephyr runs hello_world and blinky on the AM243x R5F core 0 (data/results/am243x.csv); the Zephyr-port image is 174.8 kB of flash and 29.9 kB of RAM on the CC2340R5 against 2 MB of on-chip RAM; Cortex-R5F instead of Cortex-M0+",
+      "basis": "Works on the LP-EM-CC2340R5. Zephyr runs on the LP-AM243; the MicroPython image was not built for it."
+    },
+    {
+      "project": "run-zephyr",
+      "board": "mspm33c321a",
+      "sibling": "am13e230",
+      "sibling_result": "Works on the LP-AM13E230 (run-zephyr cell in site/data/projects.json)",
+      "fit": "Both are Cortex-M33 TI parts with an upstream Zephyr board; lp_mspm33c321a was merged to Zephyr main on 2026-07-17 and hello_world builds at 11,052 B of flash (data/results/mspm33c321a.csv); 1024 kB flash and 256 kB RAM",
+      "basis": "Works on the LP-AM13E230. On the LP-MSPM33C321A Zephyr main boots MicroPython (a >>> prompt, Pin, SPI); the Zephyr GPIO driver needs two open TI pull requests, so this is not the stock 4.4.2 release."
+    },
+    {
+      "project": "handwritten-digits",
+      "board": "cc2340r5",
+      "sibling": "cc1354p10",
+      "sibling_result": "Works on the LP-CC1354P10-1 (handwritten-digits cell in site/data/projects.json)",
+      "fit": "BitNetMCU is plain C built with TI Arm Clang, as on the CC1354P10; the 99.55 percent model reads the digits in 4 kB of RAM on the LP-MSPM0L1306; the LP-EM-CC2340R5 has 36 kB of RAM; same SimpleLink family",
+      "basis": "Works on the LP-CC1354P10-1 (10 of 10 stored digits, 1.13 million cycles each at 48 MHz). Not run on the LP-EM-CC2340R5."
+    },
+    {
+      "project": "handwritten-digits",
+      "board": "cc2755p10",
+      "sibling": "cc1354p10",
+      "sibling_result": "Works on the LP-CC1354P10-1 (handwritten-digits cell in site/data/projects.json)",
+      "fit": "BitNetMCU is plain C built with TI Arm Clang, as on the CC1354P10; the 99.55 percent model reads the digits in 4 kB of RAM on the LP-MSPM0L1306; the LP-EM-CC2755P10 has 162 kB of RAM; same SimpleLink family",
+      "basis": "Works on the LP-CC1354P10-1 (10 of 10 stored digits, 1.13 million cycles each at 48 MHz). Not run on the LP-EM-CC2755P10."
+    },
+    {
+      "project": "handwritten-digits",
+      "board": "cc35x1",
+      "sibling": "g3507",
+      "sibling_result": "Works on the LP-MSPM0G3507 (handwritten-digits cell in site/data/projects.json)",
+      "fit": "BitNetMCU is plain C; a Cortex-M33 runs the Cortex-M0+ code unchanged; the LP-EM-CC35X1 has 1126 kB of RAM against the 4 kB the 99.55 percent model needs on the LP-MSPM0L1306; small-ai-model runs on this board (data/results/cc35x1.csv); the stored-digit check needs no screen",
+      "basis": "Works on the LP-MSPM0G3507 (10 of 10 test digits on all four models, 34 ms at 80 MHz). Not run on the LP-EM-CC35X1."
+    },
+    {
+      "project": "handwritten-digits",
+      "board": "mspm33c321a",
+      "sibling": "g3507",
+      "sibling_result": "Works on the LP-MSPM0G3507 (handwritten-digits cell in site/data/projects.json)",
+      "fit": "BitNetMCU is plain C; a Cortex-M33 runs the Cortex-M0+ code unchanged; the LP-MSPM33C321A has 256 kB of RAM against the 4 kB the 99.55 percent model needs on the LP-MSPM0L1306; small-ai-model runs on this board (data/results/mspm33c321a.csv); the stored-digit check needs no screen",
+      "basis": "Works on the LP-MSPM0G3507 (10 of 10 test digits on all four models, 34 ms at 80 MHz). Not run on the LP-MSPM33C321A."
+    },
+    {
+      "project": "handwritten-digits",
+      "board": "am13e230",
+      "sibling": "g3507",
+      "sibling_result": "Works on the LP-MSPM0G3507 (handwritten-digits cell in site/data/projects.json)",
+      "fit": "BitNetMCU is plain C; a Cortex-M33 runs the Cortex-M0+ code unchanged; the LP-AM13E230 has 128 kB of RAM against the 4 kB the 99.55 percent model needs on the LP-MSPM0L1306; small-ai-model runs on this board (data/results/am13e230.csv); the stored-digit check needs no screen",
+      "basis": "Works on the LP-MSPM0G3507 (10 of 10 test digits on all four models, 34 ms at 80 MHz). Not run on the LP-AM13E230."
+    },
+    {
+      "project": "handwritten-digits",
+      "board": "g3519",
+      "sibling": "g3507",
+      "sibling_result": "Works on the LP-MSPM0G3507 (handwritten-digits cell in site/data/projects.json)",
+      "fit": "Same MSPM0 SDK, TI Arm Clang and plain-C model; 128 kB RAM against the 4 kB the 99.55 percent model needs; small-ai-model runs on this board (data/results/mspm0g3519.csv); the stored-digit check needs no screen",
+      "basis": "Works on the LP-MSPM0G3507 (10 of 10 test digits, 34 ms at 80 MHz). Not run on the LP-MSPM0G3519; its touch screen path is a separate small-screen cell."
+    }
+  ],
+  "not_for_chip": [
+    {
+      "project": "bluetooth-sensor",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "bluetooth-sensor",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "bluetooth-sensor",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "bluetooth-sensor",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "bluetooth-sensor",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "battery-sensor-home-assistant",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "battery-sensor-home-assistant",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "battery-sensor-home-assistant",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "battery-sensor-home-assistant",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "battery-sensor-home-assistant",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "zigbee-light",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "zigbee-light",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "zigbee-light",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "zigbee-light",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "zigbee-light",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Zigbee; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "hubble-satellite",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "hubble-satellite",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "hubble-satellite",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "hubble-satellite",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "hubble-satellite",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-border-router",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-border-router",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-border-router",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-border-router",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-border-router",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-device",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-device",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-device",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-device",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "thread-device",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Thread (802.15.4); the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "matter-device",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi or Thread; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "matter-device",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi or Thread; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "matter-device",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi or Thread; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "matter-device",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi or Thread; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "matter-device",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi or Thread; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "two-radios",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE and Zigbee; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "two-radios",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE and Zigbee; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "two-radios",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE and Zigbee; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "two-radios",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE and Zigbee; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "two-radios",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE and Zigbee; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-presence",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-presence",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-presence",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-presence",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-presence",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-sensor",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-sensor",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-sensor",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-sensor",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "wifi-sensor",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Wi-Fi; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "esphome",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs a TI wireless chip; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "esphome",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs a TI wireless chip; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "esphome",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs a TI wireless chip; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "esphome",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs a TI wireless chip; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "esphome",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs a TI wireless chip; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ble-gamepad",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ble-gamepad",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ble-gamepad",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ble-gamepad",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ble-gamepad",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "tool-telemetry",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0C1104 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "tool-telemetry",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0G3519 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "tool-telemetry",
+      "board": "g5187",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM0G5187 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "tool-telemetry",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-MSPM33C321A has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "tool-telemetry",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "This project needs Bluetooth LE; the LP-AM13E230 has no radio on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ota-update",
+      "board": "c1104",
+      "why_not": "no-radio",
+      "basis": "Updating over the air needs a radio; the LP-MSPM0C1104 has none on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ota-update",
+      "board": "g3519",
+      "why_not": "no-radio",
+      "basis": "Updating over the air needs a radio; the LP-MSPM0G3519 has none on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ota-update",
+      "board": "mspm33c321a",
+      "why_not": "no-radio",
+      "basis": "Updating over the air needs a radio; the LP-MSPM33C321A has none on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "ota-update",
+      "board": "am13e230",
+      "why_not": "no-radio",
+      "basis": "Updating over the air needs a radio; the LP-AM13E230 has none on the chip, the same as the LP-MSPM0G3507 and LP-MSPM0L1306 cells for this build."
+    },
+    {
+      "project": "battery-sensor-home-assistant",
+      "board": "cc35x1",
+      "why_not": "no-radio",
+      "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
+      "label": "No 802.15.4 radio"
+    },
+    {
+      "project": "zigbee-light",
+      "board": "cc35x1",
+      "why_not": "no-radio",
+      "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
+      "label": "No 802.15.4 radio"
+    },
+    {
+      "project": "thread-border-router",
+      "board": "cc35x1",
+      "why_not": "no-radio",
+      "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
+      "label": "No 802.15.4 radio"
+    },
+    {
+      "project": "thread-device",
+      "board": "cc35x1",
+      "why_not": "no-radio",
+      "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
+      "label": "No 802.15.4 radio"
+    },
+    {
+      "project": "two-radios",
+      "board": "cc35x1",
+      "why_not": "no-radio",
+      "basis": "The CC3551E has Wi-Fi and Bluetooth LE but no 802.15.4 radio, so it cannot carry Zigbee or Thread; Matter on this board runs over Wi-Fi (see Add a Wi-Fi board to Apple Home).",
+      "label": "No 802.15.4 radio"
+    },
+    {
+      "project": "wifi-presence",
+      "board": "cc1354p10",
+      "why_not": "no-radio",
+      "basis": "The LP-CC1354P10-1 radio does Bluetooth LE, Thread, Zigbee and proprietary sub-1 GHz or 2.4 GHz, not Wi-Fi; this build needs Wi-Fi.",
+      "label": "No Wi-Fi radio"
+    },
+    {
+      "project": "wifi-presence",
+      "board": "cc2755p10",
+      "why_not": "no-radio",
+      "basis": "The LP-EM-CC2755P10 radio does Bluetooth LE, Thread, Zigbee and proprietary sub-1 GHz or 2.4 GHz, not Wi-Fi; this build needs Wi-Fi.",
+      "label": "No Wi-Fi radio"
+    },
+    {
+      "project": "wifi-sensor",
+      "board": "cc1354p10",
+      "why_not": "no-radio",
+      "basis": "The LP-CC1354P10-1 radio does Bluetooth LE, Thread, Zigbee and proprietary sub-1 GHz or 2.4 GHz, not Wi-Fi; this build needs Wi-Fi.",
+      "label": "No Wi-Fi radio"
+    },
+    {
+      "project": "wifi-sensor",
+      "board": "cc2755p10",
+      "why_not": "no-radio",
+      "basis": "The LP-EM-CC2755P10 radio does Bluetooth LE, Thread, Zigbee and proprietary sub-1 GHz or 2.4 GHz, not Wi-Fi; this build needs Wi-Fi.",
+      "label": "No Wi-Fi radio"
+    },
+    {
+      "project": "linux-vision",
+      "board": "c1104",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-MSPM0C1104 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "linux-vision",
+      "board": "g3519",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-MSPM0G3519 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "linux-vision",
+      "board": "g5187",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-MSPM0G5187 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "linux-vision",
+      "board": "mspm33c321a",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-MSPM33C321A is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "linux-vision",
+      "board": "am13e230",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-AM13E230 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "linux-vision",
+      "board": "cc1354p10",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-CC1354P10-1 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "linux-vision",
+      "board": "cc2755p10",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-EM-CC2755P10 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "linux-vision",
+      "board": "cc35x1",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the LP-EM-CC35X1 is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "linux-vision",
+      "board": "iwrl6432boost",
+      "why_not": "no-software",
+      "basis": "This build runs a TIDL model on the TDA4VM's C7x accelerator under Linux; the IWRL6432BOOST is a microcontroller board with no Linux and no C7x, the same as the four LaunchPad cells for this build."
+    },
+    {
+      "project": "micropython",
+      "board": "c1104",
+      "why_not": "flash",
+      "basis": "Our minimal MicroPython build is 74,608 bytes of flash (data/results/mspm0g3507.csv port_flash_bytes, micropython-min); the LP-MSPM0C1104 has 16 kB."
+    },
+    {
+      "project": "micropython",
+      "board": "l1306",
+      "why_not": "flash",
+      "basis": "Our minimal MicroPython build is 74,608 bytes of flash (data/results/mspm0g3507.csv port_flash_bytes, micropython-min); the LP-MSPM0L1306 has 64 kB."
+    },
+    {
+      "project": "run-zephyr",
+      "board": "c1104",
+      "why_not": "ram",
+      "basis": "Zephyr's blinky leaves only 200 to 260 bytes free in the LP-MSPM0L1306's 4 kB of RAM (run-zephyr cell); the LP-MSPM0C1104 has 1 kB."
+    },
+    {
+      "project": "post-quantum",
+      "board": "l1306",
+      "why_not": "ram",
+      "basis": "ML-KEM-768 key generation uses 14 to 18 kB of stack on the LP-MSPM0G5187 (data/results/mspm0g5187.csv); the LP-MSPM0L1306 has 4 kB of RAM."
+    },
+    {
+      "project": "post-quantum",
+      "board": "c1104",
+      "why_not": "ram",
+      "basis": "ML-KEM-768 key generation uses 14 to 18 kB of stack on the LP-MSPM0G5187 (data/results/mspm0g5187.csv); the LP-MSPM0C1104 has 1 kB of RAM."
+    },
+    {
+      "project": "ulisp",
+      "board": "c1104",
+      "why_not": "flash",
+      "basis": "The smallest uLisp image is 100.2 kB of flash (data/results/mspm0g5187.csv port_flash_bytes, ulisp-4.9a, 101,176 B built here); the LP-MSPM0C1104 has 16 kB."
+    },
+    {
+      "project": "ulisp",
+      "board": "f2800137",
+      "why_not": "no-software",
+      "basis": "uLisp is written for 8-bit-byte Arm and AVR targets and built with GNU Arm; the C28x has 16-bit chars (the post-quantum cell on this board needed uint8_t redefined) and no GCC or LLVM compiler targets it (Zephyr issue 96186). No C28x port of uLisp exists."
+    },
+    {
+      "project": "ulisp",
+      "board": "tda4",
+      "why_not": "no-software",
+      "basis": "This is the microcontroller image of uLisp (an Arduino-style sketch with a UART shim); the SK-TDA4VM runs Edge AI Linux on Cortex-A cores, so a Lisp there would be a Linux program, not this build."
+    },
+    {
+      "project": "ulisp",
+      "board": "am62l",
+      "why_not": "no-software",
+      "basis": "This is the microcontroller image of uLisp (an Arduino-style sketch with a UART shim); the TMDS62LEVM runs Linux on Cortex-A cores, so a Lisp there would be a Linux program, not this build."
+    },
+    {
+      "project": "arduino",
+      "board": "cc1354p10",
+      "why_not": "no-software",
+      "basis": "This build runs on Zephyr, and Zephyr 4.4.2 has no CC13x4 or CC26x4 support (zephyr_support, data/results/cc1354p10.csv)."
+    },
+    {
+      "project": "arduino",
+      "board": "cc35x1",
+      "why_not": "no-software",
+      "basis": "This build runs on Zephyr, and Zephyr 4.4.2 has no CC35xx board or SoC (zephyr_support, data/results/cc35x1.csv)."
+    },
+    {
+      "project": "arduino",
+      "board": "iwrl6432boost",
+      "why_not": "no-software",
+      "basis": "This build runs on Zephyr, and Zephyr has no xWRL6432 board or SoC (zephyr_support, data/results/iwrl6432boost.csv), and searches on 2026-10-09 found no Arduino core port for the xWRL64xx."
+    },
+    {
+      "project": "arduino",
+      "board": "f2800137",
+      "why_not": "no-software",
+      "basis": "This build runs on Zephyr, and C28x is not in upstream Zephyr (issue 96186) and no GCC or LLVM compiler targets it (zephyr_support, data/results/f2800137.csv); the C28x also has 16-bit chars."
+    },
+    {
+      "project": "arduino",
+      "board": "tda4",
+      "why_not": "no-software",
+      "basis": "This is a microcontroller build (the Arduino core on Zephyr); the SK-TDA4VM runs Edge AI Linux on Cortex-A cores, where it would be a Linux program, not this build."
+    },
+    {
+      "project": "arduino",
+      "board": "am62l",
+      "why_not": "no-software",
+      "basis": "This is a microcontroller build (the Arduino core on Zephyr); the TMDS62LEVM runs Linux on Cortex-A cores, where it would be a Linux program, not this build."
+    },
+    {
+      "project": "micropython",
+      "board": "cc1354p10",
+      "why_not": "no-software",
+      "basis": "This build runs on Zephyr, and Zephyr 4.4.2 has no CC13x4 or CC26x4 support (zephyr_support, data/results/cc1354p10.csv)."
+    },
+    {
+      "project": "micropython",
+      "board": "cc35x1",
+      "why_not": "no-software",
+      "basis": "This build runs on Zephyr, and Zephyr 4.4.2 has no CC35xx board or SoC (zephyr_support, data/results/cc35x1.csv)."
+    },
+    {
+      "project": "micropython",
+      "board": "iwrl6432boost",
+      "why_not": "no-software",
+      "basis": "This build runs on Zephyr, and Zephyr has no xWRL6432 board or SoC (zephyr_support, data/results/iwrl6432boost.csv), and searches on 2026-10-09 found no MicroPython port for the xWRL64xx."
+    },
+    {
+      "project": "micropython",
+      "board": "f2800137",
+      "why_not": "no-software",
+      "basis": "This build runs on Zephyr, and C28x is not in upstream Zephyr (issue 96186) and no GCC or LLVM compiler targets it (zephyr_support, data/results/f2800137.csv); the C28x also has 16-bit chars."
+    },
+    {
+      "project": "micropython",
+      "board": "tda4",
+      "why_not": "no-software",
+      "basis": "This is a microcontroller build (MicroPython on Zephyr); the SK-TDA4VM runs Edge AI Linux on Cortex-A cores, where it would be a Linux program, not this build."
+    },
+    {
+      "project": "micropython",
+      "board": "am62l",
+      "why_not": "no-software",
+      "basis": "This is a microcontroller build (MicroPython on Zephyr); the TMDS62LEVM runs Linux on Cortex-A cores, where it would be a Linux program, not this build."
+    },
+    {
+      "project": "arduino",
+      "board": "c1104",
+      "why_not": "ram",
+      "basis": "The Arduino layer's Blink needs 6,348 B of RAM on the LP-MSPM0G5187 (2,048 B stack and 4,096 B heap reserve, data/results/mspm0g5187.csv port_ram_bytes); the LP-MSPM0C1104 has 1 kB, and Zephyr has no board for it."
+    },
+    {
+      "project": "run-zephyr",
+      "board": "cc1354p10",
+      "why_not": "no-software",
+      "basis": "Zephyr 4.4.2 has no CC13x4 or CC26x4 support (zephyr_support, data/results/cc1354p10.csv)."
+    },
+    {
+      "project": "run-zephyr",
+      "board": "cc35x1",
+      "why_not": "no-software",
+      "basis": "Zephyr 4.4.2 has no CC35xx board or SoC (zephyr_support, data/results/cc35x1.csv)."
+    },
+    {
+      "project": "run-zephyr",
+      "board": "g5187",
+      "why_not": "no-software",
+      "basis": "Zephyr has the MSPM0 chip family but no board for the LP-MSPM0G5187 and no chip file for the G5187 (zephyr_support, data/results/mspm0g5187.csv)."
+    },
+    {
+      "project": "run-zephyr",
+      "board": "iwrl6432boost",
+      "why_not": "no-software",
+      "basis": "Zephyr has no xWRL6432 board or SoC (zephyr_support, data/results/iwrl6432boost.csv)."
+    },
+    {
+      "project": "doom",
+      "board": "l1306",
+      "why_not": "ram",
+      "basis": "The Doom engine needs 168 kB of static data and 268 kB of code (the LP-MSPM0G3507 cell, measured); the LP-MSPM0L1306 has 4 kB of RAM and 64 kB of flash."
+    },
+    {
+      "project": "doom",
+      "board": "c1104",
+      "why_not": "ram",
+      "basis": "The Doom engine needs 168 kB of static data and 268 kB of code (the LP-MSPM0G3507 cell, measured); the LP-MSPM0C1104 has 1 kB of RAM and 16 kB of flash."
+    },
+    {
+      "project": "doom",
+      "board": "cc2340r5",
+      "why_not": "ram",
+      "basis": "The Doom engine needs 168 kB of static data and 268 kB of code (the LP-MSPM0G3507 cell, measured); the LP-EM-CC2340R5 has 36 kB of RAM."
+    },
+    {
+      "project": "doom",
+      "board": "f2800137",
+      "why_not": "ram",
+      "basis": "The Doom engine needs 168 kB of static data and 268 kB of code (the LP-MSPM0G3507 cell, measured); the LAUNCHXL-F2800137 has 36 kB of RAM."
+    },
+    {
+      "project": "doom",
+      "board": "g5187",
+      "why_not": "ram",
+      "basis": "The Doom engine needs 168 kB of static data and 268 kB of code (the LP-MSPM0G3507 cell, measured); the LP-MSPM0G5187 has 32 kB of RAM and 128 kB of flash."
+    },
+    {
+      "project": "doom",
+      "board": "cc2755p10",
+      "why_not": "ram",
+      "basis": "The Doom engine needs 168 kB of static data and 268 kB of code (the LP-MSPM0G3507 cell, measured); the LP-EM-CC2755P10 has 162 kB of RAM."
+    },
+    {
+      "project": "doom",
+      "board": "am13e230",
+      "why_not": "ram",
+      "basis": "The Doom engine needs 168 kB of static data and 268 kB of code (the LP-MSPM0G3507 cell, measured); the LP-AM13E230 has 128 kB of RAM."
+    },
+    {
+      "project": "arcade",
+      "board": "l1306",
+      "why_not": "ram",
+      "basis": "The Game Boy emulator alone leaves 0.7 kB of RAM on the 32 kB LP-MSPM0G3507 and its game is 256 kB; the LP-MSPM0L1306 has 4 kB of RAM."
+    },
+    {
+      "project": "arcade",
+      "board": "c1104",
+      "why_not": "ram",
+      "basis": "The Game Boy emulator alone leaves 0.7 kB of RAM on the 32 kB LP-MSPM0G3507 and its game is 256 kB; the LP-MSPM0C1104 has 1 kB of RAM."
+    },
+    {
+      "project": "arcade",
+      "board": "cc2340r5",
+      "why_not": "ram",
+      "basis": "The Game Boy emulator alone leaves 0.7 kB of RAM on the 32 kB LP-MSPM0G3507 and its game is 256 kB; the LP-EM-CC2340R5 has 36 kB of RAM."
+    },
+    {
+      "project": "arcade",
+      "board": "f2800137",
+      "why_not": "ram",
+      "basis": "The Game Boy emulator alone leaves 0.7 kB of RAM on the 32 kB LP-MSPM0G3507 and its game is 256 kB; the LAUNCHXL-F2800137 has 36 kB of RAM."
+    }
+  ]
 }

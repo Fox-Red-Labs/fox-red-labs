@@ -1,0 +1,1658 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts found by tools/boardviz/pads_from_drawing.py, drawn but never labelled.",
+ "board": "TMDS62LEVM",
+ "id": "am62l-evm",
+ "source": "Positions read from the top-side board photo in the EVM user's guide (SPRUJG8B, figure 2-1), scale set from the 2.54 mm pitch of the J2 header. Pin names from tables 2-32 and 2-33. Checked 2026-11-09 against that photo and a bench close-up of the boot switches (docs/arrivals/img/am62l-evm-switches-as-shipped.jpg): connectors, memories, switches and LEDs redrawn at the photo's positions and colors.",
+ "size": [
+  135.3,
+  132.1
+ ],
+ "color": "#237a56",
+ "corner": 2.0,
+ "holes": [
+  [
+   3.2,
+   121.3,
+   2.8
+  ],
+  [
+   52.1,
+   121.8,
+   2.8
+  ],
+  [
+   3.8,
+   80.6,
+   2.8
+  ],
+  [
+   130.8,
+   128.4,
+   2.8
+  ],
+  [
+   123.3,
+   80.7,
+   2.8
+  ],
+  [
+   3.9,
+   3.5,
+   2.8
+  ],
+  [
+   124.2,
+   4.3,
+   2.8
+  ],
+  [
+   72.0,
+   79.8,
+   1.8
+  ],
+  [
+   86.6,
+   79.8,
+   1.8
+  ],
+  [
+   72.0,
+   65.3,
+   1.8
+  ],
+  [
+   86.6,
+   65.3,
+   1.8
+  ]
+ ],
+ "silk": [
+  {
+   "t": "AM62L EVM",
+   "x": 109.3,
+   "y": 37.8,
+   "s": 3.0,
+   "rot": 0
+  },
+  {
+   "t": "PROC181E1-1",
+   "x": 109.6,
+   "y": 34.8,
+   "s": 2.6,
+   "rot": 0
+  },
+  {
+   "t": "J2",
+   "x": 25.0,
+   "y": 124.7,
+   "s": 1.8,
+   "rot": 0
+  },
+  {
+   "t": "J3",
+   "x": 49.9,
+   "y": 124.7,
+   "s": 1.8,
+   "rot": 0
+  },
+  {
+   "t": "M.2 KEY E",
+   "x": 53.1,
+   "y": 117.7,
+   "s": 1.4,
+   "rot": 90
+  },
+  {
+   "t": "LPDDR4",
+   "x": 108.3,
+   "y": 73.0,
+   "s": 1.5,
+   "rot": 90
+  },
+  {
+   "t": "BMODE 0_7",
+   "x": 34.7,
+   "y": 47.6,
+   "s": 1.3,
+   "rot": 0
+  },
+  {
+   "t": "SW4",
+   "x": 26.7,
+   "y": 42.5,
+   "s": 1.3,
+   "rot": 0
+  },
+  {
+   "t": "SW8 NWAKEUP",
+   "x": 22.5,
+   "y": 36.8,
+   "s": 1.2,
+   "rot": 0
+  },
+  {
+   "t": "J10",
+   "x": 46.1,
+   "y": 100.2,
+   "s": 1.3,
+   "rot": 0
+  }
+ ],
+ "parts": [
+  {
+   "type": "header",
+   "x": 20.7,
+   "y": 128.0,
+   "cols": 15,
+   "rows": 2
+  },
+  {
+   "type": "ringheader",
+   "x": 20.7,
+   "y": 128.0,
+   "id": "j2",
+   "cols": 15,
+   "rows": 2,
+   "names": [
+    [
+     "SPI1_D1",
+     "SPI1_CLK",
+     "DGND",
+     "UART4_RTSn",
+     "UART4_CTSn",
+     "SPI3_CS0",
+     "DGND",
+     "SPI3_D1",
+     "GPIO0_25",
+     "DGND",
+     "GPIO0_39",
+     "GPIO0_40",
+     "GPIO0_31",
+     "DGND",
+     "GPIO0_34"
+    ],
+    [
+     "SPI1_CS0",
+     "SPI1_D0",
+     "I2C3_SDA",
+     "I2C3_SCL",
+     "DGND",
+     "UART4_RXD",
+     "UART4_TXD",
+     "DGND",
+     "SPI3_CLK",
+     "SPI3_D0",
+     "GPIO0_30",
+     "DGND",
+     "GPIO0_41",
+     "GPIO0_33",
+     "GPIO0_32"
+    ]
+   ],
+   "pinno": [
+    [
+     29,
+     27,
+     25,
+     23,
+     21,
+     19,
+     17,
+     15,
+     13,
+     11,
+     9,
+     7,
+     5,
+     3,
+     1
+    ],
+    [
+     30,
+     28,
+     26,
+     24,
+     22,
+     20,
+     18,
+     16,
+     14,
+     12,
+     10,
+     8,
+     6,
+     4,
+     2
+    ]
+   ],
+   "label": "Expansion header J2",
+   "title": "J2, 30-pin expansion header",
+   "text": "Two SPI ports, a UART with flow control, an I2C bus and ground, all at 3.3 V logic. Pin 1 is at the right end of the top row.",
+   "key": true
+  },
+  {
+   "type": "header",
+   "x": 47.0,
+   "y": 128.0,
+   "cols": 5,
+   "rows": 2
+  },
+  {
+   "type": "ringheader",
+   "x": 47.0,
+   "y": 128.0,
+   "id": "j3",
+   "cols": 5,
+   "rows": 2,
+   "names": [
+    [
+     "GPIO0_24",
+     "GPIO0_29",
+     "VCC3V3",
+     "VCC3V3",
+     "VCC3V3"
+    ],
+    [
+     "GPIO0_23",
+     "GPIO0_26",
+     "DGND",
+     "VCC5V0",
+     "VCC5V0"
+    ]
+   ],
+   "pinno": [
+    [
+     9,
+     7,
+     5,
+     3,
+     1
+    ],
+    [
+     10,
+     8,
+     6,
+     4,
+     2
+    ]
+   ],
+   "label": "Expansion header J3",
+   "title": "J3, 10-pin expansion header",
+   "text": "3.3 V and 5 V supply pins, ground and four GPIO. The two supplies are current limited to 500 mA and 155 mA."
+  },
+  {
+   "id": "soc",
+   "label": "The chip",
+   "title": "AM62L SoC",
+   "text": "Two Arm Cortex-A53 cores that run Linux, in a 373-ball package. Display, USB, Ethernet, SD, CAN and an ADC are built in.",
+   "key": true,
+   "type": "block",
+   "x": 79.3,
+   "y": 72.5,
+   "w": 11.8,
+   "h": 11.9,
+   "d": 1.0,
+   "color": "#34353a"
+  },
+  {
+   "id": "ddr",
+   "label": "DDR memory",
+   "title": "2 GB LPDDR4",
+   "text": "The working memory the Linux system runs in. One 16 Gbit LPDDR4 chip at up to 1600 Mbit/s per pin.",
+   "key": true,
+   "type": "block",
+   "x": 99.35,
+   "y": 72.6,
+   "w": 14.9,
+   "h": 10.4,
+   "d": 1.0,
+   "color": "#26272b"
+  },
+  {
+   "id": "emmc",
+   "label": "eMMC",
+   "title": "32 GB eMMC flash",
+   "text": "Onboard storage that can hold the root file system, so the board boots without an SD card.",
+   "type": "block",
+   "x": 99.85,
+   "y": 57.85,
+   "w": 12.1,
+   "h": 13.5,
+   "d": 1.0,
+   "color": "#26272b"
+  },
+  {
+   "id": "nor",
+   "label": "OSPI NOR",
+   "title": "512 Mbit OSPI NOR flash",
+   "text": "Fast serial flash for a first-stage boot image.",
+   "type": "block",
+   "x": 54.5,
+   "y": 66.5,
+   "w": 6.5,
+   "h": 8.1,
+   "d": 1.0,
+   "color": "#2b2d33"
+  },
+  {
+   "id": "nand",
+   "label": "QSPI NAND",
+   "title": "1 Gbit QSPI NAND flash",
+   "text": "A second flash chip for boot or storage, on the same OSPI port.",
+   "type": "block",
+   "x": 61.4,
+   "y": 66.5,
+   "w": 6.4,
+   "h": 8.1,
+   "d": 1.0,
+   "color": "#2b2d33"
+  },
+  {
+   "id": "xds",
+   "label": "Debug probe",
+   "title": "XDS110 emulator (TM4C129)",
+   "text": "The on-board debug probe. It carries JTAG over the micro-USB port J8, so a debugger needs no extra hardware.",
+   "type": "qfp",
+   "x": 22.5,
+   "y": 96.6,
+   "body": 14,
+   "pins": 128
+  },
+  {
+   "id": "ftdi",
+   "label": "Serial chip",
+   "title": "FT4232 USB-to-serial",
+   "text": "Turns four of the chip's serial ports into four serial devices on the micro-USB port J7. The Linux console is one of them.",
+   "type": "qfp",
+   "x": 22.7,
+   "y": 115.5,
+   "body": 10,
+   "pins": 64
+  },
+  {
+   "type": "qfp",
+   "x": 22.0,
+   "y": 66.5,
+   "body": 10,
+   "pins": 72
+  },
+  {
+   "type": "block",
+   "x": 38.2,
+   "y": 71.0,
+   "w": 6.0,
+   "h": 12.8,
+   "d": 1.1,
+   "color": "#26272b"
+  },
+  {
+   "type": "qfn",
+   "x": 62.1,
+   "y": 104.5,
+   "size": 5.0
+  },
+  {
+   "type": "qfn",
+   "x": 74.6,
+   "y": 105.6,
+   "size": 5.3
+  },
+  {
+   "type": "qfn",
+   "x": 98.5,
+   "y": 120.2,
+   "size": 5.0
+  },
+  {
+   "type": "qfn",
+   "x": 108.2,
+   "y": 16.7,
+   "size": 7.0
+  },
+  {
+   "type": "qfn",
+   "x": 69.3,
+   "y": 39.0,
+   "size": 4.5
+  },
+  {
+   "type": "qfn",
+   "x": 54.5,
+   "y": 37.5,
+   "size": 4.0
+  },
+  {
+   "type": "qfn",
+   "x": 30.65,
+   "y": 22.9,
+   "size": 3.3
+  },
+  {
+   "type": "qfn",
+   "x": 39.6,
+   "y": 22.9,
+   "size": 3.3
+  },
+  {
+   "type": "soic",
+   "x": 42.4,
+   "y": 13.6,
+   "rot": 90,
+   "pins": 8
+  },
+  {
+   "type": "soic",
+   "x": 61.2,
+   "y": 10.8,
+   "rot": 90,
+   "pins": 8
+  },
+  {
+   "type": "soic",
+   "x": 116.0,
+   "y": 47.1,
+   "rot": 90,
+   "pins": 8
+  },
+  {
+   "type": "block",
+   "x": 43.4,
+   "y": 82.2,
+   "w": 3.4,
+   "h": 5.0,
+   "d": 1.1,
+   "color": "#26272b"
+  },
+  {
+   "type": "block",
+   "x": 85.8,
+   "y": 48.8,
+   "w": 3.0,
+   "h": 3.0,
+   "d": 1.0,
+   "color": "#26272b"
+  },
+  {
+   "type": "block",
+   "x": 96.5,
+   "y": 81.6,
+   "w": 2.9,
+   "h": 1.6,
+   "d": 1.0,
+   "color": "#26272b"
+  },
+  {
+   "type": "block",
+   "x": 75.0,
+   "y": 61.0,
+   "w": 2.9,
+   "h": 1.6,
+   "d": 1.0,
+   "color": "#26272b"
+  },
+  {
+   "type": "block",
+   "x": 28.9,
+   "y": 7.5,
+   "w": 3.9,
+   "h": 3.9,
+   "d": 2.0,
+   "color": "#a9a69c"
+  },
+  {
+   "type": "block",
+   "x": 51.5,
+   "y": 81.0,
+   "w": 3.8,
+   "h": 4.1,
+   "d": 2.5,
+   "color": "#cfc7b4"
+  },
+  {
+   "id": "uartusb",
+   "label": "Serial USB",
+   "title": "J7, micro-USB, serial",
+   "text": "Plug a USB cable from your computer here for the Linux console. It shows up as four serial ports.",
+   "key": true,
+   "type": "microusb",
+   "x": 3.0,
+   "y": 108.0,
+   "rot": 90
+  },
+  {
+   "id": "jtagusb",
+   "label": "Debug USB",
+   "title": "J8, micro-USB, debug",
+   "text": "The USB side of the on-board XDS110 debug probe, for loading and debugging code from a computer.",
+   "type": "microusb",
+   "x": 3.0,
+   "y": 95.6,
+   "rot": 90
+  },
+  {
+   "id": "usbc_pwr",
+   "label": "Power USB-C",
+   "title": "J17, USB-C, power only",
+   "text": "Power in. The board asks the charger for 5 to 15 V through USB power delivery, up to 3 A. No data on this port.",
+   "key": true,
+   "type": "usbc",
+   "x": 3.5,
+   "y": 28.7,
+   "rot": 90
+  },
+  {
+   "id": "usbc_drp",
+   "label": "USB-C",
+   "title": "J19, USB-C, power or data",
+   "text": "USB 2.0 that can be a host or a device, and a second way to power the board.",
+   "type": "usbc",
+   "x": 3.5,
+   "y": 13.6,
+   "rot": 90
+  },
+  {
+   "id": "usba",
+   "label": "USB-A",
+   "title": "J15, USB-A host",
+   "text": "A USB 2.0 host port for a keyboard, a stick or a camera.",
+   "type": "block",
+   "x": 129.2,
+   "y": 52.05,
+   "w": 14.0,
+   "h": 13.1,
+   "d": 6.3,
+   "color": "#aeb0b0"
+  },
+  {
+   "id": "eth2",
+   "label": "Ethernet 2",
+   "title": "J5, Ethernet 2",
+   "text": "Gigabit Ethernet through its own PHY chip. This is the upper of the two RJ45 jacks.",
+   "type": "block",
+   "x": 127.45,
+   "y": 117.0,
+   "w": 18.5,
+   "h": 16.5,
+   "d": 13.3,
+   "color": "#b8bbbe"
+  },
+  {
+   "id": "eth1",
+   "label": "Ethernet 1",
+   "title": "J9, Ethernet 1",
+   "text": "Gigabit Ethernet through its own PHY chip. This is the lower of the two RJ45 jacks.",
+   "key": true,
+   "type": "block",
+   "x": 127.45,
+   "y": 94.35,
+   "w": 18.5,
+   "h": 16.5,
+   "d": 13.3,
+   "color": "#b8bbbe"
+  },
+  {
+   "id": "hdmi",
+   "label": "HDMI",
+   "title": "J13, HDMI output",
+   "text": "Video out to a monitor or TV.",
+   "key": true,
+   "type": "block",
+   "x": 3.95,
+   "y": 65.0,
+   "w": 10.4,
+   "h": 16.7,
+   "d": 6.5,
+   "color": "#b8bbbe"
+  },
+  {
+   "id": "sd",
+   "label": "SD card",
+   "title": "J12, microSD slot",
+   "text": "Boot from a card or use it as storage. Supports UHS-I speeds.",
+   "key": true,
+   "type": "block",
+   "x": 126.9,
+   "y": 69.0,
+   "w": 15.7,
+   "h": 14.4,
+   "d": 1.8,
+   "color": "#b8bbbe"
+  },
+  {
+   "id": "audio",
+   "label": "Audio",
+   "title": "J20, headphone and mic jack",
+   "text": "A 3.5 mm four-contact jack for headphones and a microphone, through an audio codec chip.",
+   "type": "block",
+   "x": 127.15,
+   "y": 13.45,
+   "w": 16.7,
+   "h": 7.1,
+   "d": 6.0,
+   "color": "#1d1d1f"
+  },
+  {
+   "id": "m2",
+   "label": "M.2 slot",
+   "title": "J4, M.2 Key E",
+   "text": "A slot for a Wi-Fi and Bluetooth card.",
+   "type": "block",
+   "x": 61.4,
+   "y": 121.1,
+   "w": 9.1,
+   "h": 21.0,
+   "d": 3.5,
+   "color": "#2e2e32"
+  },
+  {
+   "id": "jtag20",
+   "label": "JTAG header",
+   "title": "J10, 20-pin JTAG",
+   "text": "The standard 20-pin debug connector, for an outside debug probe instead of the on-board one.",
+   "type": "block",
+   "x": 47.6,
+   "y": 93.1,
+   "w": 4.5,
+   "h": 12.2,
+   "d": 5.0,
+   "color": "#2c2c2e"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 98.81,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 98.81,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 97.55,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 97.55,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 96.27,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 96.27,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 95.0,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 95.0,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 93.73,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 93.73,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 92.47,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 92.47,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 91.19,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 91.19,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 89.92,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 89.92,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 88.66,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 88.66,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 46.33,
+   "y": 87.38,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "block",
+   "x": 48.87,
+   "y": 87.38,
+   "w": 0.7,
+   "h": 0.7,
+   "d": 5.3,
+   "color": "#c8a24a"
+  },
+  {
+   "type": "header",
+   "x": 58.3,
+   "y": 86.0,
+   "cols": 2,
+   "rows": 5
+  },
+  {
+   "type": "header",
+   "x": 42.4,
+   "y": 109.0,
+   "cols": 4,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 130.0,
+   "y": 38.9,
+   "cols": 1,
+   "rows": 4
+  },
+  {
+   "type": "header",
+   "x": 131.0,
+   "y": 26.7,
+   "cols": 1,
+   "rows": 4
+  },
+  {
+   "type": "header",
+   "x": 7.4,
+   "y": 116.6,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 33.35,
+   "y": 116.8,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 14.0,
+   "y": 56.7,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 109.2,
+   "y": 129.9,
+   "cols": 2,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 97.8,
+   "y": 4.55,
+   "cols": 1,
+   "rows": 2
+  },
+  {
+   "type": "block",
+   "x": 43.6,
+   "y": 52.0,
+   "w": 12.6,
+   "h": 5.0,
+   "d": 4.0,
+   "color": "#1b1a1a"
+  },
+  {
+   "type": "block",
+   "x": 43.6,
+   "y": 55.8,
+   "w": 12.5,
+   "h": 2.6,
+   "d": 5.0,
+   "color": "#e6e1d4"
+  },
+  {
+   "type": "block",
+   "x": 38.6,
+   "y": 58.2,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 38.6,
+   "y": 48.4,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 41.2,
+   "y": 58.2,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 41.2,
+   "y": 48.4,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 43.7,
+   "y": 58.2,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 43.7,
+   "y": 48.4,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 46.2,
+   "y": 58.2,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 46.2,
+   "y": 48.4,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 48.8,
+   "y": 58.2,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 48.8,
+   "y": 48.4,
+   "w": 1.6,
+   "h": 2.2,
+   "d": 0.8,
+   "color": "#c9cbcc"
+  },
+  {
+   "type": "block",
+   "x": 8.1,
+   "y": 47.8,
+   "w": 6.5,
+   "h": 5.9,
+   "d": 2.5,
+   "color": "#2a2220"
+  },
+  {
+   "type": "block",
+   "x": 6.19,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 6.19,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 6.19,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 7.46,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 7.46,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 7.46,
+   "y": 48.1,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 8.73,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 8.73,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 8.73,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 10.0,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 10.0,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 10.0,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 15.4,
+   "y": 47.8,
+   "w": 6.5,
+   "h": 5.9,
+   "d": 2.5,
+   "color": "#2a2220"
+  },
+  {
+   "type": "block",
+   "x": 13.5,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 13.5,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 13.5,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 14.77,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 14.77,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 14.77,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 16.04,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 16.04,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 16.04,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 17.3,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 17.3,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 17.3,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 25.7,
+   "y": 47.8,
+   "w": 11.8,
+   "h": 5.9,
+   "d": 2.5,
+   "color": "#2a2220"
+  },
+  {
+   "type": "block",
+   "x": 21.25,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 21.25,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 21.25,
+   "y": 48.1,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 22.52,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 22.52,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 22.52,
+   "y": 48.1,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 23.79,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 23.79,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 23.79,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 25.06,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 25.06,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 25.06,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 26.34,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 26.34,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 26.34,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 27.61,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 27.61,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 27.61,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 28.88,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 28.88,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 28.88,
+   "y": 48.1,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 30.14,
+   "y": 51.4,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 30.14,
+   "y": 44.2,
+   "w": 0.8,
+   "h": 1.5,
+   "d": 0.3,
+   "color": "#c9b27a"
+  },
+  {
+   "type": "block",
+   "x": 30.14,
+   "y": 47.5,
+   "w": 0.85,
+   "h": 0.75,
+   "d": 2.8,
+   "color": "#ece8dc"
+  },
+  {
+   "type": "block",
+   "x": 36.5,
+   "y": 96.0,
+   "w": 3.8,
+   "h": 5.6,
+   "d": 2.5,
+   "color": "#2a2220"
+  },
+  {
+   "id": "wake",
+   "label": "Wake",
+   "title": "SW8, nWAKEUP",
+   "text": "Wakes the chip from a low-power state.",
+   "type": "button",
+   "x": 22.8,
+   "y": 40.3,
+   "w": 5.3,
+   "h": 3.1
+  },
+  {
+   "id": "int",
+   "label": "User button",
+   "title": "SW5, interrupt",
+   "text": "A user button that raises an interrupt on GPIO0_90. Program it for anything.",
+   "type": "button",
+   "x": 92.8,
+   "y": 14.5,
+   "w": 5.6,
+   "h": 3.0
+  },
+  {
+   "id": "por",
+   "label": "Power reset",
+   "title": "SW6, PORz",
+   "text": "Full power-on reset.",
+   "type": "button",
+   "x": 84.2,
+   "y": 7.2,
+   "w": 2.9,
+   "h": 5.0
+  },
+  {
+   "id": "reset",
+   "label": "Reset",
+   "title": "SW7, warm reset",
+   "text": "Warm reset of the main domain, without removing power.",
+   "key": true,
+   "type": "button",
+   "x": 91.9,
+   "y": 4.7,
+   "w": 2.9,
+   "h": 5.0
+  },
+  {
+   "type": "block",
+   "x": 30.65,
+   "y": 30.4,
+   "w": 8.8,
+   "h": 8.8,
+   "d": 1.6,
+   "color": "#1c1c1e"
+  },
+  {
+   "type": "bigcap",
+   "x": 30.65,
+   "y": 30.4,
+   "d": 7.8,
+   "h": 8.0,
+   "color": "#b4b6b8"
+  },
+  {
+   "type": "block",
+   "x": 39.8,
+   "y": 30.6,
+   "w": 8.8,
+   "h": 8.8,
+   "d": 1.6,
+   "color": "#1c1c1e"
+  },
+  {
+   "type": "bigcap",
+   "x": 39.8,
+   "y": 30.6,
+   "d": 7.8,
+   "h": 8.0,
+   "color": "#b4b6b8"
+  },
+  {
+   "name": "LD8",
+   "id": "ld8",
+   "label": "User LED",
+   "title": "LD8, user LED",
+   "text": "Driven by GPIO0_123. The Linux LED class can blink it.",
+   "key": true,
+   "type": "led",
+   "x": 2.5,
+   "y": 21.7,
+   "rot": 0,
+   "color": "#f5f1e0"
+  },
+  {
+   "name": "LD2",
+   "id": "ld2",
+   "label": "User LED 2",
+   "title": "LD2, user LED",
+   "text": "The second user LED, driven through a GPIO expander chip.",
+   "type": "led",
+   "x": 53.8,
+   "y": 107.4,
+   "rot": 90,
+   "color": "#f5f1e0"
+  },
+  {
+   "name": "LD6",
+   "id": "ld6",
+   "label": "Power good",
+   "title": "LD6, power good",
+   "text": "Lit when the board's supplies are up.",
+   "type": "led",
+   "x": 76.0,
+   "y": 26.1,
+   "rot": 0,
+   "color": "#f5f1e0"
+  },
+  {
+   "type": "led",
+   "x": 17.5,
+   "y": 123.8,
+   "rot": 0,
+   "color": "#f5f1e0",
+   "name": "LD1"
+  },
+  {
+   "type": "led",
+   "x": 35.3,
+   "y": 103.4,
+   "rot": 0,
+   "color": "#f5f1e0",
+   "name": "LD4"
+  },
+  {
+   "type": "led",
+   "x": 13.8,
+   "y": 35.5,
+   "rot": 0,
+   "color": "#30ff50",
+   "name": "LD5"
+  },
+  {
+   "type": "led",
+   "x": 53.5,
+   "y": 24.8,
+   "rot": 90,
+   "color": "#f5f1e0",
+   "name": "LD7"
+  },
+  {
+   "type": "led",
+   "x": 78.9,
+   "y": 17.5,
+   "rot": 0,
+   "color": "#f5f1e0",
+   "name": "LD9"
+  },
+  {
+   "type": "led",
+   "x": 13.7,
+   "y": 10.4,
+   "rot": 0,
+   "color": "#f5f1e0",
+   "name": "LD10"
+  },
+  {
+   "type": "led",
+   "x": 3.6,
+   "y": 7.2,
+   "rot": 0,
+   "color": "#f5f1e0",
+   "name": "LD11"
+  },
+  {
+   "type": "standoff",
+   "x": 90.8,
+   "y": 121.0
+  }
+ ],
+ "decor": []
+}

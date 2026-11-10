@@ -1,6 +1,6 @@
 # SK-TDA4VM starter kit: boot TI's Edge AI Linux with no card reader, and what it measures
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 The SK-TDA4VM boots TI's Edge AI Linux in 27.7 s on its first boot, first bootloader byte to the login prompt, from a card written from the board itself, with no card reader, Ethernet or display. TI quotes under 20 s to a desktop wallpaper, a different endpoint. Every number below was measured over the serial cable on this bench; TI's figures are marked as TI's. This page shows how to write the card from the board itself.
 

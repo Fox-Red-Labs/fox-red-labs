@@ -31,6 +31,8 @@ Flash and RAM come from the Zephyr link summary (`Memory region` table) and, for
 | Blink | 2.6 kB text, 8.8 kB total with the layer's 6 kB stack and heap reserve | 6.2 kB | built, not flashed | build output of `../build.sh` |
 | AnalogReadSerial | does not compile: `use of undeclared identifier 'A0'` | | no | build log |
 
+**LP-EM-CC2755P10** on TI's Zephyr fork (v3.7.0-ti-1.00.01_ga): **did not build** (checked 2026-11-09). `build-cc2755p10.sh`, `variants/lp_em_cc2755p10/` and `app/boards/lp_em_cc2755p10.conf` are the three attempts. The first error is the module's `module.yml` (a `click-through` key the fork's west rejects; deleting those lines gets past it), then the core fails to compile because it is written for Zephyr 4.x: `'const struct device' has no member named 'ops'` in `zephyrCommon.cpp`, `zephyrSerial.cpp` and `Wire.cpp`, and `rand` and `srand` are undeclared with the minimal C library. The fork has no ADC driver for this chip, so the overlay has no analog pins. Errors: `cc2755p10/bench/zephyr-fork/arduino-errors.txt`. The workspace is built as in `cc2340r5/zephyr-ti/README.md`.
+
 ## Overlay pins
 
 - **LP-EM-CC2340R5:** `LED_BUILTIN` is D0 = DIO15 (green LED). A0 is DIO5 = ADC channel 2 (A1 DIO2, A2 DIO1, A3 DIO25, A4 DIO23). `Serial` is `uart0` on the XDS110 backchannel. BoosterPack header: SPI SCLK pin 7 (DIO18), MOSI pin 15 (DIO13), MISO pin 14 (DIO12), CS pin 18 (DIO11); I2C SCL pin 9 (DIO24), SDA pin 10 (DIO0). The board has no I2C pull-ups.

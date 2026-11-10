@@ -50,7 +50,7 @@ west build -p always -b lp_mspm0g3507 samples/basic/blinky -d ../build-blinky
 # Refuse to flash if the board is not there, or if it is ambiguous which board is meant.
 # Probe serials come from CCStudio's xdsdfu when it is installed, otherwise from the USB list
 # (system_profiler), so the check never silently drops out. The serial is always passed on.
-XDSDFU=/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu
+XDSDFU="${FRL_XDSDFU:-$(python3 "$(cd "$(dirname "$0")/../.." && pwd)/tools/frl/toolpath.py" xdsdfu --optional 2>/dev/null)}"   # CCStudio or UniFlash; absent is fine, the USB list is used
 probe_serials() {
   if [ -x "$XDSDFU" ]; then
     "$XDSDFU" -e 2>/dev/null | awk '/Serial Num/ {print $3}'

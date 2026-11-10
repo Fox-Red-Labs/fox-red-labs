@@ -52,6 +52,8 @@ Terms: [docs/vocab.md](../docs/vocab.md) and the [LP-MSPM0G5187 FAQ](FAQ.md) in 
 | DSLite "Connection to MSPM0 core failed" after a retargeted TI Drivers example | Its linker file is the G3519 map, so the stack top is outside the RAM | Wait-for-debug hold, then program the backup | Main and data flash equal the backup |
 | MLPerf Tiny keyword-spotting model scores 3 of 20 on the board | The model takes float input (the pad comes before the scaling, so `skip_normalize` cannot drop it) and was fed int8 | Pass a float array; `output_int=true` still gives int8 logits | 18 of 20 as on the host |
 | Backchannel serial shows nothing and the receive buffer holds the board's own start-up text | A loop wire joins PA10 and PA11 (J4 pins 34 and 33) | Take the wire off and fit the J101 shunts, or read results through the debugger | Host sees `m-init-done` |
+| MicroPython pystone stops with `maximum recursion depth exceeded` on the minimal image | The minimal build's 1.5 kB stack minus a 512 B guard cannot hold the benchmark's calls | `make BOARD=g5187 VARIANT=min STACK_LEN=0x1000` (`mspm0g5187/bench/micropython/pystone-min-first-attempts.txt`) | Three pystone runs print |
+| Arduino layer on this board has no heap and a 256 B stack | SysConfig writes `--stack_size=256` for this chip, not 512, so the build's linker-file edit missed it | `portability/arduino/build.sh` now matches any stack size (RAM of Blink 6,348 B once the reserve is in) | `bss` near 6.3 kB in `tiarmsize` |
 
 Traps shared with other boards: TRAPS.md. Also: PB10 and PB11 carry both the radio's reset and interrupt and the audio converter, so do not run the microphone examples while the radio is wired (`mspm0g5187/radio/README.md`); `adc12_max_freq_dma` gives 0.547 Msps against the data sheet's 1.6, cause unknown (`mspm0g5187/FAQ.md`).
 
@@ -71,10 +73,13 @@ NPU against CPU at 80 MHz: 2.12 ms against 35.27 ms on the 8k model (16.7 times)
 
 ## What ran here
 
+- One-command blink: `FRL_SYSCONFIG=<SysConfig 1.28.0 folder> python3 tools/frl/frl.py run --board mspm0g5187 --probe <serial> --pattern 150,150,150,900` builds, flashes and checks PA17 in 9.4 to 10.5 s warm (536 B image); `FRL-E021` means frl refuses a SysConfig newer than 1.26.3, and naming the folder with `FRL_SYSCONFIG` runs it unvalidated (`data/results/mspm0g5187.csv`, `time_to_blink` cli).
+- Not run on this board: uLisp `analogread` and `save-image` (the port stubs the ADC and has no flash storage code; `data/results/mspm0g5187.csv`).
 - Changed blink, proved by pin reads: half-period 272 ms at DELAY 8,000,000 and 135 ms at 4,000,000 (`data/results/mspm0g5187.csv`).
 - CoreMark 182.79 per second at -O3 and 80 MHz (2.285 per MHz) (`mspm0g5187/README.md`).
 - Interrupt latency 36 to 40 cycles, 7 more than the G3507's best (`data/results/mspm0g5187.csv`).
 - Hardware AES-128 45.5 times and CRC-32 8.1 times faster than software on 1 kB (`mspm0g5187/RESULTS-mspm0g5187.md`).
+- MicroPython 1.29.0 minimal image (72.9 kB flash) boots with `ports/micropython` `BOARD=g5187`; 680 to 794 pystones per second at 80 MHz (`data/results/mspm0g5187.csv`, `micropython_pystone`). Arduino layer: Blink and `boardcheck` run through `portability/arduino` `BOARD=mspm0g5187`, PA17 half periods 1,000 and 500 ms (`led_toggle_blink_check`).
 - Example sweep: 174 of 203 build; 120 ran, 109 clean (`mspm0g5187/RESULTS-mspm0g5187.md`).
 - CC1407P radio: 21,658 of 21,658 packets received over about 6 h 15 min (`mspm0g5187/radio/README.md`).
 - Not run: power baseline and a spoken wake word heard through the onboard microphone (`data/results/mspm0g5187.csv`).
@@ -90,13 +95,16 @@ Code written for other chips and tools, brought to this board. The files to copy
 
 | Port | Status | Result | Evidence |
 |---|---|---|---|
+| Arduino display libraries on the LP-MSPM0G3507, and the core layer on the LP-MSPM0G5187 | Works | Arduino_GFX's graphics test draws on an ST7796S screen on the LP-MSPM0G3507, through a 649-line Arduino API layer under the unmodified libraries. | `portability/arduino/README.md` |
 | Fixed-weight DSP (FIR, filter bank, DFT) on the LP-MSPM0G5187 | Works | A 64-tap FIR filter runs on the LP-MSPM0G5187's NPU (its neural-network accelerator), compiled with NNC, TI's neural-network compiler, 29.7 times faster than the same graph on the CPU, with byte-for-byte equal output. | `mspm0g5187/npu-dsp/README.md` |
+| MicroPython 1.29.0 on the LP-MSPM0G3519, LP-MSPM0G3507 and LP-MSPM0G5187 | Works | A new MicroPython port boots on the LP-MSPM0G3519 with the MicroPython banner and drives a 3.5 inch touch screen from Python. | `ports/micropython/README.md` |
 | Peanut-GB Game Boy emulator on MSPM0 and MSPM33 | Works | Peanut-GB plays Tobu Tobu Girl on the LP-MSPM33C321A with the Educational BoosterPack screen at the console's own speed. | `ports/peanut-gb/README.md` |
+| Post-quantum key exchange and signatures on seven boards: LP-CC1354P10-1, LP-EM-CC2340R5, LP-AM243, LP-MSPM0G3519, LP-MSPM33C321A, LP-EM-CC2755P10 and LP-MSPM0G5187 | Works | ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on seven boards, from a 36 kB Cortex-M0+ to an 800 MHz Cortex-R5F; the LP-CC1354P10-1 also agrees a key with a Mac. | `cc1354p10/pqc-join/README.md` |
 | STM32 UART DMA receive with idle-line interrupt (MaJerle stm32-usart-uart-dma-rx-tx) on TI boards | Works | MaJerle's STM32 UART DMA example answers every test packet at 115200 baud on the LP-MSPM0G3519, G5187, L1306, C1104 and MSPM33C321A. | `docs/experiments/2026-10-19-stm32-usart-dma-port-matrix.md` |
 | Sub-1 GHz CC1407P radio on an LP-MSPM0G5187, heard by an LP-CC1354P10-1 | Works | TI's CC1407P sub-1 GHz radio driver runs unchanged on the LP-MSPM0G5187, and an LP-CC1354P10-1 receives its packets: 21,658 of 21,658. | `mspm0g5187/radio/README.md` |
-| uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507 and LP-MSPM0G3519 | Works | uLisp, an Arduino sketch, gives a Lisp prompt on the LP-MSPM0G5187's serial port: 19 of 19 REPL (type-and-run loop) checks pass. | `ports/ulisp/README.md` |
+| uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507, LP-MSPM0G3519, LP-EM-CC2340R5, LP-EM-CC2755P10, LP-MSPM33C321A, LP-AM243 and LAUNCHXL-F2800137 | Works | uLisp, an Arduino sketch, gives a Lisp prompt on the serial port of the LP-MSPM0G5187, LP-EM-CC2340R5 and LP-EM-CC2755P10: 19 of 19 REPL (type-and-run loop) checks pass on each. | `ports/ulisp/README.md` |
 | Arduboy2-compatible layer and three open-source games on MSPM0 and MSPM33 | Could work | Snake, TileWorld and Crate Confusion build unchanged against an Arduboy2-compatible layer for four kits, and Snake draws on the LP-MSPM33C321A's Educational BoosterPack screen. | `ports/arduboy/FIT.md` |
-| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
+| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. The Educational, Sharp128 and Audio builds also build for the LP-MSPM0G3519, and the Educational and Sharp128 builds for the LP-MSPM0G3507. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
 <!-- ports:end -->
 
 ## Where the evidence lives

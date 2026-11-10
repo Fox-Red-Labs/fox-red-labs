@@ -288,7 +288,11 @@
    "sub": "esphome",
    "order": 1,
    "numbers": "A repeat compile takes 27 s and the image is 262.7 kB of flash with 124.4 kB of RAM free. The LED switches at a median of 85 to 92.5 ms.",
-   "limits": "Zigbee only, no Wi-Fi. After a second flash, remove the old device from Home Assistant first, or it does not rejoin."
+   "limits": "Zigbee only, no Wi-Fi. After a second flash, remove the old device from Home Assistant first, or it does not rejoin.",
+   "upstream": {
+    "state": "not-sent",
+    "to": "ESPHome"
+   }
   },
   {
    "id": "esphome-cc23xx",
@@ -346,7 +350,11 @@
    "sub": "esphome",
    "order": 2,
    "numbers": "The image is 219.9 kB of flash, with 4.0 kB of the chip's 36 kB of RAM free. Over five runs 93 of 100 commands passed.",
-   "limits": "Zigbee only, no Wi-Fi. As a router it needs the heap cut by 2 kB, and the chip temperature reads about 10 C low."
+   "limits": "Zigbee only, no Wi-Fi. As a router it needs the heap cut by 2 kB, and the chip temperature reads about 10 C low.",
+   "upstream": {
+    "state": "not-sent",
+    "to": "ESPHome"
+   }
   },
   {
    "id": "esphome-cc35xx",
@@ -405,7 +413,11 @@
    "numbers": "A repeat compile takes 23 s. A 24-hour soak confirmed 5,616 of 5,620 commands and rode out 22 access-point drops.",
    "limits": "Home Assistant has not adopted the board.",
    "command": "cd ports/esphome-ti\npython3.12 -m venv venv && ./venv/bin/pip install \"cbor2<6\" esphome==2026.9.1\nread -p \"Wi-Fi name: \" SSID && read -s -p \"Wi-Fi password: \" WIFIPW\nprintf 'wifi_ssid: \"%s\"\\nwifi_password: \"%s\"\\n' \"$SSID\" \"$WIFIPW\" > secrets.yaml\n./venv/bin/esphome compile frl-cc35xx.yaml\n./venv/bin/esphome upload frl-cc35xx.yaml",
-   "see": "The board joins Wi-Fi after a reset and logs \"[I][wifi]: Connected\" on its serial port at 115200 baud."
+   "see": "The board joins Wi-Fi after a reset and logs \"[I][wifi]: Connected\" on its serial port at 115200 baud.",
+   "upstream": {
+    "state": "not-sent",
+    "to": "ESPHome"
+   }
   },
   {
    "id": "zigbee-smoke-co",
@@ -465,7 +477,11 @@
    "sub": "standards",
    "order": 30,
    "numbers": "20 of 20 changes landed for each sensor, median 38 ms for smoke and 56 ms for CO. The image is 210.8 kB of flash and 25.8 kB of RAM.",
-   "limits": "In sleepy mode TI's sleep call stops the UART receiver."
+   "limits": "In sleepy mode TI's sleep call stops the UART receiver.",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the SimpleLink Low Power F3 SDK"
+   }
   },
   {
    "id": "matter-smoke-thread",
@@ -523,7 +539,11 @@
    "order": 35,
    "numbers": "The 797 kB image changes state from a UART line 20 of 20 times, median 41 ms.",
    "limits": "Does not commission into Thread or Apple Home.",
-   "command": "cd cc2755p10/matter-smoke\n./build.sh sub\n./build.sh sdk\n./build.sh smoke"
+   "command": "cd cc2755p10/matter-smoke\n./build.sh sub\n./build.sh sdk\n./build.sh smoke",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the SimpleLink Matter SDK"
+   }
   },
   {
    "id": "matter-thermostat-wifi",
@@ -570,7 +590,11 @@
    "order": 36,
    "numbers": "The image is 1.7 MB.",
    "limits": "Apple Home was the only controller used. The board must be fully erased before the first flash.",
-   "command": "cc35x1/matter/build-thermostat.sh \"$PWD/cc35x1/matter\""
+   "command": "cc35x1/matter/build-thermostat.sh \"$PWD/cc35x1/matter\"",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the SimpleLink Matter SDK"
+   }
   },
   {
    "id": "ble-hid-remote",
@@ -611,7 +635,10 @@
      }
     }
    },
-   "ran": "A hand-written HID service on TI's basic_ble builds for the LP-EM-CC2340R5, and a Mac sees it as a keyboard-class device and starts pairing."
+   "ran": "A hand-written HID service on TI's basic_ble builds for the LP-EM-CC2340R5, and a Mac sees it as a keyboard-class device and starts pairing.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "bthome",
@@ -655,7 +682,11 @@
     }
    },
    "command": "cd ports/bthome\n./build.sh",
-   "see": "The Mac's BLE scan decodes \"FRL Temp\" as BTHome version 2, unencrypted, with a temperature_c reading and packet ids counting up."
+   "see": "The Mac's BLE scan decodes \"FRL Temp\" as BTHome version 2, unencrypted, with a temperature_c reading and packet ids counting up.",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the SimpleLink Low Power F3 SDK"
+   }
   },
   {
    "id": "findmy",
@@ -683,6 +714,9 @@
       "evidence": "ports/findmy/README.md"
      }
     }
+   },
+   "upstream": {
+    "state": "none"
    }
   },
   {
@@ -733,7 +767,10 @@
    "order": 19,
    "numbers": "A Mac finds the board by either service 0.17 to 0.69 s after flashing. An LED write answers in 24.3 ms median and UART echo in 24.2 ms, with 60 of 60 lines identical.",
    "limits": "A Mac was the only client.",
-   "command": "ports/nordic-apps/build.sh"
+   "command": "ports/nordic-apps/build.sh",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "phone-app-demos",
@@ -777,6 +814,9 @@
       "evidence": "ports/phone-app-demos/README.md"
      }
     }
+   },
+   "upstream": {
+    "state": "none"
    }
   },
   {
@@ -838,7 +878,11 @@
    "path": "code",
    "sub": "programs",
    "order": 20,
-   "numbers": "At 32 MHz the most accurate model (99.55% on MNIST) takes 2.64M cycles on the LP-MSPM0G3507, 3.5% fewer than the author's 2.74M on the CH32V002. The 64-wide model also runs in the LP-MSPM0L1306's 4 kB of RAM."
+   "numbers": "At 32 MHz the most accurate model (99.55% on MNIST) takes 2.64M cycles on the LP-MSPM0G3507, 3.5% fewer than the author's 2.74M on the CH32V002. The 64-wide model also runs in the LP-MSPM0L1306's 4 kB of RAM.",
+   "upstream": {
+    "state": "not-sent",
+    "to": "BitNetMCU"
+   }
   },
   {
    "id": "bitnetmcu-c1104",
@@ -872,7 +916,11 @@
    "sub": "programs",
    "order": 22,
    "limits": "The 16-channel CNN links but overruns the stack and never finishes. `mspm0c1104/prebuild.sh bitnet` builds the LP-MSPM0C1104 images; flashing them and reading the answers back are not scripted for this board.",
-   "files": "ports/bitnetmcu/mspm0"
+   "files": "ports/bitnetmcu/mspm0",
+   "upstream": {
+    "state": "not-sent",
+    "to": "BitNetMCU"
+   }
   },
   {
    "id": "bitnetmcu-c2000",
@@ -921,14 +969,19 @@
    "order": 21,
    "numbers": "2,551,750 cycles from RAM (21.3 ms) and 2,897,585 from flash (24.1 ms) at 120 MHz, 6.7% fewer than the author's CH32V002 count.",
    "limits": "The C28x has no 8-bit type, so the port needed three code fixes.",
-   "command": "ports/bitnetmcu/c2000/build.sh RAM"
+   "command": "ports/bitnetmcu/c2000/build.sh RAM",
+   "upstream": {
+    "state": "not-sent",
+    "to": "BitNetMCU"
+   }
   },
   {
    "id": "arduino-libs",
    "group": "open-source",
-   "name": "Arduino display libraries on the LP-MSPM0G3507",
+   "name": "Arduino display libraries on the LP-MSPM0G3507, and the core layer on the LP-MSPM0G5187",
    "boards": [
-    "mspm0g3507"
+    "mspm0g3507",
+    "mspm0g5187"
    ],
    "status": "runs",
    "headline": "Arduino_GFX's graphics test draws on an ST7796S screen on the LP-MSPM0G3507, through a 649-line Arduino API layer under the unmodified libraries.",
@@ -956,6 +1009,23 @@
       "note": "the touch chip answers software I2C but not the chip's I2C block",
       "evidence": "portability/arduino/README.md"
      }
+    },
+    "mspm0g5187": {
+     "build": {
+      "level": "builds",
+      "note": "Blink and the boardcheck sketch build with a board folder; AnalogReadSerial does not compile (no analogRead)",
+      "evidence": "data/results/mspm0g5187.csv"
+     },
+     "function": {
+      "level": "runs",
+      "note": "Blink and boardcheck ran; PA17 half periods 1,000 and 500 ms; boardcheck printed its banner and a millis line each second on UC0",
+      "evidence": "data/results/mspm0g5187.csv"
+     },
+     "memory": {
+      "level": "measured",
+      "note": "Blink 2,824 B flash, boardcheck 3,952 B; 6.3 kB RAM with the 6 kB stack and heap reserve",
+      "evidence": "data/results/mspm0g5187.csv"
+     }
     }
    },
    "path": "project",
@@ -963,7 +1033,10 @@
    "order": 5,
    "numbers": "Four Arduino programs built and two ran. The libraries' files are unmodified.",
    "limits": "The touch chip answers software I2C but not the chip's I2C block. This is a layer for your own build, not an Arduino IDE board.",
-   "command": "portability/arduino/build.sh"
+   "command": "portability/arduino/build.sh",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "u8g2-c2000",
@@ -996,6 +1069,9 @@
       "note": "not run on a display"
      }
     }
+   },
+   "upstream": {
+    "state": "none"
    }
   },
   {
@@ -1046,17 +1122,26 @@
    "numbers": "176x144 runs at 57 frames per second on the LP-MSPM33C321A (240x240 at 33). The LP-AM13E230 reaches 86.",
    "limits": "Baseline streams only; main-profile streams are refused.",
    "command": "portability/h264/build_host.sh",
-   "see": "The script prints one H264R line per stream: the Mac side of the frame checksums."
+   "see": "The script prints one H264R line per stream: the Mac side of the frame checksums.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "pqc",
    "group": "open-source",
-   "name": "Post-quantum key exchange and signatures on the LP-CC1354P10-1",
+   "name": "Post-quantum key exchange and signatures on seven boards: LP-CC1354P10-1, LP-EM-CC2340R5, LP-AM243, LP-MSPM0G3519, LP-MSPM33C321A, LP-EM-CC2755P10 and LP-MSPM0G5187",
    "boards": [
-    "cc1354p10"
+    "cc1354p10",
+    "cc2340r5",
+    "am243x",
+    "mspm0g3519",
+    "mspm33c321a",
+    "cc2755p10",
+    "mspm0g5187"
    ],
    "status": "runs",
-   "headline": "ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on the LP-CC1354P10-1.",
+   "headline": "ML-KEM-768 key exchange and ML-DSA-44 signatures pass NIST's known-answer vectors on seven boards, from a 36 kB Cortex-M0+ to an 800 MHz Cortex-R5F; the LP-CC1354P10-1 also agrees a key with a Mac.",
    "page": "project-post-quantum.html",
    "code": "portability/pqc-join",
    "writeup": "cc1354p10/pqc-join/README.md",
@@ -1074,6 +1159,78 @@
       "note": "ML-KEM-768 21 to 29 ms per step; ML-DSA-44 50 ms verify, 154 ms average sign",
       "evidence": "cc1354p10/pqc-join/README.md"
      }
+    },
+    "cc2340r5": {
+     "function": {
+      "level": "same",
+      "note": "every ML-KEM-768 and ML-DSA-44 step passes NIST's known-answer vectors",
+      "evidence": "portability/pqc-join/boards/cc2340r5/PORT.md"
+     },
+     "timing": {
+      "level": "runs",
+      "note": "ML-KEM-768 42 to 61 ms per step; ML-DSA-44 164 ms verify, 514 ms sign",
+      "evidence": "portability/pqc-join/boards/cc2340r5/PORT.md"
+     }
+    },
+    "am243x": {
+     "function": {
+      "level": "same",
+      "note": "every ML-KEM-768 and ML-DSA-44 step passes NIST's known-answer vectors, default build, one image, 3 of 3 RAM loads",
+      "evidence": "portability/pqc-join/README.md"
+     },
+     "timing": {
+      "level": "runs",
+      "note": "ML-KEM-768 0.95 to 1.34 ms per step; ML-DSA-44 2.5 ms verify, 5.2 ms sign at 800 MHz",
+      "evidence": "data/results/am243x.csv"
+     }
+    },
+    "mspm0g3519": {
+     "function": {
+      "level": "same",
+      "note": "every ML-KEM-768 and ML-DSA-44 step passes NIST's known-answer vectors",
+      "evidence": "data/results/mspm0g3519.csv"
+     },
+     "timing": {
+      "level": "runs",
+      "note": "ML-KEM-768 24.6, 29.1 and 35.6 ms; ML-DSA-44 key pair 82 ms, verify 95 ms, sign 317 ms at 80 MHz",
+      "evidence": "data/results/mspm0g3519.csv"
+     }
+    },
+    "mspm33c321a": {
+     "function": {
+      "level": "same",
+      "note": "every ML-KEM-768 and ML-DSA-44 step passes NIST's known-answer vectors",
+      "evidence": "data/results/mspm33c321a.csv"
+     },
+     "timing": {
+      "level": "runs",
+      "note": "ML-KEM-768 8.1, 9.2 and 11.3 ms; ML-DSA-44 key pair 19 ms, verify 19 ms, sign 39 ms",
+      "evidence": "data/results/mspm33c321a.csv"
+     }
+    },
+    "cc2755p10": {
+     "function": {
+      "level": "same",
+      "note": "every ML-KEM-768 and ML-DSA-44 step passes NIST's known-answer vectors",
+      "evidence": "data/results/cc2755p10.csv"
+     },
+     "timing": {
+      "level": "runs",
+      "note": "ML-KEM-768 10.0, 11.6 and 14.1 ms; ML-DSA-44 key pair 23.9 ms, verify 24.3 ms, sign 49.7 ms at 96 MHz",
+      "evidence": "data/results/cc2755p10.csv"
+     }
+    },
+    "mspm0g5187": {
+     "function": {
+      "level": "runs",
+      "note": "ML-KEM-768 passes the known-answer vectors; ML-DSA-44 does not fit the 32 kB of RAM",
+      "evidence": "data/results/mspm0g5187.csv"
+     },
+     "timing": {
+      "level": "runs",
+      "note": "ML-KEM-768 only: 24.9, 29.8 and 36.4 ms at -Os in 14 to 18 kB of stack; ML-DSA-44 does not fit the 32 kB of RAM",
+      "evidence": "data/results/mspm0g5187.csv"
+     }
     }
    },
    "command": "cc1354p10/pqc-join/build.sh -O3",
@@ -1081,7 +1238,10 @@
    "path": "code",
    "sub": "programs",
    "order": 25,
-   "numbers": "ML-KEM-768 takes 21 to 29 ms per step and ML-DSA-44 50 ms to verify and 154 ms on average to sign; every step passes NIST's known-answer vectors."
+   "numbers": "ML-KEM-768 takes 21 to 29 ms per step and ML-DSA-44 50 ms to verify and 154 ms on average to sign; every step passes NIST's known-answer vectors.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "cmsemicon",
@@ -1128,7 +1288,10 @@
    "sub": "vendors",
    "order": 18,
    "numbers": "29 of the 34 run with their main.c exactly as Cmsemicon shipped it. One glue layer and one pin-map file cover all of them.",
-   "limits": "The window-watchdog example resets the chip every few ms and locks the debugger out."
+   "limits": "The window-watchdog example resets the chip every few ms and locks the debugger out.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "stm32g4-hal",
@@ -1183,7 +1346,11 @@
    "order": 15,
    "numbers": "Two small TI-side shims of 13 and 50 lines carry them.",
    "limits": "The layer has no clock tree, timer or ADC, so ST's timer examples stop at the first compile. Delays count CPU cycles, not milliseconds.",
-   "files": "am13e230/stm32g4-hal"
+   "files": "am13e230/stm32g4-hal",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the AM13 SDK"
+   }
   },
   {
    "id": "stm32cubeg0-migration",
@@ -1255,7 +1422,10 @@
    "numbers": "GPIO toggle, serial port and PWM channel 4 ran as written. The button interrupt needed one fix and the ADC with DMA three: the button polarity, the DMA source address and the DMA sample count.",
    "limits": "Button presses come from the debugger, and the STM32 originals are not on the bench.",
    "command": "git clone --filter=blob:none --no-checkout https://github.com/STMicroelectronics/STM32CubeG0.git \"$HOME/cube\"\ncd \"$HOME/cube\"\ngit sparse-checkout set --no-cone '/.gitmodules' '/Projects/NUCLEO-G071RB/Examples/GPIO/GPIO_IOToggle/' '/Projects/NUCLEO-G071RB/Examples/GPIO/GPIO_EXTI/' '/Projects/NUCLEO-G071RB/Examples_LL/USART/USART_Communication_Tx_VCP_Init/' '/Projects/NUCLEO-G071RB/Examples/ADC/ADC_MultiChannelSingleConversion/' '/Projects/NUCLEO-G071RB/Examples/TIM/TIM_PWMOutput/'\ngit checkout 446ebe396489ca75679caa80887d7257efe92e3d\ngit submodule update --init --depth 1 Drivers/BSP/STM32G0xx_Nucleo\nWS=$HOME/ccs-workspace\nmkdir -p \"$WS/.claude/skills\"\ncp -R \"/Applications/ti/ccs2101/ccs/Code Composer Studio.app/Contents/Resources/ai/skills.alpha/ti-ccstudio-migrate-to-ti\" \"$WS/.claude/skills/\"\n# deletes a leftover merge marker (line 92) in the skill's SysConfig instructions\nsed -i '' '92d' \"$WS/.claude/skills/ti-ccstudio-migrate-to-ti/agents/sysconfig-configurator.md\"",
-   "see": "The skill ships in CCStudio 21.0.1's skills.alpha folder, for evaluation. Open CCStudio on that workspace, run /ti-ccstudio-migrate-to-ti ~/cube/Projects/NUCLEO-G071RB/Examples/GPIO/GPIO_IOToggle MSPM0G3507. The first example blinks LED1 on the LP-MSPM0G3507."
+   "see": "The skill ships in CCStudio 21.0.1's skills.alpha folder, for evaluation. Open CCStudio on that workspace, run /ti-ccstudio-migrate-to-ti ~/cube/Projects/NUCLEO-G071RB/Examples/GPIO/GPIO_IOToggle MSPM0G3507. The first example blinks LED1 on the LP-MSPM0G3507.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "holoscan",
@@ -1296,7 +1466,10 @@
      }
     }
    },
-   "ran": "NVIDIA Holoscan needs CUDA, so its camera graph is rebuilt from TI parts on the SK-TDA4VM: YOLOX-s pose takes 13.8 ms on the C7x accelerator."
+   "ran": "NVIDIA Holoscan needs CUDA, so its camera graph is rebuilt from TI parts on the SK-TDA4VM: YOLOX-s pose takes 13.8 ms on the C7x accelerator.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "cc1407p-g5187",
@@ -1353,7 +1526,11 @@
    "sub": "standards",
    "order": 31,
    "numbers": "An LP-CC1354P10-1 running rfPacketRx received 21,658 of 21,658 packets over 6 h 15 min at 915 MHz with no checksum errors. All 23 PHY (radio signal format) profiles sent, each rate within 3.4% of TI's figure.",
-   "limits": "One PHY (SUN O-QPSK 0) fails the checksum. The OFDM (multi-carrier) modes are transmit-only."
+   "limits": "One PHY (SUN O-QPSK 0) fails the checksum. The OFDM (multi-carrier) modes are transmit-only.",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the CC1407P host driver"
+   }
   },
   {
    "id": "cc1407p-anyhost",
@@ -1523,6 +1700,10 @@
       "note": "no packet sent"
      }
     }
+   },
+   "upstream": {
+    "state": "no-channel",
+    "to": "the CC1407P host driver"
    }
   },
   {
@@ -1559,7 +1740,11 @@
      }
     }
    },
-   "ran": "The CC1407P driver files compile for the LAUNCHXL-F2800137 with a compatibility header, and a field-by-field packer gives the same 315 octets as an Arm host."
+   "ran": "The CC1407P driver files compile for the LAUNCHXL-F2800137 with a compatibility header, and a field-by-field packer gives the same 315 octets as an Arm host.",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the CC1407P host driver"
+   }
   },
   {
    "id": "cc1407p-zephyr-cc2755p10",
@@ -1589,7 +1774,11 @@
      }
     }
    },
-   "lane": "ti"
+   "lane": "ti",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the CC1407P Zephyr samples"
+   }
   },
   {
    "id": "zephyr-l1306",
@@ -1647,7 +1836,11 @@
    "sub": "zephyr",
    "order": 10,
    "numbers": "Standard CoreMark fits with 16 bytes of RAM left and scores 1.87 per MHz. It needs the board file, a corrected GPIO driver, hand-written UART pins and one heap setting.",
-   "limits": "Most other Zephyr samples need 6 to 17 kB of RAM and do not fit."
+   "limits": "Most other Zephyr samples need 6 to 17 kB of RAM and do not fit.",
+   "upstream": {
+    "state": "not-sent",
+    "to": "Zephyr"
+   }
   },
   {
    "id": "zephyr-g3519",
@@ -1688,6 +1881,9 @@
       "evidence": "docs/experiments/2026-10-10-mspm0g3519-zephyr-lvgl.md"
      }
     }
+   },
+   "upstream": {
+    "state": "none"
    }
   },
   {
@@ -1732,7 +1928,11 @@
    "sub": "zephyr",
    "order": 11,
    "limits": "Zephyr has no LED, GPIO or serial driver for this chip, so Zephyr's own blinky does not build. The build clones Zephyr's main branch, so a later checkout can differ from the one that ran (commit 11808e9ea).",
-   "files": "am13e230/zephyr"
+   "files": "am13e230/zephyr",
+   "upstream": {
+    "state": "not-sent",
+    "to": "Zephyr"
+   }
   },
   {
    "id": "freertos-l1306",
@@ -1766,7 +1966,10 @@
    "order": 32,
    "numbers": "11 small tasks fit with static allocation and smaller stacks.",
    "limits": "TI's own settings file for this board needs 5.4 kB and does not link.",
-   "command": "cd mspm0l1306/freertos\n./build.sh blink"
+   "command": "cd mspm0l1306/freertos\n./build.sh blink",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "mspm0-family",
@@ -1812,7 +2015,11 @@
    "order": 52,
    "numbers": "With only the device changed, 101 of 170 LP-MSPM0L1306 examples build for the G3507. Of 153 ported images that built from the G3507 and C1104, 133 wrote nothing outside main flash and SRAM.",
    "limits": "One G-series clock setting stops 136 of the moves the other way. The sweep's scripts run from a scratch folder with a copy of the SDK; there is no one-line command.",
-   "files": "portability/families/mspm0"
+   "files": "portability/families/mspm0",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the MSPM0 SDK"
+   }
   },
   {
    "id": "mspm0-to-f3",
@@ -1862,15 +2069,18 @@
      }
     }
    },
-   "ran": "MSPM0 driver examples build for the CC2340R5 with a 47-line shim, the first 5 ran with the same pin states as TI's own build, and 4 of 4 ran on the CC1354P10."
+   "ran": "MSPM0 driver examples build for the CC2340R5 with a 47-line shim, the first 5 ran with the same pin states as TI's own build, and 4 of 4 ran on the CC1354P10.",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the MSPM0 SDK"
+   }
   },
   {
    "id": "f3-wifi",
    "group": "ti",
-   "name": "Driver examples across the CC23xx, CC27xx, CC13xx and Wi-Fi SDKs",
+   "name": "Driver examples across the CC23xx, CC27xx and Wi-Fi SDKs",
    "boards": [
     "cc2755p10",
-    "cc1354p10",
     "cc35x1"
    ],
    "status": "builds",
@@ -1902,13 +2112,11 @@
       "level": "untried",
       "note": "not run"
      }
-    },
-    "cc1354p10": {
-     "build": {
-      "level": "untried",
-      "note": "the F2 SDK for this board is not installed; a target only"
-     }
     }
+   },
+   "upstream": {
+    "state": "no-channel",
+    "to": "the SimpleLink SDKs"
    }
   },
   {
@@ -1944,7 +2152,11 @@
    "order": 53,
    "numbers": "Dropped in, 20 of 82 build. With each example's own SysConfig file ported, 43 of 83 build, 40 were run, and 54 of the 62 failures are names spelled differently across the two SDKs.",
    "limits": "1 of the 40 ran into a hard fault.",
-   "command": "portability/everywhere/crossbuild_mspm0_mspm33.sh \"$PWD/out/m33-work\" \"$PWD/out/m33-results.jsonl\""
+   "command": "portability/everywhere/crossbuild_mspm0_mspm33.sh \"$PWD/out/m33-work\" \"$PWD/out/m33-results.jsonl\"",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the MSPM0 SDK"
+   }
   },
   {
    "id": "g3519-to-g5187",
@@ -1972,6 +2184,10 @@
       "note": "not run"
      }
     }
+   },
+   "upstream": {
+    "state": "no-channel",
+    "to": "the MSPM0 SDK"
    }
   },
   {
@@ -2021,7 +2237,11 @@
    "sub": "chips",
    "order": 54,
    "numbers": "All 53 lines of app code are unchanged. Of 43 translated SysConfig files, 20 build and 14 of 14 tried ran clean.",
-   "command": "portability/shim/mspm0_on_am13e230/build.sh gpio"
+   "command": "portability/shim/mspm0_on_am13e230/build.sh gpio",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the MSPM0 SDK"
+   }
   },
   {
    "id": "msp430-to-mspm0",
@@ -2074,7 +2294,11 @@
    "sub": "chips",
    "order": 55,
    "numbers": "The counter survived 17 software resets, a program load and a power-off. A bus-clock UART echoed a 190-byte burst.",
-   "limits": "On the LP-AM13E230 the three examples build only, and the deep-sleep test locks the debugger out."
+   "limits": "On the LP-AM13E230 the three examples build only, and the deep-sleep test locks the debugger out.",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the MSP430 code examples"
+   }
   },
   {
    "id": "mcuplus-radar",
@@ -2116,7 +2340,11 @@
    "order": 56,
    "numbers": "In a radar SDK project 11 of 23 app files build as they are and 19 of 23 with one generated header; uart_echo and gpio_led_blink ran on the IWRL6432BOOST.",
    "limits": "The radar SDK spells some driver calls the older way. The script builds only; the runs on the board were flashed by hand.",
-   "files": "portability/everywhere/mcuplus-compat"
+   "files": "portability/everywhere/mcuplus-compat",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the MCU+ SDK"
+   }
   },
   {
    "id": "radar-parser",
@@ -2159,7 +2387,10 @@
    "sub": "chips",
    "order": 57,
    "numbers": "62 of 62 frame lines match the Mac's parser on a real capture on the LP-AM13E230, and all 231 frames match on the SK-TDA4VM.",
-   "limits": "It reads a recorded capture and is not connected to a live radar."
+   "limits": "It reads a recorded capture and is not connected to a live radar.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "fft-tda4",
@@ -2193,7 +2424,11 @@
    "sub": "chips",
    "order": 58,
    "numbers": "The peak is bin 5, value 4023, PASS.",
-   "files": "portability/everywhere/host-fft"
+   "files": "portability/everywhere/host-fft",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the MSPM0 SDK"
+   }
   },
   {
    "id": "c2000-control",
@@ -2249,7 +2484,10 @@
    "order": 59,
    "numbers": "1.33 us on the LP-AM13E230 and 2.58 us on the LAUNCHXL-F2800137. One FOC step is 117 cycles (0.585 us) on the AM13E230 with its math unit.",
    "files": "c2000-launchpad/bench/ctrl",
-   "limits": "The build and run commands cover the LAUNCHXL-F2800137; the repository has no build command for the LP-AM13E230 half."
+   "limits": "The build and run commands cover the LAUNCHXL-F2800137; the repository has no build command for the LP-AM13E230 half.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "three-ways",
@@ -2260,7 +2498,7 @@
     "mspm0l1306"
    ],
    "status": "partial",
-   "headline": "The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings.",
+   "headline": "The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings. It builds on the LP-MSPM0G3507 too.",
    "broke": "TI Drivers on FreeRTOS does not fit the L1306's 4 kB of RAM; Zephyr has no MSPM0 ADC driver",
    "page": "portability.html",
    "code": "portability/three-ways",
@@ -2308,7 +2546,10 @@
      }
     }
    },
-   "ran": "The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings."
+   "ran": "The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings. It builds on the LP-MSPM0G3507 too.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "gcc-mspm0",
@@ -2358,7 +2599,10 @@
    "sub": "standards",
    "order": 34,
    "numbers": "The 224 are 136 for the LP-MSPM0G3507 and 88 for the LP-MSPM0L1306. On the L1306, all 87 that TI Arm Clang also ran ran from GCC with no fault, and code is a median 15% larger.",
-   "limits": "The compiler is GCC 12.2 from the Zephyr SDK. Arm GNU 9-2019-q4, the version TI's makefiles name, is not used."
+   "limits": "The compiler is GCC 12.2 from the Zephyr SDK. Arm GNU 9-2019-q4, the version TI's makefiles name, is not used.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "minmea",
@@ -2425,7 +2669,10 @@
    "sub": "programs",
    "order": 23,
    "numbers": "The shim takes 5.7 kB of flash. Seven of the eight values read back over the debugger match; latitude reads 481172 against 481173 because the test app truncates a float.",
-   "limits": "The test app has no LED or serial output; you read the results with a debugger."
+   "limits": "The test app has no LED or serial output; you read the results with a debugger.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "gcc-f3",
@@ -2468,6 +2715,9 @@
       "note": "not run on the board"
      }
     }
+   },
+   "upstream": {
+    "state": "none"
    }
   },
   {
@@ -2510,7 +2760,11 @@
    "sub": "chips",
    "order": 63,
    "limits": "Runs unloaded only. Loaded starts, speeds below 20 Hz and reversals on the observers do not run.",
-   "command": "am13e230/foc-drv8376/build.sh"
+   "command": "am13e230/foc-drv8376/build.sh",
+   "upstream": {
+    "state": "no-channel",
+    "to": "the AM13 SDK"
+   }
   },
   {
    "id": "openocd-cc23xx",
@@ -2562,7 +2816,11 @@
    "sub": "standards",
    "order": 33,
    "numbers": "It programs TI's blink in 0.37 s. A 511 kB image writes in 10.5 s and reads back identical.",
-   "limits": "On the LP-EM-CC2755P10 the driver builds and has no board result. Chip erase and CCFG changes are refused."
+   "limits": "On the LP-EM-CC2755P10 the driver builds and has no board result. Chip erase and CCFG changes are refused.",
+   "upstream": {
+    "state": "not-sent",
+    "to": "OpenOCD"
+   }
   },
   {
    "id": "esp32-ble-gamepad",
@@ -2572,7 +2830,6 @@
     "mspm0g3519",
     "f2800137",
     "cc2340r5",
-    "cc35x1",
     "nucleo-u083rc"
    ],
    "status": "runs",
@@ -2863,20 +3120,6 @@
       "level": "untried",
       "note": "standby behavior of the HID service not looked at"
      }
-    },
-    "cc35x1": {
-     "build": {
-      "level": "untried",
-      "note": "no run: the board's out-of-box image cannot be backed up (cc35x1/AGENTS.md)"
-     },
-     "radio": {
-      "level": "untried",
-      "note": "the CC35X1 Bluetooth LE stack is the uncertain part of the port"
-     },
-     "function": {
-      "level": "untried",
-      "note": "not attempted: no backup of the out-of-box image could be taken, so the board was not written"
-     }
     }
    },
    "path": "code",
@@ -2884,7 +3127,10 @@
    "order": 38,
    "numbers": "Flash is 10,112 B on the LP-MSPM0G3519, 3,724 B on the NUCLEO-U083RC and 8,302 B of code on the LAUNCHXL-F2800137. The LP-EM-CC2340R5 image is 193,995 B of flash and 34,575 B of its 36,864 B of RAM.",
    "limits": "Only the LP-EM-CC2340R5 was paired with a Mac. Its Mac connect takes 31.3 s because macOS waits out its pairing timeout. The build script does not flash: write build/basic_ble.hex with UniFlash, then set your serial ports at the top of check/gp_serial.py.",
-   "files": "ports/esp32-ble-gamepad"
+   "files": "ports/esp32-ble-gamepad",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "stm32-usart-dma-rx-tx",
@@ -3474,7 +3720,10 @@
    "order": 14,
    "numbers": "Boards answer 2,246 to 2,294 packets a second, against 2,259 on the NUCLEO-U083RC original. The L1306 uses 636 B of its 4 kB of RAM and the C1104 632 B of 1 kB.",
    "limits": "The LP-AM13E230 passes five of six checks. No TI UART tested has the idle-line event, and at 921600 baud the C1104 and MSPM33C321A lose 152 to 452 of 500 packets. Each board folder builds its image; flashing is not scripted.",
-   "files": "ports/stm32-usart-dma-rx-tx"
+   "files": "ports/stm32-usart-dma-rx-tx",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "stm32-bootloader",
@@ -3571,7 +3820,10 @@
    "sub": "stm32",
    "order": 13,
    "numbers": "A 4.4 kB update takes 1.54 s with the erase. Across six builds the bootloader takes 3.0 to 3.2 kB of flash and 2.1 to 4.1 kB of RAM.",
-   "limits": "The STM32 original is not on the bench, so there is no number from the original side."
+   "limits": "The STM32 original is not on the bench, so there is no number from the original side.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "dns-sinkhole",
@@ -3626,7 +3878,10 @@
    "numbers": "A blocked name is answered in a median of 6 ms and a forwarded one in 70 ms. The 357 kB table holds 71,492 names and the application slot has room for about 304,000.",
    "limits": "IPv4 and UDP only, exact-name match, no TCP fallback.",
    "page": "project-dns-ad-blocker.html",
-   "lane": "ti"
+   "lane": "ti",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "doom",
@@ -3698,15 +3953,20 @@
    "numbers": "39.2 frames per second on the LP-EM-CC35X1 and 22.7 on the LP-MSPM33C321A's Educational BoosterPack screen. The converted game data is 1,758 kB, read in place from flash.",
    "limits": "No sound, and the stick and buttons were driven by a script. The stock doomgeneric engine stops on zone memory in all three demos on the LP-EM-CC35X1.",
    "page": "project-doom.html",
-   "files": "ports/doom"
+   "files": "ports/doom",
+   "upstream": {
+    "state": "not-sent",
+    "to": "doomgeneric"
+   }
   },
   {
    "id": "micropython",
    "group": "os",
-   "name": "MicroPython 1.29.0 on the LP-MSPM0G3519 and LP-MSPM0G3507",
+   "name": "MicroPython 1.29.0 on the LP-MSPM0G3519, LP-MSPM0G3507 and LP-MSPM0G5187",
    "boards": [
     "mspm0g3519",
-    "mspm0g3507"
+    "mspm0g3507",
+    "mspm0g5187"
    ],
    "status": "runs",
    "headline": "A new MicroPython port boots on the LP-MSPM0G3519 with the MicroPython banner and drives a 3.5 inch touch screen from Python.",
@@ -3760,6 +4020,38 @@
       "note": "minimal build 74,608 B flash, 29.8 kB heap; full build is 46,992 B too large",
       "evidence": "data/results/mspm0g3507.csv"
      }
+    },
+    "mspm0g5187": {
+     "build": {
+      "level": "builds",
+      "note": "minimal build 74,620 B flash; full build is 47,012 B too large",
+      "evidence": "data/results/mspm0g5187.csv"
+     },
+     "function": {
+      "level": "runs",
+      "note": "banner, machine.freq() 80000000, 28,992 B heap free, 1//0 traceback on the real UART (UC0)",
+      "evidence": "mspm0g5187/bench/micropython/repl-session.txt"
+     },
+     "memory": {
+      "level": "measured",
+      "note": "74,620 B flash, 2,960 B static RAM and stack, heap 29.0 kB; a 4 kB stack needs 2.5 kB of it",
+      "evidence": "data/results/mspm0g5187.csv"
+     },
+     "uart": {
+      "level": "runs",
+      "note": "REPL on the backchannel UART at 115200 baud",
+      "evidence": "mspm0g5187/bench/micropython/repl-session.txt"
+     },
+     "gpio": {
+      "level": "runs",
+      "note": "machine.Pin A17 and A24 toggled together, 4 changes in 16 samples read through the debug port",
+      "evidence": "mspm0g5187/bench/micropython/blink-readback-autorun.log"
+     },
+     "timing": {
+      "level": "measured",
+      "note": "pystone 680, 791 and 794 per second on a 4 kB-stack build with a slice-free copy of the script",
+      "evidence": "data/results/mspm0g5187.csv"
+     }
     }
    },
    "page": "project-micropython.html",
@@ -3768,7 +4060,11 @@
    "order": 9,
    "numbers": "The full build uses 174 kB of flash and leaves 121,824 bytes of heap free. Hardware SPI fills 320 by 480 pixels in 147 ms and the touch chip reads in 1.43 ms.",
    "limits": "The LP-MSPM0G3507 gets a 73 kB minimal build, because the full build does not fit its 128 kB. There is no file system, so the Python files are re-sent after each reset.",
-   "command": "ports/micropython/build_all.sh"
+   "command": "ports/micropython/build_all.sh",
+   "upstream": {
+    "state": "not-sent",
+    "to": "MicroPython"
+   }
   },
   {
    "id": "arduboy",
@@ -3840,7 +4136,10 @@
     }
    },
    "ran": "Snake, TileWorld and Crate Confusion build unchanged against an Arduboy2-compatible layer for four kits, and Snake draws on the LP-MSPM33C321A's Educational BoosterPack screen.",
-   "page": "project-arcade.html"
+   "page": "project-arcade.html",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "peanut-gb",
@@ -3927,19 +4226,22 @@
    "numbers": "160 MHz, a table scaler, DMA rows and one frame in two drawn gave 0 late frames in 8,167. The first image ran at 8 to 13 percent of real speed.",
    "limits": "No sound or cartridge saving. A person did not judge the stick and buttons.",
    "command": "bash ports/peanut-gb/build_target.sh mspm33c321a rom",
-   "page": "project-arcade.html"
+   "page": "project-arcade.html",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "touch-games",
    "group": "open-source",
-   "name": "2048 and Minesweeper on the LP-MSPM0G3519 with a 3.5 inch touch display",
+   "name": "2048 and Minesweeper on the LP-MSPM0G3519 with a 3.5 inch touch display (also built for the LP-MSPM0G3507 and LP-MSPM33C321A)",
    "boards": [
     "mspm0g3519",
     "mspm0g3507",
     "mspm33c321a"
    ],
    "status": "runs",
-   "headline": "2048 and Minesweeper run on the LP-MSPM0G3519 with a 3.5 inch touch display.",
+   "headline": "2048 and Minesweeper run on the LP-MSPM0G3519 with a 3.5 inch touch display. The same source builds for the LP-MSPM0G3507 (10.8 kB of flash) and, with a stub screen, for the LP-MSPM33C321A (8.1 kB).",
    "changed": "Written from the rules; a gesture layer and an eight-function board layer; dirty-tile redraw with a 3 kB buffer.",
    "effort": "One working session for the games, the host checks and the board run",
    "code": "ports/touch-games",
@@ -3992,7 +4294,10 @@
    "order": 44,
    "numbers": "A swipe in 2048 takes 32.6 ms at 40 MHz SPI and a one-cell tap in Minesweeper 1.09 ms. 2048 was played on the panel with working touch.",
    "limits": "A person did not check Minesweeper by finger or the touch axes. The SPI clock is above the panel's rating.",
-   "page": "project-arcade.html"
+   "page": "project-arcade.html",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "boosterpack-cores",
@@ -4008,7 +4313,7 @@
     "am13e230"
    ],
    "status": "partial",
-   "headline": "Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187.",
+   "headline": "Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. The Educational, Sharp128 and Audio builds also build for the LP-MSPM0G3519, and the Educational and Sharp128 builds for the LP-MSPM0G3507.",
    "changed": "Pin maps generated from one pins.json per board; clashes the clash matrix lacked are recorded.",
    "effort": "One speed-run day across seven agents, then a second wave for the games and the audio algorithms",
    "code": "portability/boosterpacks",
@@ -4077,7 +4382,10 @@
      }
     }
    },
-   "ran": "Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187."
+   "ran": "Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. The Educational, Sharp128 and Audio builds also build for the LP-MSPM0G3519, and the Educational and Sharp128 builds for the LP-MSPM0G3507.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "npu-dsp-g5187",
@@ -4119,12 +4427,15 @@
    "order": 27,
    "numbers": "The 64-tap FIR takes 0.566 ms for 4 x 256 outputs, 5.8 times faster than one hand-written C channel. A filter bank, a strided FIR, a max-pool and comparator, and a DFT matrix ran too.",
    "limits": "Output channels must be a multiple of 4. The DFT reaches 0.26 multiply-adds per cycle.",
-   "command": "mspm0g5187/npu-dsp/build.sh"
+   "command": "mspm0g5187/npu-dsp/build.sh",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "zephyr-shields",
    "group": "os",
-   "name": "BoosterPack shields (Educational MKII, Sharp128, Audio) for Zephyr on MSPM0 LaunchPad kits",
+   "name": "BoosterPack shields (Educational MKII, Sharp128, Audio) for Zephyr on MSPM0 LaunchPad kits and the LP-EM-CC2340R5",
    "boards": [
     "mspm0g3519",
     "mspm0g3507",
@@ -4132,7 +4443,7 @@
     "mspm33c321a"
    ],
    "status": "builds",
-   "headline": "Devicetree shields for three BoosterPacks build with Zephyr main on the LP-MSPM0G3519 and LP-MSPM0G3507 (Educational screen 32.0 and 31.9 kB of flash). Zephyr main has an MSPM0 SPI driver, added 2026-04-21; release 4.4.2 has none. No board was flashed.",
+   "headline": "Devicetree shields for three BoosterPacks build with Zephyr main on the LP-MSPM0G3519 and LP-MSPM0G3507 (Educational screen 32.0 and 31.9 kB of flash). The Audio shield also builds on the LP-EM-CC2340R5; the LP-MSPM33C321A builds hello_world and no shield. Zephyr main has an MSPM0 SPI driver, added 2026-04-21; release 4.4.2 has none. No board was flashed.",
    "changed": "A module with BoosterPack header nexus files per LaunchPad and one shield per BoosterPack; Zephyr files unmodified.",
    "effort": "One working session",
    "code": "portability/boosterpacks/zephyr",
@@ -4170,7 +4481,11 @@
      }
     }
    },
-   "page": "project-run-zephyr.html"
+   "page": "project-run-zephyr.html",
+   "upstream": {
+    "state": "not-sent",
+    "to": "Zephyr"
+   }
   },
   {
    "id": "llama2c",
@@ -4217,7 +4532,10 @@
    "sub": "programs",
    "order": 26,
    "numbers": "It writes 128 tokens at 21.2 per second at 160 MHz. The weights use 543.6 kB of the 1,024 kB flash.",
-   "limits": "It runs 128 steps and one checkpoint shape. The first 39 tokens equal the Mac build and the rest differ in library math."
+   "limits": "It runs 128 steps and one checkpoint shape. The first 39 tokens equal the Mac build and the rest differ in library math.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "wasm3",
@@ -4290,7 +4608,11 @@
    "order": 41,
    "numbers": "fib(20) runs 43.5 times and a 20,000-pass loop 28.9 times slower than the same C. The heap stays flat at 6.9 kB of 16 kB over 14 passes.",
    "limits": "Only the LP-MSPM0G3519 is flashed; the other two kits build.",
-   "command": "ports/wasm3/build_all.sh"
+   "command": "ports/wasm3/build_all.sh",
+   "upstream": {
+    "state": "not-sent",
+    "to": "wasm3"
+   }
   },
   {
    "id": "chip8",
@@ -4338,7 +4660,10 @@
    "numbers": "It executes 526 thousand instructions per second and redraws the 64 x 32 screen at 5x in 14.2 ms. The play image is 13,832 B of flash and 10,652 B of RAM.",
    "limits": "No sound, and CHIP-8 only. A person did not press the touch keypad.",
    "command": "ports/chip8/build.sh",
-   "page": "project-arcade.html"
+   "page": "project-arcade.html",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "zx-spectrum",
@@ -4381,7 +4706,10 @@
     }
    },
    "ran": "A ZX Spectrum 48K runs on the LP-MSPM0G3519 touch panel, and its screen memory equals the host machine's after 400 frames.",
-   "page": "project-arcade.html"
+   "page": "project-arcade.html",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "minimp3",
@@ -4451,7 +4779,10 @@
    "order": 43,
    "numbers": "A 5-second stereo clip decodes in 0.151 times real time on the LP-MSPM33C321A. On the LP-MSPM0G3519, which has no float unit, the same clip takes 9.84 times real time.",
    "limits": "Decode only; no audio plays. The LP-MSPM0G3519 cannot keep up in real time.",
-   "files": "ports/minimp3"
+   "files": "ports/minimp3",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "lc3",
@@ -4516,7 +4847,10 @@
    "order": 42,
    "numbers": "Encode takes 197,885 cycles at 16 kHz and 387,683 at 48 kHz on the 160 MHz Cortex-M33, which is 12.4 to 24.2 percent of real time. Decode takes 4.6 to 10.5 percent.",
    "limits": "Codec only: a generated signal, no radio and no audio output. The Cortex-M0+ build for the LP-MSPM0G3519 links, and its numbers come from an emulator.",
-   "files": "ports/lc3"
+   "files": "ports/lc3",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "plaits",
@@ -4563,7 +4897,10 @@
    "order": 51,
    "numbers": "A block costs 10.7 to 34.5 percent of real time at 160 MHz with the FPU on. With the FPU off the same core needs 149 to 1,140 percent.",
    "limits": "Synthesis only: the sound goes to a RAM buffer, with no DAC or MIDI input and no listening test.",
-   "files": "ports/plaits"
+   "files": "ports/plaits",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "opus",
@@ -4610,19 +4947,27 @@
    "order": 50,
    "numbers": "CELT 48 kHz 10 ms encodes in 29 to 54 percent of real time at 160 MHz and decodes in 17 to 22 percent.",
    "limits": "Codec only: mono, a generated signal, no radio or audio output. The Mac reference must use the same multiply macros as the board.",
-   "files": "ports/opus"
+   "files": "ports/opus",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "ulisp",
    "group": "open-source",
-   "name": "uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507 and LP-MSPM0G3519",
+   "name": "uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507, LP-MSPM0G3519, LP-EM-CC2340R5, LP-EM-CC2755P10, LP-MSPM33C321A, LP-AM243 and LAUNCHXL-F2800137",
    "boards": [
     "mspm0g5187",
     "mspm0g3507",
-    "mspm0g3519"
+    "mspm0g3519",
+    "cc2340r5",
+    "cc2755p10",
+    "am243x",
+    "f2800137",
+    "mspm33c321a"
    ],
    "status": "runs",
-   "headline": "uLisp, an Arduino sketch, gives a Lisp prompt on the LP-MSPM0G5187's serial port: 19 of 19 REPL (type-and-run loop) checks pass.",
+   "headline": "uLisp, an Arduino sketch, gives a Lisp prompt on the serial port of the LP-MSPM0G5187, LP-EM-CC2340R5 and LP-EM-CC2755P10: 19 of 19 REPL (type-and-run loop) checks pass on each.",
    "changed": "A build copy of the sketch gets one board block and the pin-mode keywords; function prototypes are written the way the Arduino IDE writes them (about 490). The shim supplies Serial, millis, micros, delay and the three LED pins; analog, tone, SPI and I2C are stubs.",
    "effort": "One working session",
    "code": "ports/ulisp",
@@ -4658,6 +5003,28 @@
       "evidence": "data/results/mspm0g5187.csv"
      }
     },
+    "cc2340r5": {
+     "build": {
+      "level": "builds",
+      "note": "TI Arm Clang 5.1.1 -Os, SimpleLink Low Power F3 SDK NoRTOS; 98,568 B flash (19 percent of 512 kB)",
+      "evidence": "data/results/cc2340r5.csv"
+     },
+     "memory": {
+      "level": "measured",
+      "note": "24,558 B RAM with the 2,800-object workspace, 11.4 kB left for the stack",
+      "evidence": "data/results/cc2340r5.csv"
+     },
+     "function": {
+      "level": "runs",
+      "note": "19 of 19 REPL checks pass over the serial port; stack-overflow guard fires and the prompt recovers",
+      "evidence": "cc2340r5/bench/ulisp/repl-check-run3-final.txt"
+     },
+     "timing": {
+      "level": "measured",
+      "note": "tak 10.8 to 10.9 s, fib 23 7.5 s, q2 28 s, fib 20 1.7 s, one garbage collection 1.5 ms at 48 MHz; three runs",
+      "evidence": "data/results/cc2340r5.csv"
+     }
+    },
     "mspm0g3507": {
      "build": {
       "level": "builds",
@@ -4681,15 +5048,102 @@
       "note": "73,336 B RAM with a 9,000-object workspace (72,000 B), 56.4 kB left for the stack",
       "evidence": "data/results/mspm0g3519.csv"
      }
+    },
+    "cc2755p10": {
+     "build": {
+      "level": "builds",
+      "note": "TI Arm Clang 5.1.1 -Os, SimpleLink Low Power F3 SDK NoRTOS; 96,656 B flash (10 percent of 928 kB)",
+      "evidence": "data/results/cc2755p10.csv"
+     },
+     "memory": {
+      "level": "measured",
+      "note": "24,788 B RAM with the 2,800-object workspace, 136.9 kB left for the stack",
+      "evidence": "data/results/cc2755p10.csv"
+     },
+     "function": {
+      "level": "runs",
+      "note": "19 of 19 REPL checks pass over the serial port in three runs; an endless recursion ends in 'Error: no room' (the workspace fills before the stack) and the next line runs",
+      "evidence": "cc2755p10/bench/ulisp/repl-check-run3.txt"
+     },
+     "timing": {
+      "level": "measured",
+      "note": "tak 3.1 to 3.2 s, fib 23 2.2 s, q2 8.1 s, fib 20 0.48 to 0.50 s, one garbage collection 505 us; three runs",
+      "evidence": "data/results/cc2755p10.csv"
+     }
+    },
+    "am243x": {
+     "build": {
+      "level": "builds",
+      "note": "TI Arm Clang -Os, MCU+ SDK, loaded to RAM through the debug port; nothing written to flash",
+      "evidence": "data/results/am243x.csv"
+     },
+     "function": {
+      "level": "runs",
+      "note": "20 of 20 REPL checks pass over the console in three loads",
+      "evidence": "am243x/bench/ulisp/"
+     },
+     "timing": {
+      "level": "measured",
+      "note": "tak 0.91 s, fib 23 0.70 s, fib 20 0.16 s, q2 2.6 s at 800 MHz, the same in every load",
+      "evidence": "data/results/am243x.csv"
+     }
+    },
+    "f2800137": {
+     "build": {
+      "level": "builds",
+      "note": "cl2000 25.11.1.LTS -O2 as C++ with every int widened to long; 141,866 B flash (54 percent of 256 kB); the image is written from a raw binary",
+      "evidence": "data/results/f2800137.csv"
+     },
+     "memory": {
+      "level": "measured",
+      "note": "28,698 B RAM with the 2,000-object workspace (16.0 kB) and a 6,144-word stack",
+      "evidence": "data/results/f2800137.csv"
+     },
+     "function": {
+      "level": "runs",
+      "note": "19 of 19 REPL checks pass over the probe's serial port in three runs; the stack guard was not exercised",
+      "evidence": "c2000-launchpad/bench/ulisp/repl-check-run3.txt"
+     },
+     "timing": {
+      "level": "measured",
+      "note": "tak 8.1 to 8.2 s, fib 23 5.3 to 5.4 s, q2 20.4 s, fib 20 1.2 s, one garbage collection 519 us; three runs at 120 MHz",
+      "evidence": "data/results/f2800137.csv"
+     }
+    },
+    "mspm33c321a": {
+     "build": {
+      "level": "builds",
+      "note": "TI Arm Clang 5.1.1 -Os, MSPM33 SDK 1.04.00.00 DriverLib no RTOS; 87,728 B flash (8 percent of 1 MB)",
+      "evidence": "data/results/mspm33c321a.csv"
+     },
+     "memory": {
+      "level": "measured",
+      "note": "23,182 B static RAM with the 2,800-object workspace, plus a 16 kB stack",
+      "evidence": "data/results/mspm33c321a.csv"
+     },
+     "function": {
+      "level": "runs",
+      "note": "19 of 19 REPL checks pass over the serial port in three runs; the stack guard prints 'Error: stack overflow' and the next line runs",
+      "evidence": "mspm33c321a/bench/ulisp/repl-check-run3.txt"
+     },
+     "timing": {
+      "level": "measured",
+      "note": "tak 2.5 to 2.6 s, fib 23 1.7 s, q2 6.5 s, fib 20 0.38 to 0.40 s, one garbage collection 461 us at 160 MHz; three runs",
+      "evidence": "data/results/mspm33c321a.csv"
+     }
     }
    },
    "path": "project",
    "sub": "arduino",
    "order": 6,
    "numbers": "The image is 98.8 kB of flash and 23.1 kB of RAM. (tak 18 12 6) takes 7.5 s at 80 MHz.",
-   "limits": "Analog read, tone, SPI and I2C are stubs. The same source builds for the LP-MSPM0G3507 and LP-MSPM0G3519 and is flashed only on the LP-MSPM0G5187.",
+   "limits": "Analog read, tone, SPI and I2C are stubs. The same source builds for the LP-MSPM0G3507 and LP-MSPM0G3519 and is flashed on the LP-MSPM0G5187, LP-EM-CC2340R5 and LP-EM-CC2755P10.",
    "command": "ports/ulisp/build.sh",
-   "page": "project-ulisp.html"
+   "page": "project-ulisp.html",
+   "upstream": {
+    "state": "not-sent",
+    "to": "uLisp"
+   }
   },
   {
    "id": "rust-mspm0",
@@ -4737,7 +5191,10 @@
    "sub": "programs",
    "order": 28,
    "numbers": "The blinky takes 2.6 kB of flash and 112 bytes of static RAM, and the hello 3.7 kB and 148 bytes. The build takes 107 s cold and 3 s after a change.",
-   "limits": "Only GPIO, the timer and the blocking UART ran."
+   "limits": "Only GPIO, the timer and the blocking UART ran.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "micropython-zephyr-cc2340r5",
@@ -4812,7 +5269,11 @@
    "sub": "micropython",
    "order": 7,
    "numbers": "The image is 174.8 kB of flash and 29.9 kB of RAM with a 20 kB heap; the stock settings overflow the RAM by 46.8 kB. Pin.irq saw 10 of 10 edges.",
-   "limits": "PWM duty_u16 needs a one-line patch, which is in the folder. SPI data is unchecked without a loopback wire, and no I2C device was on the bus."
+   "limits": "PWM duty_u16 needs a one-line patch, which is in the folder. SPI data is unchecked without a loopback wire, and no I2C device was on the bus.",
+   "upstream": {
+    "state": "not-sent",
+    "to": "MicroPython and Zephyr"
+   }
   },
   {
    "id": "micropython-zephyr-mspm33c321a",
@@ -4881,7 +5342,11 @@
    "sub": "micropython",
    "order": 8,
    "numbers": "The image is 292.3 kB of flash and 83.6 kB of RAM with a 48 kB heap.",
-   "limits": "I2C reads hang until a hardware reset. The chip has no Zephyr ADC or PWM driver."
+   "limits": "I2C reads hang until a hardware reset. The chip has no Zephyr ADC or PWM driver.",
+   "upstream": {
+    "state": "not-sent",
+    "to": "Zephyr"
+   }
   },
   {
    "id": "arduino-zephyr",
@@ -4994,7 +5459,11 @@
    "sub": "arduino",
    "order": 4,
    "numbers": "Images are 22.8 to 38.3 kB of flash and 4.8 to 6.1 kB of RAM. On the LP-MSPM0G3519, Wire reads the touch controller 100 of 100 times and SPI loopback returns 256 of 256 bytes.",
-   "lane": "arduino"
+   "lane": "arduino",
+   "upstream": {
+    "state": "not-sent",
+    "to": "ArduinoCore-zephyr"
+   }
   },
   {
    "id": "renesas-ra-fsp",
@@ -5063,7 +5532,10 @@
    "sub": "vendors",
    "order": 16,
    "numbers": "sci_uart, adc and gpt run with no edit, and iic_master with five constants changed for the touch controller. Flash use is 12.4 to 15.5 kB.",
-   "limits": "The fifth example, timer-triggered ADC, runs up to its DMA chain, and its two-group DMA transfer does not complete. The unchanged iic_master reports a missing ADXL345."
+   "limits": "The fifth example, timer-triggered ADC, runs up to its DMA chain, and its two-group DMA transfer does not complete. The unchanged iic_master reports a missing ADXL345.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "pico-sdk",
@@ -5127,7 +5599,10 @@
    "sub": "vendors",
    "order": 17,
    "numbers": "The layer is 316 lines plus 81 lines of board files. The five examples take 1.8 to 10.6 kB of flash.",
-   "limits": "There is no PIO equivalent."
+   "limits": "There is no PIO equivalent.",
+   "upstream": {
+    "state": "none"
+   }
   },
   {
    "id": "simplefoc",
@@ -5178,6 +5653,10 @@
       "note": "the motor has not turned: supply off"
      }
     }
+   },
+   "upstream": {
+    "state": "not-sent",
+    "to": "SimpleFOC"
    }
   },
   {
@@ -5242,7 +5721,12 @@
    "limits": "One core, UART0 only, no peripheral beyond the timer. The SRAM image was loaded by the debugger, so this shows the chip runs it, not that a product starts that way.",
    "path": "project",
    "sub": "zephyr",
-   "order": 9
+   "order": 9,
+   "upstream": {
+    "state": "not-sent",
+    "to": "Zephyr"
+   },
+   "files": "am62l-evm/zephyr"
   },
   {
    "id": "jailhouse-am62l",
@@ -5285,7 +5769,12 @@
    "limits": "No Zephyr cell, no cell-to-cell message traffic, no timing beyond these.",
    "path": "ti",
    "sub": "chips",
-   "order": 40
+   "order": 40,
+   "upstream": {
+    "state": "no-channel",
+    "to": "the Processor SDK"
+   },
+   "files": "am62l-evm/README.md"
   },
   {
    "id": "radar-host-readers",
@@ -5335,7 +5824,10 @@
    "page": "project-radar-presence.html",
    "see": "The Python reader prints frame and point counts that match the recording; the ROS node publishes PointCloud2 on /ti_mmwave/radar_scan_pcl.",
    "numbers": "Python reader 537 of 537 frames; ROS driver 265 of 265 frames at 50 ms, 0 at 250 ms; gesture recognizer 0 of 328 frames.",
-   "limits": "Live points were checked only with nobody in front of the radar. The ROS driver needs frames under 100 ms or a change to its read loop. The gesture recognizer is not running."
+   "limits": "Live points were checked only with nobody in front of the radar. The ROS driver needs frames under 100 ms or a change to its read loop. The gesture recognizer is not running.",
+   "upstream": {
+    "state": "none"
+   }
   }
  ],
  "terms": [
@@ -5414,5 +5906,12 @@
   "radio": "Radio",
   "rtos": "RTOS",
   "timing": "Timing"
+ },
+ "upstream_states": {
+  "merged": "the change is in the project it came from; link names the merged pull request",
+  "open": "a pull request is open in that project; link names it",
+  "not-sent": "the change lives in this repository only and has not been sent to the project named in to",
+  "no-channel": "the code came from a project that takes no outside changes; to names it",
+  "none": "nothing to send: the source was used unchanged, or the code was written for this repository"
  }
 }

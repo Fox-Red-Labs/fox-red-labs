@@ -35,16 +35,21 @@ def list_probes():
             m = re.match(r"\s*Serial Num:\s*(\S+)", line)
             if m:
                 probes.append({"serial": m.group(1), "name": name or "XDS110", "via": "xdsdfu"})
-        if out.strip():
-            return probes
+    else:
+        probes = []
+    # xdsdfu skips a probe another debugger holds open at that moment (seen 2026-11-08: 7 of 10 listed, then 12 of 12), so the
+    # OS list is merged in rather than used only as a fallback. The two agree on serials; xdsdfu's names are kept.
     sys.path.insert(0, str(ROOT / "tools" / "benchmark"))
     try:
         import detect
         devs = detect.usb_devices()
     except Exception:
         devs = []
-    return [{"serial": d.get("serial") or "", "name": d.get("name") or "XDS110", "via": "usb"}
-            for d in devs if str(d.get("vid", "")).lower() == "0451" and str(d.get("pid", "")).lower() in ("bef3", "bef4")]
+    seen = {p["serial"] for p in probes}
+    for d in devs:
+        if str(d.get("vid", "")).lower() == "0451" and str(d.get("pid", "")).lower() in ("bef3", "bef4") and d.get("serial") and d["serial"] not in seen:
+            probes.append({"serial": d["serial"], "name": d.get("name") or "XDS110", "via": "usb"}); seen.add(d["serial"])
+    return probes
 
 
 def select(requested=None, probes=None):

@@ -1,8 +1,8 @@
 # What can the TI LAUNCHXL-F2800137 and LAUNCHXL-F28P65X LaunchPad development kits do, measured from a Mac terminal?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
-**Short answer.** It builds, loads and runs TI's examples from a Mac terminal with no board changes: 138 of 139 C2000Ware examples for this chip build by script. Do two things first: check the onboard probe's firmware with `xdsdfu -e` and update it if it is older than 3.0.0.43, and use a connection file (`.ccxml`, the file that tells TI's tools which probe and chip to use) that sets the 2-pin cJTAG mode. The motor-control number: a PWM-triggered sample, motor-control step and PWM update takes 2.3 to 2.6 µs.
+**Short answer.** It builds, loads and runs TI's examples from a Mac terminal with no board changes: all 139 C2000Ware examples for this chip build by script (138 from their project files alone; one needs a source file added). Do two things first: check the onboard probe's firmware with `xdsdfu -e` and update it if it is older than 3.0.0.43, and use a connection file (`.ccxml`, the file that tells TI's tools which probe and chip to use) that sets the 2-pin cJTAG mode. The motor-control number: a PWM-triggered sample, motor-control step and PWM update takes 2.3 to 2.6 µs.
 
 Terms: [docs/vocab.md](../docs/vocab.md). Every problem hit on this bench, with its cause and fix: [FAQ](FAQ.md). 1 kB = 1,024 bytes. The **probe** is the XDS110 debugger built into the board; **cJTAG** is the 2-wire debug link it uses; the **TMU** is the chip's trig and divide hardware. **CCStudio** is TI's IDE (only its command-line scripting runner was used), **UniFlash** TI's flashing tool, **SysConfig** TI's tool that writes the pin and clock setup code, **C2000Ware** TI's software kit for C2000 chips, and **`ESTOP0`** the C28x instruction where TI's examples stop for a debugger.
 
@@ -79,7 +79,7 @@ tools/c2kbuild.sh /tmp/led_ex1_blinky RAM
 /Applications/ti/ccs2101/ccs/scripting/run.sh tools/c2krun.js /tmp/led_ex1_blinky/build-RAM-Ooff/led_ex1_blinky.out blink
 ```
 
-This is a RAM load: the program is gone at power-off. To keep it, build with `FLASH` in place of `RAM` and run the same command on `build-FLASH-Ooff/led_ex1_blinky.out`; the debugger then writes it to flash. That is how the bench and sweep loaded their flash images; the blink example from flash was not timed.
+This is a RAM load: the program is gone at power-off. To keep it, build with `FLASH` in place of `RAM` and run the same command on `build-FLASH-Ooff/led_ex1_blinky.out`; the debugger then writes it to flash. That is how the bench and sweep loaded their flash images. The one-command path (`python3 tools/frl/frl.py run --board f2800137 --probe <serial>`, see `docs/frl.md`) backs up, builds, writes main flash and checks the LED pin; it took 58 s on a powered, identified board.
 
 `c2kbuild.sh` runs SysConfig, compiles with TI's projectspec flags (CPU1_LAUNCHXL configuration) and links. Separate UniFlash command-line calls each reconnect, so they cannot watch a running program; use the scripting runner for that.
 
@@ -93,7 +93,7 @@ From the `c2000-launchpad/` folder, one script runs SysConfig, compiles with TI'
 tools/c2kbuild.sh /tmp/led_ex1_blinky RAM
 ```
 
-It took 4.6 s for TI's blink on the F2800137 (observed 2026-10-06; not saved). It does not load the program: use the scripting runner in step 5, because separate UniFlash command-line calls each reconnect and cannot watch a running program. To build every C2000Ware example for the chip, loop `tools/c2kbuild.sh` over the example folders: 138 of 139 build.
+It took 4.6 s for TI's blink on the F2800137 (observed 2026-10-06; not saved). It does not load the program: use the scripting runner in step 5, because separate UniFlash command-line calls each reconnect and cannot watch a running program. To build every C2000Ware example for the chip, loop `tools/c2kbuild.sh` over the example folders: 138 of 139 build from the project file alone, and the 139th (`transfer_ex2_customlog_export_sci_buffer`) builds once `utilities/transfer/source/transfer_ringbuffer.c` is added.
 
 ## Putting it back on TI's demo
 
@@ -105,7 +105,9 @@ LAUNCHXL-F2800137 unless the row says F28P65X. 120 MHz; RAM means code in zero-w
 
 | What | Number | Conditions | Level | Source row |
 |---|---|---|---|---|
-| Blink, TI's `led_ex1_blinky`, terminal build and RAM load | 4.6 s build, 3.9 s load | Observed 2026-10-06, output not saved. Sweep: 4.1 s load and the LED pin seen toggling. Box to blink with a flash write: not measured | measured | `blink_build`, `blink_flash` |
+| Plug-in-ready board to a checked blink, one command (`frl run`: backup, build, flash, LED check) | 58 s, one run | Terminal only: board already powered and identified, tools installed. The LED pin read back as 150, 150, 150, 900 ms. No first-power clock | measured | `time_to_blink` |
+| Print your own message, one command (`frl run --recipe print-message`: backup, build, flash, read the serial port) | 67 to 73 s, three runs; flash write 11.2 to 14.0 s | TI's `launchxl_f2800137` demo with the message edit, printed once a second on the probe's first serial port at 115200 (SCIA on GPIO28 and GPIO29, the board's own wiring, no jumper changes). The message counted 4, 3 and 4 times in the 4 s listen | measured | `message_flash_repeat` |
+| Blink, TI's `led_ex1_blinky`, terminal build and RAM load | 4.6 s build, 3.9 s load | Observed 2026-10-06, output not saved. Sweep: 4.1 s load and the LED pin seen toggling. Flash write through `frl`: 9.2 to 9.9 s, three runs (`blink_flash_repeat`) | measured | `blink_build`, `blink_flash` |
 | sinf, atan2f, divide, cycles per loop iteration, TMU flags | 8.0, 17.0, 8.0 from RAM; 12.0, 20.0, 12.0 from flash | Includes 7 (RAM) or 9 (flash) cycles of loop overhead | measured | `math_divide`, `foc_step`, `control_loop`, `isr_entry` |
 | sinf, atan2f, divide, C library | 82.0, 697.0, 241.2 from RAM | Same loop | measured | `math_divide`, `foc_step`, `control_loop`, `isr_entry` |
 | One field-oriented control (FOC) step, the standard motor-control math, float | 194 cycles with TMU flags (RAM), 221 (flash); 349 without them (RAM) | Per loop iteration | measured | `math_divide`, `foc_step`, `control_loop`, `isr_entry` |
@@ -117,7 +119,7 @@ LAUNCHXL-F2800137 unless the row says F28P65X. 120 MHz; RAM means code in zero-w
 | Float FFT, TI's FPU DSP library | Complex 256 points 0.107 ms; 1,024 points 0.52 ms from RAM, 0.52 to 0.60 ms from flash | | measured | `fft256`, `adc_max_rate` |
 | Embench-IoT | 19 of 19 fit and run; 15 pass their own check | | measured | `embench_fit` |
 | ADC rate, no wiring | 2.10 million samples a second (Msps) at TI's sample window; 3.98 Msps at 9 cycles | 9 cycles (75 ns) is the data sheet's minimum | measured | `fft256`, `adc_max_rate` |
-| TI's C2000Ware examples | 138 of 139 build from a terminal | TI's own flags plus three additions the projects do not list. Running is not passing; most need wiring to show they work | measured | the example build count in this README |
+| TI's C2000Ware examples | 139 of 139 build from a terminal (138 from the project file alone) | TI's own flags plus three additions the projects do not list; one example also needs a source file added. Running is not passing; most need wiring to show they work | measured | the example build count in this README |
 | TI's examples that report fail | 4 clock-check (DCC) examples fail as shipped; all 4 pass with a define or one SysConfig line. All 11 AI examples pass their golden-vector check | | measured | [FAQ](FAQ.md) |
 | F28P65X CoreMark, patched | 258.86 per second from RAM (1.294 per MHz); 211.79 from flash (1.059 per MHz) | 200 MHz | measured | `coremark`, `coremark_per_mhz` in `data/results/f28p65x.csv` |
 | F28P65X Dhrystone | 0.444 DMIPS per MHz from RAM; 0.279 from flash | TI C2000 compiler -O3, no inlining | measured | `dhrystone` in `data/results/f28p65x.csv` |
@@ -139,4 +141,4 @@ The rest of the errors, with causes: [FAQ.md](FAQ.md) (F2800137) and [FAQ-f28p65
 
 ## Where these facts come from
 
-Checked 2026-10-06 (F2800137) and 2026-10-08 (F28P65X) on an Intel Mac, macOS 15.7.9: CCStudio 21.0.1 (C2000 compiler 25.11.1.LTS, SysConfig 1.28.1, scripting), UniFlash 9.6.0, C2000Ware 26.02.00.00 LTS core from TI's public GitHub repo (427 MB on disk including its 87 MB git folder; no myTI login), probe firmware 3.0.0.43. Files: `data/results/f2800137.csv`, `data/results/f28p65x.csv`, `c2000-launchpad/AGENTS.md`, `c2000-launchpad/FAQ.md`, `c2000-launchpad/FAQ-f28p65x.md`.
+Checked 2026-10-06 and 2026-11-08 (F2800137) and 2026-10-08 (F28P65X) on an Intel Mac, macOS 15.7.9: CCStudio 21.0.1 (C2000 compiler 25.11.1.LTS, SysConfig 1.28.1, scripting), UniFlash 9.6.0, C2000Ware 26.02.00.00 LTS core from TI's public GitHub repo (427 MB on disk including its 87 MB git folder; no myTI login), probe firmware 3.0.0.43. Files: `data/results/f2800137.csv`, `data/results/f28p65x.csv`, `c2000-launchpad/AGENTS.md`, `c2000-launchpad/FAQ.md`, `c2000-launchpad/FAQ-f28p65x.md`.

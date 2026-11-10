@@ -50,6 +50,16 @@ int main(void) {
         #ifdef FRL_BANNER_EXTRA
         mp_hal_stdout_tx_str(FRL_BANNER_EXTRA "\r\n");
         #endif
+        #ifdef FRL_AUTORUN
+        // Build option for the LED check: run this Python text once after start-up, so a debugger
+        // that resets the chip on attach still finds a running program. Off in normal builds.
+        {
+            vstr_t v;
+            vstr_init_fixed_buf(&v, sizeof(FRL_AUTORUN), (char *)FRL_AUTORUN);
+            v.len = sizeof(FRL_AUTORUN) - 1;
+            pyexec_vstr(&v, false);
+        }
+        #endif
         for (;;) {
             if (pyexec_mode_kind == PYEXEC_MODE_RAW_REPL) {
                 if (pyexec_raw_repl() != 0) {

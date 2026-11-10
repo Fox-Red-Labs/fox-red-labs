@@ -33,7 +33,7 @@
   }, 0);
 })();
 
-/* Home page: reveal once, the portability rail, count-ups. Only runs where tools/render_home.py wrote .hm-home, and only when
+/* Home page: reveal once and count-ups (the rail ride, the mosaic, the flips and the scroll build are in tools/render_home.py). Only runs where tools/render_home.py wrote .hm-home, and only when
    motion is allowed; otherwise the page stays as rendered (every chip lit, every number final). */
 (function () {
   var home = document.querySelector('.hm-home');
@@ -42,22 +42,6 @@
   if (rm && rm.matches) return;
   var root = document.documentElement;
   root.classList.add('hm-js');
-  var rail = home.querySelector('.hm-rail svg');
-  var lit = rail ? rail.querySelectorAll('[data-k]') : [];
-  Array.prototype.forEach.call(lit, function (e) { e.classList.remove('lit'); });
-  var prog = rail && rail.querySelector('.prog'), ball = rail && rail.querySelector('.ball');
-  if (prog) prog.setAttribute('x2', rail.dataset.x0);
-  function ride() {
-    var x0 = +rail.dataset.x0, x1 = +rail.dataset.x1, dx = +rail.dataset.dx, t0 = performance.now(), shown = -1;
-    (function f(now) {
-      var p = Math.min(1, ((now || performance.now()) - t0) / 4500), x = x0 + (x1 - x0) * (1 - Math.pow(1 - p, 3));
-      prog.setAttribute('x2', x); ball.setAttribute('transform', 'translate(' + (x - x0) + ' 0)');
-      var k = Math.min(Math.round((x1 - x0) / dx), Math.floor((x - x0) / dx + 0.02));
-      if (p >= 1) k = Math.round((x1 - x0) / dx);
-      for (; shown < k; shown++) Array.prototype.forEach.call(rail.querySelectorAll('[data-k="' + (shown + 1) + '"]'), function (e) { e.classList.add('lit'); });
-      if (p < 1) requestAnimationFrame(f); else prog.setAttribute('x2', 1120);
-    })();
-  }
   function count(el) {
     var n = +el.dataset.n, t0 = performance.now();
     el.textContent = '0';
@@ -72,7 +56,6 @@
       if (!en.isIntersecting) return;
       var el = en.target;
       el.classList.add('in'); io.unobserve(el);
-      if (el.id === 'hm-rail' && rail) ride();
       Array.prototype.forEach.call(el.querySelectorAll('[data-n]'), count);
     });
   }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });

@@ -2,7 +2,7 @@
 id: E243
 board: LP-EM-CC2340R5
 date: 2026-10-12
-status: in progress
+status: waiting
 reached: run
 line: The LP-EM-CC2340R5 advertises Nordic's LED Button Service and Nordic UART Service and a Mac drives both (LED write answered in 24.3 ms median, 60 of 60 UART lines echoed identical); the LED, the button and the phone apps have not been seen.
 stop: none

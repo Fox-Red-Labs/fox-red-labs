@@ -25,7 +25,7 @@ import params  # noqa: E402
 import toolfind  # noqa: E402
 from boards_mspm0 import BOARDS, SDK  # noqa: E402
 
-VALID = {"mspm0_sdk": ["2.11.00.07"], "sysconfig": ["1.26.3"], "ticlang": ["5.1.1.LTS"], "make": None}
+VALID = {"mspm0_sdk": ["2.11.00.07"], "sysconfig": ["1.26.3", "1.28.0"], "ticlang": ["5.1.1.LTS"], "make": None}
 PLAYER = ROOT / "tools" / "webflash" / "player"
 
 

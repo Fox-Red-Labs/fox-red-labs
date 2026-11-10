@@ -1,4 +1,4 @@
-# Time a tiny AI model that counts people in a room
+# Tiny AI that counts people in a room
 
 Four room-occupancy networks, 636 to 33k weights, run as plain C on the LP-MSPM0G3507; every answer is checked and timed in clock cycles.
 

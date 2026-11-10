@@ -6,9 +6,9 @@
 set -euo pipefail
 B="${1:?board: g3507, l1306, g5187 or g3519}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
-SDK=/Applications/ti/mspm0_sdk_2_11_00_07
-CGT=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
-SYSCFG=/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh
+SDK=${FRL_MSPM0_SDK:-/Applications/ti/mspm0_sdk_2_11_00_07}
+CGT=${FRL_TICLANG:-/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS}
+SYSCFG=${FRL_SYSCONFIG:-/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh}
 [ -x "$SYSCFG" ] || SYSCFG=/Applications/ti/sysconfig_1.28.0/sysconfig_cli.sh
 case "$B" in
   g3507) STARTUP=startup_mspm0g350x_ticlang.c ;;

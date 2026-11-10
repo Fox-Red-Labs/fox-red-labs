@@ -8,9 +8,9 @@ FILE: c2000-launchpad/README.md | What can the TI LAUNCHXL-F2800137 and LAUNCHXL
 
 # What can the TI LAUNCHXL-F2800137 and LAUNCHXL-F28P65X LaunchPad development kits do, measured from a Mac terminal?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
-**Short answer.** It builds, loads and runs TI's examples from a Mac terminal with no board changes: 138 of 139 C2000Ware examples for this chip build by script. Do two things first: check the onboard probe's firmware with `xdsdfu -e` and update it if it is older than 3.0.0.43, and use a connection file (`.ccxml`, the file that tells TI's tools which probe and chip to use) that sets the 2-pin cJTAG mode. The motor-control number: a PWM-triggered sample, motor-control step and PWM update takes 2.3 to 2.6 µs.
+**Short answer.** It builds, loads and runs TI's examples from a Mac terminal with no board changes: all 139 C2000Ware examples for this chip build by script (138 from their project files alone; one needs a source file added). Do two things first: check the onboard probe's firmware with `xdsdfu -e` and update it if it is older than 3.0.0.43, and use a connection file (`.ccxml`, the file that tells TI's tools which probe and chip to use) that sets the 2-pin cJTAG mode. The motor-control number: a PWM-triggered sample, motor-control step and PWM update takes 2.3 to 2.6 µs.
 
 Terms: [docs/vocab.md](../docs/vocab.md). Every problem hit on this bench, with its cause and fix: [FAQ](FAQ.md). 1 kB = 1,024 bytes. The **probe** is the XDS110 debugger built into the board; **cJTAG** is the 2-wire debug link it uses; the **TMU** is the chip's trig and divide hardware. **CCStudio** is TI's IDE (only its command-line scripting runner was used), **UniFlash** TI's flashing tool, **SysConfig** TI's tool that writes the pin and clock setup code, **C2000Ware** TI's software kit for C2000 chips, and **`ESTOP0`** the C28x instruction where TI's examples stop for a debugger.
 
@@ -87,7 +87,7 @@ tools/c2kbuild.sh /tmp/led_ex1_blinky RAM
 /Applications/ti/ccs2101/ccs/scripting/run.sh tools/c2krun.js /tmp/led_ex1_blinky/build-RAM-Ooff/led_ex1_blinky.out blink
 ```
 
-This is a RAM load: the program is gone at power-off. To keep it, build with `FLASH` in place of `RAM` and run the same command on `build-FLASH-Ooff/led_ex1_blinky.out`; the debugger then writes it to flash. That is how the bench and sweep loaded their flash images; the blink example from flash was not timed.
+This is a RAM load: the program is gone at power-off. To keep it, build with `FLASH` in place of `RAM` and run the same command on `build-FLASH-Ooff/led_ex1_blinky.out`; the debugger then writes it to flash. That is how the bench and sweep loaded their flash images. The one-command path (`python3 tools/frl/frl.py run --board f2800137 --probe <serial>`, see `docs/frl.md`) backs up, builds, writes main flash and checks the LED pin; it took 58 s on a powered, identified board.
 
 `c2kbuild.sh` runs SysConfig, compiles with TI's projectspec flags (CPU1_LAUNCHXL configuration) and links. Separate UniFlash command-line calls each reconnect, so they cannot watch a running program; use the scripting runner for that.
 
@@ -101,7 +101,7 @@ From the `c2000-launchpad/` folder, one script runs SysConfig, compiles with TI'
 tools/c2kbuild.sh /tmp/led_ex1_blinky RAM
 ```
 
-It took 4.6 s for TI's blink on the F2800137 (observed 2026-10-06; not saved). It does not load the program: use the scripting runner in step 5, because separate UniFlash command-line calls each reconnect and cannot watch a running program. To build every C2000Ware example for the chip, loop `tools/c2kbuild.sh` over the example folders: 138 of 139 build.
+It took 4.6 s for TI's blink on the F2800137 (observed 2026-10-06; not saved). It does not load the program: use the scripting runner in step 5, because separate UniFlash command-line calls each reconnect and cannot watch a running program. To build every C2000Ware example for the chip, loop `tools/c2kbuild.sh` over the example folders: 138 of 139 build from the project file alone, and the 139th (`transfer_ex2_customlog_export_sci_buffer`) builds once `utilities/transfer/source/transfer_ringbuffer.c` is added.
 
 ## Putting it back on TI's demo
 
@@ -113,7 +113,9 @@ LAUNCHXL-F2800137 unless the row says F28P65X. 120 MHz; RAM means code in zero-w
 
 | What | Number | Conditions | Level | Source row |
 |---|---|---|---|---|
-| Blink, TI's `led_ex1_blinky`, terminal build and RAM load | 4.6 s build, 3.9 s load | Observed 2026-10-06, output not saved. Sweep: 4.1 s load and the LED pin seen toggling. Box to blink with a flash write: not measured | measured | `blink_build`, `blink_flash` |
+| Plug-in-ready board to a checked blink, one command (`frl run`: backup, build, flash, LED check) | 58 s, one run | Terminal only: board already powered and identified, tools installed. The LED pin read back as 150, 150, 150, 900 ms. No first-power clock | measured | `time_to_blink` |
+| Print your own message, one command (`frl run --recipe print-message`: backup, build, flash, read the serial port) | 67 to 73 s, three runs; flash write 11.2 to 14.0 s | TI's `launchxl_f2800137` demo with the message edit, printed once a second on the probe's first serial port at 115200 (SCIA on GPIO28 and GPIO29, the board's own wiring, no jumper changes). The message counted 4, 3 and 4 times in the 4 s listen | measured | `message_flash_repeat` |
+| Blink, TI's `led_ex1_blinky`, terminal build and RAM load | 4.6 s build, 3.9 s load | Observed 2026-10-06, output not saved. Sweep: 4.1 s load and the LED pin seen toggling. Flash write through `frl`: 9.2 to 9.9 s, three runs (`blink_flash_repeat`) | measured | `blink_build`, `blink_flash` |
 | sinf, atan2f, divide, cycles per loop iteration, TMU flags | 8.0, 17.0, 8.0 from RAM; 12.0, 20.0, 12.0 from flash | Includes 7 (RAM) or 9 (flash) cycles of loop overhead | measured | `math_divide`, `foc_step`, `control_loop`, `isr_entry` |
 | sinf, atan2f, divide, C library | 82.0, 697.0, 241.2 from RAM | Same loop | measured | `math_divide`, `foc_step`, `control_loop`, `isr_entry` |
 | One field-oriented control (FOC) step, the standard motor-control math, float | 194 cycles with TMU flags (RAM), 221 (flash); 349 without them (RAM) | Per loop iteration | measured | `math_divide`, `foc_step`, `control_loop`, `isr_entry` |
@@ -125,7 +127,7 @@ LAUNCHXL-F2800137 unless the row says F28P65X. 120 MHz; RAM means code in zero-w
 | Float FFT, TI's FPU DSP library | Complex 256 points 0.107 ms; 1,024 points 0.52 ms from RAM, 0.52 to 0.60 ms from flash | | measured | `fft256`, `adc_max_rate` |
 | Embench-IoT | 19 of 19 fit and run; 15 pass their own check | | measured | `embench_fit` |
 | ADC rate, no wiring | 2.10 million samples a second (Msps) at TI's sample window; 3.98 Msps at 9 cycles | 9 cycles (75 ns) is the data sheet's minimum | measured | `fft256`, `adc_max_rate` |
-| TI's C2000Ware examples | 138 of 139 build from a terminal | TI's own flags plus three additions the projects do not list. Running is not passing; most need wiring to show they work | measured | the example build count in this README |
+| TI's C2000Ware examples | 139 of 139 build from a terminal (138 from the project file alone) | TI's own flags plus three additions the projects do not list; one example also needs a source file added. Running is not passing; most need wiring to show they work | measured | the example build count in this README |
 | TI's examples that report fail | 4 clock-check (DCC) examples fail as shipped; all 4 pass with a define or one SysConfig line. All 11 AI examples pass their golden-vector check | | measured | [FAQ](FAQ.md) |
 | F28P65X CoreMark, patched | 258.86 per second from RAM (1.294 per MHz); 211.79 from flash (1.059 per MHz) | 200 MHz | measured | `coremark`, `coremark_per_mhz` in `data/results/f28p65x.csv` |
 | F28P65X Dhrystone | 0.444 DMIPS per MHz from RAM; 0.279 from flash | TI C2000 compiler -O3, no inlining | measured | `dhrystone` in `data/results/f28p65x.csv` |
@@ -147,7 +149,7 @@ The rest of the errors, with causes: [FAQ.md](FAQ.md) (F2800137) and [FAQ-f28p65
 
 ## Where these facts come from
 
-Checked 2026-10-06 (F2800137) and 2026-10-08 (F28P65X) on an Intel Mac, macOS 15.7.9: CCStudio 21.0.1 (C2000 compiler 25.11.1.LTS, SysConfig 1.28.1, scripting), UniFlash 9.6.0, C2000Ware 26.02.00.00 LTS core from TI's public GitHub repo (427 MB on disk including its 87 MB git folder; no myTI login), probe firmware 3.0.0.43. Files: `data/results/f2800137.csv`, `data/results/f28p65x.csv`, `c2000-launchpad/AGENTS.md`, `c2000-launchpad/FAQ.md`, `c2000-launchpad/FAQ-f28p65x.md`.
+Checked 2026-10-06 and 2026-11-08 (F2800137) and 2026-10-08 (F28P65X) on an Intel Mac, macOS 15.7.9: CCStudio 21.0.1 (C2000 compiler 25.11.1.LTS, SysConfig 1.28.1, scripting), UniFlash 9.6.0, C2000Ware 26.02.00.00 LTS core from TI's public GitHub repo (427 MB on disk including its 87 MB git folder; no myTI login), probe firmware 3.0.0.43. Files: `data/results/f2800137.csv`, `data/results/f28p65x.csv`, `c2000-launchpad/AGENTS.md`, `c2000-launchpad/FAQ.md`, `c2000-launchpad/FAQ-f28p65x.md`.
 
 ==============================================================================
 FILE: c2000-launchpad/FAQ.md | What goes wrong with the TI LAUNCHXL-F2800137 LaunchPad development kit on a Mac, and how do you fix it?
@@ -218,13 +220,17 @@ It reads 8 words from 0x5D008 (PARTIDL, PARTIDH, REVID) into `id.bin`. The read 
 
 Use the scripting runner. Build with `tools/c2kbuild.sh <folder> RAM`, then run `/Applications/ti/ccs2101/ccs/scripting/run.sh tools/c2krun.js <abs path to .out> blink`. **Tag: Setup or handling.** Separate UniFlash command-line calls each reconnect, so they cannot watch a running program. TI's `led_ex1_blinky` toggled GPIO20 every 500 ms in 8 samples 250 ms apart. This loads the program into RAM, so it is gone at power-off; build with `FLASH` to keep it. `README.md`.
 
+### How do I print my own message from the LAUNCHXL-F2800137 over the USB cable?
+
+Run `python3 tools/frl/frl.py run --board f2800137 --recipe print-message --probe <serial> --message "Hello from my LaunchPad"`. **Tag: Setup or handling.** It backs up main flash, copies TI's `launchxl_f2800137` demo, swaps its ASCII logo and ADC readout for `> <message> <count>` once a second, builds it with the C2000 compiler, writes main flash through CCStudio scripting and reads the probe's first serial port (`/dev/cu.usbmodem<serial>1`) at 115200 baud. Three runs took 67 to 73 s each, with the flash write at 11.2 to 14.0 s, and the message counted 3 to 4 times in the 4 s listen. The demo's SCIA pins (GPIO28 receive, GPIO29 transmit) are the ones the board wires to the probe, so nothing needs moving. The tools leave the program running from flash; `frl restore <backup folder>` puts TI's original demo back and read back identical. `data/results/f2800137.csv`, `message_flash_repeat`.
+
 ### frl verify says `FRL-E042 UNVERIFIED: only 18 reads a second through the probe`. Is the board wrong?
 
 No: the check could not read the LED pin fast enough to time it. **Tag: Setup or handling.** CCStudio reads this pin about 42 times a second when the computer is quiet; with five other boards writing at once it read 18, below the 20 the check needs, so frl refused to guess. Stop other debug sessions and board runs, then run `frl verify` again. Seen 2026-10-25; `docs/frl.md`.
 
 ### How long does it take from box to a blinking LED on the LAUNCHXL-F2800137?
 
-Not measured end to end. **Tag: Unknown.** On first bring-up TI's `led_ex1_blinky` built in 4.6 s and loaded into RAM in 3.9 s (observed 2026-10-06; not saved). That load is not a flash write, so the program is gone at power-off. Before it came the probe firmware update and the first, slow connection, neither timed. A flash write of the blink example was not timed; writing the 256 kB demo image back to flash took 18.6 s and 20.9 s. `README.md`.
+From a board that is already powered and identified, with the tools installed: 58 s for the whole terminal path in one command (`python3 tools/frl/frl.py run --board f2800137 --probe <serial>`: backup read twice, build, write to main flash, LED4 on GPIO20 timed to 150, 150, 150, 900 ms), and the restore read back identical. One run. **Tag: Setup or handling.** The first-power steps (probe firmware update, the slow first connection, installing the tools) are not in that number and were not timed. On first bring-up TI's `led_ex1_blinky` built in 4.6 s and loaded into RAM in 3.9 s (observed 2026-10-06; not saved). That load is not a flash write, so the program is gone at power-off. Before it came the probe firmware update and the first, slow connection, neither timed. A flash write of the blink example alone took 9.2 to 9.9 s over three runs; writing the 256 kB demo image back to flash took 18.6 s and 20.9 s. `README.md`.
 
 ### Does it work from CCStudio's window, or on an Apple Silicon Mac?
 
@@ -249,6 +255,10 @@ Unmodified, it builds a different-sized workload, because the C28x's smallest me
 ### Why does the C2000 compiler say `identifier "int8_t" is undefined`, and why does portable C give different answers on the C28x?
 
 The C28x has no 8-bit type, so TI's `stdint.h` leaves out `int8_t` and `uint8_t`; C2000 compiler 25.11.1 prints `"i8.c", line 2: error: identifier "int8_t" is undefined` for a file that uses it. **Tag: Chip limit.** Add your own `typedef int16_t int8_t;` and check that the code never relies on 8-bit wraparound. The room-occupancy models clamp every value, so they gave 20 of 20 right answers. Every int8 value takes 2 bytes, so int8 weights need twice the flash.
+
+### Why does a C++ library fail to compile for the C28x with `invalid storage class for a template declaration` or `may not have a parameter of type`?
+
+The C2000 compiler (cl2000 25.11.1.LTS) accepts C++03 only. **Tag: Tool or docs.** `--c++11` and `--c++14` print `invalid compiler option (ignored)`, and rvalue references (`String(String &&)`), trailing return types and `auto` are errors. ArduinoCore-API fails this way on `String.h` line 75 and `Common.h` line 145, in all five API files; plain C needs `--c11` for declarations inside `for` loops (MicroPython `py/`). uLisp, which is C-style C++, does compile (`ports/ulisp/boards/f2800137/PORT.md`). Measured 2026-11-09; logs in `c2000-launchpad/bench/arduino/` and `c2000-launchpad/bench/micropython/`.
 
 ### Why do Embench-IoT's `edn`, `matmult-int` and `picojpeg` fail their own check on the TMS320F2800137?
 
@@ -454,6 +464,14 @@ Not as it is: even with C2000Ware's `uint8_t` and `-D__packed__=` on the command
 
 `int` is 16 bits on the C28x, so `1 << 16` and above overflow; write `1UL << n` (or `1ULL`) for any flag at bit 16 or higher. **Tag: Tool or docs.** The code assumes a 32-bit `int`: TI's CC1407P host driver defines 15 event flags as `(1 << 16)` to `(1 << 30)` and draws 29 of these warnings with the C2000 compiler 25.11.1.LTS; the same rule is why BitNetMCU needed `1L << shift` above. What the driver's build does with those flags at run time was not checked. [CC1407P host experiment](../docs/experiments/2026-10-08-f2800137-cc1407p-host-driver.md).
 
+### Why does uLisp run on the C28x but print garbage numbers, return empty strings or get `(tak 12 8 4)` wrong?
+
+The sketch assumes a 32-bit `int`, an 8-bit `char` and a 4-byte `sizeof` of a packed word, and the C28x has none of them, so a build that only fixes the compile errors boots, answers `(+ 1 2)` and fails the rest: `(/ 1.0 3)` printed `0.0-+/*//`, `"abc"` came back empty, integers wrapped at 16 bits, and `1-` collided with another name in the radix-40 symbol packer. **Tag: Setup or handling.** Widen every `int` to `long`, cast before `<< 16` and `<< 24`, replace `sizeof` of the packed word by 4, and set `INT_MAX` to the 32-bit limit (`ports/ulisp/boards/f2800137/build.sh` and `compat.h`); 19 of 19 REPL checks then pass and `(tak 18 12 6)` takes 8.1 to 8.2 s (run 2026-11-09, `c2000-launchpad/bench/ulisp/`).
+
+### Why does a flash image written from a linked `.out` print nothing on the C28x?
+
+Two things are easy to miss: the codestart branch has to be at the flash entry, 0x80000 (a linker file that keeps `BEGIN` at 0x0 leaves the flash entry blank), and the `.TI.ramfunc` code (`Flash_initModule` and the other flash helpers) has to be copied to RAM before `Device_init` calls it. **Tag: Setup or handling.** Put `BEGIN` at 0x80000 and start `main` with `memcpy(&RamfuncsRunStart, &RamfuncsLoadStart, (size_t)&RamfuncsLoadSize);`; the banner `uLisp 4.9a` then prints after a reset (run 2026-11-09, `ports/ulisp/boards/f2800137/PORT.md`). Write the image as a raw binary the way `c2kflashback.js` does: CCStudio's `loadProgram` of the same `.out` timed out twice.
+
 ## Power measurement and ported examples
 
 ### Can I measure the F2800137's current with the kit's own probe, as the MSPM0 LaunchPad does with EnergyTrace?
@@ -591,6 +609,11 @@ A RAM load is gone at power-off. Separate UniFlash command-line calls each recon
 | `invalid attribute for "struct TRX_Phy_s"` with `uint8_t` undefined (TI CC1407P host driver) | `__attribute__((__packed__))` written directly in TRX.h; no 8-bit type | `--preinclude` `portability/cc1407p-host/c28x/c28x_compat.h`; it builds, but the message bytes are still wrong on a 16-bit char (run 2026-10-24: 9 units sent against 10 bytes), so add a field-by-field packer | 12 of 12 files compile; CRC-16 of `123456789` is 0x29B1 |
 | The CC1407P host driver sends different bytes than on Arm, or `LRF_*_byteCount` is half what you expect | Structs and bit-fields laid over the SPI buffer assume 8-bit bytes; `sizeof` counts 16-bit words | Use the field-by-field packer `portability/cc1407p-host/wire/trx_wire.c` (run 2026-10-25: 17 of 17 cases equal, 315 octets, same digest as a Mac) | The stream digest DC1DF5B1 matches |
 | `error: invalid redeclaration of type name "uint8_t"` when preincluding a `uint8_t` typedef into a file that includes driverlib | `driverlib/inc/hw_types.h` already defines `uint8_t` | Preinclude only the files that do not include driverlib (`portability/three-ways/c2000/build.sh`, run 2026-10-25) | The file compiles |
+| `error: invalid storage class for a template declaration`, `copy constructor ... may not have a parameter of type`, or `invalid compiler option --c++14 (ignored)` | cl2000 25.11.1.LTS compiles C++03 only: no rvalue references, trailing return types or `auto` | Write C++03 or C; do not take C++11 libraries such as ArduinoCore-API (run 2026-11-09, `c2000-launchpad/bench/arduino/`) | The file compiles |
+| `declaration` errors such as `type name is not allowed` on `for (int i = 0; ...)` | cl2000 defaults to C89 | Add `--c11` (run 2026-11-09, MicroPython `py/`, `c2000-launchpad/bench/micropython/`) | The file compiles |
+| `ScriptingTimeoutError` in `loadProgram` on an image of about 70,000 words | Writing a large `.out` to flash through CCStudio scripting stalled at 120 s and at 15 min; a 256 kB binary through `c2kflashback.js` takes about a minute (run 2026-11-09, `c2000-launchpad/bench/ulisp/flash-attempts.txt`) | Do not retry the same call; write a raw binary with `loadBinaryProgram` (`ports/ulisp/boards/f2800137/mkraw.sh` builds it from the `.out` with `hex2000 --ti_txt`; about 19 s, run 2026-11-09), and restore from the backup | `verifyBinaryProgram: ok` |
+| uLisp (or any 32-bit-`int` code) runs but prints garbage numbers, returns empty strings or gives wrong answers, and the stack-and-heap sizes look half-size | `int` is 16 bits (and `sizeof` counts 16-bit words), so integers, shifts into the top bytes and packed-string or radix-40 arithmetic wrap at 16 bits with no warning | Widen the `int`s to `long`, cast before `<< 16` and `<< 24`, and replace `sizeof` of a 4-byte word by 4 (`ports/ulisp/boards/f2800137/build.sh`, run 2026-11-09, `c2000-launchpad/bench/ulisp/repl-check-first-image.txt`) | 19 of 19 REPL checks pass |
+| A flash image written from the linked `.out` never starts, or the REPL is silent | The codestart branch was placed at 0x0 instead of the flash entry at 0x80000, or `.TI.ramfunc` code was not copied to RAM before `Device_init` | Put `BEGIN` at 0x80000 in the linker file and `memcpy` `RamfuncsLoadStart` to `RamfuncsRunStart` first thing in `main` (run 2026-11-09) | The banner `uLisp 4.9a` prints after a reset |
 | `8888808888` for every digit (BitNetMCU), or a wrong tiny-AES-c ciphertext | Code assumes a byte wraps at 256 | Write the test digits as signed decimals; mask `xtime()` with `& 0xFF` | Digits differ; FIPS-197 C.1 passes |
 
 Traps shared with other boards: TRAPS.md.
@@ -627,11 +650,12 @@ Traps shared with other boards: TRAPS.md.
 
 ## What ran here
 
-- F2800137, blink: 4.6 s build, 3.9 s RAM load; box to blink with a flash write not measured (`c2000-launchpad/FAQ.md`).
+- F2800137, blink: 4.6 s build, 3.9 s RAM load (`c2000-launchpad/FAQ.md`). `python3 tools/frl/frl.py run --board f2800137 --probe <serial>` did backup, build, flash and a pin-timed LED check in 58 s on a powered board, and `frl restore <backup folder>` read back identical (`data/results/f2800137.csv`, `time_to_blink`).
+- F2800137, print a message: `python3 tools/frl/frl.py run --board f2800137 --recipe print-message --probe <serial> --message "Hello"` copies TI's `launchxl_f2800137` demo, replaces its logo and ADC readout with `> <message> <count>` once a second, builds, writes main flash and reads the probe's first serial port at 115200: three runs of 67 to 73 s, flash write 11.2 to 14.0 s, restore read back identical (`data/results/f2800137.csv`, `message_flash_repeat`). The route's console port is `/dev/cu.usbmodem<serial>1`.
 - F2800137, FOC step with TMU: 194 cycles from RAM, 221 from flash; PWM trigger to new PWM value 2.3 to 2.6 µs (`data/results/f2800137.csv`).
 - F2800137, patched CoreMark: 141.0 per second from flash (1.175 per MHz), 155.3 from RAM; Dhrystone 0.362 DMIPS per MHz from flash (`data/results/f2800137.csv`).
 - F2800137, occupancy models 500 to 30k: 1.8 to 65.4 ms plain C from flash, 20 of 20 vectors (`data/results/f2800137.csv`).
-- F2800137, TI examples: 138 of 139 build from a terminal.
+- F2800137, TI examples: 139 of 139 build from a terminal (138 from the project files alone; `transfer_ex2` needs `transfer_ringbuffer.c` added). 137 safe images ran with no fault handler (`c2000-launchpad/sweep/RUNS.md`).
 - F28P65X, patched CoreMark: 258.86 per second from RAM (1.294 per MHz), 211.79 from flash; SCI loopback clean to 12.5 Mbaud (`data/results/f28p65x.csv`).
 - F28P65X, occupancy models: 0.893 ms to 47.9 ms, 20 of 20 vectors; `occ_cnn_30k` did not fit the shared RAM layout and ran from flash (`data/results/f28p65x.csv`).
 
@@ -645,6 +669,7 @@ Code written for other chips and tools, brought to this board. The files to copy
 | BitNetMCU on a C2000 control chip (LAUNCHXL-F2800137) | Works | BitNetMCU's 64-wide CNN reads all 10 test digits right on the LAUNCHXL-F2800137. | `ports/bitnetmcu/README.md` |
 | C2000 current-loop code on the LP-AM13E230 | Works | The same current-loop step, trigger to new PWM, runs about twice as fast on the LP-AM13E230 as on the LAUNCHXL-F2800137. | `docs/experiments/2026-10-11-current-loop-three-mcus.md` |
 | ESP32-BLE-Gamepad (a Bluetooth HID gamepad library) on TI, ST and C2000 boards | Works | The ESP32-BLE-Gamepad descriptor and reports match the library's output byte for byte on four boards, and 15 of 15 button changes from the LP-EM-CC2340R5 reached a Mac as gamepad reports. | `docs/experiments/2026-10-19-esp32-ble-gamepad-port-matrix.md` |
+| uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507, LP-MSPM0G3519, LP-EM-CC2340R5, LP-EM-CC2755P10, LP-MSPM33C321A, LP-AM243 and LAUNCHXL-F2800137 | Works | uLisp, an Arduino sketch, gives a Lisp prompt on the serial port of the LP-MSPM0G5187, LP-EM-CC2340R5 and LP-EM-CC2755P10: 19 of 19 REPL (type-and-run loop) checks pass on each. | `ports/ulisp/README.md` |
 | CC1407P host driver on the LAUNCHXL-F2800137 | Could work | The CC1407P driver files compile for the LAUNCHXL-F2800137 with a compatibility header, and a field-by-field packer gives the same 315 octets as an Arm host. | `docs/experiments/2026-10-25-f2800137-cc1407p-wire-packer.md` |
 <!-- ports:end -->
 

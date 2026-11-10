@@ -63,13 +63,17 @@ It reads 8 words from 0x5D008 (PARTIDL, PARTIDH, REVID) into `id.bin`. The read 
 
 Use the scripting runner. Build with `tools/c2kbuild.sh <folder> RAM`, then run `/Applications/ti/ccs2101/ccs/scripting/run.sh tools/c2krun.js <abs path to .out> blink`. Separate UniFlash command-line calls each reconnect, so they cannot watch a running program. TI's `led_ex1_blinky` toggled GPIO20 every 500 ms in 8 samples 250 ms apart. This loads the program into RAM, so it is gone at power-off; build with `FLASH` to keep it. `README.md`.
 
+### How do I print my own message from the LAUNCHXL-F2800137 over the USB cable?
+
+Run `python3 tools/frl/frl.py run --board f2800137 --recipe print-message --probe <serial> --message "Hello from my LaunchPad"`. It backs up main flash, copies TI's `launchxl_f2800137` demo, swaps its ASCII logo and ADC readout for `> <message> <count>` once a second, builds it with the C2000 compiler, writes main flash through CCStudio scripting and reads the probe's first serial port (`/dev/cu.usbmodem<serial>1`) at 115200 baud. Three runs took 67 to 73 s each, with the flash write at 11.2 to 14.0 s, and the message counted 3 to 4 times in the 4 s listen. The demo's SCIA pins (GPIO28 receive, GPIO29 transmit) are the ones the board wires to the probe, so nothing needs moving. The tools leave the program running from flash; `frl restore <backup folder>` puts TI's original demo back and read back identical. `data/results/f2800137.csv`, `message_flash_repeat`.
+
 ### frl verify says `FRL-E042 UNVERIFIED: only 18 reads a second through the probe`. Is the board wrong?
 
 No: the check could not read the LED pin fast enough to time it. CCStudio reads this pin about 42 times a second when the computer is quiet; with five other boards writing at once it read 18, below the 20 the check needs, so frl refused to guess. Stop other debug sessions and board runs, then run `frl verify` again. Seen 2026-10-25; `docs/frl.md`.
 
 ### How long does it take from box to a blinking LED on the LAUNCHXL-F2800137?
 
-Not measured end to end. On first bring-up TI's `led_ex1_blinky` built in 4.6 s and loaded into RAM in 3.9 s (observed 2026-10-06; not saved). That load is not a flash write, so the program is gone at power-off. Before it came the probe firmware update and the first, slow connection, neither timed. A flash write of the blink example was not timed; writing the 256 kB demo image back to flash took 18.6 s and 20.9 s. `README.md`.
+From a board that is already powered and identified, with the tools installed: 58 s for the whole terminal path in one command (`python3 tools/frl/frl.py run --board f2800137 --probe <serial>`: backup read twice, build, write to main flash, LED4 on GPIO20 timed to 150, 150, 150, 900 ms), and the restore read back identical. One run. The first-power steps (probe firmware update, the slow first connection, installing the tools) are not in that number and were not timed. On first bring-up TI's `led_ex1_blinky` built in 4.6 s and loaded into RAM in 3.9 s (observed 2026-10-06; not saved). That load is not a flash write, so the program is gone at power-off. Before it came the probe firmware update and the first, slow connection, neither timed. A flash write of the blink example alone took 9.2 to 9.9 s over three runs; writing the 256 kB demo image back to flash took 18.6 s and 20.9 s. `README.md`.
 
 ### Does it work from CCStudio's window, or on an Apple Silicon Mac?
 
@@ -94,6 +98,10 @@ Unmodified, it builds a different-sized workload, because the C28x's smallest me
 ### Why does the C2000 compiler say `identifier "int8_t" is undefined`, and why does portable C give different answers on the C28x?
 
 The C28x has no 8-bit type, so TI's `stdint.h` leaves out `int8_t` and `uint8_t`; C2000 compiler 25.11.1 prints `"i8.c", line 2: error: identifier "int8_t" is undefined` for a file that uses it. Add your own `typedef int16_t int8_t;` and check that the code never relies on 8-bit wraparound. The room-occupancy models clamp every value, so they gave 20 of 20 right answers. Every int8 value takes 2 bytes, so int8 weights need twice the flash.
+
+### Why does a C++ library fail to compile for the C28x with `invalid storage class for a template declaration` or `may not have a parameter of type`?
+
+The C2000 compiler (cl2000 25.11.1.LTS) accepts C++03 only. `--c++11` and `--c++14` print `invalid compiler option (ignored)`, and rvalue references (`String(String &&)`), trailing return types and `auto` are errors. ArduinoCore-API fails this way on `String.h` line 75 and `Common.h` line 145, in all five API files; plain C needs `--c11` for declarations inside `for` loops (MicroPython `py/`). uLisp, which is C-style C++, does compile (`ports/ulisp/boards/f2800137/PORT.md`). Measured 2026-11-09; logs in `c2000-launchpad/bench/arduino/` and `c2000-launchpad/bench/micropython/`.
 
 ### Why do Embench-IoT's `edn`, `matmult-int` and `picojpeg` fail their own check on the TMS320F2800137?
 
@@ -298,6 +306,14 @@ Not as it is: even with C2000Ware's `uint8_t` and `-D__packed__=` on the command
 ### Why does the C2000 compiler print `warning #64-D: shift count is too large` on code that builds clean on Arm?
 
 `int` is 16 bits on the C28x, so `1 << 16` and above overflow; write `1UL << n` (or `1ULL`) for any flag at bit 16 or higher. The code assumes a 32-bit `int`: TI's CC1407P host driver defines 15 event flags as `(1 << 16)` to `(1 << 30)` and draws 29 of these warnings with the C2000 compiler 25.11.1.LTS; the same rule is why BitNetMCU needed `1L << shift` above. What the driver's build does with those flags at run time was not checked. [CC1407P host experiment](../docs/experiments/2026-10-08-f2800137-cc1407p-host-driver.md).
+
+### Why does uLisp run on the C28x but print garbage numbers, return empty strings or get `(tak 12 8 4)` wrong?
+
+The sketch assumes a 32-bit `int`, an 8-bit `char` and a 4-byte `sizeof` of a packed word, and the C28x has none of them, so a build that only fixes the compile errors boots, answers `(+ 1 2)` and fails the rest: `(/ 1.0 3)` printed `0.0-+/*//`, `"abc"` came back empty, integers wrapped at 16 bits, and `1-` collided with another name in the radix-40 symbol packer. Widen every `int` to `long`, cast before `<< 16` and `<< 24`, replace `sizeof` of the packed word by 4, and set `INT_MAX` to the 32-bit limit (`ports/ulisp/boards/f2800137/build.sh` and `compat.h`); 19 of 19 REPL checks then pass and `(tak 18 12 6)` takes 8.1 to 8.2 s (run 2026-11-09, `c2000-launchpad/bench/ulisp/`).
+
+### Why does a flash image written from a linked `.out` print nothing on the C28x?
+
+Two things are easy to miss: the codestart branch has to be at the flash entry, 0x80000 (a linker file that keeps `BEGIN` at 0x0 leaves the flash entry blank), and the `.TI.ramfunc` code (`Flash_initModule` and the other flash helpers) has to be copied to RAM before `Device_init` calls it. Put `BEGIN` at 0x80000 and start `main` with `memcpy(&RamfuncsRunStart, &RamfuncsLoadStart, (size_t)&RamfuncsLoadSize);`; the banner `uLisp 4.9a` then prints after a reset (run 2026-11-09, `ports/ulisp/boards/f2800137/PORT.md`). Write the image as a raw binary the way `c2kflashback.js` does: CCStudio's `loadProgram` of the same `.out` timed out twice.
 
 ## Power measurement and ported examples
 

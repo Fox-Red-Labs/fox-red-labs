@@ -1,6 +1,6 @@
 # TI LP-MSPM0C1104: from box to blinking LED on a Mac, and what fits in 1 kB of RAM
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Short answer.** With the tools installed, a copied TI example went from first command to a changed blink in 77 seconds on 2026-10-08 (build 3.5 s, flash 0.64 s). Of the 19 Embench programs only 9 link in 1 kB of RAM, standard CoreMark and 256-point FFT do not fit, and Dhrystone does not fit either. The CCStudio route has not been timed.
 

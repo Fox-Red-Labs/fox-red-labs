@@ -1,6 +1,6 @@
 # How do you blink an LED on a TI LP-EM-CC2340R5 LaunchPad development kit from a Mac?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 Clip an XDS110 debug probe onto the board, build TI's `drivers/empty` example from the SimpleLink Low Power F3 SDK 9.21.00.36 with `make`, and flash it with UniFlash 9.6.0: when nothing goes wrong, the build takes 22 seconds and the flash 7 seconds. On an Intel MacBook (macOS 15.7.9) on 2026-10-05 the whole run took about 9 minutes of machine time and 3 minutes hands-on, and most of it went to a connection error that cleared once the probe was pulled off and pressed back on (gotcha 5).
 
@@ -40,6 +40,7 @@ Sources: this README as run on 2026-10-05 and 2026-10-06, `zephyr/README.md`, `F
 - [oad/](oad/README.md): over-the-air updates of the blink image.
 - [ble-light/](ble-light/README.md): a Bluetooth light.
 - [zigbee-alarm/](zigbee-alarm/README.md): a Zigbee smoke and CO alarm.
+- SWEEP.md: every F3 SDK example built from the terminal (106 of 108 TI Arm Clang variants) and 34 of them run, with the cause of each one not run. Data in `sweep/`.
 - `src/`: the copy of TI's blink example built below.
 
 ## What you need before you start
@@ -141,6 +142,8 @@ Do not add `-v` (verify) for now. With `-v`, UniFlash reports one mismatch in th
 | RAM left with a Zigbee end device | 6.2 kB | TI's `onoff_switch` | measured | `radio_ram_left` (zigbee-end-device) |
 | RAM left with a Zigbee router | 799 bytes | TI's `onoff_light`, logging on | measured | `radio_ram_left` (zigbee-router) |
 | Zigbee light toggled from Home Assistant | Median 95 ms; 20 of 20 toggles landed | First pairing; about 5 s after a re-pairing about two hours later | measured | `radio_cmd_latency`, `radio_cmd_success` (zigbee-home-assistant) |
+| Every SDK example, built and run by script | 106 of 108 TI Arm Clang variants build; 34 no-wiring variants (23 examples) flashed and started with no fault | F3 SDK 9.21.00.36, SysConfig 1.28.0, DSLite, 6 s each; backup restored and read back equal | measured | `examples_built`, `examples_ran_clean` (f3-sdk-9.21), SWEEP.md |
+| PWM example from another SDK, read from the timer | Load register 47999 (1000 us at 48 MHz), compare 0 to 43200 in 4800 steps over 8 reads | Wi-Fi SDK `pwmled1.c` built unchanged here; LGPT3 read with DSLite | measured | `port_example_behavior` (from-cc35x1-pwmled1) |
 
 More rows, with the recipes: [matrix/](matrix/README.md), [baremetal/](baremetal/README.md), [zigbee/](zigbee/README.md).
 

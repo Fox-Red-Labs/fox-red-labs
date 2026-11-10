@@ -1,0 +1,851 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts found by tools/boardviz/pads_from_drawing.py, drawn but never labelled.",
+ "board": "LP-EM-CC2755P10",
+ "id": "cc2755p10",
+ "source": "Positions read from the top-side PCB layout and the board picture in the kit's user guide (SLVUE03, figures 2-1, 2-4 and 5-4), scale set from the 2.54 mm header pitch. Checked 2026-11-09 against the guide's board photo (figure 2-1): shield can, probe plug, LEDs and buttons placed from it.",
+ "size": [
+  58.4,
+  59.4
+ ],
+ "color": "#a8101a",
+ "corner": 2.5,
+ "holes": [
+  [
+   2.81,
+   56.75,
+   3.2
+  ],
+  [
+   55.34,
+   56.75,
+   3.2
+  ],
+  [
+   2.68,
+   2.89,
+   3.2
+  ],
+  [
+   55.47,
+   2.89,
+   3.2
+  ]
+ ],
+ "silk": [
+  {
+   "t": "LP-EM-CC2755P10",
+   "x": 11.2,
+   "y": 1.9,
+   "s": 1.5
+  },
+  {
+   "t": "BTN-1",
+   "x": 7.5,
+   "y": 49.0,
+   "s": 1.4
+  },
+  {
+   "t": "DIO20",
+   "x": 7.5,
+   "y": 47.4,
+   "s": 1.4
+  },
+  {
+   "t": "BTN-2",
+   "x": 51.2,
+   "y": 48.7,
+   "s": 1.4
+  },
+  {
+   "t": "DIO0",
+   "x": 50.8,
+   "y": 47.3,
+   "s": 1.4
+  },
+  {
+   "t": "J1",
+   "x": 7.5,
+   "y": 45.9,
+   "s": 1.4
+  },
+  {
+   "t": "J2",
+   "x": 50.4,
+   "y": 45.5,
+   "s": 1.4
+  },
+  {
+   "t": "P4",
+   "x": 41.4,
+   "y": 43.0,
+   "s": 1.4
+  },
+  {
+   "t": "LEDs",
+   "x": 29.9,
+   "y": 40.4,
+   "s": 1.3
+  },
+  {
+   "t": "Red",
+   "x": 18.1,
+   "y": 36.5,
+   "s": 1.3
+  },
+  {
+   "t": "Green",
+   "x": 30.7,
+   "y": 36.5,
+   "s": 1.3
+  },
+  {
+   "t": "1",
+   "x": 7.5,
+   "y": 44.4,
+   "s": 1.1
+  },
+  {
+   "t": "21",
+   "x": 9.4,
+   "y": 44.4,
+   "s": 1.1
+  },
+  {
+   "t": "10",
+   "x": 6.0,
+   "y": 18.6,
+   "s": 1.1
+  },
+  {
+   "t": "30",
+   "x": 8.6,
+   "y": 18.6,
+   "s": 1.1
+  },
+  {
+   "t": "40",
+   "x": 49.7,
+   "y": 44.0,
+   "s": 1.1
+  },
+  {
+   "t": "20",
+   "x": 52.4,
+   "y": 44.0,
+   "s": 1.1
+  },
+  {
+   "t": "31",
+   "x": 50.0,
+   "y": 17.9,
+   "s": 1.1
+  },
+  {
+   "t": "11",
+   "x": 52.4,
+   "y": 17.9,
+   "s": 1.1
+  }
+ ],
+ "parts": [
+  {
+   "id": "mcu",
+   "type": "qfn",
+   "x": 28.65,
+   "y": 22.26,
+   "size": 6,
+   "label": "The chip",
+   "title": "CC2755P10",
+   "text": "A 96 MHz Arm Cortex-M33 with 1,024 kB of flash and 162 kB of RAM, and a 2.4 GHz radio for Bluetooth LE, Zigbee, Thread and Matter. 40-pin VQFN.",
+   "key": true
+  },
+  {
+   "id": "antenna",
+   "type": "xtalbox",
+   "x": 33.6,
+   "y": 5.9,
+   "w": 0.1,
+   "h": 0.1,
+   "label": "Antenna",
+   "title": "Printed antenna",
+   "text": "The long copper trace along the bottom edge is the 2.4 GHz antenna. Keep metal and your hand away from it when you measure range."
+  },
+  {
+   "id": "u_fl",
+   "type": "block",
+   "x": 39.5,
+   "y": 15.1,
+   "w": 3.1,
+   "h": 3.4,
+   "d": 1.3,
+   "color": "#c9c2b0",
+   "label": "U.FL",
+   "title": "Antenna test socket",
+   "text": "A tiny coax socket for connecting a cable to a spectrum analyzer or an outside antenna instead of the printed one."
+  },
+  {
+   "id": "led_red",
+   "type": "led",
+   "x": 22.7,
+   "y": 34.8,
+   "rot": 0,
+   "color": "#ff3020",
+   "name": "LED red",
+   "label": "Red LED",
+   "title": "Red LED on DIO16",
+   "text": "A user LED on DIO16. Jumper P2 pins 1 and 2 connect it; pull the jumper to use DIO16 on header pin J4:36."
+  },
+  {
+   "id": "led_green",
+   "type": "led",
+   "x": 26.2,
+   "y": 34.8,
+   "rot": 0,
+   "color": "#30d050",
+   "name": "LED green",
+   "label": "Green LED",
+   "title": "Green LED on DIO12",
+   "text": "A user LED on DIO12. Jumper P2 pins 2 and 4 connect it; pull the jumper to use DIO12 on header pin J2:19."
+  },
+  {
+   "id": "p2",
+   "type": "header",
+   "x": 24.44,
+   "y": 40.45,
+   "cols": 2,
+   "rows": 2,
+   "label": "LED jumper",
+   "title": "P2, LED enable",
+   "text": "Two small jumper spots that join the red and green LEDs to their chip pins. Remove one to free that pin on the BoosterPack header."
+  },
+  {
+   "id": "btn1",
+   "type": "button",
+   "x": 3.3,
+   "y": 46.3,
+   "w": 3.8,
+   "h": 7.1,
+   "side": "left",
+   "label": "BTN-1",
+   "title": "BTN-1 on DIO20",
+   "text": "A user button on DIO20, also wired to header pin J3:30."
+  },
+  {
+   "id": "btn2",
+   "type": "button",
+   "x": 55.4,
+   "y": 46.0,
+   "w": 3.6,
+   "h": 7.2,
+   "side": "right",
+   "label": "BTN-2",
+   "title": "BTN-2 on DIO0",
+   "text": "A user button on DIO0, also wired to header pin J4:40."
+  },
+  {
+   "id": "p4",
+   "type": "boxheader",
+   "x": 45.3,
+   "y": 47.0,
+   "cols": 2,
+   "rows": 5,
+   "rot": 90,
+   "label": "10-pin debug",
+   "title": "P4, Arm 10-pin debug",
+   "text": "A standard 10-pin debug header. An outside probe can program and debug the chip here instead of the plug on the top edge."
+  },
+  {
+   "id": "p3",
+   "type": "header",
+   "x": 28.69,
+   "y": 56.24,
+   "cols": 10,
+   "rows": 2,
+   "names": [
+    [
+     "GND",
+     "5V",
+     "3V3",
+     "RXD",
+     "TXD",
+     "nRST",
+     "SWDIO",
+     "SWDCK",
+     "NC",
+     "NC"
+    ],
+    [
+     "GND",
+     "SDA",
+     "SCL",
+     "GND",
+     "NC",
+     "GPIO3",
+     "GND",
+     "GPIO2",
+     "GPIO1",
+     "GND"
+    ]
+   ],
+   "pinno": [
+    [
+     20,
+     18,
+     16,
+     14,
+     12,
+     10,
+     8,
+     6,
+     4,
+     2
+    ],
+    [
+     19,
+     17,
+     15,
+     13,
+     11,
+     9,
+     7,
+     5,
+     3,
+     1
+    ]
+   ],
+   "label": "Debug plug",
+   "title": "P3, probe connector",
+   "text": "The 20-pin plug on the top edge. It goes into an LP-XDS110ET or LP-XDS110, which powers the board and gives it SWD, a serial port and reset.",
+   "key": true
+  },
+  {
+   "id": "j1",
+   "type": "ringheader",
+   "x": 6.17,
+   "y": 30.76,
+   "cols": 1,
+   "rows": 10,
+   "names": [
+    [
+     "3V3"
+    ],
+    [
+     "DIO21"
+    ],
+    [
+     "DIO2"
+    ],
+    [
+     "DIO1"
+    ],
+    [
+     "DIO23"
+    ],
+    [
+     "DIO22"
+    ],
+    [
+     "DIO3"
+    ],
+    [
+     ""
+    ],
+    [
+     "DIO27"
+    ],
+    [
+     "DIO28"
+    ]
+   ],
+   "pinno": [
+    [
+     1
+    ],
+    [
+     2
+    ],
+    [
+     3
+    ],
+    [
+     4
+    ],
+    [
+     5
+    ],
+    [
+     6
+    ],
+    [
+     7
+    ],
+    [
+     8
+    ],
+    [
+     9
+    ],
+    [
+     10
+    ]
+   ],
+   "label": "J1",
+   "title": "BoosterPack J1",
+   "text": "Outer left column, pins 1 to 10 from the top: 3V3 and chip pins. Plug-on boards stack here."
+  },
+  {
+   "id": "j3",
+   "type": "ringheader",
+   "x": 8.73,
+   "y": 30.76,
+   "cols": 1,
+   "rows": 10,
+   "names": [
+    [
+     "5V"
+    ],
+    [
+     "GND"
+    ],
+    [
+     ""
+    ],
+    [
+     ""
+    ],
+    [
+     ""
+    ],
+    [
+     ""
+    ],
+    [
+     "DIO18"
+    ],
+    [
+     "DIO17"
+    ],
+    [
+     "DIO19"
+    ],
+    [
+     "DIO20"
+    ]
+   ],
+   "pinno": [
+    [
+     21
+    ],
+    [
+     22
+    ],
+    [
+     23
+    ],
+    [
+     24
+    ],
+    [
+     25
+    ],
+    [
+     26
+    ],
+    [
+     27
+    ],
+    [
+     28
+    ],
+    [
+     29
+    ],
+    [
+     30
+    ]
+   ],
+   "label": "J3",
+   "title": "BoosterPack J3",
+   "text": "Inner left column, pins 21 to 30: 5 V, ground, then the I2S and analog pins."
+  },
+  {
+   "id": "j4",
+   "type": "ringheader",
+   "x": 49.38,
+   "y": 30.76,
+   "cols": 1,
+   "rows": 10,
+   "names": [
+    [
+     "DIO0"
+    ],
+    [
+     "DIO11"
+    ],
+    [
+     "DIO19"
+    ],
+    [
+     ""
+    ],
+    [
+     "DIO16"
+    ],
+    [
+     "DIO15"
+    ],
+    [
+     "DIO9"
+    ],
+    [
+     "DIO10"
+    ],
+    [
+     "DIO17"
+    ],
+    [
+     "DIO18"
+    ]
+   ],
+   "pinno": [
+    [
+     40
+    ],
+    [
+     39
+    ],
+    [
+     38
+    ],
+    [
+     37
+    ],
+    [
+     36
+    ],
+    [
+     35
+    ],
+    [
+     34
+    ],
+    [
+     33
+    ],
+    [
+     32
+    ],
+    [
+     31
+    ]
+   ],
+   "label": "J4",
+   "title": "BoosterPack J4",
+   "text": "Inner right column, pins 40 down to 31: DIO0 at the top, the LED and SWD pins, then DIO18."
+  },
+  {
+   "id": "j2",
+   "type": "ringheader",
+   "x": 51.94,
+   "y": 30.76,
+   "cols": 1,
+   "rows": 10,
+   "names": [
+    [
+     "GND"
+    ],
+    [
+     "DIO12"
+    ],
+    [
+     "DIO7"
+    ],
+    [
+     ""
+    ],
+    [
+     "LP_RST"
+    ],
+    [
+     "DIO5"
+    ],
+    [
+     "DIO4"
+    ],
+    [
+     ""
+    ],
+    [
+     ""
+    ],
+    [
+     ""
+    ]
+   ],
+   "pinno": [
+    [
+     20
+    ],
+    [
+     19
+    ],
+    [
+     18
+    ],
+    [
+     17
+    ],
+    [
+     16
+    ],
+    [
+     15
+    ],
+    [
+     14
+    ],
+    [
+     13
+    ],
+    [
+     12
+    ],
+    [
+     11
+    ]
+   ],
+   "label": "J2",
+   "title": "BoosterPack J2",
+   "text": "Outer right column, pins 20 down to 11: ground, the SPI pins and the launchpad reset."
+  },
+  {
+   "id": "p5",
+   "type": "ringheader",
+   "x": 6.17,
+   "y": 12.5,
+   "cols": 1,
+   "rows": 3,
+   "names": [
+    [
+     "GND"
+    ],
+    [
+     "GND"
+    ],
+    [
+     "5V"
+    ]
+   ],
+   "label": "5V and ground",
+   "title": "P5, 5 V and ground",
+   "text": "Three holes for a wire or pin: ground and 5 V."
+  },
+  {
+   "id": "p1",
+   "type": "ringheader",
+   "x": 51.94,
+   "y": 12.5,
+   "cols": 1,
+   "rows": 3,
+   "names": [
+    [
+     "GND"
+    ],
+    [
+     "GND"
+    ],
+    [
+     "3V3"
+    ]
+   ],
+   "label": "3V3 and ground",
+   "title": "P1, 3.3 V and ground",
+   "text": "Three holes for a wire or pin: ground and 3.3 V. Use them to power the board without the debugger."
+  },
+  {
+   "type": "standoff",
+   "x": 2.81,
+   "y": 56.75
+  },
+  {
+   "type": "standoff",
+   "x": 55.34,
+   "y": 56.75
+  },
+  {
+   "type": "standoff",
+   "x": 2.68,
+   "y": 2.89
+  },
+  {
+   "type": "standoff",
+   "x": 55.47,
+   "y": 2.89
+  },
+  {
+   "id": "shield",
+   "type": "block",
+   "x": 26.85,
+   "y": 21.15,
+   "w": 20.1,
+   "h": 19.9,
+   "d": 2.0,
+   "color": "#b9bcbf",
+   "label": "RF shield",
+   "title": "Shield can",
+   "text": "A metal can over the radio chip and its crystals. Its round holes let the board's reflow heat out."
+  },
+  {
+   "type": "block",
+   "x": 29.0,
+   "y": 63.4,
+   "w": 26.2,
+   "h": 8.8,
+   "d": 7.0,
+   "color": "#1c1c1e"
+  },
+  {
+   "type": "block",
+   "x": 12.6,
+   "y": 57.0,
+   "w": 1.6,
+   "h": 2.9,
+   "d": 1.0,
+   "color": "#1a1a1a"
+  },
+  {
+   "type": "block",
+   "x": 18.5,
+   "y": 47.2,
+   "w": 2.8,
+   "h": 2.1,
+   "d": 1.0,
+   "color": "#1a1a1a"
+  },
+  {
+   "type": "block",
+   "x": 37.4,
+   "y": 51.9,
+   "w": 1.6,
+   "h": 1.9,
+   "d": 0.7,
+   "color": "#1a1a1a"
+  },
+  {
+   "type": "block",
+   "x": 49.6,
+   "y": 52.6,
+   "w": 1.4,
+   "h": 1.9,
+   "d": 0.7,
+   "color": "#1a1a1a"
+  },
+  {
+   "type": "block",
+   "x": 50.4,
+   "y": 5.0,
+   "w": 5.4,
+   "h": 5.6,
+   "d": 0.05,
+   "color": "#e6e3dc"
+  },
+  {
+   "type": "ring",
+   "x": 7.9,
+   "y": 57.5,
+   "d": 1.6
+  },
+  {
+   "type": "ring",
+   "x": 2.6,
+   "y": 7.1,
+   "d": 1.6
+  },
+  {
+   "type": "ring",
+   "x": 55.8,
+   "y": 7.1,
+   "d": 1.6
+  },
+  {
+   "type": "chip",
+   "x": 19.1,
+   "y": 49.6,
+   "len": 1.8,
+   "w": 1.1
+  },
+  {
+   "type": "chip",
+   "x": 11.5,
+   "y": 26.2,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 11.5,
+   "y": 23.8,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 11.5,
+   "y": 21.3,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 47.8,
+   "y": 33.6,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 47.8,
+   "y": 31.0,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 47.8,
+   "y": 28.6,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 47.8,
+   "y": 26.2,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 47.8,
+   "y": 23.8,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  },
+  {
+   "type": "chip",
+   "x": 47.8,
+   "y": 21.3,
+   "len": 1.2,
+   "w": 0.6,
+   "rot": 0
+  }
+ ],
+ "decor": []
+}

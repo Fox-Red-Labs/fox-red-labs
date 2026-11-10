@@ -1,6 +1,6 @@
 # ST NUCLEO-U083RC: from plug-in to a changed LED blink on a Mac
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Short answer: 14 seconds with ST's command-line tools, once they are installed; the install took about 35 minutes. With Zephyr already installed, 7 min 51 s.** `./blink.sh 250` builds ST's blink example with a 250 ms delay, flashes it and verifies it. Measured on 2026-10-08 on an Intel Mac with macOS 15.7.9 (Apple Silicon not run). Every number is in [RESULTS-nucleo-u083rc.md](RESULTS-nucleo-u083rc.md).
 

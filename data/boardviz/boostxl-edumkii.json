@@ -1,0 +1,623 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up (the user-guide picture, pin 1 at the top left), rot in degrees counterclockwise. The two socket parts j1 and j2 sit underneath (side bottom) at the same pitch as the LaunchPad kit's j1 and j2, so a scene can mate them. Parts of type lcd, joystick, tact, buzzer, mic and rgbled are drawn in site/boardviz/boardviz.js.",
+ "board": "BOOSTXL-EDUMKII",
+ "id": "boostxl-edumkii",
+ "source": "Positions read from the board picture in the BoosterPack's user guide (SLAU599, figure 1-1); scale set from the 2.54 mm header pitch. Pin names from the user guide's header tables.",
+ "size": [
+  127.2,
+  56.1
+ ],
+ "color": "#a8101a",
+ "corner": 19,
+ "holes": [
+  [
+   21.58,
+   52.68,
+   3.2
+  ],
+  [
+   109.67,
+   50.73,
+   3.2
+  ],
+  [
+   17.75,
+   5.22,
+   3.2
+  ]
+ ],
+ "silk": [
+  {
+   "t": "JOYSTICK",
+   "x": 14.95,
+   "y": 11.52,
+   "s": 1.5,
+   "rot": 0
+  },
+  {
+   "t": "BUTTONS",
+   "x": 119.3,
+   "y": 33.63,
+   "s": 1.5,
+   "rot": 0
+  },
+  {
+   "t": "RGB LED",
+   "x": 94.92,
+   "y": 28.1,
+   "s": 1.5,
+   "rot": 0
+  },
+  {
+   "t": "SERVO",
+   "x": 102.39,
+   "y": 45.98,
+   "s": 1.5,
+   "rot": 0
+  },
+  {
+   "t": "LIGHT",
+   "x": 53.18,
+   "y": 45.98,
+   "s": 1.5,
+   "rot": 0
+  },
+  {
+   "t": "MIC",
+   "x": 23.73,
+   "y": 2.55,
+   "s": 1.5,
+   "rot": 0
+  },
+  {
+   "t": "BUZZER",
+   "x": 89.59,
+   "y": 19.98,
+   "s": 1.5,
+   "rot": 90
+  },
+  {
+   "t": "ACCELEROMETER",
+   "x": 95.89,
+   "y": 42.41,
+   "s": 1.5,
+   "rot": 0
+  },
+  {
+   "t": "EDUCATIONAL BOOSTERPACK MK II",
+   "x": 116.7,
+   "y": 14.78,
+   "s": 2.0,
+   "rot": 35
+  }
+ ],
+ "parts": [
+  {
+   "id": "j1",
+   "type": "femaleheader",
+   "x": 41.85,
+   "y": 14.03,
+   "cols": 2,
+   "rows": 10,
+   "side": "bottom",
+   "label": "Left sockets",
+   "title": "J1 and J3 sockets underneath",
+   "text": "Two rows of ten sockets on the underside. They press onto the LaunchPad kit's left headers, pin 1 at the top.",
+   "key": true
+  },
+  {
+   "id": "j2",
+   "type": "femaleheader",
+   "x": 85.0,
+   "y": 14.03,
+   "cols": 2,
+   "rows": 10,
+   "side": "bottom",
+   "label": "Right sockets",
+   "title": "J4 and J2 sockets underneath",
+   "text": "Two rows of ten sockets on the underside. They press onto the LaunchPad kit's right headers, pin 40 at the top."
+  },
+  {
+   "id": "pins_left",
+   "type": "ringheader",
+   "x": 41.85,
+   "y": 14.03,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "Buzzer",
+     "Ground"
+    ],
+    [
+     "Red LED or backlight",
+     "Servo signal"
+    ],
+    [
+     "Green LED",
+     "Not used"
+    ],
+    [
+     "Blue LED",
+     "Screen reset"
+    ],
+    [
+     "Not used",
+     "Not used"
+    ],
+    [
+     "Not used",
+     "Screen data"
+    ],
+    [
+     "Gator clip input",
+     "Not used"
+    ],
+    [
+     "Button S1",
+     "Screen select"
+    ],
+    [
+     "Button S2",
+     "Not used"
+    ],
+    [
+     "Screen data or command",
+     "Temperature alert, unused"
+    ]
+   ],
+   "pinno": [
+    [
+     40,
+     20
+    ],
+    [
+     39,
+     19
+    ],
+    [
+     38,
+     18
+    ],
+    [
+     37,
+     17
+    ],
+    [
+     36,
+     16
+    ],
+    [
+     35,
+     15
+    ],
+    [
+     34,
+     14
+    ],
+    [
+     33,
+     13
+    ],
+    [
+     32,
+     12
+    ],
+    [
+     31,
+     11
+    ]
+   ],
+   "label": "J1 and J3 pins",
+   "title": "Left header pins",
+   "text": "The same 20 pins come up through the top, so you can probe them or plug another board on."
+  },
+  {
+   "id": "pins_right",
+   "type": "ringheader",
+   "x": 85.0,
+   "y": 14.03,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "Screen data or command",
+     "Temperature alert, unused"
+    ],
+    [
+     "Button S2",
+     "Not used"
+    ],
+    [
+     "Button S1",
+     "Screen select"
+    ],
+    [
+     "Gator clip input",
+     "Not used"
+    ],
+    [
+     "Not used",
+     "Screen data"
+    ],
+    [
+     "Not used",
+     "Not used"
+    ],
+    [
+     "Blue LED",
+     "Screen reset"
+    ],
+    [
+     "Green LED",
+     "Not used"
+    ],
+    [
+     "Red LED or backlight",
+     "Servo signal"
+    ],
+    [
+     "Buzzer",
+     "Ground"
+    ]
+   ],
+   "pinno": [
+    [
+     40,
+     20
+    ],
+    [
+     39,
+     19
+    ],
+    [
+     38,
+     18
+    ],
+    [
+     37,
+     17
+    ],
+    [
+     36,
+     16
+    ],
+    [
+     35,
+     15
+    ],
+    [
+     34,
+     14
+    ],
+    [
+     33,
+     13
+    ],
+    [
+     32,
+     12
+    ],
+    [
+     31,
+     11
+    ]
+   ],
+   "label": "J4 and J2 pins",
+   "title": "Right header pins",
+   "text": "The right 20 pins, numbered 40 down to 31 and 20 down to 11 as printed on the board."
+  },
+  {
+   "id": "lcd",
+   "type": "lcd",
+   "x": 64.04,
+   "y": 20.76,
+   "w": 33.8,
+   "h": 38.6,
+   "label": "Screen",
+   "title": "128 x 128 color screen",
+   "text": "A color screen with an ST7735S controller, 128 by 128 pixels, no touch. The program draws on it over SPI.",
+   "key": true
+  },
+  {
+   "id": "joystick",
+   "type": "joystick",
+   "x": 21.45,
+   "y": 30.05,
+   "d": 26,
+   "base": 22,
+   "label": "Joystick",
+   "title": "Analog joystick",
+   "text": "Two analog axes and a push. The program reads it to move around and to press.",
+   "key": true
+  },
+  {
+   "id": "s1",
+   "type": "tact",
+   "x": 112.15,
+   "y": 42.41,
+   "w": 13,
+   "label": "S1",
+   "title": "Button S1",
+   "text": "A push button on header pin 33."
+  },
+  {
+   "id": "s2",
+   "type": "tact",
+   "x": 112.15,
+   "y": 25.18,
+   "w": 13,
+   "label": "S2",
+   "title": "Button S2",
+   "text": "A push button on header pin 32."
+  },
+  {
+   "id": "buzzer",
+   "type": "buzzer",
+   "x": 95.57,
+   "y": 6.97,
+   "d": 12.4,
+   "h": 9,
+   "label": "Buzzer",
+   "title": "Buzzer",
+   "text": "A small buzzer on header pin 40.",
+   "key": true
+  },
+  {
+   "id": "mic",
+   "type": "mic",
+   "x": 32.51,
+   "y": 6.65,
+   "d": 10,
+   "label": "Microphone",
+   "title": "Microphone",
+   "text": "An analog microphone on header pin 6."
+  },
+  {
+   "id": "rgb",
+   "type": "rgbled",
+   "x": 96.54,
+   "y": 17.05,
+   "label": "RGB LED",
+   "title": "Color LED",
+   "text": "One LED with red, green and blue parts, on header pins 39, 38 and 37."
+  },
+  {
+   "id": "d5",
+   "type": "led",
+   "x": 5.53,
+   "y": 21.73,
+   "rot": 0,
+   "color": "#35d36b",
+   "name": "5V PWR",
+   "label": "5V PWR",
+   "title": "5 V power light",
+   "text": "Lights when the pack gets 5 V from the LaunchPad."
+  },
+  {
+   "id": "d3",
+   "type": "led",
+   "x": 7.15,
+   "y": 15.3,
+   "rot": 0,
+   "color": "#35d36b",
+   "name": "3V3 PWR",
+   "label": "3V3 PWR",
+   "title": "3.3 V power light",
+   "text": "Lights when the pack gets 3.3 V from the LaunchPad."
+  },
+  {
+   "id": "accel",
+   "type": "qfn",
+   "x": 94.92,
+   "y": 33.3,
+   "size": 3,
+   "label": "Accelerometer",
+   "title": "Accelerometer",
+   "text": "A 3-axis analog accelerometer on header pins 23, 24 and 25."
+  },
+  {
+   "id": "light",
+   "type": "qfn",
+   "x": 60.79,
+   "y": 50.01,
+   "size": 2.2,
+   "label": "Light sensor",
+   "title": "Light sensor",
+   "text": "An OPT3001 light sensor on the I2C pins 9 and 10, with its alert on pin 8."
+  },
+  {
+   "id": "j5",
+   "type": "header",
+   "x": 27.3,
+   "y": 51.18,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "top",
+   "label": "J5 jumper",
+   "title": "J5, red LED or backlight",
+   "text": "Picks what header pin 39 drives: the red LED (pins 1 and 2) or the screen backlight (pins 2 and 3)."
+  },
+  {
+   "id": "servo",
+   "type": "header",
+   "x": 101.42,
+   "y": 51.31,
+   "cols": 1,
+   "rows": 3,
+   "label": "Servo header",
+   "title": "J8, servo header",
+   "text": "Ground, power and signal for a hobby servo. The signal is header pin 19."
+  },
+  {
+   "id": "gator1",
+   "type": "ring",
+   "x": 37.71,
+   "y": 50.86,
+   "d": 9,
+   "label": "Gator hole",
+   "title": "Gator-clip pad",
+   "text": "A pad for an alligator clip: touch it to read as a button."
+  },
+  {
+   "type": "ring",
+   "x": 92.32,
+   "y": 50.86,
+   "d": 9
+  }
+ ],
+ "decor": [
+  {
+   "type": "chip",
+   "x": 5.23,
+   "y": 21.82,
+   "rot": 0,
+   "len": 2.12,
+   "w": 1.24
+  },
+  {
+   "type": "chip",
+   "x": 53.94,
+   "y": 1.92,
+   "rot": 0,
+   "len": 2.68,
+   "w": 0.18
+  },
+  {
+   "type": "chip",
+   "x": 39.84,
+   "y": 2.25,
+   "rot": 0,
+   "len": 1.75,
+   "w": 0.53
+  },
+  {
+   "type": "chip",
+   "x": 61.38,
+   "y": 2.5,
+   "rot": 0,
+   "len": 1.51,
+   "w": 0.53
+  },
+  {
+   "type": "chip",
+   "x": 62.28,
+   "y": 1.89,
+   "rot": 0,
+   "len": 2.98,
+   "w": 0.06
+  },
+  {
+   "type": "chip",
+   "x": 83.91,
+   "y": 25.62,
+   "rot": 90,
+   "len": 1.41,
+   "w": 0.41
+  },
+  {
+   "type": "chip",
+   "x": 41.78,
+   "y": 43.2,
+   "rot": 0,
+   "len": 2.07,
+   "w": 0.06
+  },
+  {
+   "type": "chip",
+   "x": 44.16,
+   "y": 2.16,
+   "rot": 0,
+   "len": 2.13,
+   "w": 0.41
+  },
+  {
+   "type": "chip",
+   "x": 100.26,
+   "y": 0.32,
+   "rot": 0,
+   "len": 2.27,
+   "w": 0.06
+  },
+  {
+   "type": "chip",
+   "x": 76.23,
+   "y": 53.61,
+   "rot": 0,
+   "len": 2.75,
+   "w": 0.06
+  },
+  {
+   "type": "chip",
+   "x": 38.4,
+   "y": 39.77,
+   "rot": 90,
+   "len": 1.89,
+   "w": 0.24
+  },
+  {
+   "type": "chip",
+   "x": 39.21,
+   "y": 29.88,
+   "rot": 90,
+   "len": 1.77,
+   "w": 0.06
+  },
+  {
+   "type": "chip",
+   "x": 38.85,
+   "y": 15.29,
+   "rot": 0,
+   "len": 2.44,
+   "w": 0.3
+  },
+  {
+   "type": "chip",
+   "x": 38.03,
+   "y": 11.36,
+   "rot": 90,
+   "len": 1.96,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 17.42,
+   "y": 8.6,
+   "rot": 90,
+   "len": 2.73,
+   "w": 0.12
+  },
+  {
+   "type": "chip",
+   "x": 37.48,
+   "y": 8.02,
+   "rot": 90,
+   "len": 1.16,
+   "w": 0.24
+  },
+  {
+   "type": "chip",
+   "x": 70.89,
+   "y": 52.02,
+   "rot": 0,
+   "len": 1.3,
+   "w": 0.47
+  },
+  {
+   "type": "chip",
+   "x": 21.88,
+   "y": 3.37,
+   "rot": 0,
+   "len": 2.1,
+   "w": 0.06
+  },
+  {
+   "type": "chip",
+   "x": 94.5,
+   "y": 21.26,
+   "rot": 90,
+   "len": 1.33,
+   "w": 0.06
+  }
+ ]
+}

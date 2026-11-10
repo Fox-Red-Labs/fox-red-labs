@@ -9,7 +9,7 @@ Usage: gen_pins.py <SysConfig dist dir> (default /Applications/ti/sysconfig_1.28
 import json, re, sys, pathlib
 dist = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "/Applications/ti/sysconfig_1.28.0/dist")
 out = pathlib.Path(__file__).resolve().parent.parent / "boards"
-for dev, tag in (("MSPM0G351X", "g3519"), ("MSPM0G350X", "g3507")):
+for dev, tag in (("MSPM0G351X", "g3519"), ("MSPM0G350X", "g3507"), ("MSPM0G518X", "g5187")):
     d = json.load(open(dist / "deviceData" / dev / f"{dev}.json"))
     t = {}
     for p in d["devicePins"].values():

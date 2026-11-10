@@ -1,6 +1,6 @@
 # TI LP-AM13E230 LaunchPad development kit: Arm motor-control chip with a math unit and a neural accelerator, measured
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Run 2026-10-08 on a Rev E2 board** (prototype XAM13E23019 silicon, AM13E2x SDK 26.01.00.03.STS, short-term support, TI Arm Clang 5.1.1.LTS). Box to changed blink took 22 s from the command line and 60 s through CCStudio's AI tools. CoreMark gives 872.4 per second at 200 MHz and one motor-control step takes 117 cycles with the TMU: numbers in [RESULTS-am13e230.md](RESULTS-am13e230.md). Power, the neural accelerator and the UART loop did not run; the list is there too.
 

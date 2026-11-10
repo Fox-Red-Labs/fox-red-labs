@@ -32,6 +32,11 @@
       "boards": "AM263P"
     },
     {
+      "id": "am24",
+      "name": "AM24x",
+      "boards": "LP-AM243"
+    },
+    {
       "id": "c2000",
       "name": "C2000",
       "boards": "F2800137, F28P65X"
@@ -109,6 +114,11 @@
               "na",
               "Linux uses GCC",
               ""
+            ],
+            "am24": [
+              "ran",
+              "TI Arm Clang 4.0.4.LTS: 163 of 194 SDK examples built, 82 of 121 first-core projects printed a pass; CoreMark 2,931 per core",
+              "benchmarks.html?board=am243x"
             ]
           }
         },
@@ -160,6 +170,11 @@
               "ran",
               "TI's MSPM0 FFT example ran on the A72",
               "portability-proven.html#x33"
+            ],
+            "am24": [
+              "ran",
+              "Zephyr SDK's GCC 14.3 built and ran hello_world and blinky on the first R5F core",
+              "../data/results/am243x.csv"
             ]
           }
         },
@@ -211,6 +226,11 @@
               "na",
               "Linux builds use GCC",
               ""
+            ],
+            "am24": [
+              "untried",
+              "No IAR build recorded for the AM243",
+              "../data/toolchains/README.md"
             ]
           }
         },
@@ -262,6 +282,11 @@
               "na",
               "Linux builds use GCC",
               ""
+            ],
+            "am24": [
+              "untried",
+              "No Keil build recorded for the AM243",
+              "../data/toolchains/README.md"
             ]
           }
         }
@@ -323,6 +348,11 @@
               "ran",
               "Native gcc 13.3 on the board built the portable app in 2.3 s",
               "../beagley-ai/bench/portability/three-ways-run.log"
+            ],
+            "am24": [
+              "ran",
+              "SDK makefiles and a RAM load from the terminal; blink 31 s, 15 examples built by prebuild.sh",
+              "board-am243x.html"
             ]
           }
         },
@@ -336,44 +366,49 @@
               "../docs/frl.md"
             ],
             "mspm33": [
-              "untried",
-              "tools/frl has one route so far, the L1306 (data/routes.json)",
-              "../data/routes.json"
+              "ran",
+              "M33: 26 s, pattern checked on the pin, restore matched (2026-11-08)",
+              "../docs/frl.md"
             ],
             "radio": [
               "untried",
-              "tools/frl has one route so far, the L1306 (data/routes.json)",
+              "No tools/frl run recorded for this family in this grid (data/routes.json)",
               "../data/routes.json"
             ],
             "wifi": [
               "untried",
-              "tools/frl has one route so far, the L1306 (data/routes.json)",
+              "No tools/frl run recorded for this family in this grid (data/routes.json)",
               "../data/routes.json"
             ],
             "am13": [
-              "untried",
-              "tools/frl has one route so far, the L1306 (data/routes.json)",
-              "../data/routes.json"
+              "ran",
+              "AM13: 26 s, pattern checked on the pin, restore matched (2026-11-08)",
+              "../docs/frl.md"
             ],
             "am26": [
               "untried",
-              "tools/frl has one route so far, the L1306 (data/routes.json)",
+              "No tools/frl run recorded for this family in this grid (data/routes.json)",
               "../data/routes.json"
             ],
             "c2000": [
-              "untried",
-              "tools/frl has one route so far, the L1306 (data/routes.json)",
-              "../data/routes.json"
+              "ran",
+              "F2800137: 61 s, pattern checked on the pin, restore matched (2026-11-08)",
+              "../docs/frl.md"
             ],
             "radar": [
               "untried",
-              "tools/frl has one route so far, the L1306 (data/routes.json)",
+              "No tools/frl run recorded for this family in this grid (data/routes.json)",
               "../data/routes.json"
             ],
             "linux": [
               "na",
               "Microcontroller tool; this board runs Linux",
               ""
+            ],
+            "am24": [
+              "untried",
+              "No tools/frl run recorded for this family in this grid (data/routes.json)",
+              "../data/routes.json"
             ]
           }
         },
@@ -399,6 +434,11 @@
             "linux": [
               "untried",
               "A Linux boot needs TF-A, U-Boot and the DDR controller modeled; not attempted",
+              "../docs/guides/simulate-before-silicon.md"
+            ],
+            "am24": [
+              "untried",
+              "No Renode run recorded for the AM243",
               "../docs/guides/simulate-before-silicon.md"
             ]
           }
@@ -456,6 +496,11 @@
               "na",
               "Linux board; the R5F firmware is TI's, loaded by the bootloader",
               ""
+            ],
+            "am24": [
+              "ran",
+              "TI's FreeRTOS IPC example ran: 3.19 us round trip with four partner cores",
+              "../data/results/am243x.csv"
             ]
           }
         },
@@ -511,6 +556,11 @@
               "gap",
               "No board or SoC in Zephyr 4.4.2",
               "../data/results/iwrl6432boost.csv"
+            ],
+            "am24": [
+              "ran",
+              "Upstream lp_am243/am2434/r5f0_0 hello_world and blinky run from RAM; the M4 blinky does not build",
+              "../data/results/am243x.csv"
             ]
           }
         },
@@ -572,6 +622,11 @@
               "ran",
               "BeagleBoard Edge AI 11.00.00.08 (Arago, kernel 6.12.33): models on the C7x, hardware video codec, Docker",
               "../beagley-ai/README.md"
+            ],
+            "am24": [
+              "na",
+              "Microcontroller; no Linux port",
+              ""
             ]
           }
         }
@@ -628,6 +683,11 @@
               "na",
               "ESPHome builds firmware for chips; it does not run on this board's job",
               ""
+            ],
+            "am24": [
+              "gap",
+              "No ESPHome platform; the platforms cover only CC23xx, CC27xx and CC35xx",
+              "../ports/esphome-ti/README.md"
             ]
           }
         },
@@ -687,6 +747,11 @@
               "na",
               "Arduino is for microcontrollers",
               ""
+            ],
+            "am24": [
+              "gap",
+              "No core found 17 Oct 2026; only Energia-era TI cores exist (MSP430, MSP432, Tiva)",
+              "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
             ]
           }
         },
@@ -738,6 +803,11 @@
               "na",
               "PlatformIO is for microcontrollers",
               ""
+            ],
+            "am24": [
+              "gap",
+              "None in the registry 17 Oct 2026; its only TI platform is MSP430",
+              "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
             ]
           }
         },
@@ -800,6 +870,11 @@
               "untried",
               "MicroPython's unix port should run on the A72",
               "../docs/proof-backlog.md"
+            ],
+            "am24": [
+              "untried",
+              "Zephyr runs on the first core; no MicroPython build recorded",
+              "../data/results/am243x.csv"
             ]
           }
         },
@@ -851,6 +926,11 @@
               "untried",
               "Rust builds natively for aarch64 Linux",
               "../docs/proof-backlog.md"
+            ],
+            "am24": [
+              "gap",
+              "No crate found 17 Oct 2026; embassy-mspm0 covers MSPM0 only",
+              "../data/toolchains/README.md#how-the-search-was-done-14-oct-2026"
             ]
           }
         },
@@ -902,6 +982,11 @@
               "untried",
               "",
               "../ports/msp430-to-mspm0/README.md"
+            ],
+            "am24": [
+              "untried",
+              "",
+              "../ports/msp430-to-mspm0/README.md"
             ]
           }
         }
@@ -922,6 +1007,11 @@
                 "changed": "316-line layer over DriverLib plus an 81-line board folder, 0 app edits",
                 "files": "portability/pico-on-mspm0/README.md#take-it-with-you"
               }
+            ],
+            "am24": [
+              "untried",
+              "No Pico SDK code run on the AM243",
+              "../ports/pico-sdk/README.md"
             ]
           }
         },
@@ -937,6 +1027,11 @@
                 "changed": "577-line FSP layer over DriverLib plus a 189-line board folder, 0 app edits in three examples",
                 "files": "portability/fsp-on-mspm0/README.md#take-it-with-you"
               }
+            ],
+            "am24": [
+              "untried",
+              "No Renesas FSP code run on the AM243",
+              "../ports/renesas-ra-fsp/README.md"
             ]
           }
         },
@@ -952,6 +1047,11 @@
                 "changed": "Two 8-line service files through tools/gatt_gen and one app file on TI's basic_ble; no Nordic code",
                 "files": "ports/nordic-apps/README.md#take-it-with-you"
               }
+            ],
+            "am24": [
+              "na",
+              "No radio on the chip",
+              ""
             ]
           }
         },
@@ -967,6 +1067,11 @@
                 "changed": "No port code: TI's provisioning service unmodified; a Python script stands in for the phone app",
                 "files": "ports/wifi-provisioning-ble/README.md#take-it-with-you"
               }
+            ],
+            "am24": [
+              "na",
+              "No radio on the chip",
+              ""
             ]
           }
         }
@@ -1033,6 +1138,11 @@
               "ran",
               "Container started on the Arm cores; first HTTP answer at 52.7 s, 531 MB",
               "../beagley-ai/bench/docker/ha-and-pull.log"
+            ],
+            "am24": [
+              "untried",
+              "No run yet; the Ethernet example got no DHCP lease",
+              "../am243x/FAQ.md"
             ]
           }
         },
@@ -1084,6 +1194,11 @@
               "untried",
               "The chip has Bluetooth LE; no BTHome run yet",
               "../cc35x1/RESULTS-cc35x1.md"
+            ],
+            "am24": [
+              "na",
+              "No radio on the chip",
+              ""
             ]
           }
         },
@@ -1135,6 +1250,11 @@
               "na",
               "A host, not a radio device",
               ""
+            ],
+            "am24": [
+              "na",
+              "No radio on the chip",
+              ""
             ]
           }
         },
@@ -1185,6 +1305,11 @@
             "wifi": [
               "na",
               "Wi-Fi and Bluetooth only; no 802.15.4",
+              ""
+            ],
+            "am24": [
+              "na",
+              "No radio on the chip",
               ""
             ]
           }

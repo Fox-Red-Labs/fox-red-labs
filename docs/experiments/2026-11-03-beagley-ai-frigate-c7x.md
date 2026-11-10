@@ -44,6 +44,18 @@ Expected against measured: the server's network time (10 to 13 ms, 11.11) and to
 
 The 44 ms between the server's 20 ms and Frigate's 64 ms was not split further. The candidates are Frigate's JPEG encode, a new connection per request (the server answers HTTP/1.0) and the four cores shared with the clip decoder (about 80 percent of one core).
 
+**Live from a network camera.** On 2026-11-08 Frigate took its input from the webcam on a MacBook over the LAN instead of from USB, which avoids the USB drop. The Mac ran mediamtx on its LAN address and ffmpeg published 1280x720 at 30 fps as H.264; `beagley-ai/frigate/config-lan-camera.yml` points Frigate at the RTSP address (TCP) and `run-lan.sh <Mac address>` starts the C7x server and Frigate. Expected, written first (`beagley-ai/bench/camera-lan/expectations.txt`): inference speed 55 to 70 ms and no person events on a static scene.
+
+| What | Expected | Measured | Source |
+|---|---|---|---|
+| Frigate inference speed, C7x, 130 s median | 55 to 70 ms | 58.01 ms (59.71 ms from the USB webcam, 64.46 ms on the clip) | `beagley-ai/bench/camera-lan/frigate-lan-2026-11-08.log` |
+| Frigate camera rate | its 5 fps detect rate | 5.0 | same |
+| Detection rate | 0 after the first seconds | 11.9 to 14.4 for the first 50 s, then 0.0 | same |
+| People events | 0 | 0, top score 0 | same |
+| Container memory, CPU | 700 MB to 1.2 GB | 949.7 MiB, 62 percent of one core (software decode of the 30 fps stream) | same |
+
+No USB drop and the board stayed up for the 130 s. This is an empty-scene baseline, so it shows the stream and the detector working together, not a person being found. Rows: `frigate-deepstack-yolox-nano-416-c7x-network-camera-rtsp`, `frigate-camera-fps-network-camera-rtsp-130s`. Latency was not measured.
+
 **Ideas we did not try.**
 
 1. A powered USB hub for the webcam, then `config-camera.yml`; that gives the camera-in-the-loop number.

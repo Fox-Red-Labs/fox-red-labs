@@ -1,6 +1,6 @@
 # How do you bring up the TI TMDS62LEVM (AM62L EVM) from a Mac: console, boot modes, Linux and Zephyr?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 The TMDS62LEVM is a TI evaluation module for the AM62L32: two Arm Cortex-A53 cores up to 1.25 GHz, 160 kB of on-chip SRAM, 2 GB LPDDR4, 32 GB eMMC, micro-SD slot, 512 Mbit OSPI NOR (user guide SPRUJG8B). The box holds the board only: no power supply, cables or SD card. Failures and fixes: [FAQ](FAQ.md). Notes for an AI assistant: [AGENTS.md](AGENTS.md). 
 Terms: [docs/vocab.md](../docs/vocab.md) and the [FAQ](FAQ.md). 1 kB = 1,024 bytes. **U-Boot** is the boot loader that loads Linux; **TF-A** is Arm's secure-world firmware; **PSCI** is the Arm call that starts and stops CPU cores; **DSLite** is TI's command-line debug server; **JTAG** is the debug connection the XDS110 probe uses; **SRAM** here is the 160 kB of memory on the chip, as opposed to the 2 GB LPDDR4 beside it.
@@ -110,6 +110,10 @@ You need a 32 GB USB stick and TI's Linux SDK image `tisdk-default-image-am62lxx
    ```
 
    Expect `am62lxx-evm login:` about 21 s after `booti` (median of 3 runs: 20.9, 21.4, 21.7 s). Log in as `root`, no password. Source: `data/results/am62l-evm.csv`, `booti-to-login-median3`.
+
+## Jailhouse hypervisor
+
+TI's Jailhouse flow runs from the SDK 12.01.00.05.03 Jailhouse image: U-Boot loads `Image-jailhouse` and its dtb, then in Linux `jailhouse enable` (0.27 s), `jailhouse cell create` for the `uart-demo` or `gic-demo` inmate, and the inmate prints on UART1 (FT4232 port B). Exact commands: [AGENTS.md](AGENTS.md). Run and numbers: `docs/experiments/2026-10-22-am62l-jailhouse.md`.
 
 ## Zephyr on core 1 beside Linux
 

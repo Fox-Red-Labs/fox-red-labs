@@ -184,3 +184,14 @@ Try in this order. Remote means the Mac does it with the board in place; hands m
 - The showcase's 48 fps and 10.4 fps Game Boy numbers came from Xorg, the container and llvmpipe scaling: the same Gambatte core runs 60 fps at 640x480 and 1080p through DRM. Source: same page.
 - The tidss plane has no scaler: `drmModeSetPlane` is accepted 1:1 and returns EINVAL for any larger destination, so scale integer ratios on the CPU into a dumb buffer (0.35 ms at 640x480, 1.3 to 1.9 ms at 1080p). Source: same page.
 - Snes9x 2010 `tile.c` takes over 14 minutes and 800 MB with GCC 15.3 at `-O2` on the board; use Snes9x 2005. Source: same page.
+
+<!-- ports:start (tools/render_ports.py) -->
+## Ports that ran here
+
+Code written for other chips and tools, brought to this board. The files to copy, the command and what you see for each are in `docs/ports.md`; the method and a prompt to port your own are there too. Works ran and did what it should; Could work ran in part.
+
+| Port | Status | Result | Evidence |
+|---|---|---|---|
+| TI's Jailhouse hypervisor on the AM62L: bare-metal and Linux cells beside Linux | Works | TI's documented Jailhouse flow from Linux SDK 12.01.00.05.03 ran as written on the AM62L EVM: the hypervisor enabled in 0.27 s, the uart and gic demo cells printed within a second, and a second Linux reached a login about 20 s after its cell started. | `docs/experiments/2026-10-22-am62l-jailhouse.md` |
+| Zephyr on the AM62L's Cortex-A53: from on-chip SRAM, and on one core beside Linux | Works | Zephyr's upstream am62l_evm board runs with no DDR, no TF-A and no TIFS: a 124 KB hello world in the 144 KB of on-chip SRAM, started over JTAG at EL3. A second build runs on A53 core 1 from DDR, started by a PSCI call from U-Boot, and keeps ticking while Linux boots and runs on core 0 with no hypervisor. | `docs/experiments/2026-10-21-am62l-sram-zephyr.md` |
+<!-- ports:end -->

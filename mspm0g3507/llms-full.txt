@@ -8,7 +8,7 @@ FILE: mspm0g3507/README.md | LP-MSPM0G3507 LaunchPad: first blink with an AI ass
 
 # LP-MSPM0G3507 LaunchPad: first blink with an AI assistant in 2 min 29 s, and what else it measures
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 Let Claude Code do it: paste the prompt in `START.md`, or run `./start.sh mspm0g3507 blink` from a clone. Either one has the assistant build TI's blink example for the LP-MSPM0G3507, flash it, and change the pattern to what you ask for. The folder is `mspm0g3507/`.
 
@@ -95,7 +95,7 @@ It does not back up or restore the board, and no restore has been tested.
 
 ## What was measured
 
-One borrowed LP-MSPM0G3507 (not a sealed box), Intel Mac, macOS 15.7.9.
+One borrowed LP-MSPM0G3507 (not a sealed box), Intel Mac, macOS 15.7.9. An own LP-MSPM0G3507 arrived 2026-11-09 (same probe serial as the borrowed unit, chip DEVICEID 0x2BB8802F); every number on this page is from the borrowed unit until a row says otherwise.
 
 | What | Number | Conditions | Level | Source |
 |---|---|---|---|---|
@@ -524,7 +524,7 @@ Use the high-speed pins (PA9, PA12 to PA14, PA19) with a bus clock of 64 MHz or 
 <!-- recovery:start -->
 ## When the board stops answering
 
-Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+Checked 2026-11-09. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
 
 How it locks up:
 
@@ -535,6 +535,9 @@ Try in this order. Remote means the Mac does it with the board in place; hands m
 | Method | Remote or hands | Status | Evidence |
 |---|---|---|---|
 | Unplug and replug USB (xdsdfu -e lists the probe again) | hands | proven | `mspm0g3507/AGENTS.md`, date not recorded |
+| uhubctl power cycle of the probe's hub port (6 s off) when the XDS110 stops enumerating after a firmware write (the own unit's probe vanished from USB a minute after xdsdfu wrote 3.0.0.43; `uhubctl -l 1-1 -p 3 -a cycle -d 6` brought it back as MG350001) | remote | proven | `data/results/mspm0g3507.csv`, 2026-11-09 |
+
+Restore: frl restore <backup folder> --probe MG350001 (OpenOCD program and verify, read back and compare). Regions: main flash; NONMAIN read only. (`data/results/mspm0g3507.csv`)
 
 <!-- recovery:end -->
 
@@ -634,21 +637,21 @@ Code written for other chips and tools, brought to this board. The files to copy
 
 | Port | Status | Result | Evidence |
 |---|---|---|---|
-| 2048 and Minesweeper on the LP-MSPM0G3519 with a 3.5 inch touch display | Works | 2048 and Minesweeper run on the LP-MSPM0G3519 with a 3.5 inch touch display. | `ports/touch-games/README.md` |
-| Arduino display libraries on the LP-MSPM0G3507 | Works | Arduino_GFX's graphics test draws on an ST7796S screen on the LP-MSPM0G3507, through a 649-line Arduino API layer under the unmodified libraries. | `portability/arduino/README.md` |
+| 2048 and Minesweeper on the LP-MSPM0G3519 with a 3.5 inch touch display (also built for the LP-MSPM0G3507 and LP-MSPM33C321A) | Works | 2048 and Minesweeper run on the LP-MSPM0G3519 with a 3.5 inch touch display. The same source builds for the LP-MSPM0G3507 (10.8 kB of flash) and, with a stub screen, for the LP-MSPM33C321A (8.1 kB). | `ports/touch-games/README.md` |
+| Arduino display libraries on the LP-MSPM0G3507, and the core layer on the LP-MSPM0G5187 | Works | Arduino_GFX's graphics test draws on an ST7796S screen on the LP-MSPM0G3507, through a 649-line Arduino API layer under the unmodified libraries. | `portability/arduino/README.md` |
 | BitNetMCU handwriting AI on MSPM0 | Works | BitNetMCU handwriting models read all 10 test digits right on the LP-MSPM0G3507 and LP-MSPM0L1306, the same answers as on a Mac. | `ports/bitnetmcu/README.md` |
 | Five STM32CubeG0 examples through TI's migration skill on the LP-MSPM0G3507: 3 ran as written, 2 after fixes | Works | TI's migration skill (a tool inside CCStudio that rewrites ST code for a TI chip) moved five STM32CubeG0 examples to the LP-MSPM0G3507: 3 ran as written, 2 after fixes. | `mspm0g3507/stm32-port-eval/README.md` |
-| MicroPython 1.29.0 on the LP-MSPM0G3519 and LP-MSPM0G3507 | Works | A new MicroPython port boots on the LP-MSPM0G3519 with the MicroPython banner and drives a 3.5 inch touch screen from Python. | `ports/micropython/README.md` |
+| MicroPython 1.29.0 on the LP-MSPM0G3519, LP-MSPM0G3507 and LP-MSPM0G5187 | Works | A new MicroPython port boots on the LP-MSPM0G3519 with the MicroPython banner and drives a 3.5 inch touch screen from Python. | `ports/micropython/README.md` |
 | minmea GPS sentence parser on MSPM0 | Works | minmea, an NMEA GPS parser, runs on the LP-MSPM0G3519 with its files unchanged and a 21-line shim for one missing call. | `ports/minmea/run-g3519.txt` |
 | MSPM0 examples moved up and down the family | Works | MSPM0 examples move between family members with only the SysConfig device changed (SysConfig is TI's pin and peripheral setup tool): all 133 images that built and write nothing outside main flash and SRAM ran on the LP-MSPM0L1306. | `portability/README.md` |
 | Peanut-GB Game Boy emulator on MSPM0 and MSPM33 | Works | Peanut-GB plays Tobu Tobu Girl on the LP-MSPM33C321A with the Educational BoosterPack screen at the console's own speed. | `ports/peanut-gb/README.md` |
 | TI's MSPM0 DriverLib examples built and run with GCC | Works | TI's MSPM0 DriverLib examples build and run with GCC from a terminal: all 224 no-RTOS examples with a GCC makefile built unchanged. | `portability/toolchains/gcc-mspm0/README.md` |
-| uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507 and LP-MSPM0G3519 | Works | uLisp, an Arduino sketch, gives a Lisp prompt on the LP-MSPM0G5187's serial port: 19 of 19 REPL (type-and-run loop) checks pass. | `ports/ulisp/README.md` |
+| uLisp Lisp interpreter on the LP-MSPM0G5187, LP-MSPM0G3507, LP-MSPM0G3519, LP-EM-CC2340R5, LP-EM-CC2755P10, LP-MSPM33C321A, LP-AM243 and LAUNCHXL-F2800137 | Works | uLisp, an Arduino sketch, gives a Lisp prompt on the serial port of the LP-MSPM0G5187, LP-EM-CC2340R5 and LP-EM-CC2755P10: 19 of 19 REPL (type-and-run loop) checks pass on each. | `ports/ulisp/README.md` |
 | wasm3 (WebAssembly interpreter) on the LP-MSPM0G3519, LP-MSPM0G3507 and LP-MSPM33C321A | Works | wasm3 runs a WebAssembly module on the LP-MSPM0G3519 and prints PASS on the serial line. | `ports/wasm3/README.md` |
 | Arduboy2-compatible layer and three open-source games on MSPM0 and MSPM33 | Could work | Snake, TileWorld and Crate Confusion build unchanged against an Arduboy2-compatible layer for four kits, and Snake draws on the LP-MSPM33C321A's Educational BoosterPack screen. | `ports/arduboy/FIT.md` |
-| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
+| BoosterPack drivers (Educational MKII, Sharp128, Audio, Sensors MKII, NPU DSP) on LaunchPad kits of other families | Could work | Portable C cores for BoosterPacks ran: the Educational pack on the LP-MSPM0L1306 and LP-MSPM33C321A, the Sharp128 panel on the LP-MSPM0C1104, the Audio pack on the LP-AM13E230 and the Sensors pack on the LP-MSPM0G5187. The Educational, Sharp128 and Audio builds also build for the LP-MSPM0G3519, and the Educational and Sharp128 builds for the LP-MSPM0G3507. | `portability/boosterpacks/edumkii/RUN-LOG.md` |
 | MSPM0 code on the CC2340R5 and CC1354P10 radio chips | Could work | MSPM0 driver examples build for the CC2340R5 with a 47-line shim, the first 5 ran with the same pin states as TI's own build, and 4 of 4 ran on the CC1354P10. | `portability/README.md` |
-| One app, three ways: DriverLib, TI Drivers and Zephyr | Could work | The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings. | `portability/three-ways/README.md` |
+| One app, three ways: DriverLib, TI Drivers and Zephyr | Could work | The same 81-line app builds three ways on the LP-MSPM0L1306, and the DriverLib and Zephyr builds ran with the same readings. It builds on the LP-MSPM0G3507 too. | `portability/three-ways/README.md` |
 <!-- ports:end -->
 
 ## Where the evidence lives
@@ -658,7 +661,7 @@ Start at `mspm0g3507/FAQ.md` for each problem, then `mspm0g3507/mcu-bench/README
 <!-- recovery:start -->
 ## When the board stops answering
 
-Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+Checked 2026-11-09. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
 
 How it locks up:
 
@@ -669,6 +672,9 @@ Try in this order. Remote means the Mac does it with the board in place; hands m
 | Method | Remote or hands | Status | Evidence |
 |---|---|---|---|
 | Unplug and replug USB (xdsdfu -e lists the probe again) | hands | proven | `mspm0g3507/AGENTS.md`, date not recorded |
+| uhubctl power cycle of the probe's hub port (6 s off) when the XDS110 stops enumerating after a firmware write (the own unit's probe vanished from USB a minute after xdsdfu wrote 3.0.0.43; `uhubctl -l 1-1 -p 3 -a cycle -d 6` brought it back as MG350001) | remote | proven | `data/results/mspm0g3507.csv`, 2026-11-09 |
+
+Restore: frl restore <backup folder> --probe MG350001 (OpenOCD program and verify, read back and compare). Regions: main flash; NONMAIN read only. (`data/results/mspm0g3507.csv`)
 
 <!-- recovery:end -->
 

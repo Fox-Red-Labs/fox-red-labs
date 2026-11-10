@@ -427,6 +427,12 @@ def start(board, serial):
     if board["target"].get("transport") == "toolbox":
         import toolbox
         return toolbox.start(board, serial)
+    if board["target"].get("transport") == "dss":
+        import dss
+        code, out = dss.run(board, serial, ["start"], timeout=120)
+        if code != 0 or "OK started" not in (out or ""):
+            dss._failed(out, serial, "start")
+        return out
     return run(board, serial, ["reset run"], timeout=30)
 
 

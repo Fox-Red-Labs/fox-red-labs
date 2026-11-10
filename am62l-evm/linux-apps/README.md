@@ -1,6 +1,6 @@
 # Which Raspberry Pi software runs on the TI TMDS62LEVM (AM62L), and what does it cost?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 Mosquitto, Node-RED, Pi-hole and Home Assistant Container all run on the board's two Cortex-A53 cores from TI's own SDK Linux image, because that image already carries Docker. Python GPIO (gpiozero and Adafruit Blinka) toggles the user LED after three workarounds. No Debian or Armbian image is needed. Checked 2026-10-24 on one TMDS62LEVM: TI Linux SDK 12.01 (Arago 2026.04, kernel 6.18.38) booted from a 119 GB micro-SD card, Docker 29.3.0, both cores at 1.25 GHz (`performance` governor), 1,960 MB of RAM, Ethernet to a home network. 1 kB = 1,024 bytes. Terms: [docs/vocab.md](../../docs/vocab.md). Board basics: [../README.md](../README.md).
 

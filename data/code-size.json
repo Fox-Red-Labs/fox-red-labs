@@ -407,7 +407,7 @@
     },
     {
       "slug": "small-ai-model",
-      "name": "Run a small AI model: room occupancy",
+      "name": "Run an AI model: room occupancy",
       "builds": [
         {
           "board": "mspm0l1306",
@@ -2339,6 +2339,12 @@
     {
       "slug": "sub-ghz-demos",
       "name": "Sub-1 GHz home radio demos",
+      "kind": "size not in results file",
+      "reason": "the build ran; its size is not in the results file"
+    },
+    {
+      "slug": "sparky-voice-assistant",
+      "name": "A voice assistant on a LaunchPad",
       "kind": "size not in results file",
       "reason": "the build ran; its size is not in the results file"
     }

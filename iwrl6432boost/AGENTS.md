@@ -38,7 +38,7 @@ This is a radar board. Its first result is radar frames from the shipped demo, n
 | What you see | Cause | Do this | Check |
 |---|---|---|---|
 | Both ports send nothing and the CLI answers nothing, after a JTAG reset-and-halt failed with `-2063` and `-2062` | Link to the failure is a guess | Press S2 (NRST) | Frames resume |
-| The probe shows `NOserial` | DSLite updated the probe firmware to 3.0.0.43 on first use | `xdsdfu -n RI32` | Ports `usbmodemRI32RI321` and `4` appear |
+| The probe shows `NOserial` | DSLite updated the probe firmware to 3.0.0.43 on first use | `xdsdfu -n RI32` | Ports `usbmodemRI32RI321` and `4` appear (first unit; the second unit is named `RI32` and its ports are `usbmodemRI321` and `4`) |
 | `Error in setting up range profile:-40107` | The demo refuses a 1x1 antenna setting; the CLI hung | Press S2 and use the 2x3 configuration | The CLI answers |
 | arprog says the connection succeeded but nothing is written | It reads a 0xCC byte in the streaming frames as the board's answer and sends its download command to the demo's CLI | Put the board in flashing mode first (S1 position 1 OFF, S2) | The port is silent for 2 s before you start |
 | A 05.04 cfg on a 05.05 image tracks oddly, with no error | 05.05 `trackingCfg` reads 4 values plus `boresightFilteringEnable`; the 05.04 line's fifth value (61.4) turns that filter on | Cut `trackingCfg` to 4 values (`portability/radar-family/port_cfg.py`) | `cli_check.py <demo source> <cfg>` prints OK |
@@ -65,6 +65,7 @@ It prints one line per frame. `--selftest` runs it with no board. Frames start w
 ## What ran here
 
 - 2026-11-03, second unit (probe `RI32`, firmware 3.0.0.13, ports `usbmodemRI321` and `4`), image `Presence_Demo` SDK 05.04.00.01: people tracking from `iwrl6432boost/live/cfg/people-count-250ms.cfg` counted one person right in 89.5 percent of in-view frames with 0 overcounts on a spoken-cue walk; the TI tracker lines without our static-box change gave 25.2 percent (`radar_count_exact` rows).
+- 2026-11-08, second unit, `Presence_Demo` 05.04 left running from 2026-11-03: a 10 s read of `usbmodemRI321` at 115,200 baud gave 40 contiguous frames of 96 bytes (frame counter 1735092 to 1735131), about 4 a second, no banner (the stream was already running). After an `xds110reset` and `iwrl6432boost/live/cfg/people-count-250ms.cfg` (0 config errors), an empty lab for 60 s gave 240 frames, 0 with a tracked person, 7 with points (`data/results/iwrl6432boost.csv`, `radar_false_alarm` tracker-250ms-0504-60s-empty). Not done: the person-walk rows (they need someone 20 cm or more from the radar), the Industrial Visualizer on this Mac.
 - On that image `trackingCfg` takes 7 values though its help lists 6; `sigProcChainCfg` takes 8; `rangeSNRCompensation` is gone; `guiMonitor` point cloud 1 sends TLVs 1 and 7, 2 sends TLV 301. TI's 100 ms tracking frame hung it after about 31 frames; `xds110reset -s RI32` recovers it with no hands (`iwrl6432boost/live/README.md`).
 - The shipped demo sends frames with no configuration: 384 bytes each, TLVs 315 and 319, 4.00 frames a second over 60 s, 240 contiguous frames, 1.51 kB/s of the roughly 11.25 kB/s a 115,200 baud link carries (`data/results/iwrl6432boost.csv`, rows `radar_frame_rate`, `radar_uart_bandwidth`).
 - Re-configured Motion and Presence 2D demo, 2x3 antennas, 250 ms frame: walk-in at 6.53 m, seated person held at 4.0 m, 6,230 ms from the voice cue to detection (includes the person's reaction), 14.12 s to clear, 0 false alarms in a 60 s empty room. One run each, not the 20-of-20 rule (`data/results/iwrl6432boost.csv`, rows `presence-*-2x3`).
@@ -75,6 +76,8 @@ It prints one line per frame. `--selftest` runs it with no board. Frames start w
 - Not done: flashing TI's other demos, the 1.25 Mbaud rows, power rows, CoreMark, any custom firmware.
 
 ## Which routes reach this chip
+
+`frl` has no route for this board (`data/routes.json`): TI flashes this chip with `arprog_cmdline.py` over the UART in a boot mode set by S1, not over SWD, so the probe-based backup, write and restore steps that `frl` uses do not apply; use the flashing steps in `iwrl6432boost/README.md`.
 
 On a Mac, TI's SDK makefiles build the demo when the Unix helpers are passed in (`portability/radar-family/build/build.sh`, 2026-11-03; built, not flashed). Only TI's own route, and its build host is Windows or Ubuntu, not macOS: mmWave L SDK 05.05.00 wants Windows 10 64-bit or Ubuntu 18.04 64-bit or higher, TI Arm Clang 3.2.2.LTS, CCS 12.7.1, SysConfig 1.20.0. Zephyr 4.4.2 has no xWRL6432 board or SoC. No Arduino, PlatformIO or MicroPython support was found (absence of search results, not a vendor statement). A community Rust crate, `iwrl64xx-pac`, exists and was not built here (`iwrl6432boost/README.md`).
 
@@ -93,6 +96,7 @@ Code written for other chips and tools, brought to this board. The files to copy
 | Port | Status | Result | Evidence |
 |---|---|---|---|
 | MCU+ SDK examples on the IWRL6432BOOST radar | Works | MCU+ SDK examples build in a radar SDK project, and uart_echo and gpio_led_blink ran on the IWRL6432BOOST. | `portability/everywhere/mcuplus-compat/README.md` |
+| Open radar readers on the IWRL6432BOOST: the ROS driver, the Python SDK 3 reader, the gesture recognizer | Could work | Once the board sends the standard point format (guiMonitor 1), the most-forked Python mmWave SDK 3 reader reads every point of two recorded walks with its parser unedited; the reference ROS 1 driver publishes every point when frames come every 50 ms, nothing at the board's 250 ms; the most-starred gesture recognizer reads no frame, because it expects an AWR1642 SDK 2 layout and near-field gestures at 10 frames a second. | `docs/experiments/2026-11-03-iwrl6432boost-sdk3-python-reader.md` |
 <!-- ports:end -->
 
 ## Where the evidence lives

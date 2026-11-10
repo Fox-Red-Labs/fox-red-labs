@@ -1,6 +1,6 @@
-# Run FreeRTOS tasks on a LaunchPad kit
+# Run FreeRTOS tasks on a LaunchPad
 
-Build FreeRTOS from TI's SDK files, flash it, and watch counted tasks run: on the 4 kB-RAM LP-MSPM0L1306, or with TI's example on the LP-EM-CC2340R5.
+Build FreeRTOS from the code TI ships with the board, flash it, and watch counted tasks run: on the 4 kB-RAM LP-MSPM0L1306, or with TI's example on the LP-EM-CC2340R5.
 
 The page: [site/project-run-freertos.html](../../site/project-run-freertos.html). This file is its text. Terms: [vocabulary](../vocab.md).
 

@@ -8,9 +8,18 @@
 set -u
 HERE="$(cd "$(dirname "$0")" && pwd)"
 OUT="${OUT:-$PWD/out/am13e230}/foc-drv8376"
-SDK=/Applications/ti/am13e230x_sdk_26_01_00_03
-CC=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
-SYSCFG_PATH=/Applications/ti/sysconfig_1.28.0; NODE="$SYSCFG_PATH/nodejs/node"
+# Tools: FRL_AM13_SDK, FRL_SYSCONFIG and FRL_TICLANG if set, else the TI install folders under /Applications/ti (or FRL_TI_ROOT);
+# the compiler may be standalone or inside CCStudio. A missing tool stops with its name and download page.
+TI="${FRL_TI_ROOT:-/Applications/ti}"
+pick() { local v; for v in "$@"; do [ -e "$v" ] && { echo "$v"; return; }; done; }
+missing() { echo "Not installed: $1"; echo "  get it: $2"; echo "  or set $3 to where it is"; exit 2; }
+SDK="${FRL_AM13_SDK:-$(pick "$TI"/am13e230x_sdk_26_01_* "$TI"/am13e230x_sdk_*)}"
+[ -n "$SDK" ] || missing "the AM13E230x SDK 26.01.00.03" "https://www.ti.com/tool/LP-AM13E230 (free, myTI login; about 0.4 GB)" FRL_AM13_SDK
+SYSCFG_PATH="${FRL_SYSCONFIG:-$(pick "$TI"/sysconfig_1.28.* "$TI"/sysconfig_1.2[89]* "$TI"/sysconfig_*)}"
+[ -n "$SYSCFG_PATH" ] || missing "SysConfig 1.28.0" "https://www.ti.com/tool/SYSCONFIG (free; about 0.15 GB)" FRL_SYSCONFIG
+NODE="$SYSCFG_PATH/nodejs/node"
+CC="${FRL_TICLANG:-$(pick "$TI"/ti-cgt-armllvm_5.1.1* "$TI"/ti-cgt-armllvm_* "$TI"/ccs*/ccs/tools/compiler/ti-cgt-armllvm_5.1.1* "$TI"/ccs*/ccs/tools/compiler/ti-cgt-armllvm_*)}"
+[ -n "$CC" ] || missing "TI Arm Clang 5.1.1.LTS" "https://www.ti.com/tool/ARM-CGT (free; about 0.3 GB), or CCStudio which includes it" FRL_TICLANG
 RTL="$SDK/source/realtimelib"
 CF="$HERE/common_files"
 JOBS="$(sysctl -n hw.ncpu 2>/dev/null || echo 4)"

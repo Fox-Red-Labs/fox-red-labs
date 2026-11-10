@@ -6,7 +6,7 @@ Terms: [docs/vocab.md](docs/vocab.md). Errors seen on more than one board: [TRAP
 
 **Built it on your kit?** Post it in [Show and tell](https://github.com/Fox-Red-Labs/fox-red-labs/discussions/categories/show-and-tell) with its four parts: what you built or ported, what it runs on, a photo or a clip, and anything that did not work. [How to post](#how-to-post-what-you-built).
 
-Last activity: 2026-11-06.
+Last activity: 2026-11-10.
 
 ## Quick start: a changed blink in about ten minutes
 
@@ -54,7 +54,7 @@ The second job prints your own text over the USB cable: `./start.sh mspm0l1306 p
 The commands below need more than the sparse clone has, and Python 3.12 or newer (`.python-version` names the tested 3.14; `python3 -m pip install -r requirements.txt`). Add it with `git sparse-checkout add tools data mac-setup`, or clone without `--sparse` (about 500 MB).
 
 <!-- routes:other-boards (written by tools/start/route_summary.py; do not edit by hand) -->
-**Other boards:** `./start.sh <board id> <job>` drives 11 kits. With a recorded hardware run: LP-AM13E230 (`am13e230`: `blink`); LP-CC1354P10-1 (`cc1354p10`: `blink`); LP-EM-CC2340R5 (`cc2340r5`: `blink`, `print-a-message`); LP-EM-CC2755P10 (`cc2755p10`: `blink`); LP-EM-CC35X1 (`cc35x1`: `print-a-message`); LAUNCHXL-F2800137 (`f2800137`: `blink`); LP-MSPM0C1104 (`mspm0c1104`: `blink`); LP-MSPM0G3519 (`mspm0g3519`: `blink`); LP-MSPM0G5187 (`mspm0g5187`: `blink`); LP-MSPM0L1306 (`mspm0l1306`: `blink`, `print-a-message`); LP-MSPM33C321A (`mspm33c321a`: `blink`).
+**Other boards:** `./start.sh <board id> <job>` drives 13 kits. With a recorded hardware run: LP-AM13E230 (`am13e230`: `blink`); LP-CC1354P10-1 (`cc1354p10`: `blink`); LP-EM-CC2340R5 (`cc2340r5`: `blink`, `print-a-message`); LP-EM-CC2755P10 (`cc2755p10`: `blink`); LP-EM-CC35X1 (`cc35x1`: `print-a-message`); LAUNCHXL-F2800137 (`f2800137`: `blink`, `print-a-message`); LP-MSPM0C1104 (`mspm0c1104`: `blink`); LP-MSPM0G3507 (`mspm0g3507`: `blink`); LP-MSPM0G3519 (`mspm0g3519`: `blink`); LP-MSPM0G5187 (`mspm0g5187`: `blink`); LP-MSPM0L1306 (`mspm0l1306`: `blink`, `print-a-message`); LP-MSPM0L2228 (`mspm0l2228`: `blink`); LP-MSPM33C321A (`mspm33c321a`: `blink`, `print-a-message`).
 
 13 other boards with a folder have a manual path: `bash mac-setup/bootstrap.sh --check` lists the missing tools and their disk space, then follow the ten-minute path in the board folder's `README.md`. Each board's tools, probe, check, backup and recovery, and what is not yet tested: [docs/setup-coverage.md](docs/setup-coverage.md). For a kit not in the folder map, `python3 tools/frl/frl.py identify "<name printed on the board>"` returns TI's page for it. Board cores, memory and prices are in `data/boards.csv`; `site/hardware.html` compares them.
 <!-- /routes:other-boards -->
@@ -87,7 +87,7 @@ Open [Show and tell](https://github.com/Fox-Red-Labs/fox-red-labs/discussions/ca
 3. **A photo, a clip or a log.** Something that shows it running.
 4. **Anything that did not work.** Optional, and the most useful part.
 
-The board id is the folder name, such as `mspm0g3507`. A post with all four parts can be repeated by the next person. A step that failed goes in the [Report a problem](https://github.com/Fox-Red-Labs/fox-red-labs/issues/new?template=broke-here.yml) form, so the exact error text lands on that board's page. Questions go in [Q&A](https://github.com/Fox-Red-Labs/fox-red-labs/discussions/categories/q-a). When a post leads to a fix, the fix goes into the board's `FAQ.md` or `AGENTS.md` under your GitHub handle, and your handle joins the Built-by list. The full guide is [docs/how-to-contribute.md](docs/how-to-contribute.md).
+This repository is a copy built from a private lab notebook (`.export-source` names the commit); a merged pull request is applied to the notebook under your name and comes back in the next copy. The board id is the folder name, such as `mspm0g3507`. A post with all four parts can be repeated by the next person. A step that failed goes in the [Report a problem](https://github.com/Fox-Red-Labs/fox-red-labs/issues/new?template=broke-here.yml) form, so the exact error text lands on that board's page. Questions go in [Q&A](https://github.com/Fox-Red-Labs/fox-red-labs/discussions/categories/q-a). When a post leads to a fix, the fix goes into the board's `FAQ.md` or `AGENTS.md` under your GitHub handle, and your handle joins the Built-by list. The full guide is [docs/how-to-contribute.md](docs/how-to-contribute.md).
 
 ## Measured numbers, and how to read them
 
@@ -162,4 +162,4 @@ Top-level files: `start.sh`, `START.md`, `AGENTS.md`, `TRAPS.md`, `PORTING.md`, 
 
 Code BSD-3-Clause, written content CC BY 4.0, brand all rights reserved; third-party files keep their own licenses. Full terms: `LICENSE` and `NOTICE` in the published repository.
 
-Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.

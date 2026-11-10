@@ -6,6 +6,9 @@
 /* ---------- pin table ---------- */
 /* IOMUX_PINCMn number (1 based, from the G350x header and the data sheet pin table) for each GPIO.
    0 = the pin does not exist on this device. */
+#if __has_include("pincm_table.h")
+#include "pincm_table.h"   /* a board folder can supply its own table */
+#else
 static const uint8_t pincm_a[32] = {
    1,  2,  7,  8,  9, 10, 11, 14,        /* PA0..PA7 */
   19, 20, 21, 22, 34, 35, 36, 37,        /* PA8..PA15 */
@@ -16,6 +19,7 @@ static const uint8_t pincm_b[32] = {
   25, 26, 27, 28, 29, 30, 31, 32,        /* PB8..PB15 */
   33, 43, 44, 45, 48, 49, 50, 51,        /* PB16..PB23 */
   52, 56, 57, 58,  0,  0,  0,  0 };      /* PB24..PB31 (PB28 to PB31 do not exist) */
+#endif
 
 volatile uint32_t compat_bad_pin_number;
 extern "C" void compat_bad_pin(uint32_t pin)

@@ -27,7 +27,7 @@ calibration load; until the J101 jumper test is done, treat 1.5 mA as a possible
 """
 import argparse, ctypes as C, json, os, platform, statistics, sys, time
 
-CCS = os.environ.get("CCS_ROOT", "/Applications/ti/ccs2101/ccs")
+CCS = os.environ.get("FRL_CCS_ROOT") or os.environ.get("CCS_ROOT", "/Applications/ti/ccs2101/ccs")   # FRL_CCS_ROOT: a reader's CCStudio folder
 USCIF = os.path.join(CCS, "ccs_base", "common", "uscif")
 LIB = os.path.join(USCIF, "libjscxds110.dylib" if platform.system() == "Darwin" else "libjscxds110.so")
 

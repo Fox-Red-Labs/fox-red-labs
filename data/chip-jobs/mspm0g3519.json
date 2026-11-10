@@ -1,0 +1,1184 @@
+{
+ "_about": "Per-build jobs for the chip map on the board page (site/chip/chipview.js). Pins, headers and sizes are checked by tools/chip_jobs_check.py against portability/hobby/gen_boards.py, each build's PINS.md and the size table in portability/hobby/README.md; blink against data/results/mspm0g3519.csv. chains: part > pin > block > cpu for an input, cpu > block > pin > part for an output; ids are a block id, pin:<name> or part:<id>.",
+ "board": "mspm0g3519",
+ "chip": {
+  "part": "MSPM0G3519",
+  "stack_bytes": 256,
+  "flash_bytes": 524288,
+  "ram_bytes": 131072,
+  "clock_note": "32 MHz in these builds"
+ },
+ "callouts": [
+  [
+   "usb",
+   "USB-C: power and program"
+  ],
+  [
+   "xds",
+   "Debug probe: loads the chip"
+  ],
+  [
+   "mcu",
+   "The chip"
+  ],
+  [
+   "led_red",
+   "LEDs: your first blink, color demos"
+  ],
+  [
+   "s1",
+   "S1, S2: your buttons"
+  ],
+  [
+   "s3",
+   "Reset button"
+  ],
+  [
+   "j1",
+   "J1, J3: plug-on boards"
+  ],
+  [
+   "j2",
+   "J4, J2: plug-on boards"
+  ],
+  [
+   "j5",
+   "J5, J7: more plug-on pins"
+  ],
+  [
+   "analog",
+   "Analog pins: sensors"
+  ],
+  [
+   "j101",
+   "Jumpers: cut the probe off"
+  ]
+ ],
+ "kinds": {
+  "core": {
+   "name": "Processor",
+   "color": "#1F4E79"
+  },
+  "mem": {
+   "name": "Memory",
+   "color": "#0F7C8A"
+  },
+  "analog": {
+   "name": "Analog",
+   "color": "#A0522D"
+  },
+  "timer": {
+   "name": "Timers",
+   "color": "#8A6A00"
+  },
+  "conn": {
+   "name": "Serial and pins",
+   "color": "#3F7A3A"
+  },
+  "sys": {
+   "name": "System",
+   "color": "#7A5C99"
+  },
+  "math": {
+   "name": "Math and security",
+   "color": "#56606E"
+  }
+ },
+ "blocks": {
+  "cpu": {
+   "name": "Cortex-M0+ CPU",
+   "kind": "core",
+   "sub": "runs the program, 32 MHz here",
+   "note": "32-bit Arm Cortex-M0+; up to 80 MHz, 32 MHz in these builds"
+  },
+  "systick": {
+   "name": "SysTick",
+   "kind": "core",
+   "short": "SysTick",
+   "note": "the CPU's own free-running counter"
+  },
+  "nvic": {
+   "name": "Interrupts",
+   "kind": "core",
+   "short": "Interrupts",
+   "note": "interrupts; none are enabled in these builds"
+  },
+  "flash": {
+   "name": "Flash",
+   "kind": "mem",
+   "sub": "512 kB",
+   "note": "512 kB of program memory"
+  },
+  "sram": {
+   "name": "SRAM",
+   "kind": "mem",
+   "sub": "128 kB",
+   "note": "128 kB of working memory"
+  },
+  "dma": {
+   "name": "DMA",
+   "kind": "sys",
+   "short": "DMA",
+   "note": "moves data without the CPU; these builds do not use it"
+  },
+  "math": {
+   "name": "Math, crypto",
+   "kind": "math",
+   "sub": "CRC, AES, TRNG",
+   "short": "Math, AES"
+  },
+  "clk": {
+   "name": "Clocks and power",
+   "kind": "sys",
+   "sub": "SYSOSC 32 MHz, 3.3 V",
+   "short": "Clocks",
+   "note": "the 32 MHz oscillator and the supply"
+  },
+  "adc0": {
+   "name": "ADC0",
+   "kind": "analog",
+   "sub": "12 bit",
+   "short": "ADC0",
+   "note": "12-bit converter that reads pin voltages"
+  },
+  "adc1": {
+   "name": "ADC1",
+   "kind": "analog",
+   "sub": "12 bit",
+   "short": "ADC1"
+  },
+  "analogx": {
+   "name": "VREF, COMP",
+   "kind": "analog",
+   "sub": "DAC",
+   "short": "COMP DAC"
+  },
+  "tima1": {
+   "name": "TIMA1",
+   "kind": "timer",
+   "sub": "advanced",
+   "short": "TIMA1",
+   "note": "timer with PWM outputs"
+  },
+  "tima0": {
+   "name": "TIMA0",
+   "kind": "timer",
+   "sub": "advanced",
+   "short": "TIMA0",
+   "note": "timer with PWM outputs"
+  },
+  "timg8": {
+   "name": "TIMG8",
+   "kind": "timer",
+   "sub": "general",
+   "short": "TIMG8",
+   "note": "general timer with PWM outputs"
+  },
+  "timg0": {
+   "name": "TIMG0",
+   "kind": "timer",
+   "sub": "general",
+   "short": "TIMG0"
+  },
+  "timg67": {
+   "name": "TIMG6, 7, 9, 12, 14",
+   "kind": "timer",
+   "short": "TIMG6 to 14"
+  },
+  "rtc": {
+   "name": "RTC, WDT",
+   "kind": "sys",
+   "short": "RTC WDT"
+  },
+  "gpioa": {
+   "name": "GPIOA",
+   "kind": "conn",
+   "sub": "port A",
+   "short": "GPIOA",
+   "note": "digital pins PA0 to PA31"
+  },
+  "gpiob": {
+   "name": "GPIOB",
+   "kind": "conn",
+   "sub": "port B",
+   "short": "GPIOB",
+   "note": "digital pins PB0 to PB31"
+  },
+  "gpioc": {
+   "name": "GPIOC",
+   "kind": "conn",
+   "sub": "port C",
+   "short": "GPIOC",
+   "note": "digital pins PC0 to PC29"
+  },
+  "uart0": {
+   "name": "UART0",
+   "kind": "conn",
+   "sub": "serial",
+   "short": "UART0",
+   "note": "serial port; its pins go to the probe"
+  },
+  "i2c": {
+   "name": "I2C0 to I2C2",
+   "kind": "conn",
+   "short": "I2C0 to 2",
+   "note": "hardware I2C ports"
+  },
+  "spi": {
+   "name": "SPI0 to SPI2",
+   "kind": "conn",
+   "short": "SPI0 to 2"
+  },
+  "uartn": {
+   "name": "UART1, 3 to 7",
+   "kind": "conn",
+   "short": "UART1 3-7"
+  },
+  "can": {
+   "name": "CAN-FD 0, 1",
+   "kind": "conn",
+   "short": "CAN-FD"
+  }
+ },
+ "builds": {
+  "hobby-button-knob-dim": {
+   "title": "Button, knob and dimmer",
+   "card_title": "Knob and dimmer",
+   "card_line": "Turn a knob and an LED dims.",
+   "status": "Ran on this board; checked through the debugger",
+   "folder": "button-knob-dim",
+   "flash": 3256,
+   "ram": 456,
+   "parts": {
+    "knob": {
+     "name": "Knob",
+     "note": "10 kΩ pot, 3V3 to GND"
+    },
+    "led": {
+     "name": "LED2 green",
+     "note": "on the board"
+    },
+    "s2": {
+     "name": "S2",
+     "note": "button on the board"
+    },
+    "usb": {
+     "name": "USB",
+     "note": "serial through the probe"
+    }
+   },
+   "pins": {
+    "PA14": {
+     "header": "J1 pin 2",
+     "block": "adc0",
+     "signal": "POT1"
+    },
+    "PB27": {
+     "header": "J3 pin 28",
+     "block": "tima1",
+     "signal": "LED"
+    },
+    "PB3": {
+     "header": "J4 pin 40",
+     "block": "gpiob",
+     "signal": "BTN_A"
+    },
+    "PA10": {
+     "header": "J4 pin 34",
+     "block": "uart0",
+     "source": "portability/hobby/button-knob-dim/PINS.md"
+    },
+    "PB8": {
+     "header": "J2 pin 15",
+     "block": "gpiob",
+     "signal": "BTN_B"
+    }
+   },
+   "wiring": "Knob wiper to J1 pin 2 (PA14), its ends to J1 pin 1 (3V3) and J2 pin 20 (GND). The LED is LED2 green on the board, J3 pin 28 (PB27); an outside LED through 330 Ω works there too. S2 is on the board, J4 pin 40 (PB3); optional: your own button on J2 pin 15 (PB8), other side to GND.",
+   "jobs": [
+    {
+     "name": "Knob",
+     "chains": [
+      [
+       "part:knob",
+       "pin:PA14",
+       "adc0",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "pin:PA14",
+       "step": "Takes the knob voltage",
+       "by": "PA14, J1 pin 2"
+      },
+      {
+       "block": "adc0",
+       "step": "Reads the knob",
+       "by": "ADC0 ch 12, 12 bit"
+      }
+     ]
+    },
+    {
+     "name": "Dimmer",
+     "chains": [
+      [
+       "cpu",
+       "tima1",
+       "pin:PB27",
+       "part:led"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "tima1",
+       "step": "Turns it into a pulse width",
+       "by": "TIMA1 CC1, 1 kHz"
+      },
+      {
+       "block": "pin:PB27",
+       "step": "Dims the LED",
+       "by": "PB27, J3 pin 28"
+      }
+     ]
+    },
+    {
+     "name": "Button",
+     "chains": [
+      [
+       "part:s2",
+       "pin:PB3",
+       "gpiob",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpiob",
+       "step": "Notices a press of S2",
+       "by": "GPIOB PB3, pull-up, 20 ms debounce"
+      }
+     ]
+    },
+    {
+     "name": "Console",
+     "chains": [
+      [
+       "cpu",
+       "uart0",
+       "pin:PA10",
+       "part:usb"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "uart0",
+       "step": "Prints the values",
+       "by": "UART0 TX, 115200"
+      },
+      {
+       "block": "pin:PA10",
+       "step": "Sends it to your computer",
+       "by": "PA10, J4 pin 34, through the probe"
+      }
+     ]
+    },
+    {
+     "name": "Time",
+     "chains": [
+      [
+       "systick",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "systick",
+       "step": "Times the 5 ms pauses",
+       "by": "SysTick, the CPU's own counter"
+      }
+     ]
+    }
+   ],
+   "tags": {
+    "adc0": "ch 12",
+    "tima1": "CC1 1 kHz",
+    "gpiob": "PB3 in",
+    "uart0": "TX 115200",
+    "systick": "timebase"
+   }
+  },
+  "hobby-led-sequences": {
+   "title": "Traffic light, reaction game, tune",
+   "card_title": "Traffic light",
+   "card_line": "Three lamps, two buttons and a tune.",
+   "status": "Ran on this board; checked through the debugger",
+   "folder": "led-sequences",
+   "flash": 3840,
+   "ram": 272,
+   "parts": {
+    "red": {
+     "name": "Red",
+     "note": "LED2 red on the board"
+    },
+    "yel": {
+     "name": "Yellow",
+     "note": "LED, 330 Ω"
+    },
+    "grn": {
+     "name": "Green",
+     "note": "LED2 green on the board"
+    },
+    "btnb": {
+     "name": "Button",
+     "note": "second button"
+    },
+    "s2": {
+     "name": "S2",
+     "note": "button on the board"
+    },
+    "buzz": {
+     "name": "Buzzer",
+     "note": "passive"
+    },
+    "usb": {
+     "name": "USB",
+     "note": "serial through the probe"
+    }
+   },
+   "pins": {
+    "PB26": {
+     "header": "J3 pin 27",
+     "block": "gpiob",
+     "signal": "LED_RED"
+    },
+    "PB10": {
+     "header": "J3 pin 29",
+     "block": "gpiob",
+     "signal": "LED_YEL"
+    },
+    "PB27": {
+     "header": "J3 pin 28",
+     "block": "gpiob",
+     "signal": "LED_GRN"
+    },
+    "PB8": {
+     "header": "J2 pin 15",
+     "block": "gpiob",
+     "signal": "BTN_B"
+    },
+    "PB3": {
+     "header": "J4 pin 40",
+     "block": "gpiob",
+     "signal": "BTN_A"
+    },
+    "PB7": {
+     "header": "J2 pin 14",
+     "block": "timg8",
+     "signal": "BUZZ"
+    },
+    "PA10": {
+     "header": "J4 pin 34",
+     "block": "uart0",
+     "source": "portability/hobby/led-sequences/PINS.md"
+    }
+   },
+   "wiring": "Red is LED2 red on the board, J3 pin 27 (PB26); green is LED2 green, J3 pin 28 (PB27). Yellow LED through 330 Ω to J3 pin 29 (PB10), cathode to GND. Second button from J2 pin 15 (PB8) to GND. Passive buzzer to J2 pin 14 (PB7). S2 is on the board, J4 pin 40 (PB3).",
+   "jobs": [
+    {
+     "name": "Buttons",
+     "chains": [
+      [
+       "part:s2",
+       "pin:PB3",
+       "gpiob",
+       "cpu"
+      ],
+      [
+       "part:btnb",
+       "pin:PB8",
+       "gpiob"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpiob",
+       "step": "Notices your presses",
+       "by": "GPIOB PB3, PB8, pull-ups"
+      }
+     ]
+    },
+    {
+     "name": "Lights",
+     "chains": [
+      [
+       "cpu",
+       "gpiob",
+       "pin:PB26",
+       "part:red"
+      ],
+      [
+       "gpiob",
+       "pin:PB10",
+       "part:yel"
+      ],
+      [
+       "gpiob",
+       "pin:PB27",
+       "part:grn"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpiob",
+       "step": "Switches the lamps in turn",
+       "by": "GPIOB PB26, PB10, PB27"
+      }
+     ]
+    },
+    {
+     "name": "Tune",
+     "chains": [
+      [
+       "cpu",
+       "timg8",
+       "pin:PB7",
+       "part:buzz"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "timg8",
+       "step": "Plays the notes",
+       "by": "TIMG8 CC1, PB7 J2 pin 14"
+      }
+     ]
+    },
+    {
+     "name": "Console",
+     "chains": [
+      [
+       "cpu",
+       "uart0",
+       "pin:PA10",
+       "part:usb"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "uart0",
+       "step": "Prints your reaction time",
+       "by": "UART0 TX, 115200"
+      },
+      {
+       "block": "pin:PA10",
+       "step": "Sends it to your computer",
+       "by": "PA10, J4 pin 34, through the probe"
+      }
+     ]
+    },
+    {
+     "name": "Time",
+     "chains": [
+      [
+       "systick",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "systick",
+       "step": "Times each step and press",
+       "by": "SysTick, the CPU's own counter"
+      }
+     ]
+    }
+   ],
+   "tags": {
+    "gpiob": "5 pins",
+    "timg8": "CC1 tone",
+    "uart0": "TX 115200",
+    "systick": "timebase"
+   }
+  },
+  "hobby-parking-sensor": {
+   "title": "Parking sensor",
+   "card_title": "Parking sensor",
+   "card_line": "A buzzer beeps faster as you get close.",
+   "status": "Builds here; not run on a board",
+   "folder": "parking-sensor",
+   "flash": 3224,
+   "ram": 268,
+   "parts": {
+    "sensor": {
+     "name": "Ultrasonic",
+     "note": "RCWL-1601 at 3.3 V"
+    },
+    "buzzer": {
+     "name": "Buzzer",
+     "note": "passive"
+    },
+    "usb": {
+     "name": "USB",
+     "note": "serial through the probe"
+    }
+   },
+   "pins": {
+    "PB5": {
+     "header": "J4 pin 35",
+     "block": "gpiob",
+     "signal": "TRIG"
+    },
+    "PB4": {
+     "header": "J4 pin 36",
+     "block": "gpiob",
+     "signal": "ECHO"
+    },
+    "PB7": {
+     "header": "J2 pin 14",
+     "block": "timg8",
+     "signal": "BUZZ"
+    },
+    "PA10": {
+     "header": "J4 pin 34",
+     "block": "uart0",
+     "source": "portability/hobby/parking-sensor/PINS.md"
+    }
+   },
+   "wiring": "Sensor TRIG to J4 pin 35 (PB5), ECHO to J4 pin 36 (PB4), VCC to J1 pin 1 (3V3), GND to J2 pin 20 (GND). Buzzer to J2 pin 14 (PB7), its other leg to GND.",
+   "jobs": [
+    {
+     "name": "Ping",
+     "chains": [
+      [
+       "cpu",
+       "gpiob",
+       "pin:PB5",
+       "part:sensor"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpiob",
+       "step": "Sends a ping ten times a second",
+       "by": "GPIOB PB5, a 12 us pulse"
+      }
+     ]
+    },
+    {
+     "name": "Echo",
+     "chains": [
+      [
+       "part:sensor",
+       "pin:PB4",
+       "gpiob",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpiob",
+       "step": "Waits for the echo",
+       "by": "GPIOB PB4, high until it returns"
+      }
+     ]
+    },
+    {
+     "name": "Stopwatch",
+     "chains": [
+      [
+       "systick",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "systick",
+       "step": "Times it: cm = echo us / 58",
+       "by": "SysTick, microseconds"
+      }
+     ]
+    },
+    {
+     "name": "Beeper",
+     "chains": [
+      [
+       "cpu",
+       "timg8",
+       "pin:PB7",
+       "part:buzzer"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "timg8",
+       "step": "Beeps faster as you near",
+       "by": "TIMG8 CC1, 2 kHz, PB7 J2 pin 14"
+      }
+     ]
+    },
+    {
+     "name": "Console",
+     "chains": [
+      [
+       "cpu",
+       "uart0",
+       "pin:PA10",
+       "part:usb"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "uart0",
+       "step": "Prints the distance",
+       "by": "UART0 TX, 115200"
+      },
+      {
+       "block": "pin:PA10",
+       "step": "Sends it to your computer",
+       "by": "PA10, J4 pin 34, through the probe"
+      }
+     ]
+    }
+   ],
+   "tags": {
+    "gpiob": "PB5 PB4",
+    "timg8": "CC1 2 kHz",
+    "uart0": "TX 115200",
+    "systick": "echo / 58"
+   }
+  },
+  "hobby-weather-station": {
+   "title": "Room weather station",
+   "card_title": "Weather station",
+   "card_line": "Temperature and humidity on a small screen.",
+   "status": "Builds here; not run on a board",
+   "folder": "weather-station",
+   "flash": 8152,
+   "ram": 545,
+   "parts": {
+    "dht": {
+     "name": "DHT11",
+     "note": "temperature, humidity"
+    },
+    "oled": {
+     "name": "OLED",
+     "note": "128x64, I2C 0x3C"
+    },
+    "usb": {
+     "name": "USB",
+     "note": "serial through the probe"
+    }
+   },
+   "pins": {
+    "PB31": {
+     "header": "J1 pin 7",
+     "block": "gpiob",
+     "signal": "DHT"
+    },
+    "PC2": {
+     "header": "J1 pin 9",
+     "block": "gpioc",
+     "signal": "SCL"
+    },
+    "PC3": {
+     "header": "J1 pin 10",
+     "block": "gpioc",
+     "signal": "SDA"
+    },
+    "PA10": {
+     "header": "J4 pin 34",
+     "block": "uart0",
+     "source": "portability/hobby/weather-station/PINS.md"
+    }
+   },
+   "wiring": "DHT11 DATA to J1 pin 7 (PB31). OLED SCL to J1 pin 9 (PC2), SDA to J1 pin 10 (PC3). Both to 3V3 and GND. A bare DHT11 needs 4.7 to 10 kΩ from DATA to 3V3; the 3-pin module has it.",
+   "jobs": [
+    {
+     "name": "Read sensor",
+     "chains": [
+      [
+       "cpu",
+       "gpiob",
+       "pin:PB31",
+       "part:dht"
+      ],
+      [
+       "part:dht",
+       "pin:PB31",
+       "gpiob",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpiob",
+       "step": "Asks the DHT11, reads 40 bits",
+       "by": "GPIOB PB31, one wire, every 2 s"
+      }
+     ]
+    },
+    {
+     "name": "Screen",
+     "chains": [
+      [
+       "cpu",
+       "gpioc",
+       "pin:PC2",
+       "part:oled"
+      ],
+      [
+       "gpioc",
+       "pin:PC3",
+       "part:oled"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpioc",
+       "step": "Draws it on the OLED",
+       "by": "GPIOC PC2, PC3 as I2C by hand"
+      }
+     ]
+    },
+    {
+     "name": "Time",
+     "chains": [
+      [
+       "systick",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "systick",
+       "step": "Times the sensor pulses and the I2C clock",
+       "by": "SysTick, the CPU's own counter"
+      }
+     ]
+    },
+    {
+     "name": "Console",
+     "chains": [
+      [
+       "cpu",
+       "uart0",
+       "pin:PA10",
+       "part:usb"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "uart0",
+       "step": "Prints temperature and humidity",
+       "by": "UART0 TX, 115200"
+      },
+      {
+       "block": "pin:PA10",
+       "step": "Sends it to your computer",
+       "by": "PA10, J4 pin 34, through the probe"
+      }
+     ]
+    }
+   ],
+   "tags": {
+    "gpiob": "PB31",
+    "gpioc": "PC2 PC3",
+    "uart0": "TX 115200",
+    "systick": "timebase"
+   },
+   "near": {
+    "i2c": "Its pins PC2 and PC3 are used as plain GPIO here: this build does the I2C itself to stay small."
+   }
+  },
+  "hobby-servo-pantilt": {
+   "title": "Servo on a knob, then pan and tilt",
+   "card_title": "Servo on a knob",
+   "card_line": "A knob turns the servo; two make pan and tilt.",
+   "status": "Builds here; not run on a board",
+   "folder": "servo-pantilt",
+   "flash": 3080,
+   "ram": 456,
+   "parts": {
+    "pot1": {
+     "name": "Knob 1",
+     "note": "10 kΩ pot"
+    },
+    "pot2": {
+     "name": "Knob 2",
+     "note": "10 kΩ pot"
+    },
+    "servo1": {
+     "name": "Servo 1",
+     "note": "SG90, 5 V"
+    },
+    "servo2": {
+     "name": "Servo 2",
+     "note": "SG90, 5 V"
+    },
+    "usb": {
+     "name": "USB",
+     "note": "serial through the probe"
+    }
+   },
+   "pins": {
+    "PA14": {
+     "header": "J1 pin 2",
+     "block": "adc0",
+     "signal": "POT1"
+    },
+    "PA25": {
+     "header": "J1 pin 6",
+     "block": "adc0",
+     "signal": "POT2"
+    },
+    "PB3": {
+     "header": "J4 pin 40",
+     "block": "tima0",
+     "signal": "SERVO1"
+    },
+    "PB9": {
+     "header": "J4 pin 39",
+     "block": "tima0",
+     "signal": "SERVO2"
+    },
+    "PA10": {
+     "header": "J4 pin 34",
+     "block": "uart0",
+     "source": "portability/hobby/servo-pantilt/PINS.md"
+    }
+   },
+   "wiring": "Pots to J1 pin 2 (PA14) and J1 pin 6 (PA25), their ends to J1 pin 1 (3V3) and J2 pin 20 (GND). Servo signals to J4 pin 40 (PB3) and J4 pin 39 (PB9); servo power from J3 pin 21 (5V), grounds joined to J3 pin 22 (GND). Wire servo 1 first; the program drives both.",
+   "jobs": [
+    {
+     "name": "Knobs",
+     "chains": [
+      [
+       "part:pot1",
+       "pin:PA14",
+       "adc0",
+       "cpu"
+      ],
+      [
+       "part:pot2",
+       "pin:PA25",
+       "adc0"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "adc0",
+       "step": "Reads both knobs in turn",
+       "by": "ADC0 ch 12 (PA14), ch 2 (PA25)"
+      }
+     ]
+    },
+    {
+     "name": "Servos",
+     "chains": [
+      [
+       "cpu",
+       "tima0",
+       "pin:PB3",
+       "part:servo1"
+      ],
+      [
+       "tima0",
+       "pin:PB9",
+       "part:servo2"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "tima0",
+       "step": "Turns each into a pulse, 1 to 2 ms",
+       "by": "TIMA0 CC0, CC1, 50 Hz"
+      },
+      {
+       "block": "pin:PB3",
+       "step": "Moves servo 1",
+       "by": "PB3, J4 pin 40"
+      },
+      {
+       "block": "pin:PB9",
+       "step": "Moves servo 2",
+       "by": "PB9, J4 pin 39"
+      }
+     ]
+    },
+    {
+     "name": "Console",
+     "chains": [
+      [
+       "cpu",
+       "uart0",
+       "pin:PA10",
+       "part:usb"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "uart0",
+       "step": "Prints the two pulse widths",
+       "by": "UART0 TX, 115200"
+      },
+      {
+       "block": "pin:PA10",
+       "step": "Sends it to your computer",
+       "by": "PA10, J4 pin 34, through the probe"
+      }
+     ]
+    }
+   ],
+   "tags": {
+    "adc0": "ch 12, 2",
+    "tima0": "CC0 CC1 50 Hz",
+    "uart0": "TX 115200"
+   }
+  },
+  "hobby-pir-alarm": {
+   "title": "Motion alarm with a counter",
+   "card_title": "Motion alarm",
+   "card_line": "Counts each movement and sounds a buzzer.",
+   "status": "Builds here; not run on a board",
+   "folder": "pir-alarm",
+   "flash": 3496,
+   "ram": 268,
+   "parts": {
+    "pir": {
+     "name": "PIR",
+     "note": "HC-SR501, 5 V"
+    },
+    "tm": {
+     "name": "Display",
+     "note": "TM1637, 4 digits"
+    },
+    "buzzer": {
+     "name": "Buzzer",
+     "note": "passive"
+    },
+    "usb": {
+     "name": "USB",
+     "note": "serial through the probe"
+    }
+   },
+   "pins": {
+    "PB11": {
+     "header": "J2 pin 12",
+     "block": "gpiob",
+     "signal": "PIR"
+    },
+    "PB3": {
+     "header": "J4 pin 40",
+     "block": "gpiob",
+     "signal": "TM_CLK"
+    },
+    "PB9": {
+     "header": "J4 pin 39",
+     "block": "gpiob",
+     "signal": "TM_DIO"
+    },
+    "PB7": {
+     "header": "J2 pin 14",
+     "block": "timg8",
+     "signal": "BUZZ"
+    },
+    "PA10": {
+     "header": "J4 pin 34",
+     "block": "uart0",
+     "source": "portability/hobby/pir-alarm/PINS.md"
+    }
+   },
+   "wiring": "PIR OUT to J2 pin 12 (PB11), PIR power from J3 pin 21 (5V). Display CLK to J4 pin 40 (PB3), DIO to J4 pin 39 (PB9), VCC to J1 pin 1 (3V3). Buzzer to J2 pin 14 (PB7). Grounds to J2 pin 20 (GND). The display shows dashes for the first 30 s while the PIR warms up.",
+   "jobs": [
+    {
+     "name": "Motion",
+     "chains": [
+      [
+       "part:pir",
+       "pin:PB11",
+       "gpiob",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpiob",
+       "step": "Sees the PIR go high",
+       "by": "GPIOB PB11, J2 pin 12"
+      }
+     ]
+    },
+    {
+     "name": "Counter",
+     "chains": [
+      [
+       "cpu",
+       "gpiob",
+       "pin:PB3",
+       "part:tm"
+      ],
+      [
+       "gpiob",
+       "pin:PB9",
+       "part:tm"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "gpiob",
+       "step": "Shows the count",
+       "by": "GPIOB PB3, PB9, two wires by hand"
+      }
+     ]
+    },
+    {
+     "name": "Alarm",
+     "chains": [
+      [
+       "cpu",
+       "timg8",
+       "pin:PB7",
+       "part:buzzer"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "timg8",
+       "step": "Sounds the alarm",
+       "by": "TIMG8 CC1, PB7 J2 pin 14"
+      }
+     ]
+    },
+    {
+     "name": "Console",
+     "chains": [
+      [
+       "cpu",
+       "uart0",
+       "pin:PA10",
+       "part:usb"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "uart0",
+       "step": "Prints each movement",
+       "by": "UART0 TX, 115200"
+      },
+      {
+       "block": "pin:PA10",
+       "step": "Sends it to your computer",
+       "by": "PA10, J4 pin 34, through the probe"
+      }
+     ]
+    }
+   ],
+   "tags": {
+    "gpiob": "PB11 PB3 PB9",
+    "timg8": "CC1 tone",
+    "uart0": "TX 115200"
+   }
+  }
+ }
+}

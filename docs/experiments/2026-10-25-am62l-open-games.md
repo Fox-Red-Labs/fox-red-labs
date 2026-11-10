@@ -6,6 +6,7 @@ status: line found
 reached: run
 line: With no GPU, a 3D game on the AM62L draws in Mesa llvmpipe on two A53 cores: SuperTuxKart 1.5 (arm64 build) averages 4.5 fps at 640x480 and 2.4 fps at 1280x720, and its x86_64 build under Box64 0.3.4 crashes in OpenGL setup. Steam's download path works anonymously and natively: 2.1 GB of a dedicated server in 371 s.
 stop: x86_64 SuperTuxKart crashes under Box64 0.3.4; a Box64 git build (for it and for steamcmd) was started and stopped unfinished
+page: none
 -->
 # Do open 3D games run on the AM62L, and does Steam's download path work without an account?
 
@@ -36,6 +37,6 @@ Box64 git (420eda6, 2026-10-23) wraps `__sched_cpualloc`; its build on the board
 
 **What it does not show.** Any frame rate on the HDMI screen (the Doom demo owned it; all runs drew to Xvfb), sound, input latency, a Steam game (needs an account), OpenArena or Quake (no timedemo data shipped with the Debian packages), RetroArch cores, three runs per row (one each), and the cause of the Box64 crash (desktop GL path; the arm64 build uses GLES).
 
-**Verdict for games.** A 3D game is a slide show at 2 to 5 fps on this chip, natively; x86 translation would cut that further. 2D and software-rendered games are the class that fits: Doom written straight to the framebuffer runs at 186 to 193 fps, and through X at 10 to 27 fps.
+**The line.** A 3D game is a slide show at 2 to 5 fps on this chip, natively; x86 translation would cut that further. 2D and software-rendered games are the class that fits: Doom written straight to the framebuffer runs at 186 to 193 fps, and through X at 10 to 27 fps.
 
 **If you try it.** If SuperTuxKart's x86_64 build segfaults under Box64 0.3.4 after the GL feature list, run the arm64 build instead (the release ships one). If dsda-doom says `Unable to find required file "demo1"`, extract the DEMO1 lump to a `.lmp` file and pass its path. If steamcmd under Box64 stops on `__sched_cpualloc`, use DepotDownloader's arm64 build for anonymous downloads, or a Box64 built after 2026-09-13.

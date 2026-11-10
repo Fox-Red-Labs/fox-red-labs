@@ -2,7 +2,7 @@
 id: E193
 board: LP-EM-CC35X1
 date: 2026-10-13
-status: in progress
+status: waiting
 reached: run
 line: ESPHome builds, flashes and runs on the LP-EM-CC35X1 through an external platform `cc35xx`. `esphome compile` takes 56 s cold and 23 s warm, and `esphome upload` takes 60 s with a full erase. The board joins Wi-Fi 5.3 s after a reset and serves ESPHome's native API. A client on the board got 3 entities and 20 of 20 switch commands at a median of 120 ms. Home Assistant adoption is not run: the test network isolates its clients.
 stop: network

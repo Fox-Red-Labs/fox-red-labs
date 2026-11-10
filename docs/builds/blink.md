@@ -1,6 +1,6 @@
-# Blink an LED, then change the pattern in plain English
+# Blink an LED, then change the pattern
 
-Plug in a LaunchPad, build TI's blink example, flash it and watch the LED. Then change the pattern: ask for it in plain English, or edit one number in a terminal.
+Plug in a LaunchPad, build TI's blink example, flash it and watch the LED. Then change the pattern by editing one number.
 
 The page: [site/project-blink.html](../../site/project-blink.html). This file is its text. Terms: [vocabulary](../vocab.md).
 
@@ -90,7 +90,7 @@ The board's RGB LED blinks after a flash that takes about a second, and the one-
 
 - That an AI assistant can drive this route: no AI step was timed on this board for this route.
 - A person's first-hour time: the 13 to 14 s is a scripted run with the tools already installed.
-- The helper scripts hard-code the Mac paths in step 1.
+- The helper scripts look for the tools in the TI install folders; another place is named with the FRL_ variables the start page lists. Checked on one Mac.
 - Checked on an Intel Mac on macOS 15.7 only.
 - Nothing here ran through CCStudio on this board.
 
@@ -192,7 +192,7 @@ The board's red LED blinks the shipped pattern after a flash that takes under a 
 - That an AI assistant can drive this route: no AI step was timed on either board.
 - A person's first-hour time: the C1104 number is a scripted run's, with tools installed and hands-on time zero.
 - That the C1104's change was seen by a person; it was read from the pin.
-- The helper scripts hard-code the Mac paths in step 1.
+- The helper scripts look for the tools in the TI install folders; another place is named with the FRL_ variables the start page lists. Checked on one Mac.
 - Nothing here ran through CCStudio on these two boards.
 
 ### Numbers and sources
@@ -342,3 +342,577 @@ The RGB LED blinks about five times a second within about 3 minutes of plugging 
 | Time, first-time setup | about 29 min on 2026-10-04 (11 of your time, 18 waiting); the Mac already had git, Claude Code and Node and was logged in to Claude and myTI, so this is not a clean-machine number |  |
 | Software | CCStudio 21.0.1 (/Applications/ti/ccs2101), MSPM0 SDK 2.11.00.07, Intel MacBook, macOS 15.7.9 |  |
 | Disk | CCStudio and the SDK take 10.3 GB once installed (CCStudio 1.9 GB download, SDK 0.4 GB download becoming 2.2 GB) |  |
+
+## From a terminal, no AI step, on the LP-MSPM0G3519, LP-MSPM0C1104, LP-MSPM0L2228 and LP-MSPM0G3507
+
+One command backs the board up, copies TI's blink example, builds it, flashes it and checks the LED.
+
+Status: Works. Boards: g3519, c1104, l2228, g3507.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `mspm0g3519/AGENTS.md`):
+
+```bash
+git sparse-checkout add mspm0g3519 mspm0c1104 tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-MSPM0G3519 LaunchPad development kit | 1 | the board (LP-MSPM0G3519) |
+| LP-MSPM0C1104 LaunchPad development kit | 1 | the board (LP-MSPM0C1104) |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [MSPM0 SDK 2.11.00.07](https://www.ti.com/tool/download/MSPM0-SDK), [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.26.3](https://www.ti.com/tool/download/SYSCONFIG), [xPack OpenOCD 0.12.0-7](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.12.0-7). The tools come to about 0.9 GB to download and 5 GB on disk; only the MSPM0 SDK asks for a myTI login. No CCStudio window is needed. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board <board id>` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Plug the board into the Mac with a data cable. The board shows up as an XDS110 probe with two serial ports; there is no driver to install. Read your probe's serial number with `ls /dev/cu.usbmodem*` (the text after `usbmodem`, minus the last digit), or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e` from CCStudio.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the line for your board with your probe's serial number. It backs the board up, copies TI's example (examples/nortos/<board>/driverlib/gpio_toggle_output), builds it, flashes it and checks the LED. Leave off `--probe` only if one probe is plugged in; with several, it stops with FRL-E002.
+
+   ```text
+   ./start.sh mspm0g3519 blink --probe <serial>
+   ./start.sh mspm0c1104 blink --probe <serial>
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and the LED on the board blinks. LED checked: LP-MSPM0G3519: LED2 red (PB26); LP-MSPM0C1104: LED1 red (PA22).
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. On the LP-MSPM0C1104, jumper J7 must be on or the red LED stays dark, and the route never mass-erases that chip.
+
+4. **Terminal.** Ask for a different pattern: run the same command with `--pattern` and four or more times in milliseconds (on, off, on, pause).
+
+   ```text
+   ./start.sh mspm0g3519 blink --probe <serial> --pattern 150,150,150,900
+   ./start.sh mspm0c1104 blink --probe <serial> --pattern 150,150,150,900
+   ```
+
+   You should see: The run ends with `OK:` and says the LED repeats the pattern you asked for.
+
+   If the check fails, read the line it prints; the check decides the result, not the LED you see.
+
+### Expected result
+
+The board's LED blinks after the flash, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's blink example builds and flashes on the LP-MSPM0G3519 and LP-MSPM0C1104 from one command, with no AI step.
+- The run checks the LED through the debugger and passes the pattern you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The helper scripts look for the tools in the TI install folders; another place is named with the `FRL_` variables. Checked on one Mac.
+- Checked on an Intel Mac on macOS 15.7 only.
+- The route lists SysConfig 1.26.3 as validated. The recorded runs used SysConfig 1.28.0, named with `FRL_SYSCONFIG`, so treat 1.26.3 as the documented version and 1.28.0 as the one that ran.
+- The LP-MSPM0C1104 whole run was not timed as one command; its build, write and check are timed separately.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| LP-MSPM0G3519 | 9.5 s from the command to a checked pattern on two warm runs, 30.0 s on the first run; build 10.0 s and write 0.9 s in the 2026-10-24 run | `mspm0g3519/FAQ.md` |
+| LP-MSPM0C1104 | build 8.9 s, write and read-back 1.0 s, then 0.6 s on three repeat writes, LED check passed each time | `docs/frl.md` |
+
+## From a terminal, no AI step, on the LP-MSPM0G5187
+
+One command backs the board up, copies TI's blink example, builds it, flashes it and checks the LED.
+
+Status: Works. Boards: g5187.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `mspm0g5187/AGENTS.md`):
+
+```bash
+git sparse-checkout add mspm0g5187 tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-MSPM0G5187 LaunchPad development kit | 1 | the board (LP-MSPM0G5187) |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [MSPM0 SDK 2.11.00.07](https://www.ti.com/tool/download/MSPM0-SDK), [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.28.0](https://www.ti.com/tool/download/SYSCONFIG), [xPack OpenOCD 0.12.0-7](https://github.com/xpack-dev-tools/openocd-xpack/releases/tag/v0.12.0-7). The tools come to about 0.9 GB to download and 5 GB on disk; only the MSPM0 SDK asks for a myTI login. No CCStudio window is needed. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board <board id>` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Plug the board into the Mac with a data cable. The board shows up as an XDS110 probe with two serial ports; there is no driver to install. Read your probe's serial number with `ls /dev/cu.usbmodem*` (the text after `usbmodem`, minus the last digit), or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e` from CCStudio.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the command with your probe's serial number. It backs the board up, copies TI's example (examples/nortos/LP_MSPM0G5187/driverlib/gpio_toggle_output), builds it, flashes it and checks the LED. Leave off `--probe` only if one probe is plugged in; with several, it stops with FRL-E002.
+
+   ```text
+   ./start.sh mspm0g5187 blink --probe <serial>
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and the LED on the board blinks. LED checked: LP-MSPM0G5187: LED2 red (PA17).
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. On the LP-MSPM0G5187, jumper J12 [2:1] must be on for LED2 red.
+
+4. **Terminal.** Ask for a different pattern: run the same command with `--pattern` and four or more times in milliseconds (on, off, on, pause).
+
+   ```text
+   ./start.sh mspm0g5187 blink --probe <serial> --pattern 150,150,150,900
+   ```
+
+   You should see: The run ends with `OK:` and says LED2 red (PA17) repeats the pattern you asked for.
+
+   If the check fails, read the line it prints; the check decides the result, not the LED you see.
+
+### Expected result
+
+The board's LED blinks after the flash, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's blink example builds and flashes on the LP-MSPM0G5187 from one command, with no AI step.
+- The run checks the LED through the debugger and passes the pattern you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The helper scripts look for the tools in the TI install folders; another place is named with the `FRL_` variables. Checked on one Mac.
+- Checked on an Intel Mac on macOS 15.7 only.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| LP-MSPM0G5187 | 10.1 s median of three runs (9.4, 10.1, 10.5 s) from the command to a checked pattern; build 5.3 s and write 0.8 s in the 2026-10-24 run | `mspm0g5187/FAQ.md` |
+
+## From a terminal, no AI step, on the LP-MSPM33C321A
+
+One command backs the board up, copies TI's blink example, builds it, flashes it and checks the LED.
+
+Status: Works. Boards: mspm33c321a.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `mspm33c321a/AGENTS.md`):
+
+```bash
+git sparse-checkout add mspm33c321a tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-MSPM33C321A LaunchPad development kit | 1 | the board (LP-MSPM33C321A) |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [MSPM33 SDK 1.04.00.00](https://www.ti.com/tool/download/MSPM33-SDK), [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.28.0](https://www.ti.com/tool/download/SYSCONFIG), [TI OpenOCD (CCSTUDIO-OPENOCD) 1.5.0](https://www.ti.com/tool/download/CCSTUDIO-OPENOCD/1.5.0). The tool sizes for this family were not all recorded; the doctor command lists what is missing. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board <board id>` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Plug the board into the Mac with a data cable. The board shows up as an XDS110 probe with two serial ports; there is no driver to install. Read your probe's serial number with `ls /dev/cu.usbmodem*` (the text after `usbmodem`, minus the last digit), or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e` from CCStudio.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the command with your probe's serial number. It backs the board up, copies TI's example (examples/nortos/LP_MSPM33C321A/driverlib/gpio_toggle_output), builds it, flashes it and checks the LED. Leave off `--probe` only if one probe is plugged in; with several, it stops with FRL-E002.
+
+   ```text
+   ./start.sh mspm33c321a blink --probe <serial>
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and the LED on the board blinks. LED checked: LP-MSPM33C321A: LED2 red (PC26).
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. xPack OpenOCD 0.12.0-7 has no MSPM33 flash driver; the route needs TI's OpenOCD, unpacked to `~/ti/ti-openocd` or named with `FRL_TI_OPENOCD`.
+
+4. **Terminal.** Ask for a different pattern: run the same command with `--pattern` and four or more times in milliseconds (on, off, on, pause).
+
+   ```text
+   ./start.sh mspm33c321a blink --probe <serial> --pattern 150,150,150,900
+   ```
+
+   You should see: The run ends with `OK:` and says LED2 red (PC26) repeats the pattern you asked for.
+
+   If the check fails, read the line it prints; the check decides the result, not the LED you see.
+
+### Expected result
+
+The board's LED blinks after the flash, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's blink example builds and flashes on the LP-MSPM33C321A from one command, with no AI step.
+- The run checks the LED through the debugger and passes the pattern you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The helper scripts look for the tools in the TI install folders; another place is named with the `FRL_` variables. Checked on one Mac.
+- Checked on an Intel Mac on macOS 15.7 only.
+- The recorded runs used a build of TI's OpenOCD `ti-release` branch at commit cb22a31e.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| LP-MSPM33C321A | 26 s for backup, build, flash and LED check in one command; build 5.0 s and write 0.5 s in the 2026-10-24 run | `docs/frl.md` |
+
+## From a terminal, no AI step, on the LP-AM13E230
+
+One command backs the board up, copies TI's blink example, builds it, flashes it and checks the LED.
+
+Status: Works. Boards: am13e230.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `am13e230/AGENTS.md`):
+
+```bash
+git sparse-checkout add am13e230 tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-AM13E230 LaunchPad development kit | 1 | the board (LP-AM13E230) |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [AM13E2x SDK 26.01.00.03](https://www.ti.com/tool/download/AM13E2X-SDK), [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.28.0](https://www.ti.com/tool/download/SYSCONFIG), [TI OpenOCD (CCSTUDIO-OPENOCD) 1.5.0](https://www.ti.com/tool/download/CCSTUDIO-OPENOCD/1.5.0). The tool sizes for this family were not all recorded; the doctor command lists what is missing. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board <board id>` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Plug the board into the Mac with a data cable. The board shows up as an XDS110 probe with two serial ports; there is no driver to install. Read your probe's serial number with `ls /dev/cu.usbmodem*` (the text after `usbmodem`, minus the last digit), or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e` from CCStudio.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the command with your probe's serial number. It backs the board up, copies TI's example (examples/driverlib/gpio/gpio_toggle_output), builds it, flashes it and checks the LED. Leave off `--probe` only if one probe is plugged in; with several, it stops with FRL-E002.
+
+   ```text
+   ./start.sh am13e230 blink --probe <serial>
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and the LED on the board blinks. LED checked: LP-AM13E230: LED4 red (PA5).
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. The route needs TI's OpenOCD, unpacked to `~/ti/ti-openocd` or named with `FRL_TI_OPENOCD`.
+
+4. **Terminal.** Ask for a different pattern: run the same command with `--pattern` and four or more times in milliseconds (on, off, on, pause).
+
+   ```text
+   ./start.sh am13e230 blink --probe <serial> --pattern 150,150,150,900
+   ```
+
+   You should see: The run ends with `OK:` and says LED4 red (PA5) repeats the pattern you asked for.
+
+   If the check fails, read the line it prints; the check decides the result, not the LED you see.
+
+### Expected result
+
+The board's LED blinks after the flash, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's blink example builds and flashes on the LP-AM13E230 from one command, with no AI step.
+- The run checks the LED through the debugger and passes the pattern you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The helper scripts look for the tools in the TI install folders; another place is named with the `FRL_` variables. Checked on one Mac.
+- Checked on an Intel Mac on macOS 15.7 only.
+- The board used was prototype silicon (DEVICEID 0x0000002F); the route also accepts the production ID from the datasheet, which has not been seen on a board.
+- The SDK ships this example without a makefile; the route builds it with SysConfig, TI Arm Clang and the SDK's libraries.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| LP-AM13E230 | 26 s for backup, build, flash and LED check in one command; build 5.9 s and write 1.3 s in the 2026-10-24 run | `docs/frl.md` |
+
+## From a terminal, no AI step, on the LAUNCHXL-F2800137
+
+One command backs the board up, copies TI's blink example, builds it, flashes it and checks the LED.
+
+Status: Works. Boards: f2800137.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `c2000-launchpad/AGENTS.md`):
+
+```bash
+git sparse-checkout add c2000-launchpad tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LAUNCHXL-F2800137 LaunchPad development kit | 1 | the board (LAUNCHXL-F2800137) |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [C2000Ware 26.02.00.00](https://www.ti.com/tool/download/C2000WARE), TI C2000 compiler 25.11.1.LTS, [SysConfig 1.28.1](https://www.ti.com/tool/download/SYSCONFIG), [CCStudio 21.0.1](https://www.ti.com/tool/download/CCSTUDIO). OpenOCD has no C28x support, so this route needs CCStudio installed for its scripting; the doctor command lists what is missing. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board <board id>` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Plug the board into the Mac with a USB data cable. Its onboard XDS110 probe shows up with serial ports; there is no driver to install. Read the probe's serial number with `ls /dev/cu.usbmodem*` or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e`.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable; a charge-only cable looks the same.
+
+3. **Terminal.** From the root of this repository, run the command with your probe's serial number. It backs the board up, copies TI's example (driverlib/f280013x/examples/led (led_ex1_blinky)), builds it, flashes it and checks the LED. Leave off `--probe` only if one probe is plugged in; with several, it stops with FRL-E002.
+
+   ```text
+   ./start.sh f2800137 blink --probe <serial>
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and the LED on the board blinks. LED checked: LAUNCHXL-F2800137: LED4 red (GPIO20, active low).
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. If it stops with FRL-E042, CCStudio read the pin too rarely because other boards were writing at the same time; check one board at a time.
+
+4. **Terminal.** Ask for a different pattern: run the same command with `--pattern` and four or more times in milliseconds (on, off, on, pause).
+
+   ```text
+   ./start.sh f2800137 blink --probe <serial> --pattern 150,150,150,900
+   ```
+
+   You should see: The run ends with `OK:` and says LED4 red (GPIO20, active low) repeats the pattern you asked for, within two sample periods (48 ms).
+
+   If the check fails, read the line it prints; the check decides the result, not the LED you see.
+
+### Expected result
+
+The board's LED blinks after the flash, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's blink example builds and flashes on the LAUNCHXL-F2800137 from one command, with no AI step.
+- The run checks the LED through the debugger and passes the pattern you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The helper scripts look for the tools in the TI install folders; another place is named with the `FRL_` variables. Checked on one Mac.
+- Checked on an Intel Mac on macOS 15.7 only.
+- CCStudio reads the pin about 42 times a second while the CPU runs, so the pattern check allows two sample periods (48 ms).
+- The C2000 compiler's download size was not recorded.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| LAUNCHXL-F2800137 | 58 s and 61 s from the command to a checked pattern, backup and build included; build 4.2 s and write 9.4 s in the 2026-10-24 run | `docs/frl.md` |
+
+## From a terminal, no AI step, on the LP-EM-CC2340R5 and LP-EM-CC2755P10
+
+One command backs the board up, copies TI's blink example, builds it, flashes it and checks the LED.
+
+Status: Works. Boards: cc2340r5, cc2755p10.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `cc2340r5/AGENTS.md`):
+
+```bash
+git sparse-checkout add cc2340r5 cc2755p10 tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-EM-CC2340R5 LaunchPad development kit | 1 | the board (LP-EM-CC2340R5) |
+| LP-EM-CC2755P10 LaunchPad development kit | 1 | the board (LP-EM-CC2755P10) |
+| LP-XDS110ET debugger | 1 | debug probe |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [SimpleLink Low Power F3 SDK 9.21.00.36](https://www.ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK), [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.28.0](https://www.ti.com/tool/download/SYSCONFIG), [TI OpenOCD (CCSTUDIO-OPENOCD) 1.5.0](https://www.ti.com/tool/download/CCSTUDIO-OPENOCD/1.5.0), [DSLite (in CCStudio or UniFlash) 21.0.0.4166](https://www.ti.com/tool/download/UNIFLASH). The tool sizes for this family were not all recorded; the doctor command lists what is missing. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board <board id>` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Connect the LP-XDS110ET probe to the LP-EM board and plug the probe into the Mac with a USB data cable. The probe shows up as an XDS110 with serial ports; there is no driver to install. Read its serial number with `ls /dev/cu.usbmodem*` or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e`.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable and reseat the probe on the board's debug header; a half-seated probe cost one bench run 8 minutes.
+
+3. **Terminal.** From the root of this repository, run the line for your board with your probe's serial number. It backs the board up, copies TI's example (examples/nortos/<board>/drivers/empty), builds it, flashes it and checks the LED. Leave off `--probe` only if one probe is plugged in; with several, it stops with FRL-E002.
+
+   ```text
+   ./start.sh cc2340r5 blink --probe <serial>
+   ./start.sh cc2755p10 blink --probe <serial>
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and the LED on the board blinks. LED checked: LP-EM-CC2340R5: LED0 red (DIO14); LP-EM-CC2755P10: LED0 red (DIO16).
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. Every write erases the whole chip, CCFG included, because TI's tools have no smaller erase for these parts; frl says so before writing and the restore writes the backup back.
+
+4. **Terminal.** Ask for a different pattern: run the same command with `--pattern` and four or more times in milliseconds (on, off, on, pause).
+
+   ```text
+   ./start.sh cc2340r5 blink --probe <serial> --pattern 150,150,150,900
+   ./start.sh cc2755p10 blink --probe <serial> --pattern 150,150,150,900
+   ```
+
+   You should see: The run ends with `OK:` and says the LED pin (DIO14 on the CC2340R5, DIO16 on the CC2755P10) was seen on and off.
+
+   If the check fails, read the line it prints; the check decides the result, not the LED you see.
+
+### Expected result
+
+The board's LED blinks after the flash, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's blink example builds and flashes on the LP-EM-CC2340R5 and LP-EM-CC2755P10 from one command, with no AI step.
+- The run writes the image and the check reads the LED pin registers through the debugger.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The asked pattern's timing on these two boards.
+- The helper scripts look for the tools in the TI install folders; another place is named with the `FRL_` variables. Checked on one Mac.
+- Checked on an Intel Mac on macOS 15.7 only.
+- The check proves the LED pin is an output and was seen on and off. A DSLite read takes about 4 s, so it cannot time the blink; the pattern timing check is on the other boards' pages.
+- The recipe's own status for these two boards is partial: it asks for a pattern but checks only that the pin toggles.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| LP-EM-CC2340R5 | 10.2 s median of three DSLite writes (10.5, 10.2, 10.5 s); every write erases the whole chip, CCFG included, and the route says so before writing | `docs/frl.md` |
+| LP-EM-CC2755P10 | 67 s median of three runs (72, 67, 65 s): backup, SysConfig and make build, DSLite write, reset, pin check | `docs/frl.md` |
+
+## From a terminal, no AI step, on the LP-CC1354P10-1
+
+One command backs the board up, copies TI's blink example, builds it, flashes it and checks the LED.
+
+Status: Works. Boards: cc1354p10.
+
+Folders this version uses (in a sparse clone, fetch them first, then read `cc1354p10/AGENTS.md`):
+
+```bash
+git sparse-checkout add cc1354p10 tools/frl/examples/cc1354p10-blink tools/frl
+```
+
+### Parts
+
+| Part | Quantity | What it is for |
+|---|---|---|
+| LP-CC1354P10-1 LaunchPad development kit | 1 | the board (LP-CC1354P10-1) |
+| LP-XDS110 debug probe | 1 | debug probe |
+| USB data cable | 1 | power and programming |
+
+### Before you start
+
+- The code is in this repository. Clone it with `git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git` and fetch the folders listed for this version. This page calls the folder you clone it into `<repository folder>`; `start.sh` and `tools/frl` are in it. Checked on an Intel Mac on macOS 15.7 only.
+
+### Steps
+
+1. **Mac, terminal.** Install the tools once, all free: [SimpleLink CC13xx CC26xx SDK 8.33.00.16](https://www.ti.com/tool/download/SIMPLELINK-CC13XX-CC26XX-SDK), [TI Arm Clang 5.1.1.LTS](https://www.ti.com/tool/download/ARM-CGT-CLANG), [SysConfig 1.28.0](https://www.ti.com/tool/download/SYSCONFIG), [CCStudio 21.0.1](https://www.ti.com/tool/download/CCSTUDIO). The SDK from TI's GitHub has no examples folder, so the route builds the project in `tools/frl/examples/cc1354p10-blink`; set `FRL_F2_SDK` to the SDK folder. `python3 tools/frl/frl.py doctor --board <board id>` lists anything missing, with links. If your tools live elsewhere, `tools/frl/toolenv.py` reads the `FRL_` variables from the start page.
+
+   You should see: `python3 tools/frl/frl.py doctor --board <board id>` ends with every tool found.
+
+   If a tool is missing, the doctor command names it and prints its download link.
+
+2. **Bench.** Connect an external LP-XDS110 probe to the LaunchPad and plug the probe into the Mac with a USB data cable. Read its serial number with `ls /dev/cu.usbmodem*` or with `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/xdsdfu -e`.
+
+   You should see: The Mac lists the probe and two serial ports.
+
+   If nothing appears, try another cable and reseat the probe.
+
+3. **Terminal.** From the root of this repository, run the command with your probe's serial number. It backs the board up, copies TI's example (tools/frl/examples/cc1354p10-blink (the shape of TI's drivers/empty)), builds it, flashes it and checks the LED. Leave off `--probe` only if one probe is plugged in; with several, it stops with FRL-E002.
+
+   ```text
+   ./start.sh cc1354p10 blink --probe <serial>
+   ```
+
+   You should see: The run ends with a line that starts `OK:` and the LED on the board blinks. LED checked: LP-CC1354P10-1: red LED (DIO6).
+
+   If it stops with FRL-E002, several probes are plugged in: name yours with `--probe`. This chip can refuse a second debugger connect (error -242), which is why every step runs through CCStudio's Python script instead of DSLite.
+
+4. **Terminal.** Ask for a different pattern: run the same command with `--pattern` and four or more times in milliseconds (on, off, on, pause).
+
+   ```text
+   ./start.sh cc1354p10 blink --probe <serial> --pattern 150,150,150,900
+   ```
+
+   You should see: The run ends with `OK:` and says the red LED (DIO6) repeats the pattern you asked for, read from the program's own millisecond log.
+
+   If the check fails, read the line it prints; the check decides the result, not the LED you see.
+
+### Expected result
+
+The board's LED blinks after the flash, and the one-command run ends with an OK line.
+
+### What this shows
+
+- TI's blink example builds and flashes on the LP-CC1354P10-1 from one command, with no AI step.
+- The run checks the LED through the debugger and passes the pattern you asked for.
+
+### Limits
+
+- That an AI assistant can drive this route: no AI step was timed for it.
+- A person's first-hour time: the run times are scripted runs with the tools already installed.
+- The helper scripts look for the tools in the TI install folders; another place is named with the `FRL_` variables. Checked on one Mac.
+- Checked on an Intel Mac on macOS 15.7 only.
+- The recorded cycles used an external LP-XDS110 probe, not the board's own.
+
+### Numbers and sources
+
+| | Value | Source |
+|---|---|---|
+| LP-CC1354P10-1 | 188, 221 and 290 s with backup and restore; build 17 s, write 7.4 to 34.6 s | `docs/frl.md` |

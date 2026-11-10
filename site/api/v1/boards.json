@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-04",
+ "generated": "2026-11-10",
  "source": "data/boards.csv",
  "what_a_row_is": "one board or kit on hand: id, name, vendor, line, core, clock, flash, RAM, test classes, status",
  "row_fields": [
@@ -28,7 +28,7 @@
    "ram_kb": "32",
    "board_price_usd": "",
    "classes": "setup core analog control ai sweep agent power display hobby security",
-   "status": "borrowed"
+   "status": "bench"
   },
   {
    "board": "mspm0l1306",
@@ -327,6 +327,32 @@
    "ram_kb": "4194304",
    "board_price_usd": "",
    "classes": "setup core ai linux",
+   "status": "bench"
+  },
+  {
+   "board": "am243x",
+   "name": "LP-AM243",
+   "vendor": "TI",
+   "line": "AM243x",
+   "core": "4x Cortex-R5F + Cortex-M4F",
+   "clock_mhz": "800",
+   "flash_kb": "65536",
+   "ram_kb": "2048",
+   "board_price_usd": "",
+   "classes": "setup core comms control sweep agent power security",
+   "status": "bench"
+  },
+  {
+   "board": "mspm0l2228",
+   "name": "LP-MSPM0L2228",
+   "vendor": "TI",
+   "line": "MSPM0",
+   "core": "Cortex-M0+",
+   "clock_mhz": "32",
+   "flash_kb": "256",
+   "ram_kb": "32",
+   "board_price_usd": "",
+   "classes": "setup core analog control ai sweep agent power hobby security",
    "status": "bench"
   }
  ]

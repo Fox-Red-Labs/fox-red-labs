@@ -8,7 +8,7 @@
    "folders": [
     "mspm0g3507"
    ],
-   "checked": "2026-10-24",
+   "checked": "2026-11-09",
    "lockups": [
     {
      "how": "TI low-power examples (sysctl_power_policy_sleep_to_standby, timx_timer_mode_pwm_x_trig_stop_restore) cut the debug link",
@@ -29,9 +29,25 @@
      ],
      "date": null,
      "note": "xdsdfu -e lists the probe again"
+    },
+    {
+     "method": "uhubctl power cycle of the probe's hub port (6 s off) when the XDS110 stops enumerating after a firmware write",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "data/results/mspm0g3507.csv"
+     ],
+     "date": "2026-11-09",
+     "note": "the own unit's probe vanished from USB a minute after xdsdfu wrote 3.0.0.43; `uhubctl -l 1-1 -p 3 -a cycle -d 6` brought it back as MG350001"
     }
    ],
-   "restore": null,
+   "restore": {
+    "tool": "frl restore <backup folder> --probe MG350001 (OpenOCD program and verify, read back and compare)",
+    "regions": "main flash; NONMAIN read only",
+    "evidence": [
+     "data/results/mspm0g3507.csv"
+    ]
+   },
    "debug_pins": {
     "swdio": "PA19",
     "swclk": "PA20",
@@ -50,7 +66,7 @@
    "folders": [
     "mspm0l1306"
    ],
-   "checked": "2026-10-24",
+   "checked": "2026-11-08",
    "lockups": [
     {
      "how": "An image enters SHUTDOWN right after boot: DAP Connection Error, low power mode",
@@ -73,6 +89,20 @@
       "ports/msp430-to-mspm0/lpm3-wake/PORT.md"
      ],
      "date": "2026-10-21"
+    },
+    {
+     "how": "TI timx_timer_mode_periodic_standby enters STANDBY: every debugger read answers ack 4, and a reset pulse with a halt does not catch it",
+     "evidence": [
+      "docs/experiments/2026-11-06-mspm0l1306-live-chip-view.md"
+     ],
+     "date": "2026-11-06"
+    },
+    {
+     "how": "Found silent: OpenOCD could not attach (FRL-E006), frl identify saw no answer on SWD or JTAG (FRL-E010), an OpenOCD reset halt returned nothing; the same signature as the STANDBY lockup. Which image was on the board is not known (the last recorded run was the 2026-11-06 live chip view). Recovered the same day with the DSLite method below: the chip answered after the write; DSLite's own verify step fails with 'Memory map prevented reading 0x0000FFF8', so the proof is an OpenOCD read-back (backup.py save), which matched the written image",
+     "evidence": [
+      "mspm0l1306/FAQ.md"
+     ],
+     "date": "2026-11-08"
     }
    ],
    "methods": [
@@ -114,6 +144,16 @@
      "evidence": [],
      "date": "2026-10-21",
      "note": "the tick counter restarted; the hub location is not recorded"
+    },
+    {
+     "method": "DSLite flash from UniFlash 9.6.0 with a non-sleeping image and the board ccxml",
+     "kind": "remote",
+     "status": "proven",
+     "evidence": [
+      "docs/experiments/2026-11-06-mspm0l1306-live-chip-view.md"
+     ],
+     "date": "2026-11-08",
+     "note": "for the STANDBY lockup; the first try worked, no hands; second success 2026-11-08 (the 2026-11-02 backup image written back; expect DSLite's verify to fail at 0xFFF8 and check with backup.py instead; the image path must contain no space)"
     }
    ],
    "restore": null,
@@ -691,7 +731,46 @@
    "checked": "2026-10-24",
    "lockups": [],
    "methods": [],
-   "restore": null
+   "restore": null,
+   "memory": {
+    "arch": "c28x",
+    "regions": [
+     [
+      "RAMM0",
+      "0x0",
+      1024
+     ],
+     [
+      "RAMM1",
+      "0x400",
+      1024
+     ],
+     [
+      "RAMLS",
+      "0x8000",
+      16384
+     ],
+     [
+      "FLASH",
+      "0x80000",
+      131072
+     ]
+    ],
+    "never_write": [
+     [
+      "DCSM_Z1_OTP",
+      "0x78000",
+      512
+     ],
+     [
+      "DCSM_Z2_OTP",
+      "0x78200",
+      512
+     ]
+    ],
+    "sector_words": 1024,
+    "source": "units are 16-bit words (C28x). C2000Ware 26.02 device_support/f280013x/common/cmd/280013x_flash_api_lnk.cmd (RAMM0 0x128, RAMM1 0x400, RAMLS0+LS1 0x8000-0xBFF8, flash 0x80000-0x9FFF0 in 8-sector groups of 0x2000, last 0x10 words reserved by an errata note, BEGIN 0x80000) and driverlib hw_memmap.h (DCSM_Z1OTP_BASE 0x78000, DCSM_Z2OTP_BASE 0x78200); flash is 128 sectors of 1 KW. OTP extents are conservative (c2000-launchpad/FAQ.md saw an image reach 0x78220); TRM section not re-read"
+   }
   },
   "nucleo-g071rb": {
    "name": "NUCLEO-G071RB",
@@ -1394,6 +1473,13 @@
       32768
      ]
     ],
+    "physical_flash": [
+     [
+      "EXT_FLASH",
+      "0x14000000",
+      8388608
+     ]
+    ],
     "source": "cc35x1 linker map (Wi-Fi SDK 10.20.00.39, ota_example build, 2026-10-24): FLASH_INT_VEC + FLASH_NON_SECURE 0x2A2000 at 0x14000000, one vendor slot of the two-slot layout; the image header fills the first 0x2000 and the vector table starts at 0x14002000. TCM_DRAM 0x20000 at 0x20000000, DRAM 0x80000 at 0x28000000, and TCM_CRAM 0x8000 at 0x0, where code copied from flash runs"
    }
   },
@@ -1606,7 +1692,7 @@
    "folders": [
     "beagley-ai"
    ],
-   "checked": "2026-11-03",
+   "checked": "2026-11-08",
    "lockups": [
     {
      "how": "A model load on the C7x never returns and later model loads hang too; seen once",
@@ -1639,6 +1725,13 @@
       "beagley-ai/bench/camera-usb-drops-2026-11-03.log"
      ],
      "date": "2026-11-03"
+    },
+    {
+     "how": "Killing app_edgeai.py with pkill while it read an RTSP stream left it in uninterruptible sleep inside the Wave5 decoder release; dmesg showed 'wave5_vpu_firmware_command_queue_error_check: result not ready' and the next start failed with 'Error pulling tensor from GST Pipeline'; stopping with SIGINT and waiting 6 s did not hang",
+     "evidence": [
+      "beagley-ai/bench/camera-lan/results-2026-11-08.log"
+     ],
+     "date": "2026-11-08"
     }
    ],
    "methods": [
@@ -1674,6 +1767,103 @@
     }
    ],
    "restore": null
+  },
+  "am243x": {
+   "checked": "2026-11-08",
+   "family": "AM243x",
+   "folders": [
+    "am243x"
+   ],
+   "lockups": [],
+   "methods": [],
+   "name": "LP-AM243",
+   "restore": null
+  },
+  "mspm0l2228": {
+   "name": "LP-MSPM0L2228",
+   "family": "MSPM0",
+   "folders": [
+    "mspm0l2228"
+   ],
+   "checked": "2026-11-09",
+   "lockups": [
+    {
+     "how": "Not seen yet. Expected from the family: TI's low-power examples (sysctl_power_policy_sleep_to_*, *_standby, *_stop, sysctl_shutdown) cut the debug link",
+     "evidence": [
+      "mspm0g3507/AGENTS.md",
+      "docs/arrivals/mspm0l2228.md"
+     ],
+     "date": null
+    }
+   ],
+   "methods": [
+    {
+     "method": "OpenOCD reset halt, read, reset run (writes nothing)",
+     "kind": "remote",
+     "status": "untested",
+     "evidence": [
+      "tools/frl/target.py"
+     ],
+     "date": null,
+     "note": "the frl route connects and flashes this chip over OpenOCD; the recovery step itself has not been needed"
+    },
+    {
+     "method": "Unplug and replug USB",
+     "kind": "hands",
+     "status": "untested",
+     "evidence": [
+      "mspm0g3507/AGENTS.md"
+     ],
+     "date": null,
+     "note": "the family's proven way"
+    }
+   ],
+   "restore": {
+    "tool": "frl restore <backup folder> --probe ML220001, or DSLite flash -c mspm0l2228/MSPM0L2228_ML220001.ccxml -e -f -v mspm0l2228/data/shipped-main-flash.bin,0x0; read back and compare",
+    "regions": "main flash (256 kB); NONMAIN read only, never written",
+    "evidence": [
+     "data/results/mspm0l2228.csv"
+    ]
+   },
+   "debug_pins": {
+    "swdio": "PA19",
+    "swclk": "PA20",
+    "iomux_base": "0x40428000",
+    "pincm": "PAn is PINCM(n+1), at iomux_base + 4*n",
+    "source": "same family pins as the G3519 (PA19 SWDIO, PA20 SWCLK, SLAU928B Table 2-2 lists SWDIO and SWCLK on J101); not separately read for this chip"
+   },
+   "power_mode": {
+    "register": "0x400B0140",
+    "source": "mspm0_sdk_2_11_00_07 hw_sysctl_mspm0c110x.h (PMODECFG at 0x1140 from SYSCTL_BASE 0x400AF000)"
+   },
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x0",
+      262144
+     ],
+     [
+      "SRAM",
+      "0x20200000",
+      32768
+     ]
+    ],
+    "config": [
+     [
+      "BCR_CONFIG",
+      "0x41C00000",
+      255
+     ],
+     [
+      "BSL_CONFIG",
+      "0x41C00100",
+      128
+     ]
+    ],
+    "source": "SRAMFLASH 0x00201100 read on the board 2026-11-09; MSPM0 SDK 2.11.00.07 linker for LP_MSPM0L2228"
+   }
   }
  }
 }

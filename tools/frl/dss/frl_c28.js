@@ -4,6 +4,7 @@
 //   run.sh frl_c28.js <ccxml> program <image.out>                        CCStudio's flash tool: main flash only
 //   run.sh frl_c28.js <ccxml> restore <in.bin> <addr> <words> <back.bin> write back, verify, read back
 //   run.sh frl_c28.js <ccxml> sample  <dat> <dir> <bit> <seconds>        LED pin while the program runs
+//   run.sh frl_c28.js <ccxml> start                                      let the program in flash run from the boot ROM wait
 //   run.sh frl_c28.js <ccxml> verify  <image.out>                        flash against the image, read-only
 // Addresses are C28x word addresses. Output lines are what tools/frl/dss.py parses ("ID", "T", "N", "E", "OK").
 // Generalized from c2000-launchpad/tools/c2kbackup.js, c2kflashback.js and c2krun.js.
@@ -28,6 +29,9 @@ try {
     const w = s.memory.read(0x5D008, 4, 16).map(Number);       // PARTIDL, PARTIDH: four 16-bit words
     console.log(`ID ${((w[3] << 16) | w[2]) >>> 0} ${((w[1] << 16) | w[0]) >>> 0}`);
     runApp();
+  } else if (op === "start") {
+    runApp();
+    console.log("OK started");
   } else if (op === "backup") {
     s.memory.saveBinary(num(a[2]), num(a[3]), a[4]);
     console.log(`OK saved ${a[4]}`);

@@ -2,7 +2,7 @@
 id: E188
 board: LP-EM-CC35X1
 date: 2026-10-12
-status: in progress
+status: waiting
 reached: run
 line: It fits, boots, pairs and runs. The Matter thermostat and TI's CSI presence pipeline link into one image with 12.1 kB of main RAM and 0.2 kB of TCM to spare. The pipeline's buffers are routed to main RAM, because TI's script sends every .bss to the full 128 kB TCM. Three buffer trims took 147 kB down to 84.5 kB, and the Matter heap is 32 kB smaller. The image has 120.8 kB more flash. Heap free is 119 kB at idle and 94.6 kB with the pipeline running. First pairing, 2026-10-12 23:22: Apple Home paired it and the board joined the house Wi-Fi. The pipeline started 3 s later and gave a window every 2.08 s at 131 to 135 packets a second, and the Occupancy Sensing endpoint followed it. The commissioning was then lost to a console mishap and a reset before Apple's final step was seen. The morning re-pairs it and tests a reboot.
 stop: none

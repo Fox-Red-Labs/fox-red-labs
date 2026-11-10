@@ -2,27 +2,33 @@
 
 Checked 2026-10-08 to 2026-10-25 on one LP-MSPM0C1104. Terms: [docs/vocab.md](../docs/vocab.md). 1 kB = 1,024 bytes.
 
-## TI's blink example builds and flashes, but the LED does not blink
+## Examples and the out-of-box image
+
+### TI's blink example builds and flashes, but the LED does not blink
 
 Check the board version printed on it. The red LED moved between board versions: version E2 wires it to pin PA4, version E3 and later to PA22 (user guide SLAU908B, Table 2-1, jumper J7). The SDK's `gpio_toggle_output` README for this board says "Example requires Rev E3 or later of the MSPM0C1104 LaunchPad" and toggles PA22. On an E2 board, change the LED pin to PA4 in `gpio_toggle_output.syscfg`, or watch PA22 on header J1 pin 8 instead. Jumper J7 must be on for the LED to light at all.
 
-## Will a small AI model fit the MSPM0C1104
-
-Not the room-occupancy models in this repo: the smallest needs 1.2 kB of RAM for its buffers and the chip has 1 kB. That is a link-only result from 2026-10-08, before the board arrived, for these models as built; BitNetMCU's 1k handwritten-digit model does link (7.2 kB of code, 804 B of RAM).
-
-## The cycle counter reads zero on the MSPM0C1104
-
-SysTick does nothing on this chip. The SDK header `mspm0c110x.h` names `SysTick_IRQn`, but reading the SysTick registers with a debugger (`mdw 0xE000E010 4`) gives `0 0 0 0` and a write to LOAD and CTRL does not stick, so the cycle counter used on the other MSPM0 boards in this repo reads zero. Use a general-purpose timer on the CPU clock instead: start TIMG8 as a free-running 16-bit counter (clock `DL_TIMER_CLOCK_BUSCLK`, no divide). Checked against `delay_cycles(30000)`, it reads 30,010 counts. It wraps every 66k cycles, so time only spans shorter than that.
-
-## The reduced CoreMark builds link but hard fault
-
-Not found. The 400-byte and 200-byte data-set builds link and flash, then stop in a hard fault inside `core_bench_list` with the stack pointer below the start of RAM (`0x1FFFFF30`), even with a 920-byte stack and 10 iterations. RAM painted with `0xA5A5A5A5` before the run shows the whole stack used. The standard 2 kB build does not link at all. Do not report a CoreMark score for this chip from these builds.
-
-## The LED blinks before anything is flashed
+### The LED blinks before anything is flashed
 
 Yes. The shipped out-of-box image blinks the red LED (PA22) about every 0.5 s; pressing the S2 button changes its mode. A pin read three times a second apart can show a steady level for a blinking LED, so sample well under the blink period: 25 ms works, read through the debugger without halting the chip.
 
-## OpenOCD says "Could not find MEM-AP" and DSLite "Connection to MSPM0 core failed", but the chip's ID still reads
+## Memory, timing and benchmarks
+
+### Will a small AI model fit the MSPM0C1104
+
+Not the room-occupancy models in this repo: the smallest needs 1.2 kB of RAM for its buffers and the chip has 1 kB. That is a link-only result from 2026-10-08, before the board arrived, for these models as built; BitNetMCU's 1k handwritten-digit model does link (7.2 kB of code, 804 B of RAM).
+
+### The cycle counter reads zero on the MSPM0C1104
+
+SysTick does nothing on this chip. The SDK header `mspm0c110x.h` names `SysTick_IRQn`, but reading the SysTick registers with a debugger (`mdw 0xE000E010 4`) gives `0 0 0 0` and a write to LOAD and CTRL does not stick, so the cycle counter used on the other MSPM0 boards in this repo reads zero. Use a general-purpose timer on the CPU clock instead: start TIMG8 as a free-running 16-bit counter (clock `DL_TIMER_CLOCK_BUSCLK`, no divide). Checked against `delay_cycles(30000)`, it reads 30,010 counts. It wraps every 66k cycles, so time only spans shorter than that.
+
+### The reduced CoreMark builds link but hard fault
+
+Not found. The 400-byte and 200-byte data-set builds link and flash, then stop in a hard fault inside `core_bench_list` with the stack pointer below the start of RAM (`0x1FFFFF30`), even with a 920-byte stack and 10 iterations. RAM painted with `0xA5A5A5A5` before the run shows the whole stack used. The standard 2 kB build does not link at all. Do not report a CoreMark score for this chip from these builds.
+
+## Connecting, flashing and recovery
+
+### OpenOCD says "Could not find MEM-AP" and DSLite "Connection to MSPM0 core failed", but the chip's ID still reads
 
 Halt the core through the power access port, then reflash. If the program in flash faults before `main` (for example a write that stopped short), the fault handler faults too, and the chip resets itself in a loop (TRM SLAU893C section 3.3.3). The memory port is never up for long, and a reset pulse only restarts the loop; this chip has no ROM bootloader to fall back to. First check OpenOCD's `nRESET =` line: if it reads 0, the probe is holding the reset pin from an earlier run, and `adapter deassert srst` releases it.
 
@@ -59,15 +65,15 @@ openocd -c "adapter driver cmsis-dap; adapter serial <probe-serial>; transport s
 
 Checked on 2026-10-19 with xPack OpenOCD 0.12.0+dev.
 
-## The board stopped answering after a ported example ran
+### The board stopped answering after a ported example ran
 
 If you see `Could not find MEM-AP to control the core` after running a G3507 DriverLib example moved to the C1104 (seen with `tima_timer_mode_pwm_dead_band` on 2026-10-24), try the halt above first. If the core never halts, the program faults on every boot: the boot diagnostic register (CFG-AP BOOTDIAG) cycles through values such as 0x07, which CCStudio's GEL reads as a nested exception, and the loop resets the debug logic, so no halt sticks and a USB unplug does not help. Then the way back is TI's DSSM factory reset (mailbox command 0x020A, OpenOCD's `mspm0_factory_reset`): it erases main flash and resets NONMAIN to TI's defaults, so save what you can first. Write `data/oob-flash.bin` (the shipped image, in this folder) back with OpenOCD and start it with an nRST board reset (`mspm0_board_reset`); a `reset run` from the halted state left the core in HardFault. Keep a flash backup before any ported example and run the images that end in a reset (a PWM or timer example) last. The cause of the loop is not established. The same recovery worked after two more ported examples on 2026-10-25.
 
-## A DSSM mass erase does nothing on the MSPM0C1104
+### A DSSM mass erase does nothing on the MSPM0C1104
 
 The C1104 does not respond to it. CCStudio's `mspm0c1104.gel` says "Mass Erase is not available for this device", and the TRM's NONMAIN layout for this chip (Type B) has a factory reset policy only. The boot ROM reads 0x020C from the mailbox and never answers (seen on 2026-10-15 and again after a replug). Factory reset (0x020A) is the command TI documents for this chip. It erases main flash and resets NONMAIN, and it recovered the board in the entry above.
 
-## The probe says its firmware needs updating
+### The probe says its firmware needs updating
 
 Not for OpenOCD or DSLite here. This board's probe shipped with firmware 3.0.0.26 and read 3.0.0.43 on 2026-10-19. DSLite prints `Warning: A firmware update is required for the XDS110 probe. The current firmware is version 3.0.0.26. The probe must be upgraded to firmware version 3.0.0.43` on every call and still reads, flashes and verifies; OpenOCD printed no warning. If a tool refuses to connect instead, `xdsdfu -I <serial> -m` then `xdsdfu -I 00000000 -f firmware_3.0.0.43.bin -s <serial> -r`, run from `/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/`.
 

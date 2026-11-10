@@ -1,4 +1,4 @@
-# Show a low-power temperature sensor on your Home Assistant dashboard
+# Low-power temperature sensor in Home Assistant
 
 A Zigbee temperature sensor that sleeps between polls shows up on your Home Assistant dashboard. Built on the LP-CC1354P10-1, on USB power, not a battery.
 

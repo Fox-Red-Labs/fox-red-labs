@@ -1,0 +1,631 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. The USB port is on the top edge and the antenna side is the left, as in the bench photo. Types added for this board: patcharray (antenna window with patches), dipswitch (sliders that move), sop, hdconn, barrel.",
+ "board": "IWRL6432BOOST",
+ "id": "iwrl6432boost",
+ "source": "Positions read from the bench photos of the board (top and back) and the layout figure in TI's EVM user guide, scale set from the 2.54 mm header pitch and the micro-USB shell width. Millimeters are approximate (about half a millimeter). The debug probe chip sits on the back and is not drawn.",
+ "size": [
+  80.5,
+  64.5
+ ],
+ "color": "#a8101a",
+ "corner": 2.0,
+ "holes": [
+  [
+   2.6,
+   3.0,
+   3.2
+  ],
+  [
+   77.4,
+   5.0,
+   3.2
+  ],
+  [
+   2.6,
+   57.5,
+   3.2
+  ],
+  [
+   75.5,
+   56.5,
+   3.2
+  ]
+ ],
+ "silk": [
+  {
+   "t": "PROC117 REV. B",
+   "x": 6.0,
+   "y": 16,
+   "s": 1.5,
+   "rot": 90
+  },
+  {
+   "t": "ENGINE AREA",
+   "x": 9.3,
+   "y": 23.5,
+   "s": 1.3,
+   "rot": 0
+  },
+  {
+   "t": "S1",
+   "x": 59.2,
+   "y": 22.4,
+   "s": 1.3,
+   "rot": 0
+  },
+  {
+   "t": "ON",
+   "x": 59.0,
+   "y": 31.6,
+   "s": 1.0,
+   "rot": 0
+  },
+  {
+   "t": "SOP0",
+   "x": 69.3,
+   "y": 24.3,
+   "s": 0.95,
+   "rot": 0
+  },
+  {
+   "t": "SOP1",
+   "x": 69.3,
+   "y": 25.7,
+   "s": 0.95,
+   "rot": 0
+  },
+  {
+   "t": "S2",
+   "x": 72.0,
+   "y": 27.0,
+   "s": 1.2,
+   "rot": 0
+  },
+  {
+   "t": "RESET_SW",
+   "x": 74.5,
+   "y": 25.5,
+   "s": 1.0,
+   "rot": 0
+  },
+  {
+   "t": "USER_SW",
+   "x": 70.8,
+   "y": 11.4,
+   "s": 1.0,
+   "rot": 90
+  },
+  {
+   "t": "S3",
+   "x": 70.5,
+   "y": 15.5,
+   "s": 1.2,
+   "rot": 0
+  },
+  {
+   "t": "S5",
+   "x": 69.2,
+   "y": 17.6,
+   "s": 1.2,
+   "rot": 0
+  },
+  {
+   "t": "XDS_I2C_SW",
+   "x": 72.5,
+   "y": 21.8,
+   "s": 1.0,
+   "rot": 0
+  },
+  {
+   "t": "S4",
+   "x": 36.5,
+   "y": 52.5,
+   "s": 1.2,
+   "rot": 0
+  },
+  {
+   "t": "CAN_EN",
+   "x": 44.5,
+   "y": 59.5,
+   "s": 0.9,
+   "rot": 0
+  },
+  {
+   "t": "LIN_EN",
+   "x": 44.5,
+   "y": 58.0,
+   "s": 0.9,
+   "rot": 0
+  },
+  {
+   "t": "SPI_HEADER",
+   "x": 38.6,
+   "y": 59.0,
+   "s": 1.0,
+   "rot": 0
+  },
+  {
+   "t": "J5",
+   "x": 56.0,
+   "y": 63.0,
+   "s": 1.2,
+   "rot": 0
+  },
+  {
+   "t": "USB_5V",
+   "x": 56.5,
+   "y": 58.4,
+   "s": 0.9,
+   "rot": 90
+  },
+  {
+   "t": "5V_PWR",
+   "x": 61.0,
+   "y": 56.3,
+   "s": 0.9,
+   "rot": 90
+  },
+  {
+   "t": "J7",
+   "x": 72.0,
+   "y": 55.0,
+   "s": 1.2,
+   "rot": 0
+  },
+  {
+   "t": "D6 5V_LED",
+   "x": 47.0,
+   "y": 46.3,
+   "s": 0.9,
+   "rot": 0
+  },
+  {
+   "t": "D5 RESET_LED",
+   "x": 70.5,
+   "y": 48.5,
+   "s": 0.9,
+   "rot": 90
+  },
+  {
+   "t": "D7 USER_LED",
+   "x": 78.0,
+   "y": 41.5,
+   "s": 0.9,
+   "rot": 90
+  },
+  {
+   "t": "D3 PGOOD",
+   "x": 78.0,
+   "y": 35.5,
+   "s": 0.9,
+   "rot": 90
+  },
+  {
+   "t": "J6",
+   "x": 45.0,
+   "y": 13.6,
+   "s": 1.2,
+   "rot": 0
+  },
+  {
+   "t": "LIN_HEADER",
+   "x": 14.5,
+   "y": 2.5,
+   "s": 0.9,
+   "rot": 0
+  },
+  {
+   "t": "CAN_HEADER",
+   "x": 31.0,
+   "y": 3.2,
+   "s": 0.9,
+   "rot": 0
+  },
+  {
+   "t": "I2C_HEADER",
+   "x": 40.0,
+   "y": 3.2,
+   "s": 0.9,
+   "rot": 0
+  }
+ ],
+ "parts": [
+  {
+   "id": "ant",
+   "type": "patcharray",
+   "x": 9.3,
+   "y": 41.0,
+   "w": 18.4,
+   "h": 38.5,
+   "size": 1.5,
+   "patches": [
+    [
+     -0.8,
+     1.4
+    ],
+    [
+     1.4,
+     1.4
+    ],
+    [
+     -0.8,
+     -1.0
+    ],
+    [
+     1.4,
+     -1.0
+    ],
+    [
+     -3.0,
+     -8.9
+    ],
+    [
+     -0.7,
+     -8.9
+    ],
+    [
+     -5.7,
+     -11.3
+    ],
+    [
+     -3.0,
+     -11.3
+    ],
+    [
+     -0.7,
+     -11.3
+    ],
+    [
+     -3.0,
+     -13.8
+    ],
+    [
+     -0.7,
+     -13.8
+    ]
+   ],
+   "feeds": [
+    [
+     2.2,
+     0.2,
+     4.6,
+     0.2
+    ],
+    [
+     4.6,
+     0.2,
+     4.6,
+     -7.6
+    ],
+    [
+     4.6,
+     -7.6,
+     5.4,
+     -7.6
+    ],
+    [
+     -0.7,
+     -8.9,
+     5.4,
+     -8.9
+    ],
+    [
+     -0.7,
+     -11.3,
+     5.4,
+     -11.3
+    ],
+    [
+     -0.7,
+     -13.8,
+     3.6,
+     -13.8
+    ],
+    [
+     3.6,
+     -13.8,
+     3.6,
+     -11.3
+    ]
+   ],
+   "label": "Antennas",
+   "title": "Antenna patches",
+   "key": true,
+   "text": "The radar sends and receives through these small copper patches on the board's surface. The chip has two transmit and three receive channels. This side faces the room. The white area is kept clear of metal on purpose."
+  },
+  {
+   "id": "u1",
+   "type": "qfn",
+   "x": 18.1,
+   "y": 31.2,
+   "size": 7.2,
+   "label": "Radar chip",
+   "title": "IWRL6432",
+   "key": true,
+   "text": "The 60 GHz radar chip. It has an Arm Cortex-M4F core that runs the presence demo and a hardware accelerator for the radar math."
+  },
+  {
+   "id": "j5",
+   "type": "microusb",
+   "x": 52.2,
+   "y": 61.2,
+   "label": "USB",
+   "title": "J5, micro-USB",
+   "key": true,
+   "text": "One cable powers the board and gives your computer two serial ports: one for commands and one for data. A debug probe built into the board, on its back, does the talking."
+  },
+  {
+   "id": "j7",
+   "type": "barrel",
+   "x": 66.0,
+   "y": 58.5,
+   "w": 11.5,
+   "h": 15,
+   "d": 10,
+   "label": "5 V jack",
+   "title": "J7, 5 V power jack",
+   "text": "An optional 5 V barrel jack, marked 5V_PWR. A USB cable is enough power for this demo."
+  },
+  {
+   "id": "s1",
+   "type": "dipswitch",
+   "x": 63.3,
+   "y": 28.2,
+   "n": 6,
+   "pitch": 1.3,
+   "w": 6.6,
+   "on": [
+    1,
+    0,
+    1,
+    0,
+    1,
+    1
+   ],
+   "label": "S1, boot switches",
+   "title": "S1, six switches",
+   "key": true,
+   "text": "Six small sliders. ON is to the left. Position 1 is the bottom slider, next to the label SOP0. Position 2 is SOP1. Position 1 ON and position 2 OFF is the normal run mode. Position 1 OFF is flash mode."
+  },
+  {
+   "id": "s4",
+   "type": "dipswitch",
+   "x": 41.2,
+   "y": 55.3,
+   "n": 4,
+   "pitch": 1.3,
+   "w": 6.4,
+   "on": [
+    0,
+    0,
+    0,
+    1
+   ],
+   "label": "S4",
+   "title": "S4, four switches",
+   "text": "A bank of four small switches near the top edge. The silkscreen names the lines they control, such as CAN_EN and LIN_EN. Leave them as shipped for this demo."
+  },
+  {
+   "id": "s5",
+   "type": "dipswitch",
+   "x": 74.5,
+   "y": 18.2,
+   "n": 2,
+   "pitch": 1.3,
+   "w": 6.4,
+   "on": [
+    1,
+    1
+   ],
+   "label": "S5",
+   "title": "S5, XDS_I2C_SW",
+   "text": "Two sliders marked XDS_I2C_SW. They belong to the on-board debug probe. Leave them alone."
+  },
+  {
+   "id": "s2",
+   "type": "button",
+   "x": 75.4,
+   "y": 30.0,
+   "w": 3.8,
+   "h": 4.2,
+   "label": "Reset",
+   "title": "S2, RESET_SW",
+   "key": true,
+   "text": "Press it once to restart the board. It pulls the reset line, called NRST."
+  },
+  {
+   "id": "s3",
+   "type": "button",
+   "x": 74.0,
+   "y": 12.6,
+   "w": 3.8,
+   "h": 4.2,
+   "label": "User button",
+   "title": "S3, USER_SW",
+   "text": "A user button, marked USER_SW."
+  },
+  {
+   "id": "d6",
+   "type": "led",
+   "x": 47.8,
+   "y": 44.4,
+   "color": "#37e06f",
+   "name": "D6",
+   "label": "D6",
+   "title": "D6, 5V_LED",
+   "text": "A green light that shows the 5 V supply is up."
+  },
+  {
+   "id": "d5",
+   "type": "led",
+   "x": 75.2,
+   "y": 47.6,
+   "color": "#37e06f",
+   "name": "D5",
+   "label": "D5",
+   "title": "D5, RESET_LED",
+   "text": "A green light marked RESET_LED. It is lit in the bench photo of the running demo."
+  },
+  {
+   "id": "d7",
+   "type": "led",
+   "x": 75.3,
+   "y": 43.6,
+   "color": "#37e06f",
+   "name": "D7",
+   "label": "D7",
+   "title": "D7, USER_LED",
+   "text": "A light marked USER_LED. It is dark in the bench photo."
+  },
+  {
+   "id": "d3",
+   "type": "led",
+   "x": 76.6,
+   "y": 37.5,
+   "color": "#ffb020",
+   "name": "D3",
+   "label": "D3",
+   "title": "D3, PGOOD",
+   "text": "An amber light that shows the board's power is good."
+  },
+  {
+   "id": "j2",
+   "type": "header",
+   "x": 38.6,
+   "y": 62.0,
+   "cols": 7,
+   "rows": 1,
+   "label": "SPI header",
+   "title": "SPI_HEADER",
+   "text": "A row of pins marked SPI_HEADER. This demo does not use it."
+  },
+  {
+   "id": "j6",
+   "type": "hdconn",
+   "x": 56.9,
+   "y": 9.7,
+   "w": 23,
+   "h": 9,
+   "d": 5.2,
+   "label": "J6 connector",
+   "title": "J6, high-density connector",
+   "text": "A large high-density connector marked J6. This demo does not use it."
+  },
+  {
+   "type": "sop",
+   "x": 39.5,
+   "y": 33.0,
+   "bw": 3.9,
+   "bl": 9.9,
+   "pins": 16
+  },
+  {
+   "type": "sop",
+   "x": 39.9,
+   "y": 22.7,
+   "bw": 3.9,
+   "bl": 9.9,
+   "pins": 16
+  },
+  {
+   "type": "sop",
+   "x": 31.4,
+   "y": 27.6,
+   "bw": 4.4,
+   "bl": 7.8,
+   "pins": 24,
+   "pitch": 0.65
+  },
+  {
+   "type": "qfn",
+   "x": 51.2,
+   "y": 27.1,
+   "size": 3.0
+  },
+  {
+   "type": "soic",
+   "x": 31.0,
+   "y": 12.6,
+   "pins": 8,
+   "rot": 90
+  },
+  {
+   "type": "soic",
+   "x": 29.5,
+   "y": 54.1,
+   "pins": 8,
+   "rot": 90
+  },
+  {
+   "type": "block",
+   "x": 24.2,
+   "y": 9.7,
+   "w": 3.2,
+   "h": 4.0,
+   "d": 1.0,
+   "color": "#2e2f33"
+  },
+  {
+   "type": "xtalbox",
+   "x": 30.0,
+   "y": 45.6,
+   "w": 3.2,
+   "h": 2.5
+  },
+  {
+   "type": "block",
+   "x": 63.9,
+   "y": 37.6,
+   "w": 6.0,
+   "h": 3.3,
+   "d": 2.6,
+   "color": "#b8861f"
+  },
+  {
+   "type": "block",
+   "x": 63.9,
+   "y": 34.7,
+   "w": 6.0,
+   "h": 3.3,
+   "d": 2.6,
+   "color": "#b8861f"
+  },
+  {
+   "type": "block",
+   "x": 62.9,
+   "y": 42.0,
+   "w": 5.4,
+   "h": 3.7,
+   "d": 2.3,
+   "color": "#17171a"
+  },
+  {
+   "type": "block",
+   "x": 54.2,
+   "y": 35.3,
+   "w": 3.7,
+   "h": 5.8,
+   "d": 2.3,
+   "color": "#17171a"
+  },
+  {
+   "type": "block",
+   "x": 52.8,
+   "y": 53.2,
+   "w": 3.4,
+   "h": 6.0,
+   "d": 2.3,
+   "color": "#17171a"
+  },
+  {
+   "type": "block",
+   "x": 61.6,
+   "y": 46.5,
+   "w": 1.6,
+   "h": 3.2,
+   "d": 1.0,
+   "color": "#e8e4da"
+  }
+ ],
+ "decor": []
+}

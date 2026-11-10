@@ -389,13 +389,15 @@ No: the two CPU-fed passes at 16 MHz, the chip's maximum, completed and give 1,6
 <!-- recovery:start -->
 ## When the board stops answering
 
-Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+Checked 2026-11-08. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
 
 How it locks up:
 
 - An image enters SHUTDOWN right after boot: DAP Connection Error, low power mode (`mspm0l1306/FAQ.md`)
 - A window-watchdog example resets the chip every few milliseconds: Could not find MEM-AP (`mspm0l1306/FAQ.md`, `ports/cms32/README.md`)
 - A deep-sleep port with only the watchdog timer as wake source (ran, woke every 0.997 s) (`ports/msp430-to-mspm0/lpm3-wake/PORT.md`, 2026-10-21)
+- TI timx_timer_mode_periodic_standby enters STANDBY: every debugger read answers ack 4, and a reset pulse with a halt does not catch it (`docs/experiments/2026-11-06-mspm0l1306-live-chip-view.md`, 2026-11-06)
+- Found silent: OpenOCD could not attach (FRL-E006), frl identify saw no answer on SWD or JTAG (FRL-E010), an OpenOCD reset halt returned nothing; the same signature as the STANDBY lockup. Which image was on the board is not known (the last recorded run was the 2026-11-06 live chip view). Recovered the same day with the DSLite method below: the chip answered after the write; DSLite's own verify step fails with 'Memory map prevented reading 0x0000FFF8', so the proof is an OpenOCD read-back (backup.py save), which matched the written image (`mspm0l1306/FAQ.md`, 2026-11-08)
 
 Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.
 
@@ -405,9 +407,36 @@ Try in this order. Remote means the Mac does it with the board in place; hands m
 | OpenOCD mailbox mass erase (mspm0_mass_erase) (for the watchdog reset loop) | remote | proven | `mspm0l1306/FAQ.md`, date not recorded |
 | OpenOCD mailbox mass erase (for the SHUTDOWN lockup: OpenOCD exits when the debug port fails to answer) | remote | failed | `mspm0l1306/FAQ.md`, date not recorded |
 | uhubctl power-off of the probe port (the tick counter restarted; the hub location is not recorded) | remote | proven | 2026-10-21 |
+| DSLite flash from UniFlash 9.6.0 with a non-sleeping image and the board ccxml (for the STANDBY lockup; the first try worked, no hands; second success 2026-11-08 (the 2026-11-02 backup image written back; expect DSLite's verify to fail at 0xFFF8 and check with backup.py instead; the image path must contain no space)) | remote | proven | `docs/experiments/2026-11-06-mspm0l1306-live-chip-view.md`, 2026-11-08 |
 
 USB hub ports recorded for this board:
 
 - The probe's hub port does not cut power, 2026-10-27. SRAM marker test: a word written at 0x20000FF0 through the DAP (no CPU connect, no reset) survived a 15 s `uhubctl -a off`; the chip and the XDS110 kept power. The port does drop the data link: the probe leaves USB within 1 s and is back 1.0 s after `on` on every port of this hub (nine ports tried), and the first debugger connect after a cut answers Error -261, the second works.
 
 <!-- recovery:end -->
+
+## Watching the chip run (live chip view)
+
+### Which browsers and boards does the chip view work on?
+
+Chrome or Edge on a Mac, Windows or Linux computer, with an LP-MSPM0L1306, LP-MSPM0G3507, LP-MSPM0G3519 or LP-MSPM0G5187 plugged in over USB. The page reaches the board's XDS110 probe through WebHID, which Safari and Firefox do not have. Close CCStudio, UniFlash and OpenOCD first, because only one program can hold the probe. The view has been read live on the L1306, G3519 and G5187, with CPU load checked against a known load only on the L1306 (E317).
+
+### Does the chip view halt or slow my program? Does it change a power measurement?
+
+It does not halt, reset or write to the chip, and it costs the program no instructions, but do not measure power while it is attached. The reads go through the debug port beside the CPU. The debug connection can keep the chip out of its deepest sleep, so the current you measure is not the current of the program alone. A program that enters STANDBY drops the debug link; the page then says "Not answering". If every read answers "ack 4", flash a program that does not sleep with TI's DSLite from UniFlash 9.6 and the board's ccxml. E317
+
+### The view shows addresses like 0x00000234 instead of function names. Where do I get the names?
+
+Choose the program's .out file in the page. The chip does not store function names, only code, so the page can show the address the CPU is on. The .out is the build output that CCStudio or `make` writes in the project's Debug folder. The page reads it in the browser to turn addresses into names.
+
+### The page says "This page has no map for this chip yet". Which chips are covered?
+
+Four: the MSPM0L1306, MSPM0G3507, MSPM0G3519 and MSPM0G5187. A map is a file of the chip's blocks, pins and interrupts, made from the SDK headers. The page matches the chip's DEVICEID against the maps, and a chip without one is refused. Other MSPM0 chips need a new map file.
+
+### Why does a PWM pin show no rate, or show "fast"?
+
+A pin driven by a timer does not change its output register, so there is no rate to count; the page shows the timer's period instead. A pin that the program switches in software shows "fast" when it changes more than about 100 times a second, because the page reads the port about 500 times a second and cannot count more than that. TI's PWM example read a 16.0 ms period from its timer registers (load 1999, prescale 256, 32 MHz).
+
+### Does the chip view work with my own program?
+
+Yes, with no change to it, as long as the program does not put the chip into a sleep deep enough to drop the debug link. Load, powered blocks, pin setup, slow pin changes and the running code were read from TI's own examples, a CoreMark build and a test program; none needed a change. A program that enters STANDBY or SHUTDOWN needs the recovery above.

@@ -1,0 +1,252 @@
+{
+  "id": "am243x",
+  "board": "LP-AM243",
+  "part": "AM2434",
+  "family": "AM24",
+  "title": "Is the TI LP-AM243 the right board for my project?",
+  "short": "A LaunchPad development kit for TI's AM2434, a chip with four 800 MHz Cortex-R5F real-time cores, one Cortex-M4F and two PRU-ICSSG programmable real-time units. CoreMark is 2,931 per second on one core and 11,730 on all four at once. Of 194 SDK example projects for the board, 163 build from a Mac terminal, and of the 121 first-core projects loaded, 82 printed a pass. Upstream Zephyr's hello_world and blinky run on the first core. The Ethernet example linked at 1 Gb but never got an address from the house network, so no network number was measured.",
+  "meet": {
+    "what": "A LaunchPad development kit for TI's AM2434 industrial MCU, with an XDS110 debug probe on the board. The board needs its own 5 V, 3 A USB-C charger on J10 and a micro-B cable on J20 for the probe and the console. A load into RAM leaves the 64 MB flash and the boot switches as shipped.",
+    "facts": [
+      [
+        "Chip",
+        "AM2434 in the ALX package"
+      ],
+      [
+        "CPU",
+        "4 Arm Cortex-R5F at 800 MHz and 1 Cortex-M4F; 2 PRU-ICSSG units (PRU clock 200 MHz)"
+      ],
+      [
+        "RAM",
+        "2 MB on-chip OCSRAM; 64 kB TCM per R5F core in dual-core mode; no DDR on this package"
+      ],
+      [
+        "Flash",
+        "64 MB quad SPI on the board"
+      ],
+      [
+        "Radios",
+        "None"
+      ],
+      [
+        "Debug probe",
+        "XDS110 on micro-B J20, firmware 3.0.0.15; the console is the Application/User UART at 115200"
+      ],
+      [
+        "Power",
+        "USB-C J10 must advertise 3 A on its CC pins; a red LD9 means it did not"
+      ],
+      [
+        "Software",
+        "MCU+ SDK for AM243x 12.01.00.33, CCStudio 21.0.1, TI Arm Clang 4.0.4.LTS, SysConfig 1.27.0, Zephyr 4.5.0-rc2"
+      ]
+    ],
+    "source": "docs/arrivals/am243x.md"
+  },
+  "projects": [
+    {
+      "t": "Run a program from RAM with the switches as shipped",
+      "st": "works",
+      "result": "About 4 s from the command to a running single-core image, with flash and boot switches untouched. A power cycle returns the board to the firmware in its flash",
+      "source": "am243x/README.md"
+    },
+    {
+      "t": "Blink an LED, edit the period, prove the rate",
+      "st": "works",
+      "result": "31 s from the command to 16 verified pin edges 250 ms apart, scripted, board already powered and surveyed; the steps themselves take 13 s",
+      "source": "data/results/am243x.csv"
+    },
+    {
+      "t": "CoreMark",
+      "st": "works",
+      "result": "2,931 per second on one core (3.664 per MHz, TCM), 2,926 to 2,928 on each of the other three, 11,730 on all four at once. TI's page lists 3,015.63. TI Arm Clang 5.1.1 gives 3,151",
+      "source": "data/results/am243x.csv"
+    },
+    {
+      "t": "TI's SDK examples, built and run from a terminal",
+      "st": "works",
+      "result": "163 of 194 projects build; of 121 first-core projects loaded into RAM, 82 printed a pass, 2 a failure, 30 output with no verdict and 7 nothing in 30 s",
+      "source": "am243x/SWEEP.md"
+    },
+    {
+      "t": "Messages between cores (IPC)",
+      "st": "works",
+      "result": "3.19 us round trip per partner with four partners, 2.08 with three, 1.61 with one, 400,000 trips per run. The example hangs on a second start unless the chip is reset and given 12 s first",
+      "source": "data/results/am243x.csv"
+    },
+    {
+      "t": "A PRU core writing a pin register",
+      "st": "partial",
+      "result": "A write takes 1 cycle unrolled (5.3 ns) and 2 cycles in a loop (10 ns) by the PRU's own counter. The pad was not routed, so no scope has seen the rate",
+      "source": "data/results/am243x.csv"
+    },
+    {
+      "t": "Zephyr",
+      "st": "works",
+      "result": "Upstream lp_am243/am2434/r5f0_0 hello_world and blinky run from RAM. The M4 hello_world builds but was not run; the M4 blinky does not build because the board file has no led0 alias",
+      "source": "data/results/am243x.csv"
+    },
+    {
+      "t": "Ethernet with TI's lwIP example",
+      "st": "partial",
+      "result": "One port linked at 1 Gb full duplex, but DHCP gave no lease in 130 s and no throughput or latency number was measured. The example's UP message comes from lwIP, not the PHY",
+      "source": "am243x/FAQ.md"
+    }
+  ],
+  "chains": [
+    {
+      "t": "TI's SDK and compiler, from a Mac terminal",
+      "st": "works",
+      "verdict": "Yes",
+      "why": "There is no Mac installer for the SDK: run TI's Linux installer in an amd64 container and copy the folder. Then the SDK makefiles, SysConfig and TI Arm Clang build from the terminal, and am243x/prebuild.sh builds 15 examples",
+      "source": "am243x/README.md"
+    },
+    {
+      "t": "A Linux demo on the chip",
+      "st": "no",
+      "verdict": "Not possible",
+      "why_not": "no-linux",
+      "why": "The chip is a microcontroller with no Linux port. The chip's fast software-toggled pin work belongs on a PRU core",
+      "source": "am243x/FAQ.md"
+    },
+    {
+      "t": "A radio or wireless demo on the chip",
+      "st": "no",
+      "verdict": "Not possible",
+      "why_not": "no-radio",
+      "why": "The chip has no radio. Radio demos need a separate radio board",
+      "source": "docs/arrivals/am243x.md"
+    }
+  ],
+  "combine_title": "What else we tried, and how it went",
+  "combine_lede": "Each row is something we tried beyond the standard list. A row that did not work is recorded with its reason, not left out.",
+  "benchmarks": [
+    [
+      "CoreMark, TI's example, -O3, code in OCSRAM, 800 MHz",
+      "2,931/s",
+      "TI's page lists 3,015.63"
+    ],
+    [
+      "CoreMark, same files as the other boards, code in TCM",
+      "2,931/s (3.664/MHz)",
+      "30k iterations"
+    ],
+    [
+      "CoreMark on all four cores at once",
+      "11,730/s in all",
+      "2,931 and 2,933 per core"
+    ],
+    [
+      "CoreMark with TI Arm Clang 5.1.1",
+      "3,151/s (3.939/MHz)",
+      "+7.5 percent"
+    ],
+    [
+      "Dhrystone, TI's example, -O3",
+      "1.941 DMIPS/MHz",
+      "TI's page lists 1.9675"
+    ],
+    [
+      "One FOC step, TI's software math, OCSRAM",
+      "245 cycles (0.31 us)",
+      ""
+    ],
+    [
+      "Interrupt latency, software-pended",
+      "182 cycles (228 ns) best case",
+      "Up to 248 cycles"
+    ],
+    [
+      "GPIO pin write, raw store",
+      "147 cycles (0.184 us)",
+      "About 15 times the AM263P's 10.02 cycles"
+    ],
+    [
+      "PRU0 output register write",
+      "5.3 ns unrolled, 10 ns in a loop",
+      "PRU clock 200 MHz"
+    ],
+    [
+      "IPC round trip, four partners",
+      "3.19 us",
+      "400,000 round trips, three runs"
+    ]
+  ],
+  "benchmarks_source": "data/results/am243x.csv",
+  "glance": [
+    [
+      "11,730",
+      "CoreMark per second, four cores",
+      "2,931 on one core at 800 MHz, -O3; TI's page lists 3,015.63 for one",
+      "data/results/am243x.csv"
+    ],
+    [
+      "163 of 194",
+      "SDK examples that build",
+      "Of 121 first-core projects loaded, 82 printed a pass",
+      "am243x/SWEEP.md"
+    ],
+    [
+      "31 s",
+      "Blink, from the command",
+      "Board powered and surveyed; build, RAM load and 16 verified pin edges",
+      "data/results/am243x.csv"
+    ],
+    [
+      "3.19 us",
+      "Core-to-core round trip",
+      "Four partners, 400,000 round trips",
+      "data/results/am243x.csv"
+    ]
+  ],
+  "good_for": [
+    "Real-time control that wants four 800 MHz cores and PRU cores on one chip",
+    "Comparing an Arm real-time core with the AM263P on the same code",
+    "Running and benchmarking from RAM on a Mac without touching the flash",
+    "Trying upstream Zephyr on an R5F core"
+  ],
+  "not_for": [
+    "Anything with a radio or Linux: the chip has neither",
+    "Projects that need an Ethernet number: none was measured",
+    "Projects that need a scope-confirmed PRU pin rate: none was seen",
+    "Power or energy numbers: none were measured"
+  ],
+  "buy": "Sold by TI as the LP-AM243 LaunchPad development kit. It needs a separate 5 V, 3 A USB-C charger and a micro-B cable; the probe is on the board.",
+  "gotchas": [
+    [
+      "DSLite lists the cores but every connect fails with error -1170 at CS_DAP_0 and a red LED is on",
+      "Give the board a 3 A USB-C charger, then replug the micro-B. **Tag: Setup or handling.**"
+    ],
+    [
+      "TI's ipc_notify_echo hangs on its second start",
+      "Run am243x/tools/sysreset.js, wait 12 s, start again. **Tag: TI example default.**"
+    ],
+    [
+      "memory.loadProgram hangs in a script",
+      "Use am243x/tools/ram_run.js. **Tag: Tool or docs.**"
+    ],
+    [
+      "Zephyr stops with Synchronous External Abort",
+      "Set AM243X_BARE=1 and load from RAM. **Tag: Setup or handling.**"
+    ],
+    [
+      "The lwIP example says UP for both ports but nothing answers",
+      "The line comes from lwIP, not the PHY: print each PHY's link state and check the far end of the cable goes to a switch or mesh node. **Tag: TI example default.**"
+    ]
+  ],
+  "faq_page": null,
+  "faq_source": "am243x/FAQ.md",
+  "updated": "2026-11-08",
+  "measured_on": "Measured 2026-11-05 to 2026-11-08 on an Intel Mac with CCStudio 21.0.1, MCU+ SDK for AM243x 12.01.00.33, TI Arm Clang 4.0.4.LTS, SysConfig 1.27.0 and Zephyr 4.5.0-rc2. R5F cores at 800 MHz.",
+  "next": {
+    "title": "What do I do first with the LP-AM243?",
+    "steps": [
+      "Plug the 5 V, 3 A USB-C charger into J10, then the micro-B cable into J20. LD9 stays dark.",
+      "Run am243x/prebuild.sh to build 15 SDK examples.",
+      "Run an image from RAM: python3 am243x/tools/ram_capture.py <image.out> run.log --until \"All tests have passed\".",
+      "Read the FAQ before your first multi-core example."
+    ],
+    "source": "am243x/README.md"
+  },
+  "line": "Four 800 MHz real-time cores and two PRU cores, run from RAM on a Mac."
+}

@@ -18,11 +18,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import toolfind  # noqa: E402
 from core import Stop  # noqa: E402
 
-FAMILIES = {"mspm0": {"sdk": ("mspm0_sdk", ["2.11.00.07"]), "sysconfig": ("sysconfig", ["1.26.3"]),
+FAMILIES = {"mspm0": {"sdk": ("mspm0_sdk", ["2.11.00.07"]), "sysconfig": ("sysconfig", ["1.26.3", "1.28.0"]),
                       "ticlang": ("ticlang", ["5.1.1.LTS"])},
             "mspm0-cc": {"sdk": ("mspm0_sdk", ["2.11.00.07"]), "ticlang": ("ticlang", ["5.1.1.LTS"])},
             "mspm33-cc": {"sdk": ("mspm33_sdk", ["1.04.00.00"]), "ticlang": ("ticlang", ["5.1.1.LTS"])},
-            "sysconfig": {"sysconfig": ("sysconfig", ["1.26.3"])}}
+            "sysconfig": {"sysconfig": ("sysconfig", ["1.26.3", "1.28.0"])}}
 MAKE_VAR_33 = {"sdk": "MSPM33_SDK_INSTALL_DIR"}
 MAKE_VAR = {"sdk": "MSPM0_SDK_INSTALL_DIR", "sysconfig": "SYSCONFIG_TOOL", "ticlang": "TICLANG_ARMCOMPILER"}
 

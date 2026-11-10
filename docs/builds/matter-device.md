@@ -1,4 +1,4 @@
-# Control a CC35X1 Matter light from Apple Home
+# A Matter light in Apple Home
 
 Build the lighting example, flash the CC35X1, add it to Apple Home. Phone tile and board buttons switch the red LED.
 

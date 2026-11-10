@@ -1,0 +1,704 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LP-MSPM0G5187: errors and fixes</title>
+<meta name="description" content="Every error seen on the LP-MSPM0G5187 and its fix, with the exact error text.">
+<!-- seo -->
+<link rel="canonical" href="https://foxredlabs.dev/faq-mspm0g5187.html">
+<meta property="og:site_name" content="Fox Red Labs">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LP-MSPM0G5187: errors and fixes">
+<meta property="og:description" content="Every error seen on the LP-MSPM0G5187 and its fix, with the exact error text.">
+<meta property="og:url" content="https://foxredlabs.dev/faq-mspm0g5187.html">
+<meta property="og:image" content="https://foxredlabs.dev/media/og-image.png">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "LP-MSPM0G5187: errors and fixes", "description": "Every error seen on the LP-MSPM0G5187 and its fix, with the exact error text.", "url": "https://foxredlabs.dev/faq-mspm0g5187.html", "author": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "publisher": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "license": "https://creativecommons.org/licenses/by/4.0/", "isPartOf": {"@type": "WebSite", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "TI's wake-word example never lights the LED when you say \"OK Kilby\". Is the onboard microphone broken?", "acceptedAnswer": {"@type": "Answer", "text": "Probably not: the example does not listen to the onboard microphone."}}, {"@type": "Question", "name": "DSLite prints \"A firmware update is required for the XDS110 probe\" on every command. Is the update required?", "acceptedAnswer": {"@type": "Answer", "text": "Not on this board."}}, {"@type": "Question", "name": "TI's adc12_monitor_supply example reads values that drift and are nowhere near the supply voltage. Is the board faulty?", "acceptedAnswer": {"@type": "Answer", "text": "No."}}, {"@type": "Question", "name": "TI's adc12_max_freq_dma example captures 1k samples in 1.87 ms, which is 0.547 Msps. The data sheet says 1.6 Msps", "acceptedAnswer": {"@type": "Answer", "text": "The example as shipped is not a speed test of the chip."}}, {"@type": "Question", "name": "A TI example flashes and verifies on the LP-MSPM0G5187, then nothing happens. The LEDs do not move and the debugger shows the chip stuck in SYSCFG_DL_SYSCTL_CLK_init. What is wrong?", "acceptedAnswer": {"@type": "Answer", "text": "The example's generated start-up code waits forever for a clock-ready bit that this board never sets."}}, {"@type": "Question", "name": "How long does a blink take from the terminal, and what does FRL-E021 mean?", "acceptedAnswer": {"@type": "Answer", "text": "python3 tools/frl/frl.py run --board mspm0g5187 --probe <serial> --pattern 150,150,150,900 builds TI's blink with your pattern, flashes it and times PA17 against the pattern: 9.4, 10.1 and 10.5 s on three warm runs, image 536 bytes (data/results/mspm0g5187.csv)."}}, {"@type": "Question", "name": "Does MicroPython or the Arduino layer run on the LP-MSPM0G5187, and why does the pystone benchmark stop with a recursion error?", "acceptedAnswer": {"@type": "Answer", "text": "Both run. Build MicroPython with make BOARD=g5187 VARIANT=min in ports/micropython (72.9 kB; the full image is 47 kB too big for the 128 kB flash) and the Arduino layer with BOARD=mspm0g5187 ./build.sh in portability/arduino. Flash either with DSLite: MicroPython as a raw binary padded to 16 bytes at 0x0, Arduino as the .out. The pystone benchmark needs a stack larger than the minimal image's 1.5 kB: maximum recursion depth exceeded means rebuild with STACK_LEN=0x1000, and use tests/pystone_lowmem_min.py, because the minimal level has no x[:] slices. Three runs gave 680, 791 and 794 pystones per second at 80 MHz. The UART block is called UC0 on this chip, so code that names UART0 or UART0_IRQHandler builds and stays silent."}}, {"@type": "Question", "name": "An NPU program hangs after the first test vector and never reaches the end. What is wrong?", "acceptedAnswer": {"@type": "Answer", "text": "A debugger reset while an earlier NPU run was in progress leaves the NPU stuck."}}, {"@type": "Question", "name": "The occupancy model scores 90.9 percent on its test set but much less on a new day. Why?", "acceptedAnswer": {"@type": "Answer", "text": "Because the published test set shares days with the training data."}}, {"@type": "Question", "name": "What does the LP-MSPM0G5187's NPU not accelerate, and why is the 30k model only 2.3 times faster?", "acceptedAnswer": {"@type": "Answer", "text": "Layers outside the NPU's rules stay on the CPU."}}, {"@type": "Question", "name": "The occupancy demo on the NPU prints people=1 in a lit room with nobody in it. Is the model wrong?", "acceptedAnswer": {"@type": "Answer", "text": "Probably not, but it is untested."}}, {"@type": "Question", "name": "Can the board run the MLPerf Tiny keyword-spotting model, and why did my first run score 3 of 20?", "acceptedAnswer": {"@type": "Answer", "text": "Yes: 18.70 ms on the NPU, 91.0 percent on the full test split (docs/experiments/2026-11-03-mspm0g5187-mlperf-tiny-kws.md)."}}, {"@type": "Question", "name": "The Sensors BoosterPack (BP-BASSENSORSMKII) is stacked on the LP-MSPM0G5187 and the demo prints scan=none. Is the pin map wrong?", "acceptedAnswer": {"@type": "Answer", "text": "No."}}, {"@type": "Question", "name": "The Sensors BoosterPack's TMP117 prints tmp117=none on the LP-MSPM0G5187, with the ribbon cable in. The other sensors read", "acceptedAnswer": {"@type": "Answer", "text": "The TMP117 sits on the break-away strip and is joined to the rest of the board only by the flat cable that ships loose in the box."}}, {"@type": "Question", "name": "After the Sensors BoosterPack's flat cable is plugged in, an I2C scan shows every address from 08 to 77, and the humidity and light sensors no longer answer", "acceptedAnswer": {"@type": "Answer", "text": "The cable is in end for end."}}, {"@type": "Question", "name": "The Sensors BoosterPack's motion sensor (BMI160) prints bmi=none on the LP-MSPM0G5187, with the humidity and light sensors reading on the same bus", "acceptedAnswer": {"@type": "Answer", "text": "Cause not found."}}, {"@type": "Question", "name": "The humidity, light or magnet sensor, or the TMP117, on the Sensors BoosterPack never answers on the LP-MSPM0G5187. Do the power pins matter?", "acceptedAnswer": {"@type": "Answer", "text": "Four sensors on the BP-BASSENSORSMKII are powered through header pins, so they stay silent until your program sets them."}}, {"@type": "Question", "name": "The magnet sensor on the Sensors BoosterPack reads 1.64 V with no magnet, not exactly 1.65 V. Is it broken?", "acceptedAnswer": {"@type": "Answer", "text": "No."}}, {"@type": "Question", "name": "Which accuracy figures apply to the sensors on the Sensors BoosterPack?", "acceptedAnswer": {"@type": "Answer", "text": "The data sheets', at the conditions they name."}}, {"@type": "Question", "name": "The CC1407P radio answers the LP-MSPM0G5187 but every reply is a checksum error (04 02 f0 00). What is wrong?", "acceptedAnswer": {"@type": "Answer", "text": "The data line into the radio is not connected, so the radio reads every message as noise."}}, {"@type": "Question", "name": "Holding the CC1407P's reset pin low does not stop it answering, and its interrupt never fires. Why?", "acceptedAnswer": {"@type": "Answer", "text": "The reset and interrupt wires are not in radio pins 36 and 23."}}, {"@type": "Question", "name": "Why can't a BoosterPack with SPI stack on the LP-MSPM0G5187?", "acceptedAnswer": {"@type": "Answer", "text": "Wire it instead: the 2x4 header J20 by the microSD slot carries a whole SPI port."}}, {"@type": "Question", "name": "What antenna does the BP-CC1407P-9-FE radio need, and can it be used outside North America?", "acceptedAnswer": {"@type": "Answer", "text": "A 915 MHz antenna with an SMA plug, screwed onto the radio's SMA socket before it transmits."}}, {"@type": "Question", "name": "The CC1407P sends on one protocol, then every transmit on another ends with status 0x8A. Why?", "acceptedAnswer": {"@type": "Answer", "text": "Reset the radio between protocols: close and reopen TI's host driver, which pulses RESET_N and takes about 50 ms."}}, {"@type": "Question", "name": "After a few profile changes, the CC1407P's storeConfig never completes. What stopped it?", "acceptedAnswer": {"@type": "Answer", "text": "Probably its configuration storage filling up."}}, {"@type": "Question", "name": "200-byte packets to the CC1407P come back TRX_Host_No_Resources, but 20-byte ones go. Why?", "acceptedAnswer": {"@type": "Answer", "text": "Suspected: a config that is stored but not persisted keeps holding the radio's buffer space."}}, {"@type": "Question", "name": "TI's driver header says carrier sense is \"not functional\". Does listen-before-talk work on the CC1407P?", "acceptedAnswer": {"@type": "Answer", "text": "At low thresholds it answered correctly here."}}, {"@type": "Question", "name": "Wi-SUN FSK mode 4a or 5 between the CC1407P and a CC1354P10 loses packets. Is the link bad?", "acceptedAnswer": {"@type": "Answer", "text": "Not as far as the runs show."}}, {"@type": "Question", "name": "The CC1407P's XLR and a CC1354P10's SimpleLink Long Range do not exchange packets. Should they?", "acceptedAnswer": {"@type": "Answer", "text": "No TI document pairs them."}}, {"@type": "Question", "name": "Pings from the CC1407P to a CC1354P10 come back at 50 kbps but not at faster modes. Why?", "acceptedAnswer": {"@type": "Answer", "text": "Most likely the answer arrives before the CC1407P's receive is running."}}, {"@type": "Question", "name": "One message sent to the radio board did not show up. Why?", "acceptedAnswer": {"@type": "Answer", "text": "Not known for sure."}}, {"@type": "Question", "name": "The walkie-talkie recording has a short gap about 2.4 seconds in. Was it the radio?", "acceptedAnswer": {"@type": "Answer", "text": "No: the radio delivered all 122 voice frames with good checksums."}}, {"@type": "Question", "name": "Can the walkie-talkie work both ways on this board?", "acceptedAnswer": {"@type": "Answer", "text": "Not as wired here."}}, {"@type": "Question", "name": "The alarm listener's capture or detect image hears nothing: the microphone level stays at the floor. Is the microphone dead?", "acceptedAnswer": {"@type": "Answer", "text": "Probably not: check what is on PB10 and PB11."}}, {"@type": "Question", "name": "The alarm listener prints LEARN FAILED: no smoke or CO pattern heard in 45 s. What now?", "acceptedAnswer": {"@type": "Answer", "text": "Sound the alarm longer, or move the board closer."}}, {"@type": "Question", "name": "The alarm listener prints IGNORED ... too quiet to be the alarm beside me when an alarm sounds. Why?", "acceptedAnswer": {"@type": "Answer", "text": "The board is farther from the alarm, or more muffled, than when it learned."}}, {"@type": "Question", "name": "The alarm listener printed LEARNED ... saved, but after a reset it is not learned, or the board stops at boot. What happened?", "acceptedAnswer": {"@type": "Answer", "text": "That was a bug in an early build, now fixed."}}, {"@type": "Question", "name": "A DriverLib example retargeted from the LP-MSPM0G3519 fails with use of undeclared identifier 'UART0' (or SPI1, I2C2, GPIOC in the generated file). Is the example unportable?", "acceptedAnswer": {"@type": "Answer", "text": "Not for that reason. Delete ti_msp_dl_config.c and ti_msp_dl_config.h from the example folder (the copies next to the .c, not the ones in ticlang/) and build again."}}, {"@type": "Question", "name": "A retargeted DMA example (dma_block_transfer, dma_fill_data, dma_table_transfer) never reaches its breakpoint, though gDstData holds the right words. Why?", "acceptedAnswer": {"@type": "Answer", "text": "SysConfig put the transfer on DMA channel 1 and the example's interrupt handler only handles channel 0, so the done flag never sets. Keep DMA.associatedChannels[0].peripheral.$assign = \"DMA_CH0\" in the .syscfg when you unlock pin assignments, or check DMA_CH0_CHAN_ID in the generated header is 0."}}, {"@type": "Question", "name": "After flashing a TI Drivers example retargeted from another chip the debugger says \"Connection to MSPM0 core failed\". How do I get the board back?", "acceptedAnswer": {"@type": "Answer", "text": "The example's device_linker.cmd still describes the G3519 (512 kB flash, RAM at 0x20200000 and 0x20210000), so the stack top is outside the G5187's 32 kB and the chip faults in a reset loop. Hold the core in reset with TI's wait-for-debug sequence on the power access port, catch the first instruction, then program your backup (program backup-flash.bin 0x0 verify)."}}]}</script>
+<!-- /seo -->
+<link rel="icon" href="media/favicon.svg">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="motion.css?v=20261108-home">
+<script src="motion.js?v=20261108-home" defer></script>
+<style>
+/* Brand tokens and base */
+:root {
+ --frl-red: #B42418;
+ --frl-ember: #8E1C13;
+ --frl-ink: #161312;
+ --frl-stone: #6B625B;
+ --frl-paper: #FAFAF7;   /* the page ground (site review 2026-10-15, png/R4System.png); tan lives only inside cards */
+ --frl-tan: #F4EFE9;
+ --frl-cream: #F7F3EC;
+ --frl-line: #E2D8C9;
+ --ok: #2F6B4F;
+ --frl-font: "Barlow", "Helvetica Neue", Arial, sans-serif;
+ --frl-mono: "Barlow", "Helvetica Neue", Arial, sans-serif;   /* labels, captions and numbers in Barlow; the token name stays so 500 label rules need no edit */
+ --frl-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace;   /* code, commands and file names only */
+ --frl-ease: 180ms cubic-bezier(0.2, 0, 0, 1);
+}
+* { box-sizing: border-box; }
+code, pre, kbd, samp, code *, pre * { font-family: var(--frl-code) !important; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--frl-paper); color: var(--frl-ink); font: 400 18px/28px var(--frl-font); -webkit-font-smoothing: antialiased; }
+a { color: var(--frl-red); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+a:hover { color: var(--frl-ember); }
+:focus-visible { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 600px) { .wrap { padding: 0 16px; } }
+h1, h2, h3 { margin: 0; font-weight: 700; }
+.display { font-size: 56px; line-height: 60px; letter-spacing: -0.005em; }
+h2 { font-size: 32px; line-height: 38px; }
+h3 { font-size: 24px; line-height: 30px; font-weight: 600; }
+@media (max-width: 700px) { .display { font-size: 40px; line-height: 44px; } h2 { font-size: 26px; line-height: 32px; } h3 { font-size: 20px; line-height: 26px; } body { font-size: 17px; } }
+.eyebrow { font-weight: 500; font-size: 14px; line-height: 20px; letter-spacing: .12em; text-transform: uppercase; color: var(--frl-red); margin-bottom: 12px; }
+.small { font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+.lede { max-width: 680px; color: var(--frl-stone); margin: 12px 0 0; }
+section { padding: 96px 0; }
+@media (max-width: 700px) { section { padding: 64px 0; } }
+/* draft strip */
+.draft { background: var(--frl-ink); color: var(--frl-cream); font-size: 13px; text-align: center; padding: 6px 16px; letter-spacing: .02em; }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 8px; font: 600 16px var(--frl-font); cursor: pointer; text-decoration: none; transition: background var(--frl-ease), border-color var(--frl-ease), color var(--frl-ease); white-space: nowrap; }
+.btn-primary { background: var(--frl-red); color: var(--frl-cream); border: 0; }
+.btn-primary:hover { background: var(--frl-ember); color: var(--frl-cream); }
+.btn-secondary { background: transparent; color: var(--frl-ink); border: 1.5px solid var(--frl-ink); }
+.btn-secondary:hover { background: var(--frl-cream); color: var(--frl-ink); }
+.btn svg.lucide { width: 18px; height: 18px; }
+.try-ai { margin: 22px 0 0; max-width: 640px; border: 1px solid var(--frl-line); border-radius: 12px; background: #fff; padding: 16px 18px; }
+.try-ai .ta-h { font: 600 15px/20px var(--frl-font); margin: 0 0 8px; }
+.try-ai pre { margin: 0; padding: 12px 14px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/21px var(--frl-mono, 'JetBrains Mono', monospace); }
+.try-ai .ta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0 0; }
+.try-ai .ta-note { font-size: 14px; line-height: 20px; color: var(--frl-stone); margin: 10px 0 0; }
+
+
+
+/* Redesign chrome */
+:root { --logo-h: 48px; --frl-ok: #2F6B4F; --frl-amber: #C98500; /* success and the one amber: graphics, score tints and chart series only */ }
+body > header { position: sticky; top: 0; z-index: 30; background: rgba(250,250,247,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--frl-line); }
+/* inner pages: the header is Ink with Cream text; the home page keeps the light one above its dark hero */
+body > header.dark { background: rgba(22,19,18,.96); border-bottom-color: rgba(247,243,236,0.12); color: var(--frl-cream); }
+header.dark .logo-head { color: var(--frl-cream); }
+header.dark nav > a, header.dark nav .ni > a { color: var(--frl-cream); }
+header.dark nav > a:hover, header.dark nav .ni > a:hover { color: #F0563F; }
+header.dark nav a[aria-current="page"] { color: var(--frl-cream); border-bottom-color: #F0563F; }
+header.dark .ni-btn { color: rgba(247,243,236,.72); } header.dark .ni-btn:hover { color: var(--frl-cream); background: rgba(247,243,236,0.08); }
+header.dark .hsearch { background: rgba(247,243,236,0.05); border-color: rgba(247,243,236,0.14); } header.dark .hsearch:focus-within { border-color: var(--frl-cream); }
+header.dark .hsearch input { color: var(--frl-cream); } header.dark .hsearch input::placeholder { color: #6B625B; } header.dark .hsearch button { color: var(--frl-cream); }
+header.dark .menu-btn { border-color: var(--frl-cream); color: var(--frl-cream); }
+header.dark.nav-open nav { background: var(--frl-ink); border-bottom-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav > a, header.dark.nav-open nav .ni { border-top-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav .menu .mi b { color: var(--frl-cream); } header.dark.nav-open nav .menu .mi span { color: rgba(247,243,236,.72); }
+header .wrap { display: flex; align-items: center; gap: 32px; height: 72px; }
+.logo { display: block; width: auto; }
+.logo-head { height: var(--logo-h); color: var(--frl-red); }
+.logo-foot { height: 48px; color: var(--frl-red); }
+header .brand { display: flex; align-items: center; flex: none; }
+header nav { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+header nav > a, header nav .ni > a { color: var(--frl-ink); text-decoration: none; font-weight: 500; font-size: 16px; white-space: nowrap; padding: 4px 0; border-bottom: 2px solid transparent; }
+header nav > a:hover, header nav .ni > a:hover { color: var(--frl-red); }
+header nav a[aria-current="page"] { font-weight: 700; border-bottom-color: var(--frl-red); color: var(--frl-ink); }
+/* the Build item: a link, a chevron button, and the subject panel (open on hover, focus or tap) */
+.ni { position: relative; display: flex; align-items: center; gap: 2px; }
+.ni-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--frl-stone); cursor: pointer; padding: 0; }
+.ni-btn svg { width: 16px; height: 16px; transition: transform var(--frl-ease); }
+.ni-btn:hover { color: var(--frl-ink); background: var(--frl-cream); }
+.ni-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.menu { display: none; position: absolute; top: calc(100% + 14px); left: -24px; width: 720px; max-width: calc(100vw - 32px); background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 12px; padding: 22px 24px 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; z-index: 31; }
+#build-menu, #hardware-menu { left: -24px; } #software-menu { left: -200px; } #about-menu { left: auto; right: -90px; width: 560px; }
+.menu::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
+.ni:hover .menu, .ni:focus-within .menu, .ni.open .menu { display: grid; }
+.menu .mi { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--frl-ink); padding: 6px 8px; margin: -6px -8px; border-radius: 8px; }
+.menu .mi:hover, .menu .mi:focus-visible { background: var(--frl-paper); }
+.menu .mi b { font-weight: 700; font-size: 16px; line-height: 22px; }
+.menu .mi span { font-size: 13px; line-height: 18px; color: var(--frl-stone); }
+.menu .menu-note { grid-column: 1 / -1; margin: 0; border-top: 1px solid var(--frl-line); padding-top: 12px; font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.menu .menu-note a { color: var(--frl-ink); font-size: inherit; font-weight: 500; padding: 0; border: 0; }
+.menu .mi, .menu .mi b, .menu .mi span { white-space: normal; }  /* hand-made pages carry an older nowrap nav rule */
+/* phone menu: under 760 px the nav folds behind a Menu button (aria-expanded), opened by tap or Enter, closed by Escape */
+.menu-btn { display: none; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--frl-ink); background: transparent; color: var(--frl-ink); font: 600 16px var(--frl-font); cursor: pointer; }
+.menu-btn svg { width: 18px; height: 18px; }
+.menu-btn .mb-x { display: none; }
+.menu-btn[aria-expanded="true"] .mb-x { display: block; } .menu-btn[aria-expanded="true"] .mb-o { display: none; }
+/* site search in the header: the form goes to search.html?q=; under 760 px only the icon shows */
+.hsearch { display: flex; align-items: center; height: 40px; border: 1.5px solid var(--frl-line); border-radius: 8px; background: #fff; padding: 0 4px 0 12px; }
+.hsearch:focus-within { border-color: var(--frl-ink); }
+.hsearch input { border: 0; outline: 0; background: transparent; font: 500 15px var(--frl-font); color: var(--frl-ink); width: 150px; min-width: 0; }
+.hsearch button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 4px; background: transparent; color: var(--frl-ink); cursor: pointer; }
+.hsearch button:hover { color: var(--frl-red); } .hsearch button svg { width: 18px; height: 18px; }
+/* GitHub link beside the Digital Lab button: the repository one click from every page */
+.gh-link { display: inline-flex; align-items: center; gap: 6px; color: var(--frl-cream); text-decoration: none; font: 600 15px var(--frl-font); margin-right: 12px; opacity: .9; white-space: nowrap; }
+.gh-link:hover { opacity: 1; color: #fff; }
+header:not(.dark) .gh-link { color: var(--frl-ink); } header:not(.dark) .gh-link:hover { color: var(--frl-red); }
+.gh-link svg { width: 18px; height: 18px; }
+@media (max-width: 1180px) { .gh-link span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+/* the red "Plug in a board" button: opens the browser bench */
+.plug-btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 6px; background: var(--frl-red); color: #fff; font: 600 15px var(--frl-font); text-decoration: none; white-space: nowrap; flex: none; }
+.plug-btn:hover { background: var(--frl-ember); color: #fff; }
+.plug-btn svg { width: 17px; height: 17px; }
+header nav a.nav-lab, .plug-btn .plug-s { display: none; }
+@media (max-width: 480px) { .gh-link { display: none; } }
+@media (max-width: 1180px) { .plug-btn { padding: 0 11px; min-width: 44px; height: 44px; justify-content: center; } .plug-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+@media (max-width: 1000px) and (min-width: 761px) { header nav { gap: 6px !important; } .ni-btn { width: 20px; } header nav > a, header nav .ni > a { font-size: 15px; } header .wrap { gap: 12px !important; } }
+@media (max-width: 1100px) { header .wrap { gap: 20px; } header nav { gap: 18px; } .hsearch input { width: 90px; } }
+@media (max-width: 900px) { header nav > a, header nav .ni > a { font-size: 15px; } header nav { gap: 14px; } .hsearch { padding: 0 4px; border-color: transparent; background: transparent; } .hsearch input { display: none; } }
+@media (max-width: 760px) {
+  header .wrap { gap: 10px; position: relative; }
+  .menu-btn { display: inline-flex; }
+  .hsearch { margin-left: auto; }
+  .plug-btn { height: 44px; min-width: 44px; justify-content: center; gap: 6px; padding: 0 12px; } .plug-btn .plug-s { display: inline; font-style: normal; }
+  header.nav-open nav > a.nav-lab { display: block; color: var(--frl-red); font-weight: 600; }
+  header nav { display: none; }
+  header.nav-open nav { max-height: calc(100dvh - var(--menu-top, 144px)); overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; align-items: stretch; gap: 0; position: absolute; top: 100%; left: 0; right: 0; margin: 0; padding: 8px 16px 16px; background: var(--frl-paper); border-bottom: 1px solid var(--frl-line); box-shadow: 0 12px 24px rgba(22,19,18,.12); }
+  header.nav-open nav > a, header.nav-open nav .ni > a { display: block; padding: 12px 4px; font-size: 18px; border-top: 1px solid var(--frl-line); border-bottom: 0; }
+  header.nav-open nav .ni { display: grid; grid-template-columns: 1fr 44px; align-items: center; gap: 0; border-top: 1px solid var(--frl-line); }
+  header.nav-open nav .ni > a { grid-column: 1; border-top: 0; }
+  header.nav-open nav .ni-btn { display: inline-flex; grid-column: 2; grid-row: 1; width: 40px; height: 40px; justify-self: end; }
+  header.nav-open nav .ni:not(.open) .menu { display: none; }
+  header.nav-open nav .ni.open .menu { display: grid; grid-column: 1 / -1; position: static; width: auto; max-width: none; grid-template-columns: 1fr; gap: 4px; padding: 0 0 12px 16px; border: 0; background: transparent; }
+  header.nav-open nav .menu .mi { margin: 0; padding: 8px 8px; }
+  header.nav-open nav .menu .menu-note { display: none; }
+}
+@media (max-width: 380px) { .menu-btn { padding: 0 10px; } }
+/* footer: light, so a page has at most three dark bands (png/R4System.png): the lockup in Fox Red, the sections, About, the disclosure */
+footer { background: var(--frl-paper); color: var(--frl-stone); border-top: 1px solid var(--frl-line); padding: 56px 0 48px; font-size: 15px; line-height: 22px; }
+footer .wrap { display: grid; grid-template-columns: 1.3fr repeat(var(--fcols, 4), minmax(0, 1fr)); gap: 32px; }
+footer h2 { color: var(--frl-ink); line-height: 1.3; font-weight: 600; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 12px; }
+footer a { color: var(--frl-stone); display: block; text-decoration: none; padding: 3px 0; }
+footer a:hover { color: var(--frl-ink); }
+footer .f-brand p { margin: 16px 0 0; max-width: 360px; }
+footer .f-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 24px; border-top: 1px solid var(--frl-line); padding-top: 20px; margin-top: 8px; }
+footer .f-meta a { display: inline; padding: 0; color: var(--frl-ink); font-weight: 500; }
+footer .f-meta .disc { flex-basis: 100%; margin: 8px 0 0; max-width: 680px; }
+@media (max-width: 1000px) { footer .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); } footer .f-brand { grid-column: 1 / -1; } }
+@media (max-width: 520px) { footer .wrap { grid-template-columns: 1fr; } }
+/* the Sources line that replaced the Run details fold */
+.srcline { margin: 40px 0 0; padding-top: 14px; border-top: 1px solid var(--frl-line); font-size: 14px; line-height: 21px; color: var(--frl-stone); }
+.srcline p, .srcline li { font-size: 14px; line-height: 21px; } .srcline .srcline-h { font-weight: 600; color: var(--frl-ink); margin: 0 0 6px; }
+/* the tab strip of a section's pages (site_chrome.tabs) */
+.subtabs { display: flex; flex-wrap: wrap; gap: 4px 24px; border-bottom: 1px solid var(--frl-line); margin: 0 0 28px; }
+.subtabs a { padding: 10px 0; color: var(--frl-stone); text-decoration: none; font-weight: 600; font-size: 16px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.subtabs a:hover { color: var(--frl-ink); } .subtabs a[aria-current="page"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+/* narrow screens: long paths wrap, wide tables scroll inside themselves, never the page */
+main code { overflow-wrap: break-word; } main td code, main dd code { overflow-wrap: anywhere; }
+main select { max-width: 100%; }
+main pre { overflow-x: auto; max-width: 100%; }
+/* inner pages: the home page's 96 px band padding is for its full-width bands, not for sections inside a page */
+:where(main > .wrap) section { padding: 0; }
+:where(main > .wrap) section.blk { padding-top: 48px; }
+@media (max-width: 700px) { :where(main > .wrap) section.blk { padding-top: 36px; } }
+@media (max-width: 760px) {
+  main table { display: block; max-width: 100%; -webkit-overflow-scrolling: touch; }
+  /* every wide table scrolls inside itself, even one whose own style clips it for rounded corners; edge shadows show only
+     while there is more to scroll to (a white table sets --scroll-cover and --scroll-bg to #fff) */
+  main table:not(.ww), main .ww-wrap { overflow-x: auto !important;
+    background: linear-gradient(to right, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) left / 44px 100% no-repeat local,
+                linear-gradient(to left, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) right / 44px 100% no-repeat local,
+                radial-gradient(farthest-side at 0 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) left / 22px 100% no-repeat scroll,
+                radial-gradient(farthest-side at 100% 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) right / 22px 100% no-repeat scroll,
+                var(--scroll-bg, transparent) !important; }
+  main table th, main table td { min-width: 120px; } main table th:first-child, main table td:first-child { min-width: 120px; }
+}
+
+/* Shared pieces */
+
+/* shared pieces */
+.chip { display: inline-block; font: 600 11px/18px var(--frl-font); letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; white-space: nowrap; vertical-align: middle; border: 1.5px solid transparent; }
+.c-run { background: var(--frl-ink); color: var(--frl-cream); border-color: var(--frl-ink); }
+.c-part, .c-build { background: var(--frl-line); color: var(--frl-ink); border-color: var(--frl-line); }
+.c-no { background: #fff; color: var(--frl-ink); border-color: var(--frl-ink); }   /* red only on buttons and one key mark per graphic (step 7) */
+.c-wait { background: #fff; color: var(--frl-stone); border-color: color-mix(in srgb,#6B625B 45%,#fff); }
+.chip-key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; line-height: 20px; color: var(--frl-stone); margin: 12px 0 0; }
+.chip-key span { display: inline-flex; align-items: center; gap: 8px; }
+
+.stats { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 16px; margin: 28px 0 0; }
+.stat { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; min-width: 0; }
+.stat-n { font-size: 40px; line-height: 44px; font-weight: 700; color: var(--frl-red); letter-spacing: -0.01em; overflow-wrap: anywhere; }
+.stat-n a { color: inherit; text-decoration: none; } .stat-n a:hover { text-decoration: underline; }
+.stat-l { font-weight: 600; font-size: 16px; line-height: 22px; margin-top: 6px; color: var(--frl-ink); }
+.stat-s { font-size: 14px; line-height: 20px; color: var(--frl-stone); margin-top: 4px; }
+@media (max-width: 900px) { .stats { grid-template-columns: 1fr 1fr; } .stat-n { font-size: 32px; line-height: 36px; } }
+@media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
+
+.g { display: grid; grid-template-columns: minmax(170px, 1.1fr) repeat(var(--n), minmax(0, 1.4fr)); background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; margin-top: 16px; }
+.g > div { padding: 12px 14px; border-top: 1px solid var(--frl-line); min-width: 0; }
+.g .g-h { background: var(--frl-cream); border-top: 0; font-size: 15px; line-height: 20px; color: var(--frl-stone); }
+.g .g-h b { display: block; color: var(--frl-ink); font-weight: 600; } .g .g-h span { display: block; font-size: 13px; }
+.g .g-n { font-weight: 600; font-size: 16px; line-height: 22px; } .g .g-n a { color: var(--frl-ink); }
+.g .g-c { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 21px; }
+.g .g-c .chip { flex: none; margin-top: 1px; } .g .g-c .g-t { min-width: 0; overflow-wrap: anywhere; } .g .g-c a { color: var(--frl-ink); }
+.g .g-lab { display: none; }
+@media (max-width: 820px) {
+  .g { grid-template-columns: 1fr; }
+  .g .g-h { display: none; }
+  .g .g-n { background: var(--frl-cream); }
+  .g .g-c { border-top: 0; padding-top: 6px; padding-bottom: 6px; flex-wrap: wrap; }
+  .g .g-c:last-child, .g .g-c:has(+ .g-n) { padding-bottom: 12px; }
+  .g .g-lab { display: inline; width: 100%; font-size: 13px; color: var(--frl-stone); font-weight: 600; }
+  .g .g-empty { display: none; }
+}
+
+table.glance-t { border-collapse: separate; border-spacing: 0; width: 100%; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; font-size: 15px; line-height: 21px; }
+table.glance-t th, table.glance-t td { padding: 10px 14px; border-top: 1px solid var(--frl-line); text-align: left; vertical-align: top; }
+table.glance-t thead th { border-top: 0; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; }
+table.glance-t tbody th { font-weight: 600; color: var(--frl-stone); white-space: nowrap; }
+
+.bars { margin: 20px 0 0; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; }
+.bars figcaption { margin: 0 0 14px; } .bars figcaption b { display: block; font-size: 18px; line-height: 24px; }
+.bars figcaption span { display: block; font-size: 14px; line-height: 20px; color: var(--frl-stone); margin-top: 2px; }
+.bars-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14px; color: var(--frl-ink); margin: 0 0 12px; }
+.bars-legend span { display: inline-flex; align-items: center; gap: 7px; } .bars-legend i { width: 12px; height: 12px; border-radius: 3px; }
+.bars-body { position: relative; }
+.bar-cat { display: grid; grid-template-columns: minmax(120px, 190px) 1fr; gap: 12px; align-items: center; padding: 7px 0; border-top: 1px solid var(--frl-line); }
+.bar-cat:first-of-type { border-top: 0; }
+.bar-l { font-size: 15px; line-height: 20px; font-weight: 600; } .bar-l span { display: block; font-weight: 400; font-size: 13px; color: var(--frl-stone); }
+.bar-m { display: grid; gap: 4px; }
+.bar-track { position: relative; height: 20px; min-width: 0; }
+.bars, .bars-body, .bar-m, .bar-cat { min-width: 0; max-width: 100%; }
+.bar { position: absolute; top: 2px; height: 16px; border-radius: 0 4px 4px 0; min-width: 2px; }
+.bar-v { position: absolute; top: 0; margin-left: 8px; max-width: 28%; overflow: hidden; text-overflow: ellipsis; font-size: 13px; line-height: 20px; font-weight: 600; color: var(--frl-ink); white-space: nowrap; }
+.bar-none { font-size: 13px; line-height: 20px; color: var(--frl-stone); font-style: italic; }
+.bar-axis { position: absolute; top: -4px; bottom: -4px; width: 1px; background: var(--frl-stone); }
+@media (max-width: 560px) { .bar-cat { grid-template-columns: 1fr; gap: 4px; } }
+
+.fold { margin-top: 12px; }
+.fold > summary { cursor: pointer; font-weight: 600; font-size: 16px; color: var(--frl-ink); padding: 8px 0; }
+.fold[open] > summary { margin-bottom: 8px; }
+
+table.score { border-collapse: separate; border-spacing: 0; width: 100%; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; font-size: 15px; line-height: 20px; }
+table.score th, table.score td { padding: 9px 12px; border-top: 1px solid var(--frl-line); text-align: left; vertical-align: middle; }
+table.score thead th { border-top: 0; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; }
+table.score thead th span { display: block; font-weight: 400; font-size: 12px; color: rgba(247,243,236,.72); }
+table.score tbody th { font-weight: 500; color: var(--frl-ink); }
+table.score tbody th small { display: block; font-size: 12px; color: var(--frl-stone); font-weight: 400; }
+table.score tr.cat th { background: var(--frl-cream); font-weight: 700; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--frl-stone); padding: 7px 12px; }
+table.score td { white-space: nowrap; }
+table.score td b { font-weight: 600; font-variant-numeric: tabular-nums; }
+table.score td .rk { display: block; font-size: 11px; line-height: 14px; letter-spacing: .06em; text-transform: uppercase; }
+table.score td.best { background: color-mix(in srgb,#2F6B4F 12%,#fff); color: #2F6B4F; } table.score td.best .rk { color: #2F6B4F; }
+table.score td.worst { background: color-mix(in srgb,#B42418 9%,#fff); color: #8E1C13; } table.score td.worst .rk { color: #B42418; }
+table.score td.mid { background: color-mix(in srgb,#C98500 14%,#fff); color: #161312; }
+table.score td.none { color: var(--frl-stone); font-style: italic; }
+table.score td .chip { font-size: 10px; }
+.score-key { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; color: var(--frl-stone); margin: 10px 0 0; }
+.score-key i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 6px; border: 1px solid var(--frl-line); }
+
+.badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 0; }
+.badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px 8px 10px; border: 1px solid var(--frl-line); border-radius: 10px; background: #fff; color: var(--frl-ink); text-decoration: none; font-size: 15px; line-height: 20px; font-weight: 500; }
+.badge:hover { border-color: var(--frl-ink); color: var(--frl-ink); }
+.badge .ic { color: var(--frl-red); flex: none; }
+.badge .b-s { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 1px 7px; border-radius: 6px; background: var(--frl-cream); color: var(--frl-stone); border: 1px solid var(--frl-line); }
+.badge.b-works .b-s { background: var(--frl-ink); color: var(--frl-cream); border-color: var(--frl-ink); }
+.badge.b-partial .b-s { background: var(--frl-line); color: var(--frl-ink); border-color: var(--frl-line); }
+.badge.b-building .b-s, .badge.b-planned .b-s { background: #fff; color: var(--frl-stone); border-color: color-mix(in srgb,#6B625B 45%,#fff); }
+.badge.b-no .b-s { background: var(--frl-red); color: var(--frl-cream); border-color: var(--frl-red); }
+.badge-inline { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+.badge-inline .ic { color: var(--frl-red); }
+
+/* This page */
+
+/* community pieces */
+.codebox .cb-clone { margin: 0 0 14px; padding: 12px 16px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 6px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/22px var(--frl-mono, 'JetBrains Mono', monospace); }
+.codebox .cb-clone code { color: inherit; background: none; padding: 0; }
+.cb-folders { margin: 0; padding-left: 20px; } .cb-folders > li { margin: 8px 0; font-size: 16px; line-height: 24px; } .cb-folders ul { padding-left: 18px; margin: 4px 0 0; } .cb-folders ul li { margin: 3px 0; font-size: 15px; line-height: 22px; }
+.cb-more { list-style: none; margin-left: -20px; } .cb-more summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+.cb-src, .cb-lic { font-size: 14px; line-height: 20px; color: var(--frl-ink-2, #6B625B); margin: 12px 0 0; }
+.rp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.rp-card { display: block; padding: 14px 16px; border: 1.5px solid var(--frl-line); border-radius: 8px; text-decoration: none; color: var(--frl-ink); background: var(--frl-paper); }
+.rp-card:hover { border-color: var(--frl-red); } .rp-card b { display: block; font-size: 17px; margin-bottom: 4px; } .rp-card span { font-size: 14px; line-height: 20px; color: var(--frl-ink-2, #6B625B); }
+.rp-list { margin: 0; padding-left: 20px; } .rp-list li { margin: 8px 0; font-size: 15px; line-height: 22px; } .rp-date { font: 600 12px/18px var(--frl-mono, monospace); color: var(--frl-ink-2, #6B625B); margin-right: 6px; } .rp-status { font-style: normal; color: var(--frl-red); font-weight: 600; margin-left: 6px; }
+
+header nav a[aria-current] { color: var(--frl-red); }
+main { padding: 40px 0 96px; }
+.crumb { font-size: 15px; line-height: 22px; color: var(--frl-stone); margin: 0 0 20px; }
+.crumb a { color: var(--frl-stone); }
+h1.q { font-size: 36px; line-height: 42px; letter-spacing: -0.01em; max-width: 30ch; }
+.q-sub { font-size: 20px; line-height: 28px; color: var(--frl-stone); margin: 6px 0 0; max-width: 60ch; }
+@media (max-width: 700px) { h1.q { font-size: 28px; line-height: 34px; } .q-sub { font-size: 17px; line-height: 24px; } }
+.blk { padding-top: 72px; }
+.blk, #numbers { scroll-margin-top: 88px; }
+td a[href^="board-"] { white-space: nowrap; }
+.blk#sources { padding-top: 40px; } #sources + .blk { padding-top: 4px; }
+@media (max-width: 700px) { .blk { padding-top: 56px; } }
+.blk > h2 { margin-bottom: 8px; }
+.blk > .lede { margin: 0 0 24px; }
+.card { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 24px; }
+details > summary { cursor: pointer; font-weight: 600; font-size: 16px; color: var(--frl-ink); margin: 16px 0 0; }
+details[open] > summary { margin-bottom: 12px; }
+.note { font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+table.t { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 22px; }
+table.t th, table.t td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--frl-line); vertical-align: top; }
+table.t th { font-weight: 600; color: var(--frl-stone); }
+.tw { overflow-x: auto; }
+.glossary { padding: 0; }
+.glossary dl { display: grid; grid-template-columns: minmax(140px, max-content) 1fr; gap: 8px 20px; font-size: 15px; line-height: 22px; }
+.glossary dt { font-weight: 600; } .glossary dd { margin: 0; color: var(--frl-stone); }
+@media (max-width: 560px) { .glossary dl { grid-template-columns: 1fr; } .glossary dd { margin-bottom: 8px; } }
+
+/* yes / no / partly marks: icon plus a word, never color alone */
+.mark { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; flex: none; }
+.mark svg { width: 16px; height: 16px; }
+.m-yes { background: color-mix(in srgb,#2F6B4F 12%,#fff); color: var(--ok); }
+.m-no { background: color-mix(in srgb,#B42418 9%,#fff); color: var(--frl-red); }
+.m-partial { background: color-mix(in srgb,#C98500 14%,#fff); color: #161312; }
+.m-untested { background: transparent; color: var(--frl-stone); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+
+/* the spectrum */
+.need-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 32px 0 8px; }
+.need-bar b { font-weight: 600; margin-right: 4px; width: 100%; }
+.need { font: 500 16px var(--frl-font); height: 40px; padding: 0 16px; border-radius: 4px; border: 1.5px solid var(--frl-line); background: #fff; color: var(--frl-ink); cursor: pointer; }
+.need:hover { border-color: var(--frl-ink); }
+.need[aria-pressed="true"] { background: var(--frl-ink); border-color: var(--frl-ink); color: var(--frl-cream); }
+.need-result { min-height: 28px; font-weight: 600; margin: 8px 0 0; }
+.lane { margin-top: 32px; }
+.lane-name { font-weight: 700; font-size: 20px; line-height: 26px; margin: 0; }
+.lane-sub { margin: 2px 0 16px; }
+.rail { display: grid; gap: 16px; grid-template-columns: repeat(min(var(--n), 4), minmax(0, 1fr)); position: relative; }
+.rail.wrap::before { display: none; }
+.rail.wrap .stop::before { content: ""; position: absolute; left: 14px; right: -16px; top: 13px; height: 3px; background: var(--frl-stone); opacity: .35; border-radius: 2px; }
+.rail.wrap .stop:nth-child(4n)::before, .rail.wrap .stop:last-child::before { display: none; }
+.lane.radio .rail.wrap .stop::before { background: var(--frl-red); opacity: .5; }
+.rail { align-items: start; }
+.rail::before { content: ""; position: absolute; left: 14px; right: 14px; top: 13px; height: 3px; background: var(--frl-stone); opacity: .35; border-radius: 2px; }
+.lane.radio .rail::before { background: var(--frl-red); opacity: .5; }
+.stop { position: relative; display: flex; flex-direction: column; transition: opacity var(--frl-ease); }
+.stop .dot { width: 29px; height: 29px; border-radius: 50%; background: var(--frl-paper); border: 3px solid var(--frl-stone); position: relative; z-index: 1; display: grid; place-items: center; font-weight: 700; font-size: 13px; line-height: 1; }
+.lane.radio .stop .dot { border-color: var(--frl-red); }
+.stop .card { margin-top: 14px; padding: 20px; display: flex; flex-direction: column; }
+.stop.me .card { border: 2px solid var(--frl-red); }
+.stop.dim { opacity: .3; }
+.step-name { color: var(--frl-red); font-weight: 600; font-size: 15px; line-height: 20px; margin: 0 0 4px; }
+.lane:not(.radio) .step-name { color: var(--frl-stone); }
+.board-name { font-weight: 700; font-size: 20px; line-height: 26px; margin: 0 0 8px; overflow-wrap: anywhere; }
+.stop p.plain { margin: 0 0 14px; font-size: 16px; line-height: 23px; }
+.meters { display: grid; grid-template-columns: max-content 1fr; gap: 6px 10px; align-items: center; font-size: 14px; line-height: 18px; margin: 0 0 14px; }
+.meters dt { color: var(--frl-stone); }
+.meters dd { margin: 0; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.pips { display: inline-flex; gap: 3px; }
+.pips i { width: 10px; height: 8px; border-radius: 2px; background: var(--frl-line); }
+.pips i.on { background: var(--frl-ink); }
+.lane.radio .pips i.on { background: var(--frl-red); }
+.delta { list-style: none; padding: 0; margin: 0 0 14px; font-size: 15px; line-height: 21px; }
+.delta li { padding: 3px 0 3px 20px; position: relative; }
+.delta li::before { position: absolute; left: 1px; top: 2px; font-weight: 700; }
+.delta li.add::before { content: "+"; color: var(--ok); }
+.delta li.drop::before { content: "\2212"; color: var(--frl-red); }
+.can { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.can .tag { position: relative; z-index: 2; font: 500 13px/18px var(--frl-font); padding: 3px 9px; border-radius: 3px; background: var(--frl-cream); border: 1px solid var(--frl-line); color: var(--frl-ink); cursor: pointer; }
+button.tag:hover { border-color: var(--frl-ink); }
+span.tag { cursor: default; }
+.can .tag[aria-pressed="true"] { background: var(--frl-ink); border-color: var(--frl-ink); color: var(--frl-cream); }
+.board-name a.whole { color: var(--frl-ink); text-decoration: none; }
+.board-name a.whole::after { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: 12px; }
+.stop .card { position: relative; }
+.stop .card:hover { border-color: var(--frl-ink); }
+.stop .card:has(a.whole:focus-visible) { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.stop .foot a.price { position: relative; z-index: 2; display: block; color: var(--frl-ink); }
+.stop .foot .status { display: block; color: var(--frl-ink); font-weight: 500; }
+.stop .foot .status.quiet { color: var(--frl-stone); font-weight: 400; }
+.stop .foot { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--frl-line); font-size: 15px; line-height: 21px; }
+.stop .price { font-weight: 600; }
+@media (max-width: 1000px) {
+  .rail { grid-template-columns: 1fr; gap: 0; padding-left: 44px; }
+  .rail::before, .rail.wrap::before { display: block; left: 13px; right: auto; top: 14px; bottom: 14px; width: 3px; height: auto; }
+  .rail.wrap .stop::before { display: none; }
+  .stop { padding-bottom: 16px; }
+  .stop .dot { position: absolute; left: -44px; top: 18px; }
+  .stop .card { margin-top: 0; }
+}
+
+/* projects by board */
+.pgrid { display: grid; grid-template-columns: minmax(180px, 1.2fr) repeat(var(--n), minmax(0, 1fr)); background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; }
+.pgrid > div { padding: 14px 16px; border-top: 1px solid var(--frl-line); display: flex; gap: 10px; align-items: flex-start; }
+.pgrid .ph { font-weight: 600; background: var(--frl-cream); align-items: center; border-top: 0; }
+.pgrid .pt { font-weight: 600; }
+.pgrid .pg { grid-column: 1 / -1; background: var(--frl-ink); color: var(--frl-cream); font-weight: 600; font-size: 15px; padding: 8px 16px; }
+.pgrid .pc > span:last-child { font-size: 15px; line-height: 21px; padding-top: 3px; }
+.pgrid .pc .dim-text { color: var(--frl-stone); }
+.pgrid .cell-label { display: none; }
+@media (max-width: 760px) {
+  .pgrid { grid-template-columns: 1fr; }
+  .pgrid .ph { display: none; }
+  .pgrid .pt { background: var(--frl-cream); }
+  .pgrid .pc { border-top: 0; padding-top: 8px; padding-bottom: 8px; }
+  .pgrid .cell-label { display: inline; font-weight: 600; color: var(--frl-ink); }
+}
+.key { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 14px 0 0; font-size: 15px; }
+.key span { display: inline-flex; gap: 8px; align-items: center; }
+.key .mark { width: 22px; height: 22px; } .key .mark svg { width: 13px; height: 13px; }
+
+/* board page: numbers first */
+.glance { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 32px; background: var(--frl-ink); color: var(--frl-cream); border-radius: 12px; overflow: hidden; }
+.glance > div { padding: 24px 20px; border-left: 1px solid rgba(247,243,236,0.12); }
+.glance > div:first-child { border-left: 0; }
+.glance .n { font-size: 40px; line-height: 44px; font-weight: 700; }
+.glance .l { font-weight: 600; margin-top: 4px; font-size: 16px; line-height: 22px; }
+.glance .d { color: rgba(247,243,236,.72); font-size: 14px; line-height: 20px; margin-top: 4px; }
+@media (max-width: 900px) { .glance { grid-template-columns: 1fr 1fr; } .glance > div { border-left: 0; border-top: 1px solid rgba(247,243,236,0.12); } .glance > div:first-child, .glance > div:nth-child(2) { border-top: 0; } }
+.glance.g4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) { .glance.g4 { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .glance.g4 { grid-template-columns: 1fr; } }
+.verdict .delta { margin: 0; }
+@media (max-width: 480px) { .glance { grid-template-columns: 1fr; } .glance > div:nth-child(2) { border-top: 1px solid rgba(247,243,236,0.12); } }
+.jump { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 24px 0 0; font-size: 15px; }
+.jump a { font-size: 15px; font-weight: 500; color: var(--frl-stone); text-decoration: none; padding: 2px 0; border-bottom: 1.5px solid transparent; }
+.jump a:hover { color: var(--frl-ink); border-bottom-color: var(--frl-ink); }
+.verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .verdict { grid-template-columns: 1fr; } }
+.verdict h3 { font-size: 20px; line-height: 26px; margin: 0 0 12px; display: flex; gap: 10px; align-items: center; }
+.verdict ul { margin: 0; padding-left: 20px; } .verdict li { margin: 6px 0; }
+.verdict .buy { grid-column: 1 / -1; background: var(--frl-cream); }
+
+/* will my code fit */
+.fit { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 40px; }
+@media (max-width: 860px) { .fit { grid-template-columns: 1fr; gap: 24px; } }
+.fit-label { font-weight: 600; margin: 0 0 10px; }
+.picks { display: flex; flex-direction: column; gap: 6px; }
+.pick { text-align: left; font: 500 15px/20px var(--frl-font); padding: 8px 12px 8px 36px; border-radius: 8px; border: 1.5px solid var(--frl-line); background: #fff; color: var(--frl-ink); cursor: pointer; position: relative; }
+.pick::before { content: ""; position: absolute; left: 11px; top: 10px; width: 14px; height: 14px; border: 1.5px solid var(--frl-stone); border-radius: 4px; }
+.pick:hover { border-color: var(--frl-ink); }
+.pick[aria-pressed="true"] { border-color: var(--frl-ink); background: var(--frl-cream); }
+.pick[aria-pressed="true"]::before { background: var(--frl-ink); border-color: var(--frl-ink); box-shadow: inset 0 0 0 2.5px var(--frl-cream); }
+.mbar-wrap { position: relative; }
+.mbar-wrap .mbar { margin-bottom: 22px; }
+.mbar-wrap i.cap { position: absolute; top: -6px; height: 48px; width: 3px; margin-left: -1.5px; background: var(--frl-ink); border-radius: 2px; }
+.fit-warn { margin: 16px 0 0; padding: 12px 14px; background: var(--frl-cream); border-radius: 8px; }
+.room { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 4px 0 0; }
+.room > div { background: var(--frl-cream); border-radius: 10px; padding: 14px 16px; }
+.room .n { font-size: 32px; line-height: 36px; font-weight: 700; white-space: nowrap; } @media (max-width: 520px) { .room .n { font-size: 26px; line-height: 30px; } }
+.room .l { font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.fit-say { font-weight: 600; font-size: 20px; line-height: 26px; margin: 0 0 20px; }
+.mbar-label { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; font-size: 15px; margin: 0 0 6px; }
+.mbar-label b { font-weight: 600; }
+.mbar { display: flex; gap: 2px; height: 36px; margin: 0 0 22px; }
+.mbar span { display: block; height: 100%; min-width: 3px; }
+.mbar span:first-child { border-radius: 6px 0 0 6px; }
+.mbar span.free { border-radius: 0 6px 6px 0; background: repeating-linear-gradient(135deg, #fff 0 6px, var(--frl-cream) 6px 12px); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+.mlegend { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 10px; font-size: 15px; line-height: 21px; }
+.mlegend li { display: grid; grid-template-columns: 16px 1fr; gap: 10px; }
+.mlegend i { width: 16px; height: 16px; border-radius: 4px; margin-top: 3px; }
+.mlegend i.free { background: repeating-linear-gradient(135deg, #fff 0 4px, var(--frl-cream) 4px 8px); border: 1.5px dashed color-mix(in srgb,#6B625B 45%,#fff); }
+.mlegend small { display: block; color: var(--frl-stone); font-size: 14px; line-height: 20px; }
+.tip { position: fixed; pointer-events: none; background: var(--frl-ink); color: var(--frl-cream); font-size: 14px; line-height: 20px; padding: 6px 10px; border-radius: 6px; display: none; z-index: 40; max-width: 280px; }
+
+/* rows of results */
+.rows { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .rows { grid-template-columns: 1fr; } }
+.rowc { display: grid; grid-template-columns: 28px 1fr; gap: 14px; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 18px; }
+.rowc h3 { font-size: 18px; line-height: 24px; margin: 2px 0 2px; } .rowc h3 a { color: inherit; text-decoration: none; } .rowc h3 a:hover { text-decoration: underline; }
+.rowc .say { font-weight: 600; margin: 0 0 4px; font-size: 16px; line-height: 22px; color: var(--frl-ink); }
+.rowc p { margin: 0; font-size: 15px; line-height: 22px; color: var(--frl-stone); }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 24px; margin: 16px 0 0; font-size: 16px; line-height: 23px; }
+.facts dt { color: var(--frl-stone); } .facts dd { margin: 0; }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr; gap: 0; } .facts dd { margin-bottom: 10px; } }
+.gotchas { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+.gotchas li { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 16px 18px; min-width: 0; overflow-wrap: anywhere; }
+.gotchas b { display: block; font-weight: 600; margin-bottom: 2px; }
+.srcs { font-size: 14px; line-height: 20px; color: var(--frl-stone); overflow-wrap: anywhere; }
+.srcs li { margin: 2px 0; }
+dl.qa { margin: 0; } dl.qa dt { font-weight: 600; margin-top: 14px; } dl.qa dd { margin: 4px 0 0; font-size: 16px; line-height: 24px; color: var(--frl-stone); }
+
+/* board page header: the fact card left, three stat cards right */
+.hero { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 16px; margin-top: 28px; scroll-margin-top: 88px; }
+.hero .meet h2 { font-size: 22px; line-height: 28px; margin: 0 0 8px; }
+.hero .meet > p { margin: 0; font-size: 16px; line-height: 23px; }
+.hero .meet .facts { margin-top: 14px; font-size: 15px; line-height: 21px; gap: 6px 18px; }
+.hero .meet .buyline { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--frl-line); }
+.hero .meet .fam { margin-top: 8px; }
+.hero-stats { display: grid; gap: 16px; align-content: start; }
+@media (max-width: 860px) { .hero { grid-template-columns: 1fr; } .hero-stats { order: -1; grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .hero-stats { grid-template-columns: 1fr; } }
+.blk h3.sub { font-size: 20px; line-height: 26px; margin: 40px 0 4px; scroll-margin-top: 88px; }
+.g .g-h a { color: var(--frl-ink); }
+
+/* experiment cards */
+.xcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.xcard { position: relative; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.xcard:hover { border-color: var(--frl-ink); }
+.xcard:has(a:focus-visible) { outline: 2px solid var(--frl-red); outline-offset: 2px; }
+.xcard h3 { font-size: 18px; line-height: 24px; margin: 0; }
+.xcard h3 a { color: var(--frl-ink); text-decoration: none; }
+.xcard h3 a::after { content: ""; position: absolute; inset: 0; border-radius: 12px; }
+.xcard p { margin: 0; font-size: 15px; line-height: 22px; }
+.xcard .xline { color: var(--frl-stone); }
+.ladder { list-style: none; display: flex; gap: 3px; padding: 0; margin: auto 0 0; font-size: 11px; line-height: 14px; }
+.ladder li { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: center; padding: 4px 1px; border-radius: 4px; background: var(--frl-cream); color: var(--frl-stone); }
+.ladder li.on { background: var(--frl-ink); color: var(--frl-cream); }
+
+/* sticky "On this page" bar and back-to-top, built by OTP_JS from the page's own contents list */
+.otp { position: fixed; left: 0; right: 0; z-index: 25; background: rgba(250,250,247,.97); backdrop-filter: blur(8px); border-bottom: 1px solid var(--frl-line); opacity: 0; visibility: hidden; transition: opacity 160ms ease-out, visibility 160ms; }
+.otp.on { opacity: 1; visibility: visible; }
+.otp .wrap { display: flex; align-items: center; gap: 4px; height: 44px; overflow-x: auto; scrollbar-width: none; }
+.otp .wrap::-webkit-scrollbar { display: none; }
+.otp b { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--frl-stone); margin-right: 8px; white-space: nowrap; font-weight: 600; }
+.otp a { font-size: 15px; font-weight: 500; color: var(--frl-stone); text-decoration: none; white-space: nowrap; padding: 10px 10px; border-radius: 0; border-bottom: 2px solid transparent; }
+.otp a:hover { color: var(--frl-ink); }
+.otp a.cur { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+body.has-otp [id] { scroll-margin-top: 132px; }
+.totop { position: fixed; right: 16px; bottom: 16px; z-index: 25; width: 44px; height: 44px; border-radius: 6px; border: 1.5px solid var(--frl-ink); background: var(--frl-paper); color: var(--frl-ink); display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 6px 16px rgba(22,19,18,.12); }
+.totop.on { display: inline-flex; } .totop svg { width: 20px; height: 20px; }
+@media print { .otp, .totop { display: none !important; } }
+
+</style>
+</head>
+<body>
+
+<header class="dark">
+  <div class="wrap">
+    <a href="index.html" class="brand"><svg class="logo logo-head" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg></a>
+    <nav id="site-nav" aria-label="Main"><div class="ni"><a href="projects.html">Builds</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="build-menu" aria-label="Build filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="build-menu"><a class="mi" href="projects.html?f=smart-home"><b>Smart home</b><span>Home Assistant, Matter, Apple Home</span></a><a class="mi" href="projects.html?f=ai"><b>Edge AI</b><span>Occupancy, digits, vision on Linux</span></a><a class="mi" href="projects.html?f=radio"><b>Radio and range</b><span>Walkie-talkie, key finder, far shed sensor</span></a><a class="mi" href="projects.html?f=motors"><b>Motors, power and sensing</b><span>Control loops, radar presence, sensors</span></a><a class="mi" href="projects.html?f=screens"><b>Screens</b><span>Touch displays on a development kit</span></a><a class="mi" href="security.html"><b>Security</b><span>Post-quantum key exchange, AES</span></a><p class="menu-note">New here? <a href="project-blink.html">Blink an LED first</a>, or <a href="projects.html">see all 39 builds</a>.</p></div></div><div class="ni"><a href="hardware.html" aria-current="page">Hardware</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="hardware-menu" aria-label="Hardware pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="hardware-menu"><a class="mi" href="hardware.html"><b>The kits</b><span>Every kit a build ran on, what ran, where to get it</span></a><a class="mi" href="addons.html"><b>Add-ons and parts</b><span>Screens, sensors, radios, motors and probes, from any maker</span></a></div></div><div class="ni"><a href="portability.html">Software</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="software-menu" aria-label="Software pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="software-menu"><a class="mi" href="portability.html"><b>Bring your code</b><span>Arduino, ESPHome, Zephyr, MicroPython, STM32, ESP32 and Pico code on a TI board</span></a><a class="mi" href="ports.html"><b>Every port</b><span>What ran, what only built, what changed, with the code</span></a><a class="mi" href="one-app-eleven-boards.html"><b>One app, eleven boards</b><span>The same C file from an MSPM0 to AM62L Linux</span></a><a class="mi" href="project-build-from-terminal.html"><b>Build from the terminal</b><span>TI&#x27;s SDK examples with GCC and a makefile, no IDE</span></a><a class="mi" href="benchmarks.html"><b>Measured</b><span>Every board on the same tests, with the method</span></a><a class="mi" href="edge-ai.html"><b>Edge AI</b><span>Where to start, and the measured numbers</span></a></div></div><div class="ni"><a href="community.html">Community</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="about-menu" aria-label="Community pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="about-menu"><a class="mi" href="community.html"><b>Community</b><span>Post what you built or ported; it gets a page here</span></a><a class="mi" href="https://github.com/Fox-Red-Labs/fox-red-labs"><b>Get the code</b><span>The repository: board folders, ports and portable code</span></a></div></div></nav>
+    <form class="hsearch" action="search.html" role="search"><input name="q" type="search" placeholder="Search" aria-label="Search the site" title="Search the site (press /)"><button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></form>
+    <a class="gh-link" href="https://github.com/Fox-Red-Labs/fox-red-labs" aria-label="Fox Red Labs on GitHub"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
+    
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><svg class="mb-o" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="mb-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Menu</button>
+  </div>
+<script>
+(function () {
+  var h = document.currentScript.closest("header"), b = h.querySelector(".menu-btn");
+  function set(open) { if (open) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); h.classList.toggle("nav-open", open); b.setAttribute("aria-expanded", open ? "true" : "false"); }
+  window.addEventListener("resize", function () { if (h.classList.contains("nav-open")) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); });
+  b.addEventListener("click", function () { set(b.getAttribute("aria-expanded") !== "true"); });
+  h.querySelectorAll("nav a").forEach(function (a) { a.addEventListener("click", function () { set(false); }); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (h.classList.contains("nav-open")) { set(false); b.focus(); } h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  document.addEventListener("click", function (e) { if (!h.contains(e.target)) { set(false); h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  h.querySelectorAll(".ni-btn").forEach(function (t) {
+    t.addEventListener("click", function () { var n = t.closest(".ni"), open = !n.classList.contains("open"); n.classList.toggle("open", open); t.setAttribute("aria-expanded", open ? "true" : "false"); });
+  });
+  var f = h.querySelector(".hsearch"), q = f && f.querySelector("input");
+  if (f) f.addEventListener("submit", function (e) { if (getComputedStyle(q).display === "none" || !q.value.trim()) { e.preventDefault(); location.href = "search.html"; } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || /input|textarea|select/i.test(e.target.tagName) || e.target.isContentEditable) return;
+    e.preventDefault(); var s = document.getElementById("sq");
+    if (s) s.focus(); else if (q && getComputedStyle(q).display !== "none") q.focus(); else location.href = "search.html";
+  });
+})();
+</script>
+</header>
+<main><div class="wrap">
+<p class="crumb"><a href="index.html">Fox Red Labs</a> / <a href="hardware.html">Hardware</a> / <a href="board-mspm0g5187.html">LP-MSPM0G5187</a> / Errors and fixes</p><h1 class="q">LP-MSPM0G5187: errors and fixes</h1><p class="q-sub">MSPM0 G5187: errors and fixes</p><div id="errors" class="faqblk"><style>
+main h2 { font-size:20px; margin:36px 0 10px; font-weight:600; border-bottom:1px solid var(--frl-line); padding-bottom:6px; }
+.lede { color:var(--frl-stone); margin:0 0 16px; }
+a { color:var(--frl-red); }
+.mono, code { font-family:var(--frl-mono); font-size:13px; }
+code { background:var(--frl-cream); padding:0 4px; border-radius:3px; overflow-wrap:anywhere; }
+.legend { list-style:none; padding:0; margin:0 0 8px; display:flex; flex-wrap:wrap; gap:8px 16px; font-size:14px; }
+.legend b { margin-left:6px; }
+.qa { background:#fff; border:1px solid var(--frl-line); border-radius:8px; margin:8px 0; padding:0 14px; }
+.qa summary { cursor:pointer; padding:12px 0; display:flex; flex-wrap:wrap; gap:6px 10px; align-items:baseline; list-style:none; }
+.qa summary::-webkit-details-marker { display:none; }
+.qa summary::before { content:"+"; color:var(--frl-stone); font-weight:700; width:12px; }
+.qa[open] summary::before { content:"–"; }
+@media (max-width:700px) { .qa summary h3.q { flex:1 1 calc(100% - 22px); min-width:0; overflow-wrap:break-word; } .qa summary .pill { margin-left:22px; } }
+h1.q { margin:0 0 14px; flex:none; }
+.q-sub + .lede { margin-top:16px; }
+.q { font-weight:600; font-size:17px; margin:0; flex:1 1 60%; min-width:0; overflow-wrap:anywhere; }
+.a { font-weight:600; }
+.qa p, .qa li { font-size:15px; margin:0 0 10px; }
+.pill { display:inline-block; font-size:12px; line-height:17px; font-weight:600; padding:1px 6px; border-radius:3px; border:1.5px solid var(--c); color:var(--c); white-space:normal; max-width:100%; overflow-wrap:anywhere; }
+.t-ours { --c:var(--frl-red); } .t-setup { --c:var(--frl-amber); } .t-default { --c:var(--frl-stone); } .t-tool { --c:var(--frl-ink); }
+.t-chip { --c:var(--frl-ink); } .t-third { --c:var(--frl-ok); } .t-radio { --c:var(--frl-stone); } .t-unknown { --c:var(--frl-stone); }
+.ours ul { padding-left:20px; }
+.ffind { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:12px 0 4px; }
+.ffind input { flex:1 1 260px; font:500 16px var(--frl-font); height:44px; padding:0 14px; border:1.5px solid var(--frl-ink); border-radius:6px; background:#fff; color:var(--frl-ink); min-width:0; }
+.ffbtns { display:flex; gap:8px; flex:1 1 100%; }
+.ffind button { font:500 14px var(--frl-font); height:36px; padding:0 14px; border-radius:4px; border:1.5px solid var(--frl-line); background:#fff; color:var(--frl-ink); cursor:pointer; }
+.ffind button:hover { border-color:var(--frl-ink); }
+.fcount { font-size:14px; color:var(--frl-stone); min-height:20px; margin:0 0 4px; }
+
+table { border-collapse:collapse; width:100%; font-size:14px; margin:6px 0; }
+.tw { overflow-x:auto; }
+th, td { text-align:left; padding:4px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font-weight:600; color:var(--stone); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+.glossary dl { display:grid; grid-template-columns:minmax(120px,max-content) 1fr; gap:6px 16px; font-size:15px; }
+.glossary summary { cursor:pointer; font-weight:600; color:var(--frl-ink, #161312); margin:2px 0 12px; } .glossary dt { font-weight:600; } .glossary dd { margin:0; color:var(--stone); }
+@media (max-width:560px) { .glossary dl { grid-template-columns:1fr; } .glossary dd { margin-bottom:8px; } }
+</style><nav class="jump fs-jump" aria-label="In this section"><a href="#g-ti-examples-and-tools">TI examples and tools</a><a href="#g-npu-and-the-occupancy-model">NPU and the occupancy model</a><a href="#g-sensors-boosterpack">Sensors BoosterPack</a><a href="#g-cc1407p-sub-ghz-radio">CC1407P sub-GHz radio</a><a href="#g-walkie-talkie">Walkie-talkie</a><a href="#g-alarm-listener">Alarm listener</a><a href="#g-examples-retargeted-from-another-chip">Examples retargeted from another chip</a><a href="#g-mistakes-to-avoid">Mistakes to avoid</a><a href="#g-when-the-board-stops-answering">When the board stops answering</a></nav><p class=lede>Checked on the bench board 2026-10-08 and 2026-10-09 (MSPM0 SDK 2.11.00.07, UniFlash 9.6.0, probe firmware 3.0.0.38). Terms: the vocabulary page. 1 kB = 1,024 bytes.</p><p class=lede>Each answer starts with the fix.</p><ul class=legend></ul><div class=ffind role=search><input id=ffq type=search placeholder="Find a question" aria-label="Find a question in this section" autocomplete=off><div class=ffbtns><button type=button id=ffopen>Open all</button><button type=button id=ffclose>Close all</button></div></div><p class=fcount id=ffcount aria-live=polite></p><section id="g-ti-examples-and-tools"><h2>TI examples and tools</h2><details class=qa id="ti-s-wake-word-example-never-lights-the-led-when-you-say-ok-"><summary><h3 class=q>TI&#x27;s wake-word example never lights the LED when you say &quot;OK Kilby&quot;. Is the onboard microphone broken?</h3></summary><p class=a>Probably not: the example does not listen to the onboard microphone.</p><p><code>wakeword_detection_ai_npu</code> samples an analog microphone on pin PB22 (ADC channel 24) with the chip&#x27;s ADC; its README says &quot;Analog microphone connected to PB22 (AIN24)&quot; and its code mentions a &quot;BOOSTXL audio microphone&quot;. PB22 is BoosterPack header pin 6, where the BOOSTXL-EDUMKII BoosterPack puts its microphone. The board&#x27;s own microphone feeds the PCM1809 audio ADC, which reaches the chip over I2S on PB10, PB11 and PB12, and only <code>device_uac_microphone_i2s</code> reads it. Stack a BOOSTXL-EDUMKII, or use this repo&#x27;s port to the I2S microphone, <code>mspm0g5187/wakeword</code>: with the Mac&#x27;s synthetic &quot;OK Kilby&quot; sent in over the serial port it detects 120 of 120, and its live microphone run waits for the CC1407P&#x27;s two wires to come off J20 (PB10 and PB11 are the microphone&#x27;s clock lines). Jumper J6 powers the onboard microphone and audio ADC; on the Rev. A board it ships with its shunt in place, although the user guide&#x27;s jumper table lists it as unpopulated.</p></details><details class=qa id="dslite-prints-a-firmware-update-is-required-for-the-xds110-p"><summary><h3 class=q>DSLite prints &quot;A firmware update is required for the XDS110 probe&quot; on every command. Is the update required?</h3></summary><p class=a>Not on this board.</p><p>The full text is <code>Warning: A firmware update is required for the XDS110 probe. The current firmware is version 3.0.0.38. The probe must be upgraded to firmware version 3.0.0.43 to be compatible with this software. Click the &quot;Update&quot; button to update the firmware.</code> The board ships with probe firmware 3.0.0.38, and with that firmware DSLite still identified the chip, read and wrote flash and verified it. There is no Update button on the command line. If a command fails instead of only warning (other LaunchPad development kits on 3.0.0.31 do), update the probe: in <code>/Applications/ti/ccs2101/ccs/ccs_base/common/uscif/xds110/</code> run <code>./xdsdfu -I &lt;serial&gt; -m</code>, wait 3 seconds, then <code>./xdsdfu -I 00000000 -f firmware_3.0.0.43.bin -s &lt;serial&gt; -r</code>, wait 5 seconds, and check with <code>./xdsdfu -e</code>. The update writes the probe, not the chip.</p></details><details class=qa id="ti-s-adc12-monitor-supply-example-reads-values-that-drift-an"><summary><h3 class=q>TI&#x27;s <code>adc12_monitor_supply</code> example reads values that drift and are nowhere near the supply voltage. Is the board faulty?</h3></summary><p class=a>No.</p><p>On the MSPM0 G5187 the example&#x27;s ADC channel 15 is the header pin PA15 (J3 pin 27, also an I2S pin), not the internal supply divider the code comments describe: its README table lists &quot;ADC0 | ADC12 Channel 15 Pin | PA15&quot;, while the same example for the MSPM0 G3507 lists no pin. Raw codes read 540 to 674 and moved while watched, where the G3507 reads a steady 1,796 to 1,797. The channel that carries the supply on this chip is not found. Until it is, treat the example&#x27;s voltage as a reading of the PA15 pin.</p></details><details class=qa id="ti-s-adc12-max-freq-dma-example-captures-1k-samples-in-1-87-"><summary><h3 class=q>TI&#x27;s <code>adc12_max_freq_dma</code> example captures 1k samples in 1.87 ms, which is 0.547 Msps. The data sheet says 1.6 Msps</h3></summary><p class=a>The example as shipped is not a speed test of the chip.</p><p>With TI&#x27;s own settings (ADC clock SYSOSC 32 MHz setting, 62.5 ns sample time, 12-bit, DMA) 60k CPU cycles were counted at 32 MHz from start of conversion to the DMA-done interrupt, three runs the same. The G3507 with the same settings took 8.3k cycles for 1k samples. The reason the G5187 is slower with identical settings is unknown; other ADC clock and sample-time settings were not run.</p></details><details class=qa id="a-ti-example-flashes-and-verifies-on-the-lp-mspm0g5187-then-"><summary><h3 class=q>A TI example flashes and verifies on the LP-MSPM0G5187, then nothing happens. The LEDs do not move and the debugger shows the chip stuck in <code>SYSCFG_DL_SYSCTL_CLK_init</code>. What is wrong?</h3></summary><p class=a>The example&#x27;s generated start-up code waits forever for a clock-ready bit that this board never sets.</p><p>Seven SDK examples do it (<code>sysctl_hfxt_run</code>, <code>sysctl_mclk_syspll</code>, <code>ecg_anomaly_detection_ai</code> and its <code>_npu</code> twin, and the three <code>motor_bearing_fault</code> examples). Reading the clock status register (0x400B0204) showed the PLL and the high-speed clock good and the low-frequency oscillator bit (0x800) clear. If you see this, open the generated <code>ti_msp_dl_config.c</code>, find the <code>while</code> loop in <code>SYSCFG_DL_SYSCTL_CLK_init</code> and take <code>DL_SYSCTL_CLK_STATUS_LFOSC_GOOD</code> out of its mask, or pick a different example. Why the bit stays clear is not confirmed.</p></details><details class=qa id="how-long-does-a-blink-take-from-the-terminal-and-what-does-f"><summary><h3 class=q>How long does a blink take from the terminal, and what does FRL-E021 mean?</h3></summary><p class=a><code>python3 tools/frl/frl.py run --board mspm0g5187 --probe &lt;serial&gt; --pattern 150,150,150,900</code> builds TI&#x27;s blink with your pattern, flashes it and times PA17 against the pattern: 9.4, 10.1 and 10.5 s on three warm runs, image 536 bytes (<code>data/results/mspm0g5187.csv</code>).</p><p>The route is validated with SysConfig 1.28.0 (three runs, pin-read check, 2026-11-08), so that version needs no override. If it stops with <code>FRL-E021</code>, the installed SysConfig is another version than the one the route was checked on; set <code>FRL_SYSCONFIG</code> to its folder and run again, and the run is recorded as unvalidated. Back up first with <code>python3 tools/benchmark/backup.py save mspm0g5187 --probe &lt;serial&gt;</code> or leave the flag <code>--no-backup</code> off.</p></details><details class=qa id="does-micropython-or-the-arduino-layer-run-on-the-lp-mspm0g51"><summary><h3 class=q>Does MicroPython or the Arduino layer run on the LP-MSPM0G5187, and why does the pystone benchmark stop with a recursion error?</h3></summary><p class=a>Both run. Build MicroPython with <code>make BOARD=g5187 VARIANT=min</code> in <code>ports/micropython</code> (72.9 kB; the full image is 47 kB too big for the 128 kB flash) and the Arduino layer with <code>BOARD=mspm0g5187 ./build.sh</code> in <code>portability/arduino</code>. Flash either with DSLite: MicroPython as a raw binary padded to 16 bytes at 0x0, Arduino as the <code>.out</code>. The pystone benchmark needs a stack larger than the minimal image&#x27;s 1.5 kB: <code>maximum recursion depth exceeded</code> means rebuild with <code>STACK_LEN=0x1000</code>, and use <code>tests/pystone_lowmem_min.py</code>, because the minimal level has no <code>x[:]</code> slices. Three runs gave 680, 791 and 794 pystones per second at 80 MHz. The UART block is called UC0 on this chip, so code that names <code>UART0</code> or <code>UART0_IRQHandler</code> builds and stays silent.</p><p>Checked 2026-11-09, board Rev. A. Logs: <code>mspm0g5187/bench/micropython/</code> and <code>mspm0g5187/bench/arduino/</code>.</p></details></section><section id="g-npu-and-the-occupancy-model"><h2>NPU and the occupancy model</h2><details class=qa id="an-npu-program-hangs-after-the-first-test-vector-and-never-r"><summary><h3 class=q>An NPU program hangs after the first test vector and never reaches the end. What is wrong?</h3></summary><p class=a>A debugger reset while an earlier NPU run was in progress leaves the NPU stuck.</p><p>The symptom: the program waits forever on <code>tvmgen_default_finished</code>, the first test vector passes, and the NVIC shows the NPU interrupt (IRQ 12) pending but never taken. Reading the chip after <code>reset halt</code> followed by <code>resume</code> caused it five times out of six. Fix: start the image by flashing with DSLite, which runs it when the flash finishes, wait, then halt and read the results without a reset. With that sequence every NPU image ran and matched all 20 vectors.</p></details><details class=qa id="the-occupancy-model-scores-90-9-percent-on-its-test-set-but-"><summary><h3 class=q>The occupancy model scores 90.9 percent on its test set but much less on a new day. Why?</h3></summary><p class=a>Because the published test set shares days with the training data.</p><p>The 1,001 test windows were cut in 48-minute blocks from the same room and days the model trained on, so neighbouring conditions sit on both sides; with whole days held out a fresh 8k model scores 87.7 percent overall but 40.2 percent balanced, calling 159 of 170 three-person windows empty (2026-10-09). It is the same model recipe; what changed is the question asked of it. Retrain on your own room&#x27;s recordings with the day-held-out protocol (<code>tools/dataset/eval_occupancy.py</code>) before trusting a figure.</p></details><details class=qa id="what-does-the-lp-mspm0g5187-s-npu-not-accelerate-and-why-is-"><summary><h3 class=q>What does the LP-MSPM0G5187&#x27;s NPU not accelerate, and why is the 30k model only 2.3 times faster?</h3></summary><p class=a>Layers outside the NPU&#x27;s rules stay on the CPU.</p><p>TI&#x27;s NPU guide lists the limits (channel counts in multiples of 4, pooling kernels up to 4, fully connected inputs of 16 or more), and NNC&#x27;s compile log for the 30k model says <code>GCONV layer NOT offloaded to TI-NPU</code>, so that convolution runs in software and the gain drops from 21.6 times on the 8k model to 2.3 times. The reason for that layer&#x27;s refusal is not in the log; the suspected cause is its weights overflowing the NPU&#x27;s 18-bit accumulator, not checked. Source: <code>docs/experiments/2026-10-09-mspm0g5187-npu-vs-cpu.md</code>.</p></details><details class=qa id="the-occupancy-demo-on-the-npu-prints-people-1-in-a-lit-room-"><summary><h3 class=q>The occupancy demo on the NPU prints <code>people=1</code> in a lit room with nobody in it. Is the model wrong?</h3></summary><p class=a>Probably not, but it is untested.</p><p>The model wants four inputs: light, sound, CO2 and motion. The Sensors BoosterPack supplies only the light, so the demo holds the other three at empty-room values. In the model&#x27;s 20 test windows every lit window (115 to 157 lux) had people in it, and the bench light gave 317 lux, twice that, so the model may be reading the light as people; the other candidate is the three channels the demo holds fixed, and neither is tested. The count flickers until about sample 18 (18 seconds here) and the logits settle at sample 32: with the bench lit (317 lux) it printed 0 for 15 samples, 1 at 16, 0 at 17, then 1. Covering the sensor should bring it back to 0, which has not been tried. The run and the numbers: <code>docs/experiments/2026-10-10-mspm0g5187-npu-live-light.md</code>.</p></details><details class=qa id="can-the-board-run-the-mlperf-tiny-keyword-spotting-model-and"><summary><h3 class=q>Can the board run the MLPerf Tiny keyword-spotting model, and why did my first run score 3 of 20?</h3></summary><p class=a>Yes: 18.70 ms on the NPU, 91.0 percent on the full test split (<code>docs/experiments/2026-11-03-mspm0g5187-mlperf-tiny-kws.md</code>).</p><p>Three traps, each from that run. (1) NNC&#x27;s <code>skip_normalize=true</code> only drops the input scaling when it is the model&#x27;s first operation; this model pads first, so the model still takes float input and an int8 buffer is read as floats (3 of 20 right; feeding floats gave 18 of 20). (2) NNC&#x27;s CPU build of the same model needs 43.7 kB of RAM and does not link into 32 kB, and ResNet-8 needs 86.5 kB even on the NPU. (3) A board that reads its own start-up text back (<code>m-inad</code> in the receive buffer) has a loop wire between PA10 and PA11; take it off and fit the J101 shunts before using the backchannel serial port, or drive the image through the debugger as <code>mspm0g5187/mlperf-tiny/host/swd_run.py</code> does.</p></details></section><section id="g-sensors-boosterpack"><h2>Sensors BoosterPack</h2><details class=qa id="the-sensors-boosterpack-bp-bassensorsmkii-is-stacked-on-the-"><summary><h3 class=q>The Sensors BoosterPack (BP-BASSENSORSMKII) is stacked on the LP-MSPM0G5187 and the demo prints <code>scan=none</code>. Is the pin map wrong?</h3></summary><p class=a>No.</p><p>The kit&#x27;s I2C is on header pins 9 (PA9, clock) and 10 (PA8, data), as TI&#x27;s board file for the MSPM0 G5187 says. <code>scan=none</code> with every sensor <code>none</code> was the stack on 2026-10-09: the same board found 0x40 and 0x44 on 2026-10-10 after the BoosterPack was reseated, with the same pins and bus settings, so the seating is the inferred cause. First unplug the USB cable, press the BoosterPack straight down until its pin 1 (marked 3V3 on the BoosterPack) sits in the kit&#x27;s J1 pin 1, and plug in again. A seated stack prints <code>scan=40,44</code> within a second of starting the demo (the output is on <code>/dev/cu.usbmodem&lt;probe serial&gt;1</code> at 115200). The demo programs switch the sensors on for you; in your own code set PB22 (pin 6) low for the humidity sensor and PA15 (pin 27) high for the light sensor. Only header rows J1 and J3 have pins on this LaunchPad, so BoosterPack pins 1 to 10 and 21 to 30 are connected and the two LEDs (pins 39 and 40) and the motion sensor&#x27;s second interrupt (pin 13) are not. The <code>err=</code> count at the end of each line grows by one for every failed read: 3 a second with the TMP117 and the motion sensor missing, 5 a second when nothing answers. One more way to get the same <code>scan=none</code>, with <code>drv=0.000V</code>: a second call to <code>SYSCFG_DL_GPIO_init</code> (run of 2026-10-10), which writes the pins&#x27; initial values and switches every sensor off again; set the power pins after the last init call. Seen 2026-10-10, board Rev. A.</p></details><details class=qa id="the-sensors-boosterpack-s-tmp117-prints-tmp117-none-on-the-l"><summary><h3 class=q>The Sensors BoosterPack&#x27;s TMP117 prints <code>tmp117=none</code> on the LP-MSPM0G5187, with the ribbon cable in. The other sensors read</h3></summary><p class=a>The TMP117 sits on the break-away strip and is joined to the rest of the board only by the flat cable that ships loose in the box.</p><p>TI&#x27;s user guide (SLAU829, section 2.1.4) says the metal contacts face down in the connector and the black tab faces up; the demo already drives J3 pin 28 (PA12) high to power it. On 2026-10-10 every fit that could be tried left 0x48 silent: one way round broke the bus (next entry), the other left the bus healthy and silent, also with 3.3 V wired from pin 1 to pin 28. The cause was not found. A second cable, or the BoosterPack on another LaunchPad, would tell a bad cable from a bad strip.</p></details><details class=qa id="after-the-sensors-boosterpack-s-flat-cable-is-plugged-in-an-"><summary><h3 class=q>After the Sensors BoosterPack&#x27;s flat cable is plugged in, an I2C scan shows every address from 08 to 77, and the humidity and light sensors no longer answer</h3></summary><p class=a>The cable is in end for end.</p><p>The two sockets number their pins in opposite order (SLAU829 Figure 9: J5 has V+, GND, SDA, SCL, ALERT, J6 has ALERT, SCL, SDA, GND, V+), and the cable is symmetric, so one way round connects the clock line to ground. Unplug USB, take the cable out, and the scan returns to <code>40,44</code>. Turn it end for end, push both ends in until they stop and press both latches flat before plugging USB back in. The reader keeps driving the sensor power pin until it is reset, so halt it first if you see this. Seen twice on 2026-10-10; the program recovered each time with no damage.</p></details><details class=qa id="the-sensors-boosterpack-s-motion-sensor-bmi160-prints-bmi-no"><summary><h3 class=q>The Sensors BoosterPack&#x27;s motion sensor (BMI160) prints <code>bmi=none</code> on the LP-MSPM0G5187, with the humidity and light sensors reading on the same bus</h3></summary><p class=a>Cause not found.</p><p>The schematic in SLAU829 puts the BMI160 straight on 3V3 with its chip-select tied high, so it should answer at I2C address 0x69 whenever the humidity sensor at 0x40 does. On 2026-10-10 it answered on no scan in three runs, with the I2C controller at 100 kHz and with the lines driven by software; the third run had an I2C bus recovery at startup (nine clock pulses, then a stop) and read the same. A 2024 TI forum thread (sensors forum 1430282) reports the same silence at 0x69 on another LaunchPad and closed without a cause. A photo of the bench board on 2026-10-10 shows both the BMI160 and the BMM150 fitted in their marked boxes, so a missing part is ruled out there. Things to check: whether the BMI160 answers on another LaunchPad, and whether the ribbon cable or the break-away strip changes anything (the cable was out in every run). The light-driven occupancy demo (<code>occ_live.c</code>) is not wired to the motion sensor.</p></details><details class=qa id="the-humidity-light-or-magnet-sensor-or-the-tmp117-on-the-sen"><summary><h3 class=q>The humidity, light or magnet sensor, or the TMP117, on the Sensors BoosterPack never answers on the LP-MSPM0G5187. Do the power pins matter?</h3></summary><p class=a>Four sensors on the BP-BASSENSORSMKII are powered through header pins, so they stay silent until your program sets them.</p><p>Set pin 6 (PB22) low for the HDC2080 humidity sensor, pin 24 (PB15) low for the DRV5055 magnet sensor, pin 27 (PA15) high for the OPT3001 light sensor and pin 28 (PA12) high for the TMP117. The motion sensor and compass are always powered, so they do not need these pins. Wait about 10 ms after setting the pins before the first scan. The demo programs do all four.</p></details><details class=qa id="the-magnet-sensor-on-the-sensors-boosterpack-reads-1-64-v-wi"><summary><h3 class=q>The magnet sensor on the Sensors BoosterPack reads 1.64 V with no magnet, not exactly 1.65 V. Is it broken?</h3></summary><p class=a>No.</p><p>The DRV5055A4&#x27;s data sheet (SBAS640C) lets its resting output sit anywhere from 1.59 to 1.71 V at 3.3 V, about 8 mT either side of center at 7.5 mV per mT, so a magnet test must be read against the same chip&#x27;s own resting value. The computed voltage also assumes the ADC&#x27;s reference is exactly 3.3 V, which was not measured.</p></details><details class=qa id="which-accuracy-figures-apply-to-the-sensors-on-the-sensors-b"><summary><h3 class=q>Which accuracy figures apply to the sensors on the Sensors BoosterPack?</h3></summary><p class=a>The data sheets&#x27;, at the conditions they name.</p><p>No reference instrument was used, so none of the readings tests a sensor&#x27;s accuracy. Each figure is in the sheet for that part, with its conditions. The light sensor&#x27;s sheet gives no accuracy figure at room-light levels (about 300 lux), only at 2000 lux.</p></details></section><section id="g-cc1407p-sub-ghz-radio"><h2>CC1407P sub-GHz radio</h2><details class=qa id="the-cc1407p-radio-answers-the-lp-mspm0g5187-but-every-reply-"><summary><h3 class=q>The CC1407P radio answers the LP-MSPM0G5187 but every reply is a checksum error (<code>04 02 f0 00</code>). What is wrong?</h3></summary><p class=a>The data line into the radio is not connected, so the radio reads every message as noise.</p><p>The radio&#x27;s own replies arrive fine, which is why it looks half-working. Check that the wire from J20 PB8 sits in radio pin 15 (PICO), the 6th socket from the top of the radio&#x27;s right outer row; on the bench it was one socket high, in pin 16. A quick test: <code>mspm0g5187/radio/mosi.c</code> forces PB8 high, then low; if the radio&#x27;s reply does not change, the line is open. Wiring, found 2026-10-10. Details: radio README.</p></details><details class=qa id="holding-the-cc1407p-s-reset-pin-low-does-not-stop-it-answeri"><summary><h3 class=q>Holding the CC1407P&#x27;s reset pin low does not stop it answering, and its interrupt never fires. Why?</h3></summary><p class=a>The reset and interrupt wires are not in radio pins 36 and 23.</p><p>Both sit in the radio&#x27;s inner rows, which are easy to miss when the other six wires use the outer rows. <code>mspm0g5187/radio/diag.c</code> holds each candidate pin low for 200 ms and talks to the radio while it is held: a radio truly in reset cannot answer. Wiring, 2026-10-10.</p></details><details class=qa id="why-can-t-a-boosterpack-with-spi-stack-on-the-lp-mspm0g5187"><summary><h3 class=q>Why can&#x27;t a BoosterPack with SPI stack on the LP-MSPM0G5187?</h3></summary><p class=a>Wire it instead: the 2x4 header J20 by the microSD slot carries a whole SPI port.</p><p>The LaunchPad has header pins on its J1 and J3 rows only (BoosterPack pins 1 to 10 and 21 to 30). SPI data, chip select and the pins above 30 are on J2 and J4, which have no pins fitted. The CC1407P radio goes on eight wires instead: six to the 2x4 header J20 by the microSD slot, which carries a whole SPI (UC3 on PB6 to PB9), and power and ground to J1 and J3 pins that pass up through the Sensors BoosterPack. The user guide&#x27;s header drawing (SLAU967, Figure 2-3) shows all four rows; the board ships with pins on two. Wiring table: radio README.</p></details><details class=qa id="what-antenna-does-the-bp-cc1407p-9-fe-radio-need-and-can-it-"><summary><h3 class=q>What antenna does the BP-CC1407P-9-FE radio need, and can it be used outside North America?</h3></summary><p class=a>A 915 MHz antenna with an SMA plug, screwed onto the radio&#x27;s SMA socket before it transmits.</p><p>TI&#x27;s user guide (SWRU633) lists none in the kit; the bench unit&#x27;s came in the box. The -9 board is the 902 to 928 MHz variant (US FCC and Japan ARIB), with a filter for that band on the receive side (SWRU633 section 1.2 and its parts list); TI also lists a -8 variant (BP-CC1407P-8-FE); check its product page for the band before buying for another region. Check your local rules before transmitting.</p></details><details class=qa id="the-cc1407p-sends-on-one-protocol-then-every-transmit-on-ano"><summary><h3 class=q>The CC1407P sends on one protocol, then every transmit on another ends with status 0x8A. Why?</h3></summary><p class=a>Reset the radio between protocols: close and reopen TI&#x27;s host driver, which pulses RESET_N and takes about 50 ms.</p><p>The radio appears to keep the image of its first transmit since its last reset (suspected; the logs show only that a reset cures it), so a change of modem (FSK, OFDM, O-QPSK) or RF mode fails with 0x8A, &quot;unknown operation&quot;. Storing the device config with the new RF mode, or calling <code>TRX_Host_utilSetRfMode</code>, did not switch it on firmware 3.0.0.25. In the run without resets, the five profiles that needed one were the first OFDM, the first 2-GFSK, the 9.6 kbps 2-GFSK, O-QPSK and XLR. With a reset before each one, all 23 of TI&#x27;s profiles sent 345 of 345 packets (radio README).</p></details><details class=qa id="after-a-few-profile-changes-the-cc1407p-s-storeconfig-never-"><summary><h3 class=q>After a few profile changes, the CC1407P&#x27;s <code>storeConfig</code> never completes. What stopped it?</h3></summary><p class=a>Probably its configuration storage filling up.</p><p>It took four persisted copies of a <span class="ex" title="1,776 B">1.7 kB</span> Wi-SUN config. The fifth persist returned in 1 ms instead of 13; from the sixth on, the store&#x27;s completion event had not arrived after 5 s, while packets still went out on the last config. Its capacity in bytes is not measured, so smaller configs may fit more. Call <code>TRX_Host_eraseNv</code> before storing a new set, then store the front-end config again: that worked in the 23-profile run, which erases at every reset; erase alone was not tested.</p></details><details class=qa id="200-byte-packets-to-the-cc1407p-come-back-trx-host-no-resour"><summary><h3 class=q>200-byte packets to the CC1407P come back <code>TRX_Host_No_Resources</code>, but 20-byte ones go. Why?</h3></summary><p class=a>Suspected: a config that is stored but not persisted keeps holding the radio&#x27;s buffer space.</p><p>The run shows refusals without the persist and none with it. Persist each config right after storing it; then 200-byte packets went on the first try on all 23 profiles.</p></details><details class=qa id="ti-s-driver-header-says-carrier-sense-is-not-functional-does"><summary><h3 class=q>TI&#x27;s driver header says carrier sense is &quot;not functional&quot;. Does listen-before-talk work on the CC1407P?</h3></summary><p class=a>At low thresholds it answered correctly here.</p><p>On radio firmware 3.0.0.25, <code>TRX_RadioCommand_CarrierSense</code> in energy mode returned idle (0x11) and busy (0x12) as expected at noise-floor thresholds, and busy at -60 dBm while a nearby CC1354P10 transmitted, idle again after. At -10 dBm it read idle, as expected for a signal near -19 dBm; at -30 dBm it also read idle, which is not explained. Test it on your board before you rely on it. <code>radio_lab.c</code> has the command set-up (<code>C</code>).</p></details><details class=qa id="wi-sun-fsk-mode-4a-or-5-between-the-cc1407p-and-a-cc1354p10-"><summary><h3 class=q>Wi-SUN FSK mode 4a or 5 between the CC1407P and a CC1354P10 loses packets. Is the link bad?</h3></summary><p class=a>Not as far as the runs show.</p><p>In two runs the CC1354P10 received 20 of 20 from the CC1407P in every Wi-SUN FSK mode, but the CC1407P received 14 and 16 of 20 in mode 4a and 6 of 20 twice in mode 5 from the CC1354P10, which reported every send as done. Packets were 20 of 20 both ways in modes 1a, 1b, 2a, 2b, 3 and 4b; pings were partial at 2a, 2b, 4a and 5. Use 1a, 1b, 3 or 4b between these two chips until the cause is known.</p></details><details class=qa id="the-cc1407p-s-xlr-and-a-cc1354p10-s-simplelink-long-range-do"><summary><h3 class=q>The CC1407P&#x27;s XLR and a CC1354P10&#x27;s SimpleLink Long Range do not exchange packets. Should they?</h3></summary><p class=a>No TI document pairs them.</p><p>The CC1407P decoded the header 7 and 16 times from the CC1354P10&#x27;s 5 and 2.5 kbps settings but passed no checksum, and the CC1354P10 decoded nothing from XLR. For long range between these two chips, use a pair that interoperated, such as Wi-SUN FSK 1a at 50 kbps.</p></details><details class=qa id="pings-from-the-cc1407p-to-a-cc1354p10-come-back-at-50-kbps-b"><summary><h3 class=q>Pings from the CC1407P to a CC1354P10 come back at 50 kbps but not at faster modes. Why?</h3></summary><p class=a>Most likely the answer arrives before the CC1407P&#x27;s receive is running.</p><p>When <code>radio_lab.c</code> started the receive with a host command after each ping, only the 50 kbps modes got answers. With TI&#x27;s command chaining (the transmit in slot 0 chains to the receive in slot 1 on the radio), every mode answered, though 2a, 2b, 4a and 5 only partly. <code>radio_lab.c</code>&#x27;s <code>G</code> command shows the chaining.</p></details></section><section id="g-walkie-talkie"><h2>Walkie-talkie</h2><details class=qa id="one-message-sent-to-the-radio-board-did-not-show-up-why"><summary><h3 class=q>One message sent to the radio board did not show up. Why?</h3></summary><p class=a>Not known for sure.</p><p>In the house demo, 7 of 8 parent messages reached the MSPM0 G5187 (radio-demos.json). The board listens for 80 ms between its own sends (sensor checks and a heartbeat every second), so a message that arrives while it is sending can be missed. Send important messages twice, or have the board answer each one so the sender can retry.</p></details><details class=qa id="the-walkie-talkie-recording-has-a-short-gap-about-2-4-second"><summary><h3 class=q>The walkie-talkie recording has a short gap about 2.4 seconds in. Was it the radio?</h3></summary><p class=a>No: the radio delivered all 122 voice frames with good checksums.</p><p>One frame was cut to 123 of its 205 bytes on the USB serial line into the sending board, before it was sent, so 40 ms of audio is missing. Pace the frames into the sender, or have it check each frame&#x27;s length before sending.</p></details><details class=qa id="can-the-walkie-talkie-work-both-ways-on-this-board"><summary><h3 class=q>Can the walkie-talkie work both ways on this board?</h3></summary><p class=a>Not as wired here.</p><p>The MSPM0 G5187&#x27;s microphone sends its audio on PB10 and PB11, which carry the radio&#x27;s reset and interrupt wires, and neither board has a speaker. Two-way voice needs the radio on other pins, a speaker amplifier, and a second CC1407P.</p></details></section><section id="g-alarm-listener"><h2>Alarm listener</h2><details class=qa id="the-alarm-listener-s-capture-or-detect-image-hears-nothing-t"><summary><h3 class=q>The alarm listener&#x27;s capture or detect image hears nothing: the microphone level stays at the floor. Is the microphone dead?</h3></summary><p class=a>Probably not: check what is on PB10 and PB11.</p><p>Those pins are the microphone&#x27;s I2S clock lines (the PCM1809&#x27;s WCLK and BCLK). If the BP-CC1407P radio is wired to header J20, its reset and interrupt wires sit on the same two pins and the microphone reads zeros. With them off, a 995 Hz tone came through clean and a quiet room read -79.6 dBFS. Put the wires back to use the radio again.</p></details><details class=qa id="the-alarm-listener-prints-learn-failed-no-smoke-or-co-patter"><summary><h3 class=q>The alarm listener prints <code>LEARN FAILED: no smoke or CO pattern heard in 45 s</code>. What now?</h3></summary><p class=a>Sound the alarm longer, or move the board closer.</p><p>After S2 the board waits up to 45 s for four inferences in a row that hear the smoke (temporal-3) or CO (temporal-4) pattern (detect.h). One inference covers the last 8.3 s, so a test button held for under about 10 s may not be enough. An alarm whose pattern is not the US standard one (NFPA 72) will not be learned at all. The learn runs used alarm sound sent over USB.</p></details><details class=qa id="the-alarm-listener-prints-ignored-too-quiet-to-be-the-alarm-"><summary><h3 class=q>The alarm listener prints <code>IGNORED ... too quiet to be the alarm beside me</code> when an alarm sounds. Why?</h3></summary><p class=a>The board is farther from the alarm, or more muffled, than when it learned.</p><p>It ignores a learned pattern more than 10 dB quieter than the level it stored, so that the same alarm on a TV across the room does not count. Learn again with the board where it will stay: press S2, then the alarm&#x27;s test button. Hold S2 for 5 s to forget (<code>FORGOT: generic mode</code>).</p></details><details class=qa id="the-alarm-listener-printed-learned-saved-but-after-a-reset-i"><summary><h3 class=q>The alarm listener printed <code>LEARNED ... saved</code>, but after a reset it is not learned, or the board stops at boot. What happened?</h3></summary><p class=a>That was a bug in an early build, now fixed.</p><p>The record was written to the data flash at 0x41D00000 as two 64-bit writes; the second write fails, and a later 128-bit write left a half-written record that stopped the board at boot. The current code writes one 64-bit word. If an old image left a bad record, erase that sector (OpenOCD or UniFlash) and flash the current image.</p></details></section><section id="g-examples-retargeted-from-another-chip"><h2>Examples retargeted from another chip</h2><details class=qa id="a-driverlib-example-retargeted-from-the-lp-mspm0g3519-fails-"><summary><h3 class=q>A DriverLib example retargeted from the LP-MSPM0G3519 fails with <code>use of undeclared identifier &#x27;UART0&#x27;</code> (or <code>SPI1</code>, <code>I2C2</code>, <code>GPIOC</code> in the generated file). Is the example unportable?</h3></summary><p class=a>Not for that reason. Delete <code>ti_msp_dl_config.c</code> and <code>ti_msp_dl_config.h</code> from the example folder (the copies next to the <code>.c</code>, not the ones in <code>ticlang/</code>) and build again.</p><p>TI&#x27;s examples ship a generated config beside the source; the source includes that G3519 copy before the file SysConfig writes for the G5187. With the copies deleted 79 of 122 <code>driverlib</code> examples built, against 64 with them, and <code>uart_rw_multibyte_fifo_poll</code> and the SPI examples among the new ones (SysConfig 1.28.0, 2026-10-24).</p></details><details class=qa id="a-retargeted-dma-example-dma-block-transfer-dma-fill-data-dm"><summary><h3 class=q>A retargeted DMA example (<code>dma_block_transfer</code>, <code>dma_fill_data</code>, <code>dma_table_transfer</code>) never reaches its breakpoint, though <code>gDstData</code> holds the right words. Why?</h3></summary><p class=a>SysConfig put the transfer on DMA channel 1 and the example&#x27;s interrupt handler only handles channel 0, so the done flag never sets. Keep <code>DMA.associatedChannels[0].peripheral.$assign = &quot;DMA_CH0&quot;</code> in the <code>.syscfg</code> when you unlock pin assignments, or check <code>DMA_CH0_CHAN_ID</code> in the generated header is 0.</p><p>The native G5187 build of the same example passes (<code>gVerifyResult</code> 1).</p></details><details class=qa id="after-flashing-a-ti-drivers-example-retargeted-from-another-"><summary><h3 class=q>After flashing a TI Drivers example retargeted from another chip the debugger says &quot;Connection to MSPM0 core failed&quot;. How do I get the board back?</h3></summary><p class=a>The example&#x27;s <code>device_linker.cmd</code> still describes the G3519 (512 kB flash, RAM at 0x20200000 and 0x20210000), so the stack top is outside the G5187&#x27;s 32 kB and the chip faults in a reset loop. Hold the core in reset with TI&#x27;s wait-for-debug sequence on the power access port, catch the first instruction, then program your backup (<code>program backup-flash.bin 0x0 verify</code>).</p><p>The sequence is the same one as in the MSPM0 C1104 FAQ, with this chip&#x27;s addresses; it brought the board back twice with main and data flash read back equal to the backup (2026-10-24). Check the stack top (<code>SP</code> in the vector table) of any retargeted image before you flash it.</p></details></section><section class=ours id="g-mistakes-to-avoid"><h2>Mistakes to avoid</h2><ul><li>Do not call SysConfig&#x27;s generated <code>SYSCFG_DL_GPIO_init</code> a second time after setting the sensor power pins. The generated function writes every pin&#x27;s initial value, so it switches the sensors off again (one Sensors BoosterPack run read <code>none</code> for everything). Set power pins after the last init call.</li><li>Do not reset the chip from the debugger while an NPU inference is in progress; it leaves the NPU stuck for the next run. Flash with DSLite and let the image run; halt and read without a reset.</li><li>Do not write the alarm listener&#x27;s learned record to the data flash as two 64-bit writes; the second one fails. One write per record.</li></ul></section><section class=ours id="g-when-the-board-stops-answering"><h2>When the board stops answering</h2><p>Checked 2026-10-24. Before flashing a risky image, run <code>python3 tools/preflight_image.py &lt;board id&gt; &lt;image.out&gt;</code>. Narrative and commands: <code>docs/remote-board-recovery.md</code>.</p><p>How it locks up:</p><ul><li>A retargeted example whose linker file is the G3519 map puts the stack top outside RAM; the chip faults in a reset loop (DSLite: Connection to MSPM0 core failed) (<code>mspm0g5187/FAQ.md</code>, 2026-10-24)</li></ul><p>Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.</p><div class=tw><table><thead><tr><th>Method</th><th>Remote or hands</th><th>Status</th><th>Evidence</th></tr></thead><tbody><tr><td>sweep/results-g3519-port/tools/recover.sh with recover_halt_g5187.tcl (wait-for-debug hold), then program the backup (twice; main and data flash read back equal to the backup)</td><td>remote</td><td>proven</td><td><code>mspm0g5187/sweep/results-g3519-port/tools/recover.sh</code>, <code>mspm0g5187/FAQ.md</code>, 2026-10-24</td></tr></tbody></table></div><p>Restore: OpenOCD prog.sh: program backup-flash.bin 0x0 verify. Regions: main and data flash. (<code>mspm0g5187/FAQ.md</code>)</p></section></div><p style="margin-top:24px"><a href="board-mspm0g5187.html">Back to the LP-MSPM0G5187 page</a></p>
+</div></main>
+<footer>
+  <div class="wrap" style="--fcols:4">
+    <div class="f-brand"><svg class="logo logo-foot" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg><p>Demos and ports on TI development kits, with the code and the measured numbers.</p></div>
+    <div><h2>Builds</h2><a href="projects.html">All builds</a><a href="project-blink.html">First blink</a><a href="projects.html?f=smart-home">Smart home</a><a href="projects.html?f=ai">Edge AI</a><a href="projects.html?f=radio">Radio and range</a><a href="projects.html?f=motors">Motors, power and sensing</a><a href="projects.html?f=screens">Screens</a><a href="security.html">Security</a></div><div><h2>Hardware</h2><a href="hardware.html">The kits</a><a href="addons.html">Add-ons and parts</a></div><div><h2>Software</h2><a href="portability.html">Bring your code</a><a href="ports.html">Every port</a><a href="one-app-eleven-boards.html">One app, eleven boards</a><a href="project-build-from-terminal.html">Build from the terminal</a><a href="benchmarks.html">Measured</a><a href="edge-ai.html">Edge AI</a></div><div><h2>Community</h2><a href="community.html">Community</a><a href="https://github.com/Fox-Red-Labs/fox-red-labs">Get the code</a></div>
+    <div class="f-meta"><a href="benchmarks.html#method">Method</a><p class="disc pwr">Powered by Zephyr, GCC and OpenOCD. </p><p class="disc">Fox Red Labs is a lab run by a TI employee on personal time. Contributors&#x27; projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.</p></div>
+  </div>
+</footer>
+<div class="tip" id="tip"></div>
+<script>
+const tip = document.getElementById('tip');
+document.addEventListener('mousemove', e => {
+  const t = e.target.closest('[data-tip]');
+  if (!t) { tip.style.display = 'none'; return; }
+  tip.textContent = t.dataset.tip; tip.style.display = 'block';
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - 300) + 'px'; tip.style.top = (e.clientY + 16) + 'px';
+});
+
+(function () {
+  var q = document.getElementById('ffq'); if (!q) return;
+  var qs = Array.prototype.slice.call(document.querySelectorAll('details.qa')), cnt = document.getElementById('ffcount');
+  var low = function (s) { return s.toLowerCase(); };
+  qs.forEach(function (d) { d._t = low(d.textContent); });
+  function run() {
+    var words = low(q.value).split(/\s+/).filter(Boolean), shown = 0;
+    qs.forEach(function (d) {
+      var ok = words.every(function (w) { return d._t.indexOf(w) >= 0; });
+      d.hidden = !ok; if (ok) shown++;
+      if (words.length && q.value.trim().length >= 3) d.open = ok;
+    });
+    document.querySelectorAll('section[id^="g-"]').forEach(function (s) {
+      var any = s.querySelector('details.qa'); if (!any) { s.hidden = words.length > 0; return; }
+      s.hidden = !s.querySelector('details.qa:not([hidden])');
+    });
+    cnt.textContent = words.length ? shown + ' of ' + qs.length + ' questions match' : '';
+  }
+  var tm; q.addEventListener('input', function () { clearTimeout(tm); tm = setTimeout(run, 120); });
+  document.getElementById('ffopen').addEventListener('click', function () { qs.forEach(function (d) { if (!d.hidden) d.open = true; }); });
+  document.getElementById('ffclose').addEventListener('click', function () { qs.forEach(function (d) { d.open = false; }); });
+  if (location.hash) { var t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t && t.tagName === 'DETAILS') t.open = true; }
+})();
+
+
+(function () {
+  // The page's own contents list, or one built from its sections, as a bar that sticks under the
+  // header once the list scrolls away; the section on screen is marked. Plus a back-to-top button.
+  var src = document.querySelector('nav.jump[aria-label="On this page"], p.toc');
+  var links = [];
+  if (src) src.querySelectorAll('a[href^="#"]').forEach(function (a) { links.push([a.getAttribute('href').slice(1), a.textContent.trim()]); });
+  else document.querySelectorAll('main [id]').forEach(function (el) {
+    var h = el.firstElementChild; if (el.tagName === 'H2') h = el;
+    if (h && h.tagName === 'H2' && !el.closest('details:not([open])')) links.push([el.id, h.textContent.trim().replace(/\s+/g, ' ').slice(0, 40)]);
+  });
+  links = links.filter(function (l) { return document.getElementById(l[0]); });
+  var top = document.createElement('button');
+  top.className = 'totop'; top.type = 'button'; top.setAttribute('aria-label', 'Back to top');
+  top.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  top.addEventListener('click', function () { scrollTo({ top: 0, behavior: 'smooth' }); });
+  document.body.appendChild(top);
+  var bar = null, hdr = document.querySelector('header');
+  if (links.length >= 3 && !document.querySelector('.btabs2')) {   // a page with tabs has its own navigation
+    bar = document.createElement('nav'); bar.className = 'otp'; bar.setAttribute('aria-label', 'Sections');
+    bar.innerHTML = '<div class="wrap"><b>On this page</b>' + links.map(function (l) { return '<a href="#' + l[0] + '">' + l[1].replace(/[<&]/g, '') + '</a>'; }).join('') + '</div>';
+    document.body.appendChild(bar); document.body.classList.add('has-otp');
+  }
+  var targets = links.map(function (l) { return document.getElementById(l[0]); });
+  function tick() {
+    var y = scrollY, h = hdr ? hdr.getBoundingClientRect().height : 72;
+    top.classList.toggle('on', y > innerHeight * 1.5);
+    if (!bar) return;
+    bar.style.top = h + 'px';
+    var past = src ? src.getBoundingClientRect().bottom < h : y > innerHeight * 0.8;
+    bar.classList.toggle('on', past);
+    var cur = -1;
+    targets.forEach(function (t, i) { if (t.getBoundingClientRect().top < h + 140) cur = i; });
+    bar.querySelectorAll('a').forEach(function (a, i) {
+      var on = i === cur; if (on !== a.classList.contains('cur')) { a.classList.toggle('cur', on); if (on) a.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+    });
+  }
+  var queued = false;
+  addEventListener('scroll', function () { if (!queued) { queued = true; requestAnimationFrame(function () { queued = false; tick(); }); } }, { passive: true });
+  addEventListener('resize', tick); tick();
+})();
+
+</script>
+</body>
+</html>

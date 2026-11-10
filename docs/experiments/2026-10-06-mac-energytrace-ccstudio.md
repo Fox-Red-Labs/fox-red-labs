@@ -2,7 +2,7 @@
 id: E11
 board: LP-MSPM0L1306
 date: 2026-10-06
-status: in progress
+status: parked
 reached: link
 line: Two functions in the IDE's code switch trace off on macOS, with the comment "not supported". TI's Mac trace server library cannot load as shipped, because of a path from TI's build machine and a Linux-style search path. Patched copies of the libraries load. No capture has run against a board.
 stop: tools

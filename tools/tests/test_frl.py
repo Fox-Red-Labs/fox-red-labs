@@ -497,7 +497,9 @@ class Guide(unittest.TestCase):                   # CX31
             p = subprocess.run([sys.executable, str(ROOT / "tools" / "frl" / "guide.py")], input="", capture_output=True,
                                text=True, env=e.env, cwd=ROOT, timeout=60)   # no answers at all: stops, writes nothing
             self.assertNotEqual(p.returncode, 0)
-            p = subprocess.run([sys.executable, str(ROOT / "tools" / "frl" / "guide.py")], input="1\n1\n\n\n2\n",
+            # answers: a board in hand, the first kit, return after plugging in, the first job (the L1306 offers two since
+            # its print-message route became eligible), the first pattern, then "No, stop here"
+            p = subprocess.run([sys.executable, str(ROOT / "tools" / "frl" / "guide.py")], input="1\n1\n\n\n\n2\n",
                                capture_output=True, text=True, env=e.env, cwd=ROOT, timeout=120)
             if "FRL-E02" in p.stdout:
                 self.skipTest("TI's tools are not installed here")

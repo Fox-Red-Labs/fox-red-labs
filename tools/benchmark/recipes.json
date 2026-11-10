@@ -406,6 +406,62 @@
     }
    },
    "steps": []
+  },
+  "mspm0l2228": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash only, by the sectors the image writes",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 262144
+     },
+     {
+      "name": "NONMAIN (read only, never restored)",
+      "addr": "0x41C00000",
+      "bytes": 512,
+      "restore": false
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "mspm0l2228",
+     "route_why": "a route in data/routes.json: backup.py runs OpenOCD from Python (tools/frl/target.py), as for the LP-MSPM0L1306",
+     "why": "256 kB main flash (SRAMFLASH read 0x00201100 on the board 2026-11-09; MSPM0 SDK 2.11.00.07 linker)"
+    }
+   },
+   "steps": []
+  },
+  "mspm0g3507": {
+   "probe": "",
+   "device": "",
+   "erases": "main flash only, by the sectors the image writes",
+   "backup": {
+    "regions": [
+     {
+      "name": "main flash",
+      "addr": "0x00000000",
+      "bytes": 131072
+     },
+     {
+      "name": "NONMAIN (read only, never restored)",
+      "addr": "0x41C00000",
+      "bytes": 512,
+      "restore": false
+     }
+    ],
+    "tool": {
+     "kind": "openocd",
+     "script": "tools/frl/target.py",
+     "route": "mspm0g3507",
+     "route_why": "a route in data/routes.json: backup.py runs OpenOCD from Python (tools/frl/target.py), as for the LP-MSPM0L1306",
+     "why": "128 kB main flash (SRAMFLASH read 0x00200080 on the own board 2026-11-09; MSPM0 SDK 2.11.00.07 linker)"
+    }
+   },
+   "steps": []
   }
  }
 }

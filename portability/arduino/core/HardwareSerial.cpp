@@ -52,7 +52,7 @@ void UartSerial::_isr(void)
     if (next != tail) { buf[head] = c; head = next; }   /* buffer full: drop the new byte */
   }
 }
-extern "C" void UART0_IRQHandler(void)
+extern "C" void ARD_UART_INST_IRQHandler(void)   /* UART0_IRQHandler on the G3507, UC0_IRQHandler on the G5187 */
 {
   Serial._isr();
   DL_UART_clearInterruptStatus(ARD_UART_INST, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_OVERRUN_ERROR |

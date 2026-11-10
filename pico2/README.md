@@ -1,6 +1,6 @@
 # Raspberry Pi Pico 2 H (SC1632, RP2350): blinking from a Mac and how fast it is
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Short answer.** Drag a MicroPython file onto the RP2350 disk and the LED blinks 65 s after the download starts, then changes rate with one edit (scripted, from the built-in loader). The C path took 87 s.
 

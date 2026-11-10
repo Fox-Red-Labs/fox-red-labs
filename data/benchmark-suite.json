@@ -160,6 +160,24 @@
    "variants": "api: register, driver, zephyr"
   },
   {
+   "id": "pru_toggle_ns",
+   "class": "core",
+   "name": "PRU output register write",
+   "unit": "ns",
+   "better": "lower",
+   "variants": "loop-r30-set-clr, unrolled-r30-set-clr",
+   "method": "PRU cycle counter over millions of writes to R30, converted at the PRU clock the run measured; pad rate not seen without a scope"
+  },
+  {
+   "id": "pru_clock_mhz",
+   "class": "core",
+   "name": "PRU core clock, measured",
+   "unit": "MHz",
+   "better": "higher",
+   "variants": "icssg0-pru0",
+   "method": "PRU cycle-counter total against the R5F PMU time for the same run"
+  },
+  {
    "id": "fft256",
    "class": "core",
    "name": "256-point complex FFT",
@@ -3895,6 +3913,132 @@
    "better": "lower",
    "variants": "model-quantizer-compiler-engine",
    "method": "mspm0g5187/mlperf-tiny/README.md"
+  },
+  {
+    "id": "live_load_awake",
+    "class": "core",
+    "name": "CPU awake read through the debug port",
+    "unit": "%",
+    "better": "higher",
+    "variants": "known-10pct, known-50pct, known-90pct, coremark-ended, pwm-example-sleeping",
+    "method": "Share of samples with the sleep bit clear, read over the debug port with the CPU running, against a program of known load"
+  },
+  {
+    "id": "live_pin_changes",
+    "class": "core",
+    "name": "Pin changes read through the debug port",
+    "unit": "per s",
+    "better": "higher",
+    "variants": "pa13-true-10, pa26-true-2, blink-true-2.96",
+    "method": "Output register changes counted over the debug port with the CPU running"
+  },
+  {
+    "id": "live_read_rate",
+    "class": "core",
+    "name": "Register reads through the debug port",
+    "unit": "per s",
+    "better": "higher",
+    "variants": "one-register, five-registers, g3519-live, g5187-live",
+    "method": "Register reads a second through the probe with the CPU running"
+  },
+  {
+    "id": "dlab_connect",
+    "class": "setup",
+    "name": "Digital Lab page in Chrome connects to the board and names it",
+    "unit": "yes/no",
+    "better": "yes",
+    "variants": "browser and transport, e.g. chrome-156-webhid",
+    "method": "tools/webflash/README.md, Browser run on a real board; mspm0g3519/bench/data/dlab-2026-11-08/EVIDENCE.md"
+  },
+  {
+    "id": "dlab_program_run",
+    "class": "setup",
+    "name": "Digital Lab page writes a demo and its own check passes on the board",
+    "unit": "yes/no",
+    "better": "yes",
+    "variants": "browser and transport, e.g. chrome-156-webhid",
+    "method": "tools/webflash/README.md, Browser run on a real board; mspm0g3519/bench/data/dlab-2026-11-08/EVIDENCE.md"
+  },
+  {
+    "id": "dlab_put_back",
+    "class": "setup",
+    "name": "Digital Lab Put back restores a saved copy and reads it back equal",
+    "unit": "yes/no",
+    "better": "yes",
+    "variants": "browser and transport, e.g. chrome-156-webhid",
+    "method": "tools/webflash/README.md, Browser run on a real board; mspm0g3519/bench/data/dlab-2026-11-08/EVIDENCE.md"
+  },
+  {
+    "id": "live_pc_on_wfi",
+    "class": "core",
+    "name": "Sleeping samples on a WFI instruction",
+    "unit": "%",
+    "better": "higher",
+    "variants": "known-load",
+    "method": "Share of program counter samples, taken while the CPU slept, that land on a WFI instruction"
+  },
+  {
+    "id": "live_task_load",
+    "class": "core",
+    "name": "Task load read through the debug port from the operating system's own task statistics",
+    "unit": "%",
+    "better": "higher",
+    "variants": "busy-crunch-30pct",
+    "method": "Per-task load copied into TCM by the program every 500 ms, read over the debug port with the CPU running, against the task's designed duty"
+  },
+  {
+    "id": "live_timer_rate",
+    "class": "core",
+    "name": "Timer interrupt and tick rates counted through the debug port",
+    "unit": "Hz",
+    "better": "higher",
+    "variants": "busy-timer6-100hz, busy-tick-1000hz, busy-i2c-10hz",
+    "method": "Slope of the program's counters, read over the debug port with the CPU running, against the programmed rate"
+  },
+  {
+    "id": "live_uart_baud",
+    "class": "core",
+    "name": "UART baud rate estimated from the transmitter-busy bit read over the debug port",
+    "unit": "baud",
+    "better": "higher",
+    "variants": "busy-lsr-bursts, busy-mac-decode, oob-l1306-divider, g3519-uart0-divider",
+    "method": "Length of each console burst from line status reads, against the bytes in the burst; the line control register is never written"
+  },
+  {
+    "id": "live_power_agree",
+    "class": "core",
+    "name": "Modules whose power-switch state agrees with the module answering on the bus",
+    "unit": "modules",
+    "better": "higher",
+    "variants": "busy-psc-vs-revision",
+    "method": "PSC module status against a nonzero read at the module's revision register, read over the debug port"
+  },
+  {
+    "id": "live_config_match",
+    "class": "core",
+    "name": "Pad mux settings and enabled interrupt lines read from the chip that match the program's configuration",
+    "unit": "items",
+    "better": "higher",
+    "variants": "busy-pads-and-vim",
+    "method": "Pad registers over the debug port; interrupt lines from the core's own interrupt controller, copied into TCM by the program"
+  },
+  {
+    "id": "live_timer_period",
+    "class": "core",
+    "name": "Timer period computed from the timer registers read through the debug port",
+    "unit": "ms",
+    "better": "higher",
+    "variants": "pwm-example-load-1999",
+    "method": "(load + 1) times the prescale, over the timer clock, from registers read with the CPU running, against the period the program sets"
+  },
+  {
+    "id": "live_power_seen",
+    "class": "core",
+    "name": "Peripheral blocks seen powered through the debug port beside the always-on GPIO",
+    "unit": "blocks",
+    "better": "higher",
+    "variants": "thermometer-adc0",
+    "method": "PWREN bit of each peripheral, read with the CPU running, for a program whose source turns the block on"
   }
  ]
 }

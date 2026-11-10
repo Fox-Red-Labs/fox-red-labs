@@ -12,6 +12,7 @@ const Board   = scripting.addModule("/ti/driverlib/Board", {}, false);
 const GPIO    = scripting.addModule("/ti/driverlib/GPIO", {}, false);
 const GPIO1   = GPIO.addInstance();
 const GPIO2   = GPIO.addInstance();
+const GPIO5   = GPIO.addInstance();
 const HSADC   = scripting.addModule("/ti/driverlib/HSADC", {}, false);
 const HSADC1  = HSADC.addInstance();
 const SYSCTL  = scripting.addModule("/ti/driverlib/SYSCTL", {}, false);
@@ -38,7 +39,12 @@ GPIO1.associatedPins[3].pin.$assign  = "PB28";
 
 GPIO2.$name                          = "MICPWR";
 GPIO2.associatedPins[0].$name        = "ON";
+GPIO2.associatedPins[0].direction    = "INPUT";   /* pin 5 is held low by this board: never drive it */
 GPIO2.associatedPins[0].pin.$assign  = "PA21";
+
+GPIO5.$name                          = "MICALT";
+GPIO5.associatedPins[0].$name        = "PWR";
+GPIO5.associatedPins[0].pin.$assign  = "PB30";   /* BoosterPack pin 8: powers the pack's microphone through a wire to pin 5 */
 
 HSADC1.$name                      = "HSADC0";
 HSADC1.enabledSEQs                = ["ADC_SEQ_NUMBER1"];

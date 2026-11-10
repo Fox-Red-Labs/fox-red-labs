@@ -60,6 +60,18 @@ Several MSPM0 UART examples (`uart_rw_multibyte_fifo_poll`) expect a wire from T
 
 Not by a rename. The MSPM33 I2C is the UNICOMM block (`DL_I2CC_` and `DL_I2CT_` names), its ADC is the HSADC block, and the interrupt-group alias is not in its DriverLib. GPIO, SysTick, timer, PWM, SPI, UART and CRC examples do move with the app untouched (`portability/everywhere/PORTING.md` section 7.1). Checked 2026-10-24.
 
+### A DSLite `memory` read stops with "Memory map prevented reading 0x10100000". What count do you give it?
+
+Give the count in words of the `-s` size: `-r 0x10000000,262144 -s 32` reads the 1 MB main flash. A byte count such as 1048576 with `-s 32` asks for 4 MB; DSLite writes the first 1,023.5 kB and then fails at the top of flash. Read data flash with `-r 0x80000000,8192 -s 32` (32 kB) and the boot configuration with `-r 0x80101800,512 -s 32` (2 kB). Reading each range twice gave equal files on 2026-11-08.
+
+### The print-a-message route counted only 3 or 4 copies of my message. Did it fail?
+
+No. TI's `uart_tx_console_multibyte_repeated_fifo_dma` prints a banner, then five numbered lines one second apart, and stops; the route starts listening after the write, so it sees 3 to 5 of them. Three runs on 2026-11-08 counted 3, 4 and 4 and each ended with an `OK:` line (`data/results/mspm33c321a.csv`, row `message_flash_repeat`). Only a run with no copy of your words fails.
+
+### The Audio BoosterPack's tuner never finds the 440 Hz tone and the speaker is silent. What do you check?
+
+Check the pack's seating, volume slider and the pin 8 to pin 5 wire, in that order. BoosterPack pin 5 is not routed on this LaunchPad (PA21 is the VREF- pin), so the microphone is powered from pin 8 (PB30) through one wire. On 2026-11-08 the algorithms image reported `voiced=0` in 4 of 4 runs and a Mac microphone heard nothing from the speaker at full volume (loudest sample -40.7 dB against -49.5 dB in a quiet room), so one of the three was missing. The cycle counts (`b` key) do not depend on the pack.
+
 ## MicroPython on Zephyr
 
 ### MicroPython built for the lp_mspm33c321a Zephyr board prints nothing on the serial port. What is missing?

@@ -2,7 +2,7 @@
 id: E216
 board: LP-MSPM0G3519, LP-AM13E230, LP-MSPM33C321A, LP-MSPM0C1104, LP-EM-CC2340R5, LP-EM-CC35X1, LAUNCHXL-F2800137, LP-AM263P
 date: 2026-10-18
-status: in progress
+status: parked
 reached: verified
 line: An open tool programmed TI's blink on the LP-MSPM0G3519 (upstream OpenOCD, 0.95 s) and the LP-EM-CC2340R5 (TI's own OpenOCD fork, 6.2 s, verify step broken); the LP-AM13E230 and LP-MSPM33C321A were read byte for byte identical to DSLite or the build, write not run; the CC35X1 needs TI's Toolbox to open its debug port; the C2000 UART flasher's host is Windows-only source.
 stop: tools; the CC35X1 debug port opens only through TI's Toolbox, the C2000 host program is Win32 code, and two boards stayed read-only by decision

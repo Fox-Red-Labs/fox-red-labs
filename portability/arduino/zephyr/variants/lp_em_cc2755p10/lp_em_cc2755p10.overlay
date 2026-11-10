@@ -1,0 +1,18 @@
+/*
+ * Arduino pin map for the LP-EM-CC2755P10 on TI's Zephyr fork (ArduinoCore-zephyr static module).
+ * D0 = DIO12 green LED (LED_BUILTIN), D1 = DIO16 red LED, D2 = DIO20 (S1), D3 = DIO0 (S2).
+ * No ADC pins: the fork has no ADC driver for the CC27xx family, so A0 and analogRead are absent.
+ * Serial is uart0 on the XDS110 backchannel.
+ */
+/ {
+	zephyr,user {
+		digital-pin-gpios = <&gpio0 12 0>,
+				    <&gpio0 16 0>,
+				    <&gpio0 20 0>,
+				    <&gpio0 0 0>;
+
+		builtin-led-gpios = <&gpio0 12 0>;
+
+		serials = <&uart0>;
+	};
+};

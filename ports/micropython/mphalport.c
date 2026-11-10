@@ -157,14 +157,41 @@ uint64_t mp_hal_time_ns(void) {
     return (uint64_t)tick_ms * 1000000ull;
 }
 
+#ifdef FRL_G5187
+// The G5187 names the same UART block UC0 (and its vector UC0_IRQHandler).
+#define FRL_UART UC0
+#define FRL_UART_IRQN UC0_INT_IRQn
+#define FRL_UART_ISR UC0_IRQHandler
+#define FRL_TX_FN IOMUX_PINCM21_PF_UC0_TX
+#define FRL_RX_FN IOMUX_PINCM22_PF_UC0_RX
+#elif defined(FRL_L1306)
+// The L1306 LaunchPad back-channel is UART0 on PA8 (TX) and PA9 (RX), PINCM9 and PINCM10.
+#define FRL_UART UART0
+#define FRL_UART_IRQN UART0_INT_IRQn
+#define FRL_UART_ISR UART0_IRQHandler
+#define FRL_TX_PINCM IOMUX_PINCM9
+#define FRL_RX_PINCM IOMUX_PINCM10
+#define FRL_TX_FN IOMUX_PINCM9_PF_UART0_TX
+#define FRL_RX_FN IOMUX_PINCM10_PF_UART0_RX
+#else
+#define FRL_UART UART0
+#define FRL_UART_IRQN UART0_INT_IRQn
+#define FRL_UART_ISR UART0_IRQHandler
+#define FRL_TX_FN IOMUX_PINCM21_PF_UART0_TX
+#define FRL_RX_FN IOMUX_PINCM22_PF_UART0_RX
+#endif
+#ifndef FRL_TX_PINCM
+#define FRL_TX_PINCM IOMUX_PINCM21
+#define FRL_RX_PINCM IOMUX_PINCM22
+#endif
 // ---- console UART0 on PA10 (TX) and PA11 (RX), the LaunchPad backchannel ----------------
 
 static volatile uint8_t rx_buf[FRL_RX_RING];
 static volatile uint16_t rx_head, rx_tail;
 
-void UART0_IRQHandler(void) {
-    while (!DL_UART_Main_isRXFIFOEmpty(UART0)) {
-        uint8_t c = DL_UART_Main_receiveData(UART0);
+void FRL_UART_ISR(void) {
+    while (!DL_UART_Main_isRXFIFOEmpty(FRL_UART)) {
+        uint8_t c = DL_UART_Main_receiveData(FRL_UART);
         if (c == (uint8_t)mp_interrupt_char) {
             mp_sched_keyboard_interrupt();
             continue;
@@ -175,15 +202,15 @@ void UART0_IRQHandler(void) {
             rx_head = next;
         }
     }
-    DL_UART_Main_clearInterruptStatus(UART0, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_RX_TIMEOUT_ERROR);
+    DL_UART_Main_clearInterruptStatus(FRL_UART, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_RX_TIMEOUT_ERROR);
 }
 
 static void uart_init(void) {
-    DL_UART_Main_reset(UART0);
-    DL_UART_Main_enablePower(UART0);
+    DL_UART_Main_reset(FRL_UART);
+    DL_UART_Main_enablePower(FRL_UART);
     delay_cycles(32);
-    DL_GPIO_initPeripheralOutputFunction(IOMUX_PINCM21, IOMUX_PINCM21_PF_UART0_TX);
-    DL_GPIO_initPeripheralInputFunction(IOMUX_PINCM22, IOMUX_PINCM22_PF_UART0_RX);
+    DL_GPIO_initPeripheralOutputFunction(FRL_TX_PINCM, FRL_TX_FN);
+    DL_GPIO_initPeripheralInputFunction(FRL_RX_PINCM, FRL_RX_FN);
     static const DL_UART_Main_ClockConfig ck = {
         .clockSel = DL_UART_MAIN_CLOCK_BUSCLK,
         .divideRatio = DL_UART_MAIN_CLOCK_DIVIDE_RATIO_1,
@@ -196,15 +223,15 @@ static void uart_init(void) {
         .wordLength = DL_UART_MAIN_WORD_LENGTH_8_BITS,
         .stopBits = DL_UART_MAIN_STOP_BITS_ONE,
     };
-    DL_UART_Main_setClockConfig(UART0, (DL_UART_Main_ClockConfig *)&ck);
-    DL_UART_Main_init(UART0, (DL_UART_Main_Config *)&cfg);
+    DL_UART_Main_setClockConfig(FRL_UART, (DL_UART_Main_ClockConfig *)&ck);
+    DL_UART_Main_init(FRL_UART, (DL_UART_Main_Config *)&cfg);
     // Bus clock is half the CPU clock when the PLL is on, and equal to it when it is not.
-    DL_UART_Main_configBaudRate(UART0, cpu_hz == 80000000 ? 40000000 : 32000000, FRL_UART_BAUD);
-    DL_UART_Main_enableFIFOs(UART0);
-    DL_UART_Main_setRXFIFOThreshold(UART0, DL_UART_RX_FIFO_LEVEL_ONE_ENTRY);
-    DL_UART_Main_enableInterrupt(UART0, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_RX_TIMEOUT_ERROR);
-    DL_UART_Main_enable(UART0);
-    NVIC_EnableIRQ(UART0_INT_IRQn);
+    DL_UART_Main_configBaudRate(FRL_UART, cpu_hz == 80000000 ? 40000000 : 32000000, FRL_UART_BAUD);
+    DL_UART_Main_enableFIFOs(FRL_UART);
+    DL_UART_Main_setRXFIFOThreshold(FRL_UART, DL_UART_RX_FIFO_LEVEL_ONE_ENTRY);
+    DL_UART_Main_enableInterrupt(FRL_UART, DL_UART_INTERRUPT_RX | DL_UART_INTERRUPT_RX_TIMEOUT_ERROR);
+    DL_UART_Main_enable(FRL_UART);
+    NVIC_EnableIRQ(FRL_UART_IRQN);
 }
 
 int mp_hal_stdin_rx_chr(void) {
@@ -220,9 +247,9 @@ int mp_hal_stdin_rx_chr(void) {
 
 mp_uint_t mp_hal_stdout_tx_strn(const char *str, size_t len) {
     for (size_t i = 0; i < len; i++) {
-        while (DL_UART_Main_isTXFIFOFull(UART0)) {
+        while (DL_UART_Main_isTXFIFOFull(FRL_UART)) {
         }
-        DL_UART_Main_transmitData(UART0, (uint8_t)str[i]);
+        DL_UART_Main_transmitData(FRL_UART, (uint8_t)str[i]);
     }
     return len;
 }
@@ -242,12 +269,16 @@ uintptr_t mp_hal_stdio_poll(uintptr_t poll_flags) {
 
 void frl_board_init(void) {
     DL_GPIO_reset(GPIOA);
+    #ifndef FRL_L1306
     DL_GPIO_reset(GPIOB);
+    #endif
     #ifdef FRL_G3519
     DL_GPIO_reset(GPIOC);
     #endif
     DL_GPIO_enablePower(GPIOA);
+    #ifndef FRL_L1306
     DL_GPIO_enablePower(GPIOB);
+    #endif
     #ifdef FRL_G3519
     DL_GPIO_enablePower(GPIOC);
     #endif
@@ -262,10 +293,14 @@ void frl_board_init(void) {
 static GPIO_Regs *port_regs(mp_hal_pin_obj_t p) {
     switch (p->port) {
         case 0: return GPIOA;
+        #ifndef FRL_L1306
         case 1: return GPIOB;
+        #endif
         default:
             #ifdef FRL_G3519
             return GPIOC;
+            #elif defined(FRL_L1306)
+            return GPIOA;
             #else
             return GPIOB;
             #endif

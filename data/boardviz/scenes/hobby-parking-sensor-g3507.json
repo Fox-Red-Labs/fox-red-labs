@@ -1,0 +1,561 @@
+{
+ "id": "hobby-parking-sensor-g3507",
+ "title": "Parking sensor with an RCWL-1601 and a buzzer",
+ "heading": "Wire an ultrasonic ranger and a buzzer",
+ "base": "mspm0g3507",
+ "things": [
+  {
+   "id": "bb",
+   "type": "breadboard",
+   "at": [
+    100.0,
+    53.0,
+    -1.6
+   ],
+   "rot": 90,
+   "label": "Breadboard",
+   "title": "Half-size breadboard, 400 points",
+   "text": "Holes in the same column and half (a to e, or f to j) are joined under the plastic, so a lead and a wire in the same short strip are connected. The long rails along the edges are joined end to end.",
+   "hidden": true
+  },
+  {
+   "id": "sonar",
+   "type": "hcsr04",
+   "at": [
+    93.65,
+    42.84,
+    6.95
+   ],
+   "rot": 270,
+   "label": "RCWL-1601 ranger",
+   "title": "RCWL-1601 ultrasonic ranger",
+   "text": "One transducer sends a 40 kHz ping, the other listens. The time to the echo gives the distance. Same four pins as the HC-SR04. The RCWL-1601 runs on 3.3 V, so its echo wire can go straight to the chip.",
+   "hidden": true,
+   "plug": {
+    "vcc": "bb.g13",
+    "trig": "bb.g12",
+    "echo": "bb.g11",
+    "gnd": "bb.g10"
+   },
+   "variant": "rcwl"
+  },
+  {
+   "id": "r_bz",
+   "type": "resistor",
+   "at": [
+    91.11,
+    65.7,
+    6.95
+   ],
+   "rot": 90,
+   "label": "330 ohm resistor",
+   "title": "330 ohm for the buzzer",
+   "text": "Keeps the buzzer's current inside what a pin may give. Orange, orange, brown, gold bands.",
+   "hidden": true,
+   "plug": {
+    "p1": "bb.h19",
+    "p2": "bb.h22"
+   },
+   "ohms": 330
+  },
+  {
+   "id": "bz",
+   "type": "buzzer",
+   "at": [
+    96.19,
+    73.32,
+    6.95
+   ],
+   "rot": 90,
+   "label": "Passive buzzer",
+   "title": "Passive buzzer, 12 mm",
+   "text": "Makes a tone when the pin switches at an audio rate; the program speeds up the beeps as the distance shrinks.",
+   "hidden": true,
+   "plug": {
+    "plus": "bb.f22",
+    "minus": "bb.f25"
+   }
+  }
+ ],
+ "wires": [
+  {
+   "id": "gnd",
+   "color": "#2b2c30",
+   "from": "bb.tm2",
+   "to": "mspm0g3507.j2.pin10",
+   "exit": [
+    0,
+    0,
+    5
+   ],
+   "enter": [
+    0,
+    0,
+    5
+   ],
+   "d": 0.45,
+   "ends": [
+    "Ground rail (blue, hole 2)",
+    "J2 pin 20 (GND)"
+   ],
+   "label": "Ground rail",
+   "via": [
+    [
+     65.3,
+     37.2,
+     17.2
+    ]
+   ]
+  },
+  {
+   "id": "v33",
+   "color": "#d93025",
+   "from": "bb.tp2",
+   "to": "mspm0g3507.j1.pin0",
+   "exit": [
+    0,
+    0,
+    5
+   ],
+   "enter": [
+    0,
+    0,
+    5
+   ],
+   "d": 0.45,
+   "ends": [
+    "3V3 rail (red, hole 2)",
+    "J1 pin 1 (3V3)"
+   ],
+   "label": "3.3 V rail",
+   "via": [
+    [
+     41.2,
+     37.2,
+     21.3
+    ]
+   ]
+  },
+  {
+   "id": "sonar_gnd",
+   "color": "#2b2c30",
+   "from": "bb.j10",
+   "to": "bb.tm9",
+   "exit": [
+    0,
+    0,
+    5
+   ],
+   "enter": [
+    0,
+    0,
+    5
+   ],
+   "d": 0.45,
+   "ends": [
+    "Ranger GND, breadboard j10",
+    "Ground rail"
+   ],
+   "label": "Ranger GND"
+  },
+  {
+   "id": "sonar_vcc",
+   "color": "#d93025",
+   "from": "bb.j13",
+   "to": "bb.tp11",
+   "exit": [
+    0,
+    0,
+    5
+   ],
+   "enter": [
+    0,
+    0,
+    5
+   ],
+   "d": 0.45,
+   "ends": [
+    "Ranger VCC, breadboard j13",
+    "3V3 rail"
+   ],
+   "label": "Ranger VCC"
+  },
+  {
+   "id": "sonar_trig",
+   "color": "#f2c230",
+   "from": "bb.j12",
+   "to": "mspm0g3507.j2.pin5",
+   "exit": [
+    0,
+    0,
+    5
+   ],
+   "enter": [
+    0,
+    0,
+    5
+   ],
+   "d": 0.45,
+   "ends": [
+    "Ranger TRIG, breadboard j12",
+    "J4 pin 35 (PB13)"
+   ],
+   "label": "Ranger TRIG",
+   "via": [
+    [
+     67.8,
+     42.9,
+     16.4
+    ]
+   ]
+  },
+  {
+   "id": "sonar_echo",
+   "color": "#2fa84f",
+   "from": "bb.j11",
+   "to": "mspm0g3507.j2.pin4",
+   "exit": [
+    0,
+    0,
+    5
+   ],
+   "enter": [
+    0,
+    0,
+    5
+   ],
+   "d": 0.45,
+   "ends": [
+    "Ranger ECHO, breadboard j11",
+    "J4 pin 36 (PB20)"
+   ],
+   "label": "Ranger ECHO",
+   "via": [
+    [
+     67.8,
+     42.9,
+     16.4
+    ]
+   ]
+  },
+  {
+   "id": "sig_bz",
+   "color": "#8a4fd0",
+   "from": "bb.j19",
+   "to": "mspm0g3507.j2.pin16",
+   "exit": [
+    0,
+    0,
+    5
+   ],
+   "enter": [
+    0,
+    0,
+    5
+   ],
+   "d": 0.45,
+   "ends": [
+    "Buzzer resistor, breadboard j19",
+    "J2 pin 14 (PB7)"
+   ],
+   "label": "Buzzer signal",
+   "via": [
+    [
+     69.1,
+     50.5,
+     16.9
+    ]
+   ]
+  },
+  {
+   "id": "gnd_bz",
+   "color": "#2b2c30",
+   "from": "bb.j25",
+   "to": "bb.tm21",
+   "exit": [
+    0,
+    0,
+    5
+   ],
+   "enter": [
+    0,
+    0,
+    5
+   ],
+   "d": 0.45,
+   "ends": [
+    "Buzzer minus, breadboard j25",
+    "Ground rail"
+   ],
+   "label": "Buzzer to ground"
+  }
+ ],
+ "steps": [
+  {
+   "group": "Power rails first",
+   "title": "Breadboard and ground",
+   "text": "Set the breadboard on the right and run a black wire from J2 pin 20 (GND) to the top blue rail. A rail is a long strip of holes joined end to end.",
+   "focus": "bb",
+   "focus_label": "Breadboard",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.9,
+      "zoom": 1.0,
+      "center": [
+       70,
+       53,
+       0
+      ]
+     }
+    },
+    {
+     "show": "bb"
+    },
+    {
+     "wire": "gnd"
+    }
+   ],
+   "check": "Black wire from J2 pin 20 (GND) to the top blue rail."
+  },
+  {
+   "group": "Power rails first",
+   "title": "3.3 V to the red rail",
+   "text": "A red wire from J1 pin 1 (3V3) to the top red rail. The RCWL-1601 works from 3.3 V, so its pins are safe for the chip. The HC-SR04 needs 5 V and a divider on its echo wire; this build uses the RCWL-1601 to avoid that.",
+   "focus": "bb",
+   "focus_label": "3.3 V rail",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.95,
+      "zoom": 1.3,
+      "center": [
+       75.9,
+       20.0,
+       0
+      ]
+     }
+    },
+    {
+     "wire": "v33"
+    }
+   ],
+   "check": "Red wire from J1 pin 1 (3V3) to the top red rail."
+  },
+  {
+   "group": "The ranger",
+   "title": "The ranger on its header",
+   "text": "Push the ranger's four pins into row g, holes g10 to g13, with the two round transducers facing the LaunchPad. The pins go GND in g10, ECHO in g11, TRIG in g12 and VCC in g13.",
+   "focus": "sonar",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.95,
+      "zoom": 1.9,
+      "center": [
+       93.7,
+       41.6,
+       8
+      ]
+     }
+    },
+    {
+     "show": "sonar"
+    }
+   ],
+   "check": "The ranger stands upright, its four pins in g10 to g13. Read the letters on its back to confirm the order."
+  },
+  {
+   "group": "The ranger",
+   "title": "Power and ground",
+   "text": "A red wire from j13 to the red rail and a black wire from j10 to the blue rail.",
+   "focus": "sonar",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.95,
+      "zoom": 1.8,
+      "center": [
+       86.0,
+       41.6,
+       0
+      ]
+     }
+    },
+    {
+     "wire": [
+      "sonar_vcc",
+      "sonar_gnd"
+     ]
+    }
+   ],
+   "check": "Red at the VCC column, black at the GND column."
+  },
+  {
+   "group": "The ranger",
+   "title": "Trigger and echo",
+   "text": "A yellow wire from the TRIG column to J4 pin 35 (PB13) and a green wire from the ECHO column to J4 pin 36 (PB20). The chip raises TRIG for 10 microseconds to start a ping. ECHO stays high for as long as the sound took to go out and come back, and the chip times that.",
+   "focus": "sonar",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.95,
+      "zoom": 1.5,
+      "center": [
+       86.0,
+       41.6,
+       0
+      ]
+     }
+    },
+    {
+     "wire": [
+      "sonar_trig",
+      "sonar_echo"
+     ]
+    }
+   ],
+   "check": "Yellow to J4 pin 35 (PB13), green to J4 pin 36 (PB20)."
+  },
+  {
+   "group": "The buzzer",
+   "title": "Resistor and buzzer",
+   "text": "A 330 ohm resistor (orange, orange, brown) into h19 and h22, the buzzer's plus leg into f22 and the other leg into f25. The kit's passive buzzer is a magnetic one with a few ohms of coil; straight on a pin it would draw more than an MSPM0 pin may give, so a 330 ohm resistor goes in line.",
+   "focus": "bz",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.95,
+      "zoom": 2.2,
+      "center": [
+       93.7,
+       69.5,
+       4
+      ]
+     }
+    },
+    {
+     "show": "r_bz"
+    },
+    {
+     "show": "bz"
+    }
+   ],
+   "check": "The buzzer stands over f22 and f25, its resistor beside it in row h."
+  },
+  {
+   "group": "The buzzer",
+   "title": "Buzzer signal and ground",
+   "text": "A purple wire from j19 to J2 pin 14 (PB7) and a black wire from j25 to the blue rail.",
+   "focus": "bz",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.95,
+      "zoom": 1.7,
+      "center": [
+       91.1,
+       69.5,
+       0
+      ]
+     }
+    },
+    {
+     "wire": [
+      "sig_bz",
+      "gnd_bz"
+     ]
+    }
+   ],
+   "check": "Purple to J2 pin 14 (PB7), black to the ground rail."
+  },
+  {
+   "group": "The buzzer",
+   "title": "Run it",
+   "text": "Run the parking program. Hold your hand 30 cm from the ranger, then move it closer: the beeps speed up as the distance falls.",
+   "focus": "sonar",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.9,
+      "zoom": 1.0,
+      "center": [
+       70,
+       53,
+       0
+      ]
+     }
+    },
+    {
+     "flow": [
+      "sonar_trig"
+     ],
+     "kind": "drive"
+    },
+    {
+     "flow": [
+      "sonar_echo"
+     ],
+     "kind": "signal",
+     "dir": -1
+    }
+   ],
+   "check": "Far away: a slow beep. Close: a fast beep. Under about 5 cm: a steady tone."
+  }
+ ],
+ "extent": [
+  -4,
+  -8,
+  136,
+  112
+ ],
+ "view": {
+  "azimuth": -0.9,
+  "elevation": 0.8
+ },
+ "_about": "Hobby build scene for site/boardviz/scene.js, generated by tools/boardviz/hobby_scenes.py (do not edit by hand). things: a breadboard and kit parts (types in site/boardviz/hobby-parts.js) placed in the LaunchPad frame in millimeters; a part with a plug map stands in those breadboard holes. wires: jumper wires from place to place (bb.<hole>, <thing>.<pin>, mspm0g3507.j1.pinN); ends name both ends in plain words. steps follow the order a person wires it.",
+ "pins": {
+  "source": "portability/hobby/parking-sensor/PINS.md",
+  "caption": "Every signal to the LaunchPad",
+  "columns": [
+   "Signal",
+   "Part pin",
+   "LaunchPad pin",
+   "What the program does with it"
+  ],
+  "rows": [
+   [
+    "TRIG",
+    "Ranger TRIG, hole g12",
+    "J4 pin 35 (PB13)",
+    "Digital output"
+   ],
+   [
+    "ECHO",
+    "Ranger ECHO, hole g11",
+    "J4 pin 36 (PB20)",
+    "Digital input, internal pull-up"
+   ],
+   [
+    "BUZZ",
+    "Buzzer through 330 ohm, hole j19",
+    "J2 pin 14 (PB7)",
+    "Timer PWM output"
+   ],
+   [
+    "Ranger power",
+    "VCC and GND pins",
+    "J1 pin 1 (3V3), J2 pin 20 (GND)",
+    "3.3 V supply for the RCWL-1601"
+   ]
+  ]
+ }
+}

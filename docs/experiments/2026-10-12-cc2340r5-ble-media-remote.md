@@ -2,7 +2,7 @@
 id: E189
 board: LP-EM-CC2340R5
 date: 2026-10-12
-status: in progress
+status: waiting
 reached: run
 line: A hand-written HID over GATT service on TI's basic_ble builds to 186.5 kB of flash and 30.9 kB of RAM. It advertises 11.9 s after the flash starts, and macOS calls it a "Compatible LE HID" and asks to pair with Just Works. The pairing was then accepted on the Mac, giving an encrypted link. The link dropped 9 ms later with reason 8 and did not return, so play and pause in Music is not seen.
 stop: none

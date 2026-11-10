@@ -1,6 +1,6 @@
 # TI LP-MSPM0L1306 LaunchPad: what runs in 4 kB of RAM
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Short answer.** From a Mac terminal TI's blink example for the LP-MSPM0L1306 built in 3.3 seconds and flashed in 0.6, and the chip ran CoreMark at 78.27 per second at 32 MHz: per MHz, the same core speed as the MSPM0G3507. RAM is the limit on everything else: CoreMark fits with 144 bytes to spare, Zephyr's hello_world uses 94% of RAM (a trimmed Zephyr shell still fits, with 48 bytes left), 5 of 19 Embench benchmarks and the largest of four small neural nets do not fit.
 

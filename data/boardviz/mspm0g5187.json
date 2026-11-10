@@ -1,0 +1,1861 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts found by tools/boardviz/pads_from_drawing.py, drawn but never labelled.",
+ "board": "LP-MSPM0G5187",
+ "id": "mspm0g5187",
+ "source": "Positions read from the board picture in the kit's user guide (SLAU967, figure 2-3, November 2025), scale set from the 2.54 mm header pitch; pin names from the same figure. Checked 2026-11-09 against TI's product photo (docs/arrivals/img/source-mspm0g5187-ticom-photo.png): headers, LEDs, jumpers and small parts placed from it.",
+ "size": [
+  57.8,
+  112.4
+ ],
+ "color": "#a8101a",
+ "corner": 2.5,
+ "holes": [
+  [
+   2.1,
+   110.4,
+   3.2
+  ],
+  [
+   56.0,
+   110.4,
+   3.2
+  ],
+  [
+   55.7,
+   2.5,
+   3.2
+  ],
+  [
+   2.3,
+   2.9,
+   3.2
+  ],
+  [
+   51.9,
+   80.6,
+   2.4
+  ],
+  [
+   2.3,
+   12.2,
+   2.4
+  ],
+  [
+   38.3,
+   109.7,
+   2.4
+  ]
+ ],
+ "silk": [
+  {
+   "t": "LP-MSPM0G5187",
+   "x": 56.4,
+   "y": 89.2,
+   "s": 2.0,
+   "rot": 90
+  },
+  {
+   "t": "XDS110-ET Debug Probe",
+   "x": 19.4,
+   "y": 76.4,
+   "s": 1.5
+  },
+  {
+   "t": "MSP1",
+   "x": 22.3,
+   "y": 54.9,
+   "s": 1.5
+  },
+  {
+   "t": "USB1",
+   "x": 11.0,
+   "y": 104.4,
+   "s": 1.4
+  },
+  {
+   "t": "S1 (PA18)",
+   "x": 6.9,
+   "y": 64.2,
+   "s": 1.5
+  },
+  {
+   "t": "S2 (PA7)",
+   "x": 49.3,
+   "y": 64.4,
+   "s": 1.5
+  },
+  {
+   "t": "S3 MSP NRST",
+   "x": 46.2,
+   "y": 107.6,
+   "s": 1.5
+  },
+  {
+   "t": "Microphone",
+   "x": 14.4,
+   "y": 32.6,
+   "s": 1.5
+  },
+  {
+   "t": "LED1",
+   "x": 14.4,
+   "y": 19.4,
+   "s": 1.3
+  },
+  {
+   "t": "LED2",
+   "x": 10.3,
+   "y": 18.2,
+   "s": 1.3
+  },
+  {
+   "t": "J1",
+   "x": 5.5,
+   "y": 63.1,
+   "s": 1.5
+  },
+  {
+   "t": "J3",
+   "x": 8.8,
+   "y": 63.1,
+   "s": 1.5
+  },
+  {
+   "t": "J4",
+   "x": 47.4,
+   "y": 63.1,
+   "s": 1.5
+  },
+  {
+   "t": "J2",
+   "x": 52.6,
+   "y": 63.1,
+   "s": 1.5
+  }
+ ],
+ "parts": [
+  {
+   "id": "usb",
+   "type": "usbc",
+   "x": 9.11,
+   "y": 108.6,
+   "rot": 0,
+   "label": "USB-C",
+   "title": "USB-C to the PC",
+   "text": "One cable powers the board, programs the chip and carries its text output through the debug probe.",
+   "key": true
+  },
+  {
+   "id": "xds",
+   "type": "qfp",
+   "x": 16.21,
+   "y": 90.4,
+   "body": 14,
+   "pins": 128,
+   "label": "Debug probe",
+   "title": "Debug probe chip",
+   "text": "The big chip in the top half is the debugger. It flashes the target chip over SWD and gives the computer a serial port, with no separate probe to buy.",
+   "key": true
+  },
+  {
+   "id": "mcu",
+   "type": "qfp",
+   "x": 29.11,
+   "y": 50.48,
+   "body": 10,
+   "pins": 64,
+   "label": "The chip",
+   "title": "MSPM0G5187",
+   "text": "An 80 MHz Arm Cortex-M0+ with 128 kB of flash, 32 kB of RAM and a neural processing unit for small AI models such as wake-word spotting.",
+   "key": true
+  },
+  {
+   "type": "qfn",
+   "x": 26.69,
+   "y": 108.55,
+   "size": 3.2
+  },
+  {
+   "type": "qfn",
+   "x": 39.19,
+   "y": 97.42,
+   "size": 4.0
+  },
+  {
+   "type": "qfn",
+   "x": 22.66,
+   "y": 26.45,
+   "size": 3.6
+  },
+  {
+   "type": "sot23",
+   "x": 51.25,
+   "y": 103.3,
+   "rot": 90
+  },
+  {
+   "type": "sot23",
+   "x": 51.25,
+   "y": 99.1,
+   "rot": 90
+  },
+  {
+   "type": "sot23",
+   "x": 55.16,
+   "y": 98.06,
+   "rot": 90
+  },
+  {
+   "id": "s3",
+   "type": "button",
+   "x": 46.5,
+   "y": 110.6,
+   "w": 3.5,
+   "h": 7.3,
+   "label": "Reset",
+   "title": "S3, reset",
+   "text": "Restarts the target chip from the top. Marked MSP NRST.",
+   "rot": -90,
+   "side": "left"
+  },
+  {
+   "id": "s1",
+   "type": "button",
+   "x": 1.0,
+   "y": 68.23,
+   "w": 3.5,
+   "h": 7.3,
+   "side": "left",
+   "label": "Button 1",
+   "title": "S1 on PA18",
+   "text": "A user button on PA18. Holding it while the board powers up enters the bootloader."
+  },
+  {
+   "id": "s2",
+   "type": "button",
+   "x": 56.9,
+   "y": 68.23,
+   "w": 3.5,
+   "h": 7.3,
+   "side": "right",
+   "label": "Button 2",
+   "title": "S2 on PA7",
+   "text": "The second user button, on PA7."
+  },
+  {
+   "type": "ringheader",
+   "x": 1.1,
+   "y": 95.81,
+   "cols": 1,
+   "rows": 7
+  },
+  {
+   "type": "ring",
+   "x": 40.4,
+   "y": 88.15,
+   "d": 2.4,
+   "name": "TP1"
+  },
+  {
+   "type": "ring",
+   "x": 40.4,
+   "y": 85.73,
+   "d": 2.4,
+   "name": "TP3"
+  },
+  {
+   "type": "ring",
+   "x": 40.4,
+   "y": 83.39,
+   "d": 2.4,
+   "name": "TP2"
+  },
+  {
+   "type": "led",
+   "x": 2.5,
+   "y": 77.8,
+   "rot": 0,
+   "color": "#efe6cf",
+   "name": "LED101"
+  },
+  {
+   "type": "led",
+   "x": 2.5,
+   "y": 75.7,
+   "rot": 0,
+   "color": "#efe6cf",
+   "name": "LED102"
+  },
+  {
+   "id": "led1",
+   "type": "led",
+   "x": 14.15,
+   "y": 18.0,
+   "rot": 0,
+   "color": "#ff3020",
+   "name": "LED1",
+   "label": "LED1",
+   "title": "Red LED",
+   "text": "The red user LED on PA0. Blinking it is the first project on this board.",
+   "key": true
+  },
+  {
+   "id": "led2",
+   "type": "led",
+   "x": 10.3,
+   "y": 17.0,
+   "rot": 0,
+   "color": "#ffffff",
+   "name": "LED2",
+   "label": "LED2",
+   "title": "RGB LED",
+   "text": "One LED with red, green and blue parts on PA17, PA24 and PB13, each with its own jumper."
+  },
+  {
+   "type": "led",
+   "x": 55.2,
+   "y": 24.3,
+   "rot": 0,
+   "color": "#efe6cf",
+   "name": "LED3"
+  },
+  {
+   "id": "j101",
+   "type": "header",
+   "x": 22.34,
+   "y": 72.98,
+   "cols": 10,
+   "rows": 2,
+   "shunts": "all",
+   "label": "Isolation jumpers",
+   "title": "J101 isolation block",
+   "text": "Ten jumpers join the debug probe to the target chip: power, the serial pair, reset, SWD and the bootloader line. Pull one to disconnect that line."
+  },
+  {
+   "id": "j102",
+   "type": "boxheader",
+   "x": 45.5,
+   "y": 77.4,
+   "cols": 2,
+   "rows": 5,
+   "label": "Debug out",
+   "title": "J102, debug out",
+   "text": "Takes the probe's SWD and reset lines off the board to program another board. Not fitted.",
+   "rot": 90
+  },
+  {
+   "id": "j103",
+   "type": "boxheader",
+   "x": 45.5,
+   "y": 69.3,
+   "cols": 2,
+   "rows": 5,
+   "label": "Debug in",
+   "title": "J103, debug in",
+   "text": "Lets an outside probe program this chip once the on-board probe is cut off at J101. Not fitted.",
+   "rot": 90
+  },
+  {
+   "type": "header",
+   "x": 6.94,
+   "y": 67.42,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all"
+  },
+  {
+   "type": "header",
+   "x": 52.66,
+   "y": 67.42,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all"
+  },
+  {
+   "type": "header",
+   "x": 6.13,
+   "y": 30.16,
+   "cols": 1,
+   "rows": 3
+  },
+  {
+   "type": "header",
+   "x": 51.69,
+   "y": 29.92,
+   "cols": 1,
+   "rows": 3
+  },
+  {
+   "type": "header",
+   "x": 6.29,
+   "y": 22.9,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all"
+  },
+  {
+   "type": "header",
+   "x": 36.77,
+   "y": 30.32,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "top"
+  },
+  {
+   "type": "header",
+   "x": 40.65,
+   "y": 30.32,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "top"
+  },
+  {
+   "type": "header",
+   "x": 54.19,
+   "y": 7.58,
+   "cols": 3,
+   "rows": 2
+  },
+  {
+   "type": "header",
+   "x": 47.2,
+   "y": 1.5,
+   "cols": 3,
+   "rows": 1
+  },
+  {
+   "type": "header",
+   "x": 6.29,
+   "y": 10.97,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all"
+  },
+  {
+   "type": "header",
+   "x": 8.71,
+   "y": 10.97,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all"
+  },
+  {
+   "type": "header",
+   "x": 11.37,
+   "y": 10.97,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all"
+  },
+  {
+   "type": "header",
+   "x": 14.03,
+   "y": 10.97,
+   "cols": 1,
+   "rows": 2,
+   "shunts": "all"
+  },
+  {
+   "type": "ringheader",
+   "x": 15.16,
+   "y": 3.31,
+   "cols": 8,
+   "rows": 2
+  },
+  {
+   "id": "j1",
+   "type": "ringheader",
+   "x": 7.3,
+   "y": 49.4,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "3V3",
+     "5V"
+    ],
+    [
+     "PA25",
+     "GND"
+    ],
+    [
+     "PB3",
+     "PB14"
+    ],
+    [
+     "PB2",
+     "PB15"
+    ],
+    [
+     "PB21",
+     "PB16"
+    ],
+    [
+     "PB22",
+     "PA16"
+    ],
+    [
+     "PB18",
+     "PA15"
+    ],
+    [
+     "PB25",
+     "PA12"
+    ],
+    [
+     "PA9",
+     "PA13"
+    ],
+    [
+     "PA8",
+     "PA14"
+    ]
+   ],
+   "pinno": [
+    [
+     1,
+     21
+    ],
+    [
+     2,
+     22
+    ],
+    [
+     3,
+     23
+    ],
+    [
+     4,
+     24
+    ],
+    [
+     5,
+     25
+    ],
+    [
+     6,
+     26
+    ],
+    [
+     7,
+     27
+    ],
+    [
+     8,
+     28
+    ],
+    [
+     9,
+     29
+    ],
+    [
+     10,
+     30
+    ]
+   ],
+   "label": "BoosterPack J1, J3",
+   "title": "Left BoosterPack headers",
+   "text": "J1 is the outer column, pins 1 to 10 from the top. J3 is the inner column, pins 21 to 30. Plug-on boards stack on these.",
+   "key": true
+  },
+  {
+   "id": "j2",
+   "type": "ringheader",
+   "x": 50.5,
+   "y": 49.4,
+   "cols": 2,
+   "rows": 10,
+   "names": [
+    [
+     "PB4",
+     "GND"
+    ],
+    [
+     "PB5",
+     "PB26"
+    ],
+    [
+     "PB0",
+     "PB24"
+    ],
+    [
+     "PB1",
+     "PB23"
+    ],
+    [
+     "PA28",
+     "NRST"
+    ],
+    [
+     "PA31",
+     "PB17"
+    ],
+    [
+     "PA10",
+     "PB19"
+    ],
+    [
+     "PA11",
+     "PA30"
+    ],
+    [
+     "PA0",
+     "PA29"
+    ],
+    [
+     "PA1",
+     "PA22"
+    ]
+   ],
+   "pinno": [
+    [
+     40,
+     20
+    ],
+    [
+     39,
+     19
+    ],
+    [
+     38,
+     18
+    ],
+    [
+     37,
+     17
+    ],
+    [
+     36,
+     16
+    ],
+    [
+     35,
+     15
+    ],
+    [
+     34,
+     14
+    ],
+    [
+     33,
+     13
+    ],
+    [
+     32,
+     12
+    ],
+    [
+     31,
+     11
+    ]
+   ],
+   "label": "BoosterPack J4, J2",
+   "title": "Right BoosterPack headers",
+   "text": "J4 is the inner column, pins 40 to 31 from the top. J2 is the outer column, pins 20 to 11. Sensor and motor boards plug onto these.",
+   "key": true
+  },
+  {
+   "id": "usb2",
+   "type": "usbc",
+   "x": 54.0,
+   "y": 17.18,
+   "rot": -90,
+   "label": "USB-C 2",
+   "title": "USB-C for the target chip",
+   "text": "A second USB-C port wired straight to the MSPM0G5187, for programs that act as a USB device or host. It does not power the board."
+  },
+  {
+   "id": "sd",
+   "type": "xtalbox",
+   "x": 36.13,
+   "y": 7.74,
+   "w": 15.5,
+   "h": 15.5,
+   "label": "microSD slot",
+   "title": "microSD card slot",
+   "text": "A card socket on the target chip's SPI lines, for storing audio or logs. J6 cuts its power."
+  },
+  {
+   "id": "mic",
+   "type": "ring",
+   "x": 10.85,
+   "y": 28.7,
+   "label": "Microphone",
+   "title": "Microphone",
+   "text": "A digital microphone that feeds the audio converter next to it. J6 cuts its power.",
+   "d": 1.4
+  },
+  {
+   "type": "xtalbox",
+   "x": 38.79,
+   "y": 56.37,
+   "w": 3.2,
+   "h": 2.5
+  },
+  {
+   "type": "crystal",
+   "x": 38.39,
+   "y": 52.1,
+   "w": 3.4,
+   "h": 1.5,
+   "rot": 90
+  },
+  {
+   "type": "standoff",
+   "x": 2.1,
+   "y": 110.4
+  },
+  {
+   "type": "standoff",
+   "x": 56.0,
+   "y": 110.4
+  },
+  {
+   "type": "standoff",
+   "x": 55.7,
+   "y": 2.5
+  },
+  {
+   "type": "standoff",
+   "x": 2.3,
+   "y": 2.9
+  },
+  {
+   "type": "block",
+   "x": 13.8,
+   "y": 101.3,
+   "w": 3.2,
+   "h": 2.5,
+   "d": 1.0,
+   "color": "#cdc6b2"
+  },
+  {
+   "type": "block",
+   "x": 8.7,
+   "y": 102.3,
+   "w": 1.9,
+   "h": 1.3,
+   "d": 0.9,
+   "color": "#2e2f33"
+  },
+  {
+   "type": "sot23",
+   "x": 51.25,
+   "y": 95.0,
+   "rot": 90
+  },
+  {
+   "type": "block",
+   "x": 55.1,
+   "y": 89.5,
+   "w": 2.9,
+   "h": 1.6,
+   "d": 1.0,
+   "color": "#2a2b2e"
+  },
+  {
+   "type": "block",
+   "x": 19.9,
+   "y": 78.5,
+   "w": 2.9,
+   "h": 1.6,
+   "d": 1.0,
+   "color": "#2a2b2e"
+  },
+  {
+   "type": "block",
+   "x": 40.2,
+   "y": 102.9,
+   "w": 3.2,
+   "h": 1.6,
+   "d": 1.6,
+   "color": "#d9a24a"
+  },
+  {
+   "type": "block",
+   "x": 51.4,
+   "y": 105.9,
+   "w": 3.2,
+   "h": 1.6,
+   "d": 1.6,
+   "color": "#d9a24a"
+  },
+  {
+   "type": "block",
+   "x": 55.1,
+   "y": 95.0,
+   "w": 2.7,
+   "h": 2.0,
+   "d": 1.5,
+   "color": "#8a7a6a"
+  },
+  {
+   "type": "qfn",
+   "x": 38.2,
+   "y": 76.7,
+   "size": 1.8
+  },
+  {
+   "type": "qfn",
+   "x": 38.2,
+   "y": 70.0,
+   "size": 1.8
+  },
+  {
+   "type": "header",
+   "x": 47.9,
+   "y": 22.3,
+   "cols": 1,
+   "rows": 3,
+   "shunts": "bottom"
+  },
+  {
+   "type": "jumper2",
+   "x": 55.46,
+   "y": 8.85
+  },
+  {
+   "type": "jumper2",
+   "x": 55.46,
+   "y": 6.31
+  },
+  {
+   "type": "jumper2",
+   "x": 45.93,
+   "y": 1.5
+  },
+  {
+   "type": "header",
+   "x": 21.07,
+   "y": 10.9,
+   "cols": 4,
+   "rows": 2
+  }
+ ],
+ "decor": [
+  {
+   "type": "chip",
+   "x": 30.91,
+   "y": 40.53,
+   "rot": 0,
+   "len": 2.83,
+   "w": 1.29
+  },
+  {
+   "type": "chip",
+   "x": 24.07,
+   "y": 62.63,
+   "rot": 0,
+   "len": 2.84,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 18.84,
+   "y": 62.6,
+   "rot": 0,
+   "len": 2.7,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 29.19,
+   "y": 62.61,
+   "rot": 0,
+   "len": 2.63,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 24.56,
+   "y": 39.87,
+   "rot": 0,
+   "len": 2.52,
+   "w": 1.29
+  },
+  {
+   "type": "chip",
+   "x": 32.66,
+   "y": 62.63,
+   "rot": 0,
+   "len": 2.75,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 38.48,
+   "y": 46.82,
+   "rot": 0,
+   "len": 3.03,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 48.07,
+   "y": 87.62,
+   "rot": 0,
+   "len": 2.37,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 34.27,
+   "y": 41.71,
+   "rot": 0,
+   "len": 2.26,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 20.66,
+   "y": 108.36,
+   "rot": 90,
+   "len": 3.1,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 27.0,
+   "y": 94.22,
+   "rot": 0,
+   "len": 2.15,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 54.9,
+   "y": 92.56,
+   "rot": 0,
+   "len": 2.85,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 48.11,
+   "y": 88.99,
+   "rot": 0,
+   "len": 2.15,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 38.68,
+   "y": 60.76,
+   "rot": 0,
+   "len": 2.15,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 37.49,
+   "y": 65.11,
+   "rot": 90,
+   "len": 2.01,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 42.69,
+   "y": 53.49,
+   "rot": 90,
+   "len": 1.99,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 42.32,
+   "y": 56.41,
+   "rot": 90,
+   "len": 2.14,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 42.03,
+   "y": 41.11,
+   "rot": 90,
+   "len": 2.1,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 22.71,
+   "y": 37.94,
+   "rot": 0,
+   "len": 2.12,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 33.62,
+   "y": 18.41,
+   "rot": 0,
+   "len": 2.93,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 17.82,
+   "y": 40.4,
+   "rot": 90,
+   "len": 1.97,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 35.19,
+   "y": 20.61,
+   "rot": 0,
+   "len": 2.53,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 4.77,
+   "y": 85.58,
+   "rot": 90,
+   "len": 2.29,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 36.25,
+   "y": 65.1,
+   "rot": 90,
+   "len": 1.97,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 19.61,
+   "y": 50.98,
+   "rot": 90,
+   "len": 1.66,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 42.7,
+   "y": 50.74,
+   "rot": 90,
+   "len": 1.87,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 18.42,
+   "y": 106.19,
+   "rot": 90,
+   "len": 2.5,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 28.77,
+   "y": 105.25,
+   "rot": 0,
+   "len": 2.3,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 21.4,
+   "y": 102.03,
+   "rot": 0,
+   "len": 2.23,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 19.61,
+   "y": 47.75,
+   "rot": 90,
+   "len": 1.68,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 17.99,
+   "y": 47.72,
+   "rot": 90,
+   "len": 1.52,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 18.81,
+   "y": 45.01,
+   "rot": 0,
+   "len": 2.69,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 47.25,
+   "y": 92.43,
+   "rot": 90,
+   "len": 2.16,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 27.5,
+   "y": 64.19,
+   "rot": 0,
+   "len": 1.64,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 38.52,
+   "y": 40.48,
+   "rot": 90,
+   "len": 2.09,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 27.87,
+   "y": 32.8,
+   "rot": 0,
+   "len": 2.12,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 23.04,
+   "y": 108.7,
+   "rot": 90,
+   "len": 2.28,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 55.95,
+   "y": 101.36,
+   "rot": 90,
+   "len": 2.24,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 48.01,
+   "y": 98.76,
+   "rot": 0,
+   "len": 2.9,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 4.74,
+   "y": 88.28,
+   "rot": 90,
+   "len": 1.92,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 19.65,
+   "y": 54.17,
+   "rot": 90,
+   "len": 1.51,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 18.01,
+   "y": 54.23,
+   "rot": 90,
+   "len": 1.8,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 24.52,
+   "y": 41.55,
+   "rot": 0,
+   "len": 2.7,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 14.65,
+   "y": 28.81,
+   "rot": 90,
+   "len": 3.1,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 39.21,
+   "y": 25.16,
+   "rot": 0,
+   "len": 2.71,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 39.41,
+   "y": 100.67,
+   "rot": 0,
+   "len": 2.18,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 35.77,
+   "y": 92.55,
+   "rot": 90,
+   "len": 2.1,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 48.8,
+   "y": 92.48,
+   "rot": 90,
+   "len": 2.01,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 52.1,
+   "y": 89.13,
+   "rot": 90,
+   "len": 2.78,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 36.53,
+   "y": 86.34,
+   "rot": 0,
+   "len": 2.2,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 22.5,
+   "y": 79.42,
+   "rot": 90,
+   "len": 2.0,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 5.82,
+   "y": 75.45,
+   "rot": 0,
+   "len": 2.04,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 23.97,
+   "y": 64.24,
+   "rot": 0,
+   "len": 1.59,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 22.96,
+   "y": 31.08,
+   "rot": 90,
+   "len": 2.21,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 29.34,
+   "y": 24.89,
+   "rot": 90,
+   "len": 2.1,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 24.23,
+   "y": 22.28,
+   "rot": 90,
+   "len": 2.01,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 41.57,
+   "y": 19.32,
+   "rot": 90,
+   "len": 2.79,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 54.39,
+   "y": 101.36,
+   "rot": 90,
+   "len": 2.18,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 12.28,
+   "y": 78.64,
+   "rot": 0,
+   "len": 2.16,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 5.8,
+   "y": 77.48,
+   "rot": 0,
+   "len": 2.05,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 41.04,
+   "y": 56.42,
+   "rot": 90,
+   "len": 2.14,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 28.99,
+   "y": 28.98,
+   "rot": 90,
+   "len": 2.69,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 16.51,
+   "y": 24.38,
+   "rot": 90,
+   "len": 2.1,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 48.04,
+   "y": 10.39,
+   "rot": 0,
+   "len": 2.24,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 17.94,
+   "y": 109.11,
+   "rot": 0,
+   "len": 2.69,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 43.29,
+   "y": 96.81,
+   "rot": 90,
+   "len": 1.86,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 37.27,
+   "y": 92.42,
+   "rot": 90,
+   "len": 2.05,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 5.54,
+   "y": 90.38,
+   "rot": 0,
+   "len": 2.15,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 4.81,
+   "y": 82.97,
+   "rot": 90,
+   "len": 1.91,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 30.94,
+   "y": 64.15,
+   "rot": 0,
+   "len": 1.72,
+   "w": 1.13
+  },
+  {
+   "type": "chip",
+   "x": 38.69,
+   "y": 59.45,
+   "rot": 0,
+   "len": 2.22,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 18.83,
+   "y": 56.89,
+   "rot": 0,
+   "len": 2.47,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 18.04,
+   "y": 50.97,
+   "rot": 90,
+   "len": 1.59,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 10.16,
+   "y": 23.1,
+   "rot": 90,
+   "len": 2.51,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 18.62,
+   "y": 102.01,
+   "rot": 0,
+   "len": 2.25,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 4.77,
+   "y": 99.81,
+   "rot": 90,
+   "len": 1.97,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 47.24,
+   "y": 96.63,
+   "rot": 90,
+   "len": 2.01,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 27.8,
+   "y": 96.16,
+   "rot": 90,
+   "len": 2.2,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 26.13,
+   "y": 90.69,
+   "rot": 90,
+   "len": 2.34,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 37.36,
+   "y": 89.77,
+   "rot": 90,
+   "len": 2.18,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 55.03,
+   "y": 87.74,
+   "rot": 0,
+   "len": 2.64,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 13.76,
+   "y": 80.22,
+   "rot": 0,
+   "len": 2.17,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 17.3,
+   "y": 79.44,
+   "rot": 90,
+   "len": 1.98,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 20.61,
+   "y": 64.21,
+   "rot": 0,
+   "len": 1.55,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 40.4,
+   "y": 52.12,
+   "rot": 90,
+   "len": 1.65,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 30.8,
+   "y": 41.95,
+   "rot": 0,
+   "len": 2.06,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 27.61,
+   "y": 28.7,
+   "rot": 90,
+   "len": 2.08,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 53.34,
+   "y": 23.96,
+   "rot": 0,
+   "len": 1.88,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 44.75,
+   "y": 11.8,
+   "rot": 0,
+   "len": 2.09,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 27.77,
+   "y": 92.32,
+   "rot": 90,
+   "len": 2.25,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 54.98,
+   "y": 90.99,
+   "rot": 0,
+   "len": 2.68,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 7.99,
+   "y": 85.55,
+   "rot": 90,
+   "len": 2.36,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 2.44,
+   "y": 77.55,
+   "rot": 0,
+   "len": 2.6,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 34.3,
+   "y": 42.92,
+   "rot": 0,
+   "len": 2.18,
+   "w": 0.81
+  },
+  {
+   "type": "chip",
+   "x": 37.05,
+   "y": 40.5,
+   "rot": 90,
+   "len": 2.04,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 14.39,
+   "y": 24.36,
+   "rot": 90,
+   "len": 2.08,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 13.91,
+   "y": 17.54,
+   "rot": 0,
+   "len": 2.47,
+   "w": 0.97
+  },
+  {
+   "type": "chip",
+   "x": 6.68,
+   "y": 16.61,
+   "rot": 90,
+   "len": 2.1,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 48.0,
+   "y": 6.6,
+   "rot": 0,
+   "len": 2.17,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 48.02,
+   "y": 4.87,
+   "rot": 0,
+   "len": 2.08,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 21.44,
+   "y": 100.46,
+   "rot": 0,
+   "len": 2.15,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 48.77,
+   "y": 96.53,
+   "rot": 90,
+   "len": 1.91,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 48.06,
+   "y": 94.42,
+   "rot": 0,
+   "len": 1.88,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 39.82,
+   "y": 93.18,
+   "rot": 0,
+   "len": 2.46,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 35.68,
+   "y": 89.79,
+   "rot": 90,
+   "len": 1.87,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 27.94,
+   "y": 88.71,
+   "rot": 90,
+   "len": 2.74,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 15.86,
+   "y": 79.45,
+   "rot": 90,
+   "len": 2.12,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 38.16,
+   "y": 48.43,
+   "rot": 0,
+   "len": 2.19,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 22.38,
+   "y": 21.27,
+   "rot": 0,
+   "len": 1.9,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 39.37,
+   "y": 19.32,
+   "rot": 90,
+   "len": 2.64,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 3.93,
+   "y": 15.88,
+   "rot": 0,
+   "len": 2.62,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 48.04,
+   "y": 8.56,
+   "rot": 0,
+   "len": 2.14,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 48.1,
+   "y": 102.35,
+   "rot": 0,
+   "len": 1.95,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 26.18,
+   "y": 100.04,
+   "rot": 90,
+   "len": 1.94,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 48.06,
+   "y": 90.42,
+   "rot": 0,
+   "len": 2.14,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 55.06,
+   "y": 86.85,
+   "rot": 0,
+   "len": 2.02,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 38.88,
+   "y": 55.17,
+   "rot": 0,
+   "len": 2.88,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 27.9,
+   "y": 31.13,
+   "rot": 0,
+   "len": 1.73,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 21.22,
+   "y": 30.28,
+   "rot": 0,
+   "len": 1.88,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 27.68,
+   "y": 24.91,
+   "rot": 90,
+   "len": 1.96,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 22.35,
+   "y": 22.82,
+   "rot": 0,
+   "len": 1.91,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 20.43,
+   "y": 22.06,
+   "rot": 90,
+   "len": 2.06,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 27.8,
+   "y": 99.98,
+   "rot": 90,
+   "len": 2.06,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 26.19,
+   "y": 96.07,
+   "rot": 90,
+   "len": 1.97,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 5.57,
+   "y": 94.3,
+   "rot": 0,
+   "len": 1.95,
+   "w": 0.65
+  },
+  {
+   "type": "chip",
+   "x": 6.38,
+   "y": 88.36,
+   "rot": 90,
+   "len": 1.98,
+   "w": 0.32
+  },
+  {
+   "type": "chip",
+   "x": 18.38,
+   "y": 78.35,
+   "rot": 90,
+   "len": 1.84,
+   "w": 0.48
+  },
+  {
+   "type": "chip",
+   "x": 36.57,
+   "y": 87.77,
+   "rot": 0,
+   "len": 2.18,
+   "w": 0.65
+  }
+ ]
+}

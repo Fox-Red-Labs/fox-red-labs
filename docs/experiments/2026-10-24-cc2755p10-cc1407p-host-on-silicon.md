@@ -6,6 +6,7 @@ status: line found
 reached: run
 line: TI's CC1407P host driver, this repo's bare-metal HAL and a hook file written for the LP-EM-CC2755P10 run on the chip: reset pulse, one 12 MHz SPI transfer, timer and interrupt hooks all fire, and then TRX_Host_open waits for a radio that is not fitted. The same wait stops TI's four Zephyr CC140xP samples. No packet was sent: the BP-CC1407P was not on this board.
 stop: no-radio
+page: none
 -->
 # Does the CC1407P host driver run on the LP-EM-CC2755P10, as plain C and as TI's Zephyr samples?
 

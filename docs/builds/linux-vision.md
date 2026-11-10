@@ -1,4 +1,4 @@
-# Run a vision model on a TI Linux board's accelerator and time it
+# Camera AI on a TI Linux board, timed
 
 Boot TI's Edge AI Linux on a starter kit and run TI's ready-made models on its C7x accelerator. Read each model's time per picture over a serial cable.
 

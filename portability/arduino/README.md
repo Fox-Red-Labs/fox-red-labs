@@ -27,6 +27,14 @@ Three points in those results need care:
 - **The fills are slower than the hand-written driver.** Not tested against a changed loop.
 - **`shimcheck` treats S1 as active-low.** It toggles the LED only when `digitalRead(PIN_S1) == HIGH`. S1 on this LaunchPad is active-high, so a press leaves the pin high and the sketch would not show a press. Measured: the unpressed reading `S1=1`. Not measured: S1 pressed, because nobody pressed it on the board.
 
+## Run on the LP-MSPM0G5187 (measured 2026-11-09)
+
+`BOARD=mspm0g5187 ./build.sh` builds the layer for the MSPM0G5187 with a board folder (`boards/mspm0g5187/`: `arduino.syscfg`, `variant.h`, `board.sh`, `pincm_table.h`) and no display or touch libraries. Two changes to the shared layer: the serial interrupt handler takes its name from SysConfig's `ARD_UART_INST_IRQHandler` (the G5187 calls the block UC0, not UART0), and `wiring.cpp` uses a board folder's `pincm_table.h` when there is one. Blink (unchanged) and the new `boardcheck` sketch were flashed with DSLite and ran: PA17 (`LED_BUILTIN`) toggled with half periods of 1,000 ms and 500 ms (debug-port reads), and `boardcheck` printed `boardcheck: Arduino layer on LP-MSPM0G5187` and then `millis=1000 micros=1001729 led=0` once a second on the backchannel UART at 115200. Sizes: Blink 2,824 B flash, boardcheck 3,952 B, 6,348 and 6,360 B RAM (2,048 B stack and 4,096 B heap included). `AnalogReadSerial` does not compile (no `analogRead`), as on the G3507. Not run on this board: SPI and Wire (no module attached). Logs: mspm0g5187/bench/arduino/.
+
+## LAUNCHXL-F2800137 (C28x): not supported
+
+The layer's ArduinoCore-API needs C++11 and TI's C2000 compiler (cl2000 25.11.1.LTS) is C++03 only; the first error is `String.h` line 75, in all five API files. The board layer (SysTick, IOMUX table, DriverLib UART) was not rewritten for C2000Ware. Details: [`boards/f2800137/PORT.md`](boards/f2800137/PORT.md); log: `c2000-launchpad/bench/arduino/`.
+
 ## Build and flash
 
 Build all four programs into `out/`. It takes about a minute the first time.

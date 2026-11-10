@@ -150,7 +150,9 @@ def identify(name=None, board=None, probe=None, run=None, connect_step=None):
         routed = [bid for bid, b in rt.items() if same_chip(b)]
         if not got["family"]:
             return Result.make("refused", "FRL-E010", f"probe {probe}: {got['how']}",
-                               "check the board's power and the probe cable; then name the board with --board", steps=got["steps"])
+                               "check the board's power and the probe cable; if a step says -614 or -615 (the chip gave no debug answer), "
+                               "unplug the board's USB for 5 s and plug it back in, and close CCStudio or any other debugger that holds the probe; "
+                               "then name the board with --board", steps=got["steps"])
         what = (parts[0] if got["exact"] and len(parts) == 1 else
                 f"{' or '.join(got['family'])}" + (f" ({', '.join(parts[:6])}{' ...' if len(parts) > 6 else ''})" if parts else ""))
         msg = f"probe {probe} is attached to {what}, found by {got['how']}"
@@ -189,8 +191,11 @@ def eligible(board, project, run=None):
     p = next((x for x in pj["projects"] if x["slug"] == project), None)
     if not p:
         stop("refused", "FRL-E070", f"no project {project!r}", "the project ids are the slugs in site/data/projects.json (blink, print-a-message, speed-test, ...)")
-    cell = p.get("cells", {}).get(short.get(board, board))
-    alts = [x["slug"] for x in pj["projects"] if (x.get("cells", {}).get(short.get(board, "")) or {}).get("st") == "yes"]
+    # a board's cell lives in `cells` (the grid boards, short ids) or in `also` (hub boards such as am13e230, full ids)
+    cell_of = lambda x, b: (x.get("cells", {}).get(short.get(b, b)) or x.get("also", {}).get(b)
+                            or x.get("also", {}).get(short.get(b, b)))   # an also block may use the short id too (g3519)
+    cell = cell_of(p, board)
+    alts = [x["slug"] for x in pj["projects"] if (cell_of(x, board) or {}).get("st") == "yes"]
     if not cell or cell.get("st") in (None, "untested"):
         stop("refused", "FRL-E012", f"{project} has not been tried on {names.get(board, board)}",
              f"projects that ran on this board: {', '.join(alts[:6]) or 'none yet'}; or try it with ./start.sh --assistant claude --experimental, knowing nothing here says it works",
@@ -291,8 +296,12 @@ def prepare(board, recipe_name, pattern=None, project=None, run=None):
             shutil.rmtree(proj / junk, ignore_errors=True)
     src = proj / r["source_file"]
     text = src.read_text(encoding="utf-8")
-    if r.get("edit") == "message" and r.get("message_style") in ("display", "uart2echo"):
-        new, line = (display_message if r["message_style"] == "display" else uart2echo_message)(text, ms)
+    if r.get("edit") == "message" and r.get("message_style") in ("display", "uart2echo", "c28"):
+        if r["message_style"] == "c28":
+            import build_c28
+            new, line = build_c28.with_message(text, ms, src)
+        else:
+            new, line = (display_message if r["message_style"] == "display" else uart2echo_message)(text, ms)
         if new is None:
             stop("refused", "FRL-E070", f"{src} has been changed by hand and has no message line to edit",
                  "edit the message in it yourself, or move it aside and run prepare again to start from TI's example")

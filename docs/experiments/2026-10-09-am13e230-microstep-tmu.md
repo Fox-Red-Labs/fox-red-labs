@@ -2,7 +2,7 @@
 id: E146
 board: LP-AM13E230
 date: 2026-10-09
-status: in progress
+status: parked
 reached: run
 line: The same six wires that stepped the kit 28BYJ-48 on and off now microstep it. The chip's PWM units give sinusoidal duties, updated 20,000 times a second. The update handler costs 138 cycles with the trig unit (1.4 percent of the CPU) and 246 with the C library sine (2.5 percent). Whether the shaft turns under this drive was not watched: the run was hands-free.
 stop: none

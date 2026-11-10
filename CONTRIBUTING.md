@@ -13,6 +13,8 @@ A post with all four parts can be repeated by the next person. An accepted fix g
 
 The guide is [docs/how-to-contribute.md](docs/how-to-contribute.md): how to post, the three report forms (I built it, it broke here, a prompt that worked), what becomes of a report, how to send a pull request, add a demo or a board, fix a page, add a number, and the rules this repo holds itself to.
 
+This repository is a copy built from a private lab notebook; `.export-source` names the notebook commit it came from, and each update lands here as one commit. A pull request opened here is applied to the notebook under your name and sign-off, and the next copy carries it, so it is never lost in an update. Fixes you send to the projects the ports came from (Zephyr, ESPHome, MicroPython and the rest) are welcome too: each port's page says whether its change has been sent upstream.
+
 Every commit is signed off (`git commit -s`, the Developer Certificate of Origin); if your employer may own your work, get permission first and say so in the pull request. Details in the guide.
 
 To run the tests of the `frl` tool: `python3 -m pip install -r requirements.txt` (Python 3.12 or newer), then `bash tools/run_tests.sh`.

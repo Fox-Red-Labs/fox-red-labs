@@ -9,10 +9,14 @@ set -euo pipefail
 VAR="${1:-}"; case "$VAR" in O3|Oz) ;; *) echo "usage: $0 O3|Oz [--build-only]"; exit 2;; esac
 BUILD_ONLY=0; [ "${2:-}" = "--build-only" ] && BUILD_ONLY=1
 HERE="$(cd "$(dirname "$0")" && pwd)"; BUILD="$HERE/build-$VAR"
-SDK=/Applications/ti/simplelink_lowpower_f3_sdk_9_21_00_36_LTS
-SYSCFG=/Applications/ti/sysconfig_1.26.3/sysconfig_cli.sh
-CGT=/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS
-DSLITE=/Applications/ti/uniflash_9.6.0/dslite.sh
+# Tools found the way frl finds them (FRL_F3_SDK, FRL_SYSCONFIG, FRL_TICLANG name other places); a missing one stops with its download page.
+REPO="$(cd "$HERE/../.." && pwd)"; TP="python3 $REPO/tools/frl/toolpath.py"
+SDK="$($TP f3_sdk --path)" || exit 2
+SYSCFG="$($TP sysconfig --version 1.26.3)" || exit 2
+CGT="$($TP ticlang --version 5.1.1.LTS --path)" || exit 2
+# UniFlash's dslite.sh wrapper (its --mode flash form); FRL_DSLITE_SH names another copy
+DSLITE="${FRL_DSLITE_SH:-}"; for f in "${FRL_TI_ROOT:-/Applications/ti}"/uniflash_*/dslite.sh "$HOME"/ti/uniflash_*/dslite.sh; do [ -n "$DSLITE" ] || { [ -e "$f" ] && DSLITE="$f"; }; done
+[ -n "$DSLITE" ] || { echo "Not installed: UniFlash (its dslite.sh flashes the board)"; echo "  get it: https://www.ti.com/tool/UNIFLASH (free; about 0.5 GB)"; echo "  or set FRL_DSLITE_SH to its dslite.sh"; exit 2; }
 CCXML="$HOME/tmp/fox-red-labs/cc2340r5/CC2340R5.ccxml"
 SERIAL_DEV="${SERIAL_DEV:-/dev/cu.usbmodemLS470GTU1}"
 mkdir -p "$BUILD" "$HERE/results"

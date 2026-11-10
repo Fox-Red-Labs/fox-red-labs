@@ -1,0 +1,68 @@
+/* Drawn 3D board (site/boardviz/boardviz.js). Loads with the board page's chrome. */
+.bviz-wrap { position: relative; margin: 0; }
+.bviz { position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 560px; background: linear-gradient(180deg, #fbf8f2, #f1ebe1); border: 1px solid var(--frl-line, #e2d8c9); border-radius: 12px; overflow: hidden; cursor: grab; user-select: none; -webkit-user-select: none; }
+.bviz canvas { display: block; width: 100%; height: 100%; }
+.bviz-labels { position: absolute; inset: 0; pointer-events: none; }
+.bviz-pill { position: absolute; transform: translate(-50%, -50%); display: flex; align-items: center; gap: 6px; font: 600 13px/1 var(--frl-font, Barlow, sans-serif); color: #161312; white-space: nowrap; }
+.bviz-pill i { width: 12px; height: 12px; border-radius: 50%; background: #2fd1b8; border: 2px solid #161312; box-shadow: 0 0 0 2px #fff; flex: none; }
+.bviz-pill span { background: #fff; border: 1.5px solid #161312; border-radius: 7px; padding: 5px 8px; box-shadow: 2px 2px 0 #161312; }
+.bviz-pill.bviz-static { opacity: 0.92; }
+.bviz-leaders { position: absolute; inset: 0; pointer-events: none; }
+.bviz-leaders path { stroke: #161312; stroke-width: 1.5; fill: none; }
+.bviz-tagdot { position: absolute; width: 11px; height: 11px; border-radius: 50%; border: 2px solid #161312; box-shadow: 0 0 0 2px #fff; transform: translate(-50%, -50%); background: #fff; }
+.bviz-taglab { position: absolute; transform: translate(0, -50%); font: 600 12px/1 var(--frl-font, Barlow, sans-serif); color: #161312; background: #fff; border: 1.5px solid #161312; border-radius: 6px; padding: 4px 7px; white-space: nowrap; box-shadow: 2px 2px 0 #161312; }
+.bviz-taglab.bviz-left { transform: translate(-100%, -50%); }
+.bviz-dot { position: absolute; transform: translate(-50%, -50%); width: 12px; height: 12px; border-radius: 50%; background: #2fd1b8; border: 2px solid #161312; box-shadow: 0 0 0 2px #fff; }
+.bviz-pill.bviz-hover i, .bviz-pill.bviz-sel i { background: #B42418; }
+.bviz-pill.bviz-sel span { background: #161312; color: #F7F3EC; }
+.bviz-card { margin-top: 10px; padding: 12px 14px; border: 1px solid var(--frl-line, #e2d8c9); border-radius: 10px; background: #fff; font-size: 15px; line-height: 21px; }
+.bviz-card b { display: block; margin-bottom: 4px; }
+.bviz-card p { margin: 0; }
+.bviz-tools { display: flex; gap: 8px; margin-top: 8px; align-items: center; font-size: 13px; color: var(--frl-stone, #6B625B); }
+.bviz-tools button { font: 600 13px var(--frl-font, Barlow, sans-serif); padding: 5px 10px; border: 1px solid var(--frl-line, #e2d8c9); border-radius: 6px; background: #fff; color: #161312; cursor: pointer; }
+.bviz-tools button:hover { border-color: #161312; }
+.bviz-nogl::after { content: "The drawn board needs WebGL. The photo above shows the same parts."; position: absolute; inset: 0; display: grid; place-items: center; padding: 20px; text-align: center; color: #6B625B; }
+@media (max-width: 700px) { .bviz { aspect-ratio: 1 / 1; } }
+/* demo scenes (scene.js) */
+.bviz-scene .bviz { aspect-ratio: 16 / 10; max-height: 600px; }
+.bviz-steps { list-style: none; margin: 10px 0 0; padding: 0 6px 0 0; display: grid; gap: 4px; align-content: start; position: relative; max-height: 44vh; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }   /* the steps scroll in their own box and follow the current step, so a long build never stretches the page */
+@media (min-width: 900px) { .bviz-scene-grid .bviz-steps { margin-top: 0; max-height: min(640px, 82vh); } }
+.bviz-steps li { display: grid; grid-template-columns: 28px 1fr; gap: 8px; align-items: baseline; padding: 7px 10px; border: 1px solid var(--frl-line, #e2d8c9); border-radius: 8px; background: #fff; cursor: pointer; font-size: 15px; line-height: 20px; }
+.bviz-steps li i { font-style: normal; font-weight: 700; color: var(--frl-stone, #6B625B); }
+.bviz-steps li.on { border-color: #161312; box-shadow: 2px 2px 0 #161312; }
+.bviz-steps li.on i { color: #B42418; }
+.bviz-steps li small { display: block; color: var(--frl-stone, #6B625B); font-size: 13px; line-height: 17px; }
+@media (min-width: 900px) { .bviz-scene-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr); gap: 16px; align-items: start; } }
+
+.bviz-wires { width: 100%; border-collapse: collapse; margin-top: 18px; font-size: 15px; }
+.bviz-wires caption { text-align: left; font-weight: 600; padding: 0 0 8px; }
+.bviz-wires th, .bviz-wires td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #e3ddd2; vertical-align: top; }
+.bviz-wires th { font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: #6a635a; }
+.bviz-sw { display: inline-block; width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #161312; margin-right: 7px; vertical-align: -1px; }
+
+.bviz-check { display: block; margin-top: 6px; padding: 5px 8px; border-left: 3px solid #B42418; background: rgba(180, 36, 24, 0.07); font: 400 13px/1.35 var(--frl-font, Barlow, sans-serif); color: var(--frl-ink, #161312); }
+.bviz-check::before { content: "Check: "; font-weight: 600; }
+.bviz-console { position: sticky; bottom: 16px; display: flex; justify-content: flex-end; margin-top: 10px; padding-right: 72px; pointer-events: none; }   /* 72px clears the fixed back-to-top arrow (44px at right 16px) */
+.bviz-console-btn { pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; background: #B42418; color: #fff; border-radius: 10px; padding: 10px 16px; font: 700 15px var(--frl-font, Barlow, sans-serif); text-decoration: none; box-shadow: 0 6px 22px rgba(22, 19, 18, 0.22); max-width: 100%; }
+.bviz-console-btn:hover { filter: brightness(1.08); }
+.bviz-console-btn i { width: 9px; height: 9px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35); flex: none; }
+.bviz-console-btn small { font-weight: 400; font-size: 13px; opacity: 0.92; white-space: normal; }
+@media (max-width: 640px) { .bviz-console { justify-content: flex-start; padding-right: 0; } .bviz-console-btn small { display: none; } }
+.bviz-pins td:nth-child(3) { white-space: nowrap; }
+
+/* the scene player's scrub bar: one segment per step, the fill follows the play head, drag or tap jumps to a step */
+.bviz-tools { flex-wrap: wrap; }
+.bviz-bar { position: relative; flex: 1 1 160px; min-width: 120px; height: 22px; cursor: pointer; touch-action: none; border-radius: 6px; }
+.bviz-bar::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 4px; border-radius: 2px; background: var(--frl-line, #e2d8c9); }
+.bviz-bar-fill { position: absolute; left: 0; top: 9px; height: 4px; border-radius: 2px; background: var(--frl-red, #B42418); width: 0; pointer-events: none; }
+.bviz-bar-tick { position: absolute; top: 7px; width: 2px; height: 8px; margin-left: -1px; background: #fff; pointer-events: none; }
+.bviz-bar-knob { position: absolute; top: 5px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--frl-red, #B42418); box-shadow: 0 0 0 2px #fff; pointer-events: none; }
+.bviz-bar-seg { position: absolute; top: 0; height: 22px; display: block; }
+.bviz-bar:focus-visible { outline: 2px solid #161312; outline-offset: 2px; }
+.bviz-speed { display: inline-flex; align-items: center; gap: 4px; font: 500 13px var(--frl-font, Barlow, sans-serif); color: var(--frl-stone, #6B625B); }
+.bviz-speed select { font: 600 13px var(--frl-font, Barlow, sans-serif); padding: 4px 6px; border: 1px solid var(--frl-line, #e2d8c9); border-radius: 6px; background: #fff; color: #161312; }
+/* the printable diagram under an animated build (tools/boardviz/wiring_still.py) */
+.bviz-print { margin: 14px 0 0; }
+.bviz-print img { width: 100%; height: auto; border: 1px solid #e3e0d6; border-radius: 6px; background: #fbfaf6; }
+.bviz-print figcaption { font-size: 14px; color: #6b6a66; margin-top: 6px; }
+.bviz-pinlab { position: absolute; transform: translate(7px, -125%); font: 700 10px/12px var(--frl-font, Barlow, sans-serif); color: #161312; background: rgba(255, 255, 255, .9); border: 1px solid #161312; border-radius: 3px; padding: 0 3px; white-space: nowrap; pointer-events: none; }

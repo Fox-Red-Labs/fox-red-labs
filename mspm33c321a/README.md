@@ -1,6 +1,6 @@
 # TI LP-MSPM33C321A LaunchPad: benchmarks and a changed blink from a Mac terminal
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Short answer.** With the tools installed, a copied TI example went from first command to a verified changed blink in 19 seconds on 2026-10-08 (build 4.8 s, flash 11.3 s). The Cortex-M33 runs CoreMark at 140.3 per second at 32 MHz (4.38 per MHz) and 544.1 per second at 160 MHz (3.40 per MHz), and TI's post-quantum ML-KEM-768 encapsulation takes 1.72 million cycles. Every number is a row in `data/results/mspm33c321a.csv`.
 
@@ -84,6 +84,14 @@ mspm33c321a/prebuild.sh --wait
 
 It builds TI's blink, CoreMark at 32 and 160 MHz, the four room-occupancy models, the control-loop step and (without `--no-sweep`) every SDK example, into the folder named by `OUT` (default: a folder outside the repository). It waits for a quiet Mac and installs nothing. The shorter benchmark builds are `tools/build_timing.sh`, `build_dhrystone.sh`, `build_crypto.sh` and `build_adc.sh`; `tools/run_image.py` flashes one image, waits and reads its result variables back over the probe.
 
+## Print your own message
+
+```bash
+./start.sh mspm33c321a print-a-message --probe <serial> --message "Hello from my LaunchPad"
+```
+
+One command backs the board up, copies TI's `uart_tx_console_multibyte_repeated_fifo_dma` example, puts your text in its message line, builds it, writes it and reads the board's first serial port at 115200 baud (the chip's UART on PA10 and PA11 reaches the probe's port with the jumpers as shipped). Three runs back to back printed the message and passed (counted 3, 4 and 4 times in 5 s); build 3.2 to 4.2 s, write and read-back 0.7 to 0.8 s, 28 to 30 s whole with the backup. TI's example sends five lines, one a second, and stops. Row `message_flash_repeat` in `data/results/mspm33c321a.csv`; measured 2026-11-08 with SDK 1.04.00.00, TI Arm Clang 5.1.1.LTS and SysConfig 1.28.0.
+
 ## What was measured
 
 Each row names its test in `data/results/mspm33c321a.csv`, with the recipe and conditions.
@@ -119,6 +127,15 @@ The rest of the errors, with causes: [FAQ.md](FAQ.md).
 
 No sleep or run current figures: they need the board's own EnergyTrace with jumpers lifted. The blink LED was read through the debugger, not watched by eye. FreeRTOS: a task switch round trip takes 367 cycles at 32 MHz, and 397 tasks run with the heap raised from 8 kB to about 248 kB (`rtos_task_switch`, `rtos_max_tasks` in `data/results/mspm33c321a.csv`).
 
+## Audio BoosterPack algorithms and the model's compiler setting (measured 2026-11-08)
+
+Cycle counts of the Audio BoosterPack's four algorithms on this chip at its 32 MHz image clock, TI Arm Clang -O2, DWT counter, 8 runs: pitch tracker on 384 samples 356k cycles, 128-point spectrum 72.1k, one 205-sample DTMF block 51.0k, noise gate plus echo 104 cycles a sample. The live checks through the speaker and microphone did not complete: the firmware heard no tone (4 of 4 pitch runs unvoiced) and a microphone on the Mac heard none from the pack speaker either; check that the pack sits flat, its volume slider is up and the wire from BoosterPack pin 8 to pin 5 is fitted (this LaunchPad does not route pin 5, so the microphone needs that wire). The image leaves PA21 an input.
+
+The TinyStories model (`ports/llama2c/`) generates 21.2 tokens a second at -O2, 26.5 at -O3 and 25.9 at -Os (160 MHz, 128 tokens, the same token ids in all three). Rows: `data/results/mspm33c321a.csv`.
+
 ## Where these facts come from
 
 Checked 2026-10-08 on an Intel Mac running macOS 15.7, with CCStudio 21.0.1 (used only for its compiler and DSLite), TI Arm Clang 5.1.1.LTS, SysConfig 1.28.0, UniFlash 9.6.0 and MSPM33 SDK 1.04.00.00, probe firmware 3.0.0.43. Every number comes from command-line runs. Files: `data/results/mspm33c321a.csv`, `mspm33c321a/AGENTS.md`, `mspm33c321a/FAQ.md`.
+
+Second unit (probe M3010002, 2026-11-09): blink and CoreMark -O3 at 32 and 160 MHz, 3 runs each, matched the first unit to within 0.0001 percent (140.28 and 544.05 per second, same CoreMark CRCs); its own saved flash was written back and read back identical. Rows carry "unit 2" in `data/results/mspm33c321a.csv`.
+

@@ -1,0 +1,245 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="ca-svg" viewBox="0 0 200 150" aria-hidden="true" focusable="false"><style>:root{--frl-font:Barlow,'Helvetica Neue',Arial,sans-serif;--frl-red:#a8101a}
+.ca-two { position: relative; cursor: pointer; } .ca-two .ca-svg { transition: opacity .35s; }
+.ca-two .ca-3d { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .35s; }
+.ca-two:hover .ca-3d, .ca-two.ca-on .ca-3d { opacity: 1; } .ca-two:hover .ca-svg, .ca-two.ca-on .ca-svg { opacity: 0; }
+.ca-hint { position: absolute; top: 8px; right: 8px; font: 700 11px/1 var(--frl-font); color: #F7F3EC; border: 1px solid rgba(247,243,236,.5); border-radius: 6px; padding: 2px 5px; }
+.ca-two:hover .ca-hint, .ca-two.ca-on .ca-hint { display: none; }
+@media (prefers-reduced-motion: reduce) { .ca-two .ca-3d, .ca-hint { display: none; } }
+.il-photo { display: block; width: 100%; height: 100%; } .il-photo img, .il-photo video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ca-svg { display: block; height: 150px; width: auto; max-width: 100%; font-family: var(--frl-font); }
+.ca-s { fill: none; stroke: #F7F3EC; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.ca-f { fill: #F7F3EC; } .ca-r { fill: var(--frl-red); } .ca-rs { stroke: var(--frl-red); } .ca-dim { opacity: .45; }
+.ca-ring, .ca-bar, .ca-merc, .ca-fillbar, .ca-prog, .ca-blk, .ca-newdot, .ca-led-halo { transform-box: fill-box; }
+.ca-ring { transform-origin: center; transform: scale(var(--s, 1)); opacity: var(--o, .6); }
+.ca-hop { opacity: .85; } .ca-z { opacity: .55; }
+.ca-merc { transform-origin: bottom; } .ca-bar { transform-origin: left center; } .ca-fillbar, .ca-prog { transform-origin: left center; }
+.ca-led-halo { transform-origin: center; opacity: .6; }
+.ca-coil { opacity: var(--base, 1); } .ca-coil:not(.ca-r) { --base: .4; }
+.ca-rotor { transform-box: view-box; transform-origin: 100px 75px; transform: rotate(35deg); }
+.ca-glow { opacity: .75; }
+.ca-tr { stroke-dasharray: 1; } .ca-scroll { transform: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .ca-go .ca-wake { animation: ca-wake 4s ease-in-out infinite; }
+  .ca-go .ca-merc { animation: ca-merc 4s ease-in-out infinite; }
+  .ca-go .ca-hop { animation: ca-hop 2s ease-out infinite; animation-delay: var(--d, 0s); }
+  .ca-go .ca-sensor .ca-hop { animation: ca-hop-s 4s ease-out infinite; animation-delay: var(--d, 0s); }
+  .ca-go .ca-sensor .ca-got { animation: ca-got 4s steps(1) infinite; }
+  .ca-go .ca-sensor .ca-z { animation: ca-z 4s ease-out infinite; animation-delay: var(--d, 0s); }
+  .ca-go .ca-hb { animation-delay: calc(var(--d, 0s) + 1s); } .ca-go .ca-ha { animation-delay: var(--d, 0s); }
+  .ca-go .ca-radio .ca-got { animation: ca-got 2s steps(1) infinite; animation-delay: .7s; }
+  .ca-go .ca-ring { animation: ca-ring 2.4s ease-out infinite; animation-delay: var(--d, 0s); }
+  .ca-go .ca-rxn { animation: ca-hit 2.4s ease-out infinite; }
+  .ca-go .ca-fillbar { animation: ca-fill 2s ease-out infinite; }
+  .ca-go .ca-coil { animation: ca-coil 1.6s steps(1) calc(var(--p) * .53s) 1, ca-coil .75s steps(1) calc(1.6s + var(--p) * .25s) infinite; }
+  .ca-go .ca-rotor { animation: ca-up 1.6s cubic-bezier(.55, 0, 1, .8) 1, ca-spin .75s linear 1.6s infinite; }
+  .ca-go .ca-led, .ca-go .ca-led-halo { animation: ca-blinkled 1.6s steps(1) infinite; }
+  .ca-go .ca-join { stroke-dasharray: 1; animation: ca-join 4s ease-out infinite; animation-delay: var(--d, 0s); }
+  .ca-go .ca-newdot { animation: ca-newdot 4s steps(1) infinite; } .ca-go .ca-newring { animation: ca-newring 4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+  .ca-go .ca-bar { animation: ca-race 3.4s linear 1 both; }
+  .ca-go .ca-lead { animation: ca-race 3.4s linear 1 both, ca-lead 3.4s steps(1) 1 both; }
+  .ca-go .ca-tr { animation: ca-draw 5s linear infinite; } .ca-go .ca-tr2 { animation-name: ca-draw; }
+  .ca-go .ca-gap { animation: ca-gap 5s steps(1) infinite; }
+  .ca-go .ca-cell0 { animation: ca-cell0 9s steps(1) infinite; }
+  .ca-go .ca-cell1 { animation: ca-cell1 9s steps(1) infinite; }
+  .ca-go .ca-cell2 { animation: ca-cell2 9s steps(1) infinite; }
+  .ca-go .ca-cell3 { animation: ca-cell3 9s steps(1) infinite; }
+  .ca-go .ca-cell4 { animation: ca-cell4 9s steps(1) infinite; }
+  .ca-go .ca-scroll { animation: ca-scroll 2.4s linear infinite; }
+  .ca-go .ca-blk { animation: ca-blk 4s linear infinite; animation-delay: var(--d, 0s); }
+  .ca-go .ca-prog { animation: ca-prog 4s linear infinite; } .ca-go .ca-ok { animation: ca-ok 4s steps(1) infinite; }
+  .ca-go .ca-pw { stroke: var(--frl-red); stroke-dasharray: 1; animation: ca-draw2 4s linear infinite; }
+  .ca-go .ca-glow { animation: ca-glow 4s ease-in-out infinite; }
+}
+@keyframes ca-wake { 0%, 4% { opacity: .35 } 10%, 40% { opacity: 1 } 48%, 100% { opacity: .35 } }
+@keyframes ca-merc { 0%, 6% { transform: scaleY(.1) } 22%, 40% { transform: scaleY(1) } 48%, 100% { transform: scaleY(.1) } }
+@keyframes ca-hop { 0% { opacity: 0 } 20% { opacity: 1 } 60%, 100% { opacity: 0 } }
+@keyframes ca-hop-s { 0%, 22% { opacity: 0 } 28%, 38% { opacity: 1 } 46%, 100% { opacity: 0 } }
+@keyframes ca-got { 0%, 42% { opacity: .2 } 46%, 62% { opacity: 1 } 63%, 100% { opacity: .2 } }
+@keyframes ca-z { 0%, 50% { opacity: 0; transform: translate(0, 0) } 62% { opacity: .9 } 100% { opacity: 0; transform: translate(8px, -12px) } }
+@keyframes ca-ring { from { transform: scale(.06); opacity: .9 } to { transform: scale(1); opacity: 0 } }
+@keyframes ca-hit { 0%, 45% { opacity: .35 } 62%, 85% { opacity: 1 } 100% { opacity: .35 } }
+@keyframes ca-fill { 0%, 45% { transform: scaleX(.1) } 75%, 100% { transform: scaleX(1) } }
+@keyframes ca-coil { 0% { opacity: 1 } 33.3%, 100% { opacity: var(--base, 1) } }
+@keyframes ca-up { to { transform: rotate(395deg) } }
+@keyframes ca-spin { from { transform: rotate(35deg) } to { transform: rotate(395deg) } }
+@keyframes ca-blinkled { 0%, 49% { opacity: 1 } 50%, 100% { opacity: .15 } }
+@keyframes ca-join { 0%, 10% { stroke-dashoffset: 1 } 40%, 100% { stroke-dashoffset: 0 } }
+@keyframes ca-newdot { 0%, 45% { opacity: .15 } 50%, 100% { opacity: 1 } }
+@keyframes ca-newring { 0% { transform: scale(.7); opacity: .9 } 40%, 100% { transform: scale(1.5); opacity: 0 } }
+@keyframes ca-race { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+@keyframes ca-lead { 0%, 99% { fill: #F7F3EC } 100% { fill: var(--frl-red) } }
+@keyframes ca-draw { 0% { stroke-dashoffset: 1 } 60%, 100% { stroke-dashoffset: 0 } }
+@keyframes ca-draw2 { 0% { stroke-dashoffset: 1 } 85%, 100% { stroke-dashoffset: 0 } }
+@keyframes ca-gap { 0%, 58% { opacity: 0 } 60%, 100% { opacity: 1 } }
+@keyframes ca-cell0 { 0% { opacity: 1 } 83.3% { opacity: .25 } 100% { opacity: .25 } }
+@keyframes ca-cell1 { 0% { opacity: 1 } 66.7% { opacity: .25 } 100% { opacity: .25 } }
+@keyframes ca-cell2 { 0% { opacity: 1 } 50.0% { opacity: .25 } 100% { opacity: .25 } }
+@keyframes ca-cell3 { 0% { opacity: 1 } 33.3% { opacity: .25 } 100% { opacity: .25 } }
+@keyframes ca-cell4 { 0% { opacity: 1 } 16.7% { opacity: .25 } 100% { opacity: .25 } }
+@keyframes ca-scroll { to { transform: translateX(-120px) } }
+@keyframes ca-blk { 0% { transform: translateX(0); opacity: 0 } 10% { opacity: 1 } 80% { opacity: 1 } 100% { transform: translateX(34px); opacity: 0 } }
+@keyframes ca-prog { 0%, 25% { transform: scaleX(.05) } 85%, 100% { transform: scaleX(1) } }
+@keyframes ca-ok { 0%, 85% { opacity: .2 } 86%, 100% { opacity: 1 } }
+@keyframes ca-glow { 0%, 100% { opacity: .15 } 50% { opacity: 1 } }
+.cb-s { fill: none; stroke: #F7F3EC; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cb-f { fill: #F7F3EC; } .cb-r { fill: var(--frl-red, #B42418); } .cb-rs { stroke: var(--frl-red, #B42418); } .cb-dim { opacity: .45; }
+.cb-t { fill: #F7F3EC; font: 600 11px Barlow, "Helvetica Neue", Arial, sans-serif; } .cb-tl { font-size: 10px; opacity: .7; }
+/* still frame: the story without motion */
+.cb-b1, .cb-c1 { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418); }
+.cb-tick { opacity: 1; } .cb-slice { opacity: .25; } .cb-slice.cb-now { fill: var(--frl-red, #B42418); opacity: 1; }
+.cb-cursor { transform: translateX(10px); } .cb-led { opacity: 1; }
+.cb-blk { opacity: 0; } .cb-prog { transform-box: fill-box; transform-origin: left center; transform: scaleX(.6); }
+.cb-reply, .cb-back { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .ca-go .cb-b1 { animation: cb-press 4s steps(1) infinite; } .ca-go .cb-b2 { animation: cb-press 4s steps(1) 2s infinite; }
+  .ca-go .cb-c1 { animation: cb-lit 4s steps(1) infinite; } .ca-go .cb-c2 { animation: cb-lit 4s steps(1) 2s infinite; }
+  .ca-go .cb-wave { animation: cb-wave 2s ease-out infinite; animation-delay: var(--d); }
+  .ca-go .cb-rot { animation: cb-spin 6s linear infinite; animation-delay: calc(var(--t) - 6s); }
+  .ca-go .cb-tagled { animation: cb-flash 6s steps(1) infinite; animation-delay: calc(var(--t) - 6s); }
+  .ca-go .cb-burst { animation: cb-burst 6s ease-out infinite; }
+  .ca-go .cb-burst0 { animation-delay: calc(var(--d) - 6s); } .ca-go .cb-burst1 { animation-delay: calc(var(--d) - 4s); } .ca-go .cb-burst2 { animation-delay: calc(var(--d) - 2s); }
+  .ca-go .cb-hubled { animation: cb-hub 2s steps(1) infinite; }
+  .ca-go .cb-tick { animation: cb-tick 6s steps(1) infinite; animation-delay: calc(var(--t) - 6s); }
+  .ca-go .cb-cursor { animation: cb-sweep 3.2s linear infinite; }
+  .ca-go .cb-led, .ca-go .cb-halo { animation: cb-blink 3.2s steps(1) infinite; }
+  .ca-go .cb-type { animation: cb-type 5s steps(1) infinite; animation-delay: var(--d); }
+  .ca-go .cb-done { animation: cb-done 5s steps(1) infinite; }
+  .ca-go .cb-blk { animation: cb-blk 5s linear infinite; animation-delay: var(--d); }
+  .ca-go .cb-prog { animation: cb-prog 5s linear infinite; }
+  .ca-go .cb-build .cb-led { animation: cb-on 5s steps(1) infinite; }
+  .ca-go .cb-word { animation: cb-word 5s steps(1) infinite; animation-delay: var(--d); }
+  .ca-go .cb-reply { animation: cb-reply 5s steps(1) infinite; }
+  .ca-go .cb-back { animation: cb-back 5s linear infinite; }
+  .ca-go .cb-print .cb-led { animation: cb-ans 5s steps(1) infinite; }
+  .ca-go .cb-slice { animation: cb-slice 4.8s steps(1) infinite; animation-delay: calc(var(--d) - 4.8s); }
+}
+@keyframes cb-press { 0%, 4% { fill: none; stroke: #F7F3EC } 5%, 22% { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418) } 23%, 100% { fill: none; stroke: #F7F3EC } }
+@keyframes cb-lit { 0%, 17% { fill: none; stroke: #F7F3EC } 18%, 40% { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418) } 41%, 100% { fill: none; stroke: #F7F3EC } }
+@keyframes cb-wave { 0%, 100% { opacity: .15 } 15% { opacity: 1 } 45% { opacity: .15 } }
+@keyframes cb-spin { 0% { transform: rotate(0) } 33.3%, 100% { transform: rotate(720deg) } }
+@keyframes cb-flash { 0%, 4% { opacity: .25 } 5%, 30% { opacity: 1 } 31%, 100% { opacity: .25 } }
+@keyframes cb-burst { 0%, 18% { opacity: 0 } 22% { opacity: 1 } 34%, 100% { opacity: 0 } }
+@keyframes cb-hub { 0%, 4% { opacity: .3; fill: #F7F3EC } 5%, 25% { opacity: 1; fill: var(--frl-red, #B42418) } 26%, 100% { opacity: .3; fill: #F7F3EC } }
+@keyframes cb-tick { 0%, 41% { opacity: 0 } 42%, 100% { opacity: 1 } }
+@keyframes cb-sweep { from { transform: translateX(0) } to { transform: translateX(160px) } }
+@keyframes cb-blink { 0% { opacity: 1 } 25% { opacity: .12 } 50% { opacity: 1 } 75% { opacity: .12 } }
+@keyframes cb-type { 0% { opacity: 0 } 6%, 100% { opacity: .45 } }
+@keyframes cb-done { 0%, 27% { opacity: 0 } 28%, 100% { opacity: 1 } }
+@keyframes cb-blk { 0%, 30% { transform: translateX(0); opacity: 0 } 32% { opacity: 1 } 55% { transform: translateX(22px); opacity: 1 } 56%, 100% { opacity: 0 } }
+@keyframes cb-prog { 0%, 34% { transform: scaleX(0) } 72%, 100% { transform: scaleX(1) } }
+@keyframes cb-on { 0%, 74% { opacity: .15 } 75%, 100% { opacity: 1 } }
+@keyframes cb-word { 0% { opacity: 0 } 8%, 100% { opacity: 1 } }
+@keyframes cb-reply { 0%, 44% { opacity: 0 } 45%, 100% { opacity: 1 } }
+@keyframes cb-back { 0%, 52% { transform: translateX(0); opacity: 0 } 54% { opacity: 1 } 70% { transform: translateX(-24px); opacity: 1 } 71%, 100% { opacity: 0 } }
+@keyframes cb-ans { 0%, 70% { opacity: .15 } 71%, 90% { opacity: 1 } 91%, 100% { opacity: .15 } }
+@keyframes cb-slice { 0% { fill: var(--frl-red, #B42418); opacity: 1 } 8.33%, 100% { fill: #F7F3EC; opacity: .25 } }
+.cb-code { fill: #F7F3EC; font: 600 12px var(--frl-font, Barlow, sans-serif); }
+.cb-pyoff { opacity: 0; } .cb-heard { opacity: 1; } .cb-orbit { offset-distance: 50%; offset-rotate: 0deg; }
+@media (prefers-reduced-motion: no-preference) {
+  .ca-go .cb-pyon { animation: cb-pya 4s steps(1) infinite; } .ca-go .cb-pyoff { animation: cb-pyb 4s steps(1) infinite; }
+  .ca-go .cb-py .cb-led, .ca-go .cb-pyhalo { animation: cb-pyled 4s steps(1) infinite; }
+  .ca-go .cb-orbit { animation: cb-orbit 9s linear infinite; } .ca-go .cb-heard { animation: cb-heard 9s steps(1) infinite; }
+  .ca-go .cb-sweep { animation: cb-sweep 3s ease-in-out infinite alternate; }
+}
+@keyframes cb-pya { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
+@keyframes cb-pyb { 0%, 49% { opacity: 0 } 50%, 100% { opacity: 1 } }
+@keyframes cb-pyled { 0%, 9% { opacity: .15 } 10%, 49% { opacity: 1 } 50%, 100% { opacity: .15 } }
+@keyframes cb-orbit { from { offset-distance: 0% } to { offset-distance: 100% } }
+@keyframes cb-heard { 0%, 39% { opacity: .2 } 40%, 62% { opacity: 1 } 63%, 100% { opacity: .2 } }
+@keyframes cb-sweep { from { transform: rotate(-30deg) } to { transform: rotate(30deg) } }
+.cb-sig { fill: var(--frl-red, #B42418); } .cb-sig3 { fill: #F7F3EC; opacity: .25; }
+.cb-walk { transform: translateX(30px); }
+.cb-beam { stroke: var(--frl-red, #B42418); } .cb-zhalo, .cb-zhalo2, .cb-halo2 { opacity: .8; }
+.cb-zn { opacity: .3; } .cb-zf { opacity: 0; }
+.cb-hopn { opacity: 0; } .cb-hopn.cb-h0 { opacity: 1; }
+.cb-pkt { opacity: 1; } .cb-eq { transform-box: fill-box; transform-origin: center; }
+.cb-ota .cb-prog { transform-box: fill-box; transform-origin: left center; transform: scaleX(.6); }
+@media (prefers-reduced-motion: no-preference) {
+  .ca-go .cb-walk { animation: cb-walk 8s ease-in-out infinite; }
+  .ca-go .cb-sig1 { animation: cb-sig1 8s steps(1) infinite; } .ca-go .cb-sig2 { animation: cb-sig2 8s steps(1) infinite; }
+  .ca-go .cb-sig3 { animation: cb-sig3 8s steps(1) infinite; }
+  .ca-go .cb-knob { animation: cb-knob 4s ease-in-out infinite; } .ca-go .cb-zl .cb-led, .ca-go .cb-zhalo { animation: cb-follow 4s steps(1) infinite; }
+  .ca-go .cb-btnled .cb-b1 { animation: cb-hold 4s steps(1) infinite; } .ca-go .cb-btnled .cb-b2 { animation: none; }
+  .ca-go .cb-btnled .cb-led, .ca-go .cb-halo2 { animation: cb-hold-led 4s steps(1) infinite; }
+  .ca-go .cb-turn { animation: cb-turn 4s ease-in-out infinite alternate; }
+  .ca-go .cb-temp .cb-type { animation: cb-lines 4s steps(1) infinite; animation-delay: var(--d); }
+  .ca-go .cb-pkt { animation: cb-pkt 1.5s linear infinite; animation-delay: var(--d); }
+  .ca-go .cb-sg .cb-led { animation: cb-blinkfast 1.5s steps(1) infinite; }
+  .ca-go .cb-enter { animation: cb-enter 5s ease-in-out infinite; }
+  .ca-go .cb-beam { animation: cb-beam 5s steps(1) infinite; } .ca-go .cb-wp .cb-led { animation: cb-beamled 5s steps(1) infinite; }
+  .ca-go .cb-hopn { animation: cb-hopn 1.5s steps(1) infinite; animation-delay: var(--d); }
+  .ca-go .cb-ard .cb-led { animation: ca-blinkled 1.6s steps(1) infinite; }
+  .ca-go .cb-knob2 { animation: cb-knob2 5s ease-in-out infinite; } .ca-go .cb-esp .cb-led, .ca-go .cb-zhalo2 { animation: cb-follow2 5s steps(1) infinite; }
+  .ca-go .cb-esp .cb-blk { animation: cb-blk 5s linear infinite; animation-delay: var(--d); }
+  .ca-go .cb-eq { animation: cb-eq .9s ease-in-out infinite alternate; animation-delay: var(--d); }
+  .ca-go .cb-alert { animation: cb-alert 3s steps(1) infinite; }
+  .ca-go .cb-ota .cb-prog { animation: cb-prog 5s linear infinite; } .ca-go .cb-ota .cb-led { animation: cb-on3 5s steps(1) infinite; }
+  .ca-go .cb-move { animation: cb-move 7s ease-in-out infinite; }
+  .ca-go .cb-zn { animation: cb-zn 7s steps(1) infinite; } .ca-go .cb-zf { animation: cb-zf 7s steps(1) infinite; }
+}
+@keyframes cb-walk { 0%, 20% { transform: translateX(0) } 25%, 45% { transform: translateX(30px) } 50%, 70% { transform: translateX(60px) } 75%, 95% { transform: translateX(90px) } 100% { transform: translateX(0) } }
+@keyframes cb-sig3 { 0%, 24% { fill: var(--frl-red, #B42418); opacity: 1 } 25%, 100% { fill: #F7F3EC; opacity: .25 } }
+@keyframes cb-sig2 { 0%, 49% { fill: var(--frl-red, #B42418); opacity: 1 } 50%, 100% { fill: #F7F3EC; opacity: .25 } }
+@keyframes cb-sig1 { 0%, 74% { fill: var(--frl-red, #B42418); opacity: 1 } 75%, 100% { fill: #F7F3EC; opacity: .25 } }
+@keyframes cb-knob { 0%, 15% { transform: translateX(-18px) } 30%, 75% { transform: translateX(0) } 90%, 100% { transform: translateX(-18px) } }
+@keyframes cb-follow { 0%, 29% { opacity: .15 } 30%, 79% { opacity: 1 } 80%, 100% { opacity: .15 } }
+@keyframes cb-hold { 0%, 14% { fill: none; stroke: #F7F3EC } 15%, 60% { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418) } 61%, 100% { fill: none; stroke: #F7F3EC } }
+@keyframes cb-hold-led { 0%, 15% { opacity: .15 } 16%, 60% { opacity: 1 } 61%, 100% { opacity: .15 } }
+@keyframes cb-turn { from { transform: rotate(-60deg) } to { transform: rotate(60deg) } }
+@keyframes cb-lines { 0% { opacity: 0 } 5%, 100% { opacity: .55 } }
+@keyframes cb-pkt { 0% { transform: translateX(0); opacity: 0 } 10%, 85% { opacity: 1 } 100% { transform: translateX(var(--dx)); opacity: 0 } }
+@keyframes cb-blinkfast { 0%, 15% { opacity: 1 } 16%, 100% { opacity: .2 } }
+@keyframes cb-enter { 0%, 15% { transform: translateY(-48px); opacity: 0 } 30%, 70% { transform: translateY(0); opacity: 1 } 85%, 100% { transform: translateY(-48px); opacity: 0 } }
+@keyframes cb-beam { 0%, 31% { stroke: #F7F3EC; opacity: .45 } 32%, 69% { stroke: var(--frl-red, #B42418); opacity: 1 } 70%, 100% { stroke: #F7F3EC; opacity: .45 } }
+@keyframes cb-beamled { 0%, 33% { opacity: .15 } 34%, 69% { opacity: 1 } 70%, 100% { opacity: .15 } }
+@keyframes cb-hopn { 0%, 30% { opacity: 1 } 31%, 100% { opacity: 0 } }
+@keyframes cb-knob2 { 0%, 45% { transform: translateX(-14px) } 55%, 90% { transform: translateX(0) } 100% { transform: translateX(-14px) } }
+@keyframes cb-follow2 { 0%, 53% { opacity: .15 } 54%, 90% { opacity: 1 } 91%, 100% { opacity: .15 } }
+@keyframes cb-eq { from { transform: scaleY(.25) } to { transform: scaleY(1) } }
+@keyframes cb-alert { 0%, 49% { opacity: .25 } 50%, 85% { opacity: 1 } 86%, 100% { opacity: .25 } }
+@keyframes cb-move { 0%, 40% { transform: translateX(0) } 50%, 90% { transform: translateX(54px) } 100% { transform: translateX(0) } }
+@keyframes cb-on3 { 0%, 74% { opacity: .15 } 75%, 100% { opacity: 1 } }
+@keyframes cb-zn { 0%, 44% { opacity: .3 } 45%, 95% { opacity: 0 } 96%, 100% { opacity: .3 } }
+@keyframes cb-zf { 0%, 47% { opacity: 0 } 48%, 93% { opacity: .3 } 94%, 100% { opacity: 0 } }
+.cb-hglow { fill: #E8742A; opacity: .55; } .cb-pack { fill: var(--frl-ink, #1F1B1A); } .cb-note { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .ca-go .cb-hglow { animation: cb-hglow 6s ease-in-out infinite; }
+  .ca-go .cb-note { animation: cb-note 3.6s ease-out infinite; animation-delay: var(--d); }
+}
+@keyframes cb-hglow { 0%, 22% { fill: #E8742A; opacity: .6 } 33%, 55% { fill: #8E4FD6; opacity: .55 } 66%, 88% { fill: #9FE6A0; opacity: .45 } 100% { fill: #E8742A; opacity: .6 } }
+@keyframes cb-note { 0% { transform: translate(-8px, 10px); opacity: 0 } 15% { opacity: 1 } 75% { opacity: 1 } 100% { transform: translate(4px, -14px); opacity: 0 } }
+
+/* 2026-10-26 drawings: post-quantum, audio-boosterpack, codecs, walkie-talkies, sub-ghz-demos, dns-ad-blocker, ulisp */
+.cb-lockb { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418); stroke-width: 2; } .cb-shc { opacity: 0; } .cb-sho { opacity: 1; stroke: var(--frl-red, #B42418); }
+.cb-spk { transform-box: fill-box; transform-origin: center; } .cb-pitch { transform-box: fill-box; transform-origin: bottom; }
+.cb-fa { opacity: .85; } .cb-fa1 { stroke: var(--frl-red, #B42418); }
+.cb-cd .cb-blk { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .ca-go .cb-kx1 { animation: cb-kx1 6s linear infinite; } .ca-go .cb-kx2 { animation: cb-kx2 6s linear infinite; }
+  .ca-go .cb-lockb { animation: cb-lockb 6s steps(1) infinite; } .ca-go .cb-shc { animation: cb-shc 6s steps(1) infinite; } .ca-go .cb-sho { animation: cb-sho 6s steps(1) infinite; }
+  .ca-go .cb-spk { animation: cb-spk .5s ease-in-out infinite alternate; }
+  .ca-go .cb-pitch { animation: cb-pitch 3s ease-in-out infinite; }
+  .ca-go .cb-fa1 { animation: cb-fa1 8s steps(1) infinite; } .ca-go .cb-fa2 { animation: cb-fa2 8s steps(1) infinite; } .ca-go .cb-fa3 { animation: cb-fa3 8s steps(1) infinite; }
+  .ca-go .cb-fx .cb-sig3 { animation: cb-sig3 8s steps(1) infinite; } .ca-go .cb-fx .cb-sig2 { animation: cb-sig2 8s steps(1) infinite; } .ca-go .cb-fx .cb-sig1 { animation: cb-sig1 8s steps(1) infinite; }
+  .ca-go .cb-dA { animation: cb-dA 6s linear infinite; } .ca-go .cb-dA2 { animation: cb-dA2 6s linear infinite; }
+  .ca-go .cb-dB { animation: cb-dB 6s linear infinite; } .ca-go .cb-dR { animation: cb-dR 6s linear infinite; }
+}
+@keyframes cb-kx1 { 0% { transform: translateX(0); opacity: 0 } 4% { opacity: 1 } 26% { transform: translateX(56px); opacity: 1 } 28%, 100% { opacity: 0 } }
+@keyframes cb-kx2 { 0%, 30% { transform: translateX(0); opacity: 0 } 34% { opacity: 1 } 56% { transform: translateX(-56px); opacity: 1 } 58%, 100% { opacity: 0 } }
+@keyframes cb-lockb { 0%, 62% { fill: none; stroke: #F7F3EC } 63%, 100% { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418) } }
+@keyframes cb-shc { 0%, 62% { opacity: 1 } 63%, 100% { opacity: 0 } } @keyframes cb-sho { 0%, 62% { opacity: 0 } 63%, 100% { opacity: 1 } }
+@keyframes cb-spk { from { transform: scale(.7) } to { transform: scale(1.25) } }
+@keyframes cb-pitch { 0%, 100% { transform: scaleY(.3) } 50% { transform: scaleY(1) } }
+@keyframes cb-fa1 { 0%, 74% { opacity: .9 } 75%, 100% { opacity: .1 } } @keyframes cb-fa2 { 0%, 49% { opacity: .9 } 50%, 100% { opacity: .1 } } @keyframes cb-fa3 { 0%, 24% { opacity: .9 } 25%, 100% { opacity: .1 } }
+@keyframes cb-dA { 0% { transform: translateX(0); opacity: 0 } 3% { opacity: 1 } 17% { transform: translateX(24px); opacity: 1 } 19%, 100% { opacity: 0 } }
+@keyframes cb-dA2 { 0%, 20% { transform: translateX(0); opacity: 0 } 23% { opacity: 1 } 37% { transform: translateX(18px); opacity: 1 } 39%, 100% { opacity: 0 } }
+@keyframes cb-dB { 0%, 50% { transform: translateX(0); opacity: 0 } 53% { opacity: 1 } 67% { transform: translateX(24px); opacity: 1 } 69%, 100% { opacity: 0 } }
+@keyframes cb-dR { 0%, 70% { transform: translateX(0); opacity: 0 } 72% { opacity: 1 } 88% { transform: translateX(-24px); opacity: 1 } 90%, 100% { opacity: 0 } }
+/* 2026-10-26 arcade: the tile slides two cells right and the merged tile is the red mark; still frame shows the merge */
+.cb-arc .cb-ar-slide { transform-box: fill-box; opacity: 0; } .cb-arc .cb-ar-merge { fill: var(--frl-red, #B42418); }
+@media (prefers-reduced-motion: no-preference) {
+  .ca-go .cb-arc .cb-ar-slide { animation: cb-ar-slide 4s linear infinite; } .ca-go .cb-arc .cb-ar-merge { animation: cb-ar-merge 4s steps(1) infinite; }
+}
+@keyframes cb-ar-slide { 0%, 20% { transform: translateX(0); opacity: 1 } 45% { transform: translateX(40px); opacity: 1 } 46%, 100% { opacity: 0 } }
+@keyframes cb-ar-merge { 0%, 45% { fill: #F7F3EC; opacity: .45 } 46%, 100% { fill: var(--frl-red, #B42418); opacity: 1 } }
+svg.ca-svg{width:100%;height:100%}</style><rect x="0" y="0" width="200" height="150" fill="#161312"/><style>@keyframes b-walkie-talkies-w{0%,100%{opacity:.1}30%{opacity:1}60%{opacity:.1}}@keyframes b-walkie-talkies-s{0%,40%{opacity:0}60%{opacity:.9}90%,100%{opacity:0}}@keyframes b-walkie-talkies-p{0%,70%{opacity:1}76%,100%{opacity:0}}.b-walkie-talkies-bd{opacity:0;transition:opacity .35s}.b-walkie-talkies-case{transition:opacity .35s}.ca:hover .b-walkie-talkies-bd,a:hover .b-walkie-talkies-bd,.ca-hover .b-walkie-talkies-bd,.ca-on .b-walkie-talkies-bd{opacity:1}.ca:hover .b-walkie-talkies-case,a:hover .b-walkie-talkies-case,.ca-hover .b-walkie-talkies-case,.ca-on .b-walkie-talkies-case{opacity:.2}@media (prefers-reduced-motion:no-preference){.ca-go .b-walkie-talkies-w0{animation:b-walkie-talkies-w 2.2s ease-in-out 0.00s infinite}.ca-go .b-walkie-talkies-w1{animation:b-walkie-talkies-w 2.2s ease-in-out 0.22s infinite}.ca-go .b-walkie-talkies-w2{animation:b-walkie-talkies-w 2.2s ease-in-out 0.44s infinite}.ca-go .b-walkie-talkies-s0{animation:b-walkie-talkies-s 2.2s ease-out 0.50s infinite}.ca-go .b-walkie-talkies-s1{animation:b-walkie-talkies-s 2.2s ease-out 0.70s infinite}.ca-go .b-walkie-talkies-ptt{animation:b-walkie-talkies-p 2.2s steps(1) infinite}}</style><defs><linearGradient id="b-walkie-talkies-redT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c8232d"/><stop offset="1" stop-color="#a8101a"/></linearGradient><linearGradient id="b-walkie-talkies-redL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c0c15"/><stop offset="1" stop-color="#7c0c15" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-redR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#58060e"/><stop offset="1" stop-color="#58060e" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-grnT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#21924f"/><stop offset="1" stop-color="#17703a"/></linearGradient><linearGradient id="b-walkie-talkies-grnL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f5029"/><stop offset="1" stop-color="#0f5029" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-grnR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a381d"/><stop offset="1" stop-color="#0a381d" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-blkT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3f4046"/><stop offset="1" stop-color="#2e2f33"/></linearGradient><linearGradient id="b-walkie-talkies-blkL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c1d20"/><stop offset="1" stop-color="#1c1d20" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-blkR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#111214"/><stop offset="1" stop-color="#111214" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-hdrT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#36363c"/><stop offset="1" stop-color="#1f1f23"/></linearGradient><linearGradient id="b-walkie-talkies-hdrL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#121214"/><stop offset="1" stop-color="#121214" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-hdrR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0a0b"/><stop offset="1" stop-color="#0a0a0b" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-slvT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef0f2"/><stop offset="1" stop-color="#bcc0c5"/></linearGradient><linearGradient id="b-walkie-talkies-slvL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a9ea4"/><stop offset="1" stop-color="#9a9ea4" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-slvR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a7e84"/><stop offset="1" stop-color="#7a7e84" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-gldT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f2d98f"/><stop offset="1" stop-color="#d8b45c"/></linearGradient><linearGradient id="b-walkie-talkies-gldL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b08f3e"/><stop offset="1" stop-color="#b08f3e" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-gldR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6c2a"/><stop offset="1" stop-color="#8a6c2a" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-bluT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4283ec"/><stop offset="1" stop-color="#2a62d0"/></linearGradient><linearGradient id="b-walkie-talkies-bluL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c46a0"/><stop offset="1" stop-color="#1c46a0" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-bluR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#133374"/><stop offset="1" stop-color="#133374" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-gryT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b7076"/><stop offset="1" stop-color="#50555b"/></linearGradient><linearGradient id="b-walkie-talkies-gryL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d4146"/><stop offset="1" stop-color="#3d4146" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-gryR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b2e32"/><stop offset="1" stop-color="#2b2e32" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-glassT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#26302b"/><stop offset="1" stop-color="#10181a"/></linearGradient><linearGradient id="b-walkie-talkies-glassL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0f10"/><stop offset="1" stop-color="#0a0f10" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-glassR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#06090a"/><stop offset="1" stop-color="#06090a" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-wallT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a423c"/><stop offset="1" stop-color="#3d3631"/></linearGradient><linearGradient id="b-walkie-talkies-wallL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2622"/><stop offset="1" stop-color="#2c2622" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-wallR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#201b18"/><stop offset="1" stop-color="#201b18" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-dwoodT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b88a5a"/><stop offset="1" stop-color="#a07848"/></linearGradient><linearGradient id="b-walkie-talkies-dwoodL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e4f2c"/><stop offset="1" stop-color="#6e4f2c" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-dwoodR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#523a1f"/><stop offset="1" stop-color="#523a1f" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-whtT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6f3ec"/><stop offset="1" stop-color="#dcd7cb"/></linearGradient><linearGradient id="b-walkie-talkies-whtL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b3ad9f"/><stop offset="1" stop-color="#b3ad9f" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-whtR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#948e80"/><stop offset="1" stop-color="#948e80" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-pineT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ecdcb8"/><stop offset="1" stop-color="#dcc79a"/></linearGradient><linearGradient id="b-walkie-talkies-pineL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b39a6c"/><stop offset="1" stop-color="#b39a6c" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-pineR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8e7752"/><stop offset="1" stop-color="#8e7752" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-bk2T" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a2b30"/><stop offset="1" stop-color="#1b1c1f"/></linearGradient><linearGradient id="b-walkie-talkies-bk2L" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#101113"/><stop offset="1" stop-color="#101113" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-bk2R" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#08080a"/><stop offset="1" stop-color="#08080a" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-ylwT" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f3d268"/><stop offset="1" stop-color="#e0b83c"/></linearGradient><linearGradient id="b-walkie-talkies-ylwL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b08c20"/><stop offset="1" stop-color="#b08c20" stop-opacity=".82"/></linearGradient><linearGradient id="b-walkie-talkies-ylwR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#80651a"/><stop offset="1" stop-color="#80651a" stop-opacity=".85"/></linearGradient><linearGradient id="b-walkie-talkies-cnav" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1b3376"/><stop offset=".35" stop-color="#3c63c4"/><stop offset="1" stop-color="#1b3376"/></linearGradient><linearGradient id="b-walkie-talkies-cdgr" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#26282c"/><stop offset=".35" stop-color="#5a5e65"/><stop offset="1" stop-color="#1c1d20"/></linearGradient><linearGradient id="b-walkie-talkies-cslv" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8e9298"/><stop offset=".35" stop-color="#e6e8ea"/><stop offset="1" stop-color="#8e9298"/></linearGradient><linearGradient id="b-walkie-talkies-cblk" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#17181a"/><stop offset=".35" stop-color="#4a4b51"/><stop offset="1" stop-color="#17181a"/></linearGradient><linearGradient id="b-walkie-talkies-cmg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7b8088"/><stop offset=".35" stop-color="#c9cdd2"/><stop offset="1" stop-color="#7b8088"/></linearGradient><linearGradient id="b-walkie-talkies-crd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7c0c15"/><stop offset=".35" stop-color="#e0342b"/><stop offset="1" stop-color="#7c0c15"/></linearGradient><linearGradient id="b-walkie-talkies-cwh" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b3ad9f"/><stop offset=".35" stop-color="#f6f3ec"/><stop offset="1" stop-color="#b3ad9f"/></linearGradient><linearGradient id="b-walkie-talkies-cwd" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6e4f2c"/><stop offset=".35" stop-color="#c79a64"/><stop offset="1" stop-color="#6e4f2c"/></linearGradient><filter id="b-walkie-talkies-sh" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.2"/></filter><radialGradient id="b-walkie-talkies-glow"><stop offset="0" stop-color="#ff4a3d" stop-opacity=".95"/><stop offset=".45" stop-color="#ff2a2a" stop-opacity=".35"/><stop offset="1" stop-color="#ff2a2a" stop-opacity="0"/></radialGradient><radialGradient id="b-walkie-talkies-pool" cx=".5" cy=".55" r=".6"><stop offset="0" stop-color="#2c2723"/><stop offset="1" stop-color="#161312" stop-opacity="0"/></radialGradient><linearGradient id="b-walkie-talkies-wedge" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2fb7ad" stop-opacity=".75"/><stop offset="1" stop-color="#2fb7ad" stop-opacity=".12"/></linearGradient></defs><ellipse cx="100" cy="86" rx="98" ry="62" fill="url(#b-walkie-talkies-pool)"/><defs><linearGradient id="b-walkie-talkies-wt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b6e74"/><stop offset="1" stop-color="#3a3c41"/></linearGradient></defs><g transform="rotate(6 47.0 132)"><rect x="24" y="46" width="50" height="92" rx="11" fill="#000" opacity=".5" filter="url(#b-walkie-talkies-sh)"/><rect x="30" y="14" width="6" height="32" rx="3" fill="#4a4b51"/><circle cx="33" cy="14" r="3.6" fill="#5a5b61"/><rect x="19" y="66" width="4" height="20" rx="2" fill="#4a4b51"/><rect class="b-walkie-talkies-ptt" x="19" y="66" width="4" height="20" rx="2" fill="#c8102e"/><g class="b-walkie-talkies-bd"><rect x="28" y="46" width="38" height="80" rx="2.4" fill="url(#b-walkie-talkies-redT)"/><rect x="28" y="46" width="38" height="80" rx="2.4" fill="none" stroke="#58060e" stroke-width=".8"/><circle cx="31.2" cy="49.2" r="1.6" fill="#d8b45c"/><circle cx="31.2" cy="49.2" r=".8" fill="#2a0a0c"/><circle cx="31.2" cy="122.8" r="1.6" fill="#d8b45c"/><circle cx="31.2" cy="122.8" r=".8" fill="#2a0a0c"/><circle cx="62.8" cy="49.2" r="1.6" fill="#d8b45c"/><circle cx="62.8" cy="49.2" r=".8" fill="#2a0a0c"/><rect x="31.8" y="48.2" width="19.8" height="4" rx=".6" fill="#1f1f23"/><rect x="33.0" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="36.4" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="39.8" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="43.2" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="46.6" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="31.8" y="119.8" width="19.8" height="4" rx=".6" fill="#1f1f23"/><rect x="33.0" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="36.4" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="39.8" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="43.2" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="46.6" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="39.4" y="80.0" width="12" height="12" rx=".8" fill="#2e2f33"/><circle cx="41.4" cy="82.0" r=".8" fill="#6b6c72"/><rect x="54.6" y="82.5" width="7" height="7" rx=".6" fill="#2e2f33"/><path d="M53.1 49 V123" stroke="#f3b8b0" stroke-opacity=".45" stroke-width=".6" stroke-dasharray="1.4 1.4"/><rect x="42.0" y="43" width="10" height="9" rx="1" fill="#bcc0c5" stroke="#7a7e84" stroke-width=".6"/><rect x="57.08" y="48.4" width="7.2" height="7.2" rx=".6" fill="#bcc0c5"/><circle cx="60.68" cy="52" r="2.4" fill="#1b1b1e"/><rect x="57.08" y="116.4" width="7.2" height="7.2" rx=".6" fill="#bcc0c5"/><circle cx="60.68" cy="120" r="2.4" fill="#1b1b1e"/><rect x="56.8" y="84.8" width="3.2" height="2.4" fill="#4a1014"/></g><g class="b-walkie-talkies-case"><rect x="22" y="40" width="50" height="92" rx="11" fill="url(#b-walkie-talkies-wt)" stroke="#8a8d93" stroke-width="1"/><path d="M32 43 H62" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.6" stroke-linecap="round"/><rect x="32" y="52.0" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="32" y="58.5" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="32" y="65.0" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="32" y="71.5" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="32" y="78.0" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="31" y="90" width="32" height="30" rx="7" fill="#2a2b30"/></g><circle cx="47.0" cy="105" r="8.5" fill="#55565c"/><circle class="b-walkie-talkies-ptt" cx="47.0" cy="105" r="8.5" fill="#c8102e"/></g><g transform="rotate(-6 153.0 132)"><rect x="130" y="46" width="50" height="92" rx="11" fill="#000" opacity=".5" filter="url(#b-walkie-talkies-sh)"/><rect x="164" y="14" width="6" height="32" rx="3" fill="#4a4b51"/><circle cx="167" cy="14" r="3.6" fill="#5a5b61"/><rect x="177" y="66" width="4" height="20" rx="2" fill="#4a4b51"/><g class="b-walkie-talkies-bd"><rect x="134" y="46" width="38" height="80" rx="2.4" fill="url(#b-walkie-talkies-redT)"/><rect x="134" y="46" width="38" height="80" rx="2.4" fill="none" stroke="#58060e" stroke-width=".8"/><circle cx="137.2" cy="49.2" r="1.6" fill="#d8b45c"/><circle cx="137.2" cy="49.2" r=".8" fill="#2a0a0c"/><circle cx="137.2" cy="122.8" r="1.6" fill="#d8b45c"/><circle cx="137.2" cy="122.8" r=".8" fill="#2a0a0c"/><circle cx="168.8" cy="49.2" r="1.6" fill="#d8b45c"/><circle cx="168.8" cy="49.2" r=".8" fill="#2a0a0c"/><rect x="137.8" y="48.2" width="19.8" height="4" rx=".6" fill="#1f1f23"/><rect x="139.0" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="142.4" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="145.8" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="149.2" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="152.6" y="49.4" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="137.8" y="119.8" width="19.8" height="4" rx=".6" fill="#1f1f23"/><rect x="139.0" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="142.4" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="145.8" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="149.2" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="152.6" y="121.0" width="1.6" height="1.6" fill="#c9ccd0"/><rect x="145.4" y="80.0" width="12" height="12" rx=".8" fill="#2e2f33"/><circle cx="147.4" cy="82.0" r=".8" fill="#6b6c72"/><rect x="160.6" y="82.5" width="7" height="7" rx=".6" fill="#2e2f33"/><path d="M159.1 49 V123" stroke="#f3b8b0" stroke-opacity=".45" stroke-width=".6" stroke-dasharray="1.4 1.4"/><rect x="148.0" y="43" width="10" height="9" rx="1" fill="#bcc0c5" stroke="#7a7e84" stroke-width=".6"/><rect x="163.08" y="48.4" width="7.2" height="7.2" rx=".6" fill="#bcc0c5"/><circle cx="166.68" cy="52" r="2.4" fill="#1b1b1e"/><rect x="163.08" y="116.4" width="7.2" height="7.2" rx=".6" fill="#bcc0c5"/><circle cx="166.68" cy="120" r="2.4" fill="#1b1b1e"/><rect x="162.8" y="84.8" width="3.2" height="2.4" fill="#4a1014"/></g><g class="b-walkie-talkies-case"><rect x="128" y="40" width="50" height="92" rx="11" fill="url(#b-walkie-talkies-wt)" stroke="#8a8d93" stroke-width="1"/><path d="M138 43 H168" stroke="#ffffff" stroke-opacity=".35" stroke-width="1.6" stroke-linecap="round"/><rect x="138" y="52.0" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="138" y="58.5" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="138" y="65.0" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="138" y="71.5" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="138" y="78.0" width="30" height="3" rx="1.5" fill="#1b1c1f"/><rect x="137" y="90" width="32" height="30" rx="7" fill="#2a2b30"/></g><circle cx="153.0" cy="105" r="8.5" fill="#55565c"/></g><path class="b-walkie-talkies-w0" d="M82.0 47.8 A12 12 0 0 1 82.0 68.2" fill="none" stroke="#f7f3ec" stroke-width="2.4" stroke-linecap="round"/><path class="b-walkie-talkies-w1" d="M87.5 38.5 A23 23 0 0 1 87.5 77.5" fill="none" stroke="#f7f3ec" stroke-width="2.4" stroke-linecap="round"/><path class="b-walkie-talkies-w2" d="M93.0 29.1 A34 34 0 0 1 93.0 86.9" fill="none" stroke="#f7f3ec" stroke-width="2.4" stroke-linecap="round"/><path class="b-walkie-talkies-s0" d="M187.0 94.9 A6 6 0 0 1 187.0 105.1" fill="none" stroke="#f7f3ec" stroke-width="1.8" stroke-linecap="round"/><path class="b-walkie-talkies-s1" d="M190.0 89.8 A12 12 0 0 1 190.0 110.2" fill="none" stroke="#f7f3ec" stroke-width="1.8" stroke-linecap="round"/></svg>

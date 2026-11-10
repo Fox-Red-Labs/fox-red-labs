@@ -402,6 +402,25 @@
    "folder": "beagley-ai/",
    "sdk": "BeagleY-AI TI SDK Edge AI 11.00.00.08 (build 2025-09-06), 1.16 GB download, 10.6 GB unpacked, not downloaded",
    "serials": []
+  },
+  {
+   "id": "am243x",
+   "name": "LP-AM243",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "board_id": "am243x",
+   "folder": "am243x/",
+   "sdk": "mcu_plus_sdk_am243x_12_01_00_33 (installed 2026-11-05, no macOS installer; built in an amd64 Linux container)",
+   "serials": []
+  },
+  {
+   "id": "mspm0l2228",
+   "name": "LP-MSPM0L2228",
+   "kind": "board",
+   "vendor": "TI",
+   "usb": "ti-xds110",
+   "serials": []
   }
  ]
 }

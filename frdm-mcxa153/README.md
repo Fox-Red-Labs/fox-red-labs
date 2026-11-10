@@ -1,6 +1,6 @@
 # NXP FRDM-MCXA153 on a Mac: changed LED blink in 1.4 minutes, CoreMark and SDK sweep
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **Short answer: 1.4 minutes from the edit to a proven 250 ms blink with NXP's SDK and the open-source pyOCD flasher, once they are installed.** Measured on 2026-10-11 on an Intel Mac with macOS 15.7.9 (Apple Silicon not run); every number is in [RESULTS-frdm-mcxa153.md](RESULTS-frdm-mcxa153.md) and `data/results/frdm-mcxa153.csv`.
 

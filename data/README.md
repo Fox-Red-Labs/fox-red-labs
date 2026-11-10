@@ -39,7 +39,8 @@ Rules:
 - Measured rows need `source` and `checked`. A number nobody can trace does not go in.
 - Corrections replace the row. History is in git.
 - `not_applicable` is a fact about the chip; `not_supported` is a software or tool limit that a port or a vendor fix could change. Use `not_applicable` only when the silicon lacks the block, with the block named in `note`.
-- A gap is a result. If a test cannot run, add the row with its status so the comparison shows the hole and the reason.
+- A gap is a result. If a test cannot run, add the row with its status so the comparison shows the hole and the reason. Every `not_run`, `waiting`, `not_supported`, `does_not_fit` or `failed` row says in `note` or `conditions` what stood in the way, and whether it was the bench (nobody there, disk, a probe in use) or something a reader would meet too (a vendor login, no macOS installer, no board in the tree). `check.py` refuses a row with neither.
+- A build-only result is still a row: `does_not_fit` with the shortfall, `not_supported` with the first error, or `failed`. A recipe cell is filled only from a measured row, never from a build.
 - Measured or computed. A number read off a run, or a unit change of one (cycles to cycles per byte, worst cycles to a percent of a period), is `measured`, with `conditions` saying "derived from <capture>". A formula that claims something no run tested (a "rate with 20 percent free" from one worst case) is `computed`. A test whose method was replaced keeps its rows: `benchmark-suite.json` names its successor in `superseded_by`, and `check.py` refuses new `measured` rows for it.
 - Repeat runs: timings and agent jobs need 3 runs before they are quoted as a median. Store the median in `value` and the spread in `value_hi` or `note`. A median of samples inside one run ("median of 20 commands") is one run.
 - An unknown run count is a provenance gap, not a 1. `python3 tools/results/check.py --gaps` lists measured rows with no `runs`; fill one only from its source.
@@ -119,3 +120,7 @@ Defined in `benchmark-suite.json`: `radio_flash_used` (B), `radio_airtime` (ms p
 | `not_applicable`, `not_supported`, `does_not_fit` | closed | specified | not_applicable (`note` is the reason) |
 
 Recorded means a number under its row's conditions, not a pass. Text in `conditions` and `note` reaches the site, so write it for a reader: no first names, no private paths, no internal ids.
+
+## Quoting a row on a page
+
+A page quotes a measured value through a token, `{{row:<board>/<test>/<variant>}}`, which the renderers replace with the row's value at build time (`tools/live_numbers.py`; the content standard, section 5). The token keys on the three id columns of these files, so a row's `board`, `test` and `variant` are an address once a page quotes it: change the value, never the key.

@@ -1,14 +1,17 @@
 # Shared by the digit recipes' scripts (touch/build.sh, touch/flash.sh, mspm0/build.sh, mspm0/run.sh). Source it; do not run it.
 # One set of variable names everywhere. Set any of them in your terminal; paths may contain spaces.
-#   SDK      MSPM0 SDK folder                  (default /Applications/ti/mspm0_sdk_2_11_00_07)
-#   CC       TI Arm Clang folder               (default the copy inside CCStudio 21.0.1)
+#   SDK      MSPM0 SDK folder                  (default: the one in the TI install folder, or FRL_MSPM0_SDK)
+#   CC       TI Arm Clang folder               (default: standalone or inside CCStudio, or FRL_TICLANG)
 #   NM       the symbol tool run.sh uses       (default $CC/bin/tiarmnm, which ships with TI Arm Clang)
 #   OCD      xPack OpenOCD folder              (default ~/zephyr-toolchain/xpack-openocd-0.12.0-7)
 #   OCD_CFG  OpenOCD connection file           (default openocd-mspm0.cfg beside this file)
 #   PROBE    your LaunchPad kit's XDS110 serial    (no default: flashing refuses to guess)
 BR_HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SDK="${SDK:-/Applications/ti/mspm0_sdk_2_11_00_07}"
-CC="${CC:-/Applications/ti/ccs2101/ccs/tools/compiler/ti-cgt-armllvm_5.1.1.LTS}"
+# Defaults found the way frl finds them (tools/frl/toolpath.py): the TI install folders on this computer, or FRL_MSPM0_SDK and
+# FRL_TICLANG; the standalone compiler counts as well as the copy inside CCStudio. SDK and CC set in the terminal still win.
+BR_TP="python3 $BR_HERE/../../tools/frl/toolpath.py"
+SDK="${SDK:-${FRL_MSPM0_SDK:-$($BR_TP mspm0_sdk --path 2>/dev/null)}}"
+CC="${CC:-${FRL_TICLANG:-$($BR_TP ticlang --version 5.1.1.LTS --path 2>/dev/null)}}"
 NM="${NM:-$CC/bin/tiarmnm}"
 OCD="${OCD:-$HOME/zephyr-toolchain/xpack-openocd-0.12.0-7}"
 OCD_CFG="${OCD_CFG:-$BR_HERE/openocd-mspm0.cfg}"

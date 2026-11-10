@@ -1,4 +1,4 @@
-# Time how fast a microcontroller reacts to an interrupt
+# How fast a microcontroller reacts to an interrupt
 
 Count the CPU cycles from an interrupt to the first line of its handler, on the LP-MSPM0L1306 with no wiring, or on the LP-EM-CC2340R5.
 

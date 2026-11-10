@@ -1,4 +1,4 @@
-# Run Zephyr on a LaunchPad kit from the command line
+# Run Zephyr on a LaunchPad from the terminal
 
 One script installs Zephyr 4.4.2, builds blinky, flashes an LP-MSPM0G3507 and the LED blinks. No IDE, no Homebrew.
 

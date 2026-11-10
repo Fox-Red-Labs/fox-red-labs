@@ -1,5 +1,5 @@
 board,name,vendor,line,core,clock_mhz,flash_kb,ram_kb,board_price_usd,classes,status
-mspm0g3507,LP-MSPM0G3507,TI,MSPM0,Cortex-M0+,80,128,32,23.36,setup core analog control ai sweep agent power display hobby security,borrowed
+mspm0g3507,LP-MSPM0G3507,TI,MSPM0,Cortex-M0+,80,128,32,23.36,setup core analog control ai sweep agent power display hobby security,bench
 mspm0l1306,LP-MSPM0L1306,TI,MSPM0,Cortex-M0+,32,64,4,20.56,setup core analog control ai sweep agent power hobby,bench
 mspm0c1104,LP-MSPM0C1104,TI,MSPM0,Cortex-M0+,24,16,1,6.59,setup core analog sweep agent power hobby,bench
 mspm0g3519,LP-MSPM0G3519,TI,MSPM0,Cortex-M0+,80,512,128,21.99,setup core analog control ai sweep agent power display hobby security,bench
@@ -23,3 +23,5 @@ am263p,LP-AM263P,TI,AM263P,4x Cortex-R5F with TMU,400,32768,3072,,setup core ana
 tda4,SK-TDA4VM,TI,TDA4VM (J721E),2x Cortex-A72 + C7x/MMA + 2x C66x + 6x R5F,2000,65536,4194304,,setup core ai sweep agent power security linux,bench
 am62l-evm,TMDS62LEVM (AM62L EVM),TI,AM62L32,2x Cortex-A53,1250,0,2097152,,setup core linux,bench
 beagley-ai,BeagleY-AI,BeagleBoard.org,AM67A (J722S),4x Cortex-A53 + 2x C7x/MMA + R5F,1400,0,4194304,70,setup core ai linux,bench
+am243x,LP-AM243,TI,AM243x,4x Cortex-R5F + Cortex-M4F,800,65536,2048,,setup core comms control sweep agent power security,bench
+mspm0l2228,LP-MSPM0L2228,TI,MSPM0,Cortex-M0+,32,256,32,,setup core analog control ai sweep agent power hobby security,bench

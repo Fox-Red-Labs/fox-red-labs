@@ -1,4 +1,4 @@
-# Measure how fast the chip runs, with CoreMark
+# Measure the chip's speed with CoreMark
 
 Build the standard CoreMark benchmark, run it on the board and work out iterations per second. The same source runs on every board, so the numbers compare.
 

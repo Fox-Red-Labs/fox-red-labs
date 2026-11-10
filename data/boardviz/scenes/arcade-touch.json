@@ -1,0 +1,577 @@
+{
+ "_about": "Demo scene for site/boardviz/scene.js (the shape is described in bldc-spin.json): the Waveshare 3.5 inch capacitive touch panel wired to an LP-MSPM0G3519 with 13 jumper wires for the 2048 and Minesweeper games (the arcade project's touch variant). Pin places are ringheader child indexes: on j1 col 0 is J1 pins 1 to 10 top down and col 1 is J3; on j2 col 0 is J4 pins 40 to 31 top down and col 1 is J2 pins 20 to 11, so index = col*10 + row. The panel's fpc15 is one column of 15, index = pin - 1. Every wire is a row of the recipe's step 1; the steps are that recipe's order with the wiring split into power, screen bus, screen control and touch. Step 6 turns the panel over (flip) and lights its glass with site/media/arcade-touch-2048.png, drawn by tools/boardviz/screen_2048.py from the game's own layout and font.",
+ "id": "arcade-touch",
+ "title": "2048 on a 3.5 inch touch panel",
+ "base": "mspm0g3519",
+ "boards": [
+  {
+   "id": "waveshare-35-touch",
+   "at": [
+    86,
+    8,
+    0
+   ],
+   "rot": 0
+  }
+ ],
+ "things": [],
+ "wires": [
+  {
+   "id": "vcc",
+   "color": "#d7262a",
+   "from": "waveshare-35-touch.fpc15.pin0",
+   "to": "mspm0g3519.j1.pin0",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 1, VCC",
+    "J1 pin 1 (3V3)"
+   ],
+   "label": "VCC"
+  },
+  {
+   "id": "gnd",
+   "color": "#1b1b1b",
+   "from": "waveshare-35-touch.fpc15.pin2",
+   "to": "mspm0g3519.j2.pin10",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 3, GND",
+    "J2 pin 20 (GND)"
+   ],
+   "label": "GND"
+  },
+  {
+   "id": "sclk",
+   "color": "#f2b705",
+   "from": "waveshare-35-touch.fpc15.pin5",
+   "to": "mspm0g3519.j1.pin6",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 6, SCLK",
+    "J1 pin 7 (PB31)"
+   ],
+   "label": "SCLK"
+  },
+  {
+   "id": "mosi",
+   "color": "#2a5bd7",
+   "from": "waveshare-35-touch.fpc15.pin4",
+   "to": "mspm0g3519.j2.pin15",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 5, MOSI",
+    "J2 pin 15 (PB8)"
+   ],
+   "label": "MOSI"
+  },
+  {
+   "id": "miso",
+   "color": "#2fa84f",
+   "from": "waveshare-35-touch.fpc15.pin3",
+   "to": "mspm0g3519.j2.pin16",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 4, MISO",
+    "J2 pin 14 (PB7)"
+   ],
+   "label": "MISO"
+  },
+  {
+   "id": "cs",
+   "color": "#f4f4f4",
+   "from": "waveshare-35-touch.fpc15.pin7",
+   "to": "mspm0g3519.j2.pin17",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 8, LCD_CS",
+    "J2 pin 13 (PB12)"
+   ],
+   "label": "LCD_CS"
+  },
+  {
+   "id": "dc",
+   "color": "#8a5a2b",
+   "from": "waveshare-35-touch.fpc15.pin8",
+   "to": "mspm0g3519.j2.pin1",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 9, LCD_DC",
+    "J4 pin 39 (PB9)"
+   ],
+   "label": "LCD_DC"
+  },
+  {
+   "id": "bl",
+   "color": "#f08a24",
+   "from": "waveshare-35-touch.fpc15.pin10",
+   "to": "mspm0g3519.j2.pin2",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 11, LCD_BL",
+    "J4 pin 38 (PC4)"
+   ],
+   "label": "LCD_BL"
+  },
+  {
+   "id": "rst",
+   "color": "#9b59b6",
+   "from": "waveshare-35-touch.fpc15.pin9",
+   "to": "mspm0g3519.j2.pin3",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 10, LCD_RST",
+    "J4 pin 37 (PC5)"
+   ],
+   "label": "LCD_RST"
+  },
+  {
+   "id": "sda",
+   "color": "#1aa3a3",
+   "from": "waveshare-35-touch.fpc15.pin11",
+   "to": "mspm0g3519.j1.pin9",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 12, TP_SDA",
+    "J1 pin 10 (PC3)"
+   ],
+   "label": "TP_SDA"
+  },
+  {
+   "id": "scl",
+   "color": "#7f8c8d",
+   "from": "waveshare-35-touch.fpc15.pin12",
+   "to": "mspm0g3519.j1.pin8",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 13, TP_SCL",
+    "J1 pin 9 (PC2)"
+   ],
+   "label": "TP_SCL"
+  },
+  {
+   "id": "tint",
+   "color": "#e84393",
+   "from": "waveshare-35-touch.fpc15.pin13",
+   "to": "mspm0g3519.j2.pin19",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 14, TP_INT",
+    "J2 pin 11 (PB14)"
+   ],
+   "label": "TP_INT"
+  },
+  {
+   "id": "trst",
+   "color": "#b2bec3",
+   "from": "waveshare-35-touch.fpc15.pin14",
+   "to": "mspm0g3519.j2.pin18",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 15, TP_RST",
+    "J2 pin 12 (PB11)"
+   ],
+   "label": "TP_RST"
+  }
+ ],
+ "extent": [
+  -40,
+  -80,
+  140,
+  80
+ ],
+ "view": {
+  "azimuth": -0.9,
+  "elevation": 0.8
+ },
+ "steps": [
+  {
+   "title": "The LaunchPad and the panel, no cable in",
+   "text": "The LP-MSPM0G3519 on the bench with its USB socket at the top and no cable in, and the Waveshare 3.5 inch panel beside it, its 15-way connector toward the board's right-hand headers. Seen that way, J1 is the outer left column, J3 the inner left, J4 the inner right and J2 the outer right; pin 1 of J1 and pin 20 of J2 are the top pins. No power until the last wire is in.",
+   "focus": "mspm0g3519.usb",
+   "focus_label": "USB out",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.8,
+      "zoom": 1,
+      "center": [
+       40,
+       0,
+       0
+      ]
+     }
+    },
+    {
+     "drop": "waveshare-35-touch"
+    }
+   ]
+  },
+  {
+   "title": "Power: two wires, 3.3 V only",
+   "text": "Panel VCC to J1 pin 1 (3V3) and panel GND to J2 pin 20 (GND). The panel's pin 2 (3V3) stays empty, and nothing on this build touches a 5 V pin.",
+   "focus": "mspm0g3519.j1",
+   "focus_label": "J1 pin 1 is 3V3",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.8,
+      "elevation": 0.9,
+      "zoom": 1.6,
+      "center": [
+       30,
+       10,
+       6
+      ]
+     }
+    },
+    {
+     "wire": [
+      "vcc",
+      "gnd"
+     ]
+    }
+   ],
+   "check": "With the USB socket at the top: red on the top pin of the outer left column (J1 pin 1), black on the top pin of the outer right column (J2 pin 20). Nothing on the 5V pin beside 3V3."
+  },
+  {
+   "title": "The screen bus: clock, data and chip select",
+   "text": "SCLK to J1 pin 7 (PB31), MOSI to J2 pin 15 (PB8), MISO to J2 pin 14 (PB7) and LCD_CS to J2 pin 13 (PB12). MISO is optional: the game never reads the screen back.",
+   "focus": "mspm0g3519.j2",
+   "focus_label": "J2, outer right column",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.75,
+      "elevation": 0.95,
+      "zoom": 2.0,
+      "center": "mspm0g3519.j2"
+     }
+    },
+    {
+     "wire": [
+      "sclk",
+      "mosi",
+      "miso",
+      "cs"
+     ]
+    }
+   ],
+   "check": "Three wires in a row on J2 pins 13, 14 and 15 (two if you skip MISO), counted down from pin 20 at the top, and one on J1 pin 7."
+  },
+  {
+   "title": "Screen control: data/command, backlight, reset",
+   "text": "LCD_DC to J4 pin 39 (PB9), LCD_BL to J4 pin 38 (PC4), LCD_RST to J4 pin 37 (PC5). J4 is the inner right column; pin 40 is its top pin.",
+   "focus": "mspm0g3519.j2",
+   "focus_label": "J4, inner right column",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.7,
+      "elevation": 1.0,
+      "zoom": 2.2,
+      "center": "mspm0g3519.j2"
+     }
+    },
+    {
+     "wire": [
+      "dc",
+      "bl",
+      "rst"
+     ]
+    }
+   ],
+   "check": "Three wires on the inner right column, pins 37, 38 and 39, the second to fourth pins from the top."
+  },
+  {
+   "title": "Touch: four wires",
+   "text": "TP_SDA to J1 pin 10 (PC3), TP_SCL to J1 pin 9 (PC2), TP_INT to J2 pin 11 (PB14), TP_RST to J2 pin 12 (PB11). INT is optional: the game polls the touch chip. The panel's SD_CS pin stays empty.",
+   "focus": "waveshare-35-touch.fpc15",
+   "focus_label": "15-way connector",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.85,
+      "elevation": 0.85,
+      "zoom": 1.5,
+      "center": [
+       45,
+       8,
+       4
+      ]
+     }
+    },
+    {
+     "wire": [
+      "sda",
+      "scl",
+      "tint",
+      "trst"
+     ]
+    }
+   ],
+   "check": "Thirteen wires in (eleven if you skipped MISO and INT). On the panel only pins 2 (3V3) and 7 (SD_CS) are empty. Tug each wire."
+  },
+  {
+   "title": "Plug in USB, build and flash, then turn the panel face up",
+   "text": "Build with BOOT_GAME=1 BENCH=0 bash ports/touch-games/build.sh g3519 so it starts straight in 2048 (TI's Arm compiler; the script prints where touch-games-g3519.out lands). Flashing erases the demo that shipped on the board: back it up first (the board folder's AGENTS.md in the repository shows the DSLite memory reads that save the main flash). Then flash the .out through the board's own probe with DSLite, the flasher that comes with CCStudio, using a copy of the .ccxml file that carries your probe's serial. Turn the panel over so the glass faces you; the wires run underneath it.",
+   "focus": "waveshare-35-touch.screen",
+   "focus_label": "The screen, face up",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.9,
+      "zoom": 1.15,
+      "center": [
+       45,
+       4,
+       0
+      ]
+     }
+    },
+    {
+     "flip": "waveshare-35-touch"
+    },
+    {
+     "screen": "waveshare-35-touch.screen",
+     "image": "media/arcade-touch-2048.png",
+     "w": 49.0,
+     "h": 73.4,
+     "rot": -90
+    }
+   ],
+   "check": "The panel's backlight comes on and it shows a 4 by 4 board with two tiles."
+  },
+  {
+   "title": "Swipe to play",
+   "text": "Swipe in any direction and the tiles slide and merge. The build clocks the screen bus at 40 MHz, above the panel's rated clock of about 15 MHz: 2048 was seen playing on this panel at that clock, and a scripted swipe redraws in {{row:mspm0g3519/touch_2048_swipe_ms/spi40-cpu80-mean60|.1f}} ms. At 20 MHz the same code ran too, and a swipe takes {{row:mspm0g3519/touch_2048_swipe_ms/spi20-cpu80-mean60|.1f}} ms. MENU at the bottom of the screen goes back to the launcher, where Minesweeper is the other button: tap opens a cell, a long press flags it.",
+   "focus": "waveshare-35-touch.screen",
+   "focus_label": "Swipe here",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.6,
+      "elevation": 1.15,
+      "zoom": 1.7,
+      "center": "waveshare-35-touch.screen"
+     }
+    }
+   ],
+   "check": "Tiles move with the swipe and the score climbs. If a swipe does nothing, check the four touch wires first: J1 pins 9 and 10, J2 pins 11 and 12."
+  }
+ ],
+ "pins": {
+  "source": "ports/touch-games/README.md",
+  "rows": [
+   [
+    "Power, 3.3 V",
+    "VCC (pin 1)",
+    "J1 pin 1 (3V3)",
+    "Powers the panel's screen, backlight and touch chip. 3.3 V only: the panel's 5 V pin stays empty."
+   ],
+   [
+    "Ground",
+    "GND (pin 3)",
+    "J2 pin 20 (GND)",
+    "The return for every signal."
+   ],
+   [
+    "SPI clock",
+    "SCLK (pin 6)",
+    "J1 pin 7 (PB31)",
+    "The clock the chip ticks out for each pixel byte, at 40 MHz."
+   ],
+   [
+    "SPI data out",
+    "MOSI (pin 5)",
+    "J2 pin 15 (PB8)",
+    "Pixel data to the screen controller."
+   ],
+   [
+    "SPI data in",
+    "MISO (pin 4)",
+    "J2 pin 14 (PB7)",
+    "Reads back from the screen controller. The game never reads, so this wire is optional."
+   ],
+   [
+    "Screen chip select",
+    "LCD_CS (pin 8)",
+    "J2 pin 13 (PB12)",
+    "Low while the chip talks to the screen."
+   ],
+   [
+    "Data or command",
+    "LCD_DC (pin 9)",
+    "J4 pin 39 (PB9)",
+    "High for pixel data, low for a command byte."
+   ],
+   [
+    "Backlight",
+    "LCD_BL (pin 11)",
+    "J4 pin 38 (PC4)",
+    "Turns the backlight on."
+   ],
+   [
+    "Screen reset",
+    "LCD_RST (pin 10)",
+    "J4 pin 37 (PC5)",
+    "Pulsed low once at start."
+   ],
+   [
+    "Touch I2C data",
+    "TP_SDA (pin 12)",
+    "J1 pin 10 (PC3)",
+    "Finger positions come back on this line."
+   ],
+   [
+    "Touch I2C clock",
+    "TP_SCL (pin 13)",
+    "J1 pin 9 (PC2)",
+    "The clock for the touch chip, 400 kHz."
+   ],
+   [
+    "Touch interrupt",
+    "TP_INT (pin 14)",
+    "J2 pin 11 (PB14)",
+    "Goes low when a finger lands. The game polls, so this wire is optional."
+   ],
+   [
+    "Touch reset",
+    "TP_RST (pin 15)",
+    "J2 pin 12 (PB11)",
+    "Pulsed low once at start."
+   ]
+  ]
+ }
+}

@@ -1,6 +1,6 @@
 # How do you get a TI LP-EM-CC35X1 LaunchPad development kit from the box to a changed blink on a Mac?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 **It takes about a minute from an edited line to a blinking LED once the chip is activated, using only terminal commands.** The one step you cannot undo is the activation: TI's Wi-Fi Toolbox burns a security key into fuses inside the chip, once, before it accepts any program. The board used here arrived not activated and was activated with TI's example key (5 seconds).
 
@@ -78,6 +78,8 @@ Wi-Fi presence from channel state information (TI's CSI example, plugin 1.20, re
 - If you see `Process is stopped. Life cycle OPERATIONAL is not valid. Get fuse data failed`, the tool is not broken: the chip is not activated. Run the activation in step 3 of the ten-minute path ([FAQ](FAQ.md#get_fuse_data-prints-process-is-stopped-life-cycle-operational-is-not-valid-get-fuse-data-failed-is-the-tool-broken)).
 - If you see `Path to programming_instructions after path correction couldn't be found`, rebuild the images with an absolute build folder, or replace the relative paths in `tool_settings.json` with absolute ones ([FAQ](FAQ.md#programming-stops-with-path-to-programming_instructions-after-path-correction-couldnt-be-found)).
 - If you see a silent serial port or one or two odd characters, read at the baud rate of the image on the board: 115200 for TI's SDK examples, 921600 for the Wi-Fi CSI program ([FAQ](FAQ.md#the-boards-serial-port-is-silent-or-prints-one-or-two-odd-characters)).
+
+- If `tools/preflight_image.py` prints `REFUSE (c) linker map ... describes 6256 kB of flash; this chip has 2696 kB`, the image uses the single-slot flash layout (the Wi-Fi CSI lab image does) and the check compares it with the two-slot layout of the board's current image. Erase the whole flash first, as the FAQ says for the CSI program, and decide on the override with the saved signed bundle of the running image in hand ([FAQ](FAQ.md#the-image-preflight-refuses-a-single-slot-image-for-this-board)).
 
 The rest: [FAQ](FAQ.md).
 

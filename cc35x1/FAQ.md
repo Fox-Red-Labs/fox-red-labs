@@ -58,6 +58,10 @@ Seen on the Matter thermostat image once Bluetooth starts; the same bytes come b
 
 The commissioning window has closed: TI's Matter example keeps it open for 300 seconds after start-up. Erase and program again, then scan within 5 minutes. Pressing S1 or holding SW1 to reopen the window was not run on the thermostat image.
 
+### How do I print my own message from this board with frl, and put the old program back?
+
+Run `FRL_RESTORE_IMAGE=<toolbox/tool_settings.json of the image you want back> frl run --board cc35x1 --recipe print-message --pattern "Hello from my LaunchPad" --probe <serial>`, then `frl restore <the backup folder it prints>`. frl edits TI's uart2echo, builds and signs it, programs it with the Wi-Fi Toolbox and reads the message on the probe's serial port. This chip cannot be read back, so the backup keeps the fuse report and the running program's first line, and the restore programs the image you named and checks that line. If you see `FRL-E053`, build or pick that image first. The chip must be activated already: frl never activates it. 3 of 3 runs on 2026-10-25, probe <probe serial>; `docs/frl.md`.
+
 ## Matter
 
 ### Does activating the chip lock the board to TI's example key?
@@ -114,6 +118,10 @@ Type the network name yourself. On macOS 15, `ipconfig getsummary en0` prints th
 
 Check the Mac first: `system_profiler SPBluetoothDataType | grep -E "State|Address"`. `State: Off` with `Address: NULL` means the Mac's Bluetooth controller is down; turn Bluetooth off and on in Control Center. Over SSH, macOS refuses Bluetooth with `Bluetooth is not authorized` until the app is allowed in Privacy & Security; run the client from a Terminal window instead (2026-10-25).
 
+### The presence-lab image prints `Timeout expired connecting to AP` and never joins, while Sparky joins the same network.
+
+Seen 2026-11-08 with `frl_presence_lab`: after `wlan_start` and `wlan_sta_role_up`, `wlan_connect -s "<network>" -t WPA2 -p <password>` ends in `WLAN_EVENT_CONNECT_PERIODIC_SCAN_COMPLETE` then the timeout, with WPA2, WPA2/WPA3, WPA3 and WPA2_PLUS alike, and a one-shot `wlan_scan` lists nothing; the Sparky image joins the same network in about 6.5 s. The lab image prints country code WW and runs a one-shot scan policy. Next try: `wlan_set_con_policy`, `wlan_scan -n 30` after a few seconds, then compare the two images' Wi-Fi setup code before anything else. Put Sparky back with its bundle's RESTORE.md (erase first).
+
 ## Over-the-air update
 
 ### The OTA example's menu says `Invalid input` or `Invalid choice` right after a number
@@ -142,13 +150,13 @@ Measure the stack by painting it instead. The FreeRTOS kernel the Wi-Fi SDK 10.2
 
 Free disk space and rerun that example. With about 500 MB free the Toolbox's signing step and the linker stopped with those messages and nothing about disk. Two of 11 builds in a batch hit it on 2026-10-24 and passed once space was back. Delete each example's build folder after programming it.
 
+### The image preflight refuses a single-slot image for this board
+
+If `python3 tools/preflight_image.py cc35x1 <image.out>` prints `REFUSE (c) linker map ... describes 6256 kB of flash; this chip has 2696 kB`, update the repo and run it again. The check used to compare the map with the two-slot layout of the OTA example (2696 kB per slot), which refused every valid single-slot image (6256 kB, the Doom builds and the CSI program). It now takes the layout from the image's own map and the limit from the 8 MB external flash, and it still refuses a map bigger than 8 MB or a segment outside the slots its own map declares. A single-slot image goes on with `full_flash_erase` then `programming`. Before flashing one, check that the signed bundle of the image now running is saved, because this chip cannot be read back; the board runs Sparky 0.0.33.0 and its bundle restores it (banner `0.0.33.0`, checked 2026-11-08 at 115200 after a reset).
+
 ## Mistakes to avoid
 
 The two entries tagged Our mistake above (relative paths, and the serial baud) cost about 20 minutes together in the run.
-
-### How do I print my own message from this board with frl, and put the old program back?
-
-Run `FRL_RESTORE_IMAGE=<toolbox/tool_settings.json of the image you want back> frl run --board cc35x1 --recipe print-message --pattern "Hello from my LaunchPad" --probe <serial>`, then `frl restore <the backup folder it prints>`. frl edits TI's uart2echo, builds and signs it, programs it with the Wi-Fi Toolbox and reads the message on the probe's serial port. This chip cannot be read back, so the backup keeps the fuse report and the running program's first line, and the restore programs the image you named and checks that line. If you see `FRL-E053`, build or pick that image first. The chip must be activated already: frl never activates it. 3 of 3 runs on 2026-10-25, probe <probe serial>; `docs/frl.md`.
 
 <!-- recovery:start -->
 ## When the board stops answering

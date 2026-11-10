@@ -17,7 +17,8 @@ void board_amp(int mode)
     if (mode == 1) DL_GPIO_clearPins(DAC_PORT, DAC_AMP_PIN); else DL_GPIO_setPins(DAC_PORT, DAC_AMP_PIN);
     DL_GPIO_enableOutput(DAC_PORT, DAC_AMP_PIN);
 }
-void board_mic_power(int on) { if (on) DL_GPIO_setPins(MICPWR_PORT, MICPWR_ON_PIN); else DL_GPIO_clearPins(MICPWR_PORT, MICPWR_ON_PIN); }
+/* PA21 (pin 5) is the VREF- pin, tied to ground: it stays an input. The pack's microphone is powered from pin 8 (PB30) through one wire to pin 5. */
+void board_mic_power(int on) { DL_GPIO_disableOutput(MICPWR_PORT, MICPWR_ON_PIN); if (on) DL_GPIO_setPins(MICALT_PORT, MICALT_PWR_PIN); else DL_GPIO_clearPins(MICALT_PORT, MICALT_PWR_PIN); }
 void board_adc_start(void) { DL_HSADC_triggerSequencerSoftwareForce(HSADC0_INST, DL_HSADC_SEQ_NUMBER1); }
 uint16_t board_adc_read(void) { return (uint16_t)DL_HSADC_getResult(HSADC0_RESULT_INST, DL_HSADC_SOC_NUMBER0); }
 void board_uart_put(uint8_t c) { DL_UART_Main_transmitDataBlocking(UART_0_INST, c); }

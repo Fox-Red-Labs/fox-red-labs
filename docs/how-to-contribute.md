@@ -36,6 +36,10 @@ Every project and board page links the three forms prefilled with that page's bo
 
 Fork the repository, make a branch, change the source, run `python3 tools/site_build.py` to rebuild the pages (a sparse clone needs `git sparse-checkout add tools data site` first, or clone without `--sparse`), commit with a sign-off (`git commit -s`, see [Sign-off](#sign-off)), and open a pull request. Say in the pull request which board you ran it on and which version. The sections below say what to change for each kind of work.
 
+The public repository is a copy built from a private lab notebook (`.export-source` names the commit), and each update lands as one commit. A merged pull request is applied to the notebook under your name and sign-off, so the next copy carries it. A fork takes an update by rebasing on the newest copy.
+
+A port that changes another project's code (a Zephyr board, an ESPHome platform, a MicroPython port) is best sent to that project as well. Each port's entry on [ports.md](ports.md) carries an Upstream line saying whether that happened; a pull request that updates it with the link is welcome.
+
 ## Fix a page
 
 Every site page is generated from a data file or a Markdown page; the HTML is never edited by hand. Change the source named at the bottom of the page ("Where these facts come from"), run the renderer it names in `tools/`, then `python3 tools/content_lint.py <file>` and `python3 tools/site_check.py`. The writing rules are in `docs/writing-for-ai-search.md`: lead with the answer, exact errors in backticks, versions and dates, which machine, no marketing words.

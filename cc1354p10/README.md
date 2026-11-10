@@ -1,6 +1,6 @@
 # What is on a TI LP-CC1354P10-1 LaunchPad development kit, and how do you get it running from a Mac terminal?
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 This kit arrived with TI's Project Zero Bluetooth LE demo in flash that had never run, because its config area (CCFG) was almost blank. Building a correct CCFG from TI's own `ccfg.c` and flashing it with the original image made it advertise Project Zero on 2026-10-06; it was then renamed to "Fox Red 1354" without the source. Measured here since: CoreMark 199.92 at -O3 (4.17 per MHz), Thread and Zigbee links to a CC2340R5, and a Zigbee plus Bluetooth LE example that stays joined to Home Assistant.
 

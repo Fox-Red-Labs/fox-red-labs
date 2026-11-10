@@ -1,6 +1,6 @@
 # LP-MSPM0G3507 LaunchPad: first blink with an AI assistant in 2 min 29 s, and what else it measures
 
-> Disclosure: Fox Red Labs is an independent lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
+> Disclosure: Fox Red Labs is a lab run by a TI employee on personal time. Contributors' projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.
 
 Let Claude Code do it: paste the prompt in `START.md`, or run `./start.sh mspm0g3507 blink` from a clone. Either one has the assistant build TI's blink example for the LP-MSPM0G3507, flash it, and change the pattern to what you ask for. The folder is `mspm0g3507/`.
 
@@ -87,7 +87,7 @@ It does not back up or restore the board, and no restore has been tested.
 
 ## What was measured
 
-One borrowed LP-MSPM0G3507 (not a sealed box), Intel Mac, macOS 15.7.9.
+One borrowed LP-MSPM0G3507 (not a sealed box), Intel Mac, macOS 15.7.9. An own LP-MSPM0G3507 arrived 2026-11-09 (same probe serial as the borrowed unit, chip DEVICEID 0x2BB8802F); every number on this page is from the borrowed unit until a row says otherwise.
 
 | What | Number | Conditions | Level | Source |
 |---|---|---|---|---|

@@ -41,4 +41,4 @@ Every number for a board of this family is a row in its results file (`data/READ
 
 | Board | Rows | By status |
 |---|--:|---|
-| [beagley-ai](../../../data/results/beagley-ai.csv) | 120 | measured 108, failed 10, not_supported 1, computed 1 |
+| [beagley-ai](../../../data/results/beagley-ai.csv) | 134 | measured 120, failed 12, not_supported 1, computed 1 |

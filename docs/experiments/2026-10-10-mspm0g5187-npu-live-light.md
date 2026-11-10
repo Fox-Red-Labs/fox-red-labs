@@ -2,7 +2,7 @@
 id: E177
 board: LP-MSPM0G5187
 date: 2026-10-10
-status: in progress
+status: parked
 reached: run
 line: The room-occupancy model runs on the NPU once a second. Its input is a live light reading from the BP-BASSENSORSMKII's OPT3001, taken over I2C. Each call takes 1.30 to 1.32 ms, within 1 percent of the time on stored test vectors. The bench was lit at 316 to 319 lux, source not recorded. The model reads 0 people for the first 15 samples while the window fills, then 1 person from sample 18 on. Not done: the covered-sensor check (expect 0). Three of the model's four inputs are fixed at empty-room values because this BoosterPack has no sound, CO2 or motion sensor.
 stop: none

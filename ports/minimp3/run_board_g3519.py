@@ -5,7 +5,8 @@ over the probe (DSLite, core never halted or reset), check the clock against the
 Run from the repository root. Writes flash only (never the boot configuration). Plays no sound and touches no pin."""
 import argparse, os, re, struct, subprocess, sys, time, json
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-DS = '/Applications/ti/uniflash_9.6.0/deskdb/content/TICloudAgent/osx/ccs_base/DebugServer/bin/DSLite'
+sys.path.insert(0, os.path.join(REPO, 'tools', 'frl')); import toolfind  # noqa: E402
+DS = os.environ.get('FRL_DSLITE') or toolfind.find('dslite')['exe']   # UniFlash or CCStudio; FRL_DSLITE names another
 ap = argparse.ArgumentParser(); ap.add_argument('elf'); ap.add_argument('--no-flash', action='store_true'); ap.add_argument('--mhz', type=float, default=80)
 ap.add_argument('--limit', type=float, default=400); a = ap.parse_args()
 elf = os.path.abspath(a.elf); d = os.path.dirname(elf)

@@ -2,7 +2,7 @@
 id: E151
 board: SK-TDA4VM
 date: 2026-10-10
-status: in progress
+status: parked
 reached: verified
 line: NVIDIA's own Holoscan Sensor Bridge device emulator (Apache-2.0) builds on the SK-TDA4VM's Cortex-A72 Linux in 27 s with no CUDA and speaks the full Hololink protocol. Over a real 1 GbE link to this repo's checker on a Mac, 720p RAW8 frames arrived 100 of 100 intact at 10 fps and 300 of 300 at 30 fps, enumeration answered in 0.25 to 0.83 s. On the wire the sender costs 11.1 microseconds of one A72 per 1,408-byte packet (21.9 percent of a core at 720p30, receiver-confirmed rate); on loopback the same sender read 15.8 microseconds, suspected because loopback does the receive work inside the send call. 1080p at 30 fps over the wire averaged about 21.5 frames a second on 37 percent of a core and the Python checker lost packets there. Jumbo frames, tried only on loopback, held 1080p60 on 37 percent of a core. NVIDIA's own receiver did not see it.
 stop: NVIDIA's receiver (needs a Linux host running NVIDIA's LinuxReceiverOperator; the wire itself now works with the repo's checker)

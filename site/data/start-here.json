@@ -198,6 +198,492 @@
    ],
    "open": "",
    "faq_page": "faq-mspm0g3507.html"
+  },
+  "hobby-button-knob-dim": {
+   "board": "lp-mspm0g3507",
+   "route": "LP-MSPM0G3507 on its USB cable; the MSPM0 SDK, SysConfig and TI Arm Clang installed; a terminal in the cloned repository.",
+   "why": "A push button toggles an LED, then a knob sets how bright it is. Digital input with a pull-up, analog input, and PWM brightness.",
+   "parts": [
+    {
+     "id": "lp-mspm0g3507",
+     "what": "The board."
+    },
+    {
+     "id": "freenove-fnk0058",
+     "what": "Push button, 10 kOhm knob (potentiometer), red LED and a 220 Ohm resistor."
+    }
+   ],
+   "also_needed": [
+    "A computer with a terminal, and the free TI tools named on the page. Nothing has been run for this build yet."
+   ],
+   "total": "The board and the parts above; the buy links are on each part's page.",
+   "time": [
+    [
+     "Not yet timed",
+     "Measured at the first run."
+    ]
+   ],
+   "ai_tool": "No assistant is needed. The build is two commands.",
+   "honest": "**What we ran, and what we did not.** Nothing: this build is written ahead of its first run.",
+   "steps": [
+    {
+     "n": 1,
+     "app": "Terminal",
+     "do": "Check that the computer sees the board's USB debugger.",
+     "say": "python3 tools/frl/frl.py detect",
+     "picture": null,
+     "if_you_see": [
+      "If no probe is listed, try another USB cable: a charge-only cable looks the same."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 2,
+     "app": "Bench",
+     "do": "Wire the breadboard as in the pin table on this page.",
+     "picture": null,
+     "if_you_see": [
+      "If a part is dark or silent, check its ground wire first."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 3,
+     "app": "Terminal",
+     "do": "Build and flash the program.",
+     "say": "cd portability/hobby/button-knob-dim && ./build.sh --board mspm0g3507 --flash",
+     "picture": null,
+     "if_you_see": [
+      "If the build names a missing tool, install it from the page it names and run the command again."
+     ],
+     "tested": "Not yet run."
+    }
+   ],
+   "other_boards": [
+    "lp-mspm0g3519",
+    "lp-mspm0l1306"
+   ],
+   "other_note": {
+    "lp-mspm0g3519": "same portable layer, not yet run",
+    "lp-mspm0l1306": "same portable layer, not yet run"
+   },
+   "next": {
+    "href": "projects.html",
+    "text": "Every build."
+   },
+   "evidence_gaps": [
+    "Every step: the build has not run yet. Pictures are to come from the 3D wiring scene."
+   ],
+   "open": ""
+  },
+  "hobby-led-sequences": {
+   "board": "lp-mspm0g3507",
+   "route": "LP-MSPM0G3507 on its USB cable; the MSPM0 SDK, SysConfig and TI Arm Clang installed; a terminal in the cloned repository.",
+   "why": "Four LEDs and a buzzer on a breadboard, with one button to change what they do. Loops, timing without blocking, and a tone on a buzzer.",
+   "parts": [
+    {
+     "id": "lp-mspm0g3507",
+     "what": "The board."
+    },
+    {
+     "id": "freenove-fnk0058",
+     "what": "Red, yellow, green and blue LEDs, four 220 Ohm resistors, a passive buzzer and a push button."
+    }
+   ],
+   "also_needed": [
+    "A computer with a terminal, and the free TI tools named on the page. Nothing has been run for this build yet."
+   ],
+   "total": "The board and the parts above; the buy links are on each part's page.",
+   "time": [
+    [
+     "Not yet timed",
+     "Measured at the first run."
+    ]
+   ],
+   "ai_tool": "No assistant is needed. The build is two commands.",
+   "honest": "**What we ran, and what we did not.** Nothing: this build is written ahead of its first run.",
+   "steps": [
+    {
+     "n": 1,
+     "app": "Terminal",
+     "do": "Check that the computer sees the board's USB debugger.",
+     "say": "python3 tools/frl/frl.py detect",
+     "picture": null,
+     "if_you_see": [
+      "If no probe is listed, try another USB cable: a charge-only cable looks the same."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 2,
+     "app": "Bench",
+     "do": "Wire the breadboard as in the pin table on this page.",
+     "picture": null,
+     "if_you_see": [
+      "If a part is dark or silent, check its ground wire first."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 3,
+     "app": "Terminal",
+     "do": "Build and flash the program.",
+     "say": "cd portability/hobby/led-sequences && ./build.sh --board mspm0g3507 --flash",
+     "picture": null,
+     "if_you_see": [
+      "If the build names a missing tool, install it from the page it names and run the command again."
+     ],
+     "tested": "Not yet run."
+    }
+   ],
+   "other_boards": [
+    "lp-mspm0g3519",
+    "lp-mspm0l1306"
+   ],
+   "other_note": {
+    "lp-mspm0g3519": "same portable layer, not yet run",
+    "lp-mspm0l1306": "same portable layer, not yet run"
+   },
+   "next": {
+    "href": "projects.html",
+    "text": "Every build."
+   },
+   "evidence_gaps": [
+    "Every step: the build has not run yet. Pictures are to come from the 3D wiring scene."
+   ],
+   "open": ""
+  },
+  "hobby-parking-sensor": {
+   "board": "lp-mspm0g3507",
+   "route": "LP-MSPM0G3507 on its USB cable; the MSPM0 SDK, SysConfig and TI Arm Clang installed; a terminal in the cloned repository.",
+   "why": "An RCWL-1601 ultrasonic sensor and a buzzer; the closer you get, the faster it beeps. Timing an echo pulse with a timer capture, and turning distance into beep rate.",
+   "parts": [
+    {
+     "id": "lp-mspm0g3507",
+     "what": "The board."
+    },
+    {
+     "id": "adafruit-rcwl1601",
+     "what": "Distance sensor; it runs at 3.3 V so its echo pin is safe for the LaunchPad."
+    },
+    {
+     "id": "freenove-fnk0058",
+     "what": "Passive buzzer, jumper wires and a breadboard."
+    }
+   ],
+   "also_needed": [
+    "A computer with a terminal, and the free TI tools named on the page. Nothing has been run for this build yet."
+   ],
+   "total": "The board and the parts above; the buy links are on each part's page.",
+   "time": [
+    [
+     "Not yet timed",
+     "Measured at the first run."
+    ]
+   ],
+   "ai_tool": "No assistant is needed. The build is two commands.",
+   "honest": "**What we ran, and what we did not.** Nothing: this build is written ahead of its first run.",
+   "steps": [
+    {
+     "n": 1,
+     "app": "Terminal",
+     "do": "Check that the computer sees the board's USB debugger.",
+     "say": "python3 tools/frl/frl.py detect",
+     "picture": null,
+     "if_you_see": [
+      "If no probe is listed, try another USB cable: a charge-only cable looks the same."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 2,
+     "app": "Bench",
+     "do": "Wire the breadboard as in the pin table on this page.",
+     "picture": null,
+     "if_you_see": [
+      "If a part is dark or silent, check its ground wire first."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 3,
+     "app": "Terminal",
+     "do": "Build and flash the program.",
+     "say": "cd portability/hobby/parking-sensor && ./build.sh --board mspm0g3507 --flash",
+     "picture": null,
+     "if_you_see": [
+      "If the build names a missing tool, install it from the page it names and run the command again."
+     ],
+     "tested": "Not yet run."
+    }
+   ],
+   "other_boards": [
+    "lp-mspm0g3519",
+    "lp-mspm0l1306"
+   ],
+   "other_note": {
+    "lp-mspm0g3519": "same portable layer, not yet run",
+    "lp-mspm0l1306": "same portable layer, not yet run"
+   },
+   "next": {
+    "href": "projects.html",
+    "text": "Every build."
+   },
+   "evidence_gaps": [
+    "Every step: the build has not run yet. Pictures are to come from the 3D wiring scene."
+   ],
+   "open": ""
+  },
+  "hobby-weather-station": {
+   "board": "lp-mspm0g3507",
+   "route": "LP-MSPM0G3507 on its USB cable; the MSPM0 SDK, SysConfig and TI Arm Clang installed; a terminal in the cloned repository.",
+   "why": "A DHT11 and an OLED screen show the temperature and humidity of the room. Reading a one-wire sensor and an I2C sensor, and drawing text on an OLED.",
+   "parts": [
+    {
+     "id": "lp-mspm0g3507",
+     "what": "The board."
+    },
+    {
+     "id": "freenove-fnk0058",
+     "what": "DHT11 temperature and humidity sensor and jumper wires."
+    },
+    {
+     "id": "elegoo-ssd1306",
+     "what": "The screen: 0.96 inch, 128 by 64, I2C address 0x3C."
+    },
+    {
+     "id": "bp-bassensorsmkii",
+     "what": "Optional: plugs onto the LaunchPad kit's headers and gives a second humidity reading to compare."
+    }
+   ],
+   "also_needed": [
+    "A computer with a terminal, and the free TI tools named on the page. Nothing has been run for this build yet."
+   ],
+   "total": "The board and the parts above; the buy links are on each part's page.",
+   "time": [
+    [
+     "Not yet timed",
+     "Measured at the first run."
+    ]
+   ],
+   "ai_tool": "No assistant is needed. The build is two commands.",
+   "honest": "**What we ran, and what we did not.** Nothing: this build is written ahead of its first run.",
+   "steps": [
+    {
+     "n": 1,
+     "app": "Terminal",
+     "do": "Check that the computer sees the board's USB debugger.",
+     "say": "python3 tools/frl/frl.py detect",
+     "picture": null,
+     "if_you_see": [
+      "If no probe is listed, try another USB cable: a charge-only cable looks the same."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 2,
+     "app": "Bench",
+     "do": "Wire the breadboard as in the pin table on this page.",
+     "picture": null,
+     "if_you_see": [
+      "If a part is dark or silent, check its ground wire first."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 3,
+     "app": "Terminal",
+     "do": "Build and flash the program.",
+     "say": "cd portability/hobby/weather-station && ./build.sh --board mspm0g3507 --flash",
+     "picture": null,
+     "if_you_see": [
+      "If the build names a missing tool, install it from the page it names and run the command again."
+     ],
+     "tested": "Not yet run."
+    }
+   ],
+   "other_boards": [
+    "lp-mspm0g3519",
+    "lp-mspm0l1306"
+   ],
+   "other_note": {
+    "lp-mspm0g3519": "same portable layer, not yet run",
+    "lp-mspm0l1306": "same portable layer, not yet run"
+   },
+   "next": {
+    "href": "projects.html",
+    "text": "Every build."
+   },
+   "evidence_gaps": [
+    "Every step: the build has not run yet. Pictures are to come from the 3D wiring scene."
+   ],
+   "open": ""
+  },
+  "hobby-servo-pantilt": {
+   "board": "lp-mspm0g3507",
+   "route": "LP-MSPM0G3507 on its USB cable; the MSPM0 SDK, SysConfig and TI Arm Clang installed; a terminal in the cloned repository.",
+   "why": "Two knobs steer two small servos, a pan and tilt you can put a sensor or camera on. Servo pulse width, and mapping a knob reading to an angle.",
+   "parts": [
+    {
+     "id": "lp-mspm0g3507",
+     "what": "The board."
+    },
+    {
+     "id": "freenove-fnk0058",
+     "what": "One SG90 servo, two 10 kOhm knobs and jumper wires."
+    },
+    {
+     "id": "sg90-servo",
+     "what": "The second servo, for the tilt axis."
+    }
+   ],
+   "also_needed": [
+    "A computer with a terminal, and the free TI tools named on the page. Nothing has been run for this build yet."
+   ],
+   "total": "The board and the parts above; the buy links are on each part's page.",
+   "time": [
+    [
+     "Not yet timed",
+     "Measured at the first run."
+    ]
+   ],
+   "ai_tool": "No assistant is needed. The build is two commands.",
+   "honest": "**What we ran, and what we did not.** Nothing: this build is written ahead of its first run.",
+   "steps": [
+    {
+     "n": 1,
+     "app": "Terminal",
+     "do": "Check that the computer sees the board's USB debugger.",
+     "say": "python3 tools/frl/frl.py detect",
+     "picture": null,
+     "if_you_see": [
+      "If no probe is listed, try another USB cable: a charge-only cable looks the same."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 2,
+     "app": "Bench",
+     "do": "Wire the breadboard as in the pin table on this page.",
+     "picture": null,
+     "if_you_see": [
+      "If a part is dark or silent, check its ground wire first."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 3,
+     "app": "Terminal",
+     "do": "Build and flash the program.",
+     "say": "cd portability/hobby/servo-pantilt && ./build.sh --board mspm0g3507 --flash",
+     "picture": null,
+     "if_you_see": [
+      "If the build names a missing tool, install it from the page it names and run the command again."
+     ],
+     "tested": "Not yet run."
+    }
+   ],
+   "other_boards": [
+    "lp-mspm0g3519",
+    "lp-mspm0l1306"
+   ],
+   "other_note": {
+    "lp-mspm0g3519": "same portable layer, not yet run",
+    "lp-mspm0l1306": "same portable layer, not yet run"
+   },
+   "next": {
+    "href": "projects.html",
+    "text": "Every build."
+   },
+   "evidence_gaps": [
+    "Every step: the build has not run yet. Pictures are to come from the 3D wiring scene."
+   ],
+   "open": ""
+  },
+  "hobby-pir-alarm": {
+   "board": "lp-mspm0g3507",
+   "route": "LP-MSPM0G3507 on its USB cable; the MSPM0 SDK, SysConfig and TI Arm Clang installed; a terminal in the cloned repository.",
+   "why": "A PIR sensor, a buzzer and a four-digit display count how many times you walk past. A digital sensor that holds its output, a counter, and a four-digit display on two wires.",
+   "parts": [
+    {
+     "id": "lp-mspm0g3507",
+     "what": "The board."
+    },
+    {
+     "id": "hc-sr501-pir",
+     "what": "Motion sensor: powered from 5 V, with a 3.3 V output pin."
+    },
+    {
+     "id": "diyables-tm1637",
+     "what": "The four-digit display for the count."
+    },
+    {
+     "id": "freenove-fnk0058",
+     "what": "Passive buzzer and jumper wires."
+    }
+   ],
+   "also_needed": [
+    "A computer with a terminal, and the free TI tools named on the page. Nothing has been run for this build yet."
+   ],
+   "total": "The board and the parts above; the buy links are on each part's page.",
+   "time": [
+    [
+     "Not yet timed",
+     "Measured at the first run."
+    ]
+   ],
+   "ai_tool": "No assistant is needed. The build is two commands.",
+   "honest": "**What we ran, and what we did not.** Nothing: this build is written ahead of its first run.",
+   "steps": [
+    {
+     "n": 1,
+     "app": "Terminal",
+     "do": "Check that the computer sees the board's USB debugger.",
+     "say": "python3 tools/frl/frl.py detect",
+     "picture": null,
+     "if_you_see": [
+      "If no probe is listed, try another USB cable: a charge-only cable looks the same."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 2,
+     "app": "Bench",
+     "do": "Wire the breadboard as in the pin table on this page.",
+     "picture": null,
+     "if_you_see": [
+      "If a part is dark or silent, check its ground wire first."
+     ],
+     "tested": "Not yet run."
+    },
+    {
+     "n": 3,
+     "app": "Terminal",
+     "do": "Build and flash the program.",
+     "say": "cd portability/hobby/pir-alarm && ./build.sh --board mspm0g3507 --flash",
+     "picture": null,
+     "if_you_see": [
+      "If the build names a missing tool, install it from the page it names and run the command again."
+     ],
+     "tested": "Not yet run."
+    }
+   ],
+   "other_boards": [
+    "lp-mspm0g3519",
+    "lp-mspm0l1306"
+   ],
+   "other_note": {
+    "lp-mspm0g3519": "same portable layer, not yet run",
+    "lp-mspm0l1306": "same portable layer, not yet run"
+   },
+   "next": {
+    "href": "projects.html",
+    "text": "Every build."
+   },
+   "evidence_gaps": [
+    "Every step: the build has not run yet. Pictures are to come from the 3D wiring scene."
+   ],
+   "open": ""
   }
  },
  "recommend": {

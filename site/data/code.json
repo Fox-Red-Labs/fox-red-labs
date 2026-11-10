@@ -78,6 +78,12 @@
    "agents": "am263p/AGENTS.md",
    "stopwatch": "am263p/STOPWATCH.md"
   },
+  "am243x": {
+   "folder": "am243x",
+   "readme": "am243x/README.md",
+   "faq": "am243x/FAQ.md",
+   "agents": "am243x/AGENTS.md"
+  },
   "mspm0g5187": {
    "folder": "mspm0g5187",
    "readme": "mspm0g5187/README.md",
@@ -124,6 +130,13 @@
    "faq": "iwrl6432boost/FAQ.md",
    "agents": "iwrl6432boost/AGENTS.md",
    "stopwatch": "iwrl6432boost/STOPWATCH.md"
+  },
+  "mspm0l2228": {
+   "folder": "mspm0l2228",
+   "readme": "mspm0l2228/README.md",
+   "faq": "mspm0l2228/FAQ.md",
+   "agents": "mspm0l2228/AGENTS.md",
+   "stopwatch": "mspm0l2228/STOPWATCH.md"
   }
  }
 }

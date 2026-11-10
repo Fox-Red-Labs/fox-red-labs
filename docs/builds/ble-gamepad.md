@@ -1,4 +1,4 @@
-# Press the LaunchPad kit's two buttons and a Mac sees a game controller
+# Two buttons become a Bluetooth game controller
 
 An LP-EM-CC2340R5 advertises as a Bluetooth LE gamepad. Its two push buttons, BTN-1 and BTN-2, are gamepad buttons 1 and 2. HID is the report format Bluetooth keyboards and gamepads use. It is built from TI's basic_ble example and the report code of the ESP32-BLE-Gamepad library.
 

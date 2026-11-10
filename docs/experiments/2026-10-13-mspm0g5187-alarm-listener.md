@@ -2,7 +2,7 @@
 id: E194
 board: LP-MSPM0G5187
 date: 2026-10-13
-status: in progress
+status: waiting
 reached: run
 line: A 13.8k-parameter model on the LP-MSPM0G5187's NPU, listening through the onboard microphone, reported a smoke alarm pattern from a laptop speaker 9.4 s after it started, kept 14 of 16 look-alike sounds silent with nothing learned, and gave 0 alarms in 3.4 hours of a quiet room; learning has run only on audio over USB, and a real smoke alarm's horn has not been tried.
 stop: none

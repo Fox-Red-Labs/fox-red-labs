@@ -377,7 +377,7 @@ Use the high-speed pins (PA9, PA12 to PA14, PA19) with a bus clock of 64 MHz or 
 <!-- recovery:start -->
 ## When the board stops answering
 
-Checked 2026-10-24. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
+Checked 2026-11-09. Before flashing a risky image, run `python3 tools/preflight_image.py <board id> <image.out>`. Narrative and commands: `docs/remote-board-recovery.md`.
 
 How it locks up:
 
@@ -388,5 +388,8 @@ Try in this order. Remote means the Mac does it with the board in place; hands m
 | Method | Remote or hands | Status | Evidence |
 |---|---|---|---|
 | Unplug and replug USB (xdsdfu -e lists the probe again) | hands | proven | `mspm0g3507/AGENTS.md`, date not recorded |
+| uhubctl power cycle of the probe's hub port (6 s off) when the XDS110 stops enumerating after a firmware write (the own unit's probe vanished from USB a minute after xdsdfu wrote 3.0.0.43; `uhubctl -l 1-1 -p 3 -a cycle -d 6` brought it back as MG350001) | remote | proven | `data/results/mspm0g3507.csv`, 2026-11-09 |
+
+Restore: frl restore <backup folder> --probe MG350001 (OpenOCD program and verify, read back and compare). Regions: main flash; NONMAIN read only. (`data/results/mspm0g3507.csv`)
 
 <!-- recovery:end -->
