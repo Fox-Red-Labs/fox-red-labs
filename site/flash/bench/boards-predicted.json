@@ -1,0 +1,651 @@
+{
+ "note": "Written by tools/webflash/sdk_catalog.py from CCStudio's GEL files and TI's SDKs on this Mac. Do not edit by hand. Every board here is read-only until a hardware run moves it into boards-draft/.",
+ "sources": {
+  "ccs": "ccs2101",
+  "mspm0_sdk": "mspm0_sdk_2_11_00_07",
+  "f3_sdk": "simplelink_lowpower_f3_sdk_9_21_00_36_LTS"
+ },
+ "idTable": {
+  "0x0BB8202F": [
+   "MSPM0L1105",
+   "MSPM0L1106",
+   "MSPM0L1303",
+   "MSPM0L1304",
+   "MSPM0L1305",
+   "MSPM0L1306",
+   "MSPM0L1343",
+   "MSPM0L1344",
+   "MSPM0L1345",
+   "MSPM0L1346"
+  ],
+  "0x0BB8802F": [
+   "MSPM0G1105",
+   "MSPM0G1106",
+   "MSPM0G1107",
+   "MSPM0G1505",
+   "MSPM0G1506",
+   "MSPM0G1507",
+   "MSPM0G3105",
+   "MSPM0G3106",
+   "MSPM0G3107",
+   "MSPM0G3505",
+   "MSPM0G3506",
+   "MSPM0G3507"
+  ],
+  "0x0BB9F02F": [
+   "MSPM0L1227",
+   "MSPM0L1228",
+   "MSPM0L2227",
+   "MSPM0L2228"
+  ],
+  "0x0BBA102F": [
+   "MSPM0C1103",
+   "MSPM0C1104"
+  ],
+  "0x0BBA902F": [
+   "MSPM0G1518",
+   "MSPM0G1519",
+   "MSPM0G3518",
+   "MSPM0G3519",
+   "MSPM0G3529"
+  ],
+  "0x0BBAF02F": [
+   "MSPM0H3215",
+   "MSPM0H3216"
+  ],
+  "0x0BBB402F": [
+   "MSPM0L1116",
+   "MSPM0L1117"
+  ],
+  "0x0BBBA02F": [
+   "MSPM0C1105",
+   "MSPM0C1106"
+  ],
+  "0x0BBBC02F": [
+   "MSPM0G5115",
+   "MSPM0G5116",
+   "MSPM0G5117",
+   "MSPM0G5187"
+  ],
+  "0x0BBC702F": [
+   "MSPM0L1126",
+   "MSPM0L1127",
+   "MSPM0L2116",
+   "MSPM0L2117"
+  ],
+  "0x0BBCE02F": [
+   "MSPM0G1207",
+   "MSPM0G1218",
+   "MSPM0G3207",
+   "MSPM0G3218"
+  ]
+ },
+ "reproduced": [
+  "mspm0c1104",
+  "mspm0g3507",
+  "mspm0g3519",
+  "mspm0g5187",
+  "mspm0l1306"
+ ],
+ "leftOut": [],
+ "boards": [
+  {
+   "id": "mspm0c1106",
+   "kit": "LP-MSPM0C1106",
+   "printed": "LP-MSPM0C1106",
+   "part": "MSPM0C1106",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-shared",
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BBBA02F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "siblings": [
+    "MSPM0C1105"
+   ],
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00010000"
+   },
+   "ram": 8192,
+   "ramStart": "0x20000000",
+   "cmdbyten": "0xFF",
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "leds": [
+    {
+     "label": "LED1 (PB20)",
+     "port": "B",
+     "pin": 20,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED2 (PB24)",
+     "port": "B",
+     "pin": 24,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED3 (PA30)",
+     "port": "A",
+     "pin": 30,
+     "gpio": "0x400A0000"
+    }
+   ],
+   "check": {
+    "sramflashKb": 64,
+    "sramKb": 8
+   },
+   "note": "Predicted, not tested here: this page reads it and checks its flash size against the device tables. It does not write it yet. The ID is shared with MSPM0C1105; the flash size tells them apart.",
+   "basis": {
+    "deviceid": "ccs2101 gel/mspm0c1106.gel",
+    "memory": "examples/nortos/LP_MSPM0C1106/driverlib/gpio_toggle_output/ticlang/device_linker.cmd",
+    "leds": "examples/nortos/LP_MSPM0C1106/driverlib/gpio_toggle_output/ti_msp_dl_config.h",
+    "ecc": "examples/nortos/LP_MSPM0C1106/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c",
+    "sdk": "mspm0_sdk_2_11_00_07"
+   },
+   "unknown": [
+    "LED polarity (the example says only which LEDs start on)",
+    "jumpers (prose in the kit README)",
+    "console baud and jumpers",
+    "the board picture"
+   ]
+  },
+  {
+   "id": "mspm0g3218",
+   "kit": "LP-MSPM0G3218",
+   "printed": "LP-MSPM0G3218",
+   "part": "MSPM0G3218",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-shared",
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BBCE02F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "siblings": [
+    "MSPM0G1207",
+    "MSPM0G1218",
+    "MSPM0G3207"
+   ],
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00040000"
+   },
+   "ram": 32768,
+   "ramStart": "0x20200000",
+   "cmdbyten": "0x1FF",
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "leds": [
+    {
+     "label": "LED1 (PB22)",
+     "port": "B",
+     "pin": 22,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED2 (PB26)",
+     "port": "B",
+     "pin": 26,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED3 (PB27)",
+     "port": "B",
+     "pin": 27,
+     "gpio": "0x400A2000"
+    }
+   ],
+   "check": {
+    "sramflashKb": 256,
+    "sramKb": 32
+   },
+   "note": "Predicted, not tested here: this page reads it and checks its flash size against the device tables. It does not write it yet. The ID is shared with MSPM0G1207, MSPM0G1218, MSPM0G3207; the flash size tells them apart.",
+   "basis": {
+    "deviceid": "ccs2101 gel/mspm0g3218.gel",
+    "memory": "examples/nortos/LP_MSPM0G3218/driverlib/gpio_toggle_output/ticlang/device_linker.cmd",
+    "leds": "examples/nortos/LP_MSPM0G3218/driverlib/gpio_toggle_output/ti_msp_dl_config.h",
+    "ecc": "examples/nortos/LP_MSPM0G3218/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c",
+    "sdk": "mspm0_sdk_2_11_00_07"
+   },
+   "unknown": [
+    "LED polarity (the example says only which LEDs start on)",
+    "jumpers (prose in the kit README)",
+    "console baud and jumpers",
+    "the board picture"
+   ]
+  },
+  {
+   "id": "mspm0h3216",
+   "kit": "LP-MSPM0H3216",
+   "printed": "LP-MSPM0H3216",
+   "part": "MSPM0H3216",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-shared",
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BBAF02F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "siblings": [
+    "MSPM0H3215"
+   ],
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00010000"
+   },
+   "ram": 8192,
+   "ramStart": "0x20000000",
+   "cmdbyten": "0xFF",
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "leds": [
+    {
+     "label": "LED1 (PB20)",
+     "port": "B",
+     "pin": 20,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED2 (PB24)",
+     "port": "B",
+     "pin": 24,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED3 (PA30)",
+     "port": "A",
+     "pin": 30,
+     "gpio": "0x400A0000"
+    }
+   ],
+   "check": {
+    "sramflashKb": 64,
+    "sramKb": 8
+   },
+   "note": "Predicted, not tested here: this page reads it and checks its flash size against the device tables. It does not write it yet. The ID is shared with MSPM0H3215; the flash size tells them apart.",
+   "basis": {
+    "deviceid": "ccs2101 gel/mspm0h3216.gel",
+    "memory": "examples/nortos/LP_MSPM0H3216/driverlib/gpio_toggle_output/ticlang/device_linker.cmd",
+    "leds": "examples/nortos/LP_MSPM0H3216/driverlib/gpio_toggle_output/ti_msp_dl_config.h",
+    "ecc": "examples/nortos/LP_MSPM0H3216/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c",
+    "sdk": "mspm0_sdk_2_11_00_07"
+   },
+   "unknown": [
+    "LED polarity (the example says only which LEDs start on)",
+    "jumpers (prose in the kit README)",
+    "console baud and jumpers",
+    "the board picture"
+   ]
+  },
+  {
+   "id": "mspm0l1117",
+   "kit": "LP-MSPM0L1117",
+   "printed": "LP-MSPM0L1117",
+   "part": "MSPM0L1117",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-shared",
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BBB402F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "siblings": [
+    "MSPM0L1116"
+   ],
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00020000"
+   },
+   "ram": 16384,
+   "ramStart": "0x20000000",
+   "cmdbyten": "0xFF",
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "leds": [
+    {
+     "label": "LED1 (PB16)",
+     "port": "B",
+     "pin": 16,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED2 (PB17)",
+     "port": "B",
+     "pin": 17,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED3 (PB18)",
+     "port": "B",
+     "pin": 18,
+     "gpio": "0x400A2000"
+    }
+   ],
+   "check": {
+    "sramflashKb": 128,
+    "sramKb": 16
+   },
+   "note": "Predicted, not tested here: this page reads it and checks its flash size against the device tables. It does not write it yet. The ID is shared with MSPM0L1116; the flash size tells them apart.",
+   "basis": {
+    "deviceid": "ccs2101 gel/mspm0l1117.gel",
+    "memory": "examples/nortos/LP_MSPM0L1117/driverlib/gpio_toggle_output/ticlang/device_linker.cmd",
+    "leds": "examples/nortos/LP_MSPM0L1117/driverlib/gpio_toggle_output/ti_msp_dl_config.h",
+    "ecc": "examples/nortos/LP_MSPM0L1117/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c",
+    "sdk": "mspm0_sdk_2_11_00_07"
+   },
+   "unknown": [
+    "LED polarity (the example says only which LEDs start on)",
+    "jumpers (prose in the kit README)",
+    "console baud and jumpers",
+    "the board picture"
+   ]
+  },
+  {
+   "id": "mspm0l2117",
+   "kit": "LP-MSPM0L2117",
+   "printed": "LP-MSPM0L2117",
+   "part": "MSPM0L2117",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-shared",
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BBC702F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "siblings": [
+    "MSPM0L1126",
+    "MSPM0L1127",
+    "MSPM0L2116"
+   ],
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00020000"
+   },
+   "ram": 12288,
+   "ramStart": "0x20200000",
+   "cmdbyten": "0xFF",
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "leds": [
+    {
+     "label": "LED1 (PA23)",
+     "port": "A",
+     "pin": 23,
+     "gpio": "0x400A0000"
+    },
+    {
+     "label": "LED2 (PB0)",
+     "port": "B",
+     "pin": 0,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED3 (PB1)",
+     "port": "B",
+     "pin": 1,
+     "gpio": "0x400A2000"
+    }
+   ],
+   "check": {
+    "sramflashKb": 128,
+    "sramKb": 12
+   },
+   "note": "Predicted, not tested here: this page reads it and checks its flash size against the device tables. It does not write it yet. The ID is shared with MSPM0L1126, MSPM0L1127, MSPM0L2116; the flash size tells them apart.",
+   "basis": {
+    "deviceid": "ccs2101 gel/mspm0l2117.gel",
+    "memory": "examples/nortos/LP_MSPM0L2117/driverlib/gpio_toggle_output/ticlang/device_linker.cmd",
+    "leds": "examples/nortos/LP_MSPM0L2117/driverlib/gpio_toggle_output/ti_msp_dl_config.h",
+    "ecc": "examples/nortos/LP_MSPM0L2117/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c",
+    "sdk": "mspm0_sdk_2_11_00_07"
+   },
+   "unknown": [
+    "LED polarity (the example says only which LEDs start on)",
+    "jumpers (prose in the kit README)",
+    "console baud and jumpers",
+    "the board picture"
+   ]
+  },
+  {
+   "id": "mspm0l2228",
+   "kit": "LP-MSPM0L2228",
+   "printed": "LP-MSPM0L2228",
+   "part": "MSPM0L2228",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-shared",
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BB9F02F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "siblings": [
+    "MSPM0L1227",
+    "MSPM0L1228",
+    "MSPM0L2227"
+   ],
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00040000"
+   },
+   "ram": 32768,
+   "ramStart": "0x20200000",
+   "cmdbyten": "0x1FF",
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "leds": [
+    {
+     "label": "LED1 (PA23)",
+     "port": "A",
+     "pin": 23,
+     "gpio": "0x400A0000"
+    },
+    {
+     "label": "LED2 (PB10)",
+     "port": "B",
+     "pin": 10,
+     "gpio": "0x400A2000"
+    },
+    {
+     "label": "LED3 (PB9)",
+     "port": "B",
+     "pin": 9,
+     "gpio": "0x400A2000"
+    }
+   ],
+   "check": {
+    "sramflashKb": 256,
+    "sramKb": 32
+   },
+   "note": "Predicted, not tested here: this page reads it and checks its flash size against the device tables. It does not write it yet. The ID is shared with MSPM0L1227, MSPM0L1228, MSPM0L2227; the flash size tells them apart.",
+   "basis": {
+    "deviceid": "ccs2101 gel/mspm0l2228.gel",
+    "memory": "examples/nortos/LP_MSPM0L2228/driverlib/gpio_toggle_output/ticlang/device_linker.cmd",
+    "leds": "examples/nortos/LP_MSPM0L2228/driverlib/gpio_toggle_output/ti_msp_dl_config.h",
+    "ecc": "examples/nortos/LP_MSPM0L2228/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c",
+    "sdk": "mspm0_sdk_2_11_00_07"
+   },
+   "unknown": [
+    "LED polarity (the example says only which LEDs start on)",
+    "jumpers (prose in the kit README)",
+    "console baud and jumpers",
+    "the board picture"
+   ]
+  },
+  {
+   "id": "cc2340r2",
+   "kit": "LP-EM-CC2340R2",
+   "printed": "LP-EM-CC2340R2",
+   "part": "default",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-known",
+   "identity": {
+    "kind": "cfgap",
+    "ap": 1,
+    "deviceids": [
+     "0x0BB8502F"
+    ],
+    "deviceidMask": "0x0FFFFFFF",
+    "partid": {
+     "offset": "0x4",
+     "variantMask": "0x00FF0000"
+    }
+   },
+   "leds": [
+    {
+     "label": "LaunchPad LED Red",
+     "dio": "10"
+    },
+    {
+     "label": "LaunchPad LED Green",
+     "dio": "3"
+    }
+   ],
+   "basis": {
+    "deviceid": "ccs2101 gel/cc23xx_util.gel",
+    "kit": "source/ti/boards/.meta/LP_EM_CC2340R2.syscfg.json",
+    "sdk": "simplelink_lowpower_f3_sdk_9_21_00_36_LTS",
+    "partid": "ccs2101 targetdb/Modules/CC23xx/CC23x0R5/AP/CFGAP.xml and CC27xx/AP/CFGAP.xml: PARTID at offset 0x4"
+   },
+   "unknown": [
+    "which PARTID variant byte each kit carries (the SDK does not say)",
+    "the writable flash range (TI's security firmware sits at the top on CC27xx)",
+    "the board picture"
+   ],
+   "siblings": [],
+   "memory": {
+    "flashLinker": "0x00040000",
+    "ram": 28672,
+    "ramStart": "0x20000000",
+    "basis": "cc23x0r2/linker_files/cc23x0r2.cmd",
+    "note": "the linker's flash size is the device, not the writable range; never used as a write map"
+   },
+   "note": "Predicted, not tested here: this page reads its ID through the chip's configuration port. It does not write it."
+  },
+  {
+   "id": "cc2340r53",
+   "kit": "LP-EM-CC2340R53",
+   "printed": "LP-EM-CC2340R53",
+   "part": "CC2340R53",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-known",
+   "identity": {
+    "kind": "cfgap",
+    "ap": 1,
+    "deviceids": [
+     "0x0BBAE02F"
+    ],
+    "deviceidMask": "0x0FFFFFFF",
+    "partid": {
+     "offset": "0x4",
+     "variantMask": "0x00FF0000"
+    }
+   },
+   "leds": [
+    {
+     "label": "LaunchPad LED Red",
+     "dio": "9"
+    },
+    {
+     "label": "LaunchPad LED Green",
+     "dio": "10"
+    }
+   ],
+   "basis": {
+    "deviceid": "ccs2101 gel/cc23xx_util.gel",
+    "kit": "source/ti/boards/.meta/LP_EM_CC2340R53.syscfg.json",
+    "sdk": "simplelink_lowpower_f3_sdk_9_21_00_36_LTS",
+    "partid": "ccs2101 targetdb/Modules/CC23xx/CC23x0R5/AP/CFGAP.xml and CC27xx/AP/CFGAP.xml: PARTID at offset 0x4"
+   },
+   "unknown": [
+    "which PARTID variant byte each kit carries (the SDK does not say)",
+    "the writable flash range (TI's security firmware sits at the top on CC27xx)",
+    "the board picture"
+   ],
+   "siblings": [
+    "LP-EM-CC2340R53-Q1",
+    "LP-EM-CC2340R53-WCSP"
+   ],
+   "memory": {
+    "flashLinker": "0x00080000",
+    "ram": 65536,
+    "ramStart": "0x20000000",
+    "basis": "cc23x0r5/linker_files/cc23x0r53.cmd",
+    "note": "the linker's flash size is the device, not the writable range; never used as a write map"
+   },
+   "note": "Predicted, not tested here: this page reads its ID through the chip's configuration port. It does not write it. The same chip ships on the LP-EM-CC2340R53-Q1, LP-EM-CC2340R53-WCSP."
+  },
+  {
+   "id": "cc2755p20",
+   "kit": "LP-EM-CC2755P20",
+   "printed": "LP-EM-CC2755P20",
+   "part": "CC2755P207",
+   "status": "predicted",
+   "programmable": false,
+   "confidence": "id-known",
+   "identity": {
+    "kind": "cfgap",
+    "ap": 1,
+    "deviceids": [
+     "0x0BBC502F"
+    ],
+    "deviceidMask": "0x0FFFFFFF",
+    "partid": {
+     "offset": "0x4",
+     "variantMask": "0x00FF0000"
+    }
+   },
+   "leds": [
+    {
+     "label": "LaunchPad LED Red",
+     "dio": "16"
+    },
+    {
+     "label": "LaunchPad LED Green",
+     "dio": "14"
+    }
+   ],
+   "basis": {
+    "deviceid": "ccs2101 gel/cc23xx_util.gel",
+    "kit": "source/ti/boards/.meta/LP_EM_CC2755P20.syscfg.json",
+    "sdk": "simplelink_lowpower_f3_sdk_9_21_00_36_LTS",
+    "partid": "ccs2101 targetdb/Modules/CC23xx/CC23x0R5/AP/CFGAP.xml and CC27xx/AP/CFGAP.xml: PARTID at offset 0x4"
+   },
+   "unknown": [
+    "which PARTID variant byte each kit carries (the SDK does not say)",
+    "the writable flash range (TI's security firmware sits at the top on CC27xx)",
+    "the board picture"
+   ],
+   "siblings": [],
+   "memory": {
+    "flashLinker": "0x00200000",
+    "ram": 262144,
+    "ramStart": "0x20000000",
+    "basis": "cc27xxx20/linker_files/cc27xxx20.cmd",
+    "note": "the linker's flash size is the device, not the writable range; never used as a write map"
+   },
+   "note": "Predicted, not tested here: this page reads its ID through the chip's configuration port. It does not write it."
+  }
+ ]
+}

@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Lab: program and test a TI LaunchPad (XDS110) from Chrome or Edge</title>
+<meta name="description" content="Program and test a TI LaunchPad (LP-MSPM0G3507, G3519, L1306, C1104 and others) from Chrome or Edge over WebUSB and the on-board XDS110 debugger. Pick a demo, read the result off the chip. Nothing to install.">
+<link rel="icon" href="logo-mark.svg">
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<style>
+:root { --paper:var(--frl-paper); --cream:var(--frl-cream); --ink:var(--frl-ink); --stone:var(--frl-stone); --line:var(--frl-line); --red:var(--frl-red); --ember:var(--frl-ember); --bad:var(--frl-ember);
+  --bg:var(--frl-paper); --fg:var(--frl-ink); --muted:var(--frl-stone); --card:#fff; --hero:var(--frl-tan); --btn-fg:var(--frl-cream); --link:var(--frl-red);
+  --pass-bg:color-mix(in srgb,#2F6B4F 9%,#fff); --pass-line:color-mix(in srgb,#2F6B4F 40%,#fff); --fail-bg:color-mix(in srgb,#B42418 7%,#fff); --fail-line:color-mix(in srgb,#B42418 40%,#fff); --console:#161312; }
+/* light like the rest of the site; dark only where it helps: the console, code blocks, the drawing pad and the pin picture */
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:400 18px/28px var(--frl-font); -webkit-font-smoothing:antialiased; }
+.lab-hero h1 { font-size:36px; line-height:42px; margin:0; }
+.lab-hero .lede { margin:6px 0 0; max-width:680px; color:var(--muted); }
+/* where you are: three steps, the current one in Fox Red, done ones ticked */
+.stepper { list-style:none; margin:0; padding:0; display:flex; gap:8px; flex-wrap:wrap; }
+.stepper li { display:flex; align-items:center; gap:8px; padding:6px 14px 6px 6px; border:1.5px solid var(--line); border-radius:8px; background:var(--card); color:var(--muted); font-weight:600; font-size:15px; line-height:22px; }
+.stepper .n { flex:0 0 24px; height:24px; border-radius:50%; background:var(--line); color:var(--fg); font-size:13px; line-height:24px; text-align:center; }
+.stepper li[data-st="now"] { border-color:var(--red); color:var(--fg); }
+.stepper li[data-st="now"] .n { background:var(--red); color:var(--cream); }
+.stepper li[data-st="done"] { color:var(--fg); }
+.stepper li[data-st="done"] .n { background:var(--ok); color:#fff; font-size:0; }
+.stepper li[data-st="done"] .n::before { content:"\2713"; font-size:14px; }
+.stepper li[data-st="bad"] { border-color:var(--bad); color:var(--bad); }
+.stepper li[data-st="bad"] .n { background:var(--bad); color:#fff; }
+.card.now { border-color:var(--red); box-shadow:0 0 0 1px var(--red); }
+/* the resources strip: the chip's numbers the moment a board is found, in the labs' verdict-strip style */
+.res { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+.res-tile { padding:12px 14px; border-left:1px solid var(--line); display:flex; flex-direction:column; gap:4px; min-width:0; }
+.res-tile:first-child { border-left:0; }
+.res-l { font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.res-tile b { font-size:22px; line-height:1.1; font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.res-s { font-size:12px; line-height:1.35; color:var(--muted); }
+.res-os { grid-column:span 2; }
+.res-chip { grid-column:span 2; gap:8px; } .res-row { display:grid; grid-template-columns:52px minmax(0,1fr); gap:0 10px; align-items:baseline; } .res-row .res-k { font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); } .res-row b { font-size:18px; } .res-row .res-s, .res-row .res-bar { grid-column:2; }
+.res-list { white-space:pre-line; font-size:16px !important; line-height:1.4; }
+.res-sel { font:inherit; font-size:14px; padding:6px 8px; border:1px solid var(--line); border-radius:4px; background:var(--bg); color:inherit; max-width:100%; }
+.res-left { font-size:18px; } .res-left.tight { color:var(--bad); }
+.res-bar { display:block; height:4px; border-radius:2px; background:var(--line); overflow:hidden; margin-top:2px; } .res-bar i { display:block; height:100%; width:0; background:var(--red); }
+.preview-fold { margin:8px 0 0; } .preview-fold summary { cursor:pointer; color:var(--muted); font-size:.92rem; }
+.preview-fold select { display:block; max-width:100%; margin:8px 0; font:inherit; padding:8px; }
+main { max-width:1200px; margin:0 auto; padding:24px 24px 16px; display:flex; flex-direction:column; gap:12px; }
+p { margin:.4em 0; }
+a { color:var(--link); }
+code, pre { font-family:var(--frl-code); font-size:.85em; }
+.mono:not(pre) { font-family:Barlow, sans-serif; font-variant-numeric:tabular-nums; }   /* readouts are Barlow; mono stays on code and pre (brand guide, Typography) */
+button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible, select:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.safe { margin:0; display:flex; gap:10px; align-items:flex-start; font-size:15px; line-height:22px; color:var(--fg); }
+.safe svg { flex:0 0 18px; color:var(--ok); margin-top:2px; }
+.safe[data-tone="caution"] svg, .safe[data-tone="neutral"] svg { color:var(--muted); }
+.recovery { margin:8px 0 0; display:grid; grid-template-columns:auto 1fr; gap:2px 10px; font-size:.85rem; }
+.recovery dt { font-weight:600; } .recovery dd { margin:0; color:var(--muted); }
+.recovery[data-here="false"] { border-left:3px solid var(--red); padding-left:8px; }
+.vendor-steps table { font-size:.82rem; }
+.learn { margin:4px 0 10px; padding:0; list-style:none; } .learn li { margin:2px 0; }
+.linkish { background:none; color:var(--fg); min-height:32px; padding:2px 0; font:inherit; text-align:left; cursor:pointer; display:inline; }
+.linkish:hover:not(:disabled) { background:none; text-decoration:underline; } .linkish b { color:var(--red); } .vendor-steps code { word-break:break-all; }
+#chip-facts { margin:0; font-family:Barlow, sans-serif; font-size:.78rem; color:var(--muted); }
+.card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+.eyebrow { margin:0; font-size:13px; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--red); }
+.head { display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.head .small { margin:0; }
+:where(main, .more) button { font:600 16px var(--frl-font); border:0; border-radius:8px; min-height:44px; padding:0 20px; cursor:pointer; background:var(--red); color:var(--btn-fg); transition:background .15s ease-out; }
+:where(main, .more) button:where(:hover:not(:disabled)) { background:var(--ember); }
+button.quiet { background:transparent; color:var(--fg); border:1.5px solid var(--line); min-height:36px; padding:0 12px; font-weight:500; font-size:.9rem; }
+button.quiet:hover:not(:disabled) { border-color:var(--muted); background:transparent; }
+:where(main, .more) button:disabled { opacity:.45; cursor:default; }
+.row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.small { font-size:15px; line-height:22px; color:var(--muted); }
+.hidden { display:none !important; }
+@keyframes bench-in { from { transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes bench-spin { to { transform:rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+
+.bench { display:flex; flex-wrap:wrap; gap:16px; align-items:stretch; }
+.col-board { flex:1 1 340px; min-width:0; max-width:100%; display:flex; flex-direction:column; }
+.col-work { flex:2 1 520px; min-width:0; display:flex; flex-direction:column; gap:12px; }
+
+/* 1: the board */
+.board-card { padding:0; overflow:hidden; display:flex; flex-direction:column; flex:1; }
+.hero { position:relative; background:var(--hero); height:240px; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.hero img { max-height:100%; max-width:100%; object-fit:contain; transition:filter .3s; }
+.hero .blank { color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:6px; font-size:.9rem; text-align:center; padding:0 24px; }
+.hero:not(.on) img { filter:grayscale(.7) opacity(.55); }
+.board-body { padding:14px 16px 16px; display:flex; flex-direction:column; gap:10px; }
+#found { display:flex; align-items:center; gap:8px; font-weight:600; font-size:.95rem; margin:0; min-height:1.5em; }
+#found::before { content:""; flex:0 0 8px; height:8px; border-radius: 50%; background:var(--line); }
+#env p.hit { background:var(--pass-bg,#fff3e0); outline:2px solid var(--red); border-radius:6px; padding:4px 8px; }
+#found[data-state="on"]::before { background:var(--ok); }
+#found[data-state="bad"]::before { background:var(--bad); }
+#found[data-state="busy"]::before { background:var(--red); }
+
+.boards { list-style:none; padding:0; margin:0; font-size:.9rem; }
+.boards li { padding:6px 0; border-top:1px solid var(--line); display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.boards .sn { font-family:Barlow, sans-serif; font-size:.82rem; min-width:6.5em; color:var(--muted); }
+.boards .w { flex:1; }
+.boards li.in-use .w { font-weight:700; }
+
+/* 2: recipes */
+.recipes { display:grid; grid-template-columns:repeat(auto-fill, minmax(190px, 1fr)); gap:8px; }
+.recipes > p { grid-column:1 / -1; margin:0; }
+.recipe { font:inherit; text-align:left; cursor:pointer; background:var(--bg); color:var(--fg); border:1px solid var(--line); border-radius:10px; padding:11px 12px; display:flex; flex-direction:column; gap:6px; min-height:100px; min-width:0; transition:border-color .15s; }
+.recipe:hover:not(:disabled) { border-color:var(--muted); background:var(--bg); }
+.recipe[aria-pressed="true"], .recipe[aria-pressed="true"]:hover { border:2px solid var(--red); padding:10px 11px; }
+.recipe:disabled { opacity:.6; }
+.recipe .top { display:flex; align-items:center; gap:8px; }
+.recipe .ic { flex:0 0 28px; height:28px; border-radius:8px; background:var(--card); color:var(--muted); display:flex; align-items:center; justify-content:center; }
+.recipe[aria-pressed="true"] .ic { background:var(--red); color:var(--cream); }
+.recipe .t { font-weight:700; line-height:1.25; }
+.recipe .s { color:var(--muted); font-size:.82rem; line-height:1.4; }
+
+/* 3 and 4: run it, the result */
+.pair { display:flex; flex-wrap:wrap; gap:12px; align-items:stretch; }
+.pair:has(#editor:not(.hidden)) #detail, .pair:has(#live:not(.hidden)) #detail, .pair:has(#ble:not(.hidden)) #detail { flex-basis:100%; }
+#r-title { margin:0; font-size:1.25rem; line-height:1.25; font-weight:600; }
+#r-see { font-size:.95rem; color:var(--fg); }
+#r-more summary { cursor:pointer; }
+#r-more p { margin:.3em 0; }
+.recipe .s { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+#go { display:inline-flex; align-items:center; gap:10px; }
+#go.busy::before { content:""; width:16px; height:16px; border-radius: 50%; border:2px solid rgba(247,243,236,.35); border-top-color:var(--cream); animation:bench-spin .8s linear infinite; }
+#go.busy:disabled { opacity:1; background:var(--ember); }
+.steps { list-style:none; padding:10px 12px; margin:4px 0 0; font-family:Barlow, sans-serif; font-size:.78rem; line-height:1.6; color:#F7F3EC; background:var(--console); border-radius:8px; min-height:5.5em; max-height:9em; overflow:auto; }
+.steps li { animation:bench-in .2s ease-out both; }
+.steps li::before { content:"› "; color:#F7F3EC; }
+#log:empty::before { content:"Ready."; color:rgba(247,243,236,.72); }
+#rlog:empty { display:none; }
+#result-card { flex:1 1 280px; min-width:0; display:flex; flex-direction:column; gap:8px; transition:background .2s, border-color .2s; }
+#result-card[data-state="pass"] { background:var(--pass-bg); border-color:var(--pass-line); }
+#result-card[data-state="pass"] .eyebrow { color:var(--ok); }
+#result-card[data-state="fail"] { background:var(--fail-bg); border-color:var(--fail-line); }
+#result-card[data-state="fail"] .eyebrow { color:var(--bad); }
+#result-card:not([data-state="fail"]) .diag-row { display:none; }
+#wait { flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:6px; text-align:center; color:var(--muted); padding:16px 12px; border:1px dashed var(--line); border-radius:8px; font-size:.9rem; min-height:120px; }
+#result:not(.hidden) ~ #wait { display:none; }
+#result { display:flex; flex-direction:column; gap:8px; animation:bench-in .25s ease-out both; }
+.result { font-size:1.15rem; line-height:1.3; font-weight:700; margin:0; }
+.un-line { margin:0; font-size:15px; line-height:22px; } .un-line .result { font-size:15px; line-height:22px; }
+.un-actions { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:10px 0 0; } .un-actions .quiet { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 14px; text-decoration:none; border:1.5px solid var(--line); border-radius:8px; background:transparent; color:var(--fg); font-weight:500; font-size:.9rem; }
+.un-actions a.quiet:hover { border-color:var(--muted); }
+.un-more { margin-top:8px; } .un-more summary { cursor:pointer; color:var(--muted); } .un-more p { margin:6px 0 0; }
+.cap > summary { display:none; cursor:pointer; color:var(--muted); font-size:.9rem; line-height:22px; margin-top:6px; } .cap > p { margin:6px 0 0; }
+@media (max-width:620px) {
+  .cap > summary { display:block; }
+  .stepper { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:6px; }
+  .stepper li { padding:6px 8px 6px 6px; gap:6px; font-size:14px; white-space:nowrap; min-width:0; }
+  .un-actions { display:grid; grid-template-columns:1fr 1fr; } .un-actions a:last-of-type { grid-column:1 / -1; } .un-actions #un-note { grid-column:1 / -1; }
+}
+@media (max-width:400px) { .stepper .st-more { display:none; } }
+.result.ok { color:var(--ok); } .result.bad { color:var(--bad); }
+#verdict { display:flex; gap:12px; align-items:flex-start; }
+#verdict::before { flex:0 0 32px; height:32px; border-radius: 50%; display:flex; align-items:center; justify-content:center; color:var(--cream); font-size:1.05rem; line-height:1; }
+#verdict.ok::before { content:"✓"; background:var(--ok); }
+#verdict.bad::before { content:"✕"; background:var(--bad); }
+.bars { display:flex; gap:2px; height:26px; margin:2px 0; }
+.bars span { display:block; height:100%; border-radius:3px; }
+.bars:empty { display:none !important; }
+#measured { font-family:Barlow, sans-serif; font-size:.78rem; margin:0; }
+#next { font-weight:600; color:var(--fg); margin:0; font-size:.9rem; }
+
+/* the thermometer */
+#thermo { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+#thermo .dial { width:200px; height:200px; flex:0 0 200px; font-family:Barlow, sans-serif; }
+#th-arc { transition:stroke-dasharray .5s cubic-bezier(.2,.8,.2,1); }
+#th-knob { transition:cx .5s, cy .5s; }
+#th-num { font-family:Barlow, sans-serif; font-weight:600; }
+#thermo .th-side { flex:1 1 240px; min-width:0; }
+#th-chart { width:100%; height:110px; border:1px solid var(--line); border-radius:8px; background:var(--bg); }
+.pair:has(#thermo:not(.hidden)) #detail { flex-basis:100%; }
+
+
+/* button and breathing-LED readouts */
+#watch { display:flex; flex-direction:column; gap:8px; }
+#watch .wt-row { display:flex; justify-content:space-between; align-items:center; gap:12px; border:1px solid var(--line); border-radius:8px; padding:10px 14px; background:var(--bg); font-family:Barlow, sans-serif; }
+#watch .wt-row b { font-size:1.15rem; font-weight:600; min-width:7ch; text-align:right; }
+#watch .wt-row b.on { color:var(--red); }
+#watch .wt-bar { height:10px; border-radius:5px; background:var(--line); overflow:hidden; }
+#watch .wt-bar i { display:block; height:100%; width:0; background:var(--red); transition:width .12s linear; }
+#watch .wt-bar.hidden { display:none; }
+
+/* the first wire */
+#loop { display:flex; flex-direction:column; gap:8px; }
+#lp-chart { width:100%; max-width:520px; height:auto; font-family:Barlow, sans-serif; }
+.lp-wire { margin:0; font-weight:600; }
+
+/* draw a digit */
+#digit { display:flex; gap:20px; flex-wrap:wrap; align-items:flex-start; }
+.dg-pad { position:relative; width:288px; max-width:100%; }
+.dg-lock { position:absolute; inset:0 0 auto 0; aspect-ratio:1; z-index:2; border-radius:12px; background:rgba(22,19,18,.86); color:#F7F3EC; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:18px; text-align:center; }
+.dg-lock p { margin:0; } .dg-lock .small { color:#E2D8C9; } .dg-lock button { margin-top:6px; } .dg-pad.live .dg-lock { display:none; }
+.dg-pad canvas { width:288px; height:288px; max-width:100%; background:#161312; border-radius:12px; touch-action:none; cursor:crosshair; display:block; }
+.dg-pad .row { margin-top:8px; }
+.dg-side { flex:1 1 200px; min-width:0; }
+.dg-answer { margin:0; }
+#dg-ans { font:700 6rem/1 Barlow, sans-serif; color:var(--red); }
+#dg-in { width:120px; height:120px; image-rendering:pixelated; border:1px solid var(--line); border-radius:6px; margin-top:8px; }
+
+/* predicted against measured, the shared live panel (tools/live/live_panel.js) */
+.overlay:empty { display:none; } .overlay svg { width:100%; height:auto; display:block; margin:4px 0; }
+.overlay .lp .pa { fill:var(--bg); stroke:var(--line); } .overlay .lp .tl { fill:var(--muted); } .overlay .lp .at { fill:var(--fg); } .overlay .lp .pp, .overlay .lp .dd { fill:none; stroke:var(--fg); }
+/* the no-code controls (pin, timer, bus, PWM): a short list of settings, each with its C line, like the motor console */
+.ct-wrap { display:grid; grid-template-columns:minmax(300px, 1.3fr) minmax(260px, 1fr); gap:14px; text-align:left; width:100%; align-items:start; }
+@media (max-width: 760px) { .ct-wrap { grid-template-columns:1fr; } }
+.ct-head { display:flex; gap:12px; align-items:center; flex-wrap:wrap; position:relative; }
+.ct-plus summary { list-style:none; cursor:pointer; padding:4px 12px; border:1px solid var(--line); border-radius:8px; font-weight:600; background:var(--card); }
+.ct-plus summary::-webkit-details-marker { display:none; }
+.ct-menu { position:absolute; z-index:5; top:100%; left:0; margin-top:4px; background:var(--card); border:1px solid var(--line); border-radius:10px; padding:6px; display:flex; flex-direction:column; gap:2px; min-width:280px; box-shadow:0 6px 20px rgba(0,0,0,.12); }
+.ct-menu button { text-align:left; border:0; background:transparent; padding:6px 8px; border-radius:6px; font:inherit; cursor:pointer; color:var(--fg); }
+.ct-menu button:hover:not(:disabled) { background:var(--bg); } .ct-menu button:disabled { color:var(--muted); cursor:not-allowed; }
+.ct-row { border:1px solid var(--line); border-radius:10px; background:var(--bg); padding:8px 10px; margin:6px 0; }
+.ct-row .rh { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.ct-row .rh b { min-width:3.2rem; }
+.ct-row .rh label { display:flex; align-items:center; gap:4px; }
+.ct-row select, .ct-row input, .ct-head select { font:inherit; padding:2px 5px; border-radius:6px; border:1px solid var(--line); background:var(--card); color:var(--fg); max-width:100%; }
+.ct-row input[type=number] { width:5.4rem; } .ct-row input[type=text] { width:4.2rem; }
+.ct-row .rm { margin-left:auto; width:28px; height:28px; min-height:0; padding:0; border-radius:50%; border:1px solid var(--line); background:var(--card); cursor:pointer; font-size:1.1rem; line-height:1; color:var(--fg); }
+.ct-row pre { margin:6px 0 0; font-size:.74rem; white-space:pre-wrap; overflow-x:auto; }
+.ct-row .why { margin:4px 0 0; }
+.ct-prov { color:var(--muted); font-size:.74rem; }
+.ct-prov.tested { color:var(--ok); }
+.ct-fig { margin:0; }
+.ct-bd { position:relative; width:100%; aspect-ratio:1040 / 515; border:1px solid var(--line); border-radius:10px; background-repeat:no-repeat; overflow:hidden; background-color:#F0563F; }
+.ct-mk { position:absolute; width:4.6%; aspect-ratio:1; transform:translate(-50%, -50%); border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 2px #161312, 0 0 12px 3px rgba(255,255,255,.8); }
+.ct-mk.bus { border-color:#161312; width:3.6%; }
+.ct-lb { position:absolute; transform:translateY(-50%); background:#fff; color:#161312; border:1px solid #161312; border-radius:6px; padding:1px 6px; font-size:.7rem; line-height:1.25; white-space:nowrap; max-width:60%; overflow:hidden; text-overflow:ellipsis; }
+.pair:has(#controls:not(.hidden)) #detail { flex-basis:100%; }
+#ct-c:empty { display:none; }
+/* the color editor and TI's demo */
+.editor .step { display:flex; align-items:center; gap:6px; margin:4px 0; flex-wrap:wrap; }
+.sw { width:28px; height:28px; min-height:0; border-radius:50%; border:2px solid var(--line); padding:0; cursor:pointer; }
+.sw[aria-pressed="true"] { outline:3px solid var(--fg); outline-offset:1px; }
+.editor select { font:inherit; padding:3px 6px; border-radius:6px; border:1px solid var(--line); background:var(--bg); color:var(--fg); }
+.editor .step button.quiet { min-height:30px; }
+.presets { display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 6px; }
+#oob-value { font-family:Barlow, sans-serif; font-weight:600; font-size:2rem; margin:8px 0 0; }
+#oob-chart { width:100%; height:120px; border:1px solid var(--line); border-radius:8px; background:var(--bg); }
+#r-wiring table, .more table { border-collapse:collapse; width:100%; font-size:.88rem; }
+td, th { border-top:1px solid var(--line); padding:6px 4px; vertical-align:top; text-align:left; }
+
+/* the bench scene, after the Claude Design canvas (2026-10-15) */
+@keyframes b-plug { 0% { transform:translateX(-120px); } 60%, 100% { transform:translateX(0); } }
+@keyframes b-packet { 0% { offset-distance:0%; opacity:0; } 8%, 92% { opacity:1; } 100% { offset-distance:100%; opacity:0; } }
+@keyframes b-dash { to { stroke-dashoffset:-40; } }
+@keyframes b-blink { 0%, 11% { opacity:1; } 11.1%, 22% { opacity:.1; } 22.1%, 33% { opacity:1; } 33.1%, 100% { opacity:.1; } }
+@keyframes b-rgb { 0%, 32% { background:#F0563F; } 33%, 65% { background:#2F6B4F; } 66%, 100% { background:#161312; } }
+@keyframes b-needle { 0% { transform:rotate(-80deg); } 60% { transform:rotate(55deg); } 100% { transform:rotate(48deg); } }
+@keyframes b-type { 0%, 30% { width:0; } 70%, 100% { width:100%; } }
+@keyframes b-wave { to { transform:translateX(-50%); } }
+@keyframes b-arc { 0% { stroke-dasharray:10 80; } 50% { stroke-dasharray:44 80; } 100% { stroke-dasharray:10 80; } }
+@keyframes b-pulse { 0%, 100% { opacity:.3; } 50% { opacity:1; } }
+#scene { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 18px; color:var(--fg); display:grid; grid-template-columns:minmax(0, 1fr);
+  grid-template-areas:"top" "foot"; column-gap:20px; row-gap:6px; align-items:center; }
+.scene-top { grid-area:top; } .scene-foot { grid-area:foot; } .scene-art { grid-area:art; }
+@media (max-width:760px) { #scene { grid-template-columns:1fr; grid-template-areas:"top" "art" "foot"; } }
+.scene-top { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.scene-top .grow { flex:1; }
+.eyebrow.light { color:var(--red); }
+#scene #found { background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:5px 12px; color:var(--fg); font-size:.9rem; }
+#scene #found:empty { display:none; }
+#scene button.quiet { color:var(--fg); border-color:var(--line); }
+.scene-art { display:none; }   /* the drawing is kept in the page for the script's status lines, not shown */
+.scene-art svg { display:block; width:100%; height:auto; max-height:96px; }
+.cable-dash { stroke:rgba(247,243,236,0.14); }
+#scene:not([data-state="idle"]) .cable-dash { stroke:rgba(247,243,236,0.3); }
+#scene[data-state="run"] .cable-dash, #scene[data-state="pass"] .cable-dash { animation:b-dash .6s linear infinite; }
+#scene[data-state="idle"] .plug { animation:b-plug 2.4s ease-in-out infinite; }
+.packets circle { opacity:0; }
+.packets.out circle { fill:#F0563F; } .packets.back circle { fill:#F7F3EC; }
+#scene[data-state="run"] .packets.out circle { animation:b-packet 1.4s linear infinite; }
+#scene[data-state="pass"] .packets.back circle { animation:b-packet 1.6s linear 3; }
+.board { opacity:.45; transition:opacity .3s; }
+#scene:not([data-state="idle"]) .board { opacity:1; }
+#led { opacity:.12; transition:opacity .05s; } #led.on { opacity:1; }
+#led-glow { opacity:0; filter:blur(8px); transition:opacity .05s; } #led-glow.on { opacity:.9; }
+.scene-foot { display:flex; gap:12px; align-items:center; flex-wrap:wrap; font-size:.82rem; color:var(--muted); }
+.scene-foot p { margin:0; }
+.scene-foot .boards li { border:1px solid var(--line); border-radius:8px; padding:8px 10px; gap:8px; background:var(--bg); }
+.bd-panel { flex:1 1 100%; display:flex; flex-direction:column; gap:6px; } .bd-h { display:flex; justify-content:space-between; align-items:center; gap:10px; color:var(--fg); font-size:.95rem; }
+.bd-panel .boards { display:grid; gap:6px; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); } .bd-panel .boards:empty { display:none; }
+.boards .kit { font-weight:700; color:var(--fg); } .boards li.in-use { border-color:var(--red); } .boards .tag { border:1px solid var(--line); border-radius:6px; padding:1px 8px; font-size:.75rem; color:var(--muted); }
+.boards li button { min-height:32px; padding:0 12px; font-size:.85rem; }
+.scene-foot .boards li.in-use .w { color:var(--fg); }
+#scene #chip-facts { color:var(--muted); }
+#board-pic { display:none; }
+#picker { width:min(860px, calc(100vw - 32px)); max-height:calc(100vh - 48px); border:1px solid var(--line); border-radius:14px; padding:18px 20px; background:var(--card); color:var(--fg); }
+#picker::backdrop { background:rgba(22,19,18,.45); }
+.pk-h { display:flex; justify-content:space-between; align-items:center; gap:12px; } .pk-h h2 { margin:0; font-size:22px; line-height:28px; }
+.pk-tools { display:flex; flex-wrap:wrap; gap:10px 14px; margin:8px 0; } .pk-tools label { display:flex; flex-direction:column; gap:2px; font-size:.8rem; color:var(--muted); }
+.pk-tools input, .pk-tools select { font:inherit; font-size:.95rem; padding:6px 8px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg); min-width:150px; }
+.pk-list { list-style:none; margin:8px 0 0; padding:0; display:grid; gap:8px; }
+.pk-row { border:1px solid var(--line); border-radius:10px; padding:10px 12px; display:grid; grid-template-columns:minmax(0,1fr) auto; gap:4px 12px; align-items:center; background:var(--bg); }
+.pk-row b { font-size:1rem; } .pk-row p { margin:0; grid-column:1; font-size:.85rem; color:var(--muted); line-height:1.4; } .pk-row .pk-go { grid-column:2; grid-row:1 / span 3; align-self:center; }
+.pk-tags { display:flex; flex-wrap:wrap; gap:6px; } .pk-tags span { border:1px solid var(--line); border-radius:6px; padding:0 8px; font-size:.75rem; color:var(--muted); line-height:20px; background:var(--card); }
+.pk-tags .lv-easy { border-color:var(--ok); color:var(--ok); } .pk-tags .lv-hard { border-color:var(--red); color:var(--red); }
+.pk-row a.btn, .pk-row button { text-decoration:none; } .pk-row a.btn { border:1.5px solid var(--red); border-radius:8px; padding:9px 16px; font-weight:600; display:inline-block; }
+@media (max-width:560px) { .pk-row { grid-template-columns:1fr; } .pk-row .pk-go { grid-column:1; grid-row:auto; } }
+.est-bar { height:6px; border-radius:3px; background:var(--line); overflow:hidden; } .est-bar i { display:block; height:100%; width:0; background:var(--red); transition:width .5s; } @keyframes est-slide { 0% { margin-left:-30%; } 100% { margin-left:100%; } } .est-bar i.busy { width:30% !important; animation:est-slide 1.6s ease-in-out infinite; } @media (prefers-reduced-motion:reduce) { .est-bar i.busy { animation:none; width:100% !important; opacity:.5; } }
+.est p { margin:4px 0 0; }
+.conn-bar { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:8px 14px; } .conn-bar[hidden] { display:none; } .conn-bar b { font-size:1rem; } .conn-bar button { margin-left:auto; }
+#scene.compact { display:none; } .res-os summary { cursor:pointer; } .res-os:not([open]) > :not(summary) { display:none; } .res-tile { padding:8px 12px; }
+.c-full { display:inline-block; border:1px solid var(--line); border-radius:8px; padding:7px 12px; font-size:.9rem; text-decoration:none; color:var(--fg); margin-right:6px; } .c-full:hover { border-color:var(--red); }
+#takehome.folded > :not(.head) { display:none; } #takehome.folded .head { cursor:pointer; margin:0; } #takehome .head::after { content:"Show"; font-size:.85rem; color:var(--red); margin-left:12px; } #takehome:not(.folded) .head::after { content:"Hide"; }
+body.connected #learn { display:none !important; } body.connected .stepper { margin-bottom:4px; }
+#result-card #wait { min-height:0; padding:10px; } #result-card .res-pane { min-height:0; }
+.ai-pick #wait { flex:0 0 auto !important; padding:8px 10px !important; flex-direction:row !important; justify-content:flex-start !important; }
+#result-card { flex:0 0 auto !important; }
+.res { grid-template-columns:2fr 1fr 1fr !important; } .res-chip { grid-column:auto !important; display:grid !important; grid-template-columns:repeat(3, minmax(0,1fr)); gap:4px 14px !important; } .res-chip .res-l { grid-column:1 / -1; } .res-chip .res-row { grid-template-columns:1fr; } .res-chip .res-row .res-s { display:none; } .res-chip .res-bar { display:block; }
+.res-os { grid-column:auto !important; }
+.res-pins summary { cursor:pointer; } .pinout { display:grid; grid-template-columns:repeat(auto-fill, minmax(62px, 1fr)); gap:3px; margin-top:6px; max-height:260px; overflow:auto; }
+.pinout span { border:1px solid var(--line); border-radius:5px; padding:2px 4px; font-size:11px; line-height:1.25; background:var(--bg); display:flex; justify-content:space-between; gap:4px; } .pinout span i { font-style:normal; color:var(--muted); }
+.res-tile .pinout b { font-size:11px; line-height:1.25; font-weight:400; } .pinout span.used b { font-weight:700 !important; }
+.res { align-items:start; grid-template-columns:1.7fr 1.8fr .7fr !important; } .pinout { grid-template-columns:repeat(auto-fill, minmax(70px, 1fr)); }
+.pinout span.used { border:2px solid var(--red); background:var(--card); font-weight:700; color:var(--red); padding:1px 3px; }
+.ai-card { border:1px solid var(--line); border-radius:10px; padding:10px 12px; background:var(--bg); display:flex; flex-direction:column; gap:8px; } .ai-card > b { font-size:1rem; } .ai-fit { margin:0; }
+.ai-sizes { display:flex; flex-wrap:wrap; gap:6px; } button.recipe.ai-size { min-height:0 !important; flex-direction:row; padding:6px 12px; font-size:.9rem; font-weight:600; width:auto; }
+button.recipe.ai-size[aria-pressed="true"] { padding:5px 11px; }
+.ota-log { max-height:220px; overflow:auto; background:#161312; color:#F7F3EC; padding:8px 10px; border-radius:8px; font-size:12px; white-space:pre-wrap; } #ota .c-row input { flex:0 1 320px !important; } #ota select, #ota input[type=text], #ota input[type=password] { font:inherit; padding:7px 9px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg); min-width:220px; }
+.ai-cards { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px; }
+.ai-grid { grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)) !important; } .ai-pick .recipe { min-height:0; } .ai-pick .recipe .pic { height:26px; } .ai-pick .recipe .pic svg { height:24px; }
+.ai-grid { grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)) !important; }
+.ai-pick { margin-top:14px; display:flex; flex-direction:column; gap:8px; } .ai-pick h3 { margin:0; }
+.recipe .ai-l { color:var(--muted); font-size:.8rem; line-height:1.35; }
+.recipe[data-best] .t::before { content:"Best here · "; color:var(--red); font-weight:600; font-size:.75rem; }
+.oc-wins { display:grid; grid-template-columns:repeat(10, minmax(0,1fr)); gap:4px; } .oc-wins button { font:inherit; padding:6px 0; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg); cursor:pointer; }
+.oc-wins button[aria-pressed="true"] { border:2px solid var(--red); padding:5px 0; } .oc-wins button:disabled { opacity:.5; cursor:default; }
+#oc-chart { width:100%; max-width:640px; height:auto; background:var(--card); border-radius:8px; } .oc-ans b { font:700 1.6rem Barlow, sans-serif; margin:0 14px 0 4px; }
+.c-deeper { padding:10px 16px; border-top:1px solid var(--line); font-size:.88rem; } .c-deeper a { margin-right:14px; white-space:nowrap; }
+#cp-rows label { display:grid; grid-template-columns:minmax(0,1fr) 110px; gap:8px; align-items:center; margin:6px 0; font-size:.9rem; } #cp-rows input { font:inherit; padding:6px 8px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--fg); }
+#cp-rows small { color:var(--muted); display:block; }
+.recipe { min-height:88px; gap:8px; }
+.recipe .pic { height:34px; display:flex; align-items:center; gap:8px; width:100%; color:var(--fg); }
+.recipe .t { font-size:.95rem; }
+.recipe .s { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+.recipe:disabled .t::after { content:" · needs a computer"; font-weight:500; color:var(--muted); }
+.p-led { width:18px; height:18px; border-radius:50%; background:#F0563F; box-shadow:0 0 10px rgba(255,90,60,.6); flex:0 0 18px; }
+.p-led.blink { animation:b-blink 1.35s steps(1) infinite; }
+.p-led.rgb { animation:b-rgb 2.4s steps(1) infinite; }
+.p-led.pulse { animation:b-pulse 1.6s ease-in-out infinite; background:#161312; box-shadow:0 0 10px rgba(79,163,255,.6); }
+.p-strip { flex:1; display:flex; gap:2px; height:10px; } .p-strip i { background:var(--red); border-radius:2px; } .p-strip i.off { background:var(--line); }
+.p-sw { width:20px; height:20px; border-radius:6px; }
+.p-arc { animation:b-arc 3s ease-in-out infinite; }
+.p-wave { flex:1; height:26px; overflow:hidden; position:relative; } .p-wave svg { position:absolute; left:0; top:0; width:200%; height:100%; animation:b-wave 4s linear infinite; }
+.p-term { display:block; width:100%; background:#161312; color:#F7F3EC; border-radius:6px; padding:5px 8px; font:11px "JetBrains Mono", monospace; white-space:nowrap; overflow:hidden; }
+.p-type { display:inline-block; overflow:hidden; white-space:nowrap; vertical-align:bottom; animation:b-type 3s steps(26) infinite; } .p-type b { color:var(--red); }
+.p-sun { width:16px; height:16px; border-radius:50%; background:#C98500; box-shadow:0 0 12px #C98500; animation:b-pulse 2s ease-in-out infinite; }
+.p-guess { font:700 1.4rem Barlow, sans-serif; color:var(--red); }
+@keyframes b-draw { 0% { stroke-dashoffset:60; } 60%, 100% { stroke-dashoffset:0; } }
+.p-draw { stroke-dasharray:60; animation:b-draw 2.4s ease-out infinite; }
+.p-needle { transform-origin:20px 26px; animation:b-needle 2.6s ease-out infinite alternate; }
+.ring-wrap { position:relative; width:100%; margin:4px 0 2px; }
+.ring-wrap svg { display:none; }
+#ring { stroke-dasharray:276; stroke-dashoffset:276; transition:stroke-dashoffset .4s ease-out, stroke .3s; }
+#go { --p:0%; width:100%; min-height:64px; border-radius:12px; padding:0 20px; display:flex; align-items:center; justify-content:center; gap:12px; font-size:1.35rem; font-weight:700; letter-spacing:.01em; box-shadow:0 10px 24px -12px rgba(180,36,24,.75); }
+#go.busy { background:linear-gradient(90deg, var(--ember) var(--p), color-mix(in srgb, var(--red) 70%, #fff) var(--p)); }
+#go b { font:700 1.35rem Barlow, sans-serif; } #go span { font-size:.95rem; font-weight:500; opacity:.9; }
+#go:focus-visible { outline-offset:3px; }
+#go.busy::before { display:none; }
+#go:disabled:not(.busy) { opacity:.45; }
+.chips { list-style:none; margin:0; padding:0; display:flex; gap:6px; flex-wrap:wrap; justify-content:center; font-size:.75rem; }
+.chips li { border:1px solid var(--line); border-radius:6px; padding:2px 8px; color:var(--muted); }
+.chips li.now { border-color:var(--red); color:var(--fg); }
+.chips li.done { background:var(--ok); border-color:var(--ok); color:var(--cream); }
+.chips li.done::before { content:"✓ "; }
+.chips li.skip { text-decoration:line-through; color:var(--muted); }
+.chips li.skip::before { content:"– "; }
+.chips li.bad { background:var(--bad); border-color:var(--bad); color:var(--cream); }
+.chips li.bad::before { content:"✕ "; }
+.strip-row { display:flex; justify-content:space-between; font-size:.75rem; color:var(--muted); }
+.strip-row span:first-child { font-weight:600; color:var(--fg); }
+#asked { height:14px; }
+.stats { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+.stats div { display:flex; flex-direction:column; } .stats b { font:600 1.1rem Barlow, sans-serif; } .stats span { font-size:.75rem; color:var(--muted); }
+
+/* the stage (concept 5): demo list left, the demo right with its tabs */
+.c-work { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:16px; align-items:start; }
+.c-work > * { min-width:0; } #pick { display:flex; flex-direction:column; gap:10px; } #pick .recipes { grid-template-columns:repeat(2, minmax(0,1fr)); }
+.c-stage { border:1.5px solid var(--ink); border-radius:12px; background:#fff; overflow:hidden; }
+.c-stage.now { border-color:var(--red); box-shadow:0 0 0 1px var(--red); }
+.c-stage-h { display:flex; align-items:center; gap:10px; padding:12px 16px; border-bottom:1.5px solid var(--line); flex-wrap:wrap; }
+.c-stage-h h2 { margin:0; font:700 20px/26px var(--frl-font); flex:1; min-width:160px; }
+.c-go { padding:12px 16px 4px; } .c-go .ring-wrap { margin:0; } .c-go .small { margin:6px 0 0; }
+.c-tabs { display:flex; flex-wrap:wrap; padding:0 10px; border-bottom:1.5px solid var(--line); margin-top:8px; }
+.c-tabs button { background:none; color:var(--muted); border:0; border-bottom:3px solid transparent; border-radius:0; min-height:40px; padding:0 12px; font:600 15px var(--frl-font); margin-bottom:-1.5px; }
+.c-tabs button:hover:not(:disabled) { background:none; color:var(--fg); }
+.c-tabs button[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--red); }
+.c-tabs button[hidden] { display:none; } .c-tabs button:disabled { opacity:.45; cursor:default; } .c-tabs button small { font-weight:400; font-size:12px; margin-left:4px; }
+.c-pane { padding:14px 16px 16px; min-height:220px; display:flex; flex-direction:column; gap:10px; } .c-pane[hidden] { display:none; } .c-pane > * { margin-top:0; margin-bottom:0; }
+.res-pane { display:flex; flex-direction:column; gap:8px; }
+.c-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; } .c-row input { flex:1 1 180px; font:inherit; padding:8px 10px; border:1px solid var(--line); border-radius:6px; }
+.c-con { background:var(--console); color:#F7F3EC; border-radius:10px; padding:10px 12px; font:13px/19px var(--frl-code); height:170px; overflow:auto; white-space:pre-wrap; } .c-con .in { color:#f0a49a; }
+.c-watch table, .c-ai { width:100%; border-collapse:collapse; font-size:14px; } .c-watch td, .c-watch th, .c-ai td { text-align:left; padding:6px; border-bottom:1px solid var(--line); vertical-align:top; }
+.c-watch th { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; } .c-watch td.v { font-weight:700; } .c-ai td:first-child { width:130px; color:var(--muted); font-weight:600; }
+.c-share { position:relative; } .c-menu { position:absolute; right:0; top:44px; background:#fff; border:1.5px solid var(--ink); border-radius:10px; padding:6px; width:290px; max-width:80vw; z-index:5; box-shadow:0 8px 24px rgba(0,0,0,.12); } .c-menu[hidden] { display:none; }
+.c-menu button, .c-menu a { display:block; width:100%; text-align:left; background:#fff; color:var(--ink); min-height:0; padding:8px 10px; font:600 15px var(--frl-font); border-radius:6px; text-decoration:none; }
+.c-menu button small, .c-menu a small { display:block; font-weight:400; color:var(--muted); font-size:13px; } .c-menu button:hover:not(:disabled), .c-menu a:hover { background:var(--cream); }
+.c-plan { padding:14px 16px 16px; border-top:1.5px solid var(--line); background:var(--cream); } .c-plan[hidden] { display:none; } .c-plan h3 { margin:0 0 8px; font:700 17px var(--frl-font); }
+.c-plan table { width:100%; border-collapse:collapse; font-size:14px; } .c-plan th { text-align:left; width:110px; color:var(--muted); font-weight:600; padding:5px 8px 5px 0; vertical-align:top; } .c-plan td { padding:5px 0; }
+.c-plan .recovery { margin:6px 0 10px; } .c-plan .c-row { margin-top:10px; }
+.c-toast { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--ink); color:var(--cream); padding:10px 16px; border-radius:8px; font-size:15px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:20; } .c-toast.on { opacity:1; }
+.dg-pad { margin:0; }
+@media (max-width:900px) { .c-work { grid-template-columns:1fr; } .c-work > #detail { order:-1; } }
+
+/* take it home: two copy buttons side by side */
+.th-two { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:14px; margin-top:6px; }
+.th-col { border:1.5px solid var(--frl-line); border-radius:10px; padding:12px 14px; background:var(--frl-cream); min-width:0; } .th-col h3 { margin:0 0 4px; font-size:1.05rem; }
+.th-col.k-kit { margin:0; }
+.th-pre { margin:6px 0; max-height:300px; overflow:auto; font-size:.8rem; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
+.th-fold { margin-top:10px; } .th-fold summary { cursor:pointer; color:var(--muted); font-size:.92rem; } .th-fold .recovery { margin-top:6px; }
+
+/* the folded extras */
+.more { max-width:1200px; margin:0 auto; padding:0 24px 56px; display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px; align-items:start; }
+details.card { padding:10px 14px; }
+details.card > summary { cursor:pointer; font-weight:600; display:flex; align-items:center; gap:8px; min-height:32px; }
+details.card[open] > summary { margin-bottom:6px; }
+pre { background:var(--console); color:#F7F3EC; border-radius:8px; padding:10px 12px; white-space:pre-wrap; word-break:break-word; margin:6px 0; }
+ol.next { margin:6px 0; padding-left:1.3em; }
+ol.next li { margin:3px 0; }
+#about { grid-column:1 / -1; margin:0; }
+@media (max-width:620px) { .hero { height:190px; } main { padding:16px 16px 12px; } .more { padding:0 16px 40px; } .lab-hero h1 { font-size:30px; line-height:36px; } }
+/* Left rail (lab-nav.js), wider than 900 px only; a phone keeps the stepper and the single column */
+.lab-shell { max-width:1440px; margin:0 auto; }
+#lab-nav { display:none; }
+@media (min-width:901px) {
+  .lab-shell { display:grid; grid-template-columns:232px minmax(0,1fr); gap:8px; align-items:start; }
+  .lab-col { min-width:0; }
+  .lab-col > main { margin:0; }
+  #lab-nav { display:block; position:sticky; top:84px; max-height:calc(100vh - 96px); overflow:auto; margin:24px 0 0 16px; padding:12px 8px; border:1px solid var(--line); border-radius:8px; background:var(--card); }
+  #lab-nav .ln-h { margin:0 8px 8px; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  #lab-nav ol { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
+  #lab-nav a { display:flex; gap:10px; align-items:flex-start; padding:8px; border-radius:6px; color:inherit; text-decoration:none; border-left:3px solid transparent; }
+  #lab-nav a:hover, #lab-nav a:focus-visible { background:var(--bg); }
+  #lab-nav li.on a { border-left-color:var(--red); background:var(--bg); }
+  #lab-nav .ln-n { flex:0 0 22px; height:22px; border-radius:50%; background:var(--line); font-size:12px; line-height:22px; text-align:center; font-weight:700; position:relative; }
+  #lab-nav .ln-n:empty { background:transparent; }
+  #lab-nav .ln-n:empty::after { content:""; position:absolute; left:8px; top:8px; width:6px; height:6px; border-radius:50%; background:var(--muted); }
+  #lab-nav li[data-st="now"] .ln-n { background:var(--red); color:var(--cream); }
+  #lab-nav .ln-t { display:flex; flex-direction:column; min-width:0; }
+  #lab-nav .ln-t b { font-size:15px; line-height:20px; }
+  #lab-nav .ln-t small { font-size:12.5px; line-height:17px; color:var(--muted); }
+  #lab-nav li.off a { cursor:default; }
+  #lab-nav li.off a:hover { background:transparent; }
+  #lab-nav li.off .ln-t b { color:var(--muted); font-weight:600; }
+  #stepper { display:none; }
+  #scene, #pick, #detail, #takehome, section.more, section.more details { scroll-margin-top:84px; }   /* below the sticky site header */
+}
+.con-opts { gap:14px; flex-wrap:wrap; align-items:center; margin:6px 0 0; }
+.con-opts select { font:inherit; font-size:14px; padding:3px 6px; margin-left:4px; }
+.th-own { margin:14px 0 0; padding-top:12px; border-top:1px solid var(--line); }
+.th-own h3 { margin:0 0 6px; font-size:16px; }
+/*bench-chrome:css*/
+:root { --frl-red: #B42418; --frl-ember: #8E1C13; --frl-ink: #161312; --frl-stone: #6B625B; --frl-paper: #FAFAF7; --frl-tan: #F4EFE9; --frl-cream: #F7F3EC; --frl-line: #E2D8C9;
+  --ok: #2F6B4F; --frl-font: "Barlow", "Helvetica Neue", Arial, sans-serif; --frl-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace; --frl-ease: 180ms cubic-bezier(0.2, 0, 0, 1); }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* Redesign chrome */
+:root { --logo-h: 48px; --frl-ok: #2F6B4F; --frl-amber: #C98500; /* success and the one amber: graphics, score tints and chart series only */ }
+body > header { position: sticky; top: 0; z-index: 30; background: rgba(250,250,247,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--frl-line); }
+/* inner pages: the header is Ink with Cream text; the home page keeps the light one above its dark hero */
+body > header.dark { background: rgba(22,19,18,.96); border-bottom-color: rgba(247,243,236,0.12); color: var(--frl-cream); }
+header.dark .logo-head { color: var(--frl-cream); }
+header.dark nav > a, header.dark nav .ni > a { color: var(--frl-cream); }
+header.dark nav > a:hover, header.dark nav .ni > a:hover { color: #F0563F; }
+header.dark nav a[aria-current="page"] { color: var(--frl-cream); border-bottom-color: #F0563F; }
+header.dark .ni-btn { color: rgba(247,243,236,.72); } header.dark .ni-btn:hover { color: var(--frl-cream); background: rgba(247,243,236,0.08); }
+header.dark .hsearch { background: rgba(247,243,236,0.05); border-color: rgba(247,243,236,0.14); } header.dark .hsearch:focus-within { border-color: var(--frl-cream); }
+header.dark .hsearch input { color: var(--frl-cream); } header.dark .hsearch input::placeholder { color: #6B625B; } header.dark .hsearch button { color: var(--frl-cream); }
+header.dark .menu-btn { border-color: var(--frl-cream); color: var(--frl-cream); }
+header.dark.nav-open nav { background: var(--frl-ink); border-bottom-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav > a, header.dark.nav-open nav .ni { border-top-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav .menu .mi b { color: var(--frl-cream); } header.dark.nav-open nav .menu .mi span { color: rgba(247,243,236,.72); }
+header .wrap { display: flex; align-items: center; gap: 32px; height: 72px; }
+.logo { display: block; width: auto; }
+.logo-head { height: var(--logo-h); color: var(--frl-red); }
+.logo-foot { height: 48px; color: var(--frl-red); }
+header .brand { display: flex; align-items: center; flex: none; }
+header nav { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+header nav > a, header nav .ni > a { color: var(--frl-ink); text-decoration: none; font-weight: 500; font-size: 16px; white-space: nowrap; padding: 4px 0; border-bottom: 2px solid transparent; }
+header nav > a:hover, header nav .ni > a:hover { color: var(--frl-red); }
+header nav a[aria-current="page"] { font-weight: 700; border-bottom-color: var(--frl-red); color: var(--frl-ink); }
+/* the Build item: a link, a chevron button, and the subject panel (open on hover, focus or tap) */
+.ni { position: relative; display: flex; align-items: center; gap: 2px; }
+.ni-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--frl-stone); cursor: pointer; padding: 0; }
+.ni-btn svg { width: 16px; height: 16px; transition: transform var(--frl-ease); }
+.ni-btn:hover { color: var(--frl-ink); background: var(--frl-cream); }
+.ni-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.menu { display: none; position: absolute; top: calc(100% + 14px); left: -24px; width: 720px; max-width: calc(100vw - 32px); background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 12px; padding: 22px 24px 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; z-index: 31; }
+#build-menu, #hardware-menu { left: -24px; } #software-menu { left: -200px; } #about-menu { left: auto; right: -90px; width: 560px; }
+.menu::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
+.ni:hover .menu, .ni:focus-within .menu, .ni.open .menu { display: grid; }
+.menu .mi { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--frl-ink); padding: 6px 8px; margin: -6px -8px; border-radius: 8px; }
+.menu .mi:hover, .menu .mi:focus-visible { background: var(--frl-paper); }
+.menu .mi b { font-weight: 700; font-size: 16px; line-height: 22px; }
+.menu .mi span { font-size: 13px; line-height: 18px; color: var(--frl-stone); }
+.menu .menu-note { grid-column: 1 / -1; margin: 0; border-top: 1px solid var(--frl-line); padding-top: 12px; font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.menu .menu-note a { color: var(--frl-ink); font-size: inherit; font-weight: 500; padding: 0; border: 0; }
+.menu .mi, .menu .mi b, .menu .mi span { white-space: normal; }  /* hand-made pages carry an older nowrap nav rule */
+/* phone menu: under 760 px the nav folds behind a Menu button (aria-expanded), opened by tap or Enter, closed by Escape */
+.menu-btn { display: none; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--frl-ink); background: transparent; color: var(--frl-ink); font: 600 16px var(--frl-font); cursor: pointer; }
+.menu-btn svg { width: 18px; height: 18px; }
+.menu-btn .mb-x { display: none; }
+.menu-btn[aria-expanded="true"] .mb-x { display: block; } .menu-btn[aria-expanded="true"] .mb-o { display: none; }
+/* site search in the header: the form goes to search.html?q=; under 760 px only the icon shows */
+.hsearch { display: flex; align-items: center; height: 40px; border: 1.5px solid var(--frl-line); border-radius: 8px; background: #fff; padding: 0 4px 0 12px; }
+.hsearch:focus-within { border-color: var(--frl-ink); }
+.hsearch input { border: 0; outline: 0; background: transparent; font: 500 15px var(--frl-font); color: var(--frl-ink); width: 150px; min-width: 0; }
+.hsearch button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 4px; background: transparent; color: var(--frl-ink); cursor: pointer; }
+.hsearch button:hover { color: var(--frl-red); } .hsearch button svg { width: 18px; height: 18px; }
+/* GitHub link beside the Digital Lab button: the repository one click from every page */
+.gh-link { display: inline-flex; align-items: center; gap: 6px; color: var(--frl-cream); text-decoration: none; font: 600 15px var(--frl-font); margin-right: 12px; opacity: .9; white-space: nowrap; }
+.gh-link:hover { opacity: 1; color: #fff; }
+header:not(.dark) .gh-link { color: var(--frl-ink); } header:not(.dark) .gh-link:hover { color: var(--frl-red); }
+.gh-link svg { width: 18px; height: 18px; }
+@media (max-width: 1180px) { .gh-link span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+/* the red "Plug in a board" button: opens the browser bench */
+.plug-btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 6px; background: var(--frl-red); color: #fff; font: 600 15px var(--frl-font); text-decoration: none; white-space: nowrap; flex: none; }
+.plug-btn:hover { background: var(--frl-ember); color: #fff; }
+.plug-btn svg { width: 17px; height: 17px; }
+header nav a.nav-lab, .plug-btn .plug-s { display: none; }
+@media (max-width: 480px) { .gh-link { display: none; } }
+@media (max-width: 1180px) { .plug-btn { padding: 0 11px; min-width: 44px; height: 44px; justify-content: center; } .plug-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+@media (max-width: 1000px) and (min-width: 761px) { header nav { gap: 6px !important; } .ni-btn { width: 20px; } header nav > a, header nav .ni > a { font-size: 15px; } header .wrap { gap: 12px !important; } }
+@media (max-width: 1100px) { header .wrap { gap: 20px; } header nav { gap: 18px; } .hsearch input { width: 90px; } }
+@media (max-width: 900px) { header nav > a, header nav .ni > a { font-size: 15px; } header nav { gap: 14px; } .hsearch { padding: 0 4px; border-color: transparent; background: transparent; } .hsearch input { display: none; } }
+@media (max-width: 760px) {
+  header .wrap { gap: 10px; position: relative; }
+  .menu-btn { display: inline-flex; }
+  .hsearch { margin-left: auto; }
+  .plug-btn { height: 44px; min-width: 44px; justify-content: center; gap: 6px; padding: 0 12px; } .plug-btn .plug-s { display: inline; font-style: normal; }
+  header.nav-open nav > a.nav-lab { display: block; color: var(--frl-red); font-weight: 600; }
+  header nav { display: none; }
+  header.nav-open nav { max-height: calc(100dvh - var(--menu-top, 144px)); overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; align-items: stretch; gap: 0; position: absolute; top: 100%; left: 0; right: 0; margin: 0; padding: 8px 16px 16px; background: var(--frl-paper); border-bottom: 1px solid var(--frl-line); box-shadow: 0 12px 24px rgba(22,19,18,.12); }
+  header.nav-open nav > a, header.nav-open nav .ni > a { display: block; padding: 12px 4px; font-size: 18px; border-top: 1px solid var(--frl-line); border-bottom: 0; }
+  header.nav-open nav .ni { display: grid; grid-template-columns: 1fr 44px; align-items: center; gap: 0; border-top: 1px solid var(--frl-line); }
+  header.nav-open nav .ni > a { grid-column: 1; border-top: 0; }
+  header.nav-open nav .ni-btn { display: inline-flex; grid-column: 2; grid-row: 1; width: 40px; height: 40px; justify-self: end; }
+  header.nav-open nav .ni:not(.open) .menu { display: none; }
+  header.nav-open nav .ni.open .menu { display: grid; grid-column: 1 / -1; position: static; width: auto; max-width: none; grid-template-columns: 1fr; gap: 4px; padding: 0 0 12px 16px; border: 0; background: transparent; }
+  header.nav-open nav .menu .mi { margin: 0; padding: 8px 8px; }
+  header.nav-open nav .menu .menu-note { display: none; }
+}
+@media (max-width: 380px) { .menu-btn { padding: 0 10px; } }
+/* footer: light, so a page has at most three dark bands (png/R4System.png): the lockup in Fox Red, the sections, About, the disclosure */
+footer { background: var(--frl-paper); color: var(--frl-stone); border-top: 1px solid var(--frl-line); padding: 56px 0 48px; font-size: 15px; line-height: 22px; }
+footer .wrap { display: grid; grid-template-columns: 1.3fr repeat(var(--fcols, 4), minmax(0, 1fr)); gap: 32px; }
+footer h2 { color: var(--frl-ink); line-height: 1.3; font-weight: 600; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 12px; }
+footer a { color: var(--frl-stone); display: block; text-decoration: none; padding: 3px 0; }
+footer a:hover { color: var(--frl-ink); }
+footer .f-brand p { margin: 16px 0 0; max-width: 360px; }
+footer .f-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 24px; border-top: 1px solid var(--frl-line); padding-top: 20px; margin-top: 8px; }
+footer .f-meta a { display: inline; padding: 0; color: var(--frl-ink); font-weight: 500; }
+footer .f-meta .disc { flex-basis: 100%; margin: 8px 0 0; max-width: 680px; }
+@media (max-width: 1000px) { footer .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); } footer .f-brand { grid-column: 1 / -1; } }
+@media (max-width: 520px) { footer .wrap { grid-template-columns: 1fr; } }
+/* the Sources line that replaced the Run details fold */
+.srcline { margin: 40px 0 0; padding-top: 14px; border-top: 1px solid var(--frl-line); font-size: 14px; line-height: 21px; color: var(--frl-stone); }
+.srcline p, .srcline li { font-size: 14px; line-height: 21px; } .srcline .srcline-h { font-weight: 600; color: var(--frl-ink); margin: 0 0 6px; }
+/* the tab strip of a section's pages (site_chrome.tabs) */
+.subtabs { display: flex; flex-wrap: wrap; gap: 4px 24px; border-bottom: 1px solid var(--frl-line); margin: 0 0 28px; }
+.subtabs a { padding: 10px 0; color: var(--frl-stone); text-decoration: none; font-weight: 600; font-size: 16px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.subtabs a:hover { color: var(--frl-ink); } .subtabs a[aria-current="page"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+/* narrow screens: long paths wrap, wide tables scroll inside themselves, never the page */
+main code { overflow-wrap: break-word; } main td code, main dd code { overflow-wrap: anywhere; }
+main select { max-width: 100%; }
+main pre { overflow-x: auto; max-width: 100%; }
+/* inner pages: the home page's 96 px band padding is for its full-width bands, not for sections inside a page */
+:where(main > .wrap) section { padding: 0; }
+:where(main > .wrap) section.blk { padding-top: 48px; }
+@media (max-width: 700px) { :where(main > .wrap) section.blk { padding-top: 36px; } }
+@media (max-width: 760px) {
+  main table { display: block; max-width: 100%; -webkit-overflow-scrolling: touch; }
+  /* every wide table scrolls inside itself, even one whose own style clips it for rounded corners; edge shadows show only
+     while there is more to scroll to (a white table sets --scroll-cover and --scroll-bg to #fff) */
+  main table:not(.ww), main .ww-wrap { overflow-x: auto !important;
+    background: linear-gradient(to right, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) left / 44px 100% no-repeat local,
+                linear-gradient(to left, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) right / 44px 100% no-repeat local,
+                radial-gradient(farthest-side at 0 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) left / 22px 100% no-repeat scroll,
+                radial-gradient(farthest-side at 100% 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) right / 22px 100% no-repeat scroll,
+                var(--scroll-bg, transparent) !important; }
+  main table th, main table td { min-width: 120px; } main table th:first-child, main table td:first-child { min-width: 120px; }
+}
+
+.k-copy { display: flex; align-items: stretch; margin: 8px 0; border: 1.5px solid var(--frl-line); border-radius: 8px; background: var(--frl-cream); overflow: hidden; }
+.k-copy .k-txt { flex: 1; font: 14px/21px var(--frl-code); padding: 10px 12px; white-space: pre-wrap; word-break: break-word; background: none; }
+.k-copy.k-prompt .k-txt { font: 15px/22px var(--frl-font); }
+.k-copy button { border: 0; border-left: 1.5px solid var(--frl-line); background: #fff; font: 600 14px var(--frl-font); padding: 8px 14px; cursor: pointer; white-space: nowrap; }
+.k-tabs { display: flex; flex-wrap: wrap; border-bottom: 1.5px solid var(--frl-line); margin: 4px 0 0; }
+.k-tabs button { border: 0; background: none; font: 600 16px var(--frl-font); padding: 10px 16px; cursor: pointer; color: var(--frl-stone); border-bottom: 3px solid transparent; margin-bottom: -1.5px; text-align: left; }
+.k-tabs button[aria-selected="true"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+.k-tabs button small { display: block; font-weight: 400; font-size: 12px; }
+.k-panel { padding: 18px 0 0; } .k-panel[hidden] { display: none; } .k-panel > p:first-child { margin-top: 0; }
+.k-steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.k-steps > li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+.k-steps > li > div { min-width: 0; } .k-steps code { overflow-wrap: anywhere; }
+.k-steps > li::before { content: counter(s); width: 30px; height: 30px; border-radius: 50%; background: var(--frl-ink); color: #fff; font: 700 15px/30px var(--frl-font); text-align: center; }
+.k-steps p { margin: 2px 0 6px; }
+.k-see { color: var(--ok); font-size: 15px; margin: 6px 0 0; } .k-see b { font-weight: 600; }
+.k-note { font-size: 14px; color: var(--frl-stone); margin: 4px 0 0; }
+.k-way { font-weight: 600; margin: 4px 0; }
+.k-kit { margin: 16px 0 0; padding: 14px 16px; border-radius: 10px; background: var(--frl-cream); border: 1.5px solid var(--frl-line); }
+.k-kit-h { font-weight: 700; margin: 0 0 8px; font-size: 16px; }
+.k-kit label { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 21px; margin: 6px 0; cursor: pointer; }
+.k-kit label small { color: var(--frl-stone); display: block; font-size: 13px; }
+.k-kit input { margin-top: 3px; accent-color: var(--frl-red); width: 16px; height: 16px; }
+.k-os { display: inline-flex; border: 1.5px solid var(--frl-ink); border-radius: 8px; overflow: hidden; margin: 0 0 8px; }
+.k-os button { border: 0; background: #fff; font: 600 14px var(--frl-font); padding: 6px 14px; cursor: pointer; }
+.k-os button + button { border-left: 1.5px solid var(--frl-ink); }
+.k-os button[aria-pressed="true"] { background: var(--frl-ink); color: #fff; }
+.k-prev-h { font: 600 12px var(--frl-font); text-transform: uppercase; letter-spacing: .04em; color: var(--frl-stone); margin: 12px 0 4px; }
+.k-prev { margin: 0; padding: 10px 12px; background: #fff; border: 1.5px dashed var(--frl-line); border-radius: 8px; font-size: 14px; line-height: 21px; }
+.k-go { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.k-go button { border: 0; background: var(--frl-ink); color: #fff; border-radius: 8px; font: 600 15px var(--frl-font); padding: 10px 16px; cursor: pointer; }
+.k-go a { font-size: 14px; }
+@media (max-width: 760px) { .k-tabs button { padding: 8px 10px; font-size: 15px; } }
+
+/* the kit sits in a light card; its copy button and links follow the page */
+#takehome .k-kit { margin: 0; }
+#takehome .k-os button { color: var(--frl-ink); min-height: 0; } #takehome .k-os button[aria-pressed="true"] { color: #fff; }
+#takehome .k-go button { color: #fff; min-height: 0; } #takehome .k-go button:hover { background: var(--frl-red); }
+/*/bench-chrome:css*/
+</style>
+<link rel="stylesheet" href="../../chip/chipview.css">
+<link rel="stylesheet" href="lab.css">
+</head>
+<body>
+<!--bench-chrome:header--><header class="dark">
+  <div class="wrap">
+    <a href="../../index.html" class="brand"><svg class="logo logo-head" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg></a>
+    <nav id="site-nav" aria-label="Main"><div class="ni"><a href="../../projects.html">Builds</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="build-menu" aria-label="Build filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="build-menu"><a class="mi" href="../../projects.html?f=smart-home"><b>Smart home</b><span>Home Assistant, Matter, Apple Home</span></a><a class="mi" href="../../projects.html?f=ai"><b>Edge AI</b><span>Occupancy, digits, vision on Linux</span></a><a class="mi" href="../../projects.html?f=radio"><b>Radio and range</b><span>Walkie-talkie, key finder, far shed sensor</span></a><a class="mi" href="../../projects.html?f=motors"><b>Motors, power and sensing</b><span>Control loops, radar presence, sensors</span></a><a class="mi" href="../../projects.html?f=screens"><b>Screens</b><span>Touch displays on a development kit</span></a><a class="mi" href="../../security.html"><b>Security</b><span>Post-quantum key exchange, AES</span></a><p class="menu-note">New here? <a href="../../project-blink.html">Blink an LED first</a>, or <a href="../../projects.html">see all 39 builds</a>.</p></div></div><div class="ni"><a href="../../hardware.html">Hardware</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="hardware-menu" aria-label="Hardware pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="hardware-menu"><a class="mi" href="../../hardware.html"><b>The kits</b><span>Every kit a build ran on, what ran, where to get it</span></a><a class="mi" href="../../addons.html"><b>Add-ons and parts</b><span>Screens, sensors, radios, motors and probes, from any maker</span></a></div></div><div class="ni"><a href="../../portability.html">Software</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="software-menu" aria-label="Software pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="software-menu"><a class="mi" href="../../portability.html"><b>Bring your code</b><span>Arduino, ESPHome, Zephyr, MicroPython, STM32, ESP32 and Pico code on a TI board</span></a><a class="mi" href="../../ports.html"><b>Every port</b><span>What ran, what only built, what changed, with the code</span></a><a class="mi" href="../../one-app-eleven-boards.html"><b>One app, eleven boards</b><span>The same C file from an MSPM0 to AM62L Linux</span></a><a class="mi" href="../../project-build-from-terminal.html"><b>Build from the terminal</b><span>TI&#x27;s SDK examples with GCC and a makefile, no IDE</span></a><a class="mi" href="../../benchmarks.html"><b>Measured</b><span>Every board on the same tests, with the method</span></a><a class="mi" href="../../edge-ai.html"><b>Edge AI</b><span>Where to start, and the measured numbers</span></a></div></div><div class="ni"><a href="../../community.html">Community</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="about-menu" aria-label="Community pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="about-menu"><a class="mi" href="../../community.html"><b>Community</b><span>Post what you built or ported; it gets a page here</span></a><a class="mi" href="https://github.com/Fox-Red-Labs/fox-red-labs"><b>Get the code</b><span>The repository: board folders, ports and portable code</span></a></div></div></nav>
+    <form class="hsearch" action="../../search.html" role="search"><input name="q" type="search" placeholder="Search" aria-label="Search the site" title="Search the site (press /)"><button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></form>
+    <a class="gh-link" href="https://github.com/Fox-Red-Labs/fox-red-labs" aria-label="Fox Red Labs on GitHub"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
+    
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><svg class="mb-o" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="mb-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Menu</button>
+  </div>
+<script>
+(function () {
+  var h = document.currentScript.closest("header"), b = h.querySelector(".menu-btn");
+  function set(open) { if (open) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); h.classList.toggle("nav-open", open); b.setAttribute("aria-expanded", open ? "true" : "false"); }
+  window.addEventListener("resize", function () { if (h.classList.contains("nav-open")) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); });
+  b.addEventListener("click", function () { set(b.getAttribute("aria-expanded") !== "true"); });
+  h.querySelectorAll("nav a").forEach(function (a) { a.addEventListener("click", function () { set(false); }); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (h.classList.contains("nav-open")) { set(false); b.focus(); } h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  document.addEventListener("click", function (e) { if (!h.contains(e.target)) { set(false); h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  h.querySelectorAll(".ni-btn").forEach(function (t) {
+    t.addEventListener("click", function () { var n = t.closest(".ni"), open = !n.classList.contains("open"); n.classList.toggle("open", open); t.setAttribute("aria-expanded", open ? "true" : "false"); });
+  });
+  var f = h.querySelector(".hsearch"), q = f && f.querySelector("input");
+  if (f) f.addEventListener("submit", function (e) { if (getComputedStyle(q).display === "none" || !q.value.trim()) { e.preventDefault(); location.href = "../../search.html"; } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || /input|textarea|select/i.test(e.target.tagName) || e.target.isContentEditable) return;
+    e.preventDefault(); var s = document.getElementById("sq");
+    if (s) s.focus(); else if (q && getComputedStyle(q).display !== "none") q.focus(); else location.href = "../../search.html";
+  });
+})();
+</script>
+</header><!--/bench-chrome:header-->
+<main>
+<dialog id="picker" aria-labelledby="pk-title">
+  <div class="pk-h"><h2 id="pk-title">All demos for this board</h2><button type="button" class="quiet" id="pk-close">Close</button></div>
+  <p class="small" id="pk-sub"></p>
+  <div class="pk-tools">
+    <label>Search<input id="pk-q" type="search" placeholder="blink, radio, screen" autocomplete="off"></label>
+    <label>Level<select id="pk-level"><option value="">All</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label>
+    <label>Runs<select id="pk-where"><option value="">Anywhere</option><option value="page">In this page</option><option value="computer">On your computer</option></select></label>
+    <label>Sort by<select id="pk-sort"><option value="level">Level, easiest first</option><option value="name">Name</option><option value="where">Where it runs</option></select></label>
+  </div>
+  <p class="small" id="pk-count" role="status"></p>
+  <ul id="pk-list" class="pk-list"></ul>
+</dialog>
+<div class="lab-hero">
+  <h1 class="dl-title">Digital Lab: program and test a TI LaunchPad in your browser</h1>
+  <p class="lede" id="lab-lede">Pick any board, even one you do not own, and see an example run inside its chip. With a board connected you also get its pins, a map of its registers and its serial output. It is not a source debugger: no breakpoints or stepping. Tested on a Mac in Chrome (November 2026); Windows has not been tried yet.</p>
+  <details id="cap-box" class="cap"><summary>What it does, and what it does not</summary>
+  <p class="small" id="cap-line">What it does: saves the board's flash, writes a demo through the board's debug probe, starts it and checks the result (an LED pin, values in the chip's memory, or its serial output), then puts the saved copy back when you ask. It is not a source debugger: no breakpoints, stepping, or register and memory views. For those, use CCStudio, or GDB with OpenOCD from the terminal route below.</p></details>
+</div>
+<div id="unsupported" class="card un-card hidden" style="border-left:4px solid var(--red)">
+  <p class="un-line"><b class="result" id="un-what">Open this page in Chrome or Edge.</b> <span id="un-next">Chrome and Edge on a computer, and Chrome on an Android phone, can talk to a board over USB.</span></p>
+  <p class="un-actions"><button type="button" class="quiet" id="un-copy">Copy link</button> <a class="quiet" id="un-mail" href="mailto:?subject=Fox%20Red%20Labs%20Digital%20Lab">Email me the link</a> <a class="quiet" href="../../projects.html">Browse the demos</a> <span class="small" id="un-note" role="status"></span></p>
+  <details class="un-more"><summary class="small">What you can still do here</summary>
+  <p class="small">"Go further" below needs no board.</p>
+  <p class="small">From this phone or browser you can still read the demos, see the wiring and copy the commands. To run one on a board, send yourself the link and open it on a computer.</p></details>
+</div>
+<ol class="stepper" id="stepper" aria-label="Where you are">
+  <li data-step="connect"><span class="n">1</span>Connect</li>
+  <li data-step="pick"><span class="n">2</span>Pick</li>
+  <li data-step="watch"><span class="n">3</span><span>Watch<span class="st-more"> it work</span></span></li>
+</ol>
+<p class="safe" id="safe" data-tone="neutral" role="status"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg><span><b id="safe-lead">The page saves a copy of the board's flash before it writes anything.</b> <span id="safe-text"></span></span></p>
+<div id="startup" class="card" role="status">
+  <b id="startup-title">Loading the bench...</b>
+  <p id="startup-help">Board choices appear when loading finishes.</p>
+  <pre id="startup-detail" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+</div>
+<noscript><p class="card">This bench needs JavaScript enabled to connect to a board.</p></noscript>
+<div class="conn-bar" id="conn-bar" hidden><b id="cb-kit"></b><span class="small" id="cb-serial"></span><button type="button" class="quiet" id="cb-switch">Switch</button></div>
+<section id="scene" data-state="idle" aria-label="What is connected">
+  <div class="scene-top">
+    <span class="lab-th"><img id="lab-thumb" src="" alt="" width="72" height="54" hidden></span>
+    <div class="lab-who"><b id="lab-name">No board connected</b><span id="lab-stat" role="status"><i class="lab-dot"></i><span id="lab-stat-t">No board connected</span></span></div>
+    <p id="found" role="status"></p><button id="found-help" type="button" class="quiet hidden">Show what to check</button><button id="found-diag" type="button" class="quiet diag-btn hidden">Download a diagnostic record</button>
+    <span class="grow"></span>
+    <button id="connect" disabled>Connect a board</button>
+    <label class="lab-pick">Look at another board<select id="board-preview" title="Connect identifies the chip behind the XDS110 you choose; this preview cannot override that check"></select></label>
+    <a id="lab-boardlink" class="lab-bl" href="../../index.html" hidden>Board page</a>
+  </div>
+  <div class="scene-art">
+    <svg viewBox="40 18 1050 200" role="img" aria-label="A laptop connected by a USB cable to the board">
+      <g transform="translate(60 30)">
+        <rect x="0" y="0" width="250" height="150" rx="10" fill="rgba(247,243,236,0.08)" stroke="rgba(247,243,236,0.14)" stroke-width="2"></rect>
+        <rect x="12" y="12" width="226" height="126" rx="5" fill="#161312"></rect>
+        <rect x="-20" y="152" width="290" height="14" rx="5" fill="rgba(247,243,236,0.12)"></rect>
+        <rect x="100" y="152" width="50" height="4" rx="2" fill="#6B625B"></rect>
+        <g font-family="Barlow, sans-serif" font-size="12" fill="rgba(247,243,236,.72)">
+          <text id="scr0" x="24" y="36" fill="#F7F3EC">bench</text>
+          <text id="scr1" x="24" y="58">waiting for a board</text>
+          <text id="scr2" x="24" y="78"></text>
+          <text id="scr3" x="24" y="98"></text>
+          <text id="scr4" x="24" y="118">plug the cable in</text>
+        </g>
+        <rect id="scr-bar" x="24" y="126" width="0" height="4" rx="2" fill="#B42418"></rect>
+      </g>
+      <path d="M330 150 C 440 150, 470 118, 560 118 S 700 118, 760 118" fill="none" stroke="rgba(247,243,236,0.14)" stroke-width="7" stroke-linecap="round"></path>
+      <path class="cable-dash" d="M330 150 C 440 150, 470 118, 560 118 S 700 118, 760 118" fill="none" stroke-width="3" stroke-linecap="round" stroke-dasharray="14 12"></path>
+      <rect x="316" y="140" width="22" height="20" rx="3" fill="color-mix(in srgb,#6B625B 45%,#fff)"></rect>
+      <rect class="plug" x="752" y="108" width="22" height="20" rx="3" fill="color-mix(in srgb,#6B625B 45%,#fff)"></rect>
+      <text id="cable-label" x="545" y="96" text-anchor="middle" font-family="Barlow, sans-serif" font-size="13" font-weight="600" fill="rgba(247,243,236,.5)">plug in a USB cable that carries data</text>
+      <g class="packets out"><circle r="6" style="offset-path:path('M330 150 C 440 150, 470 118, 560 118 S 700 118, 760 118')"></circle><circle r="6" style="offset-path:path('M330 150 C 440 150, 470 118, 560 118 S 700 118, 760 118');animation-delay:.47s"></circle><circle r="6" style="offset-path:path('M330 150 C 440 150, 470 118, 560 118 S 700 118, 760 118');animation-delay:.93s"></circle></g>
+      <g class="packets back"><circle r="5" style="offset-path:path('M760 118 S 700 118, 560 118 C 470 118, 440 150, 330 150')"></circle><circle r="5" style="offset-path:path('M760 118 S 700 118, 560 118 C 470 118, 440 150, 330 150');animation-delay:.8s"></circle></g>
+      <g class="board" transform="translate(775 22)">
+        <rect x="0" y="0" width="300" height="190" rx="10" fill="#B42418" stroke="#8E1C13" stroke-width="2"></rect>
+        <rect x="-14" y="88" width="20" height="30" rx="3" fill="color-mix(in srgb,#6B625B 45%,#fff)"></rect>
+        <rect x="26" y="14" width="78" height="46" rx="4" fill="#8E1C13"></rect>
+        <text x="65" y="42" text-anchor="middle" font-family="Barlow, sans-serif" font-size="9" fill="#F7F3EC">XDS110</text>
+        <g fill="#C98500"><rect x="14" y="78" width="7" height="7"></rect><rect x="14" y="94" width="7" height="7"></rect><rect x="14" y="110" width="7" height="7"></rect><rect x="14" y="126" width="7" height="7"></rect><rect x="14" y="142" width="7" height="7"></rect><rect x="14" y="158" width="7" height="7"></rect><rect x="279" y="78" width="7" height="7"></rect><rect x="279" y="94" width="7" height="7"></rect><rect x="279" y="110" width="7" height="7"></rect><rect x="279" y="126" width="7" height="7"></rect><rect x="279" y="142" width="7" height="7"></rect><rect x="279" y="158" width="7" height="7"></rect></g>
+        <rect x="122" y="80" width="60" height="60" rx="5" fill="#161312"></rect>
+        <text id="scene-chip" x="152" y="113" text-anchor="middle" font-family="Barlow, sans-serif" font-size="9" fill="rgba(247,243,236,.5)">MCU</text>
+        <rect x="214" y="150" width="30" height="22" rx="3" fill="#F4EFE9"></rect>
+        <circle id="led-glow" cx="229" cy="161" r="22" fill="#F0563F"></circle>
+        <circle id="led" cx="229" cy="161" r="8" fill="#F0563F"></circle>
+        <text x="229" y="186" text-anchor="middle" font-family="Barlow, sans-serif" font-size="10" font-weight="700" fill="#F7F3EC">LED</text>
+        <text id="scene-kit" x="122" y="40" font-family="Barlow, sans-serif" font-size="12" font-weight="700" letter-spacing="1.5" fill="#F7F3EC">LAUNCHPAD</text>
+      </g>
+    </svg>
+  </div>
+  <details class="scene-foot lab-conn-help"><summary>Boards this page can see, and help connecting</summary>
+    <div class="bd-panel" id="bd-panel">
+      <div class="bd-h"><b>Boards this page can see</b><button id="survey" class="quiet dark hidden" type="button">Check them again</button></div>
+      <ul id="boards" class="boards"></ul>
+      <p class="small" id="bd-empty">None yet. Plug a board in with its USB cable, press Connect and choose its XDS110 in the list Chrome shows.</p>
+      <details class="preview-fold" id="bd-limits"><summary>Why only these?</summary>
+        <p class="small">A web page may list only the boards you have already allowed on this site: that is all the browser lets it see. A board you plugged in but never chose appears after you press Connect and pick it once, and then stays on this list. This page can read only an XDS110 debug probe, so a board with another kind of USB port does not show. A probe that CCStudio, UniFlash or another tab holds shows as not checked until that program lets go.</p></details>
+    </div>
+    <p id="chip-facts" class="hidden"></p>
+    <p id="boards-note">Plug the board in with its USB cable. Chrome lists it as XDS110: pick it.</p>
+    <details class="preview-fold" id="env"><summary>Before you connect: Mac, Windows, Linux, Chromebook, and what can block it</summary>
+      <p class="small" id="env-mac"><b>Mac</b>: Chrome or Edge, nothing to install.</p>
+      <p class="small" id="env-windows"><b>Windows</b> (not tried yet): Chrome or Edge; the XDS110 needs no driver for this page. If the list stays empty, unplug the board and plug it in again; Windows installs its own USB driver the first time.</p>
+      <p class="small" id="env-linux"><b>Linux</b>: Chrome or Edge, plus two udev rules so your user may open the probe (in the table at the bottom). Without them Chrome lists the board but cannot open it.</p>
+      <p class="small" id="env-chromebook"><b>Chromebook and school PCs</b>: works when the administrator allows this site to use USB devices (the WebHID and Serial device policies).</p>
+      <p class="small" id="env-browser"><b>Not here</b>: Safari, Firefox and iPhone cannot talk to the board; Chrome on an Android phone can, with an OTG adapter. The page must be on https or localhost.</p>
+      <p class="small" id="env-nolist"><b>Chrome's list is empty</b>: use a USB cable that carries data (many are charge-only), plug it into the board's debug USB port, and check the board's power LED is on. Press Connect again.</p>
+      <p class="small" id="env-busy"><b>Board or port busy</b>: close CCStudio, UniFlash, any terminal program and other browser tabs that hold the probe, then unplug the board, plug it in and press Connect.</p>
+      <p class="small" id="env-policy"><b>Blocked by the browser</b>: open chrome://policy and look for rules that turn off WebHID, WebUSB or Web Serial. A work or school administrator sets those.</p>
+      <p class="small" id="env-firmware"><b>Probe firmware too old</b>: update the XDS110 firmware with TI's xdsdfu, then press Connect.</p></details>
+    <div class="lab-cov" aria-label="Board support"><p class="small" id="board-coverage"></p><a id="board-instructions">Board notes and instructions</a></div>
+  </details>
+  <img id="board-pic" class="hidden" alt="">
+</section>
+<section id="res" class="res hidden" aria-label="The chip's resources">
+  <div class="res-tile res-chip"><span class="res-l">The chip</span>
+    <div class="res-row"><span class="res-k">Flash</span><b id="res-flash">unknown</b><span class="res-s" id="res-flash-s">program storage</span><span class="res-bar" aria-hidden="true"><i id="res-flash-bar"></i></span></div>
+    <div class="res-row"><span class="res-k">RAM</span><b id="res-ram">unknown</b><span class="res-s" id="res-ram-s">working memory</span><span class="res-bar" aria-hidden="true"><i id="res-ram-bar"></i></span></div>
+    <div class="res-row"><span class="res-k">Clock</span><b id="res-clock">unknown</b><span class="res-s">CPU</span></div>
+  </div>
+  <div class="res-tile"><span class="res-l">I/O this demo drives</span><b id="res-io" class="res-list">pick a demo</b><span class="res-s" id="res-io-s"></span>
+    <details class="res-pins" id="res-pins"><summary class="res-s">All pins of the chip</summary><div id="pinout" class="pinout"></div><p class="res-s" id="pinout-src"></p></details></div>
+  <details class="res-tile res-os"><summary class="res-l">What fits beside it</summary><select id="res-os" class="res-sel" aria-label="A build measured on this board"></select><b id="res-os-left" class="res-left"></b><span class="res-s" id="res-os-s"></span></details>
+</section>
+<section class="card hidden" id="ota" aria-label="Update over Wi-Fi"></section>
+<!--lab-v7:examples-->
+<section id="lab-examples" aria-label="Examples" hidden>
+  <div class="sec-h"><h2>Examples</h2><p class="small" id="lab-ex-sub"></p></div>
+  <div id="lab-chip-mount"></div>
+</section>
+<template id="lab-chip-tpl"><div class="cv-page" id="cv-root">
+  <div class="cv-cards" id="builds"></div>
+  <section id="inside" aria-label="Inside the chip"><div class="cv-panel">
+    <div class="cv-panel-h"><h2 id="cv-ptitle"></h2><p>How it runs inside the chip, drawn from the build's code. Click a step or a block to follow one job.</p></div>
+    <p class="cv-wiring" id="cv-wiring"></p>
+    <div class="cv-grid"><div class="cv-chipwrap"><div class="cv-mode" role="group" aria-label="Chip view"><button type="button" data-mode="focus" aria-pressed="false">Just what runs</button><button type="button" data-mode="whole" aria-pressed="false">Whole chip</button></div><div class="cv-frame"><div id="cv-chipmount"></div></div>
+      <p class="cv-now" id="cv-now" aria-live="polite">Tap a block or a step to follow one job.</p><div class="cv-legend" id="cv-legend"></div></div>
+      <div class="cv-listcol"><h3>The steps</h3><div id="cv-list"></div></div></div>
+  </div></section>
+</div></template>
+<!--/lab-v7:examples-->
+<div class="c-work">
+  <div class="card" id="pick">
+    <div class="head"><h2 class="eyebrow">Run one on your board</h2><p class="small" id="recipes-note"></p></div>
+    <div class="row"><button class="quiet" id="all-demos" type="button">All demos for this board</button></div>
+    <ol id="learn" class="learn small hidden" aria-label="A short path for learning"></ol>
+    <div id="recipes" class="recipes"></div>
+  </div>
+  <section id="detail" class="c-stage hidden" aria-label="The demo">
+    <div class="c-stage-h"><h2 id="r-title"></h2>
+      <div class="c-share"><a class="quiet c-full" id="c-full" href="#takehome">Run the full version</a> <button type="button" class="quiet" id="c-share-btn" aria-haspopup="true" aria-expanded="false">Share</button>
+        <div class="c-menu" id="c-menu" hidden>
+          <button type="button" data-share="link">Copy a link to this setup<small>Opens the bench with this board and demo</small></button>
+          <button type="button" data-share="picture">Save the result as a picture<small>For a post, an email or a slide</small></button>
+          <a class="c-menu-a" id="c-report" href="https://github.com/Fox-Red-Labs/fox-red-labs/issues/new?template=built-it.yml" target="_blank" rel="noopener">Report your build<small>Opens a prefilled report on GitHub</small></a>
+        </div></div>
+    </div>
+    <div class="c-go"><div class="ring-wrap">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--line)" stroke-width="6"></circle><circle id="ring" cx="50" cy="50" r="44" fill="none" stroke="var(--red)" stroke-width="6" stroke-linecap="round" transform="rotate(-90 50 50)"></circle></svg>
+      <button id="go">Flash it</button>
+    </div><p class="small" id="go-note"></p>
+      <div class="est" id="est" hidden role="status" aria-live="polite"><div class="est-bar"><i id="est-bar"></i></div><p class="small" id="est-text"></p></div></div>
+    <div class="c-tabs" role="tablist" aria-label="What to do with this demo">
+      <button type="button" role="tab" id="t-see" aria-selected="true" data-p="see">See it</button>
+      <button type="button" role="tab" id="t-change" aria-selected="false" data-p="change">Change it</button>
+      <button type="button" role="tab" id="t-talk" aria-selected="false" data-p="talk">Console<small id="t-talk-why" hidden></small></button>
+      <button type="button" role="tab" id="t-live" aria-selected="false" data-p="live">Live values</button>
+      <button type="button" role="tab" id="t-ai" aria-selected="false" data-p="ai" hidden>Edge AI</button>
+    </div>
+    <div class="c-pane" id="p-see" role="tabpanel">
+      <p class="small" id="r-see"></p>
+      <div id="r-wiring" class="hidden"></div>
+      <div id="loop" class="hidden">
+          <p class="lp-wire" id="lp-wire"></p>
+          <svg id="lp-chart" viewBox="0 0 320 220" role="img" aria-label="DAC code asked against ADC reading">
+            <rect x="40" y="10" width="270" height="180" fill="none" stroke="var(--line)"></rect>
+            <line x1="40" y1="190" x2="310" y2="10" stroke="var(--line)" stroke-dasharray="4 4"></line>
+            <polyline id="lp-line" fill="none" stroke="var(--red)" stroke-width="2.5" points=""></polyline>
+            <text x="175" y="212" text-anchor="middle" font-size="11" fill="var(--muted)">DAC code asked, 0 to 4095</text>
+            <text x="14" y="100" text-anchor="middle" font-size="11" fill="var(--muted)" transform="rotate(-90 14 100)">ADC read</text>
+          </svg>
+          <p class="small" id="lp-note">Press Start: the page sweeps the DAC and plots what the ADC reads.</p>
+        </div>
+      <div id="digit" class="hidden">
+          <div class="dg-pad"><div class="dg-lock" id="dg-lock"><p><b id="dg-lock-h">The digit reader is not on the chip yet.</b></p><p class="small" id="dg-lock-t">Press the red button to put it on the board. The pad wakes up when the chip answers.</p><button type="button" id="dg-start">Start the digit reader</button></div><canvas id="dg-canvas" width="288" height="288" aria-label="Drawing pad: draw one digit"></canvas>
+            <div class="row"><button class="quiet" id="dg-clear">Clear</button><span class="small" id="dg-hint">Draw one digit, 0 to 9.</span></div></div>
+          <div class="dg-side">
+            <p class="dg-answer"><span id="dg-ans">?</span></p>
+            <p class="small" id="dg-time">The chip's answer appears here when you lift your finger.</p>
+            <canvas id="dg-in" width="160" height="160" aria-label="What the chip sees: the drawing at 16 by 16"></canvas>
+            <p class="small">What the chip sees: 16 × 16 pixels.</p>
+          </div>
+        </div>
+      <div id="occ" class="hidden">
+        <p class="small" id="oc-lock">Press the red button to put the model on the board. The windows wake up when the chip has read its own 20.</p>
+        <div id="oc-wins" class="oc-wins" role="group" aria-label="The chip's 20 stored windows"></div>
+        <canvas id="oc-chart" width="640" height="160" aria-label="The window: light, sound, CO2 and motion over 32 samples"></canvas>
+        <p class="oc-ans"><span class="small">True count</span> <b id="oc-true">?</b> <span class="small">Chip says</span> <b id="oc-ans">?</b></p>
+        <p class="small" id="oc-time">Pick a window.</p>
+      </div>
+      <div id="thermo" class="hidden">
+          <svg class="dial" viewBox="0 0 200 200" role="img" aria-label="Thermometer dial">
+            <circle cx="100" cy="100" r="82" fill="none" stroke="var(--line)" stroke-width="14" stroke-linecap="round" transform="rotate(135 100 100)" style="stroke-dasharray:386 516"></circle>
+            <circle id="th-arc" cx="100" cy="100" r="82" fill="none" stroke="var(--red)" stroke-width="14" stroke-linecap="round" transform="rotate(135 100 100)" style="stroke-dasharray:0 516"></circle>
+            <circle id="th-knob" cx="42" cy="158" r="11" fill="var(--card)" stroke="var(--red)" stroke-width="4"></circle>
+            <text id="th-num" x="100" y="100" font-size="50" font-weight="700" text-anchor="middle" fill="var(--fg)">--</text>
+            <text x="100" y="126" font-size="13" font-weight="600" text-anchor="middle" fill="var(--red)" letter-spacing="2">CHIP TEMP °C</text>
+            <text id="th-f" x="100" y="148" font-size="13" text-anchor="middle" fill="var(--muted)"></text>
+            <text x="34" y="190" font-size="11" text-anchor="middle" fill="var(--muted)">10°</text>
+            <text x="166" y="190" font-size="11" text-anchor="middle" fill="var(--muted)">40°</text>
+          </svg>
+          <div class="th-side">
+            <canvas id="th-chart" width="600" height="140"></canvas>
+            <p class="small" id="th-note">Put the thermometer on the board, then touch the chip with a finger.</p>
+            <button class="quiet hidden" id="th-stop">Stop reading</button>
+          </div>
+        </div>
+      <div id="watch" class="hidden" aria-live="polite">
+          <div class="wt-row"><span id="wt-a-l">Button</span><b id="wt-a">--</b></div>
+          <div class="wt-row"><span id="wt-b-l">LED pin</span><b id="wt-b">--</b></div>
+          <div class="wt-bar" aria-hidden="true"><i id="wt-bar"></i></div>
+          <p class="small" id="wt-note"></p>
+        </div>
+      <div id="live" class="hidden">
+          <div class="row">
+            <button class="quiet" data-oob="light">Light sensor</button>
+            <button class="quiet" data-oob="thermometer">Thermometer</button>
+            <button class="quiet" data-oob="blink">Blink LED</button>
+            <label class="small">blink every <select id="oob-rate"><option value="26">0.1 s</option><option value="64">0.25 s</option><option value="128" selected>0.5 s</option><option value="255">1 s</option></select></label>
+            <button class="quiet" data-oob="stop">Stop</button>
+          </div>
+          <p class="result" id="oob-value"></p>
+          <canvas id="oob-chart" width="700" height="120"></canvas>
+          <p class="small" id="oob-note"></p>
+        </div>
+      <div id="result-card" class="res-pane hidden">
+    <div class="head"><h2 class="eyebrow" id="result-head">Result</h2><p class="small">read back from the board</p></div>
+    <div id="result" class="hidden">
+      <p id="verdict" class="result"></p>
+      <div id="asked-row" class="strip-row hidden"><span>Asked</span><span id="asked-text" class="mono"></span></div>
+      <div id="asked" class="bars"></div>
+      <div id="did-row" class="strip-row hidden"><span>Board did</span><span id="did-text" class="mono"></span></div>
+      <div id="bars" class="bars" aria-hidden="true"></div>
+      <div id="overlay" class="overlay"></div>
+      <div id="overlay-take" class="row hidden"><button class="quiet" id="ov-csv">Download the points (CSV)</button><button class="quiet" id="ov-xlsx">Download the workbook (.xlsx)</button></div>
+      <div id="stats" class="stats"></div>
+      <p id="next" class="small"></p>
+      <p class="putback-row" id="r-putback" hidden><button type="button" class="quiet" id="r-putback-btn">Put the board back the way it was</button> <span class="small">chooses the copy saved before the write; you confirm before anything is written</span></p>
+      <p class="small diag-row"><button type="button" class="quiet diag-btn">Download a diagnostic record</button> for a problem report: the steps and their outcome, with no flash contents, Wi-Fi names or passwords, addresses or full probe serial numbers.</p>
+      <details><summary class="small">Details</summary><p id="measured" class="small"></p></details>
+    </div>
+    <div id="wait">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+      <span id="wait-text">The board's answer lands here.</span>
+    </div>
+  </div>
+      <ol id="chips" class="chips" aria-label="Steps"></ol>
+      <details id="log-box"><summary class="small">Details</summary><ul id="log" class="steps"></ul></details>
+      <details id="r-more"><summary class="small">How it works</summary><p id="r-outcome" class="small"></p><p id="r-before" class="small"></p><p id="r-writes" class="small"></p><p class="small" id="r-proves"></p><p class="small" id="about"></p></details>
+    </div>
+    <div class="c-pane" id="p-change" role="tabpanel" hidden>
+      <p class="small" id="c-change-note"></p>
+      <div id="controls" class="editor hidden" aria-label="No-code controls">
+          <div class="ct-wrap">
+            <div class="ct-main">
+              <div class="ct-head">
+                <details class="ct-plus" id="ct-plus"><summary class="quiet" title="Add one I/O to control">+ Add</summary>
+                  <div class="ct-menu" id="ct-menu"></div></details>
+                <label class="small">Plugged-in BoosterPack <select id="ct-bp"><option value="">none</option></select></label>
+              </div>
+              <p class="small" id="ct-bp-note"></p>
+              <div id="ct-rows"></div>
+              <p class="small" id="ct-limit"></p>
+              <p class="small" id="ct-verdict"></p>
+            </div>
+            <figure class="ct-fig"><div class="ct-bd" id="ct-bd" role="img" aria-label="The LaunchPad kit's headers with the chosen pins lit"></div>
+              <figcaption class="small" id="ct-bd-cap">The chosen pin is lit with its setup; the bus pins show when a bus row is listed. Positions: TI's SLAU869E figure 2-9.</figcaption></figure>
+          </div>
+        </div>
+      <div id="c-params" class="editor hidden" aria-label="Settings the program reads from the board">
+        <div id="cp-rows"></div>
+        <div class="c-row"><button type="button" id="cp-send">Send to the board</button><button type="button" class="quiet" id="cp-reset">Back to defaults</button></div>
+        <p class="small" id="cp-note"></p>
+      </div>
+      <div id="editor" class="editor hidden">
+          <div class="presets" id="presets"></div>
+          <div id="steps-ed"></div>
+          <div class="row"><button class="quiet" id="add-step">Add a step</button><span id="total" class="small"></span></div>
+        </div>
+      <div id="ble" class="hidden"></div>
+      <p class="small" id="f-change2"></p>
+    </div>
+    <div class="c-pane" id="p-ai" role="tabpanel" hidden>
+    <div id="ai-pick" class="ai-pick hidden" aria-label="Pick an AI model">
+      <h3 class="eyebrow">Pick an AI model and see how it does</h3>
+      <p class="small" id="ai-pick-note">Each model is a program on the chip. Press one, flash it, run it: the chip's answer, cycles, time, flash and RAM appear beside our measured row.</p>
+      <div id="ai-models" class="ai-cards"></div>
+    </div>
+      <table class="c-ai"><tbody id="c-ai-rows"></tbody></table>
+      <p class="small">Measured on this board in this session. Numbers for other chips: <a id="ai-edge" href="../../edge-ai.html">the Edge AI page</a>.</p>
+    </div>
+    <div class="c-deeper" id="deeper" aria-label="Go deeper"><b>Go deeper</b> <span id="deeper-links"></span></div>
+    <div class="c-plan" id="c-plan" hidden>
+      <h3>Before it writes</h3>
+      <table id="c-plan-t"></table>
+      <dl id="r-recovery" class="recovery hidden" aria-label="What this write saves and changes"></dl>
+      <div class="c-row"><button type="button" id="c-write">Write it</button><button type="button" class="quiet" id="c-cancel">Cancel</button></div>
+    </div>
+  </section>
+</div>
+
+<section id="lab-debug" class="lab-debug" aria-label="Debugger">
+  <div class="sec-h"><h2>Pins, registers, serial and live values</h2></div>
+  <div class="dbg-box">
+    <div class="dbg-tabs" id="dbg-tabs" role="tablist" aria-label="Debugger"><button type="button" role="tab" id="dt-pins" data-dt="pins" aria-selected="true">Pins</button><button type="button" role="tab" id="dt-regs" data-dt="regs" aria-selected="false">Registers</button><button type="button" role="tab" id="dt-con" data-dt="con" aria-selected="false">Serial</button><button type="button" role="tab" id="dt-live" data-dt="live" aria-selected="false">Live</button></div>
+    <div class="dbg-pane" id="p-pins" role="tabpanel" aria-labelledby="dt-pins"></div>
+    <div class="dbg-pane" id="p-regs" role="tabpanel" aria-labelledby="dt-regs" hidden></div>
+    <div class="dbg-pane" id="p-talk" role="tabpanel" aria-labelledby="dt-con" hidden>
+      <div class="c-con" id="c-con" aria-live="polite"></div>
+      <div class="c-row"><button type="button" id="c-con-open">Open the serial port</button><input id="c-con-in" type="text" placeholder="Type a line to send" autocomplete="off" disabled><button type="button" class="quiet" id="c-con-send" disabled>Send</button><button type="button" class="quiet" id="c-con-clear">Clear</button></div>
+      <div class="c-row con-opts"><label class="small" title="The speed of the serial link. It must match the program on the board; the demos use 115200.">Baud <select id="c-con-baud"><option value="">the demo's rate</option><option>9600</option><option>57600</option><option>115200</option><option>230400</option><option>460800</option><option>921600</option></select></label><label class="small" title="What is added after each line you send. Most programs wait for a newline (LF); some want CR LF.">Send with <select id="c-con-eol"><option value="lf">newline (LF)</option><option value="crlf">CR LF</option><option value="cr">CR</option><option value="none">nothing</option></select></label><label class="small"><input type="checkbox" id="c-con-time"> Time on each line</label><label class="small" title="Stop jumping to the newest line, so you can read while text keeps arriving."><input type="checkbox" id="c-con-hold"> Hold the scroll</label></div>
+      <p class="small con-help">Baud must match the program on the board (the demos use 115200). Send with adds a line ending to what you type; most programs want a newline.</p>
+      <div class="c-row c-con-out"><button type="button" class="quiet" id="c-con-copy">Copy all</button><button type="button" class="quiet" id="c-con-txt">Save as .txt</button><button type="button" class="quiet" id="c-con-csv">Save as .csv</button><span class="small" id="c-con-saved" role="status"></span></div>
+      <p class="small" id="c-con-note">Chrome asks for a serial port: pick the XDS110 one whose name ends in 1. 115200 baud, 8N1, over the board's USB cable.</p>
+    </div>
+    <div class="dbg-pane c-watch" id="p-live" role="tabpanel" aria-labelledby="dt-live" hidden>
+      <p class="small" id="c-pc">Values the page read from the board during this visit, newest last.</p>
+      <table><thead><tr><th>Name</th><th>What it is</th><th>Value</th></tr></thead><tbody id="c-wt"></tbody></table>
+      <div class="c-row c-con-out"><button type="button" class="quiet" id="c-live-csv">Save every reading as .csv</button><span class="small" id="c-live-saved" role="status"></span></div>
+    </div>
+    
+  </div>
+  <p class="small" id="dbg-note"></p>
+</section>
+<div class="c-toast" id="c-toast" role="status"></div>
+<div class="card" id="takehome" aria-label="Take it home">
+  <div class="head"><h2 class="eyebrow">Take it home</h2><p class="small" id="th-sub">The same thing on your own computer, with your own tools. Filled in for the board and demo above.</p></div>
+  <!--bench-chrome:kit--><div id="home-kit"><div class="k-os" role="group" aria-label="Your computer"><button type="button" data-os="mac" aria-pressed="true">Mac</button><button type="button" data-os="win" aria-pressed="false">Windows</button><button type="button" data-os="linux" aria-pressed="false">Linux</button></div><div class="th-two"><div class="th-col" id="th-term"><h3>Copy for your terminal</h3><p class="small">The exact lines, nothing else: clone, tools, build, flash, check.</p><pre class="th-pre" id="th-term-pre"></pre><div class="k-go"><button type="button" id="th-term-copy">Copy for your terminal</button></div><p class="k-note" id="th-term-note"></p></div><div class="th-col k-kit" id="th-ai"><h3>Copy for your AI</h3><label><input type="checkbox" data-p-all="Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of mspm0l1306, docs/builds and mac-setup, and read mspm0l1306/AGENTS.md first." checked disabled><span>This board&#x27;s folder and its AGENTS.md<small>the code, the pins and the traps; always included</small></span></label><label><input type="checkbox" data-p-mac="Install CCStudio 21.0.1 and the MSPM0 SDK 2.11 with mac-setup/bootstrap.sh. It opens the myTI sign-in page in my browser; wait for me there." data-p-win="Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode." data-p-linux="Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."><span>CCStudio and the MSPM0 SDK<small>TI&#x27;s IDE and libraries; your assistant opens the myTI sign-in for you</small></span></label><label><input type="checkbox" data-p-all="Install the Arm GNU toolchain and xPack OpenOCD 0.12 so I can build and flash without CCStudio."><span>GCC and OpenOCD<small>build and flash without a vendor IDE</small></span></label><p class="k-prev-h">You will copy</p><p class="k-prev"></p><div class="k-go"><button type="button" id="th-ai-copy">Copy for your AI</button></div><p class="k-note">Paste it into Claude Code, Codex, Cursor or any assistant that can run commands. It needs more tokens than the terminal lines and does the setup for you.</p></div></div><details class="th-fold"><summary>Sizes, source and one change to try</summary><p class="small" id="th-install"></p><dl id="f-facts" class="recovery hidden" aria-label="This demo's source and build"></dl><p class="small" id="f-change"></p><p class="small"><a href="https://github.com/Fox-Red-Labs/fox-red-labs">The repository on GitHub</a></p></details></div><!--/bench-chrome:kit-->
+  <div id="th-own" class="th-own" hidden><h3>Use your own tools</h3><p class="small" id="th-own-img"></p><pre class="th-pre" id="th-own-cmd"></pre><p class="small" id="th-own-note"></p></div>
+</div>
+</main>
+<section class="more">
+  <details class="card">
+    <summary><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v6h6"></path></svg>Put back what was there</summary>
+    <p class="small" id="restore-for">On the LaunchPad kits this page programs over the debugger (the MSPM0 and MSPM33 boards), it saves the board's flash to your Downloads folder as a .json file before it first writes. Choose that file to put it back; it goes back only onto the chip it came from. The CC23 and CC27 Bluetooth boards save .bin files instead, which this page cannot put back: connect one to see its steps.</p>
+    <div id="restore-page" class="row"><label class="small" for="file">The saved .json copy</label><input id="file" type="file" accept=".json,application/json"><button id="restore" class="quiet" disabled>Put it back</button></div>
+    <p class="small" id="file-check" role="status"></p>
+    <p class="small" id="bin-row" hidden><button type="button" class="quiet" id="bin-save">Also save the copy as a .bin</button> <span id="bin-note">for OpenOCD, UniFlash or your own tools</span></p>
+    <div id="restore-vendor" class="vendor-steps hidden"></div>
+    <ul id="rlog" class="steps"></ul>
+    <div class="est" id="rest-est" hidden role="status" aria-live="polite"><div class="est-bar"><i id="rest-est-bar"></i></div><p class="small" id="rest-est-text"></p></div>
+    <p id="rresult" class="result hidden"></p>
+    <p class="small"><button type="button" class="quiet diag-btn">Download a diagnostic record</button></p>
+  </details>
+  <details class="card">
+    <summary><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>If something goes wrong</summary>
+    <table>
+    <tr><th>You see</th><th>Do this</th></tr>
+    <tr><td>What do Works, Should work and Could work mean on an example card?</td><td>Works: ran on this board. Should work: it ran on a sister board with the same chip family. Could work: not run on a board yet. Not for this chip: it does not fit. The LP-MSPM0G3507 examples say Should work because they ran from the terminal and no run from this page is recorded yet.</td></tr>
+    <tr><td>The Registers tab says "Not connected"</td><td>Registers need a board plugged in. The tab lists where each block sits in the chip (from the chip's header file); this page does not read their values. <a href="../chip/">Inside the chip</a> reads a running board's blocks without stopping it.</td></tr>
+    <tr><td>Why can I not run an example on a board I picked from the list?</td><td>The list lets you look at any board without owning it: you see its examples and, where one is drawn, the chip view. Running one needs that board plugged in and connected with the button at the top. Nothing is written to a board until you press the write button.</td></tr>
+    <tr><td>Safari, Firefox or an iPhone shows "Open this page in Chrome or Edge."</td><td>Those browsers cannot talk to a board over USB. Use Chrome or Edge on a computer, or Chrome on an Android phone.</td></tr>
+    <tr><td>Garbled characters in the serial output</td><td>The serial speed (baud rate) does not match. The demos use 115200 baud, 8N1. The demo's steps name the speed (baud rate); set the same one on the port.</td></tr>
+    <tr><td>Is it safe to try, and what does the page save?</td><td>Before it first writes to an MSPM0 or MSPM33 LaunchPad, the page saves the board's flash to your Downloads folder as a .json file. Open "Put back what was there" to choose that file and restore it. CC23 and CC27 boards save .bin files that this page cannot put back.</td></tr>
+    <tr><td>The device list is empty</td><td>Use a cable that carries data, in the board's debugger connector, straight into the computer. A charge-only cable, or CCStudio or UniFlash holding the probe, looks the same.</td></tr>
+    <tr><td>"… is not on an LP-…" or "… reports DEVICEID …"</td><td>That XDS110 belongs to another board; nothing was written. Connect again and pick another.</td></tr>
+    <tr><td>"the chip's debug port did not power up"</td><td>The program may be in a deep sleep. Hold S1, press and release S3, keep S1 held two more seconds, then try again at once.</td></tr>
+    <tr><td>The check says the LED did not do what you asked</td><td>Check the LED's jumpers are on, as shipped, and send it again.</td></tr>
+    <tr><td>No message arrives</td><td>Check the UART jumpers are on XDS (as shipped), and that you picked the serial port named in the steps.</td></tr>
+    <tr><td>The board will not connect at all, even after unplugging it</td><td>The chip may be locked by a program that went wrong. This page cannot recover it. TI's MSPM0 chips have a mass erase through the debugger (UniFlash, or the terminal route in Go further): it erases everything on the chip, including its boot settings, so use it only as a last step.</td></tr>
+    <tr><td>Two boards plugged in, both called XDS110</td><td>Pick either. The page reads the chip, names the board, and lists every board it can see under Connect, each with a Use this one button.</td></tr>
+    <tr><td>The board's program restarted when I connected</td><td>Expected, once: if the chip does not answer, the page restarts it to wake it. Nothing is written until you press the button.</td></tr>
+    <tr><td>An Android phone</td><td>Chrome on Android, and a cable from the phone's USB-C port to the board's USB port. The page uses WebUSB there; it passed through that interface from a Mac but has not been run on a phone yet. The two recipes that read the board's serial port need a computer.</td></tr>
+    <tr><td>Windows</td><td>Tested on a Mac in Chrome. Windows has not been tried yet. Close CCStudio and UniFlash first: they hold the probe.</td></tr>
+    <tr><td>Linux: no device, or permission denied</td><td>Not tried yet. Chrome reaches the probe through hidraw, and the serial port through ttyACM, so two rules go in <code>/etc/udev/rules.d/70-xds110.rules</code>: <code>KERNEL=="hidraw*", ATTRS{idVendor}=="0451", ATTRS{idProduct}=="bef3", TAG+="uaccess"</code> and <code>SUBSYSTEM=="usb", ATTRS{idVendor}=="0451", ATTRS{idProduct}=="bef3", TAG+="uaccess"</code>. Then run <code>sudo udevadm control --reload-rules &amp;&amp; sudo udevadm trigger</code> and replug. OpenOCD and the serial port also need your user in the <code>dialout</code> (or <code>uucp</code>) group.</td></tr>
+    <tr><td>Connect shows no device at all, on a managed Chromebook or PC</td><td>The administrator's device policy blocks it. The two policy lines IT needs are WebHidAllowDevicesForUrls and SerialAllowUsbDevicesForUrls, with vendor 1105 and product 48883, for this site.</td></tr>
+    <tr><td>A CC23 or CC27 board stopped while the light program was being written</td><td>The board may hold a partly written program. This page cannot put the saved .bin files back: follow that board's steps under "Put back what was there" (TI's UniFlash), or press the button again to write the light program whole.</td></tr>
+    <tr><td>"the debugger stopped answering"</td><td>Unplug the board, plug it back in, reload this page and try again.</td></tr>
+    <tr><td>"The board was unplugged or lost its USB link while the page was writing it"</td><td>The board may hold a partly written program. Plug the USB cable back in, press Connect, then use “Put back what was there” with the .json copy the page saved before the write. Do not run a demo until Put back says it is done. If the cable comes out again, press Put it back again: it compares first and writes only what still differs. If the page says no copy was saved, run the same demo again instead.</td></tr>
+    <tr><td>"The browser could not open the board" (Chrome: "Failed to open the device.")</td><td>Another program holds the probe: close CCStudio, UniFlash, terminal programs and other tabs, then replug. On Linux, install the two udev rules in the Linux row.</td></tr>
+    <tr><td>Any other failure</td><td>Press "Download a diagnostic record" and attach the file to your report. It lists what the page tried and how each step ended, with no flash contents, Wi-Fi names or passwords, addresses or full probe serial numbers. Open it before you send it.</td></tr>
+    </table>
+  </details>
+</section>
+<!--bench-chrome:footer--><footer>
+  <div class="wrap" style="--fcols:4">
+    <div class="f-brand"><svg class="logo logo-foot" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg><p>Demos and ports on TI development kits, with the code and the measured numbers.</p></div>
+    <div><h2>Builds</h2><a href="../../projects.html">All builds</a><a href="../../project-blink.html">First blink</a><a href="../../projects.html?f=smart-home">Smart home</a><a href="../../projects.html?f=ai">Edge AI</a><a href="../../projects.html?f=radio">Radio and range</a><a href="../../projects.html?f=motors">Motors, power and sensing</a><a href="../../projects.html?f=screens">Screens</a><a href="../../security.html">Security</a></div><div><h2>Hardware</h2><a href="../../hardware.html">The kits</a><a href="../../addons.html">Add-ons and parts</a></div><div><h2>Software</h2><a href="../../portability.html">Bring your code</a><a href="../../ports.html">Every port</a><a href="../../one-app-eleven-boards.html">One app, eleven boards</a><a href="../../project-build-from-terminal.html">Build from the terminal</a><a href="../../benchmarks.html">Measured</a><a href="../../edge-ai.html">Edge AI</a></div><div><h2>Community</h2><a href="../../community.html">Community</a><a href="https://github.com/Fox-Red-Labs/fox-red-labs">Get the code</a></div>
+    <div class="f-meta"><a href="../../benchmarks.html#method">Method</a><p class="disc pwr">Powered by Zephyr, GCC and OpenOCD. </p><p class="disc">Fox Red Labs is a lab run by a TI employee on personal time. Contributors&#x27; projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.</p></div>
+  </div>
+</footer><!--/bench-chrome:footer-->
+<script src="live-panel.js"></script>
+<script src="ui.js?v=20261022-ai11"></script>
+<script type="module" src="con-save.js?v=20261025b"></script>
+<script src="own-tools.js?v=20261025"></script>
+<script type="module" src="lab.js"></script>
+<script src="xlsx.js"></script>
+<script>
+(async () => {
+  const panel = document.getElementById("startup");
+  try {
+    if (location.protocol === "file:") throw new Error("Opened directly from a file. Start the local server and open its localhost address.");
+    const bench = await import("./bench.js?v=20261022-ai11");
+    await bench.ready;
+    panel.classList.add("hidden");
+  } catch (error) {
+    document.getElementById("connect").disabled = true;
+    document.getElementById("go").disabled = true;
+    document.getElementById("startup-title").textContent = "The bench could not load. No board connection was attempted.";
+    document.getElementById("startup-help").textContent = "From the repository folder, run py tools/webflash/serve.py on Windows or python3 tools/webflash/serve.py on Mac/Linux. Open http://localhost:8765/site/flash/bench/ in Chrome or Edge. If it still fails, share the error below and the page address.";
+    document.getElementById("startup-detail").textContent = String(error.message || error);
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+{
+ "note": "Draft written by tools/webflash/make_board_draft.py. Not yet in data/routes.json.",
+ "id": "mspm0g3507",
+ "kit": "LP-MSPM0G3507",
+ "printed": "LP-MSPM0G3507",
+ "probe_serial": "MG350001",
+ "identity": {
+  "addr": "0x41C40000",
+  "deviceid": "0x0BB8802F",
+  "deviceid_mask": "0x0FFFFFFF",
+  "part": "0xBB88",
+  "userid": "0x0000AE2D",
+  "useridMask": "0x0000FFFF"
+ },
+ "flash": {
+  "start": "0x00000000",
+  "end": "0x00020000",
+  "kb": 128,
+  "banks": 1,
+  "sector_bytes": 1024,
+  "word_bits": 64,
+  "ecc": true,
+  "cmdbyten": "0x1FF",
+  "program_command": "one 64-bit word per command (CMDTYPE 0x01), CMDDATA0 and CMDDATA1",
+  "erase_command": "sector (CMDTYPE 0x42)",
+  "flashctl_base": "0x400CD000",
+  "table_sector": "0x0001FC00"
+ },
+ "ram": {
+  "start": "0x20200000",
+  "bytes": 32768,
+  "why": "SRAM origin and length in the example's ticlang/device_linker.cmd (G3519: SRAM_BANK0 + SRAM_BANK1, 64 KB each, contiguous). The SRAM does not start at 0x20000000 on the G3519 and G5187."
+ },
+ "cmdbyten": "0x1FF",
+ "protect": {
+  "has_weprota": true,
+  "weprota_bits": 32,
+  "weprotb_bits": 12,
+  "weprotc_bits": 0,
+  "rule": "mspm0g350x.h: 32 WEPROTA bits and 12 WEPROTB bits. DL_FlashCTL_unprotectSector uses A for sectors 0 to 31, then one B bit per eight sectors through sector 127.",
+  "bench_writes": "Uses the existing MSPM0 sector programming path; hardware validation on the G3507 is pending."
+ },
+ "leds": [
+  {
+   "label": "LED2 red (PB26)",
+   "channel": "red",
+   "port": "B",
+   "pin": 26,
+   "gpio": "0x400A2000",
+   "color": "red",
+   "rgb": true
+  },
+  {
+   "label": "LED2 green (PB27)",
+   "channel": "green",
+   "port": "B",
+   "pin": 27,
+   "gpio": "0x400A2000",
+   "color": "green",
+   "rgb": true
+  },
+  {
+   "label": "LED2 blue (PB22)",
+   "channel": "blue",
+   "port": "B",
+   "pin": 22,
+   "gpio": "0x400A2000",
+   "color": "blue",
+   "rgb": true
+  }
+ ],
+ "active_high": true,
+ "leds_note": "LED2 RGB: red PB26, green PB27, blue PB22, active high. TI gpio_toggle_output setup initializes all three pins.",
+ "jumpers": [
+  "J6 ON for red, J7 ON for green, J5 ON for blue",
+  "J101 15:16 and 13:14 ON for the onboard debugger"
+ ],
+ "check_channels": [
+  {
+   "ch": 0,
+   "bit": 26,
+   "gpio": "0x400A2000",
+   "label": "LED2 red (PB26)"
+  },
+  {
+   "ch": 1,
+   "bit": 27,
+   "gpio": "0x400A2000",
+   "label": "LED2 green (PB27)"
+  },
+  {
+   "ch": 2,
+   "bit": 22,
+   "gpio": "0x400A2000",
+   "label": "LED2 blue (PB22)"
+  }
+ ],
+ "gpio_offsets": {
+  "dout": "0x1280",
+  "doe": "0x12C0"
+ },
+ "reset": {
+  "cpuss_ctl": "0x40401300",
+  "resetlevel": "0x400B0300",
+  "resetcmd": "0x400B0304",
+  "bootrst": 1,
+  "go": "0xE4000001"
+ },
+ "images": {
+  "blink": {
+   "dir": "prebuilt/mspm0g3507/blink-150-150-150-900",
+   "sha256": "49c5077e45b75dc21bd3c6165e1528952f4544734d6af372ef91b9d3ec0b213d",
+   "bytes": 6312,
+   "segments": [
+    {
+     "addr": "0x00000000",
+     "bytes": 464
+    }
+   ],
+   "ends_at": "0x000001D0"
+  },
+  "color_player": {
+   "dir": "prebuilt/mspm0g3507/color-player",
+   "sha256": "ac86209f93a4ce048dca12cbce044e31e0a07b326a06cabe629cc2078ca4ce9e",
+   "bytes": 7056,
+   "segments": [
+    {
+     "addr": "0x00000000",
+     "bytes": 984
+    }
+   ],
+   "ends_at": "0x000003D8",
+   "table_addr": "0x0001fc00"
+  }
+ },
+ "differs_from_l1306": [
+  "128 KB flash with ECC, CMDBYTEN 0x1FF",
+  "32 KB SRAM at 0x20200000",
+  "RGB LED on GPIOB",
+  "USERID part 0xAE2D distinguishes G3507 from G3505/G3506"
+ ],
+ "sources": [
+  {
+   "fact": "LED pins, ports, polarity, jumpers",
+   "file": "examples/nortos/LP_MSPM0G3507/driverlib/gpio_toggle_output/gpio_toggle_output.syscfg, ti_msp_dl_config.h, README.md, gpio_toggle_output.c"
+  },
+  {
+   "fact": "FLASH length, SRAM",
+   "file": "examples/nortos/LP_MSPM0G3507/driverlib/gpio_toggle_output/ticlang/device_linker.cmd"
+  },
+  {
+   "fact": "FLASHCTL base, GPIO bases, FLASHCTL_SYS_DATAWIDTH, WEPROT widths",
+   "file": "source/ti/devices/msp/m0p/mspm0g350x.h"
+  },
+  {
+   "fact": "DEVICE_HAS_NO_CMDWEPROTA, DEVICE_HAS_FLASH_128_BIT_WORD",
+   "file": "source/ti/driverlib/dl_flashctl.h"
+  },
+  {
+   "fact": "unprotect rule",
+   "file": "source/ti/driverlib/dl_flashctl.c (DL_FlashCTL_unprotectSector)"
+  },
+  {
+   "fact": "CMDBYTEN values",
+   "file": "source/ti/driverlib/dl_flashctl.h (DL_FLASHCTL_PROGRAM_64_WITHOUT_ECC 0xFF, _WITH_ECC 0x1FF) and examples/nortos/LP_MSPM0G3507/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c"
+  },
+  {
+   "fact": "FLASHCTL and GPIO register offsets",
+   "file": "source/ti/devices/msp/peripherals/hw_flashctl.h, hw_gpio.h"
+  },
+  {
+   "fact": "CPUSS CTL 0x1300 from base 0x40400000",
+   "file": "source/ti/devices/msp/peripherals/m0p/hw_cpuss.h and source/ti/devices/msp/m0p/mspm0g350x.h"
+  },
+  {
+   "fact": "RESETLEVEL 0x1300 and RESETCMD 0x1304 from SYSCTL base 0x400AF000; BOOT level 1; KEY 0xE4 and GO",
+   "file": "source/ti/devices/msp/peripherals/m0p/sysctl/hw_sysctl_mspm0g350x.h"
+  },
+  {
+   "fact": "FACTORYREGION identity and SRAMFLASH (flash size, bank count)",
+   "file": "source/ti/devices/msp/peripherals/m0p/hw_factoryregion.h"
+  },
+  {
+   "fact": "DEVICEID and USERID part identification",
+   "url": "https://www.ti.com/lit/ds/symlink/mspm0g3507.pdf",
+   "section": "SLASEX6C tables 8-21 and 8-22"
+  }
+ ]
+}

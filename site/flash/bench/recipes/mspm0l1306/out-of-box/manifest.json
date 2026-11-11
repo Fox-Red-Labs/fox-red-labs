@@ -1,0 +1,60 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0l1306",
+ "kit": "LP-MSPM0L1306",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BB8202F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "out-of-box",
+ "oob": {
+  "baud": 115200,
+  "commands": {
+   "blink": "blinkEnable",
+   "blink_delay": "blinkTick",
+   "light": "lightEnable",
+   "thermometer": "thermEnable"
+  },
+  "readings": {
+   "light": "lsADC",
+   "temperature_c": "thADC"
+  }
+ },
+ "image": {
+  "file": "firmware.out",
+  "sha256": "732aea2373d7e4e6ced3b400c75eeccab3ccf578809524bb7c90ad622dbd43d6",
+  "bytes": 26812,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 9808
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "acc1de1ca07d7e3e780b1284468325e9edde0e49",
+  "example": "examples/nortos/LP_MSPM0L1306/demos/out_of_box",
+  "file": "main.c",
+  "sha256": "bb097628d926ec550f3e8882adb74a29af747e8a411230f0be15efd6dea0ec8d",
+  "edited_line": "none: TI's demo as it is in the SDK",
+  "rebuild": "python3 tools/webflash/build_oob.py mspm0l1306"
+ },
+ "tools": {
+  "sdk": {
+   "version": "2.11.00.07"
+  },
+  "sysconfig": {
+   "version": "1.26.3"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS"
+  }
+ },
+ "expect": "TI's out-of-box demo: LED1 blinks; over the USB serial port it answers MessagePack commands and sends light and temperature readings",
+ "made": "2026-10-15T00:10:13",
+ "release_cleared": false,
+ "release_note": "TI's out-of-box demo from the MSPM0 SDK (BSD-3-Clause, NOTICE.txt), unchanged, with TI Arm Clang's runtime. Not cleared for public distribution."
+}

@@ -1,0 +1,72 @@
+{
+ "note": "Draft from SDK files and read-only reads on probe M3010001, 2026-10-14. Not wired into the page. Fields follow site/flash/bench/board.json.",
+ "id": "mspm33c321a",
+ "kit": "LP-MSPM33C321A",
+ "usb": {"vendorId": 1105, "productId": 48883, "usagePage": 65280, "note": "same XDS110 CMSIS-DAP interface as the MSPM0 board; product ID not re-read here"},
+ "core": {"dpidr": "0x6BA02477", "cpuid": "0x411FD210", "name": "Cortex-M33"},
+ "identity": {
+  "addr": "0x80111000",
+  "alias": "0x90111000 (secure alias, reads the same)",
+  "fields": ["TRACEID", "DEVICEID", "USERID"],
+  "values": {"traceid": "0x008080FC", "deviceid": "0x0BBB702F", "userid": "0x801043B6"},
+  "deviceid": "0x0BBB702F",
+  "deviceidMask": "0x0FFFFFFF",
+  "note": "0x41C40000 (the MSPM0 address) reads 0 on this chip"
+ },
+ "flash": {
+  "start": "0x00000000",
+  "end": "0x00100000",
+  "cpuAlias": "0x10000000 (secure) and 0x00000000 read the same bytes",
+  "banks": 2, "bankSize": "0x80000",
+  "sector": 2048,
+  "wordBytes": 16,
+  "controllerAddress": "CMDADDR is the offset from 0; bank 1 starts at 0x80000",
+  "usedByShippedImage": "first 0x320 bytes; the rest reads 0xFF",
+  "externalFlash": "8 MB QSPI holds the OLED demo and is not reachable by the debugger"
+ },
+ "controller": {
+  "base": "0x40042000", "secureBase": "0x50042000",
+  "registerBlock": "base + 0x1000 (CMDEXEC at base + 0x1100)",
+  "regs": {"CMDEXEC": "0x1100", "CMDTYPE": "0x1104", "CMDCTL": "0x1108", "CMDADDR": "0x1120", "CMDBYTEN": "0x1124", "CMDDATAINDEX": "0x112C", "CMDDATA0": "0x1130", "CMDWEPROTA": "0x11D0", "CMDWEPROTB": "0x11D4", "CMDWEPROTNM": "0x1210", "STATCMD": "0x13D0", "GBLINFO0": "0x13F0"},
+  "commands": {"clearStatus": "0x05", "eraseSector": "0x42", "programOneWord": "0x01"},
+  "programByteEnable": "0x3FFFF (128 data bits plus hardware-made ECC)",
+  "statcmd": {"done": 1, "pass": 2},
+  "semaphore": {"base": "0x50046000", "request": "0x50047800 = 1", "status": "0x50047808", "clear": "0x50047804 = 1", "heldValue": "0xC0010101", "rule": "request before any flash register is readable or writable; release after"},
+  "protectAtRest": {"CMDWEPROTA": "0xFFFFFFFF", "CMDWEPROTB": "0x0FFFFFFF", "CMDWEPROTNM": "0x0000000F", "note": "all read 0 without the semaphore. Clear status does NOT re-protect; the proof wrote the at-rest values back by hand"},
+  "sequence": "halt; request semaphore and check 0xC0010101; clear status; CMDWEPROTA=CMDWEPROTB=0; CMDTYPE; CMDADDR; (program: CMDBYTEN, CMDDATAINDEX=(addr>>4)&3, CMDDATA0..3); CMDEXEC=1; poll STATCMD for done and pass; at the end restore WEPROT, release semaphore"
+ },
+ "neverWrite": [
+  {"name": "NONMAIN bank 0", "range": "0x80100000 and up", "why": "boot configuration (BCR_CONFIG 0x80101800) and bootloader configuration (BSL_CONFIG 0x80101C00)"},
+  {"name": "NONMAIN bank 1 and 2", "range": "0x80102000, 0x8010C000"},
+  {"name": "factory region and trim", "range": "0x80110000 to 0x80111FFF"},
+  {"name": "engineering regions", "range": "0x80118000 and up"},
+  {"name": "mass erase and factory reset", "why": "DL_FlashCTL_massErase*/factoryReset* touch data flash and NONMAIN"}
+ ],
+ "leds": [
+  {"label": "LED2 blue (PA2)", "gpio": "0x400F0000", "bit": 2},
+  {"label": "LED2 red (PC26)", "gpio": "0x400F4000", "bit": 26},
+  {"label": "LED2 green (PC27)", "gpio": "0x400F4000", "bit": 27}
+ ],
+ "gpio": {"dout": "0x1280", "doe": "0x12C0", "note": "DOE read 0x4 on port A and 0x0C000000 on port C with TI's shipped program running; polarity not checked"},
+ "reset": {"sysctl": "0x400AF000", "level": "0x400AF300", "cmd": "0x400AF304", "boot": "RESETLEVEL=1 then RESETCMD=0xE4000001", "tested": false},
+ "cache": {"register": "none found in the SDK headers", "note": "readback after a write matched without turning anything off"},
+ "console": "not read",
+ "sources": [
+  "mspm33_sdk_1_04_00_00/source/ti/devices/msp/peripherals/m33/hw_factoryregion.h",
+  "mspm33_sdk_1_04_00_00/source/ti/devices/msp/m33/mspm33c321x.h (bases, FLASHCTL_SYS_* widths)",
+  "mspm33_sdk_1_04_00_00/source/ti/devices/msp/peripherals/hw_flashctl.h",
+  "mspm33_sdk_1_04_00_00/source/ti/devices/msp/peripherals/hw_gsc.h",
+  "mspm33_sdk_1_04_00_00/source/ti/driverlib/dl_flashctl.c and .h",
+  "mspm33_sdk_1_04_00_00/source/ti/driverlib/dl_gsc.h (DL_GSC_acquireFlashSemaphore)",
+  "mspm33_sdk_1_04_00_00/examples/nortos/LP_MSPM33C321A/driverlib/flashctl_multiple_size_write",
+  "mspm33_sdk_1_04_00_00/examples/nortos/LP_MSPM33C321A/driverlib/gpio_toggle_output (.syscfg)",
+  "mspm33_sdk_1_04_00_00/source/ti/devices/msp/m33/linker_files/ticlang/mspm33c321a.cmd"
+ ],
+ "hardwareResults": {
+  "date": "2026-10-14", "probe": "M3010001",
+  "save": "1,048,576 bytes read three times, sha256 33d3bdbfec7f6ca3ba56416f99e02300ec4b6aa09f116db99da2fe9cb3e51968 every time",
+  "proof": "sector 0xFF800 (last 2 KB of bank 1, blank before): erased, 128 words of a pattern programmed, read back with 0 mismatches, erased again; flash afterwards byte for byte equal to the first save. Write protection put back to its at-rest values by hand",
+  "factoryRead": "TRACEID 0x008080FC, DEVICEID 0x0BBB702F, USERID 0x801043B6; same through 0x80111000 and 0x90111000",
+  "notRun": ["boot reset", "LED polarity", "a whole-image flash"]
+ }
+}

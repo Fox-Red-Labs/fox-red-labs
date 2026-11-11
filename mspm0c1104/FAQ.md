@@ -14,7 +14,7 @@ Yes. The shipped out-of-box image blinks the red LED (PA22) about every 0.5 s; p
 
 ## Memory, timing and benchmarks
 
-### Will a small AI model fit the MSPM0C1104
+### Will an edge AI model fit the MSPM0C1104
 
 Not the room-occupancy models in this repo: the smallest needs 1.2 kB of RAM for its buffers and the chip has 1 kB. That is a link-only result from 2026-10-08, before the board arrived, for these models as built; BitNetMCU's 1k handwritten-digit model does link (7.2 kB of code, 804 B of RAM).
 

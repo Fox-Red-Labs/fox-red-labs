@@ -1,0 +1,163 @@
+{
+ "note": "Draft written by tools/webflash/make_board_draft.py. Not yet in data/routes.json.",
+ "id": "mspm0c1104",
+ "kit": "LP-MSPM0C1104",
+ "printed": "LP-MSPM0C1104 (the example needs Rev E3 or later: TI's example README)",
+ "probe_serial": "MC110001",
+ "identity": {
+  "addr": "0x41C40000",
+  "deviceid": "0x3BBA102F",
+  "deviceid_mask": "0x0FFFFFFF",
+  "part": "0xBBA1"
+ },
+ "flash": {
+  "start": "0x00000000",
+  "end": "0x00004000",
+  "kb": 16,
+  "banks": 1,
+  "sector_bytes": 1024,
+  "word_bits": 64,
+  "ecc": false,
+  "cmdbyten": "0xFF",
+  "program_command": "one 64-bit word per command (CMDTYPE 0x01), CMDDATA0 and CMDDATA1",
+  "erase_command": "sector (CMDTYPE 0x42)",
+  "flashctl_base": "0x400CD000",
+  "table_sector": "0x00003C00"
+ },
+ "ram": {
+  "start": "0x20000000",
+  "bytes": 1024,
+  "why": "SRAM origin and length in the example's ticlang/device_linker.cmd (G3519: SRAM_BANK0 + SRAM_BANK1, 64 KB each, contiguous). The SRAM does not start at 0x20000000 on the G3519 and G5187."
+ },
+ "cmdbyten": "0xFF",
+ "protect": {
+  "has_weprota": true,
+  "weprota_bits": 16,
+  "weprotb_bits": 0,
+  "weprotc_bits": 0,
+  "rule": "DL_FlashCTL_unprotectSector (the branch used when DEVICE_HAS_NO_CMDWEPROTA is not defined): sectors 0 to 31 of a bank are CMDWEPROTA bit = sector number; this part has 16 sectors, so A bits 0 to 15. CMDWEPROTB would be one bit per 8 sectors from sector 32 and CMDWEPROTC from sector 256; neither exists here.",
+  "bench_writes": "CMDWEPROTA = 0 and CMDWEPROTB = 0 before each command, as for the L1306 (B is not implemented here; the write was accepted without error on the board)"
+ },
+ "leds": [
+  {
+   "label": "LED1 red (PA22)",
+   "channel": "red",
+   "port": "A",
+   "pin": 22,
+   "gpio": "0x400A0000",
+   "color": "red",
+   "rgb": false
+  }
+ ],
+ "active_high": false,
+ "leds_note": "One user LED (LED1, red) on PA22, no RGB. PA2 is a test pin on header J2 pin 13 that mirrors the LED in TI's example. TI's example sets PA22 with the comment 'Default: LED is off', so the LED is active low; see the hardware results.",
+ "jumpers": [
+  "J7 must be on for the LED to light (SLAU908B Table 2-1, as quoted in mspm0c1104/FAQ.md)",
+  "J101 11:12 and 13:14 stay ON (SWD to the XDS110, as shipped)"
+ ],
+ "check_channels": [
+  {
+   "ch": 0,
+   "bit": 22,
+   "gpio": "0x400A0000",
+   "label": "LED1 red (PA22)"
+  }
+ ],
+ "gpio_offsets": {
+  "dout": "0x1280",
+  "doe": "0x12C0"
+ },
+ "reset": {
+  "cpuss_ctl": "0x40401300",
+  "resetlevel": "0x400B0300",
+  "resetcmd": "0x400B0304",
+  "bootrst": 1,
+  "go": "0xE4000001"
+ },
+ "images": {
+  "blink": {
+   "dir": "prebuilt/mspm0c1104/blink-150-150-150-900",
+   "sha256": "0430bfe2bb629e74c300570db3fbe224f4bb10637425ddadf0a2ff7a862cd73d",
+   "bytes": 5736,
+   "segments": [
+    {
+     "addr": "0x00000000",
+     "bytes": 424
+    }
+   ],
+   "ends_at": "0x000001A8"
+  },
+  "color_player": {
+   "dir": "prebuilt/mspm0c1104/color-player",
+   "sha256": "c737e9c84a82bce39c65bbb2e34b3d9f577b723b68fbdb261dea58af70419b41",
+   "bytes": 6476,
+   "segments": [
+    {
+     "addr": "0x00000000",
+     "bytes": 936
+    }
+   ],
+   "ends_at": "0x000003A8",
+   "table_addr": "0x00003c00"
+  }
+ },
+ "differs_from_l1306": [
+  "flash 16 KB, not 64 KB",
+  "one LED, no RGB, active low (pin low = lit)",
+  "GPIOA PA22; 1 KB SRAM, so the RAM loader buffer must be sized from board data",
+  "CMDWEPROTA covers sectors 0 to 15 (the L1306 uses A and B)"
+ ],
+ "sources": [
+  {
+   "fact": "LED pins, ports, polarity, jumpers",
+   "file": "examples/nortos/LP_MSPM0C1104/driverlib/gpio_toggle_output/gpio_toggle_output.syscfg, ti_msp_dl_config.h, README.md, gpio_toggle_output.c"
+  },
+  {
+   "fact": "FLASH length, SRAM",
+   "file": "examples/nortos/LP_MSPM0C1104/driverlib/gpio_toggle_output/ticlang/device_linker.cmd"
+  },
+  {
+   "fact": "FLASHCTL base, GPIO bases, FLASHCTL_SYS_DATAWIDTH, WEPROT widths",
+   "file": "source/ti/devices/msp/m0p/mspm0c110x.h"
+  },
+  {
+   "fact": "DEVICE_HAS_NO_CMDWEPROTA, DEVICE_HAS_FLASH_128_BIT_WORD",
+   "file": "source/ti/driverlib/dl_flashctl.h"
+  },
+  {
+   "fact": "unprotect rule",
+   "file": "source/ti/driverlib/dl_flashctl.c (DL_FlashCTL_unprotectSector)"
+  },
+  {
+   "fact": "CMDBYTEN values",
+   "file": "source/ti/driverlib/dl_flashctl.h (DL_FLASHCTL_PROGRAM_64_WITHOUT_ECC 0xFF, _WITH_ECC 0x1FF) and examples/nortos/LP_MSPM0C1104/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c"
+  },
+  {
+   "fact": "FLASHCTL and GPIO register offsets",
+   "file": "source/ti/devices/msp/peripherals/hw_flashctl.h, hw_gpio.h"
+  },
+  {
+   "fact": "CPUSS CTL 0x1300 from base 0x40400000",
+   "file": "source/ti/devices/msp/peripherals/m0p/hw_cpuss.h and source/ti/devices/msp/m0p/mspm0c110x.h"
+  },
+  {
+   "fact": "RESETLEVEL 0x1300 and RESETCMD 0x1304 from SYSCTL base 0x400AF000; BOOT level 1; KEY 0xE4 and GO",
+   "file": "source/ti/devices/msp/peripherals/m0p/sysctl/hw_sysctl_mspm0c110x.h"
+  },
+  {
+   "fact": "FACTORYREGION identity and SRAMFLASH (flash size, bank count)",
+   "file": "source/ti/devices/msp/peripherals/m0p/hw_factoryregion.h"
+  }
+ ],
+ "hardware": {
+  "status": "incomplete: locked out",
+  "date": "2026-10-15",
+  "passed": [
+   "identify (DEVICEID 0x3BBA102F, factory region 16 KB, 1 bank)",
+   "save main flash (16384 bytes, sha256 2305794a807654d40ef3c544f186883a222dcac36692888c84f106285010efc8)",
+   "flash blink image 200 ms",
+   "blink LED check: pass, pin low = lit, 150/150/150/900 ms within 5 ms"
+  ],
+  "failed": "flash of the color player: ack 4 on the first transfers; AP0 closed since. Cause: the RAM loader's 4 KB default buffer ran past the 1 KB SRAM after sector 0 was erased (found by the module's author). Not restored; waiting for approval of mass erase. The saved copy is mspm0c1104-main-flash.bin."
+ }
+}

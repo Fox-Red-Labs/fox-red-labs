@@ -1,0 +1,88 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0g3519",
+ "kit": "LP-MSPM0G3519",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BBA902F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "blink-pattern",
+ "pattern_ms": [
+  150,
+  150,
+  150,
+  150,
+  150,
+  450,
+  450,
+  150,
+  450,
+  150,
+  450,
+  450,
+  150,
+  150,
+  150,
+  150,
+  150,
+  1050
+ ],
+ "led": {
+  "label": "LED2 red (PB26)",
+  "bit": 26,
+  "gpio": "0x400a2000"
+ },
+ "active_high": true,
+ "title": "Blink LED2 red: Morse S O S",
+ "short": "Blink: SOS",
+ "see": "LED2 red (PB26) sends three short flashes, three long, three short, then a pause.",
+ "outcome": "The Morse call for help, from TI's LED example with a longer pattern. The page times the LED through the board's debugger to check it.",
+ "seconds": 11.2,
+ "image": {
+  "file": "firmware.out",
+  "sha256": "94072c3841c436518be32bc501ce7de2ec657ed5b3f027d4a6598d5b31f5f86f",
+  "bytes": 6856,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 544
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "96b3a8978b914ad4597a33b2e41e81fd534f5546",
+  "example": "examples/nortos/LP_MSPM0G3519/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/blink.c",
+  "sha256": "31bc46c6cb082c07e0cce078e45b13c68f1477a8ece73566331105dbbe946c7a",
+  "edited_line": "PATTERN_MS = 150, 150, 150, 150, 150, 450, 450, 150, 450, 150, 450, 450, 150, 150, 150, 150, 150, 1050",
+  "rebuild": "python3 tools/webflash/build_examples.py mspm0g3519 --only sos"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.28.0",
+   "validated": false,
+   "source": "override"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "4.4.1_st_20260330-0700",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-19T16:50:54",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}

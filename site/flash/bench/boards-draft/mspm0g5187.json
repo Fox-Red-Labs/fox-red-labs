@@ -1,0 +1,474 @@
+{
+ "note": "Draft written by tools/webflash/make_board_draft.py. Not yet in data/routes.json.",
+ "id": "mspm0g5187",
+ "kit": "LP-MSPM0G5187",
+ "printed": "LP-MSPM0G5187",
+ "probe_serial": "MG020001",
+ "identity": {
+  "addr": "0x41C40000",
+  "deviceid": "0x0BBBC02F",
+  "deviceid_mask": "0x0FFFFFFF",
+  "part": "0xBBBC"
+ },
+ "flash": {
+  "start": "0x00000000",
+  "end": "0x00020000",
+  "kb": 128,
+  "banks": 2,
+  "sector_bytes": 1024,
+  "word_bits": 128,
+  "ecc": true,
+  "cmdbyten": "0x1FF",
+  "program_command": "one 64-bit word per command (CMDTYPE 0x01), CMDDATA0 and CMDDATA1",
+  "erase_command": "sector (CMDTYPE 0x42)",
+  "flashctl_base": "0x400CD000",
+  "table_sector": "0x0001FC00"
+ },
+ "ram": {
+  "start": "0x20200000",
+  "bytes": 32768,
+  "why": "SRAM origin and length in the example's ticlang/device_linker.cmd (G3519: SRAM_BANK0 + SRAM_BANK1, 64 KB each, contiguous). The SRAM does not start at 0x20000000 on the G3519 and G5187."
+ },
+ "cmdbyten": "0x1FF",
+ "protect": {
+  "has_weprota": false,
+  "weprota_bits": 0,
+  "weprotb_bits": 16,
+  "weprotc_bits": 0,
+  "rule": "DEVICE_HAS_NO_CMDWEPROTA is defined. Same rule as the G3519: CMDWEPROTB bit (sectorInBank / 8) % 32, 16 bits here. The factory region reports 2 banks of 64 KB, so 64 sectors per bank, 8 bits used. FLASHCTL_SYS_DATAWIDTH is 128 (header: 'minimum 64, maximum 128'), and DEVICE_HAS_FLASH_128_BIT_WORD is set, but TI's flashctl_multiple_size_write for this board still programs 64 bits with ECC generated (CMDBYTEN 0x1FF, one-word command).",
+  "bench_writes": "CMDWEPROTA = 0 and CMDWEPROTB = 0 before each command, as for the L1306"
+ },
+ "leds": [
+  {
+   "label": "LED2 red (PA17)",
+   "channel": "red",
+   "port": "A",
+   "pin": 17,
+   "gpio": "0x400A0000",
+   "color": "red",
+   "rgb": true
+  },
+  {
+   "label": "LED2 green (PA24)",
+   "channel": "green",
+   "port": "A",
+   "pin": 24,
+   "gpio": "0x400A0000",
+   "color": "green",
+   "rgb": true
+  },
+  {
+   "label": "LED2 blue (PB13)",
+   "channel": "blue",
+   "port": "B",
+   "pin": 13,
+   "gpio": "0x400A2000",
+   "color": "blue",
+   "rgb": true
+  }
+ ],
+ "active_high": true,
+ "leds_note": "LED2 is the RGB LED, split across two ports: red PA17, green PA24, blue PB13. PA25 is a test pin on header J1 pin 2.",
+ "jumpers": [
+  "J12 [2:1] populated for red",
+  "J13 [2:1] populated for green",
+  "J11 [2:1] populated for blue (TI's example README)"
+ ],
+ "check_channels": [
+  {
+   "ch": 0,
+   "bit": 17,
+   "gpio": "0x400A0000",
+   "label": "LED2 red (PA17)"
+  },
+  {
+   "ch": 1,
+   "bit": 24,
+   "gpio": "0x400A0000",
+   "label": "LED2 green (PA24)"
+  },
+  {
+   "ch": 2,
+   "bit": 13,
+   "gpio": "0x400A2000",
+   "label": "LED2 blue (PB13)"
+  }
+ ],
+ "gpio_offsets": {
+  "dout": "0x1280",
+  "doe": "0x12C0"
+ },
+ "reset": {
+  "cpuss_ctl": "0x40401300",
+  "resetlevel": "0x400B0300",
+  "resetcmd": "0x400B0304",
+  "bootrst": 1,
+  "go": "0xE4000001"
+ },
+ "images": {
+  "blink": {
+   "dir": "prebuilt/mspm0g5187/blink-150-150-150-900",
+   "sha256": "724884c89e33bd0efcb9dbd56e7f6984a3699615aec8c62e195e94b5f318fd60",
+   "bytes": 6268,
+   "segments": [
+    {
+     "addr": "0x00000000",
+     "bytes": 504
+    }
+   ],
+   "ends_at": "0x000001F8"
+  },
+  "color_player": {
+   "dir": "prebuilt/mspm0g5187/color-player",
+   "sha256": "a2cf8bc30a137a37aee191b5d9c191ad249b46131488762061daa03559b992eb",
+   "bytes": 7028,
+   "segments": [
+    {
+     "addr": "0x00000000",
+     "bytes": 1080
+    }
+   ],
+   "ends_at": "0x00000438",
+   "table_addr": "0x0001fc00"
+  }
+ },
+ "differs_from_l1306": [
+  "flash 128 KB, 128-bit flash word but TI programs 64 bits with ECC: CMDBYTEN 0x1FF",
+  "no CMDWEPROTA",
+  "RGB LED across two ports: red PA17 and green PA24 on GPIOA, blue PB13 on GPIOB (0x400A2000), each LED needs its jumper J12/J13/J11",
+  "SRAM at 0x20200000, aliased at 0x20000000",
+  "table sector 0x1FC00"
+ ],
+ "sources": [
+  {
+   "fact": "LED pins, ports, polarity, jumpers",
+   "file": "examples/nortos/LP_MSPM0G5187/driverlib/gpio_toggle_output/gpio_toggle_output.syscfg, ti_msp_dl_config.h, README.md, gpio_toggle_output.c"
+  },
+  {
+   "fact": "FLASH length, SRAM",
+   "file": "examples/nortos/LP_MSPM0G5187/driverlib/gpio_toggle_output/ticlang/device_linker.cmd"
+  },
+  {
+   "fact": "FLASHCTL base, GPIO bases, FLASHCTL_SYS_DATAWIDTH, WEPROT widths",
+   "file": "source/ti/devices/msp/m0p/mspm0g518x.h"
+  },
+  {
+   "fact": "DEVICE_HAS_NO_CMDWEPROTA, DEVICE_HAS_FLASH_128_BIT_WORD",
+   "file": "source/ti/driverlib/dl_flashctl.h"
+  },
+  {
+   "fact": "unprotect rule",
+   "file": "source/ti/driverlib/dl_flashctl.c (DL_FlashCTL_unprotectSector)"
+  },
+  {
+   "fact": "CMDBYTEN values",
+   "file": "source/ti/driverlib/dl_flashctl.h (DL_FLASHCTL_PROGRAM_64_WITHOUT_ECC 0xFF, _WITH_ECC 0x1FF) and examples/nortos/LP_MSPM0G5187/driverlib/flashctl_multiple_size_write/flashctl_multiple_size_write.c"
+  },
+  {
+   "fact": "FLASHCTL and GPIO register offsets",
+   "file": "source/ti/devices/msp/peripherals/hw_flashctl.h, hw_gpio.h"
+  },
+  {
+   "fact": "CPUSS CTL 0x1300 from base 0x40400000",
+   "file": "source/ti/devices/msp/peripherals/m0p/hw_cpuss.h and source/ti/devices/msp/m0p/mspm0g518x.h"
+  },
+  {
+   "fact": "RESETLEVEL 0x1300 and RESETCMD 0x1304 from SYSCTL base 0x400AF000; BOOT level 1; KEY 0xE4 and GO",
+   "file": "source/ti/devices/msp/peripherals/m0p/sysctl/hw_sysctl_mspm0g518x.h"
+  },
+  {
+   "fact": "FACTORYREGION identity and SRAMFLASH (flash size, bank count)",
+   "file": "source/ti/devices/msp/peripherals/m0p/hw_factoryregion.h"
+  }
+ ],
+ "hardware": {
+  "board": "mspm0g5187",
+  "probe": "MG020001",
+  "module": "site/flash/mspm0-dap.js unchanged",
+  "started": "2026-10-15T04:42:33.861Z",
+  "steps": [
+   {
+    "name": "1: connect and identify",
+    "ms": 43,
+    "traceid": "0x000A6E83",
+    "deviceid": "0x0BBBC02F",
+    "userid": "0x80105610",
+    "dap_firmware": "1.2.0"
+   },
+   {
+    "name": "RAM alias check (SRAM only, no flash)",
+    "ms": 26,
+    "wrote": "0x20200100",
+    "read_at": "0x20000100",
+    "value": "0xA5C3F00D",
+    "alias_of_loader_base": true
+   },
+   {
+    "name": "save main flash",
+    "ms": 9989,
+    "bytes": 131072,
+    "sha256": "f1a76dd941d5ca69bc6a0c1957727e36ee22aa1e2aaab6c3c0c0facf9399961d",
+    "flash_kb": 128,
+    "banks": 2,
+    "sramflash": "0x20201080"
+   },
+   {
+    "name": "start the board's own program again (never leave a core halted)",
+    "ms": 333
+   },
+   {
+    "name": "2: connect and identify",
+    "ms": 34,
+    "traceid": "0x000A6E83",
+    "deviceid": "0x0BBBC02F",
+    "userid": "0x80105610",
+    "dap_firmware": "1.2.0"
+   },
+   {
+    "name": "flash blink image",
+    "ms": 175,
+    "flash_ms": 175,
+    "image_sha256": "724884c89e33bd0efcb9dbd56e7f6984a3699615aec8c62e195e94b5f318fd60"
+   },
+   {
+    "name": "run blink (boot reset)",
+    "ms": 330
+   },
+   {
+    "name": "check blink LED",
+    "ms": 4010,
+    "pass": true,
+    "outputEnabled": true,
+    "levels": [
+     [
+      0,
+      895
+     ],
+     [
+      1,
+      150
+     ],
+     [
+      0,
+      150
+     ],
+     [
+      1,
+      149
+     ],
+     [
+      0,
+      895
+     ],
+     [
+      1,
+      149
+     ],
+     [
+      0,
+      150
+     ],
+     [
+      1,
+      148
+     ]
+    ],
+    "samples": 23784,
+    "rate_per_s": 5946
+   },
+   {
+    "name": "3: connect and identify",
+    "ms": 34,
+    "traceid": "0x000A6E83",
+    "deviceid": "0x0BBBC02F",
+    "userid": "0x80105610",
+    "dap_firmware": "1.2.0"
+   },
+   {
+    "name": "send colors 1",
+    "ms": 476,
+    "flashed": true,
+    "image_sha256": "a2cf8bc30a137a37aee191b5d9c191ad249b46131488762061daa03559b992eb"
+   },
+   {
+    "name": "run color player 1",
+    "ms": 332
+   },
+   {
+    "name": "check colors 1 on 0x400A0000",
+    "ms": 4712,
+    "pass": true,
+    "mask": 3,
+    "levels": [
+     [
+      2,
+      498
+     ],
+     [
+      0,
+      995
+     ],
+     [
+      1,
+      498
+     ],
+     [
+      2,
+      497
+     ],
+     [
+      0,
+      996
+     ],
+     [
+      1,
+      496
+     ],
+     [
+      2,
+      499
+     ]
+    ],
+    "samples": 28176,
+    "rate_per_s": 5995
+   },
+   {
+    "name": "check colors 1 on 0x400A2000",
+    "ms": 4706,
+    "pass": true,
+    "mask": 4,
+    "levels": [
+     [
+      0,
+      1492
+     ],
+     [
+      4,
+      497
+     ],
+     [
+      0,
+      1493
+     ],
+     [
+      4,
+      498
+     ]
+    ],
+    "samples": 27108,
+    "rate_per_s": 5769
+   },
+   {
+    "name": "send colors 2",
+    "ms": 155,
+    "flashed": false,
+    "image_sha256": "a2cf8bc30a137a37aee191b5d9c191ad249b46131488762061daa03559b992eb"
+   },
+   {
+    "name": "run color player 2",
+    "ms": 334
+   },
+   {
+    "name": "check colors 2 on 0x400A0000",
+    "ms": 4008,
+    "pass": true,
+    "mask": 3,
+    "levels": [
+     [
+      3,
+      398
+     ],
+     [
+      2,
+      398
+     ],
+     [
+      3,
+      248
+     ],
+     [
+      0,
+      248
+     ],
+     [
+      3,
+      398
+     ],
+     [
+      2,
+      398
+     ],
+     [
+      3,
+      249
+     ],
+     [
+      0,
+      252
+     ]
+    ],
+    "samples": 23580,
+    "rate_per_s": 5895
+   },
+   {
+    "name": "check colors 2 on 0x400A2000",
+    "ms": 4004,
+    "pass": true,
+    "mask": 4,
+    "levels": [
+     [
+      4,
+      646
+     ],
+     [
+      0,
+      647
+     ],
+     [
+      4,
+      646
+     ],
+     [
+      0,
+      648
+     ],
+     [
+      4,
+      646
+     ]
+    ],
+    "samples": 23772,
+    "rate_per_s": 5946
+   },
+   {
+    "name": "4: connect and identify",
+    "ms": 34,
+    "traceid": "0x000A6E83",
+    "deviceid": "0x0BBBC02F",
+    "userid": "0x80105610",
+    "dap_firmware": "1.2.0"
+   },
+   {
+    "name": "restore saved flash",
+    "ms": 10477
+   },
+   {
+    "name": "read back after restore",
+    "ms": 9878,
+    "identical": true,
+    "sha256": "f1a76dd941d5ca69bc6a0c1957727e36ee22aa1e2aaab6c3c0c0facf9399961d"
+   },
+   {
+    "name": "start restored program",
+    "ms": 331,
+    "started": true
+   }
+  ],
+  "factory": {
+   "flash_kb": 128,
+   "banks": 2,
+   "sramflash": "0x20201080"
+  },
+  "finished": "2026-10-15T04:43:29.569Z"
+ }
+}

@@ -1,0 +1,26 @@
+[
+ {
+  "board": "mspm0l1306",
+  "kit": "LP-MSPM0L1306",
+  "deviceid": 196616239,
+  "mask": 268435455
+ },
+ {
+  "board": "mspm0g3507",
+  "kit": "LP-MSPM0G3507",
+  "deviceid": 196640815,
+  "mask": 268435455
+ },
+ {
+  "board": "mspm0g3519",
+  "kit": "LP-MSPM0G3519",
+  "deviceid": 196775983,
+  "mask": 268435455
+ },
+ {
+  "board": "mspm0g5187",
+  "kit": "LP-MSPM0G5187",
+  "deviceid": 196853807,
+  "mask": 268435455
+ }
+]

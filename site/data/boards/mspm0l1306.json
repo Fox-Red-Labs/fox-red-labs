@@ -75,7 +75,7 @@
    "source": "mspm0l1306/data/restore-check.txt"
   },
   {
-   "t": "Small AI model in 4 kB of RAM",
+   "t": "A tiny edge AI model in 4 kB of RAM",
    "st": "works",
    "result": "8k-parameter room-occupancy model, 20 of 20 test vectors right, 84 to 100 ms; the 30k model does not fit",
    "source": "mspm0l1306/bench/RESULTS-mspm0l1306.md"
@@ -279,7 +279,7 @@
   ],
   [
    "84 ms",
-   "Small AI model",
+   "Edge AI model",
    "8k parameters, 20 of 20 right",
    "mspm0l1306/bench/RESULTS-mspm0l1306.md"
   ]
@@ -287,7 +287,7 @@
  "good_for": [
   "Small sensors and controllers that read light, temperature or a voltage with the analog parts on the chip",
   "Learning bare-metal C with TI's examples: 156 build from a terminal and every safe one ran",
-  "Very small AI models in software: an 8k-parameter model ran; 30k did not link (suspected RAM limit)",
+  "Very small edge AI models in software: an 8k-parameter model ran; 30k did not link (suspected RAM limit)",
   "Cost-sensitive designs: the chip is $0.65 in thousands"
  ],
  "not_for": [

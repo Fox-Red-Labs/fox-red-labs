@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-10",
+ "generated": "2026-11-11",
  "source": "data/support-matrix.json",
  "what_a_row_is": "the works-with grid per TI family: ran, partial, built, ships, early, community, untried, with evidence",
  "row_fields": [

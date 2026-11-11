@@ -62,7 +62,7 @@ Only for the optional screen. Header pins are the LP-EM-CC35X1's (SDK board file
 
    If the board later says No server, check that the computer's firewall allows port 8000 from the Wi-Fi.
 
-2. **Bench.** Press the BOOSTXL-AUDIO onto the LaunchPad headers. For the screen, wire the 3.5 inch touch panel as in the pin table above; keep the pack's J5 jumper on its default SPI DAC position.
+2. **Bench.** Press the BOOSTXL-AUDIO onto the LaunchPad headers. For the screen, wire the 3.5 inch touch panel as in the wiring picture and the wire table above; keep the pack's J5 jumper on its default SPI DAC position.
 
    You should see: The pack sits flat on the headers. No wire is needed for voice alone.
 

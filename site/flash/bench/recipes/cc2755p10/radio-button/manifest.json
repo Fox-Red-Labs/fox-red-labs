@@ -1,0 +1,128 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "cc2755p10",
+ "kit": "LP-EM-CC2755P10",
+ "revisions_tested": [
+  "LP-EM-CC2755P10, probe LS5600RE, 2026-10-22 (see data/results/cc2755p10.csv)"
+ ],
+ "chip": {
+  "deviceid": "0x6BB9802F"
+ },
+ "recipe": "radio-button",
+ "console": {
+  "uart": "the XDS110 backchannel (the probe's second serial port, /dev/cu.usbmodem<serial>1 on a Mac)",
+  "baud": 115200,
+  "format": "8N1"
+ },
+ "params": {
+  "kind": "params",
+  "format": 1,
+  "addr": "0x000DF800",
+  "magic": "0x50524C46",
+  "image_id": 8,
+  "items": [
+   {
+    "id": "repeat_ms",
+    "label": "Repeat the buttons line every",
+    "unit": "ms",
+    "min": 100,
+    "max": 60000,
+    "default": 1000,
+    "step": 100,
+    "note": "lines also print at once on every press or release"
+   }
+  ],
+  "region": "the last 2 kB sector below the security firmware; one sector write through the chip's mailbox, then a reset"
+ },
+ "status": {
+  "addr": "0x20002648",
+  "magic": "0x53524C46",
+  "words": [
+   "magic",
+   "demo",
+   "counter",
+   "aux"
+  ],
+  "demo_id": 3
+ },
+ "image": {
+  "file": "radio-button.hex",
+  "format": "Intel HEX",
+  "sha256": "25890bb37d34f12b29ab9094c0ac8e8ed6a8f6275620f39d5deade01f438ade1",
+  "bytes": 40266,
+  "data_bytes": 14613,
+  "main_flash_end": "0x2D18",
+  "segments": [
+   {
+    "region": "main flash",
+    "start": "0x00000000",
+    "end": "0x00002C71",
+    "bytes": 11377
+   },
+   {
+    "region": "main flash",
+    "start": "0x00002C74",
+    "end": "0x00002D18",
+    "bytes": 164
+   },
+   {
+    "region": "ccfg",
+    "start": "0x4E020000",
+    "end": "0x4E020800",
+    "bytes": 2048
+   },
+   {
+    "region": "scfg",
+    "start": "0x4E040000",
+    "end": "0x4E040400",
+    "bytes": 1024
+   }
+  ]
+ },
+ "elf": {
+  "file": "radio-button.out",
+  "sha256": "89b43faf12df088877150be5ae1933da5b220fe2d291559f776b08de2a8c2f49",
+  "bytes": 39356,
+  "note": "stripped; the .hex was made from the unstripped ELF"
+ },
+ "config": {
+  "ccfg": {
+   "addr": "0x4E020000",
+   "bytes": 2048,
+   "source": "cc2755p10/ble-light/known-good/ccfg.bin",
+   "sha256": "448712d24837e2b381e7c53b8085446276294af376920132492e0d83a825ba25"
+  },
+  "scfg": {
+   "addr": "0x4E040000",
+   "bytes": 1024,
+   "source": "cc2755p10/ble-light/known-good/scfg.bin",
+   "sha256": "e39761ce57d24e460d49fdcb15f56ca2914664e10c52c51a1afe3cfe3d1517ea"
+  },
+  "origin": "read from the LP-EM-CC2755P10 on probe LB07021W on 2026-10-15 (web flasher save)"
+ },
+ "source": {
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/nortos/LP_EM_CC2755P10/drivers/empty",
+  "added": [
+   "frl_demo.c",
+   "frl_demo.syscfg"
+  ],
+  "sha256_frl_demo_c": "1481af1aa220dafb0afc15e1e00b80ca48367df677ce46d07e64fd93783b06aa",
+  "rebuild": "cc2755p10/radio-demos/build.sh cc2755p10 button"
+ },
+ "tools": {
+  "sdk": {
+   "version": "9.21.00.36"
+  },
+  "sysconfig": {
+   "version": "1.28.0"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS"
+  }
+ },
+ "expect": "LED0 follows BTN-1 and LED1 follows BTN-2 (pressed = lit); prints \"buttons: BTN-1 up, BTN-2 down, presses N\" on every change and every period_ms; frl_status.aux holds the buttons (bit 0 BTN-1, bit 1 BTN-2), counter the presses",
+ "made": "2026-10-22T15:04:52",
+ "release_cleared": false,
+ "release_note": "Built from TI's drivers/empty example (BSD-3-Clause, NOTICE.txt) plus our frl_demo.c. Not cleared for public distribution."
+}

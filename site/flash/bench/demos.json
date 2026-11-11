@@ -1,0 +1,811 @@
+{
+ "made_from": [
+  "site/data/projects.json"
+ ],
+ "projects": [
+  {
+   "slug": "blink",
+   "t": "Blink an LED",
+   "tier": "easy",
+   "what": "Plug in, build TI's blink, then change the pattern.",
+   "time": "3 min to blink, tools installed; first-time install about 30 min, 10 GB",
+   "href": "../../project-blink.html",
+   "boards": {
+    "mspm0g3507": "yes",
+    "cc2340r5": "yes",
+    "cc2755p10": "yes",
+    "mspm0l1306": "yes",
+    "mspm0g3519": "yes",
+    "mspm0c1104": "yes",
+    "mspm0g5187": "yes",
+    "mspm33c321a": "yes",
+    "am13e230": "yes",
+    "cc35x1": "yes"
+   }
+  },
+  {
+   "slug": "print-a-message",
+   "t": "Print a message from the board on your computer",
+   "tier": "easy",
+   "what": "Send text from the chip to a terminal on the Mac over the USB serial port, and loop it back.",
+   "time": "10 min, tools installed; tools need 12 GB free, once",
+   "href": "../../project-print-a-message.html",
+   "boards": {
+    "mspm33c321a": "yes",
+    "cc35x1": "yes",
+    "mspm0g3507": "yes",
+    "cc2340r5": "yes",
+    "mspm0l1306": "yes",
+    "mspm0g5187": "yes",
+    "cc2755p10": "yes",
+    "mspm0g3519": "yes"
+   }
+  },
+  {
+   "slug": "temperature",
+   "t": "Read a temperature sensor",
+   "tier": "medium",
+   "what": "The board's thermistor or the chip's own sensor, printed every second.",
+   "time": "30 min",
+   "href": "../../project-temperature.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "partial"
+   }
+  },
+  {
+   "slug": "small-screen",
+   "t": "Show colors and read touch on a small screen",
+   "tier": "medium",
+   "what": "A 3.5 inch SPI touch display on jumper wires, then a widget library on it.",
+   "time": "1 evening; tools need 12 GB free, once",
+   "href": "../../project-small-screen.html",
+   "boards": {
+    "mspm0g3507": "yes",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested",
+    "mspm0g3519": "partial",
+    "mspm33c321a": "partial"
+   }
+  },
+  {
+   "slug": "small-ai-model",
+   "t": "Run an edge AI model on the chip",
+   "tier": "medium",
+   "what": "A room-occupancy model, 636 to 32,836 weights, timed on the chip and checked against the test set.",
+   "time": "1 evening; tools need 12 GB free, once",
+   "href": "../../project-small-ai-model.html",
+   "boards": {
+    "mspm0g3507": "yes",
+    "cc2340r5": "yes",
+    "mspm0l1306": "yes",
+    "cc2755p10": "yes",
+    "cc35x1": "yes",
+    "mspm0g3519": "yes",
+    "mspm0g5187": "yes",
+    "mspm33c321a": "yes",
+    "am13e230": "yes",
+    "mspm0c1104": "no"
+   }
+  },
+  {
+   "slug": "handwritten-digits",
+   "t": "Recognize a handwritten digit on the chip",
+   "tier": "medium",
+   "what": "Draw a digit on a touch screen and a TI LaunchPad shows its answer. It takes 34 ms to read the digit; the demo waits half a second after you lift your finger before it looks. The same neural net reads its ten stored test digits on four boards.",
+   "time": "1 evening; tools need 12 GB free, once",
+   "href": "../../project-handwritten-digits.html",
+   "boards": {
+    "mspm0g3507": "yes",
+    "cc2340r5": "yes",
+    "mspm0l1306": "yes",
+    "mspm0g3519": "yes",
+    "mspm0g5187": "yes",
+    "mspm33c321a": "yes",
+    "cc2755p10": "yes",
+    "mspm0c1104": "partial"
+   }
+  },
+  {
+   "slug": "bluetooth-sensor",
+   "t": "Send a sensor reading to a phone over Bluetooth",
+   "tier": "hard",
+   "what": "A beacon or TI's example advertising a reading to a phone or a Mac.",
+   "time": "1 evening",
+   "href": "../../project-bluetooth-sensor.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "partial",
+    "mspm0l1306": "no",
+    "cc2755p10": "partial",
+    "cc35x1": "partial"
+   }
+  },
+  {
+   "slug": "battery-sensor-home-assistant",
+   "t": "Add a low-power temperature sensor to Home Assistant",
+   "tier": "hard",
+   "what": "A sleepy Zigbee sensor reporting a temperature into Home Assistant.",
+   "time": "about 10 min from build to the first reading; tools need about 13 GB, once",
+   "href": "../../project-battery-sensor-home-assistant.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "untested",
+    "mspm0l1306": "no",
+    "mspm0c1104": "no",
+    "mspm0g3519": "no",
+    "mspm0g5187": "no",
+    "mspm33c321a": "no",
+    "am13e230": "no",
+    "cc35x1": "no"
+   }
+  },
+  {
+   "slug": "zigbee-light",
+   "t": "Switch a board's LED from Home Assistant over Zigbee",
+   "tier": "hard",
+   "what": "TI's on/off light example joined to Home Assistant through a Zigbee coordinator; Home Assistant switches the board's LED.",
+   "time": "about 20 min from build to a switch on 2026-10-05, not reproduced; tools need about 15 GB, once",
+   "href": "../../project-zigbee-light.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "partial",
+    "mspm0l1306": "no",
+    "mspm0c1104": "no",
+    "mspm0g3519": "no",
+    "mspm0g5187": "no",
+    "mspm33c321a": "no",
+    "am13e230": "no",
+    "cc35x1": "no",
+    "cc2755p10": "yes"
+   }
+  },
+  {
+   "slug": "sub-ghz-link",
+   "t": "Send sensor readings over a sub-1 GHz radio",
+   "tier": "hard",
+   "what": "Temperature, humidity and light from a Sensors BoosterPack, sent once a second at 915 MHz by a plain MSPM0 and a CC1407P radio plug-in, received by a CC1354P10 LaunchPad.",
+   "time": "an evening with two boards; the receiver build needs about 110 MB of SDK files",
+   "href": "../../project-sub-ghz-link.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "no",
+    "mspm0l1306": "no",
+    "mspm0g5187": "yes"
+   }
+  },
+  {
+   "slug": "radar-presence",
+   "t": "See whether a room is occupied with a 60 GHz radar",
+   "tier": "medium",
+   "what": "TI's 60 GHz radar board streams who is where in a room over USB with no setup; a script reads it and a timed test measures detection range, delay and false alarms.",
+   "time": "ten minutes to see frames; an afternoon for the timed test",
+   "href": "../../project-radar-presence.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "wifi-sensor",
+   "t": "Send a sensor reading to Home Assistant over Wi-Fi",
+   "tier": "hard",
+   "what": "A sensor reporting over Wi-Fi into Home Assistant.",
+   "time": "no timed run",
+   "href": "../../project-wifi-sensor.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "no",
+    "mspm0l1306": "no",
+    "cc35x1": "partial"
+   }
+  },
+  {
+   "slug": "ota-update",
+   "t": "Update a board's firmware over the air",
+   "tier": "hard",
+   "what": "An over-the-air firmware update from Home Assistant or a laptop.",
+   "time": "about 2 min to build",
+   "href": "../../project-ota-update.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "partial",
+    "mspm0l1306": "no",
+    "cc35x1": "yes"
+   }
+  },
+  {
+   "slug": "matter-device",
+   "t": "A Matter light in Apple Home",
+   "tier": "hard",
+   "what": "Switch the CC35X1's red LED from Apple Home over Wi-Fi.",
+   "time": "About 20 min after host setup (estimate)",
+   "href": "../../project-matter-device.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "no",
+    "mspm0l1306": "no",
+    "cc2755p10": "partial",
+    "mspm0c1104": "no",
+    "mspm0g3519": "no",
+    "mspm0g5187": "no",
+    "mspm33c321a": "no",
+    "am13e230": "no",
+    "cc35x1": "yes"
+   }
+  },
+  {
+   "slug": "speed-test",
+   "t": "Measure how fast a chip runs (CoreMark)",
+   "tier": "medium",
+   "what": "CoreMark and the rest of the suite, the same source on every board, by compiler and operating system.",
+   "time": "85 s to rerun; tools need 12 GB free, once",
+   "href": "../../project-speed-test.html",
+   "boards": {
+    "mspm0g3507": "yes",
+    "cc2340r5": "yes",
+    "mspm0l1306": "yes",
+    "cc2755p10": "yes",
+    "cc35x1": "yes",
+    "mspm0g3519": "yes",
+    "mspm0g5187": "yes",
+    "mspm33c321a": "yes",
+    "am13e230": "yes",
+    "mspm0c1104": "no"
+   }
+  },
+  {
+   "slug": "reaction-time",
+   "t": "How fast a chip reacts to a signal",
+   "tier": "medium",
+   "what": "Interrupt latency, and a sensor-to-output control step like a motor controller runs.",
+   "time": "1 evening; tools need 12 GB free, once",
+   "href": "../../project-reaction-time.html",
+   "boards": {
+    "mspm0g3507": "yes",
+    "cc2340r5": "yes",
+    "mspm0l1306": "yes",
+    "cc2755p10": "yes",
+    "cc35x1": "yes",
+    "mspm0c1104": "yes",
+    "mspm0g3519": "yes",
+    "mspm0g5187": "yes",
+    "mspm33c321a": "yes",
+    "am13e230": "partial"
+   }
+  },
+  {
+   "slug": "battery-life",
+   "t": "Measure a board's current draw, for battery life",
+   "tier": "medium",
+   "what": "Running and STANDBY current measured through the debug probe of a second board. Coin-cell life is not measured.",
+   "time": "1 evening",
+   "href": "../../project-battery-life.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "build-from-terminal",
+   "t": "Build and flash from the terminal in one command",
+   "tier": "easy",
+   "what": "One make command and one flash command, no window.",
+   "time": "5 min once the tools are installed (12 GB, once)",
+   "href": "../../project-build-from-terminal.html",
+   "boards": {
+    "mspm0g3507": "yes",
+    "cc2340r5": "yes",
+    "mspm0l1306": "yes",
+    "mspm0g5187": "yes",
+    "cc2755p10": "yes",
+    "cc35x1": "yes",
+    "mspm0c1104": "yes",
+    "mspm0g3519": "yes",
+    "mspm33c321a": "yes",
+    "am13e230": "yes"
+   }
+  },
+  {
+   "slug": "run-zephyr",
+   "t": "Run the Zephyr real-time operating system",
+   "tier": "hard",
+   "what": "Zephyr's blink from the command line, on the upstream board or on an out-of-tree board file.",
+   "time": "about 3 min with this repo's script; 2 GB download, nothing else to install",
+   "href": "../../project-run-zephyr.html",
+   "boards": {
+    "mspm0g3507": "yes",
+    "cc2340r5": "partial",
+    "mspm0l1306": "partial",
+    "cc2755p10": "partial",
+    "am13e230": "yes",
+    "mspm0g3519": "no"
+   }
+  },
+  {
+   "slug": "run-freertos",
+   "t": "Run the FreeRTOS real-time operating system",
+   "tier": "hard",
+   "what": "FreeRTOS tasks on a chip with no TI example, and how many fit.",
+   "time": "1 evening; tools need 12 GB free, once",
+   "href": "../../project-run-freertos.html",
+   "boards": {
+    "mspm0g3507": "builds",
+    "cc2340r5": "yes",
+    "mspm0l1306": "yes",
+    "cc2755p10": "yes",
+    "cc35x1": "yes",
+    "mspm0c1104": "yes",
+    "mspm0g3519": "yes",
+    "mspm0g5187": "yes",
+    "mspm33c321a": "yes",
+    "am13e230": "yes"
+   }
+  },
+  {
+   "slug": "arduino",
+   "t": "Run Arduino's own sketches on a TI chip",
+   "tier": "hard",
+   "what": "The Arduino API on a TI chip, through the Zephyr-based Arduino core or through this repository's portability layer.",
+   "time": "about 80 s a build after a one-time setup of about 5 GB of tools",
+   "href": "../../project-arduino.html",
+   "boards": {
+    "mspm0g3507": "partial",
+    "cc2340r5": "yes",
+    "mspm0l1306": "no",
+    "mspm0g3519": "yes",
+    "mspm0g5187": "yes"
+   }
+  },
+  {
+   "slug": "micropython",
+   "t": "Program a TI chip in Python (MicroPython)",
+   "tier": "hard",
+   "what": "MicroPython on a TI chip, through upstream MicroPython's own Zephyr port.",
+   "time": "about 3 minutes a build after a one-time setup of about 5 GB of tools",
+   "href": "../../project-micropython.html",
+   "boards": {
+    "mspm0g3507": "builds",
+    "cc2340r5": "yes",
+    "mspm0l1306": "no",
+    "mspm0g3519": "partial",
+    "mspm33c321a": "partial",
+    "mspm0g5187": "yes"
+   }
+  },
+  {
+   "slug": "esphome",
+   "t": "Configure a TI radio chip with ESPHome",
+   "tier": "hard",
+   "what": "ESPHome's YAML configuration running on a TI radio chip, built and flashed with ESPHome's own commands.",
+   "time": "about 1 min from esphome compile to a running device on the LP-EM-CC2755P10: 35 s build, 15 s upload, 5.7 to 6.3 s to join",
+   "href": "../../project-esphome.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "yes",
+    "mspm0l1306": "no",
+    "mspm0c1104": "no",
+    "mspm0g3519": "no",
+    "mspm0g5187": "no",
+    "mspm33c321a": "no",
+    "am13e230": "no",
+    "cc2755p10": "yes",
+    "cc35x1": "partial"
+   }
+  },
+  {
+   "slug": "linux-vision",
+   "t": "Run a vision model on a Linux board's AI accelerator",
+   "tier": "hard",
+   "what": "TI's SK-TDA4VM starter kit on its Edge AI Linux: boot it, run TI's model zoo on the C7x accelerator, decode video into a model with no CPU copy, and measure what the two Arm cores are left doing.",
+   "time": "one evening; 62 min from a working serial console to the first login, 15 GB on a second computer",
+   "href": "../../project-linux-vision.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "no",
+    "mspm0l1306": "no",
+    "cc2755p10": "no",
+    "cc35x1": "no",
+    "mspm0c1104": "no",
+    "mspm0g3519": "no",
+    "mspm0g5187": "no",
+    "mspm33c321a": "no",
+    "am13e230": "no"
+   }
+  },
+  {
+   "slug": "alarm-listener",
+   "t": "Detect a smoke alarm's beeps with a microphone",
+   "tier": "hard",
+   "what": "Try an experimental alarm-pattern detector on the LP-MSPM0G5187. It reported smoke-alarm sounds played through a laptop speaker; learning has run over USB. Detection and learning with a real alarm remain untested.",
+   "time": "1 evening; tools need 12 GB free, once",
+   "href": "../../project-alarm-listener.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested",
+    "mspm0g5187": "partial"
+   }
+  },
+  {
+   "slug": "bldc-spin",
+   "t": "Spin a brushless motor",
+   "tier": "hard",
+   "what": "A three-phase brushless motor with Hall sensors, spun three ways from one LaunchPad and one driver board: six-step on the Halls, field-oriented control (FOC) on the Halls, and FOC with the Halls out of the control loop.",
+   "time": "1 evening for six-step; a day for the FOC versions; tools need about 10 GB, once",
+   "href": "../../project-bldc-spin.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested",
+    "am13e230": "yes",
+    "mspm33c321a": "partial"
+   }
+  },
+  {
+   "slug": "tool-telemetry",
+   "t": "Asset tracking over Bluetooth",
+   "tier": "hard",
+   "what": "A machine's motor MCU sends run events, run time and overcurrent trips to a Bluetooth tag. A Wi-Fi hub collects every machine in range and serves a phone app, no internet. An edge AI model on the tag classifies each event.",
+   "time": "an afternoon with two boards",
+   "href": "../../project-tool-telemetry.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "yes",
+    "mspm0l1306": "untested",
+    "cc2755p10": "yes",
+    "cc35x1": "yes",
+    "am13e230": "partial"
+   }
+  },
+  {
+   "slug": "ble-gamepad",
+   "t": "Make a Bluetooth game controller from a LaunchPad",
+   "tier": "medium",
+   "what": "The LaunchPad kit's two buttons become buttons 1 and 2 of a Bluetooth LE game controller. A Mac lists it under Game Controllers with no driver, and a browser page shows the presses (checked by eye in Chrome).",
+   "time": "1 evening (estimate, not timed)",
+   "href": "../../project-ble-gamepad.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "yes",
+    "mspm0l1306": "no",
+    "mspm0c1104": "no",
+    "mspm0g3519": "no",
+    "mspm0g5187": "no",
+    "mspm33c321a": "no",
+    "am13e230": "no"
+   }
+  },
+  {
+   "slug": "jack-o-lantern-jukebox",
+   "t": "Jack-o'-Lantern Jukebox",
+   "tier": "medium",
+   "what": "A LaunchPad plays a Halloween music and light show from a power bank: orchestra and organ recordings, synth songs and scare sounds through the BOOSTXL-AUDIO, with the board's RGB LED following the music.",
+   "time": "under an hour once the tools are installed (estimate, not timed)",
+   "href": "../../project-jack-o-lantern-jukebox.html",
+   "boards": {
+    "mspm33c321a": "yes",
+    "am13e230": "partial"
+   }
+  },
+  {
+   "slug": "doom",
+   "t": "Doom on a TI board",
+   "tier": "hard",
+   "what": "The Doom engine on two Cortex-M33 kits with the rp2040-doom design, and on the AM62L with a frame-buffer port.",
+   "time": "about an hour once the tools are installed (estimate, not timed)",
+   "href": "../../project-doom.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested",
+    "cc35x1": "yes",
+    "mspm33c321a": "yes",
+    "mspm0g3519": "no"
+   }
+  },
+  {
+   "slug": "arcade",
+   "t": "Retro games on a TI LaunchPad",
+   "tier": "medium",
+   "what": "A Game Boy emulator, Arduboy games, 2048, Minesweeper, CHIP-8 and a ZX Spectrum on LaunchPad screens.",
+   "time": "under an hour per game once the tools are installed (estimate, not timed)",
+   "href": "../../project-arcade.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested",
+    "mspm33c321a": "yes",
+    "mspm0g3519": "yes",
+    "mspm0g5187": "no"
+   }
+  },
+  {
+   "slug": "post-quantum",
+   "t": "Post-quantum on every board",
+   "tier": "hard",
+   "what": "ML-KEM-768 key exchange and ML-DSA-44 signatures, the same portable C, on five TI boards; the full key exchange with a Mac on the CC1354P10.",
+   "time": "an hour once the tools are installed (estimate, not timed)",
+   "href": "../../project-post-quantum.html",
+   "boards": {
+    "mspm0g3507": "builds",
+    "cc2340r5": "yes",
+    "mspm0l1306": "untested",
+    "cc2755p10": "yes",
+    "mspm0g3519": "yes",
+    "mspm33c321a": "yes",
+    "mspm0g5187": "yes"
+   }
+  },
+  {
+   "slug": "dns-ad-blocker",
+   "t": "A DNS ad blocker on a Wi-Fi board",
+   "tier": "hard",
+   "what": "A DNS server on the LP-EM-CC35X1 that answers 0.0.0.0 for 71,492 blocklisted names and forwards the rest.",
+   "time": "about half an hour (estimate, not timed)",
+   "href": "../../project-dns-ad-blocker.html",
+   "boards": {
+    "mspm0g3507": "no",
+    "cc2340r5": "no",
+    "mspm0l1306": "no",
+    "mspm0c1104": "no",
+    "mspm0g3519": "no",
+    "mspm0g5187": "no",
+    "mspm33c321a": "no",
+    "am13e230": "no",
+    "cc2755p10": "no",
+    "cc35x1": "yes"
+   }
+  },
+  {
+   "slug": "ulisp",
+   "t": "A Lisp prompt on a LaunchPad",
+   "tier": "medium",
+   "what": "uLisp 4.9a on the LP-MSPM0G5187, with a 160-line Arduino shim.",
+   "time": "about 10 minutes (estimate, not timed)",
+   "href": "../../project-ulisp.html",
+   "boards": {
+    "mspm0g3507": "builds",
+    "cc2340r5": "yes",
+    "mspm0l1306": "no",
+    "mspm0g5187": "yes",
+    "mspm0g3519": "builds",
+    "cc2755p10": "yes",
+    "mspm33c321a": "yes"
+   }
+  },
+  {
+   "slug": "audio-boosterpack",
+   "t": "Audio BoosterPack on a LaunchPad",
+   "tier": "medium",
+   "what": "A tone and a four-voice tune from the BOOSTXL-AUDIO's DAC on an LP-AM13E230, read back with the pack's microphone, plus a guitar tuner, spectrum, DTMF decoder and noise gate for the same microphone.",
+   "time": "about 20 minutes once the tools are installed (estimate, not timed)",
+   "href": "../../project-audio-boosterpack.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested",
+    "am13e230": "yes",
+    "mspm33c321a": "builds",
+    "mspm0g3519": "builds"
+   }
+  },
+  {
+   "slug": "codecs",
+   "t": "Audio and video codecs on a LaunchPad",
+   "tier": "hard",
+   "what": "LE Audio's LC3, Opus, MP3 and the Plaits synthesizer on an LP-MSPM33C321A, MP3 on an LP-MSPM0G3519, and H.264 video on the LP-MSPM33C321A and LP-AM13E230, each checked frame by frame against a Mac build.",
+   "time": "about 20 minutes per codec once the tools are installed (estimate, not timed)",
+   "href": "../../project-codecs.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested",
+    "mspm33c321a": "yes",
+    "mspm0g3519": "yes",
+    "am13e230": "yes"
+   }
+  },
+  {
+   "slug": "walkie-talkies",
+   "t": "Walkie-talkie over a 915 MHz radio",
+   "tier": "hard",
+   "what": "A spoken line goes from a Mac over a 915 MHz radio link between two LaunchPad kits and plays back the same, one way.",
+   "time": "an afternoon, mostly the CC1354P10 build (estimate, not timed)",
+   "href": "../../project-walkie-talkies.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "no",
+    "mspm0l1306": "no",
+    "mspm0g5187": "yes"
+   }
+  },
+  {
+   "slug": "sub-ghz-demos",
+   "t": "Sub-1 GHz home radio demos",
+   "tier": "hard",
+   "what": "A fox hunt, a key finder and a mailbox, doorbell, panic and keep-close tag set, each run over 915 MHz between an LP-MSPM0G5187 with a CC1407P radio and an LP-CC1354P10-1.",
+   "time": "an afternoon, mostly the CC1354P10 build (estimate, not timed)",
+   "href": "../../project-sub-ghz-demos.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "no",
+    "mspm0l1306": "no",
+    "mspm0g5187": "yes"
+   }
+  },
+  {
+   "slug": "hobby-button-knob-dim",
+   "t": "Button, knob and dimmer",
+   "tier": "easy",
+   "what": "Read the board's own S2 button, read a knob with the analog-to-digital converter, and dim an LED with PWM, in one short build on a breadboard.",
+   "time": "One sitting, not yet timed",
+   "href": "../../project-hobby-button-knob-dim.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-led-sequences",
+   "t": "Traffic light, police strobe and a buzzer tune",
+   "tier": "easy",
+   "what": "Three LEDs run a traffic light, a two-button reaction game times your press, and a passive buzzer plays a 14-note melody, in a loop.",
+   "time": "One sitting, not yet timed",
+   "href": "../../project-hobby-led-sequences.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-parking-sensor",
+   "t": "Parking sensor",
+   "tier": "medium",
+   "what": "An ultrasonic distance sensor measures how far away your hand or a wall is, and a buzzer beeps faster as the distance shrinks.",
+   "time": "One sitting, not yet timed",
+   "href": "../../project-hobby-parking-sensor.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-weather-station",
+   "t": "Room weather station",
+   "tier": "medium",
+   "what": "A DHT11 sensor reads temperature and humidity and a 0.96 inch OLED shows them; the Sensors BoosterPack's own humidity sensor can sit beside it.",
+   "time": "One evening, not yet timed",
+   "href": "../../project-hobby-weather-station.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-servo-pantilt",
+   "t": "Servo on a knob, then pan and tilt",
+   "tier": "medium",
+   "what": "A knob sets the angle of a servo; a second knob and a second servo make a pan and tilt neck.",
+   "time": "One sitting, not yet timed",
+   "href": "../../project-hobby-servo-pantilt.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-pir-alarm",
+   "t": "Motion alarm with a counter",
+   "tier": "medium",
+   "what": "A PIR motion sensor sets off a buzzer, and a four-digit display counts each time something moves in front of it.",
+   "time": "One sitting, not yet timed",
+   "href": "../../project-hobby-pir-alarm.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-motor-knob",
+   "t": "Motor speed from a knob",
+   "tier": "medium",
+   "what": "A rotary knob sets the speed and direction of a small DC motor through a DRV8833 motor driver, with the speed shown on a four-digit display.",
+   "time": "One evening, not yet timed",
+   "href": "../../project-hobby-motor-knob.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-led-strip",
+   "t": "Addressable LED ring and strip",
+   "tier": "medium",
+   "what": "An 8-LED ring from the Freenove kit runs a rainbow and a few effects, then a 60-LED strip runs the same effects.",
+   "time": "One evening, not yet timed",
+   "href": "../../project-hobby-led-strip.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-relay-lamp",
+   "t": "Relay lamp from a button",
+   "tier": "medium",
+   "what": "A push button switches a 12 V lamp through a relay, the first step toward a lamp that a phone or Home Assistant can switch.",
+   "time": "One evening, not yet timed",
+   "href": "../../project-hobby-relay-lamp.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-tilt-level",
+   "t": "Tilt level on an OLED",
+   "tier": "medium",
+   "what": "An MPU6050 reads how the board is tilted and an OLED shows a bubble level that moves as you tilt it.",
+   "time": "One evening, not yet timed",
+   "href": "../../project-hobby-tilt-level.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-robot-car",
+   "t": "Obstacle-avoiding robot car",
+   "tier": "hard",
+   "what": "A two-wheeled robot drives forward, senses an obstacle with an ultrasonic sensor, and turns away.",
+   "time": "Two or three sittings, not yet timed",
+   "href": "../../project-hobby-robot-car.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "hobby-handheld-screen",
+   "t": "Handheld touch screen dashboard",
+   "tier": "hard",
+   "what": "A 3.5 inch touch panel shows a small dashboard of the board's own readings and a few tiles you tap, drawn with LVGL.",
+   "time": "Two or three sittings, not yet timed",
+   "href": "../../project-hobby-handheld-screen.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
+  },
+  {
+   "slug": "sparky-voice-assistant",
+   "t": "A voice assistant on a LaunchPad",
+   "tier": "hard",
+   "what": "Sparky, a voice assistant on the LP-EM-CC35X1 with the Audio BoosterPack: you ask, a server on your network answers, and the board speaks. An optional 3.5 inch touch screen adds four looks and kids' games.",
+   "time": "a day: the server, the build and the programming; the Hey Sparky model needs your own training",
+   "href": "../../project-sparky-voice-assistant.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested",
+    "cc35x1": "yes"
+   }
+  }
+ ]
+}

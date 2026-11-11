@@ -1,0 +1,106 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0g5187",
+ "kit": "LP-MSPM0G5187",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BBBC02F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "color-player",
+ "table": {
+  "addr": "0x0001fc00",
+  "magic": "0x52434C46",
+  "max_steps": 32,
+  "min_ms": 20,
+  "max_ms": 10000,
+  "bits": {
+   "red": 0,
+   "green": 1,
+   "blue": 2
+  },
+  "pins": {
+   "red": {
+    "label": "LED2 red (PA17)",
+    "bit": 17,
+    "gpio": "0x400a0000"
+   },
+   "green": {
+    "label": "LED2 green (PA24)",
+    "bit": 24,
+    "gpio": "0x400a0000"
+   },
+   "blue": {
+    "label": "LED2 blue (PB13)",
+    "bit": 13,
+    "gpio": "0x400a2000"
+   }
+  },
+  "active_high": true,
+  "default": [
+   [
+    1,
+    300
+   ],
+   [
+    2,
+    300
+   ],
+   [
+    4,
+    300
+   ],
+   [
+    0,
+    300
+   ]
+  ]
+ },
+ "expect": "the LED plays the color sequence in the table in the last flash sector (red, green, blue, off at 300 ms each when there is none)",
+ "image": {
+  "file": "firmware.out",
+  "sha256": "a2cf8bc30a137a37aee191b5d9c191ad249b46131488762061daa03559b992eb",
+  "bytes": 7028,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 1080
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "afc63c7e58aa7ac4f1c5132fa084a2d523f43063",
+  "example": "examples/nortos/LP_MSPM0G5187/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/color_player.c",
+  "sha256": "940fdd66b37f88c84354714866a211f9c89752352c519cc9ce99f99549629dca",
+  "edited_line": "the example's main source replaced by the color player",
+  "rebuild": "python3 tools/webflash/build_board.py mspm0g5187"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.26.3",
+   "validated": true,
+   "source": "discovered"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "3.81",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-14T23:20:53",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}

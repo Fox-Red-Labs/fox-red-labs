@@ -1224,5 +1224,3 @@ tool-telemetry/results/tag-cc2340r5-memory.txt
 tool-telemetry/results/tag-cc2755p10-memory.txt
 tools/ai_runs/jobs/tda4-coremark-nodocs.txt
 tools/byom/nnc-container/nnc-compile
-tools/webflash/ai-run.mjs
-tools/webflash/node-radio.mjs

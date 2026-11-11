@@ -1,0 +1,64 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0g3519",
+ "kit": "LP-MSPM0G3519",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BBA902F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "first-wire",
+ "wire": {
+  "addr": "0x20200000",
+  "magic": "0xD1A10001",
+  "from": "J3 pin 30 (PA15, DAC)",
+  "to": "J1 pin 6 (PA25, ADC0.2)"
+ },
+ "expect": "with the wire in, the ADC reads back about the DAC code it was sent",
+ "image": {
+  "file": "firmware.out",
+  "sha256": "28eb20b3815fe6e1e911b1144b9920c4d153b668b3920beb4ac211ae515f190f",
+  "bytes": 8056,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 1152
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "d36ce4ceb167839b58e7714003a277f4d519278a",
+  "example": "examples/nortos/LP_MSPM0G3519/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/wire.c",
+  "sha256": "c06bacadf6e40fdcfbb011a96c3a4974cc525413cc3b4c15949552ea927562df",
+  "edited_line": "the example's main source replaced by the first-wire loop",
+  "rebuild": "python3 tools/webflash/build_wire.py mspm0g3519"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.26.3",
+   "validated": true,
+   "source": "discovered"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "3.81",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-15T18:29:26",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}

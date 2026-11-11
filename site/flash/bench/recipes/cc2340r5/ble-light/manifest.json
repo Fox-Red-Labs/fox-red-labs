@@ -1,0 +1,110 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "cc2340r5",
+ "kit": "LP-EM-CC2340R5",
+ "revisions_tested": [
+  "unknown: not run on a board yet"
+ ],
+ "chip": {
+  "deviceid": "unknown: not read for this build"
+ },
+ "recipe": "ble-light",
+ "ble": {
+  "device_name": "FRL Light",
+  "advertising": "connectable; flags and the 128-bit service UUID in the advertising data, name in the scan response",
+  "service_uuid": "8a570001-4724-4979-ab46-406d217495e5",
+  "characteristics": {
+   "colour": {
+    "uuid": "8a570002-4724-4979-ab46-406d217495e5",
+    "properties": "read, write",
+    "format": "3 bytes R,G,B; a channel is on at 128 or more"
+   },
+   "pattern": {
+    "uuid": "8a570003-4724-4979-ab46-406d217495e5",
+    "properties": "write",
+    "format": "up to 16 steps of R,G,B (3 bytes) + duration ms (uint16 little endian); empty = solid colour"
+   },
+   "status": {
+    "uuid": "8a570004-4724-4979-ab46-406d217495e5",
+    "properties": "read, notify",
+    "format": "ASCII, e.g. 'up=12s step=2/4' or 'up=12s solid', notified once a second"
+   }
+  },
+  "security": "open: no pairing or bonding is requested or required",
+  "leds": "red and green user LEDs of the kit (blue has no LED and is ignored)"
+ },
+ "image": {
+  "file": "ble-light.hex",
+  "format": "Intel HEX",
+  "sha256": "436f3de1bce117b0046777e41480831e2e6440349d2b791b3cc0222fe209b7b5",
+  "bytes": 557797,
+  "data_bytes": 198280,
+  "main_flash_end": "0x2FE9C",
+  "segments": [
+   {
+    "region": "main flash",
+    "start": "0x00000000",
+    "end": "0x0000008C",
+    "bytes": 140
+   },
+   {
+    "region": "main flash",
+    "start": "0x00000090",
+    "end": "0x0002B602",
+    "bytes": 177522
+   },
+   {
+    "region": "main flash",
+    "start": "0x0002B610",
+    "end": "0x0002F966",
+    "bytes": 17238
+   },
+   {
+    "region": "main flash",
+    "start": "0x0002F968",
+    "end": "0x0002FE9C",
+    "bytes": 1332
+   },
+   {
+    "region": "ccfg",
+    "start": "0x4E020000",
+    "end": "0x4E020800",
+    "bytes": 2048
+   }
+  ]
+ },
+ "elf": {
+  "file": "ble-light.out",
+  "sha256": "a5012e3507b6977bef8e9156459b91397464d4fba449424fae1b7a2c2e98ca86",
+  "bytes": 440636,
+  "note": "stripped; the .hex was made from the unstripped ELF"
+ },
+ "config": {
+  "origin": "the CCFG the SDK's SysConfig built into the ELF (CRCs filled by the SDK's crc_tool); not compared with a board yet"
+ },
+ "source": {
+  "repo_commit": "238bca6480aa60fec1f84497d828eb37f375db94",
+  "example": "examples/rtos/LP_EM_CC2340R5/ble/basic_ble",
+  "added": [
+   "frl_light.c",
+   "frl_light.h"
+  ],
+  "sha256_frl_light_c": "4ef1818fb9316d94d996577a1d090b56cc0cc5fc14073adcf3609477def1782f",
+  "rebuild": "cc2755p10/ble-light/build.sh cc2340r5"
+ },
+ "tools": {
+  "sdk": {
+   "version": "9.21.00.36"
+  },
+  "sysconfig": {
+   "version": "1.26.3"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS"
+  }
+ },
+ "expect": "advertises as FRL Light; a Web Bluetooth page can connect without a PIN, set the LED colour, play a pattern and read the status",
+ "made": "2026-10-15T09:21:40",
+ "release_cleared": false,
+ "release_note": "Built from TI's basic_ble example (BSD-3-Clause, NOTICE.txt) plus our frl_light.c. Not cleared for public distribution; not yet run on a board."
+}

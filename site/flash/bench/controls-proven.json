@@ -1,0 +1,14 @@
+{
+ "board": "mspm0l1306",
+ "run": "mspm0l1306/bench/controls/README.md",
+ "made": "2026-10-17",
+ "note": "What ran on the LP-MSPM0L1306 (probe ML130001) in Chrome through bench-test.mjs --controls. A row kind is listed only for what that run proved; anything not listed shows 'Predicted, not tested here'. BoosterPack rows are always predicted: no BoosterPack was on this board.",
+ "rows": {
+  "pin-read": {"label": "Tested here", "note": "PA22 read: the program applied it and reported the level (low). The level was not compared with a known input."},
+  "pin-high": {"label": "Tested here", "note": "PA26 driven high: the pad read high in 588 of 588 samples through the debugger."},
+  "pin-low": {"label": "Tested here", "note": "PA26 driven low: the pad read high in 0 of 576 samples through the debugger."},
+  "toggle": {"label": "Tested here", "note": "PA26 at 200 and 300 ms timed 200 to 203 and 294 to 299 ms; PA13 at 100 and 400 ms timed 99 to 100 and 396 to 399 ms, from the pin's output register."},
+  "pwm": {"label": "Tested here: the timer", "note": "Six settings (PA26 and PA13, 100 Hz to 20 kHz, 10 to 75 percent): load and compare registers equal the values the page worked out, the counter moves, and its share above the compare value was within 1 point of the duty. A steady 100 percent was read from the pad. The waveform on the pad was not observed: the GPIO input register does not follow a timer-driven pad (TI's own PWM example reads the same), and the LED was not watched."},
+  "scan": {"label": "Tested here: found nothing", "note": "The scan ran from 0x08 to 0x77 and nothing acknowledged, as expected with no part on PA0 and PA1. It has not yet found a part on this board."}
+ }
+}

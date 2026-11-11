@@ -1,0 +1,522 @@
+{
+ "_about": "Demo scene for site/boardviz/scene.js (shape in bldc-spin.json): the Waveshare 3.5 inch capacitive touch panel wired to the LP-EM-CC35X1 with the BOOSTXL-AUDIO pack pressed on, for the Hey Sparky voice assistant (project sparky-voice-assistant). Every pin comes from the build's own record, ports/xiaozhi/target-cc35x1/xz_screen.syscfg and the pin table in site/data/projects.json (wiring of the voice variant); the wires end on the pack's stack-through pins t1 and t2, which sit at the same positions as the LaunchPad kit's J1/J3 and J4/J2 (index = col * 10 + row, as in arcade-touch). Panel pin n is fpc15 index n - 1. The step-6 picture is the Core look, drawn by ports/xiaozhi/target-cc35x1/face_preview.py.",
+ "id": "sparky-voice-assistant",
+ "title": "Hey Sparky: the LaunchPad, the audio pack and the 3.5 inch screen",
+ "base": "cc35x1",
+ "boards": [
+  {
+   "id": "boostxl-audio",
+   "mate": [
+    [
+     "j1",
+     "j1"
+    ],
+    [
+     "j2",
+     "j2"
+    ]
+   ],
+   "rot": 0,
+   "lift": 9
+  },
+  {
+   "id": "waveshare-35-touch",
+   "at": [
+    70,
+    -4,
+    0
+   ],
+   "rot": 0
+  }
+ ],
+ "things": [],
+ "wires": [
+  {
+   "id": "vcc",
+   "color": "#d7262a",
+   "from": "waveshare-35-touch.fpc15.pin0",
+   "to": "boostxl-audio.t1.pin0",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 1, VCC",
+    "J1 pin 1 (3V3)"
+   ],
+   "label": "VCC"
+  },
+  {
+   "id": "gnd",
+   "color": "#1b1b1b",
+   "from": "waveshare-35-touch.fpc15.pin2",
+   "to": "boostxl-audio.t2.pin10",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 3, GND",
+    "J2 pin 20 (GND)"
+   ],
+   "label": "GND"
+  },
+  {
+   "id": "sclk",
+   "color": "#f2b705",
+   "from": "waveshare-35-touch.fpc15.pin5",
+   "to": "boostxl-audio.t1.pin3",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 6, SCLK",
+    "J1 pin 4 (GPIO17)"
+   ],
+   "label": "SCLK"
+  },
+  {
+   "id": "mosi",
+   "color": "#2a5bd7",
+   "from": "waveshare-35-touch.fpc15.pin4",
+   "to": "boostxl-audio.t2.pin2",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 5, MOSI",
+    "J4 pin 38 (GPIO19)"
+   ],
+   "label": "MOSI"
+  },
+  {
+   "id": "miso",
+   "color": "#2fa84f",
+   "from": "waveshare-35-touch.fpc15.pin3",
+   "to": "boostxl-audio.t1.pin2",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 4, MISO",
+    "J1 pin 3 (GPIO18)"
+   ],
+   "label": "MISO"
+  },
+  {
+   "id": "cs",
+   "color": "#f4f4f4",
+   "from": "waveshare-35-touch.fpc15.pin7",
+   "to": "boostxl-audio.t2.pin3",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 8, LCD_CS",
+    "J4 pin 37 (GPIO16)"
+   ],
+   "label": "LCD_CS"
+  },
+  {
+   "id": "dc",
+   "color": "#8a5a2b",
+   "from": "waveshare-35-touch.fpc15.pin8",
+   "to": "boostxl-audio.t2.pin12",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 9, LCD_DC",
+    "J2 pin 18 (GPIO26)"
+   ],
+   "label": "LCD_DC"
+  },
+  {
+   "id": "bl",
+   "color": "#f08a24",
+   "from": "waveshare-35-touch.fpc15.pin10",
+   "to": "boostxl-audio.t1.pin7",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 11, LCD_BL",
+    "J1 pin 8 (GPIO14)"
+   ],
+   "label": "LCD_BL"
+  },
+  {
+   "id": "rst",
+   "color": "#9b59b6",
+   "from": "waveshare-35-touch.fpc15.pin9",
+   "to": "boostxl-audio.t1.pin19",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 10, LCD_RST",
+    "J3 pin 30 (GPIO31)"
+   ],
+   "label": "LCD_RST"
+  },
+  {
+   "id": "sda",
+   "color": "#1aa3a3",
+   "from": "waveshare-35-touch.fpc15.pin11",
+   "to": "boostxl-audio.t1.pin9",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 12, TP_SDA",
+    "J1 pin 10 (GPIO32)"
+   ],
+   "label": "TP_SDA"
+  },
+  {
+   "id": "scl",
+   "color": "#7f8c8d",
+   "from": "waveshare-35-touch.fpc15.pin12",
+   "to": "boostxl-audio.t1.pin8",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 13, TP_SCL",
+    "J1 pin 9 (GPIO33)"
+   ],
+   "label": "TP_SCL"
+  },
+  {
+   "id": "tint",
+   "color": "#e84393",
+   "from": "waveshare-35-touch.fpc15.pin13",
+   "to": "boostxl-audio.t2.pin19",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 14, TP_INT",
+    "J2 pin 11 (GPIO15)"
+   ],
+   "label": "TP_INT"
+  },
+  {
+   "id": "trst",
+   "color": "#b2bec3",
+   "from": "waveshare-35-touch.fpc15.pin14",
+   "to": "boostxl-audio.t2.pin16",
+   "exit": [
+    0,
+    0,
+    10
+   ],
+   "enter": [
+    0,
+    0,
+    10
+   ],
+   "d": 0.7,
+   "ends": [
+    "Panel pin 15, TP_RST",
+    "J2 pin 14 (GPIO28)"
+   ],
+   "label": "TP_RST"
+  }
+ ],
+ "extent": [
+  -10,
+  -10,
+  160,
+  95
+ ],
+ "view": {
+  "azimuth": -0.9,
+  "elevation": 0.8
+ },
+ "steps": [
+  {
+   "title": "The LaunchPad and the panel, no cable in",
+   "text": "The LP-EM-CC35X1 with its Wi-Fi antenna at the top and no cable in, and the Waveshare 3.5 inch panel beside it, its 15-way connector toward the board. No power until the last wire is in.",
+   "focus": "cc35x1.mcu",
+   "focus_label": "The CC3551E chip",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.8,
+      "zoom": 1,
+      "center": [
+       72,
+       38,
+       0
+      ]
+     }
+    },
+    {
+     "drop": "waveshare-35-touch"
+    }
+   ]
+  },
+  {
+   "title": "Press the Audio BoosterPack on",
+   "text": "Press the BOOSTXL-AUDIO onto the LaunchPad headers J1 to J4 and leave its J5 jumper on SPI DAC, the way it ships. The pack's microphone and speaker use pins 5, 6, 7, 12, 13 and 15; none of the screen wires below touch them. You need no wire for voice alone: stop here if you have no screen.",
+   "focus": "boostxl-audio.j1",
+   "focus_label": "Sockets on the headers",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.8,
+      "zoom": 0.95,
+      "center": [
+       72,
+       45,
+       8
+      ]
+     }
+    },
+    {
+     "drop": "boostxl-audio"
+    }
+   ]
+  },
+  {
+   "title": "Power: two wires, 3.3 V only",
+   "text": "Panel VCC to J1 pin 1 (3V3) and panel GND to J2 pin 20 (GND). Plug each wire onto the same pin position on the pack's top headers. The panel's pin 2 (3V3) stays empty, and nothing here touches a 5 V pin.",
+   "focus": "boostxl-audio.t1",
+   "focus_label": "J1 pin 1 is 3V3",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.8,
+      "elevation": 0.9,
+      "zoom": 1.15,
+      "center": [
+       62,
+       48,
+       10
+      ]
+     }
+    },
+    {
+     "wire": [
+      "vcc",
+      "gnd"
+     ]
+    }
+   ],
+   "check": "Red on J1 pin 1 (3V3), black on J2 pin 20 (GND). Nothing on the 5V pin beside 3V3."
+  },
+  {
+   "title": "The screen bus: clock, data and chip select",
+   "text": "SCLK to J1 pin 4 (GPIO17), MOSI to J4 pin 38 (GPIO19), MISO to J1 pin 3 (GPIO18) and LCD_CS to J4 pin 37 (GPIO16). MISO is optional: it only reads the panel ID back at start.",
+   "focus": "boostxl-audio.t1",
+   "focus_label": "J1, outer left column",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.75,
+      "elevation": 0.95,
+      "zoom": 1.2,
+      "center": [
+       62,
+       48,
+       10
+      ]
+     }
+    },
+    {
+     "wire": [
+      "sclk",
+      "mosi",
+      "miso",
+      "cs"
+     ]
+    }
+   ],
+   "check": "Two wires on J1 pins 3 and 4, two on J4 pins 37 and 38."
+  },
+  {
+   "title": "Screen control: data or command, backlight, reset",
+   "text": "LCD_DC to J2 pin 18 (GPIO26), LCD_BL to J1 pin 8 (GPIO14), LCD_RST to J3 pin 30 (GPIO31). Pin 30 also runs to the pack's J5 jumper, so keep J5 on SPI DAC.",
+   "focus": "boostxl-audio.t1",
+   "focus_label": "J1 and J3",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.7,
+      "elevation": 1.0,
+      "zoom": 1.25,
+      "center": [
+       62,
+       48,
+       10
+      ]
+     }
+    },
+    {
+     "wire": [
+      "dc",
+      "bl",
+      "rst"
+     ]
+    }
+   ],
+   "check": "J2 pin 18, J1 pin 8 and J3 pin 30 each have one wire."
+  },
+  {
+   "title": "Touch: four wires",
+   "text": "TP_SDA to J1 pin 10 (GPIO32), TP_SCL to J1 pin 9 (GPIO33), TP_INT to J2 pin 11 (GPIO15), TP_RST to J2 pin 14 (GPIO28). The panel's SD_CS pin stays empty.",
+   "focus": "waveshare-35-touch.fpc15",
+   "focus_label": "15-way connector",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.85,
+      "elevation": 0.85,
+      "zoom": 1.1,
+      "center": [
+       70,
+       42,
+       8
+      ]
+     }
+    },
+    {
+     "wire": [
+      "sda",
+      "scl",
+      "tint",
+      "trst"
+     ]
+    }
+   ],
+   "check": "Thirteen wires in (twelve if you skipped MISO). On the panel only pins 2 (3V3) and 7 (SD_CS) are empty. Tug each wire."
+  },
+  {
+   "title": "Turn the panel face up",
+   "text": "Turn the panel over so the glass faces you; the wires run underneath it. After you build and program the image, the screen shows Sparky's look and the backlight comes on.",
+   "focus": "waveshare-35-touch.screen",
+   "focus_label": "The screen, face up",
+   "do": [
+    {
+     "view": {
+      "azimuth": -0.9,
+      "elevation": 0.9,
+      "zoom": 1.0,
+      "center": [
+       78,
+       40,
+       0
+      ]
+     }
+    },
+    {
+     "flip": "waveshare-35-touch"
+    },
+    {
+     "screen": "waveshare-35-touch.screen",
+     "image": "media/sparky/sparky-look-core.png",
+     "w": 73.4,
+     "h": 48.9,
+     "rot": 0
+    }
+   ]
+  }
+ ]
+}

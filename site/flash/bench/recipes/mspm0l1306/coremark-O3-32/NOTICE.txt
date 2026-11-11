@@ -1,0 +1,1 @@
+EEMBC CoreMark 1.0 (Apache License 2.0, https://github.com/eembc/coremark) with the Fox Red Labs MSPM0 port, TI SysConfig output and TI DriverLib (BSD-3-Clause, Texas Instruments).

@@ -1,0 +1,69 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0c1104",
+ "kit": "LP-MSPM0C1104",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x3BBA102F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "blink-pattern",
+ "pattern_ms": [
+  150,
+  150,
+  150,
+  900
+ ],
+ "led": {
+  "label": "LED1 red (PA22)",
+  "bit": 22,
+  "gpio": "0x400a0000"
+ },
+ "active_high": false,
+ "image": {
+  "file": "firmware.out",
+  "sha256": "0430bfe2bb629e74c300570db3fbe224f4bb10637425ddadf0a2ff7a862cd73d",
+  "bytes": 5736,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 424
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "765a52862cb6f748eaa6866248c49c73a7b1b3de",
+  "example": "examples/nortos/LP_MSPM0C1104/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/blink.c",
+  "sha256": "31bc46c6cb082c07e0cce078e45b13c68f1477a8ece73566331105dbbe946c7a",
+  "edited_line": "PATTERN_MS = 150,150,150,900",
+  "rebuild": "python3 tools/webflash/build_board.py mspm0c1104 --pattern 150,150,150,900"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.26.3",
+   "validated": true,
+   "source": "discovered"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "3.81",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-14T23:20:42",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}

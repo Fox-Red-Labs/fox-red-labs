@@ -1,0 +1,449 @@
+{
+ "_about": "Chip map for the Hey Sparky project page (site/chip/chipview.js through tools/render_projects.py t_chip_panel). Not a board page file, so the board page and the Digital Lab ignore it. Every row traces to ports/xiaozhi/target-cc35x1: xz_main.c (the turn, the button, Wi-Fi), xz_audio.c (the ADC, the timer, the DAC lines), xz_ws.c (WebSocket on TCP), xz_wake.cc (wake word), xz_lcd.c and xz_screen.syscfg (SPI0, DMA, software I2C touch). Header pins are checked against data/boardviz/cc35x1.json and the sizes against data/results/cc35x1.csv (xiaozhi rows) by tools/chip_jobs_project_check.py. chip.ram_bytes is the RAM the linker can place data in (data/results/cc35x1.csv, doom-s3-zone and its static rows: 491,520 + 131,071 + 32,768 + 27,748). chip.flash_bytes is the 2,696 kB application slot.",
+ "board": "cc35x1",
+ "chip": {
+  "part": "CC3551E",
+  "stack_bytes": 0,
+  "flash_bytes": 2760704,
+  "ram_bytes": 683107,
+  "clock_note": "160 MHz"
+ },
+ "kinds": {
+  "core": {
+   "name": "Processor",
+   "color": "#1F4E79"
+  },
+  "mem": {
+   "name": "Memory",
+   "color": "#0F7C8A"
+  },
+  "analog": {
+   "name": "Analog",
+   "color": "#A0522D"
+  },
+  "timer": {
+   "name": "Timers",
+   "color": "#8A6A00"
+  },
+  "conn": {
+   "name": "Serial and pins",
+   "color": "#3F7A3A"
+  },
+  "sys": {
+   "name": "System",
+   "color": "#7A5C99"
+  },
+  "math": {
+   "name": "Math and security",
+   "color": "#56606E"
+  }
+ },
+ "blocks": {
+  "cpu": {
+   "name": "Cortex-M33 CPU",
+   "kind": "core",
+   "sub": "runs the program, 160 MHz",
+   "note": "32-bit Arm Cortex-M33 at 160 MHz in the CC3551E"
+  },
+  "flash": {
+   "name": "Flash",
+   "kind": "mem",
+   "sub": "8 MB chip, 2.6 MB app slot",
+   "note": "The program lives in the 8 MB flash chip on the board; this build takes 1,577 kB of its 2,696 kB application slot"
+  },
+  "sram": {
+   "name": "SRAM",
+   "kind": "mem",
+   "sub": "static RAM, heap not counted",
+   "note": "Static RAM of the voice image; a 319 kB FreeRTOS heap for task stacks sits beside it"
+  },
+  "clk": {
+   "name": "Clocks and power",
+   "kind": "sys",
+   "sub": "160 MHz CPU, 80 MHz timer clock, 3.3 V",
+   "short": "Clocks",
+   "note": "The CPU runs at 160 MHz; the general-purpose timer counts at 80 MHz"
+  },
+  "adc0": {
+   "name": "ADC0",
+   "kind": "analog",
+   "sub": "12 bit, 0 to 3.3 V",
+   "short": "ADC0",
+   "note": "12-bit converter that reads the microphone pin"
+  },
+  "gpt": {
+   "name": "General timer",
+   "kind": "timer",
+   "sub": "16 kHz tick",
+   "short": "Timer",
+   "note": "General-purpose timer whose interrupt sets the 16 kHz sample rate"
+  },
+  "gpio": {
+   "name": "GPIO",
+   "kind": "conn",
+   "sub": "pins",
+   "short": "GPIO",
+   "note": "Digital pins: the button, the DAC's three lines, touch, screen control"
+  },
+  "spi0": {
+   "name": "SPI0",
+   "kind": "conn",
+   "sub": "10 MHz, to the screen",
+   "short": "SPI0",
+   "note": "Serial bus that carries pixels to the screen"
+  },
+  "dma": {
+   "name": "DMA",
+   "kind": "sys",
+   "sub": "moves screen pixels",
+   "short": "DMA",
+   "note": "Moves the pixels to the SPI block without the CPU"
+  },
+  "wifi": {
+   "name": "Wi-Fi 6 radio",
+   "kind": "conn",
+   "sub": "2.4 and 5 GHz",
+   "short": "Wi-Fi",
+   "note": "The Wi-Fi radio and its network stack carry the WebSocket to the server"
+  },
+  "ble": {
+   "name": "Bluetooth LE",
+   "kind": "conn",
+   "sub": "Wi-Fi setup only",
+   "short": "BLE",
+   "note": "Used only to give the board your Wi-Fi name and password"
+  },
+  "uart2": {
+   "name": "UART2",
+   "kind": "conn",
+   "sub": "console, 115200",
+   "short": "UART2",
+   "note": "The text console on the debug probe's serial port"
+  },
+  "wdt": {
+   "name": "Watchdog",
+   "kind": "sys",
+   "sub": "restarts a stuck board",
+   "short": "Watchdog",
+   "note": "A watchdog task restarts the board if it stops responding"
+  }
+ },
+ "builds": {
+  "sparky-voice-assistant": {
+   "title": "Hey Sparky voice assistant",
+   "card_title": "Hey Sparky voice assistant",
+   "card_line": "Audio pack on the LaunchPad, optional 3.5 inch screen.",
+   "status": "Works on this board",
+   "folder": null,
+   "flash": 1614734,
+   "ram": 194143,
+   "parts": {
+    "mic": {
+     "name": "Mic",
+     "note": "on the audio pack"
+    },
+    "s2": {
+     "name": "S2",
+     "note": "on the board"
+    },
+    "ant": {
+     "name": "Antenna",
+     "note": "on the board"
+    },
+    "dac": {
+     "name": "Speaker",
+     "note": "DAC8311, amplifier and speaker on the pack"
+    },
+    "screen": {
+     "name": "Screen",
+     "note": "optional panel"
+    },
+    "touch": {
+     "name": "Touch",
+     "note": "optional panel"
+    }
+   },
+   "pins": {
+    "GPIO36": {
+     "header": "onboard",
+     "block": "gpio",
+     "source": "ports/xiaozhi/target-cc35x1/README.md"
+    },
+    "GPIO11": {
+     "header": "J1 pin 6",
+     "block": "adc0",
+     "source": "ports/xiaozhi/target-cc35x1/README.md"
+    },
+    "GPIO27": {
+     "header": "J1 pin 7",
+     "block": "gpio",
+     "source": "ports/xiaozhi/target-cc35x1/README.md"
+    },
+    "GPIO12": {
+     "header": "J2 pin 12",
+     "block": "gpio",
+     "source": "ports/xiaozhi/target-cc35x1/README.md"
+    },
+    "GPIO29": {
+     "header": "J2 pin 15",
+     "block": "gpio",
+     "source": "ports/xiaozhi/target-cc35x1/README.md"
+    },
+    "GPIO32": {
+     "header": "J1 pin 10",
+     "block": "gpio",
+     "source": "ports/xiaozhi/target-cc35x1/xz_screen.syscfg"
+    },
+    "GPIO33": {
+     "header": "J1 pin 9",
+     "block": "gpio",
+     "source": "ports/xiaozhi/target-cc35x1/xz_screen.syscfg"
+    }
+   },
+   "wiring": "Voice alone needs no wire: the Audio BoosterPack presses onto the LaunchPad headers. The optional screen takes the 13 wires in the pin table above; S2 is on the board.",
+   "jobs": [
+    {
+     "name": "Start a turn",
+     "chains": [
+      [
+       "part:s2",
+       "pin:GPIO36",
+       "gpio",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "pin:GPIO36",
+       "step": "You press S2",
+       "by": "S2 on the board, a pull-up input; the s key on the console or a tap on the screen does the same"
+      },
+      {
+       "block": "gpio",
+       "step": "Reads the button",
+       "by": "GPIO, click detected by the button driver"
+      },
+      {
+       "block": "cpu",
+       "step": "Starts one voice turn",
+       "by": "the worker task opens the connection and the microphone"
+      }
+     ]
+    },
+    {
+     "name": "Wake word (build without XZ_WAKE=0)",
+     "chains": [
+      [
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "cpu",
+       "step": "Listens for Hey Sparky",
+       "by": "a small neural network on every 10 ms of audio (160 samples), TensorFlow Lite Micro with CMSIS-NN kernels"
+      },
+      {
+       "block": "cpu",
+       "step": "Opens the connection only after it hears it",
+       "by": "cutoff 230 of 255; the last 960 ms, kept as 8-bit samples, is sent first so the server hears the wake phrase"
+      }
+     ]
+    },
+    {
+     "name": "Hear you",
+     "chains": [
+      [
+       "part:mic",
+       "pin:GPIO11",
+       "adc0",
+       "cpu"
+      ],
+      [
+       "gpt",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "pin:GPIO11",
+       "step": "The pack's microphone voltage arrives",
+       "by": "pack MIC OUT, header pin 6 (GPIO11), powered from GPIO10"
+      },
+      {
+       "block": "gpt",
+       "step": "A timer ticks 16,000 times a second",
+       "by": "general-purpose timer, 80 MHz clock; its interrupt takes one sample"
+      },
+      {
+       "block": "adc0",
+       "step": "Turns the voltage into a number",
+       "by": "ADC0, 12 bit, 0 to 3.3 V"
+      },
+      {
+       "block": "cpu",
+       "step": "Removes the offset, scales it and queues it",
+       "by": "in the interrupt, into a ring of 8,192 16-bit samples"
+      }
+     ]
+    },
+    {
+     "name": "Send it",
+     "chains": [
+      [
+       "cpu",
+       "wifi",
+       "part:ant"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "cpu",
+       "step": "Packs 60 ms of speech into an Opus packet",
+       "by": "Opus, CELT mode, 16 kHz mono, 24 kbit/s, complexity 0, on the CPU"
+      },
+      {
+       "block": "cpu",
+       "step": "Wraps each packet in a WebSocket message",
+       "by": "a plain TCP socket on the Wi-Fi stack, one packet per message"
+      },
+      {
+       "block": "wifi",
+       "step": "Sends it to the server over your Wi-Fi",
+       "by": "ws:// to port 8000 on the xiaozhi server"
+      }
+     ]
+    },
+    {
+     "name": "Speak the answer",
+     "chains": [
+      [
+       "part:ant",
+       "wifi",
+       "cpu"
+      ],
+      [
+       "gpt",
+       "cpu"
+      ],
+      [
+       "cpu",
+       "gpio",
+       "pin:GPIO29",
+       "part:dac"
+      ],
+      [
+       "cpu",
+       "gpio",
+       "pin:GPIO27",
+       "part:dac"
+      ],
+      [
+       "cpu",
+       "gpio",
+       "pin:GPIO12",
+       "part:dac"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "wifi",
+       "step": "Receives the reply audio",
+       "by": "one Opus packet per WebSocket message"
+      },
+      {
+       "block": "cpu",
+       "step": "Decodes each packet",
+       "by": "Opus decoder at the rate the server says, 16 or 24 kHz"
+      },
+      {
+       "block": "gpt",
+       "step": "Paces playback at the same rate",
+       "by": "the same timer, one sample per tick"
+      },
+      {
+       "block": "gpio",
+       "step": "Clocks each sample into the DAC",
+       "by": "three lines driven by software: SYNC GPIO12, SCLK GPIO27, DIN GPIO29"
+      },
+      {
+       "block": "pin:GPIO29",
+       "step": "Sends the bits to the DAC8311",
+       "by": "pack D MOSI, header pin 15; the amplifier turns on with GPIO13 low"
+      }
+     ]
+    },
+    {
+     "name": "Draw the face (with the screen)",
+     "chains": [
+      [
+       "cpu",
+       "dma",
+       "spi0",
+       "part:screen"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "cpu",
+       "step": "Draws the look for the current state",
+       "by": "one strip at a time into a row buffer, then the next"
+      },
+      {
+       "block": "dma",
+       "step": "Hands the strip to the SPI block",
+       "by": "DMA channels 0 and 1"
+      },
+      {
+       "block": "spi0",
+       "step": "Clocks the pixels out to the panel",
+       "by": "SPI0 at 10 MHz: MOSI on header pin 38 (GPIO19), clock on header pin 4 (GPIO17)"
+      }
+     ]
+    },
+    {
+     "name": "Read touch (with the screen)",
+     "chains": [
+      [
+       "part:touch",
+       "pin:GPIO32",
+       "gpio",
+       "cpu"
+      ],
+      [
+       "part:touch",
+       "pin:GPIO33",
+       "gpio",
+       "cpu"
+      ]
+     ],
+     "rows": [
+      {
+       "block": "pin:GPIO32",
+       "step": "A finger lands and the touch chip answers",
+       "by": "FT6336U at address 0x38, data on header pin 10 (GPIO32)"
+      },
+      {
+       "block": "gpio",
+       "step": "Software I2C reads the position",
+       "by": "clock on header pin 9 (GPIO33), about 100 kHz, every 8 ms"
+      },
+      {
+       "block": "cpu",
+       "step": "Turns it into a tap or a swipe",
+       "by": "a tap is read as an S2 click; a swipe changes the look"
+      }
+     ]
+    }
+   ],
+   "tags": {
+    "gpt": "16 kHz tick",
+    "adc0": "mic, 12 bit",
+    "wifi": "WebSocket",
+    "spi0": "10 MHz",
+    "dma": "channels 0, 1",
+    "gpio": "pins"
+   }
+  }
+ }
+}

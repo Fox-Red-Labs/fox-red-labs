@@ -1,0 +1,348 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm. Parts a picture does not show are left out.",
+ "board": "SK-TDA4VM",
+ "id": "tda4",
+ "source": "Positions read from the top-side bench photo tda4/img/tda4-top.jpg, scale set from the 2.54 mm pitch of the 40-pin expansion header (20 rows). The board outline (99 x 110 mm) is measured off that photo, not taken from a drawing; positions are good to about 2 mm. Connector counts from docs/arrivals/tda4.md (TI's SK-TDA4VM user's guide). Chips that the photo shows but no document names are drawn without a label. Parts the photo does not show are left out.",
+ "size": [
+  99.0,
+  110.0
+ ],
+ "color": "#1f4f93",
+ "corner": 2.0,
+ "holes": [
+  [
+   2.7,
+   94.5,
+   3.0
+  ],
+  [
+   2.2,
+   41.2,
+   3.0
+  ],
+  [
+   2.2,
+   3.6,
+   3.0
+  ],
+  [
+   93.7,
+   10.2,
+   3.0
+  ],
+  [
+   82.0,
+   86.4,
+   3.0
+  ],
+  [
+   37.8,
+   61.0,
+   3.0
+  ]
+ ],
+ "silk": [
+  {
+   "t": "EXP HDR 40p",
+   "x": 6.8,
+   "y": 67.0,
+   "s": 1.5,
+   "rot": 90
+  },
+  {
+   "t": "SW2 PORZ",
+   "x": 66.6,
+   "y": 27.2,
+   "s": 1.4,
+   "rot": 0
+  },
+  {
+   "t": "BOOT CTL",
+   "x": 14.0,
+   "y": 21.0,
+   "s": 1.3,
+   "rot": 0
+  },
+  {
+   "t": "SK-TDA4VM",
+   "x": 45.0,
+   "y": 8.0,
+   "s": 2.6,
+   "rot": 0
+  },
+  {
+   "t": "USB C PWR",
+   "x": 87.0,
+   "y": 18.5,
+   "s": 1.2,
+   "rot": 0
+  }
+ ],
+ "parts": [
+  {
+   "type": "header",
+   "x": 2.7,
+   "y": 67.1,
+   "cols": 2,
+   "rows": 20
+  },
+  {
+   "type": "ringheader",
+   "x": 2.7,
+   "y": 67.1,
+   "cols": 2,
+   "rows": 20,
+   "id": "exp",
+   "label": "Expansion header",
+   "title": "40-pin expansion header",
+   "text": "The 40-pin header on the left edge, laid out like a Raspberry Pi header so Pi add-on boards plug on. Nothing was connected to it in our runs.",
+   "key": true
+  },
+  {
+   "type": "block",
+   "x": 37.8,
+   "y": 89.9,
+   "w": 19.0,
+   "h": 8.0,
+   "d": 3.0,
+   "color": "#3a3b40",
+   "id": "m2",
+   "label": "M.2 slot",
+   "title": "M.2 key E slot",
+   "text": "A slot for a Wi-Fi and Bluetooth card. The kit has no radio of its own, and the slot was left empty in our runs."
+  },
+  {
+   "id": "soc",
+   "label": "The chip",
+   "title": "TDA4VM under the heatsink",
+   "text": "Two Arm Cortex-A72 cores that run Linux, the C7x DSP with its matrix accelerator for neural networks, and six Cortex-R5F cores, under a black finned heatsink. There was no fan in our runs.",
+   "key": true,
+   "type": "block",
+   "x": 40.9,
+   "y": 40.3,
+   "w": 34.5,
+   "h": 34.0,
+   "d": 12.0,
+   "color": "#202023"
+  },
+  {
+   "id": "ddr",
+   "label": "DDR memory",
+   "title": "4 GB LPDDR4",
+   "text": "The working memory the Linux system and the models run in.",
+   "type": "block",
+   "x": 66.8,
+   "y": 39.8,
+   "w": 10.0,
+   "h": 14.7,
+   "d": 1.0,
+   "color": "#26272b"
+  },
+  {
+   "id": "eth",
+   "label": "Ethernet",
+   "title": "Gigabit Ethernet",
+   "text": "One wired network port. Ethernet ran at about 940 Mbit/s each way in our tests.",
+   "type": "block",
+   "x": 17.7,
+   "y": 100.5,
+   "w": 17.8,
+   "h": 21.0,
+   "d": 13.5,
+   "color": "#b8bbbd",
+   "key": true
+  },
+  {
+   "id": "usb3a",
+   "label": "USB Type-A",
+   "title": "USB 3.1 Type-A host port",
+   "text": "A host port for a keyboard, a webcam or a storage stick.",
+   "type": "block",
+   "x": 37.0,
+   "y": 103.0,
+   "w": 13.0,
+   "h": 15.0,
+   "d": 7.0,
+   "color": "#a8adb3"
+  },
+  {
+   "id": "usb3b",
+   "label": "USB Type-A pair",
+   "title": "Two stacked USB 3.1 Type-A host ports",
+   "text": "Two more host ports in one housing. The kit has three Type-A host ports in all.",
+   "type": "block",
+   "x": 54.3,
+   "y": 103.0,
+   "w": 12.7,
+   "h": 14.5,
+   "d": 14.0,
+   "color": "#a8adb3"
+  },
+  {
+   "type": "block",
+   "x": 72.9,
+   "y": 100.0,
+   "w": 20.0,
+   "h": 22.0,
+   "d": 14.0,
+   "color": "#a8adb3"
+  },
+  {
+   "type": "microusb",
+   "x": 4.5,
+   "y": 106.0,
+   "rot": 0,
+   "id": "uart",
+   "label": "Serial USB",
+   "title": "Micro-USB, serial console",
+   "text": "Plug a micro-B cable from your computer here for the serial console. It shows up as four serial ports; the console is the second one on a Mac."
+  },
+  {
+   "type": "usbc",
+   "x": 87.6,
+   "y": 9.0,
+   "rot": 180,
+   "id": "pwr",
+   "label": "Power USB-C",
+   "title": "USB-C, power",
+   "text": "Power in. The kit needs a 20 V USB-C power-delivery supply and does not include one.",
+   "key": true
+  },
+  {
+   "type": "header",
+   "x": 20.5,
+   "y": 7.6,
+   "cols": 10,
+   "rows": 2
+  },
+  {
+   "type": "button",
+   "x": 66.6,
+   "y": 23.0,
+   "w": 6.0,
+   "h": 6.0,
+   "id": "porz",
+   "label": "Power-on reset",
+   "title": "SW2, power-on reset",
+   "text": "Resets the whole board, as if power had been removed and returned."
+  },
+  {
+   "type": "block",
+   "x": 14.1,
+   "y": 15.8,
+   "w": 6.5,
+   "h": 6.0,
+   "d": 5.0,
+   "color": "#2b4a9a",
+   "id": "boot",
+   "label": "Boot switches",
+   "title": "SW1, boot mode switches",
+   "text": "A bank of small switches that picks where the chip boots from. The kit boots Linux from the micro-SD card."
+  },
+  {
+   "type": "block",
+   "x": 88.6,
+   "y": 73.7,
+   "w": 8.0,
+   "h": 18.4,
+   "d": 4.0,
+   "color": "#2b2b2e",
+   "id": "csi1",
+   "label": "Camera connector",
+   "title": "CSI-2 camera connector",
+   "text": "One of two camera connectors. No camera was attached in our runs."
+  },
+  {
+   "type": "block",
+   "x": 92.7,
+   "y": 34.0,
+   "w": 7.0,
+   "h": 18.3,
+   "d": 4.0,
+   "color": "#2b2b2e"
+  },
+  {
+   "type": "block",
+   "x": 87.6,
+   "y": 58.4,
+   "w": 6.0,
+   "h": 5.0,
+   "d": 5.0,
+   "color": "#e8e4d8"
+  },
+  {
+   "type": "block",
+   "x": 77.0,
+   "y": 72.0,
+   "w": 6.0,
+   "h": 6.0,
+   "d": 4.0,
+   "color": "#1f2024"
+  },
+  {
+   "type": "block",
+   "x": 82.5,
+   "y": 51.3,
+   "w": 6.0,
+   "h": 6.0,
+   "d": 4.0,
+   "color": "#1f2024"
+  },
+  {
+   "type": "qfp",
+   "x": 11.1,
+   "y": 80.0,
+   "body": 8,
+   "pins": 48
+  },
+  {
+   "type": "qfp",
+   "x": 18.5,
+   "y": 63.5,
+   "body": 7,
+   "pins": 48
+  },
+  {
+   "type": "qfn",
+   "x": 22.0,
+   "y": 89.0,
+   "size": 5.0
+  },
+  {
+   "type": "qfn",
+   "x": 54.6,
+   "y": 84.8,
+   "size": 8.0
+  },
+  {
+   "type": "qfn",
+   "x": 62.2,
+   "y": 69.1,
+   "size": 7.0
+  },
+  {
+   "type": "qfn",
+   "x": 37.8,
+   "y": 10.2,
+   "size": 5.0
+  },
+  {
+   "type": "led",
+   "x": 6.0,
+   "y": 99.0,
+   "rot": 0,
+   "color": "#ff2a2a"
+  },
+  {
+   "type": "led",
+   "x": 82.0,
+   "y": 18.8,
+   "rot": 0,
+   "color": "#ff2a2a",
+   "id": "pwrled",
+   "label": "Power LED",
+   "title": "Power LED",
+   "text": "Red when the board has power."
+  }
+ ]
+}

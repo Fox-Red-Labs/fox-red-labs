@@ -97,7 +97,7 @@
    "id": "mspm0g5187",
    "page": "board-mspm0g5187.html",
    "fam": "MSPM0 family",
-   "hi": "An MSPM0 with a neural processing unit (NPU) for small models; the Sub-1 GHz link and the sensors pack ran here.",
+   "hi": "An MSPM0 with a neural processing unit (NPU) for edge AI models; the Sub-1 GHz link and the sensors pack ran here.",
    "photo": "media/g5187-sensors-boosterpack-bench.jpg",
    "photo_alt": "The Sensors BoosterPack on an LP-MSPM0G5187"
   },
@@ -157,7 +157,7 @@
    "id": "am13e230",
    "page": "board-am13e230.html",
    "fam": "AM13 family",
-   "hi": "A real-time control MCU with a neural processing unit; motor control and small models ran here.",
+   "hi": "A real-time control MCU with a neural processing unit; motor control and edge AI models ran here.",
    "photo": "media/am13e230-on-bench.jpg",
    "photo_alt": "The LP-AM13E230 on the bench"
   },
@@ -314,7 +314,7 @@
    "back_cap": "The Digital Lab"
   },
   {
-   "verb": "Run a small model on the chip",
+   "verb": "Run an edge AI model on the chip",
    "line": "Occupancy, digit and vision models, timed on each board.",
    "card": "small-ai-model",
    "href": "edge-ai.html",
@@ -351,6 +351,13 @@
    "line": "Set a speed, watch the phase currents and the speed trace, compare a run to the predicted speed.",
    "href": "motor-console.html",
    "alt": "The motor console page with its speed slider and current traces"
+  },
+  {
+   "img": "media/hero/slides/radar.jpg",
+   "title": "Radar room view",
+   "line": "The radar BoosterPack's live page: who is in the room, where, from the board over USB.",
+   "href": "../iwrl6432boost/live/index.html",
+   "alt": "The radar room view page with a tracked person on the floor plan"
   },
   {
    "img": "media/tool-telemetry-dashboard.png",
@@ -411,7 +418,7 @@
   {
    "kind": "draw",
    "file": "card-small-ai-model",
-   "title": "A small model on the chip",
+   "title": "An edge AI model on the chip",
    "board": "LP-MSPM0G3507",
    "href": "project-small-ai-model.html",
    "alt": "Drawing: a kit reads three sensors and a small neural network on the chip names the room's state"

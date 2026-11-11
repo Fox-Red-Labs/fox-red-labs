@@ -166,7 +166,7 @@
    "pins": 64,
    "label": "The chip",
    "title": "MSPM0G5187",
-   "text": "An 80 MHz Arm Cortex-M0+ with 128 kB of flash, 32 kB of RAM and a neural processing unit for small AI models such as wake-word spotting.",
+   "text": "An 80 MHz Arm Cortex-M0+ with 128 kB of flash, 32 kB of RAM and a neural processing unit for edge AI models such as wake-word spotting.",
    "key": true
   },
   {

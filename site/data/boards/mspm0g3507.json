@@ -4,7 +4,7 @@
  "part": "MSPM0G3507",
  "family": "MSPM0",
  "title": "Is the TI LP-MSPM0G3507 the right board for my project?",
- "short": "TI's LaunchPad for the MSPM0G3507 chip: an 80 MHz Arm Cortex-M0+ with 128 kB of flash, 32 kB of RAM, a math accelerator and the debugger on the board. It blinked in 2 min 29 s from board in hand with the tools installed, drove a 3.5 inch touch screen, and ran small AI models and Zephyr. It has no radio, and 32 kB of RAM and 128 kB of flash are what limit bigger programs.",
+ "short": "TI's LaunchPad for the MSPM0G3507 chip: an 80 MHz Arm Cortex-M0+ with 128 kB of flash, 32 kB of RAM, a math accelerator and the debugger on the board. It blinked in 2 min 29 s from board in hand with the tools installed, drove a 3.5 inch touch screen, and ran edge AI models and Zephyr. It has no radio, and 32 kB of RAM and 128 kB of flash are what limit bigger programs.",
  "meet": {
   "what": "A LaunchPad development kit for TI's MSPM0G3507 microcontroller. A USB debugger and serial port are built in, so one cable powers it, programs it and carries its text output. It has a red LED, an RGB LED, two buttons, a thermistor, a light sensor and 40-pin BoosterPack headers for plug-on boards.",
   "facts": [
@@ -77,7 +77,7 @@
    "source": "ports/bitnetmcu/README.md"
   },
   {
-   "t": "Small AI model, in software",
+   "t": "Edge AI model, in software",
    "st": "works",
    "result": "Room-occupancy models of 500 to 30k weights: 4.0 to 129 ms per answer at 80 MHz, 20 of 20 right",
    "source": "mspm0g3507/mcu-bench/RESULTS-2.md"
@@ -228,7 +228,7 @@
  "good_for": [
   "A first board: the debugger is on it, and the blink took 2 min 29 s with the tools installed",
   "Screens: a 3.5 inch touch display on 12 jumper wires, 67 ms for a full-screen fill and LVGL in 25.1 kB of RAM",
-  "Small AI models in plain C: occupancy models of up to 30k weights ran, and a handwritten-digit net reads a digit in 34 ms",
+  "Edge AI models in plain C: occupancy models of up to 30k weights ran, and a handwritten-digit net reads a digit in 34 ms",
   "Zephyr on a board upstream Zephyr already supports",
   "Control maths with a speed-up: a math accelerator gives one motor-control step in 88.5 µs against 172 µs without it, and 70.8 kHz in IQmath fixed point"
  ],

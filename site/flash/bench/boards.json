@@ -1,0 +1,632 @@
+{
+ "note": "Written by tools/webflash/build_page.py from data/routes.json, prebuilt/, site/data/projects.json and boards-draft/. Do not edit by hand.",
+ "usb": {
+  "vendorId": 1105,
+  "productId": 48883,
+  "usagePage": 65280
+ },
+ "boards": [
+  {
+   "id": "mspm0l1306",
+   "kit": "LP-MSPM0L1306",
+   "printed": "The kit name LP-MSPM0L1306 and its revision (for example Rev. A) are printed sideways on the right half of the board, between the TEXAS INSTRUMENTS logo and the S2 button (TI's board drawing, SLAU869E; mspm0l1306/img/board-tour.png).",
+   "programmable": true,
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BB8202F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00010000"
+   },
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "console": {
+    "baud": 115200,
+    "jumpers": "J16 and J17 on XDS (right, as shipped) send UART0 (PA8 TX, PA9 RX) to the USB serial port"
+   },
+   "ram": 4096,
+   "ramStart": "0x20000000",
+   "cmdbyten": "0xFF",
+   "picture": "boards/mspm0l1306.png",
+   "recovery": {
+    "kind": "page",
+    "saves": "the board's whole main flash, as one .json file in your Downloads folder, before the first write",
+    "changes": "only the main-flash sectors the program needs; never the boot configuration",
+    "back": "“Put back what was there” below writes that .json file back and reads it back to compare. It accepts only a copy saved from this same chip.",
+    "tested": "Put back works on the LP-MSPM0L1306: 13.5 s in Chrome on a Mac, and 7.8 s after a write cut off part way, read back identical."
+   },
+   "resources": {
+    "clock_mhz": 32,
+    "flash_kb": 64,
+    "ram_kb": 4,
+    "builds": [
+     {
+      "id": "blink",
+      "label": "TI's blink example (no OS)",
+      "flash": 440,
+      "ram": 256,
+      "flash_total": 65528,
+      "ram_total": 4096
+     },
+     {
+      "id": "out_of_box",
+      "label": "TI's out-of-box demo",
+      "flash": 9808,
+      "ram": 462,
+      "flash_total": 65528,
+      "ram_total": 4096
+     },
+     {
+      "id": "coremark",
+      "label": "CoreMark, bare metal",
+      "flash": 23208,
+      "ram": 3952,
+      "flash_total": 65528,
+      "ram_total": 4096
+     },
+     {
+      "id": "occ_8k",
+      "label": "8k-parameter AI model",
+      "flash": 29320,
+      "ram": 3248,
+      "flash_total": 65528,
+      "ram_total": 4096
+     },
+     {
+      "id": "largest_sdk",
+      "label": "Largest TI example (battery monitor demo)",
+      "flash": 11256,
+      "ram": 3310,
+      "flash_total": 65528,
+      "ram_total": 4096
+     },
+     {
+      "id": "zephyr_hello",
+      "label": "Zephyr hello_world",
+      "flash": 9424,
+      "ram": 3832,
+      "flash_total": 65536,
+      "ram_total": 4096
+     },
+     {
+      "id": "zephyr_blinky",
+      "label": "Zephyr blinky",
+      "flash": 11364,
+      "ram": 3888,
+      "flash_total": 65536,
+      "ram_total": 4096
+     },
+     {
+      "id": "zephyr_coremark",
+      "label": "Zephyr CoreMark",
+      "flash": 35760,
+      "ram": 4080,
+      "flash_total": 65536,
+      "ram_total": 4096
+     }
+    ],
+    "builds_source": "mspm0l1306/memory-breakdown.json"
+   }
+  },
+  {
+   "id": "am13e230",
+   "kit": "LP-AM13E230",
+   "printed": "LP-AM13E230",
+   "programmable": false,
+   "note": "Recognized. The page can write this board's flash, but starting the program afterwards is not proven yet, so it does not offer a write.",
+   "identity": {
+    "addr": "0x60111000",
+    "deviceid": "0x0000002F",
+    "deviceidMask": "0x0000FFFF"
+   },
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00080000"
+   },
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "cmdbyten": "0x3FFFF",
+   "cpuss": null,
+   "reset": "aircr",
+   "fc": {
+    "base": "0x40042000",
+    "sector": 2048,
+    "word": 16,
+    "semaphore": {
+     "request": "0x40047800",
+     "status": "0x40047808",
+     "clear": "0x40047804",
+     "held": "0xC0010100"
+    },
+    "protectAtRest": {
+     "a": "0xFFFFFFFF",
+     "b": "0x00000FFF"
+    }
+   },
+   "recovery": {
+    "kind": "none",
+    "saves": "nothing",
+    "changes": "nothing: this page only reads this board",
+    "back": "Nothing to put back.",
+    "tested": ""
+   },
+   "resources": {
+    "clock_mhz": 200,
+    "flash_kb": 512,
+    "ram_kb": 128
+   }
+  },
+  {
+   "id": "mspm0c1104",
+   "kit": "LP-MSPM0C1104",
+   "printed": "LP-MSPM0C1104 (the example needs Rev E3 or later: TI's example README)",
+   "programmable": true,
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x3BBA102F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "note": "",
+   "recovery": {
+    "kind": "page",
+    "saves": "the board's whole main flash, as one .json file in your Downloads folder, before the first write",
+    "changes": "only the main-flash sectors the program needs; never the boot configuration",
+    "back": "“Put back what was there” below writes that .json file back and reads it back to compare. It accepts only a copy saved from this same chip.",
+    "tested": "Put back from this page: no run recorded on the LP-MSPM0C1104 yet. The same code passed on the LP-MSPM0L1306 and LP-MSPM0G5187."
+   },
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00004000"
+   },
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "ram": 1024,
+   "ramStart": "0x20000000",
+   "cmdbyten": "0xFF",
+   "resources": {
+    "clock_mhz": 24,
+    "flash_kb": 16,
+    "ram_kb": 1
+   }
+  },
+  {
+   "id": "mspm0g3507",
+   "kit": "LP-MSPM0G3507",
+   "printed": "LP-MSPM0G3507",
+   "programmable": true,
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BB8802F",
+    "deviceidMask": "0x0FFFFFFF",
+    "userid": "0x0000AE2D",
+    "useridMask": "0x0000FFFF"
+   },
+   "note": "Blink and color-player firmware built for this board. Browser flashing and restore on the G3507 still need a hardware check.",
+   "recovery": {
+    "kind": "page",
+    "saves": "the board's whole main flash, as one .json file in your Downloads folder, before the first write",
+    "changes": "only the main-flash sectors the program needs; never the boot configuration",
+    "back": "“Put back what was there” below writes that .json file back and reads it back to compare. It accepts only a copy saved from this same chip.",
+    "tested": "Put back from this page: no run recorded on the LP-MSPM0G3507 yet. The same code passed on the LP-MSPM0L1306 and LP-MSPM0G5187.",
+    "proven": false
+   },
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00020000"
+   },
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "ram": 32768,
+   "ramStart": "0x20200000",
+   "cmdbyten": "0x1FF",
+   "resources": {
+    "clock_mhz": 80,
+    "flash_kb": 128,
+    "ram_kb": 32,
+    "builds": [
+     {
+      "id": "driverlib",
+      "label": "DriverLib, no OS (a small app)",
+      "flash": 2352,
+      "ram": 528,
+      "flash_total": 131072,
+      "ram_total": 32768
+     },
+     {
+      "id": "tidrivers_nortos",
+      "label": "TI Drivers, no OS",
+      "flash": 13848,
+      "ram": 4207,
+      "flash_total": 131072,
+      "ram_total": 32768
+     },
+     {
+      "id": "tidrivers_freertos",
+      "label": "TI Drivers on FreeRTOS",
+      "flash": 21040,
+      "ram": 7059,
+      "flash_total": 131072,
+      "ram_total": 32768
+     },
+     {
+      "id": "digit_touch",
+      "label": "Handwritten-digit demo (screen, touch, neural net)",
+      "flash": 43304,
+      "ram": 5128,
+      "flash_total": 131072,
+      "ram_total": 32768
+     },
+     {
+      "id": "zephyr",
+      "label": "Zephyr blinky-class app",
+      "flash": 12704,
+      "ram": 3992,
+      "flash_total": 131072,
+      "ram_total": 32768
+     }
+    ],
+    "builds_source": "mspm0g3507/memory-breakdown.json"
+   }
+  },
+  {
+   "id": "mspm0g3519",
+   "kit": "LP-MSPM0G3519",
+   "printed": "LP-MSPM0G3519",
+   "programmable": true,
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BBA902F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "note": "",
+   "recovery": {
+    "kind": "page",
+    "saves": "the board's whole main flash, as one .json file in your Downloads folder, before the first write",
+    "changes": "only the main-flash sectors the program needs; never the boot configuration",
+    "back": "“Put back what was there” below writes that .json file back and reads it back to compare. It accepts only a copy saved from this same chip.",
+    "tested": "Put back works on this board after a write cut off part way: 512 kB read back identical in 59.7 s."
+   },
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00080000"
+   },
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "ram": 131072,
+   "ramStart": "0x20200000",
+   "cmdbyten": "0x1FF",
+   "resources": {
+    "clock_mhz": 80,
+    "flash_kb": 512,
+    "ram_kb": 128
+   }
+  },
+  {
+   "id": "mspm0g5187",
+   "kit": "LP-MSPM0G5187",
+   "printed": "LP-MSPM0G5187",
+   "programmable": true,
+   "identity": {
+    "addr": "0x41C40000",
+    "deviceid": "0x0BBBC02F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "note": "",
+   "recovery": {
+    "kind": "page",
+    "saves": "the board's whole main flash, as one .json file in your Downloads folder, before the first write",
+    "changes": "only the main-flash sectors the program needs; never the boot configuration",
+    "back": "“Put back what was there” below writes that .json file back and reads it back to compare. It accepts only a copy saved from this same chip.",
+    "tested": "Put back works on this board: 16.5 s in Chrome on a Mac, read back identical."
+   },
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00020000"
+   },
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "ram": 32768,
+   "ramStart": "0x20200000",
+   "cmdbyten": "0x1FF",
+   "resources": {
+    "clock_mhz": 80,
+    "flash_kb": 128,
+    "ram_kb": 32
+   }
+  },
+  {
+   "id": "mspm33c321a",
+   "kit": "LP-MSPM33C321A",
+   "printed": "LP-MSPM33C321A",
+   "programmable": true,
+   "note": "",
+   "identity": {
+    "addr": "0x80111000",
+    "deviceid": "0x0BBB702F",
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "flash": {
+    "start": "0x00000000",
+    "end": "0x00100000"
+   },
+   "gpio": {
+    "dout": "0x1280",
+    "doe": "0x12C0"
+   },
+   "cmdbyten": "0x3FFFF",
+   "cpuss": null,
+   "reset": "aircr",
+   "fc": {
+    "base": "0x40042000",
+    "sector": 2048,
+    "word": 16,
+    "semaphore": {
+     "request": "0x50047800",
+     "status": "0x50047808",
+     "clear": "0x50047804",
+     "held": "0xC0010101"
+    },
+    "protectAtRest": {
+     "a": "0xFFFFFFFF",
+     "b": "0x0FFFFFFF"
+    }
+   },
+   "recovery": {
+    "kind": "page",
+    "saves": "the board's whole main flash, as one .json file in your Downloads folder, before the first write",
+    "changes": "only the main-flash sectors the program needs; never the boot configuration",
+    "back": "“Put back what was there” below writes that .json file back and reads it back to compare. It accepts only a copy saved from this same chip.",
+    "tested": "Put back works on the LP-MSPM33C321A: write, start, LED check, then put back."
+   },
+   "alias": "0x10000000",
+   "resources": {
+    "clock_mhz": 160,
+    "flash_kb": 1024,
+    "ram_kb": 256
+   }
+  },
+  {
+   "id": "cc2755p10",
+   "kit": "LP-EM-CC2755P10",
+   "printed": "LP-EM-CC2755P10",
+   "programmable": false,
+   "note": "Recognized. This page puts small programs on it (blink, a console message, the buttons, a Zigbee light, a Bluetooth light), reads its console and puts back what was on it.",
+   "saci": "cc27",
+   "recovery": {
+    "kind": "vendor",
+    "saves": "the main flash and both configuration areas, as three .bin files in your Downloads folder (cc2755p10-<time>-main.bin, -ccfg.bin, -scfg.bin), and only if the board holds a different program",
+    "changes": "erases the main flash (TI's security firmware at the top stays) and rewrites both configuration areas, CCFG and SCFG",
+    "back": "This page cannot put those files back. TI's UniFlash can, with the repository's restore script.",
+    "tool": "TI UniFlash 9.6.0 (its DSLite command line) on a Mac",
+    "files": [
+     [
+      "cc2755p10-<time>-main.bin",
+      "backup-flash-1.bin",
+      "main flash, 0x0 to 0xE8000"
+     ],
+     [
+      "cc2755p10-<time>-ccfg.bin",
+      "backup-ccfg-1.bin",
+      "CCFG, 2 kB at 0x4E020000"
+     ],
+     [
+      "cc2755p10-<time>-scfg.bin",
+      "scfg-sdk-default.bin",
+      "SCFG, 1 kB at 0x4E040000; the script checks its CRC32"
+     ]
+    ],
+    "steps": [
+     "Put the three files in one folder and rename them as in the table.",
+     "In a copy of this repository, with UniFlash installed at /Applications/ti/uniflash_9.6.0, run: cc2755p10/restore.sh <that folder>",
+     "It erases the chip (keeping TI's security firmware), writes all three, reads the main flash and CCFG back, and prints RESTORED when they match."
+    ],
+    "tested": "Not tested with files this page saved. The same steps worked on 2026-10-09 with files read by TI's DSLite."
+   },
+   "identity": {
+    "kind": "cfgap",
+    "ap": 1,
+    "deviceids": [
+     "0x0BB9802F"
+    ],
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "resources": {
+    "clock_mhz": 96,
+    "flash_kb": 1024,
+    "ram_kb": 162
+   }
+  },
+  {
+   "id": "cc2340r5",
+   "kit": "LP-EM-CC2340R5",
+   "printed": "LP-EM-CC2340R5",
+   "programmable": false,
+   "note": "Recognized. This page puts small programs on it (blink, a console message, the buttons, a Zigbee light, a Bluetooth light), reads its console and puts back what was on it.",
+   "saci": "cc23",
+   "recovery": {
+    "kind": "vendor",
+    "proven": true,
+    "saves": "the main flash and the configuration area, as two .bin files in your Downloads folder (cc2340r5-<time>-main.bin and -ccfg.bin), and only if the board holds a different program that starts; a board with no program has nothing to save",
+    "changes": "erases the main flash and rewrites the configuration area (CCFG)",
+    "back": "This page cannot put those files back. TI's UniFlash can, with the repository's put-back script.",
+    "tool": "TI UniFlash 9.6.0 (its DSLite command line) on a Mac",
+    "files": [
+     [
+      "cc2340r5-<time>-main.bin",
+      "keep the name",
+      "main flash, 512 kB from 0x0"
+     ],
+     [
+      "cc2340r5-<time>-ccfg.bin",
+      "keep the name",
+      "CCFG, 2 kB at 0x4E020000"
+     ]
+    ],
+    "steps": [
+     "Put the two files from one save in a folder of their own.",
+     "In a copy of this repository, with UniFlash installed at /Applications/ti/uniflash_9.6.0 and your probe's serial in cc2340r5/CC2340R5.ccxml, run: cc2340r5/restore-from-page.sh <that folder>",
+     "It merges the two files, erases the chip, writes them, reads main flash and CCFG back and prints RESTORED when they match. A program that keeps data in TI's NVS area (the top 4 kB; a Zigbee image keeps its network there) may write it as soon as it starts; the script reports those bytes rather than failing."
+    ],
+    "tested": "Passed on 2026-10-16 with files this page saved: a Zigbee alarm image went back read-back identical (except 375 bytes it wrote to its own NVS area after starting) and answered Home Assistant without being paired again; the put-back took 30 s."
+   },
+   "identity": {
+    "kind": "cfgap",
+    "ap": 1,
+    "deviceids": [
+     "0x0BB8402F"
+    ],
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "resources": {
+    "clock_mhz": 48,
+    "flash_kb": 512,
+    "ram_kb": 36,
+    "builds": [
+     {
+      "id": "empty_nortos",
+      "label": "Empty project, no RTOS (TI empty)",
+      "flash": 5741,
+      "ram": 10129,
+      "flash_total": 524288,
+      "ram_total": 36864
+     },
+     {
+      "id": "empty_rtos",
+      "label": "Empty project, FreeRTOS (TI empty)",
+      "flash": 12022,
+      "ram": 13316,
+      "flash_total": 524288,
+      "ram_total": 36864
+     },
+     {
+      "id": "basic_ble",
+      "label": "Bluetooth (TI basic_ble)",
+      "flash": 191934,
+      "ram": 31689,
+      "flash_total": 512000,
+      "ram_total": 36864
+     },
+     {
+      "id": "data_stream",
+      "label": "Bluetooth (TI data_stream)",
+      "flash": 190393,
+      "ram": 31456,
+      "flash_total": 512000,
+      "ram_total": 36864
+     },
+     {
+      "id": "rfPacketTx",
+      "label": "Proprietary radio packet sender (TI rfPacketTx)",
+      "flash": 33296,
+      "ram": 13968,
+      "flash_total": 524288,
+      "ram_total": 36864
+     },
+     {
+      "id": "onoff_switch_zed",
+      "label": "Zigbee end device (TI onoff_switch), logging on",
+      "flash": 220344,
+      "ram": 30478,
+      "flash_total": 520192,
+      "ram_total": 36864
+     },
+     {
+      "id": "onoff_light",
+      "label": "Zigbee router (TI onoff_light), logging on",
+      "flash": 282274,
+      "ram": 36065,
+      "flash_total": 516096,
+      "ram_total": 36864
+     },
+     {
+      "id": "ota_on_v1",
+      "label": "Zigbee OTA client (TI onoff_switch_ota_client_onchip), receiver always on",
+      "flash": 222004,
+      "ram": 25952,
+      "flash_total": 284880,
+      "ram_total": 36864
+     },
+     {
+      "id": "coremark_O3",
+      "label": "CoreMark bare metal, -O3",
+      "flash": 37444,
+      "ram": 16130,
+      "flash_total": 524288,
+      "ram_total": 36864
+     },
+     {
+      "id": "zephyr_blinky",
+      "label": "Zephyr blink, upstream Zephyr 4.4.2",
+      "flash": 10108,
+      "ram": 4112,
+      "flash_total": 524288,
+      "ram_total": 36864
+     },
+     {
+      "id": "zephyr_ti_peripheral",
+      "label": "Bluetooth peripheral, TI's Zephyr fork (runs with the C library heap set; the beacon sample faults)",
+      "flash": 207656,
+      "ram": 35122,
+      "flash_total": 524288,
+      "ram_total": 36864
+     }
+    ],
+    "builds_source": "cc2340r5/matrix/memory-breakdown.json"
+   }
+  },
+  {
+   "id": "cc35x1",
+   "kit": "LP-EM-CC35X1",
+   "printed": "LP-EM-CC35X1",
+   "programmable": false,
+   "note": "Recognized. This page cannot write this board's flash: its code lives in a separate memory chip that only TI's own tool writes. With TI's over-the-air example on the board, the page updates it over Wi-Fi from your own server; the one-time Toolbox step is shown below.",
+   "saci": false,
+   "recovery": {
+    "kind": "none",
+    "saves": "nothing",
+    "changes": "nothing: this page only reads this board",
+    "back": "Nothing to put back.",
+    "tested": ""
+   },
+   "console": {
+    "baud": 115200,
+    "port": "the second serial port of the XDS110 (on a Mac /dev/cu.usbmodem<probe serial>1)",
+    "baudNote": "TI's SDK examples print at 115200; the Wi-Fi CSI program prints at 921600"
+   },
+   "toolbox": {
+    "command": "./simplelink-wifi-toolbox programmer -i XDS110 -param1 <probe serial> programming --tool_settings <absolute path to tool_settings.json>",
+    "from": "the SimpleLink Wi-Fi Toolbox folder (<Toolbox>)",
+    "before": "Build and sign the images first: the SDK's make, then the Toolbox image builder, which writes tool_settings.json (cc35x1/README.md steps 1 to 4). The board needs a debugger under it (LP-XDS110ET or LP-XDS110, TGT VDD on EXT) and a second USB-C cable for power.",
+    "after": "The Toolbox does not reset the board: press S1 or run xds110reset -s <probe serial>.",
+    "note": "This page does not write this board. Run the command on your computer."
+   },
+   "identity": {
+    "kind": "cfgap",
+    "ap": 0,
+    "deviceids": [
+     "0x0BB9602F"
+    ],
+    "deviceidMask": "0x0FFFFFFF"
+   },
+   "resources": {
+    "clock_mhz": 160,
+    "flash_kb": 8192,
+    "ram_kb": 1126
+   }
+  }
+ ]
+}

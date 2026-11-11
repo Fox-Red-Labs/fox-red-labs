@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-10",
+ "generated": "2026-11-11",
  "source": "data/boards.csv",
  "what_a_row_is": "one board or kit on hand: id, name, vendor, line, core, clock, flash, RAM, test classes, status",
  "row_fields": [

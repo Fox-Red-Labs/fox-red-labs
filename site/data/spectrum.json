@@ -80,7 +80,7 @@
    "part": "MSPM0G3507",
    "name": "LP-MSPM0G3507",
    "step": "More speed and memory",
-   "plain": "Small control and sensing projects, Zephyr, and small AI models run in software.",
+   "plain": "Small control and sensing projects, Zephyr, and edge AI models run in software.",
    "needs": [
     "zephyr"
    ],
@@ -92,7 +92,7 @@
    ],
    "drops": [],
    "lane": "small",
-   "line": "The step up when the L1306 runs out of memory: screens, small AI models and Zephyr. A math accelerator roughly doubles the speed of control maths."
+   "line": "The step up when the L1306 runs out of memory: screens, edge AI models and Zephyr. A math accelerator roughly doubles the speed of control maths."
   },
   {
    "part": "MSPM0G3519",
@@ -130,7 +130,29 @@
     "Back to 32 kB RAM and 128 kB flash"
    ],
    "lane": "small",
-   "line": "The G3507's memory with an AI accelerator and a microphone on the board. Hear a sound or spot a pattern on the chip itself."
+   "line": "The G3507's memory with an AI accelerator and a microphone on the board. Hear a sound or spot a pattern on the chip itself.",
+   "ai_source": "ti.com/product/MSPM0G5187: TinyEngine NPU"
+  },
+  {
+   "part": "MSPM33C321A",
+   "name": "LP-MSPM33C321A",
+   "lane": "small",
+   "step": "Adds Arm security and room for bigger programs",
+   "plain": "The same small-chip jobs with a 160 MHz Cortex-M33, 256 kB of RAM and hardware security, for devices that must keep keys safe.",
+   "needs": [
+    "memory"
+   ],
+   "adds": [
+    "Cortex-M33 at 160 MHz, twice the speed of the G3507",
+    "256 kB of RAM and 1 MB of flash, with ECC",
+    "Hardware AES-256, SHA-256 and random numbers, TrustZone and an immutable root of trust",
+    "Two CAN-FD controllers"
+   ],
+   "drops": [
+    "No AI accelerator and no math accelerator on the chip",
+    "No radio"
+   ],
+   "line": "A 160 MHz Cortex-M33 with 256 kB of RAM, 1 MB of flash and a hardware security block, for devices that hold keys. No AI accelerator."
   },
   {
    "part": "CC2340R52",
@@ -233,6 +255,7 @@
    "step": "Wi-Fi 6 and Matter",
    "plain": "A smart-home device that joins Wi-Fi with no extra hub.",
    "needs": [
+    "ai",
     "wifi",
     "ble",
     "matter",
@@ -246,7 +269,8 @@
     "Debug probe sold separately",
     "No Zephyr"
    ],
-   "line": "Wi-Fi 6 with Bluetooth and Matter over Wi-Fi: a smart-home device that joins your network with no hub."
+   "line": "Wi-Fi 6 with Bluetooth and Matter over Wi-Fi: a smart-home device that joins your network with no hub.",
+   "ai_source": "site/data/portfolio.json CC3551E extras list an NPU (TI CC3551E product page)"
   },
   {
    "part": "CC1354P10",
@@ -379,6 +403,7 @@
    "step": "Adds motor control",
    "plain": "Spin a motor smoothly and precisely.",
    "needs": [
+    "ai",
     "motor",
     "memory"
    ],
@@ -390,7 +415,32 @@
     "Not Arm: new tools to learn",
     "No Zephyr"
    ],
-   "line": "The step up from the F2800137 for motor control: a faster core, more PWM outputs and three encoder inputs."
+   "line": "The step up from the F2800137 for motor control: a faster core, more PWM outputs and three encoder inputs.",
+   "ai_source": "site/data/portfolio.json F28P550SJ extras list an NPU (ti.com/product/TMS320F28P550SJ)"
+  },
+  {
+   "part": "AM13E230",
+   "name": "LP-AM13E230",
+   "lane": "special",
+   "step": "Motor control on a 200 MHz Arm chip with an AI accelerator",
+   "plain": "Spin a motor with Arm tools, with trig done in hardware and a small neural network on the same chip.",
+   "needs": [
+    "motor",
+    "ai"
+   ],
+   "adds": [
+    "Cortex-M33 at 200 MHz with a trig math unit (TMU)",
+    "TinyEngine NPU for small neural networks",
+    "Five motor PWM modules, three fast ADCs, CAN-FD",
+    "Debug probe on the board"
+   ],
+   "drops": [
+    "No motor driver on the board",
+    "No radio",
+    "Prototype silicon on the kit we ran"
+   ],
+   "ai_source": "ti.com/product/AM13E23019: parameters list the TinyEngine NPU",
+   "line": "A 200 MHz Arm motor-control chip with a trig math unit and a neural accelerator, in an Arm toolchain rather than C2000's."
   },
   {
    "part": "AM263P",
@@ -509,7 +559,34 @@
     "Boots from a micro-SD card"
    ],
    "maker": "TI",
-   "line": "A Linux computer with a deep-learning accelerator and video codecs, for camera and vision projects."
+   "line": "A Linux computer with a deep-learning accelerator and video codecs, for camera and vision projects.",
+   "ai_source": "ti.com/tool/SK-TDA4VM: C7x with an 8 TOPS matrix accelerator"
+  },
+  {
+   "part": "AM67A",
+   "name": "BeagleY-AI",
+   "lane": "linux",
+   "step": "Linux and vision AI in a Pi-size board",
+   "plain": "A small Linux computer with a vision accelerator, for camera and detection projects.",
+   "needs": [
+    "linux",
+    "ai",
+    "memory"
+   ],
+   "adds": [
+    "Four Cortex-A53 cores at 1.4 GHz and the C7x vision accelerator",
+    "4 GB RAM; boots from a micro-SD card",
+    "Hardware H.264 video decode and encode",
+    "Gigabit Ethernet, Wi-Fi 6 and Bluetooth LE on the board"
+   ],
+   "drops": [
+    "A 4 TOPS accelerator, about half the SK-TDA4VM's",
+    "No ADC and no debug probe",
+    "Runs hot with no fan (75 to 87 degrees C in our runs)"
+   ],
+   "maker": "BeagleBoard.org",
+   "ai_source": "AM67A: C7x with a matrix accelerator (beagley-ai/README.md; milestone m-beagley-ai-c7x-zoo)",
+   "line": "A small Linux board whose C7x accelerator ran 11 model-zoo vision models and Frigate's object detection."
   }
  ],
  "need_labels": {

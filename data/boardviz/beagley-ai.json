@@ -1,0 +1,190 @@
+{
+ "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm. Parts a picture does not show are left out.",
+ "board": "BeagleY-AI",
+ "id": "beagley-ai",
+ "source": "Outline 56 x 85 mm from BeagleBoard.org's BeagleY-AI Design and specifications page (mechanical table); the mounting holes follow the Raspberry Pi form factor the board shares (3.5 mm in from the edges, 58 x 49 mm apart). Part positions read from the top-side bench photo beagley-ai/img/ask-camera-power.jpg, scaled to the 56 x 85 mm outline; good to about 3 mm. The 40-pin header is 20 rows of 2.54 mm. Parts the photo does not show clearly (the microSD cage, the fan and debug UART connectors, LEDs, the PMIC) are left out, and the part names come from the board's README and the BeagleBoard.org documentation.",
+ "size": [
+  56.0,
+  85.0
+ ],
+ "color": "#1c1d20",
+ "corner": 2.0,
+ "holes": [
+  [
+   3.5,
+   3.5,
+   2.7
+  ],
+  [
+   52.5,
+   3.5,
+   2.7
+  ],
+  [
+   3.5,
+   61.5,
+   2.7
+  ],
+  [
+   52.5,
+   61.5,
+   2.7
+  ]
+ ],
+ "silk": [
+  {
+   "t": "BeagleY-AI",
+   "x": 28.0,
+   "y": 9.0,
+   "s": 3.0,
+   "rot": 0
+  }
+ ],
+ "parts": [
+  {
+   "type": "header",
+   "x": 4.6,
+   "y": 30.6,
+   "cols": 2,
+   "rows": 20
+  },
+  {
+   "type": "ringheader",
+   "x": 4.6,
+   "y": 30.6,
+   "cols": 2,
+   "rows": 20,
+   "id": "hdr",
+   "label": "40-pin header",
+   "title": "40-pin expansion header",
+   "text": "The 40-pin header on the left edge, in the Raspberry Pi layout. Nothing was attached to it in our runs.",
+   "key": true
+  },
+  {
+   "id": "soc",
+   "label": "The chip",
+   "title": "AM67A",
+   "text": "Four Arm Cortex-A53 cores that run Linux, the C7x DSP with its matrix accelerator for neural networks, and R5F cores, under a metal heat spreader. It ran at 80 to 87 degrees C with no fan.",
+   "key": true,
+   "type": "block",
+   "x": 21.5,
+   "y": 46.4,
+   "w": 17.0,
+   "h": 16.0,
+   "d": 2.5,
+   "color": "#c9ccd0"
+  },
+  {
+   "id": "ddr",
+   "label": "DDR memory",
+   "title": "4 GB LPDDR4",
+   "text": "The working memory. Linux sees about 2.5 GB of it; the rest is reserved for the accelerator and firmware.",
+   "type": "block",
+   "x": 41.0,
+   "y": 28.5,
+   "w": 11.0,
+   "h": 9.0,
+   "d": 1.2,
+   "color": "#4a4b52"
+  },
+  {
+   "id": "wifi",
+   "label": "Wi-Fi and Bluetooth",
+   "title": "BM3301 Wi-Fi 6 and Bluetooth LE module",
+   "text": "A shielded radio module built around TI's CC3301. It was not used in our runs: every run went over Ethernet.",
+   "type": "block",
+   "x": 11.8,
+   "y": 13.0,
+   "w": 11.0,
+   "h": 10.5,
+   "d": 2.2,
+   "color": "#aeb2b7"
+  },
+  {
+   "id": "eth",
+   "label": "Ethernet",
+   "title": "Gigabit Ethernet",
+   "text": "One wired network port. Every run of ours used it, and the board's address came from the router.",
+   "type": "block",
+   "x": 48.5,
+   "y": 74.5,
+   "w": 16.0,
+   "h": 21.0,
+   "d": 13.5,
+   "color": "#c8cacc",
+   "key": true
+  },
+  {
+   "id": "usba",
+   "label": "USB Type-A pair",
+   "title": "Two stacked USB Type-A host ports",
+   "text": "Host ports for a webcam or a keyboard. The USB-C port is power only on the Edge AI image.",
+   "type": "block",
+   "x": 10.6,
+   "y": 78.0,
+   "w": 15.5,
+   "h": 14.5,
+   "d": 15.0,
+   "color": "#a8adb3"
+  },
+  {
+   "id": "usbb",
+   "label": "USB Type-A pair",
+   "title": "Two more stacked USB Type-A host ports",
+   "text": "Four Type-A host ports in all. A USB webcam on this board's supply dropped off USB in our runs.",
+   "type": "block",
+   "x": 28.5,
+   "y": 78.0,
+   "w": 15.5,
+   "h": 14.5,
+   "d": 15.0,
+   "color": "#a8adb3"
+  },
+  {
+   "type": "usbc",
+   "x": 52.0,
+   "y": 13.3,
+   "rot": 270,
+   "id": "pwr",
+   "label": "USB-C power",
+   "title": "USB-C, power",
+   "text": "Power in: a 5 V, 3 A supply and a C-to-C cable. On the Edge AI image this port carries power only.",
+   "key": true
+  },
+  {
+   "type": "block",
+   "x": 53.5,
+   "y": 27.9,
+   "w": 7.0,
+   "h": 6.0,
+   "d": 3.0,
+   "color": "#c8cacc",
+   "id": "hdmi",
+   "label": "Micro-HDMI",
+   "title": "Micro-HDMI port",
+   "text": "One HDMI 1.4 output, up to 1080p at 60 Hz. No display was attached in our runs."
+  },
+  {
+   "type": "block",
+   "x": 45.5,
+   "y": 56.0,
+   "w": 14.0,
+   "h": 4.0,
+   "d": 3.0,
+   "color": "#d8d2c0",
+   "id": "csi",
+   "label": "Camera and display connectors",
+   "title": "Flat-cable connectors",
+   "text": "Two fine-pitch flat-cable sockets for a camera or a display. Nothing was plugged into them in our runs."
+  },
+  {
+   "type": "block",
+   "x": 45.5,
+   "y": 47.9,
+   "w": 14.0,
+   "h": 4.0,
+   "d": 3.0,
+   "color": "#d8d2c0"
+  }
+ ]
+}

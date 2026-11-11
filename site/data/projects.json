@@ -672,7 +672,7 @@
        }
       ],
       "total": "$20.56 for the board on TI.com, read 2026-10-09 without a login. The cable came in the box of the board. The Claude subscription is extra and not priced here.",
-      "why_board": "It has its own USB debugger, so there is no probe to buy. Its 32 kB of RAM leaves room for a screen or a small AI model.",
+      "why_board": "It has its own USB debugger, so there is no probe to buy. Its 32 kB of RAM leaves room for a screen or an edge AI model.",
       "setup_steps": 6,
       "routes": {
        "diy": {
@@ -3620,7 +3620,7 @@
   },
   {
    "group": "Sensors and screens",
-   "t": "Run a small AI model on the chip",
+   "t": "Run an edge AI model on the chip",
    "radio": "",
    "cells": {
     "g3507": {
@@ -3706,7 +3706,7 @@
     "E289",
     "E297"
    ],
-   "q": "run a small AI model in software, and how fast",
+   "q": "run an edge AI model in software, and how fast",
    "topics": [
     "ai"
    ],
@@ -3766,7 +3766,7 @@
    },
    "outcome": "ai-model",
    "card": {
-    "title": "Run a small AI model on the chip",
+    "title": "Run an edge AI model on the chip",
     "drawing": {
      "kind": "nn",
      "board": "LP-MSPM0G3507"
@@ -13276,6 +13276,11 @@
      "st": "yes",
      "why": "All 14 TI zoo models tried ran on the C7x accelerator in {{row:tda4/dl_inference_ms/mobilenetv1-mlperf-224-tflitert-tidl-c7x|.1f}} to {{row:tda4/dl_inference_ms/yolox-s-pose-640-onnxrt-tidl-c7x|.1f}} ms. Decode into a model runs at 110.8 fps with TI's zero-copy settings",
      "source": "tda4/RESULTS-tda4.md"
+    },
+    "beagley-ai": {
+     "st": "yes",
+     "why": "11 precompiled zoo models run on the C7x accelerator, pose in 43.1 ms against 4.48 s on the Arm cores. Frigate's object detection runs on the C7x at 64.5 ms per detection (recorded clip; the USB webcam dropped off USB), and hardware decode of 1080p runs at 255.9 fps",
+     "source": "beagley-ai/README.md"
     }
    },
    "card": {
@@ -14896,7 +14901,7 @@
     "long": "A hub, a tag and a dashboard, each with its own step."
    },
    "tier": "hard",
-   "what": "A machine's motor MCU sends run events, run time and overcurrent trips to a Bluetooth tag. A Wi-Fi hub collects every machine in range and serves a phone app, no internet. A small model on the tag classifies each event.",
+   "what": "A machine's motor MCU sends run events, run time and overcurrent trips to a Bluetooth tag. A Wi-Fi hub collects every machine in range and serves a phone app, no internet. An edge AI model on the tag classifies each event.",
    "time": "an afternoon with two boards",
    "hardware": [
     "lp-em-cc2340r5",
@@ -24040,7 +24045,7 @@
    "also": {
     "cc35x1": {
      "st": "yes",
-     "proof": "ran",
+     "proof": "checked",
      "why": "Ran on the LP-EM-CC35X1 with the Audio BoosterPack: three spoken questions were transcribed word for word and the first reply audio started 2.28 to 2.67 s after each question (2026-10-29, Claude Haiku). Not judged by ear: the speaker's sound. The screen with its four looks runs on the same image.",
      "source": "data/results/cc35x1.csv"
     }
@@ -24273,7 +24278,7 @@
         "n": 2,
         "app": "Bench",
         "title": "Stack the audio pack, and the screen if you have one.",
-        "do": "Press the BOOSTXL-AUDIO onto the LaunchPad headers. For the screen, wire the 3.5 inch touch panel as in the pin table above; keep the pack's J5 jumper on its default SPI DAC position.",
+        "do": "Press the BOOSTXL-AUDIO onto the LaunchPad headers. For the screen, wire the 3.5 inch touch panel as in the wiring picture and the wire table above; keep the pack's J5 jumper on its default SPI DAC position.",
         "see": "The pack sits flat on the headers. No wire is needed for voice alone.",
         "if": "If you skip the screen, nothing else changes: the image runs the same without a panel attached."
        },
@@ -24438,7 +24443,7 @@
   {
    "id": "medium",
    "name": "Medium",
-   "sub": "One part at most: a sensor, a screen, a small model, or a measurement."
+   "sub": "One part at most: a sensor, a screen, an edge AI model, or a measurement."
   },
   {
    "id": "hard",
@@ -24537,6 +24542,13 @@
    "page": "board-am62l32.html",
    "part": "AM62L32",
    "family": "am62l"
+  },
+  {
+   "id": "beagley-ai",
+   "name": "BeagleY-AI",
+   "page": "board-am67a.html",
+   "part": "AM67A",
+   "family": "tda4"
   }
  ],
  "hub_families": [
@@ -24588,7 +24600,8 @@
   "am13e230": "am13",
   "iwrl6432boost": "iwrl",
   "tda4": "tda4",
-  "am62l": "am62l"
+  "am62l": "am62l",
+  "beagley-ai": "tda4"
  },
  "hub_topics": [
   {
@@ -24690,7 +24703,7 @@
     "speed"
    ],
    "href": "project-small-ai-model.html#e130",
-   "where": "Experiment on the small AI model page",
+   "where": "Experiment on the edge AI model page",
    "headline": "The LP-MSPM0G5187's neural-network engine runs the four room-occupancy models 1.9 to 16.7 times faster than the best CPU build.",
    "boards": {
     "g5187": {
@@ -25316,8 +25329,8 @@
   {
    "id": "ai-model",
    "group": "ai",
-   "name": "Run a small AI model on the chip",
-   "chip": "Small AI model",
+   "name": "Run an edge AI model on the chip",
+   "chip": "Edge AI model",
    "one_line": "A model guesses how many people are in a room from sensor readings, and the chip times its own answer.",
    "why": "The model and its answer stay on the chip; nothing goes to a cloud.",
    "proof": {

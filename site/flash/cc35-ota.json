@@ -1,0 +1,53 @@
+{
+ "board": "cc35x1",
+ "kit": "LP-EM-CC35X1",
+ "module": "cc35-ota.js",
+ "title": "Update this board over Wi-Fi",
+ "summary": "The board runs TI's OTA example. This page types its menu answers over the probe's serial port; the board downloads a signed image from a server on your computer, checks it, restarts into it, and you keep it or go back. This page never writes the board's flash itself.",
+ "serial": {
+  "baud": 115200,
+  "pick": "In the browser's port list choose the XDS110 entry that prints the menu. If the console stays silent, choose the other XDS110 entry (the application uses the first one) and press S1 on the board."
+ },
+ "firstTime": {
+  "title": "Once: program the OTA example",
+  "why": "Updates over Wi-Fi need a flash layout with two image slots and the OTA example as the running program. Only TI's Toolbox writes that layout, so it is done once from a terminal.",
+  "build": "cc35x1/ota/build.sh 0.0.1.0",
+  "command": "./simplelink-wifi-toolbox programmer -i XDS110 -param1 <probe serial> programming --tool_settings <absolute path to tool_settings.json>",
+  "from": "the SimpleLink Wi-Fi Toolbox folder (<Toolbox>)",
+  "after": "Press S1 or run xds110reset -s <probe serial>. The console prints \"CC35xx OTA Example Application\" and a menu.",
+  "measured": "35 to 45 s on the bench board, the same command that programs any image."
+ },
+ "server": {
+  "port": 8443,
+  "steps": [
+   "Copy the SDK folder tools/ota_https_server/ to an empty folder on your computer (it holds ota_server.py and TI's example certificates).",
+   "Build the update image with a higher version: cc35x1/ota/build.sh 0.0.2.0. Copy toolbox/primary_vendor_image.sign.bin from its output into that folder as vendor_image_0.0.2.0.bin.",
+   "Run python3 ota_server.py in that folder. It listens on port 8443 over HTTPS with the example certificates the OTA example already trusts.",
+   "Your computer and the board must be on the same network. The address you give the board is your computer's address there, for example https://192.0.2.71:8443."
+  ],
+  "limit": "The board trusts TI's example certificate authority, built into the image. A server with another certificate needs an image built with that authority."
+ },
+ "flow": [
+  {"id": "connect", "label": "Connect the console", "does": "Opens the serial port and reads which menu the board is in."},
+  {"id": "scan", "label": "Find Wi-Fi networks", "does": "Starts the board's radio and lists the networks it hears (about 2 to 10 s)."},
+  {"id": "join", "label": "Join", "does": "You pick a network and type its password. The password is sent once and is not shown, logged or saved."},
+  {"id": "server", "label": "Check the server", "does": "Gives the board your server's address and lists what it offers."},
+  {"id": "download", "label": "Download", "does": "The board downloads the image into the spare slot and checks it (4 to 21 s; a slot that was left in the failed state is erased first)."},
+  {"id": "install", "label": "Install", "does": "Marks the image to run at the next restart."},
+  {"id": "reboot", "label": "Restart into the new image", "does": "The board restarts and runs the new image on trial (about 3 s)."},
+  {"id": "keep", "label": "Keep it", "does": "Makes the new image the one the board runs from now on."},
+  {"id": "revert", "label": "Go back", "does": "Drops the new image and restarts the old one (about 3 s)."}
+ ],
+ "states": {
+  "candidate": "A downloaded image is waiting from an earlier try: install it, cancel it, or go on.",
+  "silent": "No menu printed: press S1, or use the other serial port."
+ },
+ "measured": {
+  "date": "2026-10-22",
+  "board": "LP-EM-CC35X1 on an LP-XDS110ET, SDK 10.20.00.39, image sizes 1,291,256 bytes",
+  "rounds": 4,
+  "note": "Scan 1.9 s, join 2.2 to 2.7 s, server query 0.4 to 0.6 s, download 3.6 s (20.5 s when the spare slot was left failed), install under 0.1 s, restart into the new image 3.1 s, keep or go back 3.1 s. Whole flow from the main menu to the new image on trial: 12 to 28 s. Driven by the same module from a Mac through a serial bridge, not yet from Chrome.",
+  "source": "cc35x1/AGENTS.md"
+ },
+ "never": "No command that activates the chip, burns fuses, sets protection against older images, changes the lifecycle state or erases the whole flash is in this flow."
+}

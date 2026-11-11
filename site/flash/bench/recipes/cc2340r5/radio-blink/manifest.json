@@ -1,0 +1,110 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "cc2340r5",
+ "kit": "LP-EM-CC2340R5",
+ "revisions_tested": [
+  "unknown: not run on a board yet"
+ ],
+ "chip": {
+  "deviceid": "0x6BB8402F"
+ },
+ "recipe": "radio-blink",
+ "console": null,
+ "params": {
+  "kind": "params",
+  "format": 1,
+  "addr": "0x0007F800",
+  "magic": "0x50524C46",
+  "image_id": 6,
+  "items": [
+   {
+    "id": "on_ms",
+    "label": "LED on",
+    "unit": "ms",
+    "min": 10,
+    "max": 60000,
+    "default": 500,
+    "step": 10,
+    "note": ""
+   },
+   {
+    "id": "off_ms",
+    "label": "LED off",
+    "unit": "ms",
+    "min": 10,
+    "max": 60000,
+    "default": 500,
+    "step": 10,
+    "note": ""
+   }
+  ],
+  "region": "the last 2 kB sector below the security firmware; one sector write through the chip's mailbox, then a reset"
+ },
+ "status": {
+  "addr": "0x200001A0",
+  "magic": "0x53524C46",
+  "words": [
+   "magic",
+   "demo",
+   "counter",
+   "aux"
+  ],
+  "demo_id": 1
+ },
+ "image": {
+  "file": "radio-blink.hex",
+  "format": "Intel HEX",
+  "sha256": "2621cc33c2ac075a1141ecd3adb4a96eb65d1fe470b9b7ae6d6b8c6f49e6ef71",
+  "bytes": 23355,
+  "data_bytes": 8272,
+  "main_flash_end": "0x1850",
+  "segments": [
+   {
+    "region": "main flash",
+    "start": "0x00000000",
+    "end": "0x00001850",
+    "bytes": 6224
+   },
+   {
+    "region": "ccfg",
+    "start": "0x4E020000",
+    "end": "0x4E020800",
+    "bytes": 2048
+   }
+  ]
+ },
+ "elf": {
+  "file": "radio-blink.out",
+  "sha256": "763a843089534dc55adb6fa8bb6716e20aa2cbf7a316bd3d463cb7795cef3019",
+  "bytes": 26408,
+  "note": "stripped; the .hex was made from the unstripped ELF"
+ },
+ "config": {
+  "origin": "the CCFG the SDK's SysConfig built into the ELF (CRCs filled by the SDK's crc_tool); not compared with a board yet"
+ },
+ "source": {
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/nortos/LP_EM_CC2340R5/drivers/empty",
+  "added": [
+   "frl_demo.c",
+   "frl_demo.syscfg"
+  ],
+  "sha256_frl_demo_c": "1481af1aa220dafb0afc15e1e00b80ca48367df677ce46d07e64fd93783b06aa",
+  "rebuild": "cc2755p10/radio-demos/build.sh cc2340r5 blink"
+ },
+ "tools": {
+  "sdk": {
+   "version": "9.21.00.36"
+  },
+  "sysconfig": {
+   "version": "1.28.0"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS"
+  }
+ },
+ "expect": "the red LED (LED0) is on for on_ms and off for off_ms, repeating; frl_status.counter rises at every toggle",
+ "made": "2026-10-22T15:06:26",
+ "release_cleared": false,
+ "release_note": "Built from TI's drivers/empty example (BSD-3-Clause, NOTICE.txt) plus our frl_demo.c. Not cleared for public distribution."
+}

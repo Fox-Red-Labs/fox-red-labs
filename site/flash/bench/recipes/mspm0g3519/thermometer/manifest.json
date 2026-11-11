@@ -1,0 +1,106 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0g3519",
+ "kit": "LP-MSPM0G3519",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BBA902F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "thermometer",
+ "thermometer": {
+  "memres": "0x40001280",
+  "trim": "0x41C4003C",
+  "channel": 11,
+  "vref": 3.3,
+  "bits": 12,
+  "mv_per_c": -1.8,
+  "trim_c": 30,
+  "trim_refs": [
+   1.4,
+   3.3
+  ],
+  "trim_window_v": [
+   0.55,
+   0.75
+  ],
+  "typical_vtrim": 0.6345,
+  "formula": "T = (Vsample - Vtrim) / slope + 30 C, V = (code - 0.5) * ref / 4096 (TI's MSPM0 examples and TRM)"
+ },
+ "params": {
+  "kind": "params",
+  "format": 1,
+  "addr": "0x0007FC00",
+  "magic": "0x50524C46",
+  "image_id": 3,
+  "items": [
+   {
+    "id": "sample_ms",
+    "label": "Time between readings",
+    "unit": "ms",
+    "min": 20,
+    "max": 2000,
+    "default": 100,
+    "step": 10,
+    "note": "how often the ADC reads the chip's temperature"
+   },
+   {
+    "id": "blink_every",
+    "label": "LED flash every",
+    "unit": "readings",
+    "min": 1,
+    "max": 100,
+    "default": 10,
+    "step": 1,
+    "note": "the red LED shows the program is running"
+   }
+  ]
+ },
+ "expect": "LED2 red flashes once a second; ADC0 MEMRES0 holds the chip's temperature reading, updated ten times a second",
+ "image": {
+  "file": "firmware.out",
+  "sha256": "c65ea2016d8f6f0626f3ec8281ddca7b272577be3a2f3658b64f0b5c4ff6a9b7",
+  "bytes": 8012,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 1040
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/nortos/LP_MSPM0G3519/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/thermometer.c",
+  "sha256": "9d8d2c608413c6ccb62209e3346665ad0904d1c054eb197cd5d05e3724c06827",
+  "edited_line": "the example's main source replaced by the thermometer; TH_CHAN = channel 11",
+  "rebuild": "python3 tools/webflash/build_sensor.py mspm0g3519"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.28.0",
+   "validated": false,
+   "source": "override"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "4.4.1_st_20260330-0700",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-22T14:40:09",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}

@@ -70,31 +70,11 @@
    "text": "Three pins: the outer two go across the supply, the middle one is the wiper and gives a voltage between 0 V and 3.3 V as you turn.",
    "hidden": true,
    "plug": {
-    "p1": "bb.g22",
+    "p1": "bb.g23",
     "w": "bb.g24",
-    "p3": "bb.g26"
+    "p3": "bb.g25"
    },
    "angle": 40
-  },
-  {
-   "id": "btn2",
-   "type": "button",
-   "at": [
-    100.0,
-    90.54,
-    6.95
-   ],
-   "rot": 90,
-   "label": "Your button",
-   "title": "Push button (your own)",
-   "text": "Opposite corners are the two sides of the switch.",
-   "hidden": true,
-   "plug": {
-    "p1": "bb.f13",
-    "p2": "bb.f15",
-    "p3": "bb.e13",
-    "p4": "bb.e15"
-   }
   }
  ],
  "wires": [
@@ -210,7 +190,7 @@
   {
    "id": "potv",
    "color": "#d93025",
-   "from": "bb.j22",
+   "from": "bb.j23",
    "to": "bb.tp19",
    "exit": [
     0,
@@ -224,7 +204,7 @@
    ],
    "d": 0.45,
    "ends": [
-    "Knob outer pin, breadboard j22",
+    "Knob outer pin, breadboard j23",
     "3V3 rail"
    ],
    "label": "Knob to 3.3 V"
@@ -232,8 +212,8 @@
   {
    "id": "potg",
    "color": "#2b2c30",
-   "from": "bb.j26",
-   "to": "bb.tm22",
+   "from": "bb.j25",
+   "to": "bb.tm21",
    "exit": [
     0,
     0,
@@ -246,7 +226,7 @@
    ],
    "d": 0.45,
    "ends": [
-    "Knob outer pin, breadboard j26",
+    "Knob outer pin, breadboard j25",
     "Ground rail"
    ],
    "label": "Knob to ground"
@@ -277,86 +257,6 @@
      46.7,
      104.6,
      21.8
-    ]
-   ]
-  },
-  {
-   "id": "btnsig",
-   "color": "#2a6bd7",
-   "from": "bb.j13",
-   "to": "mspm0g3519.j2.pin15",
-   "exit": [
-    0,
-    0,
-    5
-   ],
-   "enter": [
-    0,
-    0,
-    5
-   ],
-   "d": 0.45,
-   "ends": [
-    "Button, breadboard j13",
-    "J2 pin 15 (PB8)"
-   ],
-   "label": "Button signal",
-   "via": [
-    [
-     69.3,
-     85.5,
-     16.1
-    ]
-   ]
-  },
-  {
-   "id": "btngnd",
-   "color": "#2b2c30",
-   "from": "bb.a15",
-   "to": "bb.bm12",
-   "exit": [
-    0,
-    0,
-    5
-   ],
-   "enter": [
-    0,
-    0,
-    5
-   ],
-   "d": 0.45,
-   "ends": [
-    "Button, breadboard a15",
-    "Bottom ground rail"
-   ],
-   "label": "Button to ground"
-  },
-  {
-   "id": "gndtie",
-   "color": "#2b2c30",
-   "from": "bb.bm1",
-   "to": "bb.tm1",
-   "exit": [
-    0,
-    0,
-    5
-   ],
-   "enter": [
-    0,
-    0,
-    5
-   ],
-   "d": 0.45,
-   "ends": [
-    "Bottom ground rail, hole 1",
-    "Top ground rail, hole 1"
-   ],
-   "label": "Ground rails joined",
-   "via": [
-    [
-     100.0,
-     58.8,
-     17.2
     ]
    ]
   }
@@ -586,7 +486,7 @@
   {
    "group": "Part 2: knob to ADC",
    "title": "The knob in the breadboard",
-   "text": "Press the 10 k knob into g22, g24 and g26. It has three pins: the outer two go across the supply and the middle one, the wiper, gives a voltage that follows the turn.",
+   "text": "Press the 10 k knob into g23, g24 and g25. It has three pins: the outer two go across the supply and the middle one, the wiper, gives a voltage that follows the turn.",
    "focus": "pot1",
    "do": [
     {
@@ -605,12 +505,12 @@
      "show": "pot1"
     }
    ],
-   "check": "The knob stands upright with its three pins in row g, two holes apart."
+   "check": "The knob stands upright with its three pins side by side in row g."
   },
   {
    "group": "Part 2: knob to ADC",
    "title": "Knob to 3.3 V and ground",
-   "text": "A red wire from j22 to the red rail and a black wire from j26 to the blue rail put 3.3 V across the knob. 3.3 V, not 5 V: the chip's pins cannot take more than that.",
+   "text": "A red wire from j23 to the red rail and a black wire from j25 to the blue rail put 3.3 V across the knob. 3.3 V, not 5 V: the chip's pins cannot take more than that.",
    "focus": "pot1",
    "do": [
     {
@@ -740,88 +640,6 @@
     }
    ],
    "check": "Knob to the left: LED off. Knob to the right: LED full. In between it dims smoothly."
-  },
-  {
-   "group": "Optional: a button of your own",
-   "title": "A bigger button across the channel",
-   "text": "Optional: if you want a button you can mount anywhere, press a push button across the center channel at f13, f15, e13 and e15. Opposite corners are the two sides of the switch; use f13 with e15. The program reads it on its own pin, with the same pull-up as S2.",
-   "focus": "btn2",
-   "do": [
-    {
-     "view": {
-      "azimuth": -0.9,
-      "elevation": 0.95,
-      "zoom": 3.0,
-      "center": [
-       100.0,
-       90.5,
-       4
-      ]
-     }
-    },
-    {
-     "show": "btn2"
-    }
-   ],
-   "check": "The button straddles the center channel, two legs on each side."
-  },
-  {
-   "group": "Optional: a button of your own",
-   "title": "Button wires",
-   "text": "A blue wire from j13 to J2 pin 15 (PB8), a black wire from a15 to the bottom blue rail, and a black wire joining the bottom blue rail to the top one at hole 1, so both rails are ground.",
-   "focus": "btn2",
-   "do": [
-    {
-     "view": {
-      "azimuth": -0.9,
-      "elevation": 0.95,
-      "zoom": 1.4,
-      "center": [
-       100.0,
-       90.5,
-       0
-      ]
-     }
-    },
-    {
-     "wire": [
-      "btnsig",
-      "btngnd",
-      "gndtie"
-     ]
-    }
-   ],
-   "check": "Blue wire from j13 to J2 pin 15 (PB8); black wires from a15 and between the two blue rails."
-  },
-  {
-   "group": "Optional: a button of your own",
-   "title": "Either button works",
-   "text": "Run the same dim program: it reads both buttons. A press on your button or on S2 toggles the LED, and the knob still sets how bright it is.",
-   "focus": "btn2",
-   "do": [
-    {
-     "view": {
-      "azimuth": -0.9,
-      "elevation": 0.9,
-      "zoom": 1.0,
-      "center": [
-       70,
-       53,
-       0
-      ]
-     }
-    },
-    {
-     "flow": [
-      "btnsig"
-     ],
-     "kind": "signal"
-    },
-    {
-     "led": "led1"
-    }
-   ],
-   "check": "Your button and S2 both toggle the LED."
   }
  ],
  "extent": [
@@ -849,12 +667,6 @@
     "BTN_A",
     "Button S2 (on the board)",
     "J4 pin 40 (PB3)",
-    "Digital input, internal pull-up"
-   ],
-   [
-    "BTN_B",
-    "Your own button, hole j13 (optional)",
-    "J2 pin 15 (PB8)",
     "Digital input, internal pull-up"
    ],
    [

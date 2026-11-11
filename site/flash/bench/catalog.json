@@ -1,0 +1,290 @@
+{
+ "boards": [
+  {
+   "id": "mspm0g3507",
+   "kit": "LP-MSPM0G3507",
+   "recognized": true,
+   "browserFlash": true,
+   "demos": 2,
+   "readme": "mspm0g3507/README.md",
+   "page": "board-mspm0g3507.html",
+   "status": "Browser demos available",
+   "note": "Blink and color-player firmware built for this board. Browser flashing and restore on the G3507 still need a hardware check."
+  },
+  {
+   "id": "mspm0l1306",
+   "kit": "LP-MSPM0L1306",
+   "recognized": true,
+   "browserFlash": true,
+   "demos": 14,
+   "readme": "mspm0l1306/README.md",
+   "page": "board-mspm0l1306.html",
+   "status": "Browser demos available",
+   "note": ""
+  },
+  {
+   "id": "mspm0c1104",
+   "kit": "LP-MSPM0C1104",
+   "recognized": true,
+   "browserFlash": true,
+   "demos": 1,
+   "readme": "mspm0c1104/README.md",
+   "page": "board-mspm0c1104.html",
+   "status": "Browser demos available",
+   "note": ""
+  },
+  {
+   "id": "mspm0g3519",
+   "kit": "LP-MSPM0G3519",
+   "recognized": true,
+   "browserFlash": true,
+   "demos": 16,
+   "readme": "mspm0g3519/README.md",
+   "page": "board-mspm0g3519.html",
+   "status": "Browser demos available",
+   "note": ""
+  },
+  {
+   "id": "mspm0g5187",
+   "kit": "LP-MSPM0G5187",
+   "recognized": true,
+   "browserFlash": true,
+   "demos": 11,
+   "readme": "mspm0g5187/README.md",
+   "page": "board-mspm0g5187.html",
+   "status": "Browser demos available",
+   "note": ""
+  },
+  {
+   "id": "cc2340r5",
+   "kit": "LP-EM-CC2340R5",
+   "recognized": true,
+   "browserFlash": true,
+   "demos": 5,
+   "readme": "cc2340r5/README.md",
+   "page": "board-cc2340r5.html",
+   "status": "Browser demos available",
+   "note": "Recognized. This page puts small programs on it (blink, a console message, the buttons, a Zigbee light, a Bluetooth light), reads its console and puts back what was on it."
+  },
+  {
+   "id": "cc1354p10",
+   "kit": "LP-CC1354P10-1",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "cc1354p10/README.md",
+   "page": "board-cc1354p10.html",
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "cc3200",
+   "kit": "CC3200-LAUNCHXL",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "cc3200-launchxl/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "f2800137",
+   "kit": "LAUNCHXL-F2800137",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "c2000-launchpad/README.md",
+   "page": "board-f2800137.html",
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "nucleo-g071rb",
+   "kit": "NUCLEO-G071RB",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "nucleo-g071rb/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "nucleo-u083rc",
+   "kit": "NUCLEO-U083RC",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "nucleo-u083rc/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "frdm-mcxa153",
+   "kit": "FRDM-MCXA153",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "frdm-mcxa153/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "pico2",
+   "kit": "Raspberry Pi Pico 2 H",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "pico2/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "esp32c6",
+   "kit": "ESP32-C6-DevKitC-1-N8",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "esp32c6/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "mspm33c321a",
+   "kit": "LP-MSPM33C321A",
+   "recognized": true,
+   "browserFlash": true,
+   "demos": 1,
+   "readme": "mspm33c321a/README.md",
+   "page": "board-mspm33c321a.html",
+   "status": "Browser demos available",
+   "note": ""
+  },
+  {
+   "id": "am13e230",
+   "kit": "LP-AM13E230",
+   "recognized": true,
+   "browserFlash": false,
+   "demos": 1,
+   "readme": "am13e230/README.md",
+   "page": "board-am13e230.html",
+   "status": "Recognized; browser flashing unavailable",
+   "note": "Recognized. The page can write this board's flash, but starting the program afterwards is not proven yet, so it does not offer a write."
+  },
+  {
+   "id": "cc2755p10",
+   "kit": "LP-EM-CC2755P10",
+   "recognized": true,
+   "browserFlash": true,
+   "demos": 5,
+   "readme": "cc2755p10/README.md",
+   "page": "board-cc2755p10.html",
+   "status": "Browser demos available",
+   "note": "Recognized. This page puts small programs on it (blink, a console message, the buttons, a Zigbee light, a Bluetooth light), reads its console and puts back what was on it."
+  },
+  {
+   "id": "cc35x1",
+   "kit": "LP-EM-CC35X1",
+   "recognized": true,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "cc35x1/README.md",
+   "page": "board-cc3551e.html",
+   "status": "Recognized; browser flashing unavailable",
+   "note": "Recognized. This page cannot write this board's flash: its code lives in a separate memory chip that only TI's own tool writes. With TI's over-the-air example on the board, the page updates it over Wi-Fi from your own server; the one-time Toolbox step is shown below."
+  },
+  {
+   "id": "f28p65x",
+   "kit": "LAUNCHXL-F28P65X",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "c2000-launchpad/README.md",
+   "page": "board-f28p65x.html",
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "iwrl6432boost",
+   "kit": "IWRL6432BOOST",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "iwrl6432boost/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "am263p",
+   "kit": "LP-AM263P",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "am263p/README.md",
+   "page": "board-am263p.html",
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "tda4",
+   "kit": "SK-TDA4VM",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "tda4/README.md",
+   "page": "board-tda4.html",
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "am62l-evm",
+   "kit": "TMDS62LEVM (AM62L EVM)",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "am62l-evm/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "beagley-ai",
+   "kit": "BeagleY-AI",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "beagley-ai/README.md",
+   "page": null,
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "am243x",
+   "kit": "LP-AM243",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "am243x/README.md",
+   "page": "board-am243x.html",
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  },
+  {
+   "id": "mspm0l2228",
+   "kit": "LP-MSPM0L2228",
+   "recognized": false,
+   "browserFlash": false,
+   "demos": 0,
+   "readme": "mspm0l2228/README.md",
+   "page": "board-mspm0l2228.html",
+   "status": "Use the board instructions; no browser connection yet",
+   "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
+  }
+ ]
+}

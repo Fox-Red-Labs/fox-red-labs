@@ -1,0 +1,424 @@
+{
+ "board": "mspm0l1306",
+ "kit": "LP-MSPM0L1306",
+ "chip": "MSPM0L130x",
+ "header": "mspm0l130x.h",
+ "deviceid": 196616239,
+ "mask": 268435455,
+ "flash": 65536,
+ "ram": {
+  "start": 536870912,
+  "bytes": 4096
+ },
+ "iomux": 1078099968,
+ "sysctl": 1074458624,
+ "peripherals": {
+  "ADC0": {
+   "base": 1073758208,
+   "kind": "adc",
+   "group": "Analog",
+   "irq": 4
+  },
+  "COMP0": {
+   "base": 1073774592,
+   "kind": "analog",
+   "group": "Analog",
+   "irq": 1
+  },
+  "OPA0": {
+   "base": 1073872896,
+   "kind": "analog",
+   "group": "Analog"
+  },
+  "OPA1": {
+   "base": 1073881088,
+   "kind": "analog",
+   "group": "Analog"
+  },
+  "VREF": {
+   "base": 1073938432,
+   "kind": "analog",
+   "group": "Analog"
+  },
+  "WWDT0": {
+   "base": 1074266112,
+   "kind": "system",
+   "group": "System",
+   "irq": 0
+  },
+  "TIMG0": {
+   "base": 1074282496,
+   "kind": "timer",
+   "group": "Timers",
+   "irq": 16
+  },
+  "TIMG1": {
+   "base": 1074290688,
+   "kind": "timer",
+   "group": "Timers",
+   "irq": 2
+  },
+  "TIMG2": {
+   "base": 1074298880,
+   "kind": "timer",
+   "group": "Timers",
+   "irq": 18
+  },
+  "TIMG4": {
+   "base": 1074315264,
+   "kind": "timer",
+   "group": "Timers",
+   "irq": 20
+  },
+  "GPIOA": {
+   "base": 1074397184,
+   "kind": "io",
+   "group": "GPIO",
+   "irq": 1
+  },
+  "I2C0": {
+   "base": 1074724864,
+   "kind": "i2c",
+   "group": "Serial",
+   "irq": 24
+  },
+  "I2C1": {
+   "base": 1074733056,
+   "kind": "i2c",
+   "group": "Serial",
+   "irq": 25
+  },
+  "UART1": {
+   "base": 1074790400,
+   "kind": "uart",
+   "group": "Serial",
+   "irq": 13
+  },
+  "UART0": {
+   "base": 1074823168,
+   "kind": "uart",
+   "group": "Serial",
+   "irq": 15
+  },
+  "DMA": {
+   "base": 1078108160,
+   "kind": "system",
+   "group": "System",
+   "irq": 31
+  },
+  "CRC": {
+   "base": 1078198272,
+   "kind": "accel",
+   "group": "Math and security"
+  },
+  "SPI0": {
+   "base": 1078362112,
+   "kind": "spi",
+   "group": "Serial",
+   "irq": 9
+  }
+ },
+ "pins": {
+  "1": {
+   "fn": {
+    "1": "GPIOA_DIO00",
+    "2": "UART1_TX",
+    "3": "I2C0_SDA",
+    "4": "TIMG1_CCP0",
+    "5": "SPI0_CS1_POCI1",
+    "6": "SYSCTL_FCC_IN"
+   },
+   "port": "A",
+   "pin": 0
+  },
+  "2": {
+   "fn": {
+    "1": "GPIOA_DIO01",
+    "2": "UART1_RX",
+    "3": "I2C0_SCL",
+    "4": "TIMG1_CCP1"
+   },
+   "port": "A",
+   "pin": 1
+  },
+  "3": {
+   "fn": {
+    "1": "GPIOA_DIO02",
+    "2": "TIMG1_CCP1",
+    "3": "SPI0_CS0"
+   },
+   "port": "A",
+   "pin": 2
+  },
+  "4": {
+   "fn": {
+    "1": "GPIOA_DIO03",
+    "2": "TIMG2_CCP0",
+    "3": "SPI0_CS1_POCI1",
+    "4": "UART1_CTS",
+    "5": "COMP0_OUT",
+    "6": "I2C1_SDA"
+   },
+   "port": "A",
+   "pin": 3
+  },
+  "5": {
+   "fn": {
+    "1": "GPIOA_DIO04",
+    "2": "TIMG2_CCP1",
+    "3": "SPI0_POCI",
+    "4": "UART1_RTS",
+    "5": "I2C1_SCL"
+   },
+   "port": "A",
+   "pin": 4
+  },
+  "6": {
+   "fn": {
+    "1": "GPIOA_DIO05",
+    "2": "TIMG0_CCP0",
+    "3": "SPI0_PICO",
+    "4": "SYSCTL_FCC_IN"
+   },
+   "port": "A",
+   "pin": 5
+  },
+  "7": {
+   "fn": {
+    "1": "GPIOA_DIO06",
+    "2": "TIMG0_CCP1",
+    "3": "SPI0_SCLK"
+   },
+   "port": "A",
+   "pin": 6
+  },
+  "8": {
+   "fn": {
+    "1": "GPIOA_DIO07",
+    "2": "COMP0_OUT",
+    "3": "SYSCTL_CLK_OUT",
+    "4": "TIMG1_CCP0"
+   },
+   "port": "A",
+   "pin": 7
+  },
+  "9": {
+   "fn": {
+    "1": "GPIOA_DIO08",
+    "2": "UART0_TX",
+    "3": "SPI0_CS0",
+    "4": "UART1_RTS",
+    "5": "TIMG2_CCP0"
+   },
+   "port": "A",
+   "pin": 8
+  },
+  "10": {
+   "fn": {
+    "1": "GPIOA_DIO09",
+    "2": "UART0_RX",
+    "3": "SPI0_PICO",
+    "4": "UART1_CTS",
+    "5": "TIMG2_CCP1",
+    "6": "SYSCTL_CLK_OUT"
+   },
+   "port": "A",
+   "pin": 9
+  },
+  "11": {
+   "fn": {
+    "1": "GPIOA_DIO10",
+    "2": "UART1_TX",
+    "3": "SPI0_POCI",
+    "4": "I2C0_SDA",
+    "5": "TIMG4_CCP0",
+    "6": "SYSCTL_CLK_OUT"
+   },
+   "port": "A",
+   "pin": 10
+  },
+  "12": {
+   "fn": {
+    "1": "GPIOA_DIO11",
+    "2": "UART1_RX",
+    "3": "SPI0_SCLK",
+    "4": "I2C0_SCL",
+    "5": "TIMG4_CCP1",
+    "6": "COMP0_OUT"
+   },
+   "port": "A",
+   "pin": 11
+  },
+  "13": {
+   "fn": {
+    "1": "GPIOA_DIO12",
+    "2": "UART0_CTS",
+    "3": "TIMG0_CCP0",
+    "4": "SYSCTL_FCC_IN"
+   },
+   "port": "A",
+   "pin": 12
+  },
+  "14": {
+   "fn": {
+    "1": "GPIOA_DIO13",
+    "2": "UART0_RTS",
+    "3": "TIMG0_CCP1",
+    "4": "UART1_RX"
+   },
+   "port": "A",
+   "pin": 13
+  },
+  "15": {
+   "fn": {
+    "1": "GPIOA_DIO14",
+    "2": "UART1_CTS",
+    "3": "SYSCTL_CLK_OUT",
+    "4": "UART1_TX",
+    "5": "TIMG1_CCP0"
+   },
+   "port": "A",
+   "pin": 14
+  },
+  "16": {
+   "fn": {
+    "1": "GPIOA_DIO15",
+    "2": "UART1_RTS",
+    "3": "I2C1_SCL",
+    "4": "SPI0_CS2_POCI2",
+    "5": "TIMG4_CCP1"
+   },
+   "port": "A",
+   "pin": 15
+  },
+  "17": {
+   "fn": {
+    "1": "GPIOA_DIO16",
+    "2": "COMP0_OUT",
+    "3": "I2C1_SDA",
+    "4": "SPI0_POCI",
+    "5": "TIMG0_CCP0",
+    "6": "SYSCTL_FCC_IN"
+   },
+   "port": "A",
+   "pin": 16
+  },
+  "18": {
+   "fn": {
+    "1": "GPIOA_DIO17",
+    "2": "UART0_TX",
+    "3": "I2C1_SCL",
+    "4": "SPI0_SCLK",
+    "5": "TIMG4_CCP0",
+    "6": "SPI0_CS1_POCI1"
+   },
+   "port": "A",
+   "pin": 17
+  },
+  "19": {
+   "fn": {
+    "1": "GPIOA_DIO18",
+    "2": "UART0_RX",
+    "3": "SPI0_PICO",
+    "4": "I2C1_SDA",
+    "5": "TIMG4_CCP1"
+   },
+   "port": "A",
+   "pin": 18
+  },
+  "20": {
+   "fn": {
+    "1": "GPIOA_DIO19",
+    "2": "DEBUGSS_SWDIO",
+    "3": "I2C1_SDA",
+    "4": "SPI0_POCI"
+   },
+   "port": "A",
+   "pin": 19
+  },
+  "21": {
+   "fn": {
+    "1": "GPIOA_DIO20",
+    "2": "DEBUGSS_SWCLK",
+    "3": "I2C1_SCL",
+    "4": "TIMG4_CCP0"
+   },
+   "port": "A",
+   "pin": 20
+  },
+  "22": {
+   "fn": {
+    "1": "GPIOA_DIO21",
+    "2": "TIMG2_CCP0",
+    "3": "UART0_CTS",
+    "4": "UART0_TX"
+   },
+   "port": "A",
+   "pin": 21
+  },
+  "23": {
+   "fn": {
+    "1": "GPIOA_DIO22",
+    "2": "UART0_RX",
+    "3": "TIMG2_CCP1",
+    "4": "UART0_RTS",
+    "5": "SYSCTL_CLK_OUT",
+    "6": "UART1_RX"
+   },
+   "port": "A",
+   "pin": 22
+  },
+  "24": {
+   "fn": {
+    "1": "GPIOA_DIO23",
+    "2": "UART0_TX",
+    "3": "SPI0_CS3_CD_POCI3",
+    "4": "TIMG0_CCP0",
+    "5": "UART0_CTS",
+    "6": "UART1_TX"
+   },
+   "port": "A",
+   "pin": 23
+  },
+  "25": {
+   "fn": {
+    "1": "GPIOA_DIO24",
+    "2": "SPI0_CS2_POCI2",
+    "3": "TIMG0_CCP1",
+    "4": "UART0_RTS"
+   },
+   "port": "A",
+   "pin": 24
+  },
+  "26": {
+   "fn": {
+    "1": "GPIOA_DIO25",
+    "2": "TIMG4_CCP1",
+    "3": "UART0_TX",
+    "4": "SPI0_PICO"
+   },
+   "port": "A",
+   "pin": 25
+  },
+  "27": {
+   "fn": {
+    "1": "GPIOA_DIO26",
+    "2": "TIMG1_CCP0",
+    "3": "UART0_RX",
+    "4": "SPI0_POCI"
+   },
+   "port": "A",
+   "pin": 26
+  },
+  "28": {
+   "fn": {
+    "1": "GPIOA_DIO27",
+    "2": "TIMG1_CCP1",
+    "3": "SPI0_CS3_CD_POCI3"
+   },
+   "port": "A",
+   "pin": 27
+  }
+ },
+ "labels": {}
+}

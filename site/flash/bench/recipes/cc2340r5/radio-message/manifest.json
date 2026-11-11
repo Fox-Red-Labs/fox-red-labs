@@ -1,0 +1,110 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "cc2340r5",
+ "kit": "LP-EM-CC2340R5",
+ "revisions_tested": [
+  "unknown: not run on a board yet"
+ ],
+ "chip": {
+  "deviceid": "0x6BB8402F"
+ },
+ "recipe": "radio-message",
+ "console": {
+  "uart": "the XDS110 backchannel (the probe's second serial port, /dev/cu.usbmodem<serial>1 on a Mac)",
+  "baud": 115200,
+  "format": "8N1"
+ },
+ "params": {
+  "kind": "params",
+  "format": 1,
+  "addr": "0x0007F800",
+  "magic": "0x50524C46",
+  "image_id": 7,
+  "items": [
+   {
+    "id": "period_ms",
+    "label": "Time between lines",
+    "unit": "ms",
+    "min": 50,
+    "max": 60000,
+    "default": 1000,
+    "step": 50,
+    "note": "the line counts up each time"
+   }
+  ],
+  "region": "the last 2 kB sector below the security firmware; one sector write through the chip's mailbox, then a reset"
+ },
+ "status": {
+  "addr": "0x200025C0",
+  "magic": "0x53524C46",
+  "words": [
+   "magic",
+   "demo",
+   "counter",
+   "aux"
+  ],
+  "demo_id": 2
+ },
+ "image": {
+  "file": "radio-message.hex",
+  "format": "Intel HEX",
+  "sha256": "055930277b915771661b28c70d3fff50fb760ef2154dce4e4ded813e1ab3c12b",
+  "bytes": 33711,
+  "data_bytes": 11955,
+  "main_flash_end": "0x26B4",
+  "segments": [
+   {
+    "region": "main flash",
+    "start": "0x00000000",
+    "end": "0x00002627",
+    "bytes": 9767
+   },
+   {
+    "region": "main flash",
+    "start": "0x00002628",
+    "end": "0x000026B4",
+    "bytes": 140
+   },
+   {
+    "region": "ccfg",
+    "start": "0x4E020000",
+    "end": "0x4E020800",
+    "bytes": 2048
+   }
+  ]
+ },
+ "elf": {
+  "file": "radio-message.out",
+  "sha256": "75c5fb3c9c2d246c2dd44a5b915844cfd7f36ea7e9639f86bddf08c802fd1989",
+  "bytes": 33688,
+  "note": "stripped; the .hex was made from the unstripped ELF"
+ },
+ "config": {
+  "origin": "the CCFG the SDK's SysConfig built into the ELF (CRCs filled by the SDK's crc_tool); not compared with a board yet"
+ },
+ "source": {
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/nortos/LP_EM_CC2340R5/drivers/empty",
+  "added": [
+   "frl_demo.c",
+   "frl_demo.syscfg"
+  ],
+  "sha256_frl_demo_c": "1481af1aa220dafb0afc15e1e00b80ca48367df677ce46d07e64fd93783b06aa",
+  "rebuild": "cc2755p10/radio-demos/build.sh cc2340r5 message"
+ },
+ "tools": {
+  "sdk": {
+   "version": "9.21.00.36"
+  },
+  "sysconfig": {
+   "version": "1.28.0"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS"
+  }
+ },
+ "expect": "prints \"> Hello from my LaunchPad N\" on the backchannel UART at 115200 baud every period_ms, N counting; LED0 toggles with each line; frl_status.counter = N",
+ "made": "2026-10-22T15:06:52",
+ "release_cleared": false,
+ "release_note": "Built from TI's drivers/empty example (BSD-3-Clause, NOTICE.txt) plus our frl_demo.c. Not cleared for public distribution."
+}

@@ -154,7 +154,7 @@ You can write code for a TI board with TI's own SDK or with Zephyr. On 2026-10-0
 | | TI's SDK | Zephyr |
 |---|---|---|
 | What it is | TI's drivers, examples and radio stacks, set up with SysConfig, TI's point-and-click tool | An open-source operating system, a Linux Foundation project, with one build tool (west) and one driver model across more than 1,000 boards |
-| Boards on the Hardware page | All have a TI SDK | 8 of the 24 are in upstream Zephyr, the main Zephyr project (2026-10-06) |
+| Boards on the Hardware page | All have a TI SDK | 8 of the 27 are in upstream Zephyr, the main Zephyr project (2026-10-06) |
 | Radios | Bluetooth LE, Zigbee and proprietary 2.4 GHz, which is TI's own packet format, in the Low Power F3 SDK; Thread and Matter as separate downloads | Upstream Zephyr has no Bluetooth for the CC2340R5. TI's fork, its own copy of Zephyr, adds it, but on the test board its samples flashed and printed nothing. The cause is not known. Suspected cause: tool or docs. One boot setting differs from upstream, and the fork is an older Zephyr (3.7), so it is one difference among several, not proven. |
 | Speed, CoreMark per MHz, LP-MSPM0G3507 | 2.30 with TI Arm Clang, no operating system | 1.82 with GCC, the compiler Zephyr uses, no operating system, -O3 with loop unrolling |
 | Same compiler, GCC 12.2 -O2, LP-MSPM0G3507 | 1.76, no operating system | 1.63 under Zephyr: 7.9 percent slower. The C library also differs. |

@@ -1,0 +1,103 @@
+{
+ "made_from": [
+  "data/parts.json",
+  "docs/boards/<id>.json"
+ ],
+ "board": "mspm0l1306",
+ "packs": [
+  {
+   "id": "bp-bassensorsmkii",
+   "name": "BP-BASSENSORSMKII Sensors BoosterPack plug-in module",
+   "fit": "Plugs on; I2C is on pins 9 and 10, the L1306's PA1 and PA0. The OPT3001 and TMP117 are powered from pins 27 and 28, which the L1306 does not have: two wires (27 to pin 12, PA23; 28 to pin 18, PA7) and seven jumpers out.",
+   "pins": "docs/boards/bp-bassensorsmkii.json: I2C 9, 10 (10 kOhm pull-ups on the board); pin 27 powers the OPT3001 and 28 the TMP117 (high = on); 6 and 24 enable the HDC2080 and DRV5055 (low = on).",
+   "rows": [
+    {
+     "kind": "pin",
+     "pin": 23,
+     "mode": "high",
+     "why": "pin 27 by wire to PA23 (header pin 12): powers the OPT3001"
+    },
+    {
+     "kind": "scan",
+     "why": "who answers on the shared bus",
+     "expect": "0x40 (HDC2080), 0x44 (OPT3001), 0x69 (BMI160), and 0x13 (BMM150) once awake; 0x48 only with the ribbon cable in and pin 28 high"
+    },
+    {
+     "kind": "read",
+     "addr": 68,
+     "reg": 126,
+     "n": 2,
+     "why": "OPT3001 manufacturer ID",
+     "expect": "54 49 (0x5449, Texas Instruments)"
+    },
+    {
+     "kind": "read",
+     "addr": 64,
+     "reg": 252,
+     "n": 2,
+     "why": "HDC2080 manufacturer ID",
+     "expect": "49 54 (0x5449, low byte first)"
+    }
+   ],
+   "tested_here": false,
+   "bench": "in hand, stacked on the LP-MSPM0G5187: humidity and temperature, light and the magnet sensor read live; the BMI160 did not answer and the TMP117 needs its ribbon cable (see its guide)",
+   "on_this_board": false,
+   "note": "Predicted, not tested here: the Sensors BoosterPack is stacked on the LP-MSPM0G5187, not on the L1306."
+  },
+  {
+   "id": "boostxl-edumkii",
+   "name": "BOOSTXL-EDUMKII Educational BoosterPack MKII",
+   "fit": "Plugs on with pins 27 to 34 not connected: no screen (pin 31), no S1 or S2. The light sensor is on I2C pins 9 and 10. Jumpers J4 to J6, J1, J11, J3, J12, J13 and J2 come out on the L1306 (our arrival plan).",
+   "pins": "docs/boards/boostxl-edumkii.json: I2C 9, 10 (OPT3001 at 0x44, alert on 8); PWM 19, 37 to 40: servo, blue, green, red, buzzer.",
+   "rows": [
+    {
+     "kind": "scan",
+     "why": "who answers on the BoosterPack's bus",
+     "expect": "0x44 only (OPT3001)"
+    },
+    {
+     "kind": "read",
+     "addr": 68,
+     "reg": 126,
+     "n": 2,
+     "why": "OPT3001 manufacturer ID",
+     "expect": "54 49 (0x5449)"
+    },
+    {
+     "kind": "pwm",
+     "pin": 27,
+     "hz": 1000,
+     "duty": 25,
+     "why": "header pin 37 drives the BoosterPack's blue LED (L1306 jumper J12 out)"
+    }
+   ],
+   "tested_here": false,
+   "bench": "in hand, stacked on the LP-MSPM33C321A",
+   "on_this_board": false,
+   "note": "Predicted, not tested here: the Education BoosterPack is stacked on the LP-MSPM33C321A, not on the L1306."
+  },
+  {
+   "id": "boostxl-sharp128",
+   "name": "BOOSTXL-SHARP128 display BoosterPack plug-in module",
+   "fit": "Plugs on with no wires. The screen speaks SPI (pins 7 and 15, select on 6), which this card cannot drive; what it can show is the display's power and on/off pins.",
+   "pins": "docs/boards/boostxl-sharp128.json: SPI 7, 15, select 6; GPIO 2 power and 5 on/off; SD card 8, 14, 17.",
+   "rows": [
+    {
+     "kind": "pin",
+     "pin": 24,
+     "mode": "high",
+     "why": "header pin 5 is the display's on/off line (L1306 jumper J5 joins PA24 to the light sensor; pull it)"
+    },
+    {
+     "kind": "scan",
+     "why": "the display has no I2C part",
+     "expect": "nothing answers (the L1306's own pull-ups only)"
+    }
+   ],
+   "tested_here": false,
+   "bench": "arrived 2026-10-14",
+   "on_this_board": false,
+   "note": "Predicted, not tested here: the display BoosterPack has not been plugged onto the L1306 yet."
+  }
+ ]
+}

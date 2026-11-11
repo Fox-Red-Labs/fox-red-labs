@@ -1,0 +1,8 @@
+{
+ "note": "The demos shown first when a board is plugged in, the blink first (the quickest proof the board works), then the best ones (measured here, fits, looks good). Ids are recipes.json ids. tools/webflash/ai.test.mjs checks that every id exists for its board.",
+ "mspm0l1306": ["blink-150-150-150-900", "digit", "color-player", "thermometer", "controls"],
+ "mspm0g5187": ["blink-150-150-150-900", "digit", "color-player", "thermometer"],
+ "mspm0g3519": ["digit", "color-player", "thermometer", "breathe", "button-led", "first-wire"],
+ "mspm0g3507": ["blink-150-150-150-900", "color-player"],
+ "mspm0c1104": ["blink-150-150-150-900"]
+}

@@ -1,0 +1,45 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm33c321a",
+ "kit": "LP-MSPM33C321A",
+ "recipe": "blink-pattern",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "pattern_ms": [
+  250,
+  250
+ ],
+ "led": {
+  "label": "LED2 blue (PA2)",
+  "gpio": "0x400F0000",
+  "bit": 2
+ },
+ "active_high": true,
+ "image": {
+  "file": "firmware.out",
+  "sha256": "2e9c45bc7c335e4e900f4b3da8cd94792e65006d02d81c27ffbdf8b2fdefa62c",
+  "bytes": 7708,
+  "segments": [
+   {
+    "addr": "0x10000000",
+    "bytes": 800
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "2d623be910d029fa9cdf7cf4f7f74665b875dd6b",
+  "example": "examples/nortos/LP_MSPM33C321A/driverlib/gpio_toggle_output",
+  "file": "gpio_toggle_output.c",
+  "edited_line": "#define DELAY (8000000)",
+  "rebuild": "python3 tools/webflash/build_m33.py 250"
+ },
+ "tools": {
+  "sdk": "mspm33_sdk_1_04_00_00",
+  "compiler": "ti-cgt-armllvm_5.1.1.LTS",
+  "sysconfig": "sysconfig_1.28.0"
+ },
+ "made": "2026-10-15T21:01:16",
+ "release_cleared": false,
+ "release_note": "TI's example (BSD-3-Clause, NOTICE.txt) with one line changed, linked with TI's libraries. Not cleared for public distribution."
+}

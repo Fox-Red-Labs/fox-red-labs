@@ -1,0 +1,78 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "cc2340r5",
+ "kit": "LP-EM-CC2340R5",
+ "revisions_tested": [
+  "unknown: not run on a board yet"
+ ],
+ "chip": {
+  "deviceid": "0x6BB8402F"
+ },
+ "recipe": "radio-zigbee",
+ "console": {
+  "uart": "the XDS110 backchannel (the probe's second serial port, /dev/cu.usbmodem<serial>1 on a Mac)",
+  "baud": 115200,
+  "format": "8N1"
+ },
+ "params": null,
+ "status": null,
+ "image": {
+  "file": "radio-zigbee.hex",
+  "format": "Intel HEX",
+  "sha256": "340c9c05a7043d78fd0d9ca590c3d9d1e6d3386049e88625a0c7a7b7b2120068",
+  "bytes": 847830,
+  "data_bytes": 301400,
+  "main_flash_end": "0x4915C",
+  "segments": [
+   {
+    "region": "main flash",
+    "start": "0x00000000",
+    "end": "0x0000008C",
+    "bytes": 140
+   },
+   {
+    "region": "main flash",
+    "start": "0x00000090",
+    "end": "0x0004915C",
+    "bytes": 299212
+   },
+   {
+    "region": "ccfg",
+    "start": "0x4E020000",
+    "end": "0x4E020800",
+    "bytes": 2048
+   }
+  ]
+ },
+ "elf": {
+  "file": "radio-zigbee.out",
+  "sha256": "23fcb3f6ad5129dab82c08f4a40f48805968d9aecbce011f47d47d025ffef419",
+  "bytes": 591896,
+  "note": "stripped; the .hex was made from the unstripped ELF"
+ },
+ "config": {
+  "origin": "the CCFG the SDK's SysConfig built into the ELF (CRCs filled by the SDK's crc_tool); not compared with a board yet"
+ },
+ "source": {"file": "on_off_light.c", 
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/rtos/LP_EM_CC2340R5/zigbee/onoff_light",
+  "added": [],
+  "sha256_frl_demo_c": "1481af1aa220dafb0afc15e1e00b80ca48367df677ce46d07e64fd93783b06aa",
+  "rebuild": "cc2755p10/radio-demos/build.sh cc2340r5 zigbee"
+ },
+ "tools": {
+  "sdk": {
+   "version": "9.21.00.36"
+  },
+  "sysconfig": {
+   "version": "1.28.0"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS"
+  }
+ },
+ "expect": "starts TI's Zigbee on/off light (a relaying node): it logs its stack messages on the backchannel UART at 115200 baud and waits for a network; joining a coordinator was not tested",
+ "made": "2026-10-22T15:08:27",
+ "release_cleared": false,
+ "release_note": "Built from TI's drivers/empty example (BSD-3-Clause, NOTICE.txt) plus our frl_demo.c. Not cleared for public distribution."
+}

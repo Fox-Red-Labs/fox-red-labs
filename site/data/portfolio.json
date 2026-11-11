@@ -797,6 +797,36 @@
     "docs/arrivals/tda4.md"
    ],
    "maker": "TI"
+  },
+  {
+   "part": "AM67A",
+   "family": "Jacinto 7 (J722S)",
+   "board": "BeagleY-AI",
+   "core": "4x Cortex-A53 at 1.4 GHz, C7x DSP with matrix accelerator (MMA), R5F cores",
+   "mhz": 1400,
+   "flash_kb": null,
+   "flash_label": "microSD card",
+   "ram_kb": 4194304,
+   "radios": [
+    "Wi-Fi 6",
+    "Bluetooth LE"
+   ],
+   "extras": [
+    "Deep-learning accelerator (C7x and MMA)",
+    "Hardware H.264 and H.265 decode and encode (Wave5)",
+    "Gigabit Ethernet",
+    "Micro-SD boot"
+   ],
+   "board_price": "$70 (data/boards.csv)",
+   "probe": "none; a serial port and JTAG pads",
+   "board_note": "Not sold on TI.com; made by BeagleBoard.org",
+   "zephyr": null,
+   "sources": [
+    "beagley-ai/README.md",
+    "data/boards.csv",
+    "docs/arrivals/beagley-ai.md"
+   ],
+   "maker": "BeagleBoard.org"
   }
  ],
  "probes": [

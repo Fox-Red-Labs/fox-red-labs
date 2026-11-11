@@ -1,0 +1,59 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0l1306",
+ "kit": "LP-MSPM0L1306",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BB8202F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "print-message",
+ "message": "Hello from my LaunchPad",
+ "image": {
+  "file": "firmware.out",
+  "sha256": "078bc8002ffd7e754e39ddc39a51b29911bb80d340000b77f8bb6494634a53b7",
+  "bytes": 9520,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 1880
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "afac7261e904caefe61d5cac75f0254c2b8651b5",
+  "example": "examples/nortos/LP_MSPM0L1306/driverlib/uart_tx_console_multibyte_repeated_fifo_dma",
+  "file": "uart_tx_console_multibyte_repeated_fifo_dma.c",
+  "sha256": "c2e20c7f021bcfc6eba42de98e2fbb1689b52aab19c11b48af6ed6ccf1fbcd59",
+  "edited_line": "uint8_t gTestingMsg[] = \"> Hello from my LaunchPad 0\\r\\n\";",
+  "rebuild": "python3 tools/frl/frl.py run --board mspm0l1306 --recipe print-message --message \"Hello from my LaunchPad\" --probe <serial>"
+ },
+ "tools": {
+  "sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.26.3",
+   "validated": true,
+   "source": "discovered"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "3.81",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "expect": "the board prints \"> Hello from my LaunchPad N\" once a second on its USB serial port at 115200 baud, N counting; frl verify checks it",
+ "made": "2026-10-14T21:28:41",
+ "release_cleared": false,
+ "release_note": "TI example (BSD-3-Clause, NOTICE.txt) linked with TI Arm Clang's runtime (permissive licenses per its SPDX file, not reviewed line by line). Not cleared for public distribution."
+}

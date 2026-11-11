@@ -21,5 +21,6 @@ if [ -z "$PY" ] || ! ok "$PY"; then
   exit 2
 fi
 if [ -f tools/chip_jobs_check.py ]; then "$PY" tools/chip_jobs_check.py || exit 1; fi   # the chip map data agrees with the pin table and the size tables; notebook only (it reads portability/hobby, held out of the reader copy)
+if [ -f tools/chip_jobs_project_check.py ]; then "$PY" tools/chip_jobs_project_check.py || exit 1; fi   # the Sparky chip map (data/chip-jobs-builds/) agrees with the header table and the results rows
 echo "running tools/tests with $PY ($("$PY" -V 2>&1))"
 exec "$PY" -m pytest -q tools/tests "$@"

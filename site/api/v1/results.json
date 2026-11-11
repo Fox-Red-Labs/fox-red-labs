@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-10",
+ "generated": "2026-11-11",
  "source": "data/results/*.csv",
  "what_a_row_is": "one measured number, or one test that could not run with its reason (data/README.md)",
  "row_fields": [

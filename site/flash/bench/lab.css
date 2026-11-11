@@ -1,0 +1,83 @@
+/* The Digital Lab, concept 7 (approved 2026-11-09): the strip, the example cards, the chip view and the debugger.
+   The chip drawing and the cards use site/chip/chipview.css unchanged. Board red is #a8101a. */
+.stepper { display:none; }
+.lab-hero { margin-bottom:2px; }
+.lab-hero .lede { max-width:760px; }
+.cap { margin-top:4px; } .cap summary { cursor:pointer; color:var(--muted); font-size:15px; }
+
+/* what is connected now: one strip */
+#scene, #scene.compact { display:block !important; padding:12px 16px; }
+.conn-bar { display:none !important; }
+#scene .scene-top { display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; }
+.lab-th { flex:0 0 72px; height:54px; border-radius:8px; background:var(--cream); border:1px solid var(--line); overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.lab-th img { width:72px; height:54px; object-fit:cover; display:block; }
+.lab-th:has(img[hidden]) { display:none; }
+.lab-who { display:flex; flex-direction:column; min-width:0; flex:1 1 220px; }
+.lab-who b { font:700 20px/24px var(--frl-font); overflow-wrap:anywhere; }
+#lab-stat { display:flex; align-items:flex-start; gap:8px; font-size:15px; line-height:20px; color:var(--muted); }
+.lab-dot { flex:none; width:10px; height:10px; border-radius:50%; margin-top:5px; background:var(--stone); opacity:.6; }
+#lab-stat[data-on="1"] .lab-dot { background:#2F6B4F; opacity:1; box-shadow:0 0 0 3px color-mix(in srgb,#2F6B4F 22%,transparent); }
+#scene .scene-top .grow { display:none; }
+#scene #connect { background:#a8101a; }
+.lab-pick { display:flex; flex-direction:column; gap:2px; font-size:13px; line-height:18px; color:var(--muted); min-width:220px; flex:0 1 300px; }
+.lab-pick select { font:600 16px var(--frl-font); color:var(--ink); padding:9px 10px; border:1.5px solid var(--ink); border-radius:8px; background:#fff; max-width:100%; }
+.lab-pick[data-off="1"] select { opacity:.5; }
+.lab-bl { font-size:15px; }
+#found:empty { display:none; }
+.lab-conn-help { margin-top:8px; }
+.lab-conn-help > summary { cursor:pointer; color:var(--muted); font-size:15px; }
+.lab-cov { display:flex; gap:12px; flex-wrap:wrap; align-items:baseline; }
+.lab-cov p { margin:0; }
+
+/* examples and the chip view */
+.sec-h { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin:6px 0 10px; }
+.sec-h h2 { margin:0; font:700 22px/28px var(--frl-font); }
+.sec-h .small { margin:0; color:var(--muted); }
+#lab-examples[hidden] { display:none; }
+#lab-examples .cv-page { gap:16px; }
+#lab-examples .cv-card { min-height:0; padding:0; border:1.5px solid var(--frl-line); border-radius:12px; background:var(--frl-cream); }
+#lab-examples .cv-card:hover { background:var(--frl-cream); border-color:var(--frl-stone); }
+#lab-examples .cv-card.sel { border-color:#a8101a; }
+.cv-card .tx small, .cv-card .tx .ln { font-weight:400; }
+
+/* the demo you can run on a connected board */
+.c-tabs #t-talk, .c-tabs #t-live { display:none; }
+
+/* the debugger */
+.lab-debug .sec-h { margin-top:14px; }
+.dbg-box { border:1.5px solid var(--ink); border-radius:14px; background:#fff; overflow:hidden; }
+.dbg-tabs { display:flex; flex-wrap:wrap; padding:0 10px; border-bottom:1.5px solid var(--line); background:var(--cream); }
+.dbg-tabs button { background:none; color:var(--muted); border:0; border-bottom:3px solid transparent; border-radius:0; min-height:44px; padding:0 14px; font:600 16px var(--frl-font); margin-bottom:-1.5px; }
+.dbg-tabs button:hover { background:none; color:var(--fg); }
+.dbg-tabs button[aria-selected="true"] { color:var(--ink); border-bottom-color:#a8101a; }
+.dbg-pane { padding:12px 16px 16px; min-height:140px; }
+.dbg-pane[hidden] { display:none; }
+.dbg-h { margin:0 0 8px; font:700 16px/22px var(--frl-font); }
+.dbg-pane .empty { color:var(--muted); }
+.dbg-t { width:100%; border-collapse:collapse; font-size:15px; line-height:22px; }
+.dbg-t th { text-align:left; font:600 12px var(--frl-font); letter-spacing:.06em; text-transform:uppercase; color:var(--muted); padding:4px 10px 6px 0; border-bottom:1.5px solid var(--line); }
+.dbg-t td { padding:7px 10px 7px 0; border-bottom:1px solid var(--line); vertical-align:top; }
+.dbg-v { color:var(--muted); }
+.dbg-clone { overflow-x:auto; }
+#p-talk .c-con { margin-top:6px; }
+
+@media (max-width:700px) {
+  #scene, #scene.compact { padding:10px 12px; }
+  .lab-pick { flex-basis:100%; }
+  #scene #connect { flex:1 1 100%; }
+  .dbg-pane { padding:10px 12px 14px; }
+  .dbg-tabs button { padding:0 10px; }
+}
+
+.lab-th img[hidden] { display:none; }
+.c-work:has(#detail.hidden) { grid-template-columns:minmax(0,1fr); }
+.c-work:has(#detail.hidden) #pick .recipes { grid-template-columns:repeat(auto-fill, minmax(190px,1fr)); }
+@media (max-width:700px) {
+  .res { grid-template-columns:minmax(0,1fr) !important; }
+  .res-tile, .res-tile:first-child { border-left:0; border-top:1px solid var(--line); }
+  .res-tile:first-child { border-top:0; }
+  .res-chip { grid-template-columns:repeat(3, minmax(0,1fr)) !important; }
+  .res-os { grid-column:auto; }
+}
+.res-tile:has(#res-io) { display:none; }
+.res-chip .res-row { display:flex !important; flex-direction:column; gap:0; }

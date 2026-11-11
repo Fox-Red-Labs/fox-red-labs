@@ -1,0 +1,110 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "cc2340r5",
+ "kit": "LP-EM-CC2340R5",
+ "revisions_tested": [
+  "unknown: not run on a board yet"
+ ],
+ "chip": {
+  "deviceid": "0x6BB8402F"
+ },
+ "recipe": "radio-button",
+ "console": {
+  "uart": "the XDS110 backchannel (the probe's second serial port, /dev/cu.usbmodem<serial>1 on a Mac)",
+  "baud": 115200,
+  "format": "8N1"
+ },
+ "params": {
+  "kind": "params",
+  "format": 1,
+  "addr": "0x0007F800",
+  "magic": "0x50524C46",
+  "image_id": 8,
+  "items": [
+   {
+    "id": "repeat_ms",
+    "label": "Repeat the buttons line every",
+    "unit": "ms",
+    "min": 100,
+    "max": 60000,
+    "default": 1000,
+    "step": 100,
+    "note": "lines also print at once on every press or release"
+   }
+  ],
+  "region": "the last 2 kB sector below the security firmware; one sector write through the chip's mailbox, then a reset"
+ },
+ "status": {
+  "addr": "0x200025C0",
+  "magic": "0x53524C46",
+  "words": [
+   "magic",
+   "demo",
+   "counter",
+   "aux"
+  ],
+  "demo_id": 3
+ },
+ "image": {
+  "file": "radio-button.hex",
+  "format": "Intel HEX",
+  "sha256": "bf1b21cac8d0b3c467ae5b0c9b29f9323cb2b9197d9dac44a51d4065edc40874",
+  "bytes": 34304,
+  "data_bytes": 12167,
+  "main_flash_end": "0x2788",
+  "segments": [
+   {
+    "region": "main flash",
+    "start": "0x00000000",
+    "end": "0x000026FB",
+    "bytes": 9979
+   },
+   {
+    "region": "main flash",
+    "start": "0x000026FC",
+    "end": "0x00002788",
+    "bytes": 140
+   },
+   {
+    "region": "ccfg",
+    "start": "0x4E020000",
+    "end": "0x4E020800",
+    "bytes": 2048
+   }
+  ]
+ },
+ "elf": {
+  "file": "radio-button.out",
+  "sha256": "b2b121963390722af36fb128b4ff550aabf1d78d204c98de966eef98488e6f2a",
+  "bytes": 33984,
+  "note": "stripped; the .hex was made from the unstripped ELF"
+ },
+ "config": {
+  "origin": "the CCFG the SDK's SysConfig built into the ELF (CRCs filled by the SDK's crc_tool); not compared with a board yet"
+ },
+ "source": {
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/nortos/LP_EM_CC2340R5/drivers/empty",
+  "added": [
+   "frl_demo.c",
+   "frl_demo.syscfg"
+  ],
+  "sha256_frl_demo_c": "1481af1aa220dafb0afc15e1e00b80ca48367df677ce46d07e64fd93783b06aa",
+  "rebuild": "cc2755p10/radio-demos/build.sh cc2340r5 button"
+ },
+ "tools": {
+  "sdk": {
+   "version": "9.21.00.36"
+  },
+  "sysconfig": {
+   "version": "1.28.0"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS"
+  }
+ },
+ "expect": "LED0 follows BTN-1 and LED1 follows BTN-2 (pressed = lit); prints \"buttons: BTN-1 up, BTN-2 down, presses N\" on every change and every period_ms; frl_status.aux holds the buttons (bit 0 BTN-1, bit 1 BTN-2), counter the presses",
+ "made": "2026-10-22T15:07:18",
+ "release_cleared": false,
+ "release_note": "Built from TI's drivers/empty example (BSD-3-Clause, NOTICE.txt) plus our frl_demo.c. Not cleared for public distribution."
+}

@@ -2193,7 +2193,7 @@
       "evidence": "data/results/mspm0l2228.csv",
       "home": false,
       "tag": "",
-      "why": "A 32 MHz Cortex-M0+ with a segment LCD runs the same small models as the bigger MSPM0 boards."
+      "why": "A 32 MHz Cortex-M0+ with a segment LCD runs the same edge AI models as the bigger MSPM0 boards."
     }
   ],
   "faq": [

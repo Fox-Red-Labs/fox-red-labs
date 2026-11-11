@@ -1,0 +1,69 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0g3507",
+ "kit": "LP-MSPM0G3507",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BB8802F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "blink-pattern",
+ "pattern_ms": [
+  150,
+  150,
+  150,
+  900
+ ],
+ "led": {
+  "label": "LED2 red (PB26)",
+  "bit": 26,
+  "gpio": "0x400a2000"
+ },
+ "active_high": true,
+ "image": {
+  "file": "firmware.out",
+  "sha256": "49c5077e45b75dc21bd3c6165e1528952f4544734d6af372ef91b9d3ec0b213d",
+  "bytes": 6312,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 464
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "26a33c48a03f6cf70bdd1c92516d0455866eb492",
+  "example": "examples/nortos/LP_MSPM0G3507/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/blink.c",
+  "sha256": "31bc46c6cb082c07e0cce078e45b13c68f1477a8ece73566331105dbbe946c7a",
+  "edited_line": "PATTERN_MS = 150,150,150,900",
+  "rebuild": "python3 tools/webflash/build_board.py mspm0g3507 --pattern 150,150,150,900"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.26.3",
+   "validated": true,
+   "source": "discovered"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "3.81",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-16T12:18:26",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}

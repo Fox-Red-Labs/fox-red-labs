@@ -1,0 +1,58 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0l1306",
+ "kit": "LP-MSPM0L1306",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BB8202F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "speed-test",
+ "coremark": {
+  "log_addr": "0x20000000",
+  "log_bytes": 800,
+  "result_addr": "0x20000320",
+  "len_addr": "0x20000334",
+  "iterations": 1000,
+  "clock_mhz": 32,
+  "expect_score": 78.27,
+  "expect_source": "data/results/mspm0l1306.csv (coremark, ticlang-bare-o3, 2026-10-06)"
+ },
+ "image": {
+  "file": "firmware.out",
+  "sha256": "af49e52d0ace16bfd371ce87a3fff01a0f3defba4c02990156932ce35733f093",
+  "bytes": 38300,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 23208
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "8568a25dfd37ac90004bc61b139c31ba17f2c891",
+  "example": "EEMBC CoreMark 1.0 (mspm0l1306/bench/coremark, coremark-source.sha1)",
+  "file": "mspm0l1306/bench/coremark/core_portme.c",
+  "sha256": "56c078700106a885936edb89d1b83ae46a798fa2e0d50d6700f9309778944ee5",
+  "edited_line": "our port: bare metal, results logged to RAM (cm_log)",
+  "rebuild": "mspm0l1306/bench/coremark/build.sh O3 32 (it empties build-O3-32/ first: copy the committed results out)"
+ },
+ "tools": {
+  "compiler": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "build.sh"
+  },
+  "sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "build.sh"
+  }
+ },
+ "expect": "CoreMark prints its report into RAM after about 13 s; score about 78 at 32 MHz",
+ "made": "2026-10-15T00:01:40",
+ "release_cleared": false,
+ "release_note": "EEMBC CoreMark (Apache 2.0) with our MSPM0 port and TI's SysConfig output and DriverLib (BSD-3-Clause); EEMBC's naming rules for published scores apply. Not cleared for public distribution."
+}

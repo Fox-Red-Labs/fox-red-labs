@@ -1,0 +1,96 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "cc2755p10",
+ "kit": "LP-EM-CC2755P10",
+ "revisions_tested": [
+  "LP-EM-CC2755P10, probe LS5600RE, 2026-10-22 (see data/results/cc2755p10.csv)"
+ ],
+ "chip": {
+  "deviceid": "0x6BB9802F"
+ },
+ "recipe": "radio-zigbee",
+ "console": {
+  "uart": "the XDS110 backchannel (the probe's second serial port, /dev/cu.usbmodem<serial>1 on a Mac)",
+  "baud": 115200,
+  "format": "8N1"
+ },
+ "params": null,
+ "status": null,
+ "image": {
+  "file": "radio-zigbee.hex",
+  "format": "Intel HEX",
+  "sha256": "ea5286140742b974602a64a305aea13f8f1efb43548b5f3daddb424fc219c001",
+  "bytes": 780836,
+  "data_bytes": 283892,
+  "main_flash_end": "0x44908",
+  "segments": [
+   {
+    "region": "main flash",
+    "start": "0x00000000",
+    "end": "0x000000CC",
+    "bytes": 204
+   },
+   {
+    "region": "main flash",
+    "start": "0x000000E0",
+    "end": "0x00044908",
+    "bytes": 280616
+   },
+   {
+    "region": "ccfg",
+    "start": "0x4E020000",
+    "end": "0x4E020800",
+    "bytes": 2048
+   },
+   {
+    "region": "scfg",
+    "start": "0x4E040000",
+    "end": "0x4E040400",
+    "bytes": 1024
+   }
+  ]
+ },
+ "elf": {
+  "file": "radio-zigbee.out",
+  "sha256": "dbcd8bbd28b51eb6ee5a26b116d474f88492a03c5ab05c7626db9e655caf154c",
+  "bytes": 551144,
+  "note": "stripped; the .hex was made from the unstripped ELF"
+ },
+ "config": {
+  "ccfg": {
+   "addr": "0x4E020000",
+   "bytes": 2048,
+   "source": "cc2755p10/ble-light/known-good/ccfg.bin",
+   "sha256": "448712d24837e2b381e7c53b8085446276294af376920132492e0d83a825ba25"
+  },
+  "scfg": {
+   "addr": "0x4E040000",
+   "bytes": 1024,
+   "source": "cc2755p10/ble-light/known-good/scfg.bin",
+   "sha256": "e39761ce57d24e460d49fdcb15f56ca2914664e10c52c51a1afe3cfe3d1517ea"
+  },
+  "origin": "read from the LP-EM-CC2755P10 on probe LB07021W on 2026-10-15 (web flasher save)"
+ },
+ "source": {"file": "on_off_light.c", 
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/rtos/LP_EM_CC2755P10/zigbee/onoff_light",
+  "added": [],
+  "sha256_frl_demo_c": "1481af1aa220dafb0afc15e1e00b80ca48367df677ce46d07e64fd93783b06aa",
+  "rebuild": "cc2755p10/radio-demos/build.sh cc2755p10 zigbee"
+ },
+ "tools": {
+  "sdk": {
+   "version": "9.21.00.36"
+  },
+  "sysconfig": {
+   "version": "1.28.0"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS"
+  }
+ },
+ "expect": "starts TI's Zigbee on/off light (a relaying node): it logs its stack messages on the backchannel UART at 115200 baud and waits for a network; joining a coordinator was not tested",
+ "made": "2026-10-22T15:05:56",
+ "release_cleared": false,
+ "release_note": "Built from TI's drivers/empty example (BSD-3-Clause, NOTICE.txt) plus our frl_demo.c. Not cleared for public distribution."
+}

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bluetooth Light</title>
+<meta name="description" content="Control a LaunchPad kit's lights from your phone over Bluetooth. Nothing to install.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../bench/logo-mark.svg">
+<style>
+:root { --red:#B42418; --ember:#8f1c12; --fg:#1d1a17; --bg:#fbf8f3; --card:#f4efe7; --line:#e3dbcf; --muted:#6b635a; --btn-fg:#fff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fg:#f3eee6; --bg:#171513; --card:#211e1b; --line:#332e29; --muted:#a59b90; } }
+:root[data-theme="dark"] { --fg:#f3eee6; --bg:#171513; --card:#211e1b; --line:#332e29; --muted:#a59b90; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+main { max-width:560px; margin:0 auto; padding:18px 16px 40px; }
+header img { height:34px; }
+h1 { font-size:1.45rem; margin:12px 0 4px; }
+.lede, .small { color:var(--muted); } .small { font-size:.9rem; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:14px 0; }
+h2 { font-size:1.05rem; margin:0 0 10px; }
+button { font:600 1rem system-ui,sans-serif; border:0; border-radius:9px; padding:11px 16px; cursor:pointer; background:var(--red); color:var(--btn-fg); }
+button:disabled { opacity:.45; cursor:default; }
+button.quiet { background:transparent; color:var(--fg); border:1px solid var(--line); }
+.hidden { display:none; } .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.grid button { background:var(--bg); color:var(--fg); border:1px solid var(--line); text-align:left; font-weight:600; }
+.grid button .sw { display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:8px; vertical-align:-2px; border:1px solid var(--line); }
+.grid button[aria-pressed="true"] { border:2px solid var(--red); padding:10px 15px; }
+#status { font-family:ui-monospace,Menlo,monospace; font-size:.92rem; }
+.err { color:var(--red); }
+.hidden { display:none; }
+</style></head>
+<body><main>
+<header><img src="../bench/logo-red.svg" alt="Fox Red Labs"></header>
+<h1>Bluetooth Light</h1>
+<p class="lede">Your phone talks to the LaunchPad kit over Bluetooth and sets its lights. The board runs our light program; nothing to install on the phone.</p>
+
+<div class="card" id="light"></div>
+<p class="small">On an iPhone, open this page in the free Bluefy browser: Safari has no Bluetooth for web pages.</p>
+</main>
+<script type="module" src="light.js"></script>
+</body></html>

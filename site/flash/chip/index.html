@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inside the chip: live MSPM0 view over the debug port | Fox Red Labs</title>
+<meta name="description" content="Connect an MSPM0 LaunchPad in Chrome or Edge and watch its running chip block by block: power, pins, interrupts and CPU time, read through the debug port. No board? Look at a sample reading.">
+<link rel="icon" href="../bench/logo-mark.svg">
+<link rel="stylesheet" href="../../fonts/fonts.css">
+<style>
+:root { --paper:var(--frl-paper); --cream:var(--frl-cream); --ink:var(--frl-ink); --stone:var(--frl-stone); --line:var(--frl-line); --red:var(--frl-red); --ember:var(--frl-ember); --off:#F3EFE7;
+  --bg:var(--frl-paper); --fg:var(--frl-ink); --muted:var(--frl-stone); --card:#fff; --btn-fg:var(--frl-cream); --link:var(--frl-red); }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:400 18px/28px var(--frl-font); -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums; }
+.lab-hero h1 { font-size:36px; line-height:42px; margin:0; }
+.lab-hero .lede { margin:6px 0 0; max-width:680px; color:var(--muted); }
+main { max-width:1200px; margin:0 auto; padding:24px 24px 16px; display:flex; flex-direction:column; gap:12px; }
+p { margin:.4em 0; }
+a { color:var(--link); }
+button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible, select:focus-visible, .btn:focus-visible, .btn:focus-within, .blk:focus-visible { outline:2px solid var(--red); outline-offset:2px; }
+.hidden, [hidden] { display:none !important; }
+.small { font-size:15px; line-height:22px; color:var(--muted); }
+.ctl { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; }
+.btn { font:600 16px var(--frl-font); display:inline-flex; align-items:center; min-height:44px; padding:0 20px; border:1.5px solid var(--line); border-radius:8px; background:transparent; color:var(--fg); cursor:pointer; text-decoration:none; transition:background .15s ease-out; }
+.btn.go { background:var(--red); border-color:var(--red); color:var(--btn-fg); }
+.btn.go:hover { background:var(--ember); }
+.btn.quiet { min-height:36px; padding:0 12px; font-weight:500; font-size:.9rem; }
+.status { color:var(--muted); font-size:15px; line-height:22px; flex:1 1 260px; min-width:0; }
+.legend { margin:0; font-size:15px; line-height:22px; color:var(--muted); }
+.stamp { margin:0; font-size:15px; line-height:22px; color:var(--fg); }
+.ctl select { font:inherit; font-size:15px; padding:6px 8px; max-width:100%; }
+@media (max-width:620px) { main { padding:16px 16px 12px; } .lab-hero h1 { font-size:30px; line-height:36px; } }
+/* Left rail (lab-nav.js), wider than 900 px only; a phone keeps the single column and the way-back button */
+.lab-shell { max-width:1440px; margin:0 auto; }
+#lab-nav { display:none; }
+@media (min-width:901px) {
+  .lab-shell { display:grid; grid-template-columns:232px minmax(0,1fr); gap:8px; align-items:start; }
+  .lab-col { min-width:0; }
+  .lab-col > main { margin:0; }
+  #lab-nav { display:block; position:sticky; top:84px; max-height:calc(100vh - 96px); overflow:auto; margin:24px 0 0 16px; padding:12px 8px; border:1px solid var(--line); border-radius:8px; background:var(--card); }
+  #lab-nav .ln-h { margin:0 8px 8px; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  #lab-nav ol { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
+  #lab-nav a { display:flex; gap:10px; align-items:flex-start; padding:8px; border-radius:6px; color:inherit; text-decoration:none; border-left:3px solid transparent; }
+  #lab-nav a:hover, #lab-nav a:focus-visible { background:var(--bg); }
+  #lab-nav li.on a { border-left-color:var(--red); background:var(--bg); }
+  #lab-nav .ln-n { flex:0 0 22px; height:22px; border-radius:50%; background:var(--line); font-size:12px; line-height:22px; text-align:center; font-weight:700; position:relative; }
+  #lab-nav .ln-n:empty { background:transparent; }
+  #lab-nav .ln-n:empty::after { content:""; position:absolute; left:8px; top:8px; width:6px; height:6px; border-radius:50%; background:var(--muted); }
+  #lab-nav .ln-t { display:flex; flex-direction:column; min-width:0; }
+  #lab-nav .ln-t b { font-size:15px; line-height:20px; }
+  #lab-nav .ln-t small { font-size:12.5px; line-height:17px; color:var(--muted); }
+}
+/*bench-chrome:css*/
+:root { --frl-red: #B42418; --frl-ember: #8E1C13; --frl-ink: #161312; --frl-stone: #6B625B; --frl-paper: #FAFAF7; --frl-tan: #F4EFE9; --frl-cream: #F7F3EC; --frl-line: #E2D8C9;
+  --ok: #2F6B4F; --frl-font: "Barlow", "Helvetica Neue", Arial, sans-serif; --frl-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace; --frl-ease: 180ms cubic-bezier(0.2, 0, 0, 1); }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* Redesign chrome */
+:root { --logo-h: 48px; --frl-ok: #2F6B4F; --frl-amber: #C98500; /* success and the one amber: graphics, score tints and chart series only */ }
+body > header { position: sticky; top: 0; z-index: 30; background: rgba(250,250,247,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--frl-line); }
+/* inner pages: the header is Ink with Cream text; the home page keeps the light one above its dark hero */
+body > header.dark { background: rgba(22,19,18,.96); border-bottom-color: rgba(247,243,236,0.12); color: var(--frl-cream); }
+header.dark .logo-head { color: var(--frl-cream); }
+header.dark nav > a, header.dark nav .ni > a { color: var(--frl-cream); }
+header.dark nav > a:hover, header.dark nav .ni > a:hover { color: #F0563F; }
+header.dark nav a[aria-current="page"] { color: var(--frl-cream); border-bottom-color: #F0563F; }
+header.dark .ni-btn { color: rgba(247,243,236,.72); } header.dark .ni-btn:hover { color: var(--frl-cream); background: rgba(247,243,236,0.08); }
+header.dark .hsearch { background: rgba(247,243,236,0.05); border-color: rgba(247,243,236,0.14); } header.dark .hsearch:focus-within { border-color: var(--frl-cream); }
+header.dark .hsearch input { color: var(--frl-cream); } header.dark .hsearch input::placeholder { color: #6B625B; } header.dark .hsearch button { color: var(--frl-cream); }
+header.dark .menu-btn { border-color: var(--frl-cream); color: var(--frl-cream); }
+header.dark.nav-open nav { background: var(--frl-ink); border-bottom-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav > a, header.dark.nav-open nav .ni { border-top-color: rgba(247,243,236,0.12); }
+header.dark.nav-open nav .menu .mi b { color: var(--frl-cream); } header.dark.nav-open nav .menu .mi span { color: rgba(247,243,236,.72); }
+header .wrap { display: flex; align-items: center; gap: 32px; height: 72px; }
+.logo { display: block; width: auto; }
+.logo-head { height: var(--logo-h); color: var(--frl-red); }
+.logo-foot { height: 48px; color: var(--frl-red); }
+header .brand { display: flex; align-items: center; flex: none; }
+header nav { display: flex; align-items: center; gap: 26px; margin-left: auto; }
+header nav > a, header nav .ni > a { color: var(--frl-ink); text-decoration: none; font-weight: 500; font-size: 16px; white-space: nowrap; padding: 4px 0; border-bottom: 2px solid transparent; }
+header nav > a:hover, header nav .ni > a:hover { color: var(--frl-red); }
+header nav a[aria-current="page"] { font-weight: 700; border-bottom-color: var(--frl-red); color: var(--frl-ink); }
+/* the Build item: a link, a chevron button, and the subject panel (open on hover, focus or tap) */
+.ni { position: relative; display: flex; align-items: center; gap: 2px; }
+.ni-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 0; border-radius: 6px; background: transparent; color: var(--frl-stone); cursor: pointer; padding: 0; }
+.ni-btn svg { width: 16px; height: 16px; transition: transform var(--frl-ease); }
+.ni-btn:hover { color: var(--frl-ink); background: var(--frl-cream); }
+.ni-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.menu { display: none; position: absolute; top: calc(100% + 14px); left: -24px; width: 720px; max-width: calc(100vw - 32px); background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 12px; padding: 22px 24px 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 24px; z-index: 31; }
+#build-menu, #hardware-menu { left: -24px; } #software-menu { left: -200px; } #about-menu { left: auto; right: -90px; width: 560px; }
+.menu::before { content: ""; position: absolute; left: 0; right: 0; top: -14px; height: 14px; }
+.ni:hover .menu, .ni:focus-within .menu, .ni.open .menu { display: grid; }
+.menu .mi { display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: var(--frl-ink); padding: 6px 8px; margin: -6px -8px; border-radius: 8px; }
+.menu .mi:hover, .menu .mi:focus-visible { background: var(--frl-paper); }
+.menu .mi b { font-weight: 700; font-size: 16px; line-height: 22px; }
+.menu .mi span { font-size: 13px; line-height: 18px; color: var(--frl-stone); }
+.menu .menu-note { grid-column: 1 / -1; margin: 0; border-top: 1px solid var(--frl-line); padding-top: 12px; font-size: 14px; line-height: 20px; color: var(--frl-stone); }
+.menu .menu-note a { color: var(--frl-ink); font-size: inherit; font-weight: 500; padding: 0; border: 0; }
+.menu .mi, .menu .mi b, .menu .mi span { white-space: normal; }  /* hand-made pages carry an older nowrap nav rule */
+/* phone menu: under 760 px the nav folds behind a Menu button (aria-expanded), opened by tap or Enter, closed by Escape */
+.menu-btn { display: none; align-items: center; gap: 6px; height: 44px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--frl-ink); background: transparent; color: var(--frl-ink); font: 600 16px var(--frl-font); cursor: pointer; }
+.menu-btn svg { width: 18px; height: 18px; }
+.menu-btn .mb-x { display: none; }
+.menu-btn[aria-expanded="true"] .mb-x { display: block; } .menu-btn[aria-expanded="true"] .mb-o { display: none; }
+/* site search in the header: the form goes to search.html?q=; under 760 px only the icon shows */
+.hsearch { display: flex; align-items: center; height: 40px; border: 1.5px solid var(--frl-line); border-radius: 8px; background: #fff; padding: 0 4px 0 12px; }
+.hsearch:focus-within { border-color: var(--frl-ink); }
+.hsearch input { border: 0; outline: 0; background: transparent; font: 500 15px var(--frl-font); color: var(--frl-ink); width: 150px; min-width: 0; }
+.hsearch button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 4px; background: transparent; color: var(--frl-ink); cursor: pointer; }
+.hsearch button:hover { color: var(--frl-red); } .hsearch button svg { width: 18px; height: 18px; }
+/* GitHub link beside the Digital Lab button: the repository one click from every page */
+.gh-link { display: inline-flex; align-items: center; gap: 6px; color: var(--frl-cream); text-decoration: none; font: 600 15px var(--frl-font); margin-right: 12px; opacity: .9; white-space: nowrap; }
+.gh-link:hover { opacity: 1; color: #fff; }
+header:not(.dark) .gh-link { color: var(--frl-ink); } header:not(.dark) .gh-link:hover { color: var(--frl-red); }
+.gh-link svg { width: 18px; height: 18px; }
+@media (max-width: 1180px) { .gh-link span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+/* the red "Plug in a board" button: opens the browser bench */
+.plug-btn { display: inline-flex; align-items: center; gap: 8px; height: 40px; padding: 0 16px; border-radius: 6px; background: var(--frl-red); color: #fff; font: 600 15px var(--frl-font); text-decoration: none; white-space: nowrap; flex: none; }
+.plug-btn:hover { background: var(--frl-ember); color: #fff; }
+.plug-btn svg { width: 17px; height: 17px; }
+header nav a.nav-lab, .plug-btn .plug-s { display: none; }
+@media (max-width: 480px) { .gh-link { display: none; } }
+@media (max-width: 1180px) { .plug-btn { padding: 0 11px; min-width: 44px; height: 44px; justify-content: center; } .plug-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } }
+@media (max-width: 1000px) and (min-width: 761px) { header nav { gap: 6px !important; } .ni-btn { width: 20px; } header nav > a, header nav .ni > a { font-size: 15px; } header .wrap { gap: 12px !important; } }
+@media (max-width: 1100px) { header .wrap { gap: 20px; } header nav { gap: 18px; } .hsearch input { width: 90px; } }
+@media (max-width: 900px) { header nav > a, header nav .ni > a { font-size: 15px; } header nav { gap: 14px; } .hsearch { padding: 0 4px; border-color: transparent; background: transparent; } .hsearch input { display: none; } }
+@media (max-width: 760px) {
+  header .wrap { gap: 10px; position: relative; }
+  .menu-btn { display: inline-flex; }
+  .hsearch { margin-left: auto; }
+  .plug-btn { height: 44px; min-width: 44px; justify-content: center; gap: 6px; padding: 0 12px; } .plug-btn .plug-s { display: inline; font-style: normal; }
+  header.nav-open nav > a.nav-lab { display: block; color: var(--frl-red); font-weight: 600; }
+  header nav { display: none; }
+  header.nav-open nav { max-height: calc(100dvh - var(--menu-top, 144px)); overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; align-items: stretch; gap: 0; position: absolute; top: 100%; left: 0; right: 0; margin: 0; padding: 8px 16px 16px; background: var(--frl-paper); border-bottom: 1px solid var(--frl-line); box-shadow: 0 12px 24px rgba(22,19,18,.12); }
+  header.nav-open nav > a, header.nav-open nav .ni > a { display: block; padding: 12px 4px; font-size: 18px; border-top: 1px solid var(--frl-line); border-bottom: 0; }
+  header.nav-open nav .ni { display: grid; grid-template-columns: 1fr 44px; align-items: center; gap: 0; border-top: 1px solid var(--frl-line); }
+  header.nav-open nav .ni > a { grid-column: 1; border-top: 0; }
+  header.nav-open nav .ni-btn { display: inline-flex; grid-column: 2; grid-row: 1; width: 40px; height: 40px; justify-self: end; }
+  header.nav-open nav .ni:not(.open) .menu { display: none; }
+  header.nav-open nav .ni.open .menu { display: grid; grid-column: 1 / -1; position: static; width: auto; max-width: none; grid-template-columns: 1fr; gap: 4px; padding: 0 0 12px 16px; border: 0; background: transparent; }
+  header.nav-open nav .menu .mi { margin: 0; padding: 8px 8px; }
+  header.nav-open nav .menu .menu-note { display: none; }
+}
+@media (max-width: 380px) { .menu-btn { padding: 0 10px; } }
+/* footer: light, so a page has at most three dark bands (png/R4System.png): the lockup in Fox Red, the sections, About, the disclosure */
+footer { background: var(--frl-paper); color: var(--frl-stone); border-top: 1px solid var(--frl-line); padding: 56px 0 48px; font-size: 15px; line-height: 22px; }
+footer .wrap { display: grid; grid-template-columns: 1.3fr repeat(var(--fcols, 4), minmax(0, 1fr)); gap: 32px; }
+footer h2 { color: var(--frl-ink); line-height: 1.3; font-weight: 600; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 12px; }
+footer a { color: var(--frl-stone); display: block; text-decoration: none; padding: 3px 0; }
+footer a:hover { color: var(--frl-ink); }
+footer .f-brand p { margin: 16px 0 0; max-width: 360px; }
+footer .f-meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 4px 24px; border-top: 1px solid var(--frl-line); padding-top: 20px; margin-top: 8px; }
+footer .f-meta a { display: inline; padding: 0; color: var(--frl-ink); font-weight: 500; }
+footer .f-meta .disc { flex-basis: 100%; margin: 8px 0 0; max-width: 680px; }
+@media (max-width: 1000px) { footer .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); } footer .f-brand { grid-column: 1 / -1; } }
+@media (max-width: 520px) { footer .wrap { grid-template-columns: 1fr; } }
+/* the Sources line that replaced the Run details fold */
+.srcline { margin: 40px 0 0; padding-top: 14px; border-top: 1px solid var(--frl-line); font-size: 14px; line-height: 21px; color: var(--frl-stone); }
+.srcline p, .srcline li { font-size: 14px; line-height: 21px; } .srcline .srcline-h { font-weight: 600; color: var(--frl-ink); margin: 0 0 6px; }
+/* the tab strip of a section's pages (site_chrome.tabs) */
+.subtabs { display: flex; flex-wrap: wrap; gap: 4px 24px; border-bottom: 1px solid var(--frl-line); margin: 0 0 28px; }
+.subtabs a { padding: 10px 0; color: var(--frl-stone); text-decoration: none; font-weight: 600; font-size: 16px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.subtabs a:hover { color: var(--frl-ink); } .subtabs a[aria-current="page"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+/* narrow screens: long paths wrap, wide tables scroll inside themselves, never the page */
+main code { overflow-wrap: break-word; } main td code, main dd code { overflow-wrap: anywhere; }
+main select { max-width: 100%; }
+main pre { overflow-x: auto; max-width: 100%; }
+/* inner pages: the home page's 96 px band padding is for its full-width bands, not for sections inside a page */
+:where(main > .wrap) section { padding: 0; }
+:where(main > .wrap) section.blk { padding-top: 48px; }
+@media (max-width: 700px) { :where(main > .wrap) section.blk { padding-top: 36px; } }
+@media (max-width: 760px) {
+  main table { display: block; max-width: 100%; -webkit-overflow-scrolling: touch; }
+  /* every wide table scrolls inside itself, even one whose own style clips it for rounded corners; edge shadows show only
+     while there is more to scroll to (a white table sets --scroll-cover and --scroll-bg to #fff) */
+  main table:not(.ww), main .ww-wrap { overflow-x: auto !important;
+    background: linear-gradient(to right, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) left / 44px 100% no-repeat local,
+                linear-gradient(to left, var(--scroll-cover, var(--frl-paper)) 30%, rgba(255,255,255,0)) right / 44px 100% no-repeat local,
+                radial-gradient(farthest-side at 0 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) left / 22px 100% no-repeat scroll,
+                radial-gradient(farthest-side at 100% 50%, rgba(29,24,21,.5), rgba(29,24,21,0)) right / 22px 100% no-repeat scroll,
+                var(--scroll-bg, transparent) !important; }
+  main table th, main table td { min-width: 120px; } main table th:first-child, main table td:first-child { min-width: 120px; }
+}
+
+.k-copy { display: flex; align-items: stretch; margin: 8px 0; border: 1.5px solid var(--frl-line); border-radius: 8px; background: var(--frl-cream); overflow: hidden; }
+.k-copy .k-txt { flex: 1; font: 14px/21px var(--frl-code); padding: 10px 12px; white-space: pre-wrap; word-break: break-word; background: none; }
+.k-copy.k-prompt .k-txt { font: 15px/22px var(--frl-font); }
+.k-copy button { border: 0; border-left: 1.5px solid var(--frl-line); background: #fff; font: 600 14px var(--frl-font); padding: 8px 14px; cursor: pointer; white-space: nowrap; }
+.k-tabs { display: flex; flex-wrap: wrap; border-bottom: 1.5px solid var(--frl-line); margin: 4px 0 0; }
+.k-tabs button { border: 0; background: none; font: 600 16px var(--frl-font); padding: 10px 16px; cursor: pointer; color: var(--frl-stone); border-bottom: 3px solid transparent; margin-bottom: -1.5px; text-align: left; }
+.k-tabs button[aria-selected="true"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
+.k-tabs button small { display: block; font-weight: 400; font-size: 12px; }
+.k-panel { padding: 18px 0 0; } .k-panel[hidden] { display: none; } .k-panel > p:first-child { margin-top: 0; }
+.k-steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+.k-steps > li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
+.k-steps > li > div { min-width: 0; } .k-steps code { overflow-wrap: anywhere; }
+.k-steps > li::before { content: counter(s); width: 30px; height: 30px; border-radius: 50%; background: var(--frl-ink); color: #fff; font: 700 15px/30px var(--frl-font); text-align: center; }
+.k-steps p { margin: 2px 0 6px; }
+.k-see { color: var(--ok); font-size: 15px; margin: 6px 0 0; } .k-see b { font-weight: 600; }
+.k-note { font-size: 14px; color: var(--frl-stone); margin: 4px 0 0; }
+.k-way { font-weight: 600; margin: 4px 0; }
+.k-kit { margin: 16px 0 0; padding: 14px 16px; border-radius: 10px; background: var(--frl-cream); border: 1.5px solid var(--frl-line); }
+.k-kit-h { font-weight: 700; margin: 0 0 8px; font-size: 16px; }
+.k-kit label { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 21px; margin: 6px 0; cursor: pointer; }
+.k-kit label small { color: var(--frl-stone); display: block; font-size: 13px; }
+.k-kit input { margin-top: 3px; accent-color: var(--frl-red); width: 16px; height: 16px; }
+.k-os { display: inline-flex; border: 1.5px solid var(--frl-ink); border-radius: 8px; overflow: hidden; margin: 0 0 8px; }
+.k-os button { border: 0; background: #fff; font: 600 14px var(--frl-font); padding: 6px 14px; cursor: pointer; }
+.k-os button + button { border-left: 1.5px solid var(--frl-ink); }
+.k-os button[aria-pressed="true"] { background: var(--frl-ink); color: #fff; }
+.k-prev-h { font: 600 12px var(--frl-font); text-transform: uppercase; letter-spacing: .04em; color: var(--frl-stone); margin: 12px 0 4px; }
+.k-prev { margin: 0; padding: 10px 12px; background: #fff; border: 1.5px dashed var(--frl-line); border-radius: 8px; font-size: 14px; line-height: 21px; }
+.k-go { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.k-go button { border: 0; background: var(--frl-ink); color: #fff; border-radius: 8px; font: 600 15px var(--frl-font); padding: 10px 16px; cursor: pointer; }
+.k-go a { font-size: 14px; }
+@media (max-width: 760px) { .k-tabs button { padding: 8px 10px; font-size: 15px; } }
+
+/* the kit sits in a light card; its copy button and links follow the page */
+#takehome .k-kit { margin: 0; }
+#takehome .k-os button { color: var(--frl-ink); min-height: 0; } #takehome .k-os button[aria-pressed="true"] { color: #fff; }
+#takehome .k-go button { color: #fff; min-height: 0; } #takehome .k-go button:hover { background: var(--frl-red); }
+/*/bench-chrome:css*/
+.dgrid { display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:14px; align-items:start; }
+@media (max-width:1279px) { .dgrid { grid-template-columns:minmax(0,1fr); } #chip { min-width:860px; } }
+.dgrid > *, main > * { min-width:0; }
+.scroll { overflow-x:auto; }
+#chip { width:100%; height:auto; display:block; background:#fff; border:1px solid var(--line); border-radius:8px; }
+.side { display:grid; gap:12px; }
+.panel { background:var(--cream); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+.panel h2 { font-size:17px; margin:0 0 6px; }
+.row { display:grid; grid-template-columns:1fr auto; gap:8px; font-size:15px; padding:2px 0; }
+.row span { overflow-wrap:anywhere; }
+.row b { font-weight:600; }
+.bar { height:6px; background:var(--off); border-radius:3px; margin:0 0 4px; overflow:hidden; }
+.bar i { display:block; height:100%; }
+.empty { color:var(--stone); font-size:14px; margin:0; }
+.card h3 { font-size:15px; margin:10px 0 2px; }
+.card p { margin:0 0 4px; font-size:15px; }
+.card ul { margin:0 0 4px; padding-left:18px; font-size:15px; }
+.card .src { font-size:13px; color:var(--stone); margin-top:8px; }
+.card .now { background:#fff; border:1px solid var(--line); border-radius:6px; padding:7px 9px; margin:8px 0; font-size:15px; }
+.strip { margin-top:12px; background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 14px; }
+.strip svg { width:100%; height:60px; display:block; background:var(--off); border-radius:3px; margin-top:4px; }
+.strip .hd { display:flex; justify-content:space-between; gap:12px; font-size:14px; color:var(--stone); }
+.strip .hd b { color:var(--ink); }
+.blk { cursor:pointer; }
+.blk rect.b { stroke-width:1.5; }
+.blk:hover rect.b, .blk:focus rect.b { stroke-width:3; }
+.blk:focus { outline:none; }
+.sel rect.b { stroke:#161312 !important; stroke-width:3; }
+svg text { font-variant-numeric:tabular-nums; }
+.t { font:600 14px Barlow,Arial,sans-serif; fill:#161312; pointer-events:none; }
+.T { font:600 15px Barlow,Arial,sans-serif; fill:#161312; pointer-events:none; }
+.s { font:400 12px Barlow,Arial,sans-serif; fill:#6B625B; pointer-events:none; }
+.off .t { fill:#8D857D; }
+.g { font:600 13px Barlow,Arial,sans-serif; fill:#6B625B; }
+.wire { fill:none; stroke-width:2; }
+</style></head><body data-lab-page="chip">
+<!--bench-chrome:header--><header class="dark">
+  <div class="wrap">
+    <a href="../../index.html" class="brand"><svg class="logo logo-head" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg></a>
+    <nav id="site-nav" aria-label="Main"><div class="ni"><a href="../../projects.html">Builds</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="build-menu" aria-label="Build filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="build-menu"><a class="mi" href="../../projects.html?f=smart-home"><b>Smart home</b><span>Home Assistant, Matter, Apple Home</span></a><a class="mi" href="../../projects.html?f=ai"><b>Edge AI</b><span>Occupancy, digits, vision on Linux</span></a><a class="mi" href="../../projects.html?f=radio"><b>Radio and range</b><span>Walkie-talkie, key finder, far shed sensor</span></a><a class="mi" href="../../projects.html?f=motors"><b>Motors, power and sensing</b><span>Control loops, radar presence, sensors</span></a><a class="mi" href="../../projects.html?f=screens"><b>Screens</b><span>Touch displays on a development kit</span></a><a class="mi" href="../../security.html"><b>Security</b><span>Post-quantum key exchange, AES</span></a><p class="menu-note">New here? <a href="../../project-blink.html">Blink an LED first</a>, or <a href="../../projects.html">see all 39 builds</a>.</p></div></div><div class="ni"><a href="../../hardware.html">Hardware</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="hardware-menu" aria-label="Hardware pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="hardware-menu"><a class="mi" href="../../hardware.html"><b>The kits</b><span>Every kit a build ran on, what ran, where to get it</span></a><a class="mi" href="../../addons.html"><b>Add-ons and parts</b><span>Screens, sensors, radios, motors and probes, from any maker</span></a></div></div><div class="ni"><a href="../../portability.html">Software</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="software-menu" aria-label="Software pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="software-menu"><a class="mi" href="../../portability.html"><b>Bring your code</b><span>Arduino, ESPHome, Zephyr, MicroPython, STM32, ESP32 and Pico code on a TI board</span></a><a class="mi" href="../../ports.html"><b>Every port</b><span>What ran, what only built, what changed, with the code</span></a><a class="mi" href="../../one-app-eleven-boards.html"><b>One app, eleven boards</b><span>The same C file from an MSPM0 to AM62L Linux</span></a><a class="mi" href="../../project-build-from-terminal.html"><b>Build from the terminal</b><span>TI&#x27;s SDK examples with GCC and a makefile, no IDE</span></a><a class="mi" href="../../benchmarks.html"><b>Measured</b><span>Every board on the same tests, with the method</span></a><a class="mi" href="../../edge-ai.html"><b>Edge AI</b><span>Where to start, and the measured numbers</span></a></div></div><div class="ni"><a href="../../community.html">Community</a><button class="ni-btn" type="button" aria-expanded="false" aria-controls="about-menu" aria-label="Community pages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="menu" id="about-menu"><a class="mi" href="../../community.html"><b>Community</b><span>Post what you built or ported; it gets a page here</span></a><a class="mi" href="https://github.com/Fox-Red-Labs/fox-red-labs"><b>Get the code</b><span>The repository: board folders, ports and portable code</span></a></div></div></nav>
+    <form class="hsearch" action="../../search.html" role="search"><input name="q" type="search" placeholder="Search" aria-label="Search the site" title="Search the site (press /)"><button type="submit" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button></form>
+    <a class="gh-link" href="https://github.com/Fox-Red-Labs/fox-red-labs" aria-label="Fox Red Labs on GitHub"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
+    
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav"><svg class="mb-o" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="mb-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Menu</button>
+  </div>
+<script>
+(function () {
+  var h = document.currentScript.closest("header"), b = h.querySelector(".menu-btn");
+  function set(open) { if (open) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); h.classList.toggle("nav-open", open); b.setAttribute("aria-expanded", open ? "true" : "false"); }
+  window.addEventListener("resize", function () { if (h.classList.contains("nav-open")) h.style.setProperty("--menu-top", Math.max(0, h.getBoundingClientRect().bottom) + "px"); });
+  b.addEventListener("click", function () { set(b.getAttribute("aria-expanded") !== "true"); });
+  h.querySelectorAll("nav a").forEach(function (a) { a.addEventListener("click", function () { set(false); }); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { if (h.classList.contains("nav-open")) { set(false); b.focus(); } h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  document.addEventListener("click", function (e) { if (!h.contains(e.target)) { set(false); h.querySelectorAll(".ni.open").forEach(function (n) { n.classList.remove("open"); n.querySelector(".ni-btn").setAttribute("aria-expanded", "false"); }); } });
+  h.querySelectorAll(".ni-btn").forEach(function (t) {
+    t.addEventListener("click", function () { var n = t.closest(".ni"), open = !n.classList.contains("open"); n.classList.toggle("open", open); t.setAttribute("aria-expanded", open ? "true" : "false"); });
+  });
+  var f = h.querySelector(".hsearch"), q = f && f.querySelector("input");
+  if (f) f.addEventListener("submit", function (e) { if (getComputedStyle(q).display === "none" || !q.value.trim()) { e.preventDefault(); location.href = "../../search.html"; } });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "/" || e.metaKey || e.ctrlKey || /input|textarea|select/i.test(e.target.tagName) || e.target.isContentEditable) return;
+    e.preventDefault(); var s = document.getElementById("sq");
+    if (s) s.focus(); else if (q && getComputedStyle(q).display !== "none") q.focus(); else location.href = "../../search.html";
+  });
+})();
+</script>
+</header><!--/bench-chrome:header-->
+<main>
+<div class="lab-hero">
+  <h1 class="dl-title">Inside the chip: a live view of a running MSPM0</h1>
+  <p class="lede">Connect an MSPM0 LaunchPad (L1306, G3507, G3519 or G5187) in Chrome or Edge, or look at the sample reading below. Every block, pin and CPU share you see is read from the running chip through its debug port. The program is not stopped, changed or told about it.</p>
+</div>
+<div class="ctl"><button class="btn go" id="connect" type="button">Connect to a board</button><button class="btn" id="stop" type="button" hidden>Stop</button>
+<label class="btn" id="elfL" hidden>Name the functions: choose the program's .out file<input type="file" id="elf" accept=".out,.elf" hidden></label>
+<a class="btn quiet" href="../bench/">Back to the Digital Lab</a>
+<span class="status" id="status" role="status">Not connected. Works with an MSPM0 LaunchPad in Chrome or Edge.</span></div>
+<p class="stamp" id="stamp" hidden><b id="stamp-t"></b> <label class="small">Sample <select id="sample"><option value="sample/live-ML130001.json">LP-MSPM0L1306</option><option value="sample/live-MG000001.json">LP-MSPM0G3519</option><option value="sample/live-MG020001.json">LP-MSPM0G5187</option></select></label> <span class="small">No G3507 sample yet; a connected G3507 still works.</span></p>
+<p class="small">Colored blocks have power. Pale blocks are off. Pick a block or a pin for what it is and what this program does with it.</p>
+<div class="dgrid"><div><div class="scroll"><svg id="chip" viewBox="0 0 1000 620" role="img" aria-label="Block diagram of the chip with live state"></svg></div>
+<p class="legend" id="legend">Filled pin: the program drives it high. Outlined: connected, low or not driven. Gray: not connected. Red number: how many times a second the pin changes.</p>
+<details class="cap"><summary>Limits, and if the board stops answering</summary>
+<p class="small">The view reads registers while the program runs. A pin that changes more than about 100 times a second shows "fast", and a pin driven by a timer shows no rate. The debug connection may keep the chip out of its deepest sleep, so do not use this view to measure power. If a program enters STANDBY, the debug port stops answering: the fix is in the <a href="https://github.com/Fox-Red-Labs/fox-red-labs/blob/main/mspm0l1306/FAQ.md">LP-MSPM0L1306 FAQ</a>. How each reading was checked against a known program: <a href="https://github.com/Fox-Red-Labs/fox-red-labs/blob/main/docs/experiments/2026-11-06-mspm0l1306-live-chip-view.md">the MSPM0 experiment</a>. The LP-AM243 version, which needs a few lines in the program for CPU load: <a href="https://github.com/Fox-Red-Labs/fox-red-labs/blob/main/docs/experiments/2026-11-07-am243x-live-chip-view.md">the AM243 experiment</a>.</p></details></div>
+<div class="side"><div class="panel"><h2>Where the CPU spends its time</h2><div id="fns"><p class="empty">Connect a board to start.</p></div></div>
+<div class="panel card" id="card"><h2>Pick a block</h2><p>Choose any block or pin on the chip.</p></div></div></div>
+<div class="strip"><div class="hd"><b>CPU awake, last minute</b><span id="rate"></span></div><svg id="hist" viewBox="0 0 600 60" preserveAspectRatio="none"></svg></div>
+</main>
+<script type="module">
+import { Dap, WebHidTransport } from "../mspm0-dap.js";
+import { ChipFeed, elfFunctions, matchMap } from "./feed.js";
+const $ = (i) => document.getElementById(i), NS = "http://www.w3.org/2000/svg", svg = $("chip");
+const el = (n, a, p) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); (p || svg).appendChild(e); return e; };
+const KIND = { cpu: "#1F4E79", mem: "#0F7C8A", system: "#6B46C1", accel: "#8A3B8F", timer: "#B7791F", "timer-other": "#B7791F", uart: "#2B6CB0", i2c: "#2B6CB0", spi: "#2B6CB0", serial: "#2B6CB0", adc: "#2F6B4F", analog: "#2F6B4F", io: "#B42418" };
+const HDR = "MSPM0 SDK device header";
+// What each kind of block does. Only facts true of every MSPM0 block of that kind; chip numbers come from the map or the data sheet.
+const KCARD = {
+  timer: { what: "A counter that keeps time, measures pulses or makes PWM.", how: "It counts its clock through a prescaler. Compare values set a pin or raise an interrupt." },
+  "timer-other": { what: "A basic timer.", how: "It counts its clock and can raise an interrupt." },
+  uart: { what: "Sends and receives bytes on two wires, one bit at a time.", how: "The baud rate comes from a divider on its clock." },
+  i2c: { what: "A two-wire bus shared by many chips, each with an address.", how: "The controller drives the clock and addresses a device on the bus." },
+  spi: { what: "A fast serial bus with a clock, data each way, and a chip select.", how: "The controller clocks data out and in at the same time." },
+  serial: { what: "A communication block.", how: "It moves data between the chip and the outside through its pins." },
+  adc: { what: "Turns an analog voltage into a number.", how: "A trigger starts a conversion and the result lands in a memory register." },
+  analog: { what: "An analog block: a comparator, DAC, amplifier or voltage reference.", how: "Analog blocks can connect to each other and to the ADC inside the chip." },
+  accel: { what: "A hardware helper: checksums, encryption, random numbers or math.", how: "The program hands it data and reads the result, which is faster than doing it in software." },
+  system: { what: "A system block: DMA, a watchdog, the real-time clock or low-power support.", how: "It keeps the chip running, timed or safe beside the program." },
+  io: { what: "The program's direct control of pins, as outputs or inputs.", how: "A write to the output register sets the pin. A pin must first be routed to GPIO in the pin control block." },
+};
+// Data-sheet facts checked for one chip, used in place of the generic attributes.
+const DS = "MSPM0L1306 data sheet (SLASEX0)";
+const CHIPCARD = { mspm0l1306: {
+  cpu: { attrs: ["Arm Cortex-M0+, up to 32 MHz", "No hardware divide, no floating point"], src: DS }, flash: { attrs: ["64 kB", "One wait state above 24 MHz"], src: DS }, sram: { attrs: ["4 kB"], src: DS },
+  DMA: { attrs: ["3 channels"], src: DS }, CRC: { attrs: ["CRC-16 or CRC-32"], src: DS }, WWDT0: { attrs: ["Windowed: checking in too early also counts as a fault"], src: DS },
+  TIMG0: { attrs: ["16 bits", "Two capture or compare channels"], src: DS }, TIMG1: { attrs: ["16 bits", "Two capture or compare channels"], src: DS }, TIMG2: { attrs: ["16 bits", "Two capture or compare channels"], src: DS }, TIMG4: { attrs: ["16 bits", "Two capture or compare channels"], src: DS },
+  ADC0: { attrs: ["12 bits, up to 1.68 million samples a second", "Up to 10 external channels"], src: DS }, COMP0: { attrs: ["32 ns propagation delay", "8-bit reference DAC"], src: DS },
+  OPA0: { attrs: ["Zero drift, chopper type", "Gain 1 to 32x"], src: DS }, OPA1: { attrs: ["Zero drift, chopper type", "Gain 1 to 32x"], src: DS }, VREF: { attrs: ["1.4 V or 2.5 V"], src: DS }, SPI0: { attrs: ["Up to 16 Mbit/s"], src: DS },
+  clock: { attrs: ["SYSOSC 4 to 32 MHz, within 1.2%", "LFOSC 32 kHz, within 3%"], src: DS },
+} };
+const BOARD_LABEL = { mspm0l1306: { PA0: "LED1", PA26: "red", PA13: "green", PA27: "blue", PA18: "S1", PA14: "S2", PA8: "TX", PA9: "RX", PA15: "therm" } };
+let map = null, LABELS = {}, BL = {}, PINS = {}, G = {}, st = null, picked = null, on = false, transport = null, feed = null, wiresG, meter, big, clockT, CELL = [], SECT = [], chanTop = 0;
+const fmtMs = (m) => m >= 1000 ? (m / 1000).toFixed(2) + " s" : m >= 0.9995 ? m.toFixed(m < 10 ? 2 : 1) + " ms" : (m * 1000).toFixed(m * 1000 < 10 ? 2 : 0) + " us";
+const press = (g, f) => { g.addEventListener("click", f); g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); f(); } }); };
+function block(id, x, y, w, h, title, sub, kind, power, large) {
+  const g = el("g", { id: "blk-" + id, class: "blk", "data-block": id, "data-refs": "", tabindex: 0, role: "button", "aria-label": title });
+  const r = el("rect", { class: "b", x, y, width: w, height: h, rx: 5, fill: KIND[kind] + "22", stroke: KIND[kind] }, g);
+  el("text", { class: large ? "T" : "t", x: x + 8, y: y + (large ? 20 : 17) }, g).textContent = title;
+  const s = el("text", { class: "s", x: x + 8, y: y + (large ? 36 : 32) }, g); s.textContent = sub;
+  press(g, () => pick(id)); BL[id] = { x, y, w, h, title, kind, power }; G[id] = { g, r, sub: s };
+}
+// Lay the chip out from its map: a fixed top row, the peripheral groups in columns of three, pin control, then the pins by port.
+function layout() {
+  svg.textContent = ""; BL = {}; G = {}; PINS = {}; CELL = []; SECT = [];
+  block("cpu", 24, 30, 270, 110, "Arm Cortex-M0+ CPU", "", "cpu", null, true);
+  block("flash", 304, 30, 120, 110, "Flash", (map.flash / 1024) + " kB", "mem", null, true);
+  block("sram", 434, 30, 270, 110, "SRAM", (map.ram.bytes / 1024) + " kB", "mem", null, true);
+  block("nvic", 714, 30, 150, 52, "Interrupts", "", "system", null, true);
+  block("systick", 714, 88, 150, 52, "SysTick", "", "system", null, true);
+  block("debug", 874, 30, 102, 110, "Debug port", "2 pins", "system", null, true);
+  el("rect", { x: 33, y: 94, width: 252, height: 16, rx: 3, fill: "#fff", "pointer-events": "none" });
+  meter = el("rect", { x: 33, y: 94, width: 0, height: 16, rx: 3, fill: KIND.cpu, "pointer-events": "none" });
+  big = el("text", { x: 33, y: 86, style: "font:700 28px Barlow,Arial,sans-serif;fill:#161312", "pointer-events": "none" });
+  clockT = el("text", { x: 33, y: 130, class: "s" });
+  for (let i = 0; i < 1024; i++) CELL.push(el("rect", { x: 443 + (i % 64) * (252 / 64), y: 72 + Math.floor(i / 64) * 4, width: 252 / 64 - 0.4, height: 3.6, fill: "#fff", "pointer-events": "none" }));
+  const ns = map.flash / 1024, fc = ns <= 64 ? 8 : 32, fw = 102 / fc, fh = Math.min(6, 60 / Math.ceil(ns / fc));
+  for (let i = 0; i < ns; i++) SECT.push(el("rect", { x: 313 + (i % fc) * fw, y: 72 + Math.floor(i / fc) * fh, width: fw - 0.5, height: fh - 0.5, fill: "#fff", "pointer-events": "none" }));
+  const order = ["System", "Math and security", "Timers", "Serial", "Analog", "GPIO"], groups = {};
+  for (const [n, p] of Object.entries(map.peripherals)) (groups[p.group] ||= []).push([n, p]);
+  (groups.System ||= []).push(["clock", { kind: "system", group: "System" }]);
+  const W = 84, H = 42, ROWS = 3, PITCH = W + 8, bandH = ROWS * (H + 6);
+  let x = 24, y = 172;
+  for (const gname of order) {
+    const list = groups[gname]; if (!list) continue;
+    const cols = Math.ceil(list.length / ROWS), gw = Math.max(cols * PITCH - 8, gname.length * 7.4);
+    if (x + gw > 976) { x = 24; y += bandH + 26; }
+    el("text", { x, y: y - 8, class: "g" }).textContent = gname;
+    list.forEach(([n, p], i) => block(n, x + Math.floor(i / ROWS) * PITCH, y + (i % ROWS) * (H + 6), W, H, n === "clock" ? "Clocks" : n.replace(/^GPIO([A-C])$/, "GPIO $1"), "", p.kind, n === "clock" ? null : n, false));
+    x += gw + 18;
+  }
+  chanTop = y + bandH + 6; const mux = chanTop + 14 * 9 + 12;
+  wiresG = el("g", { "pointer-events": "none" });
+  block("iomux", 24, mux, 952, 40, "Pin control", "", "io", null, true);
+  const ports = [...new Set(Object.values(map.pins).map((p) => p.port).filter(Boolean))].sort();
+  const pinTop = mux + 56, pitch = 928 / 32;
+  const labels = LABELS = { ...(BOARD_LABEL[map.board] || {}), PA19: "DIO", PA20: "CLK" };
+  for (const [k, l] of Object.entries(map.labels || {})) labels[k] = l.split(" (")[0].replace("LED2 ", "");
+  ports.forEach((port, r) => {
+    const py = pinTop + r * 56;
+    el("text", { x: 24, y: py + 19, class: "g" }).textContent = "P" + port;
+    for (const [cm, p] of Object.entries(map.pins)) {
+      if (p.port !== port) continue;
+      const name = "P" + port + p.pin, px = 48 + p.pin * pitch, cx = px + (pitch - 4) / 2, g = el("g", { id: "blk-" + name, class: "blk", "data-block": name, "data-refs": "", tabindex: 0, role: "button", "aria-label": "Pin " + name });
+      const rr = el("rect", { class: "b", x: px, y: py, width: pitch - 4, height: 28, rx: 3, fill: "#F3EFE7", stroke: "#D8CEBF" }, g);
+      el("text", { x: cx, y: py + 18, "text-anchor": "middle", style: "font:600 12px Barlow,Arial,sans-serif;fill:#161312", "pointer-events": "none" }, g).textContent = p.pin;
+      el("text", { x: cx, y: py + 40, "text-anchor": "middle", style: "font:400 12px Barlow,Arial,sans-serif;fill:#6B625B", "pointer-events": "none" }, g).textContent = (labels[name] || "").slice(0, 5);
+      if (labels[name]) el("title", {}, g).textContent = name + ": " + labels[name];
+      const hz = el("text", { x: cx, y: py + 52, "text-anchor": "middle", style: "font:600 12px Barlow,Arial,sans-serif;fill:#B42418", "pointer-events": "none" }, g);
+      press(g, () => pickPin(name)); PINS[name] = { g, r: rr, hz, cm: +cm, x: cx, row: r, y: py };
+    }
+  });
+  const end = pinTop + ports.length * 56 + 14;
+  svg.setAttribute("viewBox", `0 0 1000 ${end - 4}`);
+}
+const owner = (fn) => { if (!fn || fn.startsWith("GPIO")) return null; const n = fn.split("_")[0]; if (n === "DEBUGSS") return "debug"; if (n === "SYSCTL") return "clock"; return BL[n] ? n : null; };
+function render() {
+  if (!st || !map) return;
+  big.textContent = st.answering === false ? "Not answering" : st.halted ? "Halted" : Math.round(st.awake ?? 0) + "% awake";
+  meter.setAttribute("width", 252 * (st.awake || 0) / 100);
+  clockT.textContent = st.clock ? (st.clock.hz ? st.clock.hz / 1e6 + " MHz from " + st.clock.source : "Clocked from " + st.clock.source) : "";
+  if (st.ram) { G.sram.sub.textContent = st.ram.changed != null ? st.ram.changed + " bytes changed so far" : st.ram.changedCells + " of 1,024 parts changed so far"; st.ram.map.forEach((v, i) => CELL[i].setAttribute("fill", v ? KIND.mem : "#fff")); }
+  if (st.flashSectors) { st.flashSectors.forEach((v, i) => SECT[i] && SECT[i].setAttribute("fill", v ? KIND.mem : "#fff")); G.flash.sub.textContent = st.flashSectors.filter(Boolean).length + " of " + map.flash / 1024 + " kB"; }
+  G.nvic.sub.textContent = st.enabled?.length ? "Lines on: " + st.enabled.join(", ") : "No peripheral lines on";
+  G.systick.sub.textContent = st.systick?.on ? (st.systick.irq && st.systick.periodMs ? "Every " + fmtMs(st.systick.periodMs) : st.systick.irq ? "Interrupt on" : "Counting, no interrupt") : "Off";
+  G.clock.sub.textContent = st.clock?.hz ? st.clock.hz / 1e6 + " MHz" : "PLL or crystal";
+  const pins = st.pins || [];
+  G.iomux.sub.textContent = pins.filter((p) => p.connected).length + " of " + pins.length + " pins connected";
+  for (const id in BL) {
+    const b = BL[id]; if (!b.power) continue;
+    const live = !!st.power?.[b.power], c = KIND[b.kind];
+    G[id].g.classList.toggle("off", !live); G[id].r.setAttribute("fill", live ? c + "2B" : "#F7F4EE"); G[id].r.setAttribute("stroke", live ? c : "#D8CEBF"); G[id].r.setAttribute("stroke-dasharray", live ? "" : "4 3");
+    const d = st.detail?.[id]; let t = "";
+    if (live && d) { if (d.baud) t = (d.baud / 1000).toFixed(1) + " kbaud"; else if (d.running != null) t = d.running && d.periodMs != null ? "Every " + fmtMs(d.periodMs) : d.running ? "Counting" : "Stopped"; else if (d.controller) t = "Controller"; }
+    if (live && b.kind === "io") t = pins.filter((p) => p.output && "GPIO" + p.port === id).length + " out";
+    G[id].sub.textContent = t || (live ? "On" : "");
+  }
+  wiresG.textContent = ""; const seen = {}, refs = {}, mux = BL.iomux.y;
+  for (const p of pins) {
+    const P = PINS[p.name]; if (!P) continue;
+    const own = owner(p.fn), gp = p.gpio ? "GPIO" + p.port : null, src = own || gp, col = !p.connected ? "#D8CEBF" : src && BL[src] ? KIND[BL[src].kind] : "#6B625B";
+    const level = p.gpio && p.output ? (st.level?.[p.port] >>> p.pin) & 1 : 0;
+    P.r.setAttribute("fill", !p.connected ? "#F3EFE7" : level ? col : col + "33"); P.r.setAttribute("stroke", col);
+    const t = (st.toggles || []).find((q) => q.name === p.name);
+    P.hz.textContent = t ? (t.tooFast ? "fast" : t.changesPerSec < 10 ? t.changesPerSec.toFixed(1) : Math.round(t.changesPerSec)) : "";
+    if (!p.connected || !src || !BL[src]) continue;
+    const b = BL[src]; if (seen[src] == null) seen[src] = Object.keys(seen).length; (refs[src] ||= []).push(p.name);
+    const lane = chanTop + 9 * (seen[src] % 14), x = P.x;
+    const d = src === "debug" ? `M976 85H986V${lane}H${x}V${mux}` : `M${b.x} ${b.y + b.h / 2}H${b.x - 5}V${lane}H${x}V${mux}`;
+    el("path", { class: "wire", d, stroke: col, opacity: t || !gp ? 0.9 : 0.35 }, wiresG);
+    if (P.row === 0) el("path", { class: "wire", d: `M${x} ${mux + 40}V${P.y}`, stroke: col }, wiresG);
+  }
+  for (const id in G) G[id].g.setAttribute("data-refs", (refs[id] || []).join(" "));
+  const F = $("fns"), recent = (st.history || []).slice(-20), awake = recent.reduce((a, b) => a + b, 0) / (recent.length || 1);
+  F.textContent = "";
+  const add = (n, pct, c) => { const r = document.createElement("div"); r.className = "row"; const a = document.createElement("span"), b = document.createElement("b"); a.textContent = n; b.textContent = pct < 1 && pct > 0 ? pct.toFixed(1) + "%" : Math.round(pct) + "%"; r.append(a, b); F.appendChild(r); const w = document.createElement("div"); w.className = "bar"; const i = document.createElement("i"); i.style.width = pct + "%"; i.style.background = c; w.appendChild(i); F.appendChild(w); };
+  (st.functions || []).filter((f) => f.pct >= 0.5).slice(0, 7).forEach((f) => add(f.name, f.pct, KIND.cpu));
+  add("Asleep", Math.max(0, 100 - awake), "#B8AFA4");
+  const note = (t) => { const h = document.createElement("p"); h.className = "empty"; h.style.marginTop = "6px"; h.textContent = t; F.appendChild(h); };
+  const irq = (st.interrupts || []).filter((x) => x.pct >= 0.1);
+  if (irq.length) note("Inside an interrupt: " + irq.map((x) => x.name + " " + x.pct + "%").join(", "));
+  if (!feed && (st.functions || []).some((f) => f.name.startsWith("0x"))) note("The sample shows addresses, not function names, because the program's .out file was not loaded when it was read.");
+  if (feed && (st.functions || []).some((f) => f.name.startsWith("0x"))) note("Add the program's .out file (the build output CCStudio or make writes, in the project's Debug folder) to see function names instead of addresses.");
+  $("rate").textContent = st.sampleRate ? st.sampleRate + " readings a second" : "";
+  const hs = st.history || [], hv = $("hist"), n = 60; hv.textContent = "";
+  hs.forEach((v, i) => el("rect", { x: (n - hs.length + i) * (600 / n), y: 60 - v * 0.6, width: 600 / n - 1, height: v * 0.6, fill: KIND.cpu }, hv));
+  if (picked) (picked.startsWith("pin:") ? pickPin(picked.slice(4), true) : pick(picked, true));
+}
+const irqName = (i) => Object.entries(map.peripherals).filter(([, p]) => p.irq === i).map(([n]) => n).join(" or ") || "line " + i;
+function inProgram(id) {
+  if (!st) return "Connect a board to see this.";
+  const b = BL[id], pins = st.pins || [];
+  if (id === "cpu") { const f = st.functions?.[0]; return `Awake ${Math.round(st.awake)}% of the time${f ? `. Most time at ${f.name} (${Math.round(f.pct)}%).` : "."}`; }
+  if (id === "flash") return st.flashSectors ? `About ${st.flashSectors.filter(Boolean).length} of ${map.flash / 1024} kB holds data, checked once per 1 kB block. Each cell in the map is 1 kB.` : "Not read yet.";
+  if (id === "sram") return !st.ram ? "Not read yet." : st.ram.changed != null ? `${st.ram.changed} of ${map.ram.bytes.toLocaleString("en-US")} bytes have changed since you connected.` : `The map checks one word in every ${st.ram.cellBytes} bytes. ${st.ram.changedCells} of 1,024 have changed since you connected.`;
+  if (id === "nvic") { const names = (st.enabled || []).map((i) => `${i} (${irqName(i)})`), act = (st.interrupts || []).map((x) => `${x.name} ${x.pct}%`); return (names.length ? "Lines on: " + names.join(", ") + ". " : "This program turned on no peripheral lines. ") + (act.length ? "Seen running: " + act.join(", ") + "." : "No interrupt was caught running in these readings."); }
+  if (id === "systick") return st.systick?.on ? (st.systick.irq ? (st.systick.periodMs ? `Interrupt every ${fmtMs(st.systick.periodMs)}.` : "Interrupt on; the clock rate is not read here.") : `Counting with no interrupt, reload ${st.systick.reload}. Programs often use it this way to time themselves.`) : "This program does not use it.";
+  if (id === "clock") return st.clock?.hz ? `The CPU clock is ${st.clock.hz / 1e6} MHz from ${st.clock.source}.` : `The CPU runs from ${st.clock?.source}; this view does not decode its rate yet.`;
+  if (id === "debug") return `${st.sampleRate || 0} sets of readings a second through this port. PA19 and PA20 carry it.`;
+  if (id === "iomux") return `${pins.filter((p) => p.connected).length} of ${pins.length} pins connected: ${pins.filter((p) => p.connected).map((p) => p.name).join(", ") || "none"}.`;
+  if (b.power && !st.power?.[b.power]) return "Off. This program has not powered it.";
+  if (b.kind === "io") { const ou = pins.filter((p) => p.output && "GPIO" + p.port === id).map((p) => p.name), tg = (st.toggles || []).filter((q) => q.name[1] === id[4]).map((q) => q.name); return `Outputs: ${ou.join(", ") || "none"}. Changing now: ${tg.join(", ") || "none"}.`; }
+  const d = st.detail?.[id], mine = pins.filter((p) => p.fn && p.fn.split("_")[0] === id).map((p) => `${p.name} ${p.fn.split("_").slice(1).join(" ")}`);
+  let t = "Powered on by this program.";
+  if (d) { if (d.baud) t = `Enabled at about ${d.baud.toLocaleString("en-US")} baud.`; if (d.running != null) t = d.running ? `Counting${d.periodMs != null ? ", period " + fmtMs(d.periodMs) : ""}, prescale ${d.prescale}.` : "Powered, not counting."; if (d.controller) t = "Set up as a bus controller."; if (d.powered === false) t = "Powered, converter off."; if (d.powered) t = "Converter on."; }
+  return t + (mine.length ? " Pins: " + mine.join(", ") + "." : " No pin routed to it.");
+}
+const BASE = { cpu: { what: "The processor. It runs the program in flash one instruction at a time and sleeps when told to wait.", how: "It fetches from flash, works on SRAM, and reaches every block over the bus. An interrupt wakes it from sleep." },
+  flash: { what: "Holds the program. It keeps its contents with the power off.", how: "The CPU fetches each instruction from here." },
+  sram: { what: "Working memory: variables and the stack. Its contents are lost at power off.", how: "Dark cells have changed since you connected. Other cells have not changed, which does not prove they are free." },
+  nvic: { what: "Decides which interrupt the CPU takes next, and stops the current code to run it.", how: "A block raises its line. If the program turned that line on, the CPU saves its place and runs the handler." },
+  systick: { what: "A 24-bit down counter inside the CPU. Programs use it as a regular tick.", how: "It counts to zero, reloads, and can raise an interrupt each time.", src: "Arm Cortex-M0+ generic user guide" },
+  debug: { what: "How this page reads the chip while the program runs.", how: "It works beside the CPU, so reading costs the program no instructions. While attached, the debug connection may keep the chip out of its deepest sleep, so do not use this view to measure power. A program that enters deep sleep can drop the link." },
+  iomux: { what: "Connects each pin to one job. Every block reaches the outside world through here.", how: "The program writes one setting per pin. Choose a pin to see what it could do." },
+  clock: { what: "The oscillators and dividers that drive everything else.", how: "The program picks a source and a divider. Blocks take the bus clock or a slower one." } };
+function pick(id, keep) {
+  picked = id; if (!keep) { for (const k in G) G[k].g.classList.toggle("sel", k === id); for (const k in PINS) PINS[k].g.classList.remove("sel"); }
+  const b = BL[id], base = BASE[id] || KCARD[b.kind], extra = CHIPCARD[map.board]?.[id] || {}, p = map.peripherals[id];
+  const attrs = extra.attrs || (p ? [`Interrupt line ${p.irq ?? "none"}`, `Registers at 0x${p.base.toString(16).toUpperCase()}`] : []);
+  const card = $("card");
+  card.innerHTML = '<h2></h2><p></p><div class="now"><b>In this program.</b> <span></span></div><h3 class="ah">Attributes</h3><ul></ul><h3>How it works in the system</h3><p class="h"></p><p class="src"></p>';
+  card.querySelector("h2").textContent = b.title; card.querySelector("p").textContent = base.what; card.querySelector(".now span").textContent = inProgram(id);
+  const u = card.querySelector("ul"); attrs.forEach((a) => { const l = document.createElement("li"); l.textContent = a; u.appendChild(l); }); if (!attrs.length) { card.querySelector(".ah").remove(); u.remove(); }
+  card.querySelector(".h").textContent = base.how; card.querySelector(".src").textContent = "Source: " + (extra.src || base.src || HDR);
+}
+function pickPin(name, keep) {
+  picked = "pin:" + name; if (!keep) { for (const k in G) G[k].g.classList.remove("sel"); for (const k in PINS) PINS[k].g.classList.toggle("sel", k === name); }
+  const card = $("card"), p = st?.pins?.find((q) => q.name === name), t = st?.toggles?.find((q) => q.name === name), m = map.pins[PINS[name].cm];
+  const opts = Object.values(m.fn).map((n) => n.startsWith("GPIO") ? "GPIO" : n.replace(/_/g, " ")).join(", "), own = p && owner(p.fn), d = own && st.detail?.[own];
+  card.innerHTML = '<h2></h2><div class="now"><b>In this program.</b> <span></span></div><h3>What this pin can do</h3><p class="o"></p><p class="src"></p>';
+  card.querySelector("h2").textContent = "Pin " + name + (LABELS[name] ? " (" + LABELS[name] + ")" : "");
+  card.querySelector(".now span").textContent = !p ? "Connect a board to see this." : !p.connected ? "Not connected to anything." : `${p.fn.replace(/_/g, " ")}${p.pullUp ? ", pull-up on" : ""}${p.pullDown ? ", pull-down on" : ""}.${t ? ` Changing about ${t.changesPerSec} times a second.` : ""}${d?.periodMs ? ` ${own} repeats every ${fmtMs(d.periodMs)}.` : ""}`;
+  card.querySelector(".o").textContent = opts; card.querySelector(".src").textContent = "Source: " + HDR;
+}
+async function loadMap(board) { map = await (await fetch("maps/" + board + ".json")).json(); layout(); }
+async function loop() { let k = 0; st = await feed.slow(); render(); while (on) { st = await feed.fast(1000); render(); if (++k % 5 === 0) { await feed.slow(); render(); } } }
+async function connect() {
+  try {
+    const [d] = await navigator.hid.requestDevice({ filters: [{ vendorId: 0x0451 }] }); if (!d) return;
+    transport = new WebHidTransport(d); await transport.open();
+    const dap = new Dap(transport); await dap.connect();
+    const id = (await dap.read32(0x41C40004)) >>> 0, hit = matchMap(await (await fetch("maps/index.json")).json(), id);
+    if (!hit) { await dap.disconnect(); await transport.close(); throw new Error("This page has no map for this chip yet (DEVICEID 0x" + id.toString(16) + ")."); }
+    sampleUrl = null; $("stamp").hidden = true; await loadMap(hit.board); feed = new ChipFeed(dap, map, () => performance.now()); on = true;
+    $("connect").hidden = true; $("stop").hidden = false; $("elfL").hidden = false; $("status").textContent = map.kit + ": reading the running chip. The program keeps running.";
+    loop().catch((e) => { $("status").textContent = "Lost the board: " + e.message; on = false; });
+  } catch (e) { $("status").textContent = e.message; }
+}
+$("connect").addEventListener("click", connect);
+$("stop").addEventListener("click", async () => { on = false; await new Promise((r) => setTimeout(r, 1300)); await feed.dap.disconnect(); await transport.close(); $("connect").hidden = false; $("stop").hidden = true; $("status").textContent = "Stopped. The program is still running on the board."; });
+$("elf").addEventListener("change", async (e) => { const f = e.target.files[0]; if (f && feed) { feed.fns = elfFunctions(await f.arrayBuffer()); $("status").textContent = "Named " + feed.fns.length + " functions from " + f.name + "."; } });
+// A saved reading shows until a board connects: the shipped sample, or ?replay=<file> for review.
+const rp = new URLSearchParams(location.search).get("replay");
+let sampleUrl = null;
+async function startSample(url) {
+  sampleUrl = url;
+  try {
+    const first = await (await fetch(url)).json(); if (url !== sampleUrl) return;
+    await loadMap(first.board || "mspm0l1306");
+    $("stamp-t").textContent = "Sample reading from an " + (first.kit || "LP-MSPM0L1306") + ", not your board.";
+    $("stamp").hidden = false; $("status").textContent = "Nothing is connected. Use the red button to read your own board instead.";
+    const sel = $("sample"); if (![...sel.options].some((o) => o.value === url)) sel.add(new Option("Saved reading for review", url)); sel.value = url;
+  } catch (e) { $("status").textContent = "The sample reading did not load: " + e.message; return; }
+  const poll = async () => { if (url !== sampleUrl) return; try { const s = await (await fetch(url + "?" + Date.now())).json(); if (url !== sampleUrl) return; st = s; render(); } catch (e) { /* the next poll retries */ } setTimeout(poll, 1000); };
+  await poll();
+}
+$("sample").addEventListener("change", (e) => { picked = null; startSample(e.target.value); });
+await startSample(rp || "sample/live-ML130001.json");
+{ const hb = location.hash.slice(1); if (hb) (BL[hb] ? pick(hb) : PINS[hb] && pickPin(hb)); }
+</script>
+<!--bench-chrome:footer--><footer>
+  <div class="wrap" style="--fcols:4">
+    <div class="f-brand"><svg class="logo logo-foot" viewBox="0 0 280.65 138.8" role="img" aria-label="Fox Red Labs"><title>Fox Red Labs</title><path class="ticks" transform="translate(8 7.8) scale(1)" fill="currentColor" d="M30.33,16.83 L25.03,8.35 A2.8,2.8 0 0 0 20.28,11.32 L25.58,19.8 A2.8,2.8 0 0 0 30.33,16.83 Z M49.3,13 L49.3,3 A2.8,2.8 0 0 0 43.7,3 L43.7,13 A2.8,2.8 0 0 0 49.3,13 Z M67.42,19.8 L72.72,11.32 A2.8,2.8 0 0 0 67.97,8.35 L62.67,16.83 A2.8,2.8 0 0 0 67.42,19.8 Z"/><path transform="translate(8 7.8) scale(1)" fill="currentColor" fill-rule="evenodd" d="M17.9,48 A28.6,28.6 0 0 1 28.12,26.09 C20.62,25.29 5.5,29.59 1.6,38.59 C-1.4,45.59 -0.2,55.09 4.6,63.59 C7.2,68.29 10.6,72.69 13.6,73.09 C16.2,73.39 17.9,71.09 17.9,67.09 Z M75.1,48 A28.6,28.6 0 0 0 64.88,26.09 C72.38,25.29 87.5,29.59 91.4,38.59 C94.4,45.59 93.2,55.09 88.4,63.59 C85.8,68.29 82.4,72.69 79.4,73.09 C76.8,73.39 75.1,71.09 75.1,67.09 Z M21.5,84 V48 A25,25 0 0 1 71.5,48 V84 H74.1 Q75.5,84 75.5,85.4 V89.2 Q75.5,90.6 74.1,90.6 H58 V110.5 A3,3 0 0 1 52,110.5 V90.6 H41 V120 A3,3 0 0 1 35,120 V90.6 H18.9 Q17.5,90.6 17.5,89.2 V85.4 Q17.5,84 18.9,84 Z M30.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M55.6,51.5 a3.4,3.4 0 1 0 6.8,0 a3.4,3.4 0 1 0 -6.8,0 Z M40.9,62.4 C40.9,60.4 42.9,59.6 46.5,59.6 C50.1,59.6 52.1,60.4 52.1,62.4 C52.1,65.2 48.7,69.8 46.5,69.8 C44.3,69.8 40.9,65.2 40.9,62.4 Z"/><path fill="currentColor" d="M139.41 38.45H124.46Q124.23 38.45 124.23 38.68V45.77Q124.23 45.99 124.46 45.99H134.29Q134.52 45.99 134.68 46.15Q134.84 46.31 134.84 46.54V50.98Q134.84 51.21 134.68 51.37Q134.52 51.53 134.29 51.53H124.46Q124.23 51.53 124.23 51.75V64.37Q124.23 64.6 124.07 64.76Q123.91 64.92 123.69 64.92H118.34Q118.11 64.92 117.95 64.76Q117.79 64.6 117.79 64.37V33.47Q117.79 33.24 117.95 33.08Q118.11 32.92 118.34 32.92H139.41Q139.64 32.92 139.8 33.08Q139.96 33.24 139.96 33.47V37.9Q139.96 38.13 139.8 38.29Q139.64 38.45 139.41 38.45Z M140.07 57.79Q139.43 55.64 139.43 53.13Q139.43 50.43 140.07 48.28Q141.12 44.9 143.87 42.98Q146.61 41.06 150.45 41.06Q154.2 41.06 156.85 42.95Q159.5 44.85 160.6 48.23Q161.33 50.52 161.33 53.03Q161.33 55.5 160.69 57.65Q159.68 61.22 156.96 63.25Q154.24 65.29 150.4 65.29Q146.56 65.29 143.82 63.27Q141.08 61.26 140.07 57.79ZM154.47 56.33Q154.84 54.86 154.84 53.13Q154.84 51.21 154.47 49.88Q153.97 48.33 152.92 47.46Q151.87 46.59 150.36 46.59Q148.8 46.59 147.77 47.46Q146.75 48.33 146.29 49.88Q145.92 50.98 145.92 53.13Q145.92 55.18 146.24 56.33Q146.7 57.93 147.77 58.84Q148.85 59.75 150.4 59.75Q151.91 59.75 152.96 58.84Q154.01 57.93 154.47 56.33Z M162.63 64.23 169.99 53.31Q170.08 53.17 169.99 53.03L162.63 42.11Q162.54 41.93 162.54 41.79Q162.54 41.42 162.99 41.42H168.71Q169.12 41.42 169.35 41.79L173.46 48.05Q173.65 48.33 173.78 48.05L177.9 41.79Q178.13 41.42 178.54 41.42H184.66Q184.98 41.42 185.07 41.63Q185.17 41.83 184.98 42.11L177.67 53.03Q177.62 53.17 177.67 53.31L184.98 64.23Q185.07 64.37 185.07 64.55Q185.07 64.92 184.66 64.92H178.9Q178.49 64.92 178.26 64.55L174.15 58.29Q174.01 58.02 173.87 58.29L169.76 64.55Q169.53 64.92 169.12 64.92H162.99Q162.67 64.92 162.56 64.71Q162.45 64.51 162.63 64.23Z M214.37 64.51 208.66 51.85Q208.57 51.66 208.38 51.66H204.13Q203.9 51.66 203.9 51.89V64.37Q203.9 64.6 203.74 64.76Q203.58 64.92 203.35 64.92H198.01Q197.78 64.92 197.62 64.76Q197.46 64.6 197.46 64.37V33.47Q197.46 33.24 197.62 33.08Q197.78 32.92 198.01 32.92H211.08Q214.01 32.92 216.22 34.11Q218.44 35.3 219.65 37.49Q220.86 39.69 220.86 42.57Q220.86 45.67 219.31 47.89Q217.75 50.11 214.97 51.02Q214.74 51.11 214.83 51.34L221.05 64.28Q221.14 64.46 221.14 64.55Q221.14 64.92 220.63 64.92H215.01Q214.55 64.92 214.37 64.51ZM203.9 38.68V46.5Q203.9 46.73 204.13 46.73H210.12Q212.04 46.73 213.25 45.58Q214.46 44.44 214.46 42.61Q214.46 40.78 213.25 39.62Q212.04 38.45 210.12 38.45H204.13Q203.9 38.45 203.9 38.68Z M245.48 54.63Q245.43 55.18 244.88 55.18H230.76Q230.48 55.18 230.57 55.41Q230.71 56.33 231.08 57.24Q232.27 59.8 235.92 59.8Q238.85 59.75 240.54 57.42Q240.72 57.15 240.95 57.15Q241.09 57.15 241.27 57.33L244.56 60.58Q244.79 60.81 244.79 60.99Q244.79 61.08 244.61 61.35Q243.1 63.23 240.72 64.26Q238.35 65.29 235.51 65.29Q231.58 65.29 228.86 63.5Q226.14 61.72 224.95 58.52Q223.99 56.23 223.99 52.53Q223.99 50.02 224.68 48.1Q225.73 44.85 228.36 42.93Q230.99 41.01 234.6 41.01Q239.17 41.01 241.93 43.66Q244.7 46.31 245.29 50.75Q245.57 52.49 245.48 54.63ZM230.85 49.29Q230.67 49.88 230.53 50.75Q230.53 50.98 230.76 50.98H238.67Q238.94 50.98 238.85 50.75Q238.62 49.42 238.62 49.47Q238.21 48.1 237.18 47.34Q236.15 46.59 234.64 46.59Q231.76 46.59 230.85 49.29Z M264.29 32.92H269.63Q269.86 32.92 270.02 33.08Q270.18 33.24 270.18 33.47V64.37Q270.18 64.6 270.02 64.76Q269.86 64.92 269.63 64.92H264.29Q264.06 64.92 263.9 64.76Q263.74 64.6 263.74 64.37V62.86Q263.74 62.73 263.65 62.7Q263.55 62.68 263.46 62.77Q261.54 65.29 258.21 65.29Q255.01 65.29 252.7 63.5Q250.39 61.72 249.38 58.61Q248.61 56.23 248.61 53.08Q248.61 49.83 249.43 47.41Q250.48 44.49 252.74 42.77Q255.01 41.06 258.34 41.06Q261.63 41.06 263.46 43.34Q263.55 43.48 263.65 43.43Q263.74 43.39 263.74 43.25V33.47Q263.74 33.24 263.9 33.08Q264.06 32.92 264.29 32.92ZM263.69 53.17Q263.69 50.11 262.69 48.37Q261.63 46.59 259.62 46.59Q257.47 46.59 256.38 48.37Q255.23 50.15 255.23 53.22Q255.23 55.96 256.19 57.79Q257.34 59.75 259.58 59.75Q261.63 59.75 262.78 57.79Q263.69 56.1 263.69 53.17Z M117.1 96.02V78.62Q117.1 78.36 117.36 78.36H119.3Q119.56 78.36 119.56 78.62V94.05Q119.56 94.16 119.66 94.16H128.49Q128.75 94.16 128.75 94.41V96.02Q128.75 96.28 128.49 96.28H117.36Q117.1 96.28 117.1 96.02Z M148.48 96.08 147.56 93.08Q147.54 93 147.46 93H140.27Q140.19 93 140.16 93.08L139.24 96.08Q139.17 96.28 138.94 96.28H136.86Q136.58 96.28 136.66 96L142.26 78.56Q142.34 78.36 142.57 78.36H145.13Q145.36 78.36 145.44 78.56L151.1 96L151.12 96.1Q151.12 96.28 150.89 96.28H148.79Q148.56 96.28 148.48 96.08ZM140.91 91.06H146.8Q146.85 91.06 146.88 91.02Q146.92 90.98 146.9 90.93L143.93 81.43Q143.9 81.38 143.85 81.38Q143.8 81.38 143.77 81.43L140.8 90.93Q140.78 90.98 140.82 91.02Q140.86 91.06 140.91 91.06Z M168.96 87.09Q171.68 88.24 171.68 91.36Q171.68 93.72 170.12 95Q168.56 96.28 166.05 96.28H159.67Q159.42 96.28 159.42 96.02V78.62Q159.42 78.36 159.67 78.36H165.84Q168.5 78.36 169.98 79.58Q171.45 80.79 171.45 83.12Q171.45 85.89 168.96 86.94Q168.84 87.01 168.96 87.09ZM161.87 80.59V85.99Q161.87 86.09 161.98 86.09H165.84Q167.33 86.09 168.18 85.35Q169.04 84.61 169.04 83.33Q169.04 82.02 168.18 81.25Q167.33 80.48 165.84 80.48H161.98Q161.87 80.48 161.87 80.59ZM169.22 91.13Q169.22 89.75 168.35 88.95Q167.48 88.14 165.97 88.14H161.98Q161.87 88.14 161.87 88.24V94.03Q161.87 94.13 161.98 94.13H166.05Q167.51 94.13 168.36 93.32Q169.22 92.52 169.22 91.13Z M179.87 91.49V90.75Q179.87 90.49 180.13 90.49H182Q182.25 90.49 182.25 90.75V91.36Q182.25 92.67 183.38 93.52Q184.5 94.36 186.48 94.36Q188.24 94.36 189.14 93.62Q190.03 92.88 190.03 91.67Q190.03 90.88 189.57 90.32Q189.11 89.75 188.23 89.28Q187.35 88.8 185.66 88.14Q183.79 87.42 182.7 86.83Q181.61 86.24 180.89 85.28Q180.18 84.32 180.18 82.87Q180.18 80.66 181.75 79.41Q183.33 78.16 186.01 78.16Q187.91 78.16 189.34 78.8Q190.78 79.44 191.56 80.59Q192.34 81.74 192.34 83.25V83.76Q192.34 84.02 192.08 84.02H190.16Q189.91 84.02 189.91 83.76V83.38Q189.91 82.05 188.84 81.16Q187.78 80.28 185.91 80.28Q184.32 80.28 183.45 80.93Q182.58 81.59 182.58 82.81Q182.58 83.66 183.02 84.2Q183.45 84.73 184.31 85.16Q185.17 85.58 186.94 86.24Q188.75 86.96 189.88 87.56Q191.01 88.16 191.75 89.15Q192.49 90.14 192.49 91.6Q192.49 93.85 190.84 95.17Q189.19 96.48 186.3 96.48Q184.32 96.48 182.88 95.87Q181.43 95.26 180.65 94.13Q179.87 93 179.87 91.49Z"/></svg><p>Demos and ports on TI development kits, with the code and the measured numbers.</p></div>
+    <div><h2>Builds</h2><a href="../../projects.html">All builds</a><a href="../../project-blink.html">First blink</a><a href="../../projects.html?f=smart-home">Smart home</a><a href="../../projects.html?f=ai">Edge AI</a><a href="../../projects.html?f=radio">Radio and range</a><a href="../../projects.html?f=motors">Motors, power and sensing</a><a href="../../projects.html?f=screens">Screens</a><a href="../../security.html">Security</a></div><div><h2>Hardware</h2><a href="../../hardware.html">The kits</a><a href="../../addons.html">Add-ons and parts</a></div><div><h2>Software</h2><a href="../../portability.html">Bring your code</a><a href="../../ports.html">Every port</a><a href="../../one-app-eleven-boards.html">One app, eleven boards</a><a href="../../project-build-from-terminal.html">Build from the terminal</a><a href="../../benchmarks.html">Measured</a><a href="../../edge-ai.html">Edge AI</a></div><div><h2>Community</h2><a href="../../community.html">Community</a><a href="https://github.com/Fox-Red-Labs/fox-red-labs">Get the code</a></div>
+    <div class="f-meta"><a href="../../benchmarks.html#method">Method</a><p class="disc pwr">Powered by Zephyr, GCC and OpenOCD. </p><p class="disc">Fox Red Labs is a lab run by a TI employee on personal time. Contributors&#x27; projects are their own. Not affiliated with, sponsored by, or endorsed by Texas Instruments or any other manufacturer.</p></div>
+  </div>
+</footer><!--/bench-chrome:footer-->
+<script src="../bench/lab-nav.js?v=20261107"></script>
+</body></html>

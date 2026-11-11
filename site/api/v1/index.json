@@ -1,41 +1,41 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-10",
+ "generated": "2026-11-11",
  "files": {
   "boards.json": {
    "rows": 26,
    "source": "data/boards.csv",
-   "sha256": "201ef28074f3f053eeff0aa679b082cfb95c1a8a8e0e925364d280ee32ae922c"
+   "sha256": "f2519f0a40356f341b89b01c1703c172903930123e6721fee0b5637820d13663"
   },
   "results.json": {
    "rows": 7941,
    "source": "data/results/*.csv",
-   "sha256": "fe9099c9881042b75882dffe1248103898235cc053604c841eec01eb26510581"
+   "sha256": "0abf7c3e5cde1ee72a5348894b35cce1e9e02c6668c770d27d2490cdaf72aa2c"
   },
   "parts.json": {
    "rows": 74,
    "source": "data/parts.json",
-   "sha256": "bc6f7f8cb66aab812a62255d45c645b117b4ae66232c7c60ea62a8ce61bddc8c"
+   "sha256": "13ef58a499d1256ec9c7863dfafd84d39e5664c46d5e761c4ef61598cd634a14"
   },
   "ports.json": {
    "rows": 76,
    "source": "site/data/ports.json",
-   "sha256": "34fedc34fae853710cd1c5a2e9e3611168277ee373e8455a0bbd7633f01b1a66"
+   "sha256": "cb95b114dd609e122a723ae0f1bfc37b6bf2cd0d411ec3ce3c11920d5f331629"
   },
   "milestones.json": {
    "rows": 149,
    "source": "data/milestones.json",
-   "sha256": "2bcbc71aa8a14014c72ca2957d7621d7c964b008b768665d8e6793ea4ca1e9f2"
+   "sha256": "b1b5f77dc9fe6a5937808e69e50467ce9392676da964405dfcfe7504c916f637"
   },
   "support-matrix.json": {
    "rows": 6,
    "source": "data/support-matrix.json",
-   "sha256": "3a1b440316c0910eb5c381ac3219e977cdc82ce0a9710b380cd693835996d41b"
+   "sha256": "8aac047a2efe577e4adcd2415f12054a63c778bbf0ed954f6f2e57439973e8c8"
   },
   "questions.json": {
    "rows": 10,
    "source": "data/questions.json",
-   "sha256": "5aa696ae7f7ad0b975a616178140e1232f2eec1de8ff90dcc374b03cb5e07543"
+   "sha256": "ac88bfe32f5049544c9bd7df5ef708fffbb04d07ac9d798f598b4ceeecc20f52"
   }
  },
  "doc": "docs/api-v1.md",

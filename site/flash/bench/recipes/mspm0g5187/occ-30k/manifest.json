@@ -1,0 +1,125 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0g5187",
+ "kit": "LP-MSPM0G5187",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BBBC02F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "occupancy",
+ "occ": {
+  "addr": "0x20201080",
+  "magic": "0x0CC00002",
+  "model": "occ_cnn_30k",
+  "n_test": 20,
+  "labels": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   1,
+   1,
+   1,
+   1,
+   1,
+   2,
+   2,
+   2,
+   2,
+   2,
+   3,
+   3,
+   3,
+   3,
+   3
+  ],
+  "layout": [
+   "magic",
+   "cpuclk_hz",
+   "n_test",
+   "same_ref",
+   "right",
+   "cyc_min",
+   "cyc_max",
+   "seq_in",
+   "seq_out",
+   "idx",
+   "pred",
+   "cycles",
+   "logits[4]"
+  ]
+ },
+ "memory": {
+  "flash_b": 49928,
+  "ram_b": 5312,
+  "from": "the linker map of this image: bytes used in FLASH and SRAM, test program, driver library, model and stack included"
+ },
+ "params": {
+  "kind": "params",
+  "format": 1,
+  "addr": "0x0001FC00",
+  "magic": "0x50524C46",
+  "image_id": 5,
+  "items": [
+   {
+    "id": "led_ms",
+    "label": "LED flash per answer",
+    "unit": "ms",
+    "min": 0,
+    "max": 1000,
+    "default": 80,
+    "step": 10,
+    "note": "0 turns the flash off"
+   }
+  ]
+ },
+ "expect": "self-test: the chip runs its 20 test windows and matches the reference answers; then one answer per window the page asks for; LED2 red flashes once per answer",
+ "image": {
+  "file": "firmware.out",
+  "sha256": "ca1b05c780ddca033eb30965ccb41363d44e21adbc4ac2703c05963d4c3137d4",
+  "bytes": 58452,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 49928
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/nortos/LP_MSPM0G5187/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/occ.c",
+  "sha256": "54d7af2eda5434f538b842702e80052cda6c9933ea5b3872b7b20ef0c1f5005e",
+  "edited_line": "the example's main source replaced by the room-occupancy program with occ_cnn_30k; stack 1024 bytes",
+  "rebuild": "python3 tools/webflash/build_occ.py --model occ_cnn_30k mspm0g5187"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.28.0",
+   "validated": false,
+   "source": "override"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "4.4.1_st_20260330-0700",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-22T14:48:00",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}

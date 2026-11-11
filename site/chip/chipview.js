@@ -373,6 +373,7 @@ export function mountChip(root, data) {
     $$('.cv-card').forEach((c) => { const on = c.dataset.slug === slug; c.classList.toggle('sel', on); c.setAttribute('aria-pressed', on ? 'true' : 'false'); });
     $('#cv-ptitle').textContent = builds[slug].title;
     $('#cv-wiring').innerHTML = '<b>Wiring.</b> ' + esc(builds[slug].wiring);
+    const pl = $('#cv-plink'); if (pl && builds[slug].href) pl.href = builds[slug].href;
     renderChip(); return true;
   }
   $$('.cv-card').forEach((c) => c.addEventListener('click', () => { pick(c.dataset.slug); $('#inside').scrollIntoView({ behavior: 'smooth', block: 'start' }); }));

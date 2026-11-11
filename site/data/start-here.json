@@ -5,7 +5,7 @@
   "blink": {
    "board": "lp-mspm0g3507",
    "route": "LP-MSPM0G3507 on its USB cable; CCStudio 21.0.1 open; Claude Code in VS Code or a terminal, reaching CCStudio's build and flash servers; MSPM0 SDK 2.11.00.07; Intel Mac, macOS 15.7.9.",
-   "why": "It is the board our AI steps were timed on, end to end, with a person watching the LED: 2 min 29 s from plugging in to a changed blink on 2026-10-05. It has its own USB debugger, so there is no probe to buy. Its 32 kB of RAM is room for the next projects (a screen, a small AI model) that the 4 kB LP-MSPM0L1306 cannot hold.",
+   "why": "It is the board our AI steps were timed on, end to end, with a person watching the LED: 2 min 29 s from plugging in to a changed blink on 2026-10-05. It has its own USB debugger, so there is no probe to buy. Its 32 kB of RAM is room for the next projects (a screen, an edge AI model) that the 4 kB LP-MSPM0L1306 cannot hold.",
    "parts": [
     {
      "id": "lp-mspm0g3507",

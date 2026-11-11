@@ -1,0 +1,548 @@
+{
+ "made_from": [
+  "tools/board_template.kit_options",
+  "site/data/portfolio.json",
+  "site/data/code.json",
+  "site/data/projects.json",
+  "data/routes.json",
+  "site/flash/bench/boards.json"
+ ],
+ "demo": {
+  "label": "Run this demo",
+  "text": "Then build and run the \"{title}\" demo for my {kit}, the one I just ran in the browser: follow {folder}/AGENTS.md and the matching guide in docs/builds, flash it and check the result.",
+  "text_nofolder": "Then build and run the \"{title}\" demo for my {kit}, the one I just ran in the browser, flash it and check the result."
+ },
+ "boards": {
+  "LP-MSPM0L1306": {
+   "id": "mspm0l1306",
+   "folder": "mspm0l1306",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of mspm0l1306, docs/builds and mac-setup, and read mspm0l1306/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the MSPM0 SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the MSPM0 SDK 2.11 with mac-setup/bootstrap.sh. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    },
+    {
+     "label": "GCC and OpenOCD",
+     "sub": "build and flash without a vendor IDE",
+     "texts": {
+      "all": "Install the Arm GNU toolchain and xPack OpenOCD 0.12 so I can build and flash without CCStudio."
+     }
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [
+      "brew install --cask gcc-arm-embedded",
+      "# No admin password on this Mac? Unpack the Arm GNU Toolchain (darwin-arm64 or darwin-x86_64 .tar.xz) from https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads into ~/ti and put its bin folder on PATH",
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "win": [
+      "winget install Arm.GnuArmEmbeddedToolchain",
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "linux": [
+      "sudo apt install gcc-arm-none-eabi",
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ]
+    }
+   },
+   "install": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free."
+  },
+  "LP-AM13E230": {
+   "id": "am13e230",
+   "folder": "am13e230",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of am13e230, docs/builds and mac-setup, and read am13e230/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the AM13E2x SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the AM13E2x SDK 26.01 with mac-setup/bootstrap.sh --all. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the AM13E2x SDK 26.01 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/AM13E2X-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the AM13E2x SDK 26.01 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/AM13E2X-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    },
+    {
+     "label": "Zephyr",
+     "sub": "the open-source RTOS, board lp_am13e230",
+     "texts": {
+      "all": "Set up Zephyr 4.4 for board lp_am13e230."
+     }
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh --all"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the AM13E2x SDK 26.01 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/AM13E2X-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the AM13E2x SDK 26.01 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/AM13E2X-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [],
+     "win": [],
+     "linux": []
+    }
+   },
+   "install": "TI's AM13E230x SDK, TI Arm Clang, SysConfig and TI's OpenOCD (CCSTUDIO-OPENOCD); no CCStudio needed."
+  },
+  "LP-MSPM0C1104": {
+   "id": "mspm0c1104",
+   "folder": "mspm0c1104",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of mspm0c1104, docs/builds and mac-setup, and read mspm0c1104/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the MSPM0 SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the MSPM0 SDK 2.11 with mac-setup/bootstrap.sh. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    },
+    {
+     "label": "OpenOCD",
+     "sub": "flash without a vendor IDE",
+     "texts": {
+      "all": "Install xPack OpenOCD 0.12 so I can flash without CCStudio."
+     }
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "win": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "linux": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ]
+    }
+   },
+   "install": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free."
+  },
+  "LP-MSPM0G3507": {
+   "id": "mspm0g3507",
+   "folder": "mspm0g3507",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of mspm0g3507, docs/builds and mac-setup, and read mspm0g3507/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the MSPM0 SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the MSPM0 SDK 2.11 with mac-setup/bootstrap.sh. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    },
+    {
+     "label": "GCC and OpenOCD",
+     "sub": "build and flash without a vendor IDE",
+     "texts": {
+      "all": "Install the Arm GNU toolchain and xPack OpenOCD 0.12 so I can build and flash without CCStudio."
+     }
+    },
+    {
+     "label": "Zephyr",
+     "sub": "the open-source RTOS, board lp_mspm0g3507",
+     "texts": {
+      "all": "Set up Zephyr 4.4 for board lp_mspm0g3507."
+     }
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [
+      "brew install --cask gcc-arm-embedded",
+      "# No admin password on this Mac? Unpack the Arm GNU Toolchain (darwin-arm64 or darwin-x86_64 .tar.xz) from https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads into ~/ti and put its bin folder on PATH",
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "win": [
+      "winget install Arm.GnuArmEmbeddedToolchain",
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "linux": [
+      "sudo apt install gcc-arm-none-eabi",
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ]
+    }
+   },
+   "install": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free."
+  },
+  "LP-MSPM0G3519": {
+   "id": "mspm0g3519",
+   "folder": "mspm0g3519",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of mspm0g3519, docs/builds and mac-setup, and read mspm0g3519/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the MSPM0 SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the MSPM0 SDK 2.11 with mac-setup/bootstrap.sh. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    },
+    {
+     "label": "OpenOCD",
+     "sub": "flash without a vendor IDE",
+     "texts": {
+      "all": "Install xPack OpenOCD 0.12 so I can flash without CCStudio."
+     }
+    },
+    {
+     "label": "Zephyr",
+     "sub": "the open-source RTOS, board lp_mspm0g3519",
+     "texts": {
+      "all": "Set up Zephyr 4.4 for board lp_mspm0g3519."
+     }
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "win": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "linux": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ]
+    }
+   },
+   "install": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free."
+  },
+  "LP-MSPM0G5187": {
+   "id": "mspm0g5187",
+   "folder": "mspm0g5187",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of mspm0g5187, docs/builds and mac-setup, and read mspm0g5187/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the MSPM0 SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the MSPM0 SDK 2.11 with mac-setup/bootstrap.sh. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    },
+    {
+     "label": "OpenOCD",
+     "sub": "flash without a vendor IDE",
+     "texts": {
+      "all": "Install xPack OpenOCD 0.12 so I can flash without CCStudio."
+     }
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the MSPM0 SDK 2.11 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM0-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "win": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ],
+     "linux": [
+      "# xPack OpenOCD 0.12.0-7 or newer (the first with ti_mspm0.cfg): https://github.com/xpack-dev-tools/openocd-xpack/releases"
+     ]
+    }
+   },
+   "install": "Together the four tools are about 0.9 GB to download and 5 GB on disk (SDK 2.2 GB, compiler 1.8 GB, SysConfig 0.9 GB, OpenOCD 10 MB; measured on our Macs 2026-10-14). No CCStudio needed; only the SDK asks for a myTI login. Have 6 GB free."
+  },
+  "LP-MSPM33C321A": {
+   "id": "mspm33c321a",
+   "folder": "mspm33c321a",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of mspm33c321a, docs/builds and mac-setup, and read mspm33c321a/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the MSPM33 SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the MSPM33 SDK 1.04 with mac-setup/bootstrap.sh --all. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the MSPM33 SDK 1.04 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM33-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the MSPM33 SDK 1.04 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM33-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh --all"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the MSPM33 SDK 1.04 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM33-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the MSPM33 SDK 1.04 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/MSPM33-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [],
+     "win": [],
+     "linux": []
+    }
+   },
+   "install": "TI's MSPM33 SDK, TI Arm Clang, SysConfig and TI's OpenOCD (CCSTUDIO-OPENOCD); no CCStudio needed."
+  },
+  "LP-EM-CC2755P10": {
+   "id": "cc2755p10",
+   "folder": "cc2755p10",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of cc2755p10, docs/builds and mac-setup, and read cc2755p10/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the SimpleLink Low Power F3 SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 with mac-setup/bootstrap.sh --all. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh --all"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [],
+     "win": [],
+     "linux": []
+    }
+   },
+   "install": "TI's SimpleLink Low Power F3 SDK, TI Arm Clang, SysConfig and TI's OpenOCD (CCSTUDIO-OPENOCD); no CCStudio needed. The LP-EM board needs a separate XDS110 probe (LP-XDS110ET)."
+  },
+  "LP-EM-CC2340R5": {
+   "id": "cc2340r5",
+   "folder": "cc2340r5",
+   "options": [
+    {
+     "label": "This board's folder and its AGENTS.md",
+     "sub": "the code, the pins and the traps; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of cc2340r5, docs/builds and mac-setup, and read cc2340r5/AGENTS.md first."
+     }
+    },
+    {
+     "label": "CCStudio and the SimpleLink Low Power F3 SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 with mac-setup/bootstrap.sh --all. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    },
+    {
+     "label": "Zephyr",
+     "sub": "the open-source RTOS, board lp_em_cc2340r5",
+     "texts": {
+      "all": "Set up Zephyr 4.4 for board lp_em_cc2340r5."
+     }
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh --all"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the SimpleLink Low Power F3 SDK 9.21 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-LOWPOWER-F3-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [],
+     "win": [],
+     "linux": []
+    }
+   },
+   "install": "TI's SimpleLink Low Power F3 SDK, TI Arm Clang, SysConfig and TI's OpenOCD (CCSTUDIO-OPENOCD); no CCStudio needed. The LP-EM board needs a separate XDS110 probe (LP-XDS110ET)."
+  },
+  "LP-EM-CC35X1": {
+   "id": "cc35x1",
+   "folder": "",
+   "options": [
+    {
+     "label": "The repository and its AGENTS.md",
+     "sub": "the methods, the traps and the build guides; always included",
+     "locked": true,
+     "texts": {
+      "all": "Clone https://github.com/Fox-Red-Labs/fox-red-labs with a sparse checkout of docs/builds and mac-setup, and read AGENTS.md at the top first."
+     }
+    },
+    {
+     "label": "CCStudio and the SimpleLink Wi-Fi SDK",
+     "sub": "TI's IDE and libraries; your assistant opens the myTI sign-in for you",
+     "texts": {
+      "mac": "Install CCStudio 21.0.1 and the SimpleLink Wi-Fi SDK 10.20 with mac-setup/bootstrap.sh --all. It opens the myTI sign-in page in my browser; wait for me there.",
+      "win": "Download CCStudio 21.0.1 and the SimpleLink Wi-Fi SDK 10.20 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-WIFI-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode.",
+      "linux": "Download CCStudio 21.0.1 and the SimpleLink Wi-Fi SDK 10.20 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-WIFI-SDK. Open each page in my browser so I can sign in to myTI, then run each installer in unattended mode."
+     },
+     "on": false
+    }
+   ],
+   "tools": {
+    "ide": {
+     "mac": [
+      "git sparse-checkout add mac-setup && ./mac-setup/bootstrap.sh --all"
+     ],
+     "win": [
+      "# Download CCStudio 21.0.1 and the SimpleLink Wi-Fi SDK 10.20 for Windows from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-WIFI-SDK, then run each installer."
+     ],
+     "linux": [
+      "# Download CCStudio 21.0.1 and the SimpleLink Wi-Fi SDK 10.20 for Linux from ti.com/tool/download/CCSTUDIO and ti.com/tool/download/SIMPLELINK-WIFI-SDK, then run each installer."
+     ]
+    },
+    "free": {
+     "mac": [],
+     "win": [],
+     "linux": []
+    }
+   },
+   "install": "TI's SimpleLink Wi-Fi SDK, the SimpleLink Wi-Fi Toolbox (it signs and programs), TI Arm Clang, SysConfig, and TI's xds110reset (inside CCStudio or UniFlash). The board needs an LP-XDS110ET or LP-XDS110 probe and its own USB-C power cable."
+  }
+ }
+}

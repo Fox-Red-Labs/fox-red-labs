@@ -1,0 +1,64 @@
+{
+ "note": "Draft from SDK files and read-only reads on probe AL130001, 2026-10-14. Not wired into the page. Fields follow site/flash/bench/board.json.",
+ "id": "am13e230",
+ "kit": "LP-AM13E230",
+ "usb": {"vendorId": 1105, "usagePage": 65280, "note": "same XDS110 CMSIS-DAP interface; product ID not re-read here"},
+ "core": {"dpidr": "0x6BA02477", "cpuid": "0x411FD210", "name": "Cortex-M33"},
+ "identity": {
+  "addr": "0x60111000",
+  "fields": ["TRACEID", "DEVICEID", "USERID"],
+  "values": {"traceid": "0x00000000", "deviceid": "0x0000002F", "userid": "0x00000000"},
+  "deviceid": "0x0000002F",
+  "deviceidMask": "0x0000FFFF",
+  "note": "prototype silicon (XAM13E23019): TRACEID and USERID read 0, so only the DEVICEID low half separates it from a blank read. Production parts will read different values; re-read before relying on this. Also read SRAMFLASH at 0x60111074 = 0x00802200 and ROM_SRAMFLASH at 0x6011101C = 0x00202200"
+ },
+ "flash": {
+  "start": "0x00000000",
+  "end": "0x00080000",
+  "banks": 2, "bankSize": "0x40000",
+  "sector": 2048,
+  "wordBytes": 16,
+  "controllerAddress": "CMDADDR is the bus address; bank 1 starts at 0x40000",
+  "usedByShippedImage": "TI's gpio_toggle_output left by our earlier runs; the last sector reads 0xFF"
+ },
+ "controller": {
+  "base": "0x40042000",
+  "name": "NVMNW",
+  "registerBlock": "base + 0x1000 (CMDEXEC at base + 0x1100)",
+  "regs": {"CMDEXEC": "0x1100", "CMDTYPE": "0x1104", "CMDCTL": "0x1108", "CMDADDR": "0x1120", "CMDBYTEN": "0x1124", "CMDDATAINDEX": "0x112C", "CMDDATA0": "0x1130", "CMDWEPROTA": "0x11D0", "CMDWEPROTB": "0x11D4", "CMDWEPROTNM": "0x1210", "STATCMD": "0x13D0", "GBLINFO0": "0x13F0"},
+  "commands": {"clearStatus": "0x05", "eraseSector": "0x42", "programOneWord": "0x01"},
+  "programByteEnable": "0x3FFFF",
+  "statcmd": {"done": 1, "pass": 2},
+  "semaphore": {"base": "0x40046000", "request": "0x40047800 = 1", "status": "0x40047808", "clear": "0x40047804 = 1", "heldValue": "0xC0010100", "rule": "request before any flash register is readable or writable; release after"},
+  "protectAtRest": {"CMDWEPROTA": "0xFFFFFFFF", "CMDWEPROTB": "0x00000FFF", "CMDWEPROTNM": "0x00000003", "note": "all read 0 without the semaphore. Clear status does NOT re-protect; the proof wrote the at-rest values back by hand"},
+  "sequence": "same as the LP-MSPM33C321A"
+ },
+ "neverWrite": [
+  {"name": "NONMAIN bank 0 and 1", "range": "0x60100000 and 0x60101000", "why": "boot configuration (BCR_CONFIG 0x60100800) and bootloader configuration (BSL_CONFIG 0x60100C00)"},
+  {"name": "factory region", "range": "0x60111000 and up"},
+  {"name": "ECC regions", "range": "0x60200000 and 0x60260000"},
+  {"name": "mass erase and factory reset", "why": "DL_FlashCTL_massErase and factoryReset touch NONMAIN"}
+ ],
+ "leds": [
+  {"label": "LED4 red (PA5)", "gpio": "0x400F0000", "bit": 5}
+ ],
+ "gpio": {"dout": "0x1280", "doe": "0x12C0", "note": "DOE and DOUT both read 0x20 with TI's program running"},
+ "reset": {"sysctl": "0x400AF000", "level": "0x400AF300", "cmd": "0x400AF304", "boot": "RESETLEVEL=1 then RESETCMD=0xE4000001 (same header layout as MSPM0; names only checked in hw_sysctl.h)", "tested": false},
+ "cache": {"register": "none found in the SDK headers", "note": "readback after a write matched without turning anything off"},
+ "console": "not read",
+ "sources": [
+  "am13e230x_sdk_26_01_00_03/source/device/am13e230x/include/hw/hw_memmap.h",
+  "am13e230x_sdk_26_01_00_03/source/device/am13e230x/include/hw/hw_factoryregion.h",
+  "am13e230x_sdk_26_01_00_03/source/device/am13e230x/include/hw/hw_nvmnw.h",
+  "am13e230x_sdk_26_01_00_03/source/device/am13e230x/include/hw/hw_gsc.h",
+  "am13e230x_sdk_26_01_00_03/source/driverlib/am13e230x/dl_flashctl.c and .h (acquireFlashSemaphore, executeCommand, programMemoryConfig, unprotectSector)",
+  "am13e230x_sdk_26_01_00_03/examples/driverlib/gpio/gpio_toggle_output (generated ti_sdk_dl_config.h)",
+  "am13e230x_sdk_26_01_00_03/ti_sdk_config/am13e230x/default/linker_m33_ti_arm_clang.cmd"
+ ],
+ "hardwareResults": {
+  "date": "2026-10-14", "probe": "AL130001",
+  "save": "524,288 bytes read twice, sha256 2974022cd52a34da017be66a7a558dd1aca36f9eb5db74a25d89fb69fe726d7a both times",
+  "proof": "sector 0x7F800 (last 2 KB of bank 1, blank before): erased, 128 words of a pattern programmed, read back with 0 mismatches, erased again; flash afterwards byte for byte equal to the first save. Write protection put back by hand",
+  "notRun": ["boot reset", "LED polarity", "a whole-image flash"]
+ }
+}

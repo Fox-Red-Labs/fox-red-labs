@@ -1,0 +1,932 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Motor">
+<meta name="theme-color" content="#1E1B18">
+<link rel="manifest" href="motor.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Motor remote</title>
+<style>
+:root { --bg: #FAFAF7; --ink: #1E1B18; --muted: #6B645C; --card: #FFFFFF; --line: #E4DED4; --red: #B42418; --ok: #2E6B4F; --warn: #A86A12; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Barlow, system-ui, -apple-system, sans-serif; }
+body { padding: max(12px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom)); max-width: 520px; margin: 0 auto; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+h1 { font-size: 20px; margin: 0; letter-spacing: .01em; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #BBB; margin-right: 6px; vertical-align: middle; }
+.dot.on { background: var(--ok); } .dot.bad { background: var(--red); }
+button { font: inherit; border: 0; border-radius: 14px; padding: 14px 16px; font-weight: 600; font-size: 17px; color: var(--ink); background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); }
+button:disabled { opacity: .38; }
+button:active:not(:disabled) { transform: scale(.98); }
+#connect { padding: 10px 14px; font-size: 15px; }
+.status { font-size: 14px; color: var(--muted); min-height: 1.3em; margin: 4px 2px 12px; }
+.big { background: var(--card); border-radius: 18px; box-shadow: inset 0 0 0 1.5px var(--line); padding: 16px; margin-bottom: 12px; }
+.speed { font-size: 64px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.speed small { font-size: 20px; font-weight: 600; color: var(--muted); margin-left: 6px; }
+.sub { display: flex; justify-content: space-between; margin-top: 10px; font-size: 15px; color: var(--muted); }
+.sub b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.state { font-size: 15px; font-weight: 600; margin-top: 8px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.seg button.sel { background: var(--ink); color: #fff; box-shadow: none; }
+.slider { margin: 6px 0 14px; }
+.slider label { display: flex; justify-content: space-between; font-size: 15px; color: var(--muted); margin-bottom: 8px; }
+.slider label b { color: var(--ink); font-size: 18px; }
+input[type=range] { width: 100%; height: 44px; accent-color: var(--ink); }
+#start { background: var(--ink); color: #fff; box-shadow: none; }
+#stop { width: 100%; background: var(--red); color: #fff; box-shadow: none; font-size: 26px; padding: 22px; border-radius: 18px; margin-top: 4px; letter-spacing: .04em; }
+.note { font-size: 13px; color: var(--muted); margin-top: 14px; line-height: 1.4; }
+.banner { background: #FFF4E5; color: #6B4407; border-radius: 12px; padding: 10px 12px; font-size: 14px; margin-bottom: 10px; display: none; }
+.banner button { margin-top: 8px; width: 100%; }
+.cam { display: none; position: relative; margin-bottom: 12px; border-radius: 18px; overflow: hidden; background: #111; aspect-ratio: 16 / 9; }
+.cam img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cam button { position: absolute; right: 8px; bottom: 8px; padding: 6px 10px; font-size: 13px; background: rgba(255,255,255,.85); }
+.bar { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-top: 12px; }
+.bar i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .3s linear; }
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="dot" id="dot"></span>Motor remote</h1>
+  <button id="connect">Connect</button>
+</header>
+<div class="status" id="status">Not connected.</div>
+
+<div class="cam" id="campanel"><img id="cam" alt="Bench camera"><button id="camtoggle">Hide camera</button></div>
+
+<div class="banner" id="calbanner">The Hall table is not calibrated, so the motor cannot start yet. Calibration turns the motor slowly for about 3 minutes.
+  <button id="cal">Calibrate</button></div>
+<div class="banner" id="faultbanner"><span id="faulttext"></span><button id="clear">Clear fault</button></div>
+
+<div class="big">
+  <div class="speed" id="rpm">0<small>rpm</small></div>
+  <div class="state" id="state">Idle</div>
+  <div class="sub"><span>Current <b id="amps">0.00</b> A</span><span>Bus <b id="bus">-</b> V</span><span>Peak <b id="peak">-</b> A</span></div>
+  <div class="bar"><i id="capbar"></i></div>
+</div>
+
+<div class="row seg" id="dir">
+  <button id="fwd" class="sel">Forward</button>
+  <button id="rev">Reverse</button>
+</div>
+
+<div class="slider">
+  <label>Speed <b id="target">300 rpm</b></label>
+  <input type="range" id="speed" min="150" max="600" step="15" value="300">
+</div>
+
+<div class="row">
+  <button id="start" disabled>Start</button>
+  <button id="brake" disabled>Slow &amp; stop</button>
+</div>
+<button id="stop" disabled>STOP</button>
+
+<p class="note">Change direction only while stopped. Speed changes apply once the motor has closed its loop (a few seconds after Start). A run lasts at most 60 s. If this phone loses its link, or you switch to another app, the board's guard stops the motor within 1 second.</p>
+
+<script>// Motor console engine: TI's MotorVision UART protocol in JavaScript, the session that keeps the board's receiver in step, the
+// controller that runs a Hall calibration or a bounded run under the bench guard, and the pure helpers the page and the tests share.
+// Loadable in node (require) and in the browser (window.MotorConsole). No DOM here; tools/motor/console_ui.js draws.
+//
+// Ported from tools/motorlink/link.py (the reference client). The variable map is data/ site/data/motorlink-vars.json, built from the
+// firmware's C table by tools/motorlink/varmap.py. Nothing here fetches anything.
+(function (root) {
+  "use strict";
+  const START = 0x73, END = 0x65;
+  const CMD = { INIT: 40, WRITE: 43, START1: 63, STOP: 76, DATA: 77, ERR: 39 };
+  const SIZE = { bool: 2, uint16: 2, int16: 2, uint32: 4, int32: 4, float: 4 };
+  const N = {
+    state: "motorVars_M1.outVars.motorState", fault: "motorVars_M1.outVars.faultMtrNow",
+    run: "motorVars_M1.inputCtrl.flagEnableRunAndIdentify", clear: "motorVars_M1.inputCtrl.flagClearFaults",
+    calStart: "motorVars_M1.inputCtrl.flagStartHallCal", ref: "motorVars_M1.inputCtrl.speedRef_Hz",
+    spd: "motorVars_M1.outVars.speed_Hz", id: "motorVars_M1.outVars.Idq_in_A.value[0]", iq: "motorVars_M1.outVars.Idq_in_A.value[1]",
+    bus: "halFOCDataObj_M1.adcData.VdcBus_V", ia: "halFOCDataObj_M1.adcData.I_A.value[0]", ib: "halFOCDataObj_M1.adcData.I_A.value[1]", ic: "halFOCDataObj_M1.adcData.I_A.value[2]",
+    gVer: "frlGuard.version", gState: "frlGuard.state", gReason: "frlGuard.reason", gBeat: "frlGuard.heartbeat", gRunMs: "frlGuard.runMs",
+    gCap: "frlGuard.capMs", gPackets: "frlGuard.hostPackets", gPeak: "frlGuard.peak_A", gLimit: "frlGuard.limit_A", gSpeedMax: "frlGuard.speedMax_Hz",
+    scheme: "frlGuard.scheme", schemes: "frlGuard.schemesSupported", obsErr: "frlGuard.obsErr_deg",
+    calValid: "hallSensorData.flagCalValid", calDone: "hallSensorData.flagCalDone", hall: "hallSensorData.state",
+    nFault: "frlGuard.nFault", fhall: "frlGuard.hall", hEA: "frlGuard.hallEdgesA", hEB: "frlGuard.hallEdgesB", hEC: "frlGuard.hallEdgesC",
+  };
+  // up to 13 variables a poll: the fast set drives the traces, the slow set is read for a moment every half second
+  const SET_A = [N.spd, N.ref, N.id, N.iq, N.ia, N.ib, N.ic, N.bus, N.state, N.fault, N.gState, N.gReason, N.gRunMs];
+  // the middle set (driver pin, Hall lines and their edge counts, peak, calibration) is read for 100 ms every 500 ms; the rare set (version,
+  // limits, scheme) for another 100 ms every 2 s
+  const SET_B = [N.nFault, N.fhall, N.hEA, N.hEB, N.hEC, N.gPeak, N.gLimit, N.calValid, N.calDone];
+  const SET_C = [N.gVer, N.gSpeedMax, N.gCap, N.gPackets, N.hall];
+  // Control schemes (frlGuard.scheme) and the bit each takes in frlGuard.schemesSupported
+  const SCHEMES = [{ id: 0, key: "hall-foc", name: "Hall FOC" }, { id: 1, key: "esmo-foc", name: "Sensorless FOC, ESMO observer" },
+    { id: 2, key: "flux-foc", name: "Sensorless FOC, flux observer" }, { id: 3, key: "six-step-hall", name: "Trapezoidal six-step, Halls" }];
+  // Settings the page can write: range is what the page clamps to, not what TI's firmware accepts
+  const P = "motorVars_M1.inputCtrl.", Q = "motorSetVars_M1.";
+  const SETTINGS = [
+    // svmMode is NOT offered (2026-10-17): TI's table lists the mode enums (svmMode, startupMode, estimatorMode) as uint16,
+    // but on this build they appear to be one byte each; svmMode read 256 on the board, which is svmMode 0 with the next field,
+    // brakingMode, at 1. A uint16 write would also overwrite brakingMode. Reinstate only once a debugger confirms the layout.
+    { name: P + "flagEnableDTC", label: "Dead-time compensation", kind: "bool" },
+    { name: P + "flagEnableFWC", label: "Field weakening", kind: "bool" },
+    { name: P + "flagEnableMTPA", label: "MTPA", kind: "bool" },
+    { name: Q + "Kp_Id", label: "Kp, d current", kind: "float", min: 0, max: 50, unit: "V/A" },
+    { name: Q + "Ki_Id", label: "Ki, d current", kind: "float", min: 0, max: 5000, unit: "" },
+    { name: Q + "Kp_Iq", label: "Kp, q current", kind: "float", min: 0, max: 50, unit: "V/A" },
+    { name: Q + "Ki_Iq", label: "Ki, q current", kind: "float", min: 0, max: 5000, unit: "" },
+    { name: Q + "Kp_spd", label: "Kp, speed", kind: "float", min: 0, max: 20, unit: "A/Hz" },
+    { name: Q + "Ki_spd", label: "Ki, speed", kind: "float", min: 0, max: 200, unit: "" },
+    { name: "frlGuard.limit_A", label: "Guard phase-current trip", kind: "float", min: 0.3, max: 1.8, unit: "A" },
+    { name: "frlGuard.busMin_V", label: "Guard bus minimum (10 adapter, 15.5 tool pack)", kind: "float", min: 9, max: 21, unit: "V" },   // frl_guard.h FRL_GUARD_BUS_ABS_MIN_V / MAX_V; guard version 6
+    { name: "frlGuard.busMax_V", label: "Guard bus maximum (14.5 adapter, 21 tool pack)", kind: "float", min: 10, max: 22, unit: "V" },   // frl_guard.h FRL_GUARD_LIMIT_MIN_A / MAX_A; the firmware clamps too
+    { name: Q + "maxCurrent_A", label: "Current limit (controller)", kind: "float", min: 0.1, max: 0.9, unit: "A" },
+    { name: Q + "accelerationMax_Hzps", label: "Acceleration limit", kind: "float", min: 1, max: 100, unit: "Hz/s" },
+    { name: Q + "startCurrent_A", label: "Start current", kind: "float", min: 0.05, max: 0.9, unit: "A" },
+    { name: Q + "olSpeedThr", label: "Open-loop to closed-loop speed", kind: "float", min: 1, max: 40, unit: "Hz" },
+  ];
+  const clampSetting = (st, x) => st.kind === "float" ? Math.max(st.min, Math.min(st.max, Number(x))) : st.kind === "bool" ? (x ? 1 : 0) : Number(x);
+  const POLES_PAIRS = 4, RPM_PER_HZ = 60 / POLES_PAIRS;   // rpm = Hz x 15
+  const VER_INDEX = 5;   // frlGuard.version always sits at table index 5, in every firmware version; nothing else is read before it matches
+  const HB_MS = 250, HOST_LOST_MS = 1000, CAP_MAX_S = 60;
+
+  function makeVars(json) {
+    const byName = new Map(), byIndex = new Map();
+    for (const v of json.vars) { byName.set(v.name, v); byIndex.set(v.index, v); }
+    return {
+      json, byName, byIndex,
+      find(name) {
+        if (byName.has(name)) return byName.get(name);
+        const hits = json.vars.filter((v) => v.name.endsWith("." + name));
+        if (hits.length !== 1) throw new Error(`${name}: ${hits.length ? "more than one" : "no"} variable matches`);
+        return hits[0];
+      },
+    };
+  }
+
+  function packet(cmd, payload) {
+    payload = payload || [];
+    if (payload.length > 13) throw new Error("payload is 13 bytes at most");
+    const p = new Uint8Array(16);
+    p[0] = START; p[1] = cmd; p.set(payload, 2); p[15] = END;
+    return p;
+  }
+
+  // a write's payload: the index, then the value most significant byte first; a bool is [0, 0 or 1]
+  function encodeWrite(v, value) {
+    if (!/W/.test(v.permissions)) throw new Error(`${v.name} is read-only`);
+    const dv = new DataView(new ArrayBuffer(4));
+    let bytes;
+    switch (v.type) {
+      case "bool": bytes = [0, value ? 1 : 0]; break;
+      case "uint16": dv.setUint16(0, Math.round(value), false); bytes = [dv.getUint8(0), dv.getUint8(1)]; break;
+      case "int16": dv.setInt16(0, Math.round(value), false); bytes = [dv.getUint8(0), dv.getUint8(1)]; break;
+      case "uint32": dv.setUint32(0, Math.round(value), false); bytes = [0, 1, 2, 3].map((i) => dv.getUint8(i)); break;
+      case "int32": dv.setInt32(0, Math.round(value), false); bytes = [0, 1, 2, 3].map((i) => dv.getUint8(i)); break;
+      case "float": dv.setFloat32(0, value, false); bytes = [0, 1, 2, 3].map((i) => dv.getUint8(i)); break;
+      default: throw new Error("unknown type " + v.type);
+    }
+    return [v.index].concat(bytes);
+  }
+
+  function decode(type, b, o) {
+    const dv = new DataView(b.buffer, b.byteOffset + o, SIZE[type]);   // values arrive little endian
+    switch (type) {
+      case "bool": return dv.getUint16(0, true) ? 1 : 0;
+      case "uint16": return dv.getUint16(0, true);
+      case "int16": return dv.getInt16(0, true);
+      case "uint32": return dv.getUint32(0, true);
+      case "int32": return dv.getInt32(0, true);
+      default: return dv.getFloat32(0, true);
+    }
+  }
+
+  // Frames from the board: 73 4D index value 65 (poll data), 73 4C 65 (stop acknowledged), 73 27 (packet error). A start byte inside a
+  // value is not a frame: a poll frame counts only when its end byte is where the variable's size says.
+  // TI's table lists these enums as uint16, but on this build they appear to be one byte (svmMode read 256 on the board:
+  // svmMode 0 with brakingMode 1 beside it). Keep the low byte; the page never writes them (tools/motorlink/link.py too).
+  const ENUM_ONE_BYTE = new Set(["motorVars_M1.inputCtrl.svmMode", "motorVars_M1.inputCtrl.startupMode",
+    "motorVars_M1.inputCtrl.estimatorMode", "motorVars_M1.outVars.motorState"]);
+
+  class Parser {
+    constructor(vars) { this.vars = vars; this.buf = new Uint8Array(0); }
+    push(chunk, onFrame) {
+      let b = this.buf;
+      if (b.length) { const m = new Uint8Array(b.length + chunk.length); m.set(b); m.set(chunk, b.length); b = m; } else b = chunk;
+      let i = 0;
+      while (i < b.length) {
+        if (b[i] !== START) { i++; continue; }
+        if (i + 1 >= b.length) break;
+        const c = b[i + 1];
+        if (c === CMD.DATA) {
+          if (i + 2 >= b.length) break;
+          const v = this.vars.byIndex.get(b[i + 2]);
+          if (!v) { i++; continue; }
+          const n = SIZE[v.type];
+          if (i + 3 + n >= b.length) break;
+          if (b[i + 3 + n] !== END) { i++; continue; }
+          const raw = decode(v.type, b, i + 3);
+          onFrame({ cmd: CMD.DATA, variable: v, value: ENUM_ONE_BYTE.has(v.name) ? raw & 0xFF : raw });
+          i += 4 + n;
+        } else if (c === CMD.STOP || c === CMD.INIT) {
+          if (i + 2 >= b.length) break;
+          if (b[i + 2] === END) { onFrame({ cmd: c }); i += 3; } else i++;
+        } else if (c === CMD.ERR) { onFrame({ cmd: CMD.ERR }); i += 2; }
+        else i++;
+      }
+      this.buf = b.slice(i);
+    }
+  }
+
+  // env: { now(): ms, sleep(ms): Promise, every(ms, fn): cancel }. The page passes real timers, the tests a fake clock.
+  class Session {
+    constructor({ vars, write, env }) {
+      this.vars = vars; this.writeRaw = write; this.env = env; this.parser = new Parser(vars);
+      this.latest = {}; this.stamp = {}; this.seq = {}; this.lastRx = env.now(); this.frames = 0; this.errors = 0; this.acks = 0; this.inits = 0; this.fillers = 0; this.writes = [];
+    }
+    feed(u8) {
+      this.lastRx = this.env.now();
+      this.parser.push(u8, (f) => {
+        if (f.cmd === CMD.DATA) { this.latest[f.variable.name] = f.value; this.stamp[f.variable.name] = this.env.now(); this.seq[f.variable.name] = (this.seq[f.variable.name] || 0) + 1; this.frames++; }
+        else if (f.cmd === CMD.STOP) this.acks++;
+        else if (f.cmd === CMD.INIT) this.inits++;
+        else if (f.cmd === CMD.ERR) this.errors++;
+      });
+    }
+    send(cmd, payload) { return this.writeRaw(packet(cmd, payload)); }
+    // The board's receiver counts bytes into 16-byte packets and never looks for the start byte; one lost byte makes it answer every
+    // packet with PACKET_ERROR. Opening the port is enough to slip it by a byte or more. Send a harmless STOP_POLLING and look only for
+    // its acknowledgement; without one in 200 ms, add one 0x00 filler and try again (16 tries cover every offset). Two traps found on the
+    // bench (2026-10-17): a board still streaming an earlier session's polls answers about 100 ms late, so a short window mistook a late
+    // acknowledgement for a miss and the filler it added broke the alignment again; and a filler that completes a window draws its own
+    // PACKET_ERROR 30 ms later, which must not be read as the answer to the next probe, so an error never ends the wait.
+    async sync(tries) {
+      tries = tries || 32;   // 16 tries reach every offset only if the last one lands; a worst-case start needs all of them
+      for (let k = 0; k < tries; k++) {
+        this.parser.buf = new Uint8Array(0); const before = this.acks;
+        await this.send(CMD.STOP);
+        for (let waited = 0; waited < 200 && this.acks === before; waited += 5) await this.env.sleep(5);
+        if (this.acks > before) return k;
+        await this.writeRaw(new Uint8Array([0])); this.fillers++;
+        await this.env.sleep(20);
+      }
+      throw new Error("could not get in step with the board's receiver; reset the board");
+    }
+    // TI's firmware starts with its 4-variable scope stream on and keeps sending it, about 120 to 390 KB/s of frames this page never uses,
+    // which slows the polls and delays every answer. INITCMD is the protocol's own reset: it turns the stream off and clears the poll list.
+    // It changes nothing about the motor. Returns true when the board acknowledged it.
+    async initBoard() {
+      const before = this.inits;
+      await this.send(CMD.INIT);
+      for (let waited = 0; waited < 400 && this.inits === before; waited += 5) await this.env.sleep(5);
+      return this.inits > before;
+    }
+    async startPolling(names) {
+      if (names.length > 13) throw new Error("13 variables per poll at most");
+      await this.send(CMD.STOP); await this.env.sleep(20);
+      await this.send(CMD.START1 + names.length - 1, names.map((n) => this.vars.find(n).index));
+    }
+    async startPollingIdx(idxs) {
+      await this.send(CMD.STOP); await this.env.sleep(20);
+      await this.send(CMD.START1 + idxs.length - 1, idxs);
+    }
+    stopPolling() { return this.send(CMD.STOP); }
+    write(name, value) {
+      if (this.locked) return Promise.reject(new Error("Writing is off: " + this.locked));
+      const v = this.vars.find(name);
+      this.writes.push({ t: this.env.now(), name: v.name, value });
+      return this.send(CMD.WRITE, encodeWrite(v, value));
+    }
+  }
+
+  // ---- words -------------------------------------------------------------------------------------------------------------------
+  const decodeFaults = (json, word) => json.fault_bits.filter((_, b) => (word >> b) & 1);
+  const rpm = (hz) => hz * RPM_PER_HZ;
+  // The remote-style speed slider: from SLOW_RPM to the guard's speed limit, in steps of 15 rpm (1 Hz electrical).
+  const SLOW_RPM = 150, RPM_STEP = 15;
+  const speedHzOf = (r) => r / RPM_PER_HZ;
+  const sliderMaxRpm = (speedMaxHz) => Math.max(SLOW_RPM, Math.floor((speedMaxHz || 40) * RPM_PER_HZ / RPM_STEP) * RPM_STEP);
+  const snapRpm = (r, speedMaxHz) => Math.max(SLOW_RPM, Math.min(sliderMaxRpm(speedMaxHz), Math.round(r / RPM_STEP) * RPM_STEP));
+  const word = (table, n) => (table && table[String(n)] !== undefined ? table[String(n)] : "unknown (" + n + ")");
+
+  // ---- the controller: a calibration or a bounded run, with the heartbeat the firmware's host-lost stop needs --------------------
+  class Controller {
+    constructor({ session, env, onEvent }) {
+      this.s = session; this.env = env; this.onEvent = onEvent || (() => {});
+      this.active = null;          // "run" | "cal" while a run or calibration is under way
+      this.last = null;            // the outcome of the last one
+      this.beat = 0; this.cancelBeat = null; this.cancelWatch = null; this.cancelRot = null; this.rot = 0;
+      this.run = null;             // record of the current or last run
+      this.errSeen = 0; this.resyncs = 0; this.resyncing = false; this.linkLost = false; this.up = false; this.cancelMon = null;
+    }
+    get v() { return this.s.latest; }
+    supported() {
+      const m = this.v[N.schemes];
+      return SCHEMES.filter((c) => (typeof m === "number" ? (m >> c.id) & 1 : c.id === 0));
+    }
+    get wantVersion() { return this.s.vars.json.guard_version; }
+    get guard() { return !this.locked && this.v[N.gVer] === this.wantVersion; }
+    // The firmware's table layout changes between guard versions, so a write by name could land on another variable. Read index 5 first;
+    // the controls are on only when it equals the map's version exactly. Otherwise nothing but that one variable is read, and nothing is written.
+    async _versionGate() {
+      // One lost or garbled reply must not leave a good board in monitor-only: ask again, up to 3 times over about 1.5 s.
+      for (let attempt = 0; attempt < 3 && this.v[N.gVer] !== this.wantVersion; attempt++) {
+        delete this.v[N.gVer];
+        await this.s.startPollingIdx([VER_INDEX]);
+        for (let i = 0; i < 10 && this.v[N.gVer] === undefined; i++) await this.env.sleep(50);
+        if (this.v[N.gVer] !== undefined && this.v[N.gVer] !== this.wantVersion && attempt < 2) await this.env.sleep(100);
+      }
+      const got = this.v[N.gVer];
+      if (got === this.wantVersion) return true;
+      this.mismatch = { board: got === undefined ? null : got, built: this.wantVersion };
+      this.mismatchText = `This page was built for board firmware version ${this.wantVersion}; the board reports version ${got === undefined ? "unknown" : got}. Writing would change the wrong settings, so controls are off. Flash the matching firmware or open the matching page.`;
+      this.locked = this.mismatchText;
+      return false;
+    }
+    async connect() {
+      await this.s.sync();
+      this.streamOff = await this.s.initBoard();
+      if (!(await this._versionGate())) {
+        this.settings = []; this.defaults = {}; this.setB = []; this.setC = [];
+        this.errSeen = this.s.errors; this.s.lastRx = this.env.now(); this.up = true;
+        this.cancelMon = this.env.every(100, () => this._monitor());
+        this.onEvent({ versionMismatch: this.mismatch, message: this.mismatchText });
+        return;
+      }
+      const have = (n) => this.s.vars.byName.has(n);
+      this.setB = SET_B.filter(have); this.setC = SET_C.concat([N.scheme, N.schemes, N.obsErr]).filter(have);
+      this.settings = SETTINGS.filter((st) => this.s.vars.byName.has(st.name));
+      await this.s.startPolling(this.setC);
+      await this.s.startPolling(this.setB); await this.env.sleep(150);   // the middle set once, so the lights and Run's checks have their values at connect
+      const names = this.settings.map((st) => st.name);
+      await this.readBack(names);
+      this.defaults = {}; for (const n of names) if (this.v[n] !== undefined) this.defaults[n] = this.v[n];
+      this.cancelRot = this.env.every(500, () => this._rotate());
+      this.errSeen = this.s.errors; this.s.lastRx = this.env.now(); this.up = true;
+      this.cancelMon = this.env.every(100, () => this._monitor());
+    }
+    async _rotate() {
+      if (this.rotating || this.resyncing || this.linkLost || !this.up) return;
+      this.rotating = true; this.rotN = (this.rotN || 0) + 1;
+      try {
+        await this.s.startPolling(this.setB); await this.env.sleep(100);
+        if (this.up && this.rotN % 4 === 1) { await this.s.startPolling(this.setC); await this.env.sleep(100); }
+        if (this.up) await this.s.startPolling(SET_A);
+      } catch (e) { this.onEvent({ error: String(e) }); }
+      this.rotating = false;
+    }
+    canStart(kind) {
+      const v = this.v;
+      if (this.locked) return { ok: false, why: "Controls are off: the board's firmware version does not match this page." };
+      if (!this.guard) return { ok: false, why: "This firmware has no bench guard version " + this.wantVersion + ", so the page is monitor-only." };
+      if (this.active) return { ok: false, why: "A " + (this.active === "cal" ? "calibration" : "run") + " is under way." };
+      if (v[N.fault]) return { ok: false, why: "The controller reports a fault; clear it after you have read the diagnosis." };
+      if (kind === "run" && !v[N.calValid]) return { ok: false, why: "The Hall table is not calibrated; calibrate first." };
+      return { ok: true, why: "" };
+    }
+    // A setting is written only on an explicit apply, never while a run or calibration is starting or under way
+    async apply(name, value) {
+      if (this.locked) throw new Error(this.locked);
+      if (this.active) throw new Error("Settings are not written while a run or calibration is under way.");
+      const st = SETTINGS.find((x) => x.name === name);
+      if (!st) throw new Error(name + " is not a setting this page writes.");
+      const x = clampSetting(st, value);
+      if (!(x === x)) throw new Error("Not a number.");
+      await this.s.write(name, st.kind === "bool" ? !!x : x);
+      await this.readBack([name]);
+      return x;
+    }
+    // read variables once, then go back to the fast set; the value read is what the page shows as current
+    async readBack(names) {
+      this.rotating = true;
+      try {
+        for (let k = 0; k < names.length; k += 13) { await this.s.startPolling(names.slice(k, k + 13)); await this.env.sleep(150); }
+        await this.s.startPolling(SET_A);
+      } finally { this.rotating = false; }
+    }
+    async restoreDefaults() {
+      if (this.locked) throw new Error(this.locked);
+      const out = [];
+      for (const [n, val] of Object.entries(this.defaults || {})) { await this.s.write(n, this.s.vars.find(n).type === "bool" ? !!val : val); out.push(n); }
+      return out;
+    }
+    async setScheme(id) {
+      if (this.locked) throw new Error(this.locked);
+      if (this.active) throw new Error("The scheme is not changed while a run or calibration is under way.");
+      if (!this.supported().some((c) => c.id === id)) throw new Error("The firmware does not report that scheme as supported.");
+      if (!this.s.vars.byName.has(N.scheme)) throw new Error("The firmware has no scheme variable yet.");
+      await this.s.write(N.scheme, id);
+    }
+    async step(deltaHz) {
+      if (this.locked) throw new Error(this.locked);
+      const r = this.run;
+      if (this.active !== "run" || !r) throw new Error("A step needs a run under way.");
+      if (!r.states.some((s) => s === 11 || s === 12)) throw new Error("Wait until the controller has closed the loop.");
+      const lim = this.v[N.gSpeedMax] || 40;
+      const from = r.curRef === undefined ? r.speedHz : r.curRef;
+      const to = Math.max(-lim, Math.min(lim, from + deltaHz));
+      if (to === from) throw new Error("The step would go past the speed limit.");
+      r.step = { t: this.env.now() - r.t0, from, to }; r.curRef = to;
+      await this.s.write(N.ref, to);
+    }
+    // True once the controller has closed its speed loop in the run under way: only then does the firmware take a new reference.
+    get closed() { const r = this.run; return !!(this.active === "run" && r && r.states.some((s) => s === 11 || s === 12)); }
+    // A live speed change, like the phone remote's slider: signed Hz electrical. Before the loop closes it is queued and applied the
+    // moment it does; after, it goes through step() (the controller's own acceleration limit shapes the change).
+    async setSpeedHz(to) {
+      if (this.locked) throw new Error(this.locked);
+      if (this.active !== "run" || !this.run) return;
+      if (!this.closed) { this.pendingHz = to; return; }
+      this.pendingHz = null;
+      const from = this.run.curRef === undefined ? this.run.speedHz : this.run.curRef;
+      if (Math.abs(to - from) > 0.01) await this.step(to - from);
+    }
+    setSpeedRpm(rpm, dir) { return this.setSpeedHz((dir < 0 ? -1 : 1) * speedHzOf(rpm)); }
+    // Slow and stop: down to SLOW_RPM through the speed loop, then stop (a stop from speed is a hard brake; this is the gentle one).
+    async slowStop(dir) {
+      if (this.active === "run" && this.closed) {
+        await this.setSpeedRpm(SLOW_RPM, dir);
+        for (let i = 0; i < 40 && this.active === "run" && Math.abs(this.v[N.spd] || 0) > SLOW_RPM / RPM_PER_HZ + 1; i++) await this.env.sleep(100);
+      }
+      await this.stop();
+    }
+    // The board answers PACKET_ERROR when its byte count has slipped: resync and poll again. A second of silence is a lost link.
+    _monitor() {
+      if (!this.up || this.resyncing || this.linkLost || this.rotating) return;
+      if (this.s.errors > this.errSeen) { this._resync(); return; }
+      if (this.env.now() - this.s.lastRx > 1000) this._lost();
+    }
+    async _resync() {
+      this.resyncing = true;
+      try { await this.s.sync(); if (this.locked) await this.s.startPollingIdx([VER_INDEX]); else await this.s.startPolling(SET_A); this.resyncs++; this.onEvent({ resynced: this.resyncs }); }
+      catch (e) { this._lost(); }
+      finally { this.resyncing = false; this.errSeen = this.s.errors; this.s.lastRx = this.env.now(); }
+    }
+    _lost() {
+      if (this.linkLost) return;
+      this.linkLost = true;
+      this.cancelBeat && this.cancelBeat(); this.cancelWatch && this.cancelWatch(); this.cancelBeat = this.cancelWatch = null;
+      if (this.active && this.run) { this.run.linkLost = true; this.last = this.run; if (this.run.kind === "run") this.run.metrics = metrics(this.run); }
+      this.active = null;
+      if (!this.locked) this.s.write(N.run, false).catch(() => {});   // best effort; the guard stops the motor within 1 s with no host
+      this.onEvent({ linkLost: true, message: "Link lost: the board may have stopped; the guard turns the motor off within 1 s" });
+    }
+    _beat() { if (this.resyncing || this.linkLost) return Promise.resolve(); this.beat = (this.beat + 1) & 0xFFFF; return this.s.write(N.gBeat, this.beat); }
+    _begin(kind) {
+      this.active = kind; this.began = this.env.now(); this.sawActive = false; this.pendingHz = null;
+      this.run = { kind, t0: this.env.now(), states: [], peak: 0, rows: [], fault: 0, lastSeq: -1, scheme: this.v[N.scheme] === undefined ? 0 : this.v[N.scheme], settings: Object.assign({}, this.defaults && this.s.latest ? this._settingsNow() : {}) };
+      this.cancelBeat = this.env.every(HB_MS, () => this._beat().catch(() => {}));
+      this.cancelWatch = this.env.every(4, () => this._watch());
+    }
+    _settingsNow() { const o = {}; for (const st of this.settings || []) if (this.v[st.name] !== undefined) o[st.name] = this.v[st.name]; return o; }
+    async start(kind, opts) {
+      const c = this.canStart(kind);
+      if (!c.ok) throw new Error(c.why);
+      this._begin(kind);
+      try {
+        await this._beat();
+        if (kind === "run") {
+          const sp = Math.max(-this.v[N.gSpeedMax] || -40, Math.min(this.v[N.gSpeedMax] || 40, opts.speedHz));
+          const cap = Math.max(1, Math.min(CAP_MAX_S, opts.capS));
+          await this.s.write(N.ref, sp);
+          await this.s.write(N.gCap, Math.round(cap * 1000));
+          this.run.speedHz = sp; this.run.capS = cap;
+        } else await this.s.write(N.calStart, true);
+        await this.s.write(N.run, true);
+      } catch (e) { await this.stop(); throw e; }
+    }
+    _watch() {
+      const v = this.v, r = this.run;
+      if (!this.active || !r) return;
+      const gs = v[N.gState];
+      if (gs === 1 || gs === 2) this.sawActive = true;
+      if (v[N.state] !== undefined && r.states[r.states.length - 1] !== v[N.state]) r.states.push(v[N.state]);
+      if (typeof v[N.gPeak] === "number") r.peak = Math.max(r.peak, v[N.gPeak]);
+      if (v[N.fault]) r.fault |= v[N.fault];
+      if (r.tClosed === undefined && (v[N.state] === 11 || v[N.state] === 12)) { r.tClosed = v[N.gRunMs] || 0; r.tClosedPage = this.env.now() - r.t0; }
+      const sq = this.s.seq[N.spd] || 0;
+      if (this.active === "run" && typeof v[N.spd] === "number" && sq !== r.lastSeq) {   // one row per fresh speed update
+        r.lastSeq = sq;
+        const st = [N.ia, N.ib, N.ic].map((k) => this.s.stamp[k]), skew = st.every((x) => typeof x === "number") ? Math.max(...st) - Math.min(...st) : null;
+        r.rows.push([this.env.now() - r.t0, v[N.spd], r.curRef === undefined ? v[N.ref] : r.curRef, v[N.ia], v[N.ib], v[N.ic], skew]);
+      }
+      if (this.pendingHz !== null && this.pendingHz !== undefined && this.closed) { const p = this.pendingHz; this.pendingHz = null; this.setSpeedHz(p).catch((e) => this.onEvent({ error: e.message })); }
+      const waited = this.env.now() - this.began;
+      const ended = (this.sawActive && (gs === 0 || gs === 3)) || (!this.sawActive && waited > 3000);
+      if (ended) this._end();
+    }
+    _end() {
+      const v = this.v, r = this.run;
+      this.cancelBeat && this.cancelBeat(); this.cancelWatch && this.cancelWatch(); this.cancelBeat = this.cancelWatch = null;
+      r.tEnd = this.env.now() - r.t0;   // the overlay stops here: the speed falling to zero after the stop is not part of the step
+      r.reason = v[N.gReason]; r.runMs = v[N.gRunMs]; r.endState = v[N.gState]; r.calValid = v[N.calValid]; r.peakEnd = v[N.gPeak]; r.limit = v[N.gLimit];
+      r.refused = !this.sawActive;
+      if (r.kind === "run") r.metrics = metrics(r);
+      this.last = r; this.active = null;
+      this.s.write(N.run, false).catch(() => {});   // the flag must not stay set once the guard has ended the run
+      this.onEvent({ ended: r });
+    }
+    async stop() {
+      if (this.locked) {   // the run flag's index is only known for the matching version: write nothing, close the link, and the guard stops the motor within 1 s of silence
+        this.up = false; this.cancelMon && this.cancelMon(); this.cancelMon = null;
+        this.onEvent({ closeLink: true, message: "Stop closed the link. The board's guard stops the motor within 1 s of silence." });
+        return;
+      }
+      this.cancelBeat && this.cancelBeat(); this.cancelWatch && this.cancelWatch(); this.cancelBeat = this.cancelWatch = null;
+      const was = this.active;
+      await this.s.write(N.run, false); await this.s.write(N.run, false);
+      await this.env.sleep(50);
+      await this.s.write(N.run, false);
+      if (was) { this.run && (this.run.stoppedByPage = true); if (this.run && this.run.kind === "run") { this.run.reason = this.v[N.gReason]; this.run.metrics = metrics(this.run); } this.active = null; this.last = this.run; this.onEvent({ ended: this.run }); }
+    }
+    clearFaults() { return this.locked ? Promise.reject(new Error(this.locked)) : this.s.write(N.clear, true); }
+    async disconnect() {
+      this.cancelRot && this.cancelRot(); this.cancelRot = null; this.cancelMon && this.cancelMon(); this.cancelMon = null; this.up = false;
+      // a rotation or resync still in flight would write after the page has released the port; let it finish first
+      for (let i = 0; i < 40 && (this.rotating || this.resyncing); i++) await this.env.sleep(25);
+      try { if (this.locked) { /* nothing written */ } else if (this.active) await this.stop(); else await this.s.write(N.run, false); await this.s.stopPolling(); } catch (e) { /* the port may be gone */ }
+    }
+  }
+
+  // ---- the walkthrough: each stage's expectation beside what was measured -----------------------------------------------------------
+  // rows are {id, label, expect, got, status}; status is "pass", "fail" or "wait" (not measured yet)
+  const f = (x, d) => (typeof x === "number" ? x.toFixed(d) : "no reading");
+  const IDLE_A = 0.05;   // one threshold for the idle phase light and the idle check
+  function idleCheck(v, json, lim) {
+    lim = lim || { busLo: typeof v["frlGuard.busMin_V"] === "number" ? v["frlGuard.busMin_V"] : 10, busHi: typeof v["frlGuard.busMax_V"] === "number" ? v["frlGuard.busMax_V"] : 14.5, idleA: IDLE_A };   // the board's own window when read
+    const rows = [], have = (k) => typeof v[k] === "number";
+    rows.push({ id: "bus", label: "Bus voltage", expect: `${lim.busLo} to ${lim.busHi} V`, got: have(N.bus) ? f(v[N.bus], 2) + " V" : "no reading", status: !have(N.bus) ? "wait" : v[N.bus] >= lim.busLo && v[N.bus] <= lim.busHi ? "pass" : "fail" });
+    const cur = [N.ia, N.ib, N.ic].map((k) => v[k]);
+    rows.push({ id: "idle", label: "Phase currents at idle", expect: `each within ${lim.idleA} A of zero`, got: cur.every((x) => typeof x === "number") ? cur.map((x) => f(x, 3)).join(", ") + " A" : "no reading", status: !cur.every((x) => typeof x === "number") ? "wait" : cur.every((x) => Math.abs(x) <= lim.idleA) ? "pass" : "fail" });
+    const fw = v[N.fault];
+    rows.push({ id: "fault", label: "Controller fault word", expect: "0, no fault", got: typeof fw !== "number" ? "no reading" : fw === 0 ? "0, no fault" : fw + ": " + decodeFaults(json, fw).join(", "), status: typeof fw !== "number" ? "wait" : fw === 0 ? "pass" : "fail" });
+    const gv = v[N.gVer];
+    rows.push({ id: "guard", label: "Bench guard in the firmware", expect: "version " + json.guard_version, got: gv === undefined ? "no reading" : gv === json.guard_version ? "version " + gv : "version " + gv + " (monitor only)", status: gv === undefined ? "wait" : gv === json.guard_version ? "pass" : "fail" });
+    return rows;
+  }
+  function calCheck(v, run, exp, json) {
+    const rows = [], done = v[N.gReason] === 10 && !!v[N.calValid];
+    const secs = run && run.kind === "cal" && run.runMs ? run.runMs / 1000 : null;
+    rows.push({ id: "time", label: "Time taken", expect: `about ${Math.round(exp.cal.secs / 60)} minutes (${exp.cal.secs} s on this bench)`, got: secs === null ? "not run" : secs.toFixed(0) + " s", status: secs === null ? "wait" : "pass" });
+    rows.push({ id: "reason", label: "Guard reason at the end", expect: "10, calibration done", got: v[N.gReason] === undefined ? "no reading" : v[N.gReason] + ", " + word(json.guard_reasons, v[N.gReason]), status: v[N.gReason] === 10 ? "pass" : (run && run.kind === "cal" && !run.refused && run.reason !== undefined && run.reason !== 10) ? "fail" : "wait" });
+    rows.push({ id: "valid", label: "Hall table valid", expect: "true", got: v[N.calValid] === undefined ? "no reading" : v[N.calValid] ? "true" : "false", status: v[N.calValid] ? "pass" : (run && run.kind === "cal" && run.reason !== undefined) ? "fail" : "wait" });
+    return { rows, done };
+  }
+  // run: a finished run record against the bench record's expectation
+  function runCheck(run, exp) {
+    const e = exp.run, rows = [];
+    if (!run || run.kind !== "run") return [{ id: "none", label: "No run yet", expect: "", got: "", status: "wait" }];
+    const closed = run.states.some((s) => s === 11 || s === 12);
+    rows.push({ id: "closed", label: "Controller closes the loop", expect: `closed loop from about ${e.closedFromS} s`, got: run.refused ? "refused" : closed ? "closed loop reached" : "not reached", status: closed ? "pass" : "fail" });
+    const rows2 = steadyRows(run), tail = rows2.filter((r) => r[0] >= (rows2.length ? rows2[rows2.length - 1][0] : 0) - 1000);
+    const mean = tail.length ? tail.reduce((a, r) => a + r[1], 0) / tail.length : null;
+    const refEnd = run.curRef === undefined ? run.speedHz : run.curRef;
+    if (Math.abs(refEnd - e.refHz) < 0.005) {   // the bench record is for this reference: compare with it
+      const lo = Math.min(e.tiLo, e.speedHz), hi = Math.max(e.tiHi, e.speedHz);
+      rows.push({ id: "speed", label: "Speed over the last second", expect: `${e.speedHz} Hz electrical (${e.rpm} rpm) against ${e.cmdRpm} rpm commanded on ${e.date}; the controller's own reading ${e.tiLo} to ${e.tiHi} Hz`, got: mean === null ? "no samples" : `${mean.toFixed(1)} Hz (${rpm(mean).toFixed(0)} rpm)`, status: mean === null ? "wait" : mean >= lo && mean <= hi ? "pass" : "fail" });
+    } else {   // no bench record at this reference: report the speed against the reference and say there is nothing to match
+      rows.push({ id: "speed", label: "Speed over the last second", expect: `no bench record at ${refEnd} Hz; our record is for ${e.refHz} Hz`, got: mean === null ? "no samples" : `${mean.toFixed(1)} Hz (${rpm(mean).toFixed(0)} rpm) for a ${refEnd} Hz reference, ${(100 * mean / refEnd).toFixed(0)} %`, status: mean === null ? "wait" : "info" });
+    }
+    rows.push({ id: "fault", label: "Controller fault during the run", expect: "none", got: run.fault ? run.fault + ": see the diagnosis" : "none", status: run.fault ? "fail" : "pass" });
+    rows.push({ id: "peak", label: "Peak phase current", expect: `below the guard limit${typeof run.limit === "number" ? " of " + run.limit.toFixed(2) + " A" : ""}`, got: typeof run.peakEnd === "number" ? run.peakEnd.toFixed(2) + " A" : "no reading", status: typeof run.peakEnd !== "number" ? "wait" : run.peakEnd < (run.limit || 1.5) ? "pass" : "fail" });
+    rows.push({ id: "end", label: "Why it ended", expect: "1, cap reached", got: run.stoppedByPage ? "stopped from the page" : run.reason + ", " + (exp.reasons ? exp.reasons[String(run.reason)] : run.reason), status: run.stoppedByPage ? "info" : run.reason === 1 ? "pass" : "fail" });
+    return rows;
+  }
+
+  // ---- performance, computed in the page from the run's samples ----------------------------------------------------------------------
+  // Rows are one per fresh speed update: [t_ms on the page clock, speed_Hz, reference_Hz, ia, ib, ic, skew_ms of the three current stamps].
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+  const median = (a) => { const s = a.slice().sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const ppPct = (a) => (a.length < 3 || !mean(a) ? null : (100 * (Math.max(...a) - Math.min(...a))) / Math.abs(mean(a)));
+  // The speed falls after the guard stops the motor, and the page notices a poll later: the last 300 ms of a run are not steady state.
+  const END_TRIM_MS = 300;
+  const steadyRows = (run) => (run.tEnd === undefined ? run.rows : run.rows.filter((r) => r[0] <= run.tEnd - END_TRIM_MS));
+  // 3-point running median: removes a one-sample spike (TI's Hall speed shows them) without delaying a monotonic rise
+  // and only replaces an update that sits farther than thr from its 3-point median, so a clean edge or an ordinary sample is left as it is
+  const despike = (s, thr) => s.map(([t, x], i) => { const m = median([s[Math.max(0, i - 1)][1], x, s[Math.min(s.length - 1, i + 1)][1]]); return [t, Math.abs(x - m) > thr ? m : x]; });
+  const SETTLE_BAND = 0.02, FINAL_TOL = 0.1, MIN_RISE_UPDATES = 4;
+  // 10-90 % rise, overshoot over the final value, and settling into a band of 2 % of the step, or twice the scatter of the final second where that is larger, at most 10 % of the step; samples [t_ms, speed_Hz] from the step
+  // on, tStep the step's time on the same clock. Rise and overshoot are read from the 3-point median of the updates, rise crossings are
+  // interpolated between updates. A number the signal cannot support comes back null with the reason in why: the speed did not end
+  // within 10 % of the commanded step, the updates are too slow to time the rise (fewer than 4 across it), or it never settled.
+  function stepMetrics(samples, from, to, tStep, minRise_ms) {
+    const size = to - from, none = (why, fin) => ({ rise_ms: null, over_pct: null, settle_ms: null, final: fin === undefined ? null : fin, why });
+    if (samples.length < 10 || !size) return none("too few samples after the step");
+    const t0 = tStep === undefined ? samples[0][0] : tStep, tEnd = samples[samples.length - 1][0];
+    const spikeThr = Math.max(0.5, 0.1 * Math.abs(size)), sm = despike(samples, spikeThr), dt = median(samples.slice(1).map((r, i) => r[0] - samples[i][0]));
+    const tail = sm.filter(([t]) => t >= tEnd - 1000).map(([, x]) => x);
+    if (tail.length < 4) return none(`fewer than 4 speed updates in the last second (an update every ${dt.toFixed(0)} ms)`);
+    const fin = mean(tail), y = (x) => (x - from) / size;
+    if (Math.abs(fin - to) > FINAL_TOL * Math.abs(size)) return none(`the speed ended at ${fin.toFixed(2)} Hz, not within 10 % of the step to ${to} Hz, so rise, overshoot and settling are not reported`, fin);
+    const cross = (lvl) => {
+      for (let i = 0; i < sm.length; i++) if (y(sm[i][1]) >= lvl) {
+        if (i === 0) return sm[0][0];
+        const ya = y(sm[i - 1][1]), yb = y(sm[i][1]); return sm[i - 1][0] + ((lvl - ya) / (yb - ya)) * (sm[i][0] - sm[i - 1][0]);
+      }
+      return null;
+    };
+    const t10 = cross(0.1), t90 = cross(0.9), notes = [];
+    let rise = t10 !== null && t90 !== null ? t90 - t10 : null;
+    if (rise !== null && rise < MIN_RISE_UPDATES * dt) { notes.push(`speed updates arrive every ${dt.toFixed(0)} ms, too slow to time a ${rise.toFixed(0)} ms rise (it needs at least ${MIN_RISE_UPDATES} updates across it)`); rise = null; }
+    if (rise !== null && minRise_ms && rise < 0.5 * minRise_ms) { notes.push(`a ${rise.toFixed(0)} ms rise is faster than the ${minRise_ms.toFixed(0)} ms the acceleration limit allows, so it is not a measurement of the response`); rise = null; }
+    const peak = sm.reduce((m, [, x]) => (size > 0 ? Math.max(m, x) : Math.min(m, x)), sm[0][1]);
+    const over = t90 === null ? null : Math.max(0, ((peak - fin) / (fin - from)) * 100);
+    const sd = Math.sqrt(mean(tail.map((x) => (x - fin) * (x - fin))));
+    if (over !== null && over > 0 && Math.abs(peak - fin) <= 2 * sd) notes.push(`the ${Math.abs(peak - fin).toFixed(2)} Hz overshoot is within twice the scatter of the final speed (${sd.toFixed(2)} Hz)`);
+    if (2 * sd > SETTLE_BAND * Math.abs(size)) notes.push(`the settling band is ${Math.min(2 * sd, 0.1 * Math.abs(size)).toFixed(2)} Hz, twice the scatter of the final speed, because 2 % of the step is smaller than the noise`);
+    const raw = samples.filter((r, i) => r[1] !== sm[i][1]).length;
+    if (raw) notes.push(`${raw} speed update${raw > 1 ? "s" : ""} looked like a spike and ${raw > 1 ? "were" : "was"} removed from rise and overshoot`);
+    const band = Math.max(SETTLE_BAND * Math.abs(size), Math.min(2 * sd, 0.1 * Math.abs(size))); let last = -1;
+    for (let i = 0; i < sm.length; i++) if (Math.abs(sm[i][1] - fin) > band) last = i;
+    const settled = last === -1 ? 0 : sm.length - 1 - last < 3 ? null : sm[last + 1][0] - t0;
+    return { rise_ms: rise, over_pct: over, settle_ms: settled, final: fin,
+      why: [t90 === null ? "the speed did not reach 90 % of the step" : "", settled === null ? "the speed had not settled inside its band when the run ended" : ""].concat(notes).filter(Boolean).join("; ") };
+  }
+  function metrics(run) {
+    const out = { samples: run.rows.length, speed_ripple_pct: null, i_ripple_pct: null, rise_ms: null, over_pct: null, settle_ms: null,
+      start_ms: run.tClosed === undefined ? null : run.tClosed, peak_A: run.peakEnd === undefined ? run.peak : run.peakEnd, notes: [] };
+    const rows = steadyRows(run);
+    if (rows.length < 20) { out.notes.push("too few samples"); return out; }
+    const tl = rows[rows.length - 1][0];
+    out.sample_hz = rows.length / ((tl - rows[0][0]) / 1000 || 1);
+    const tEndRip = run.step ? run.step.t : tl, tLo = Math.max(tEndRip - 2000, (run.tClosedPage === undefined ? Infinity : run.tClosedPage) + 1000);
+    const win = rows.filter((r) => r[0] >= tLo && r[0] <= tEndRip);
+    if (run.tClosedPage === undefined) out.notes.push("The controller never closed the loop, so there is no speed at steady state to take a ripple from");
+    else if (win.length >= 20) {
+      const sp = win.map((r) => r[1]);
+      out.speed_ripple_pct = ppPct(sp);
+      const refm = mean(win.map((r) => r[2])), spm = mean(sp);
+      if (Math.abs(spm - refm) > 0.1 * Math.abs(refm)) out.notes.push(`mean speed ${spm.toFixed(1)} Hz was not within 10 % of the ${refm.toFixed(1)} Hz reference`);
+      const sorted = sp.slice().sort((x, y) => x - y), trimmed = (100 * (sorted[Math.floor(0.98 * (sorted.length - 1))] - sorted[Math.ceil(0.02 * (sorted.length - 1))])) / Math.abs(spm);
+      if (out.speed_ripple_pct > 2 * trimmed + 1e-9 && out.speed_ripple_pct - trimmed > 1) out.notes.push(`a few outlying updates set the speed ripple: without the highest and lowest 2 % it is ${trimmed.toFixed(1)} %`);
+      // current amplitude of the three phases at each sample: sqrt(2/3 (a^2+b^2+c^2)), the peak of a balanced sine. It needs the three
+      // currents from the same instant: they arrive one after another, so it is reported only where their stamps lie within 2 % of an electrical period.
+      const T = 1000 / Math.abs(spm), sk = win.map((r) => r[6]).filter((x) => typeof x === "number");
+      if (!sk.length || median(sk) <= 0.02 * T) out.i_ripple_pct = ppPct(win.map((r) => Math.sqrt((2 / 3) * (r[3] * r[3] + r[4] * r[4] + r[5] * r[5]))));
+      else out.notes.push(`current ripple not reported: the three phase currents arrive ${median(sk).toFixed(0)} ms apart, more than 2 % of the ${T.toFixed(0)} ms electrical period, so they are not one instant`);
+    } else out.notes.push(`fewer than 20 speed updates in the 2 s at steady speed (${win.length}; the board updated ${out.sample_hz.toFixed(0)} a second), so no ripple`);
+    if (run.step) {
+      const accel = (run.settings || {})["motorSetVars_M1.accelerationMax_Hzps"];
+      const m = stepMetrics(rows.filter((r) => r[0] >= run.step.t).map((r) => [r[0], r[1]]), run.step.from, run.step.to, run.step.t, accel > 0 ? (0.8 * Math.abs(run.step.to - run.step.from) / accel) * 1000 : undefined);
+      out.rise_ms = m.rise_ms; out.over_pct = m.over_pct; out.settle_ms = m.settle_ms; if (m.why) out.notes.push(m.why);
+    }
+    return out;
+  }
+  // The predicted reference after a step: TI's ramp from the old reference to the new at the acceleration limit, then flat
+  function rampPrediction(from, to, accel, span) {
+    const t = [0], v = [from], dur = accel > 0 ? (Math.abs(to - from) / accel) * 1000 : 0;
+    if (dur > 0) { t.push(dur); v.push(to); }
+    t.push(Math.max(span, dur + 1)); v.push(to);
+    return { t, v };
+  }
+  const METRIC_TESTS = [["motor_speed_ripple", "speed_ripple_pct", "%"], ["motor_i_ripple", "i_ripple_pct", "%"], ["motor_step_rise", "rise_ms", "ms"],
+    ["motor_step_over", "over_pct", "%"], ["motor_step_settle", "settle_ms", "ms"], ["motor_start_ms", "start_ms", "ms"]];
+  // CSV rows in the shape of data/results: one row per measured number, with the scheme in the variant and the page's limits in the note
+  function resultsCsv(runs) {
+    const q = (x) => '"' + String(x).replace(/"/g, '""') + '"';
+    const out = ["run,test,variant,status,value,unit,conditions,note"];
+    for (const r of runs) {
+      const m = r.metrics, key = (SCHEMES.find((c) => c.id === r.scheme) || SCHEMES[0]).key;
+      const variant = `${key}-hall-${(r.speedHz || 0).toString()}hz`;
+      const cond = `LP-AM13E230 + DRV8376EVM; page-computed from ${m.sample_hz ? m.sample_hz.toFixed(0) : "?"} fresh speed updates/s; settings ${JSON.stringify(r.settings || {})}`;
+      for (const [id, k, unit] of METRIC_TESTS) {
+        const val = m[k];
+        const note = id === "motor_start_ms" ? "run click to controller closed loop on the guard's clock, not one shaft turn" : id === "motor_i_ripple" ? "peak to peak over mean of the phase-current amplitude" : m.notes.join("; ");
+        out.push([r.n, id, variant, val === null || val === undefined ? "not_run" : "measured", val === null || val === undefined ? "" : Number(val.toPrecision(4)), unit, q(cond), q(note)].join(","));
+      }
+    }
+    return out.join("\n") + "\n";
+  }
+
+
+  // ---- the status lights ---------------------------------------------------------------------------------------------------------
+  // Each light is {id, label, status: "ok" | "bad" | "unk", tip}. "unk" is grey: not known yet. The tip begins with a word (OK, Problem,
+  // Not known) so a light is readable without its colour. Lights holds the short windows the phase and Hall verdicts need.
+  const PLAIN_STATE = { 0: "Idle", 1: "Fault stop", 2: "Braking", 3: "Stopping", 4: "Charging", 5: "Seeking position", 6: "Aligning", 7: "Identifying motor", 8: "Finding position",
+    9: "Open loop", 10: "Open loop ending", 11: "Closed loop", 12: "Closed loop", 13: "Field weakening", 14: "Braking", 15: "Motor ID", 16: "Motor ID", 17: "Motor ID done",
+    18: "Resistance check", 19: "Resistance check", 20: "Resistance check done", 21: "Storing parameters", 22: "Code update", 23: "Offset calibration", 24: "Calibrating", 25: "Hall start" };
+  const STAGES = ["Idle", "Calibrate", "Align", "Open loop", "Closed loop"];
+  // which stage of the strip is lit: from the controller's motor state, and from the page's own controller for a calibration (the firmware reports its own name for that)
+  function stageOf(state, active) {
+    if (active === "cal" || state === 7 || state === 24) return 1;   // 24 is TI's Hall calibration (MOTOR_HALL_CAL); 7 its parameter identification
+    if (state === 4 || state === 5 || state === 6 || state === 8) return 2;
+    if (state === 9 || state === 10 || state === 25) return 3;
+    if (state === 11 || state === 12 || state === 13) return 4;
+    return 0;
+  }
+  const MIN_CUR_UPDATES = 25, PHASE_IDLE_A = IDLE_A, PHASE_MIN_RMS = 0.08, PHASE_RATIO = 0.2, TURN_HZ = 3, PH = ["A", "B", "C"], ESC_HALL = [N.hEA, N.hEB, N.hEC];
+  const isRunning = (v, active) => !!active || (typeof v[N.state] === "number" && v[N.state] >= 4);
+  const hex3 = (n) => ((n >> 2) & 1) + "" + ((n >> 1) & 1) + "" + (n & 1);   // C B A, as written on a Hall chart
+  class Lights {
+    constructor() { this.cur = []; this.idle = []; this.hw = []; this.latch = {}; this.running = false; }
+    sample(t, v, ctx) {
+      const run = isRunning(v, ctx.active), cur = [N.ia, N.ib, N.ic].map((k) => v[k]);
+      if (run && !this.running) this.latch = {};
+      this.running = run;
+      if (ctx.active === "cal" || v[N.state] === 24) { for (const k of Object.keys(this.latch)) if (k[0] === "h") delete this.latch[k]; }   // a calibration turns the rotor slowly: no Hall verdict from it
+      const fresh = !ctx.seq || ctx.seq[N.ia] !== this.lastSeq; if (ctx.seq) this.lastSeq = ctx.seq[N.ia];   // the page calls this every 20 ms; a held value is not a new sample
+      if (fresh && cur.every((x) => typeof x === "number")) {
+        const w = run ? this.cur : this.idle; (run ? this.idle : this.cur).length = 0;
+        w.push([t, cur[0], cur[1], cur[2]]); while (w.length && w[0][0] < t - (run ? 1000 : 500)) w.shift();
+      }
+      if (ESC_HALL.every((k) => typeof v[k] === "number")) {
+        this.hw.push([t, v[N.hEA], v[N.hEB], v[N.hEC]]); while (this.hw.length && this.hw[0][0] < t - 2000) this.hw.shift();
+      }
+    }
+    status(t, v, ctx, json) {
+      const out = [], num = (k) => typeof v[k] === "number";
+      const L = (id, label, status, tip) => out.push({ id, label, status, tip: (status === "ok" ? "OK: " : status === "bad" ? "Problem: " : "Not known yet: ") + tip });
+      // Link
+      if (ctx.linkLost) L("link", "Link", "bad", "no poll reply for more than 1 s. The guard stops the motor within 1 s with no host.");
+      else if (ctx.connected === false) L("link", "Link", "unk", "not connected.");
+      else L("link", "Link", "ok", "poll replies are arriving from the board.");
+      // Bus
+      if (!num(N.bus)) L("bus", "Bus", "unk", "no bus reading yet.");
+      else {
+        const lo = num("frlGuard.busMin_V") ? v["frlGuard.busMin_V"] : 10, hi = num("frlGuard.busMax_V") ? v["frlGuard.busMax_V"] : 14.5;   // the guard's window (settable from guard version 6)
+        if (v[N.bus] >= lo && v[N.bus] <= hi) L("bus", "Bus", "ok", `${v[N.bus].toFixed(2)} V, inside the guard's ${lo} to ${hi} V window.`);
+        else L("bus", "Bus", "bad", `${v[N.bus].toFixed(2)} V, outside the guard's ${lo} to ${hi} V window. Check the supply and its lead, or set the window for the supply in Settings.`);
+      }
+      // Driver
+      const fw = v[N.fault], nf = v[N.nFault], fnames = num(N.fault) && fw ? decodeFaults(json, fw).join(", ") : "";
+      if (num(N.fault) && fw) L("driver", "Driver", "bad", `Controller fault word ${fw}: ${fnames}.`);
+      else if (num(N.nFault) && nf === 0) L("driver", "Driver", "bad", "the DRV8376 nFAULT pin is low (its own fault line), though the controller's fault word is 0.");
+      else if (num(N.fault) && num(N.nFault)) L("driver", "Driver", "ok", "nFAULT is high and the controller's fault word is 0.");
+      else if (num(N.fault)) L("driver", "Driver", "unk", "The controller's fault word is 0; this firmware does not report the nFAULT pin yet.");
+      else L("driver", "Driver", "unk", "no fault reading yet.");
+      // Calibrated
+      if (!num(N.calValid)) L("cal", "Calibrated", "unk", "the Hall table's state has not been read yet.");
+      else if (v[N.calValid]) L("cal", "Calibrated", "ok", "the Hall table is valid.");
+      else L("cal", "Calibrated", "bad", "the Hall table is not calibrated. Use Calibrate before a run.");
+      // Phases
+      const run = this.running, rms = [0, 1, 2].map((i) => this.cur.length ? Math.sqrt(this.cur.reduce((a, r) => a + r[i + 1] * r[i + 1], 0) / this.cur.length) : null);
+      const span = this.cur.length ? this.cur[this.cur.length - 1][0] - this.cur[0][0] : 0;
+      const idleMean = [0, 1, 2].map((i) => (this.idle.length ? this.idle.reduce((a, r) => a + r[i + 1], 0) / this.idle.length : num([N.ia, N.ib, N.ic][i]) ? v[[N.ia, N.ib, N.ic][i]] : null));
+      PH.forEach((nm, i) => {
+        const id = "p" + nm, label = "Phase " + nm;
+        if (run) {
+          const mx = Math.max(...rms.map((x) => x || 0)), oth = ((rms[(i + 1) % 3] || 0) + (rms[(i + 2) % 3] || 0)) / 2;
+          if (span < 400 || mx < PHASE_MIN_RMS) return L(id, label, "unk", "no current yet; this turns green once current flows.");
+          if (this.cur.length < MIN_CUR_UPDATES) return L(id, label, "unk", `only ${this.cur.length} current updates in the last second, too few to tell an open phase from slow sampling.`);
+          if (oth >= PHASE_MIN_RMS && rms[i] < PHASE_RATIO * oth) {
+            const tip = `phase ${nm} reads ${rms[i].toFixed(2)} A rms while the others carry ${oth.toFixed(2)} A: an open phase or a loose motor lead.`;
+            this.latch[id] = tip; return L(id, label, "bad", tip);
+          }
+          delete this.latch[id];
+          return L(id, label, "ok", `phase ${nm} carries ${rms[i].toFixed(2)} A rms, like the others.`);
+        }
+        const x = idleMean[i];
+        if (x !== null && Math.abs(x) > PHASE_IDLE_A) return L(id, label, "bad", `phase ${nm} reads ${x.toFixed(3)} A at idle, more than ${PHASE_IDLE_A} A from zero: a current sense or offset fault.`);
+        if (this.latch[id]) return L(id, label, "bad", "last run: " + this.latch[id]);
+        L(id, label, "unk", "turns green once current flows." + (x === null ? "" : ` Idle reading ${x.toFixed(3)} A.`));
+      });
+      // Hall lines
+      const fh = v[N.fhall], haveHall = num(N.fhall) && ESC_HALL.every(num);
+      const first = this.hw[0], last = this.hw[this.hw.length - 1], hspan = first ? last[0] - first[0] : 0;
+      const d = first && hspan >= 800 ? [1, 2, 3].map((i) => (last[i] - first[i]) & 0xFFFF) : null;
+      const spd = Math.abs(v[N.spd] || 0), turning = !!d && (spd > TURN_HZ || d.filter((x) => x >= 2).length >= 2);
+      const bad3 = haveHall && !turning && (fh === 0 || fh === 7);
+      PH.forEach((nm, i) => {
+        const id = "h" + nm, label = "Hall " + nm;
+        if (!haveHall) return L(id, label, "unk", "this firmware does not report the Hall lines yet.");
+        if (bad3) return L(id, label, "bad", `the three Hall lines read ${hex3(fh)} (C B A): not a valid Hall state. Check the Hall supply, pull-ups and wires.`);
+        if (!d) return L(id, label, "unk", "reading the edge counts.");
+        if (ctx.active === "cal" || v[N.state] === 24) return L(id, label, "unk", "a calibration is under way; the Hall lines are judged during a run.");
+        if (turning) {
+          if (d[i] > 0) { delete this.latch[id]; return L(id, label, "ok", `${d[i]} edges in the last ${(hspan / 1000).toFixed(1)} s while the motor turns.`); }
+          // a line is dead only if the others moved while it did not; a noisy speed reading with no edges anywhere (the end of a calibration) proves nothing
+          if (!d.some((x, j) => j !== i && x >= 2)) return L(id, label, "unk", "no Hall edges in the last " + (hspan / 1000).toFixed(1) + " s, so there is nothing to compare yet.");
+          const tip = `the motor turns but the Hall ${nm} edge count did not move: check its wire, pull-up and supply.`;
+          this.latch[id] = tip; return L(id, label, "bad", tip);
+        }
+        if (this.latch[id]) return L(id, label, "bad", "last run: " + this.latch[id]);
+        L(id, label, "unk", `turns green once the motor turns. Level now ${(fh >> i) & 1}, ${v[ESC_HALL[i]]} edges counted since power-up.`);
+      });
+      return out;
+    }
+  }
+
+  // ---- traces ------------------------------------------------------------------------------------------------------------------
+  class Trace {
+    constructor(seconds) { this.span = seconds * 1000; this.t = []; this.v = []; }
+    // mean of the samples in the last `ms` milliseconds (the page samples every 20 ms, so this is a time-weighted mean of the updates); null when empty
+    mean(now, ms) { let sum = 0, n = 0; for (let i = this.t.length - 1; i >= 0 && this.t[i] >= now - ms; i--) { sum += this.v[i]; n++; } return n ? sum / n : null; }
+    push(t, v) { this.t.push(t); this.v.push(v); const lo = t - this.span - 500; let k = 0; while (k < this.t.length && this.t[k] < lo) k++; if (k > 200) { this.t.splice(0, k); this.v.splice(0, k); } }
+  }
+  function niceRange(lo, hi, minSpan) {
+    if (!(hi - lo >= minSpan)) { const m = (hi + lo) / 2; lo = m - minSpan / 2; hi = m + minSpan / 2; }
+    const pad = (hi - lo) * 0.08; return [lo - pad, hi + pad];
+  }
+
+  const api = { SCHEMES, SETTINGS, clampSetting, stepMetrics, metrics, steadyRows, rampPrediction, median, END_TRIM_MS, resultsCsv, ppPct, START, END, CMD, SIZE, N, SET_A, SET_B, SET_C, RPM_PER_HZ, SLOW_RPM, RPM_STEP, speedHzOf, sliderMaxRpm, snapRpm, HB_MS, HOST_LOST_MS, CAP_MAX_S, makeVars, packet, encodeWrite, decode, Parser, Session, Controller, decodeFaults, rpm, word, idleCheck, calCheck, runCheck, VER_INDEX, Trace, niceRange, Lights, PLAIN_STATE, STAGES, stageOf };
+  if (typeof module !== "undefined" && module.exports) module.exports = api; else root.MotorConsole = api;
+})(typeof window !== "undefined" ? window : globalThis);
+</script>
+<script>window.MC_VARS = {"guard_version":12,"layout_sha":"ffd0e7757cc7fea0","note":"Written by tools/motorlink/varmap.py from the firmware's C table (motorvision_hash.c); never edit by hand. Permissions come from the SDK JSON by name. States and fault bits are from tools/motorlink/link.py; guard words from am13e230/foc-drv8376/frl_guard.h.","vars":[{"name":"motorVars_M1.outVars.motorState","index":0,"type":"uint16","permissions":"R"},{"name":"motorVars_M1.outVars.faultMtrNow","index":1,"type":"uint16","permissions":"R"},{"name":"motorVars_M1.inputCtrl.startupMode","index":2,"type":"uint16","permissions":"RW"},{"name":"motorVars_M1.inputCtrl.estimatorMode","index":3,"type":"uint16","permissions":"RW"},{"name":"motorVars_M1.inputCtrl.svmMode","index":4,"type":"uint16","permissions":"RW"},{"name":"frlGuard.version","index":5,"type":"uint16","permissions":"R"},{"name":"frlGuard.state","index":6,"type":"uint16","permissions":"R"},{"name":"frlGuard.reason","index":7,"type":"uint16","permissions":"R"},{"name":"frlGuard.heartbeat","index":8,"type":"uint16","permissions":"RW"},{"name":"frlGuard.hall","index":9,"type":"uint16","permissions":"R"},{"name":"frlGuard.hallEdgesA","index":10,"type":"uint16","permissions":"R"},{"name":"frlGuard.hallEdgesB","index":11,"type":"uint16","permissions":"R"},{"name":"frlGuard.hallEdgesC","index":12,"type":"uint16","permissions":"R"},{"name":"frlGuard.nFault","index":13,"type":"uint16","permissions":"R"},{"name":"hallSensorData.state","index":14,"type":"uint16","permissions":"R"},{"name":"frlGuard.obsMode","index":15,"type":"uint16","permissions":"RW"},{"name":"frlGuard.onObs","index":16,"type":"uint16","permissions":"R"},{"name":"frlGuard.hallFree","index":17,"type":"uint16","permissions":"RW"},{"name":"frlGuard.capChan[0]","index":18,"type":"uint16","permissions":"RW"},{"name":"frlGuard.capChan[1]","index":19,"type":"uint16","permissions":"RW"},{"name":"frlGuard.capChan[2]","index":20,"type":"uint16","permissions":"RW"},{"name":"frlGuard.capChan[3]","index":21,"type":"uint16","permissions":"RW"},{"name":"frlGuard.capDecim","index":22,"type":"uint16","permissions":"RW"},{"name":"frlGuard.capTrig","index":23,"type":"uint16","permissions":"RW"},{"name":"frlGuard.capArm","index":24,"type":"uint16","permissions":"RW"},{"name":"frlGuard.capState","index":25,"type":"uint16","permissions":"R"},{"name":"frlGuard.capWinMs","index":26,"type":"uint16","permissions":"RW"},{"name":"frlGuard.hallPll","index":27,"type":"uint16","permissions":"RW"},{"name":"frlGuard.hallTable","index":28,"type":"uint16","permissions":"RW"},{"name":"frlGuard.hallTableOk","index":29,"type":"uint16","permissions":"R"},{"name":"frlGuard.ilimMode","index":30,"type":"uint16","permissions":"RW"},{"name":"frlGuard.ilimOk","index":31,"type":"uint16","permissions":"R"},{"name":"frlGuard.dirRotor","index":32,"type":"uint16","permissions":"RW"},{"name":"frlGuard.testMode","index":33,"type":"uint16","permissions":"RW"},{"name":"frlGuard.ilimCode","index":34,"type":"uint16","permissions":"R"},{"name":"frlGuard.drvReset","index":35,"type":"uint16","permissions":"RW"},{"name":"frlGuard.drvResets","index":36,"type":"uint16","permissions":"R"},{"name":"motorVars_M1.ISRCount","index":37,"type":"uint32","permissions":"RW"},{"name":"frlGuard.runMs","index":38,"type":"uint32","permissions":"R"},{"name":"frlGuard.capMs","index":39,"type":"uint32","permissions":"RW"},{"name":"frlGuard.hostPackets","index":40,"type":"uint32","permissions":"R"},{"name":"frlGuard.capLen","index":41,"type":"uint32","permissions":"RW"},{"name":"frlGuard.capPre","index":42,"type":"uint32","permissions":"RW"},{"name":"frlGuard.capCount","index":43,"type":"uint32","permissions":"R"},{"name":"frlGuard.capStart","index":44,"type":"uint32","permissions":"R"},{"name":"frlGuard.capIndex","index":45,"type":"uint32","permissions":"RW"},{"name":"frlGuard.capWinIdxA","index":46,"type":"uint32","permissions":"R"},{"name":"frlGuard.capWinIdxB","index":47,"type":"uint32","permissions":"R"},{"name":"frlGuard.dirFlips","index":48,"type":"uint32","permissions":"R"},{"name":"motorVars_M1.statusVars.flagMotorIdentified","index":49,"type":"bool","permissions":"R"},{"name":"motorVars_M1.inputCtrl.flagEnableRunAndIdentify","index":50,"type":"bool","permissions":"RW"},{"name":"motorVars_M1.inputCtrl.flagClearFaults","index":51,"type":"bool","permissions":"RW"},{"name":"motorVars_M1.inputCtrl.flagEnableFlyingStart","index":52,"type":"bool","permissions":"RW"},{"name":"motorVars_M1.inputCtrl.flagEnableDTC","index":53,"type":"bool","permissions":"RW"},{"name":"motorVars_M1.inputCtrl.flagEnableFWC","index":54,"type":"bool","permissions":"RW"},{"name":"motorVars_M1.inputCtrl.flagEnableMTPA","index":55,"type":"bool","permissions":"RW"},{"name":"motorVars_M1.inputCtrl.flagStartHallCal","index":56,"type":"bool","permissions":"RW"},{"name":"hallSensorData.flagCalValid","index":57,"type":"bool","permissions":"R"},{"name":"hallSensorData.flagCalDone","index":58,"type":"bool","permissions":"R"},{"name":"motorVars_M1.outVars.speed_Hz","index":59,"type":"float","permissions":"R"},{"name":"motorVars_M1.outVars.Is_A","index":60,"type":"float","permissions":"R"},{"name":"motorVars_M1.statusVars.Irms_A[0]","index":61,"type":"float","permissions":"R"},{"name":"motorVars_M1.outVars.Idq_in_A.value[1]","index":62,"type":"float","permissions":"R"},{"name":"motorVars_M1.outVars.Idq_in_A.value[0]","index":63,"type":"float","permissions":"R"},{"name":"motorVars_M1.statusVars.angleObs_rad","index":64,"type":"float","permissions":"R"},{"name":"motorVars_M1.inputCtrl.speedRef_Hz","index":65,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.Kp_spd","index":66,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.Ki_spd","index":67,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.overVoltageFault_V","index":68,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.underVoltageFault_V","index":69,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.Kp_fwc","index":70,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.Ki_fwc","index":71,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.Kp_Id","index":72,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.Ki_Id","index":73,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.Kp_Iq","index":74,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.Ki_Iq","index":75,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.maxCurrent_A","index":76,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.overCurrent_A","index":77,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.accelerationMax_Hzps","index":78,"type":"float","permissions":"RW"},{"name":"halFOCDataObj_M1.adcData.VdcBus_V","index":79,"type":"float","permissions":"R"},{"name":"halFOCDataObj_M1.adcData.I_A.value[0]","index":82,"type":"float","permissions":"R"},{"name":"halFOCDataObj_M1.adcData.I_A.value[1]","index":83,"type":"float","permissions":"R"},{"name":"halFOCDataObj_M1.adcData.I_A.value[2]","index":84,"type":"float","permissions":"R"},{"name":"halFOCDataObj_M1.adcData.V_V.value[0]","index":85,"type":"float","permissions":"R"},{"name":"halFOCDataObj_M1.adcData.V_V.value[1]","index":86,"type":"float","permissions":"R"},{"name":"halFOCDataObj_M1.adcData.V_V.value[2]","index":87,"type":"float","permissions":"R"},{"name":"motorSetVars_M1.olSpeedThr","index":88,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.accelerationStart_Hzps","index":89,"type":"float","permissions":"RW"},{"name":"motorSetVars_M1.startCurrent_A","index":90,"type":"float","permissions":"RW"},{"name":"frlGuard.peak_A","index":91,"type":"float","permissions":"R"},{"name":"frlGuard.limit_A","index":92,"type":"float","permissions":"RW"},{"name":"frlGuard.speedMax_Hz","index":93,"type":"float","permissions":"RW"},{"name":"frlGuard.handover_Hz","index":94,"type":"float","permissions":"RW"},{"name":"frlGuard.obsSpeed_Hz","index":95,"type":"float","permissions":"R"},{"name":"frlGuard.obsErr_deg","index":96,"type":"float","permissions":"R"},{"name":"frlGuard.obsErrPk_deg","index":97,"type":"float","permissions":"R"},{"name":"frlGuard.obsTrim_deg","index":98,"type":"float","permissions":"R"},{"name":"frlGuard.obsTrimSet_deg","index":99,"type":"float","permissions":"RW"},{"name":"frlGuard.angleAdj_deg","index":100,"type":"float","permissions":"RW"},{"name":"frlGuard.busMin_V","index":101,"type":"float","permissions":"RW"},{"name":"frlGuard.busMax_V","index":102,"type":"float","permissions":"RW"},{"name":"frlGuard.isrUs_avg","index":103,"type":"float","permissions":"R"},{"name":"frlGuard.isrUs_max","index":104,"type":"float","permissions":"RW"},{"name":"frlGuard.cpuLoad_pct","index":105,"type":"float","permissions":"R"},{"name":"frlGuard.capScale[0]","index":106,"type":"float","permissions":"R"},{"name":"frlGuard.capScale[1]","index":107,"type":"float","permissions":"R"},{"name":"frlGuard.capScale[2]","index":108,"type":"float","permissions":"R"},{"name":"frlGuard.capScale[3]","index":109,"type":"float","permissions":"R"},{"name":"frlGuard.capWin[0]","index":110,"type":"float","permissions":"R"},{"name":"frlGuard.capWin[1]","index":111,"type":"float","permissions":"R"},{"name":"frlGuard.capWin[2]","index":112,"type":"float","permissions":"R"},{"name":"frlGuard.capWin[3]","index":113,"type":"float","permissions":"R"},{"name":"frlGuard.pllSpeed_Hz","index":114,"type":"float","permissions":"R"},{"name":"frlGuard.pllErr_deg","index":115,"type":"float","permissions":"R"},{"name":"frlGuard.calFwd_deg[0]","index":116,"type":"float","permissions":"R"},{"name":"frlGuard.calFwd_deg[1]","index":117,"type":"float","permissions":"R"},{"name":"frlGuard.calFwd_deg[2]","index":118,"type":"float","permissions":"R"},{"name":"frlGuard.calFwd_deg[3]","index":119,"type":"float","permissions":"R"},{"name":"frlGuard.calFwd_deg[4]","index":120,"type":"float","permissions":"R"},{"name":"frlGuard.calFwd_deg[5]","index":121,"type":"float","permissions":"R"},{"name":"frlGuard.calRev_deg[0]","index":122,"type":"float","permissions":"R"},{"name":"frlGuard.calRev_deg[1]","index":123,"type":"float","permissions":"R"},{"name":"frlGuard.calRev_deg[2]","index":124,"type":"float","permissions":"R"},{"name":"frlGuard.calRev_deg[3]","index":125,"type":"float","permissions":"R"},{"name":"frlGuard.calRev_deg[4]","index":126,"type":"float","permissions":"R"},{"name":"frlGuard.calRev_deg[5]","index":127,"type":"float","permissions":"R"},{"name":"frlGuard.calSpread_deg","index":128,"type":"float","permissions":"R"},{"name":"frlGuard.ilim_V","index":129,"type":"float","permissions":"R"},{"name":"frlGuard.dirNow","index":130,"type":"float","permissions":"R"},{"name":"frlGuard.testAngle_deg","index":131,"type":"float","permissions":"RW"},{"name":"frlGuard.testId_A","index":132,"type":"float","permissions":"RW"},{"name":"frlGuard.testRamp_Aps","index":133,"type":"float","permissions":"RW"},{"name":"frlGuard.testVd_V","index":134,"type":"float","permissions":"RW"},{"name":"frlGuard.testIdNow_A","index":135,"type":"float","permissions":"R"},{"name":"frlGuard.cmpLimit_A","index":136,"type":"float","permissions":"R"},{"name":"motorVars_M1.outVars.Vdq_out_V.value[0]","index":137,"type":"float","permissions":"R"},{"name":"motorVars_M1.outVars.Vdq_out_V.value[1]","index":138,"type":"float","permissions":"R"},{"name":"frlGuard.ilimTest_V","index":139,"type":"float","permissions":"RW"}],"states":{"0":"stop idle","1":"fault stop","2":"brake stop","3":"normal stop","4":"charge","5":"seek position","6":"alignment","7":"parameter identification","8":"initial position detection","9":"open-loop start","10":"open-loop end","11":"closed loop running","12":"control run","13":"field weakening run","14":"brake run","15":"motor ID start","16":"motor ID run","17":"motor ID done","18":"Rs calibration start","19":"Rs calibration run","20":"Rs calibration done","21":"parameters store","22":"code update","23":"offset calibration","24":"Hall calibration","25":"Hall startup"},"fault_bits":["DC bus over voltage","DC bus under voltage","motor over temperature","power module over temperature","hardware over current","comparator over current","over load","motor lost phase","phase current unbalance","motor stall","startup failed","over speed","estimator error","gate driver fault","current offset check","voltage offset check"],"guard_states":{"0":"idle","1":"calibrating","2":"running","3":"stopped by the guard"},"guard_reasons":{"0":"none","1":"cap reached","2":"host lost","3":"over current","4":"controller fault","5":"bus out of range","6":"refused: controller fault present","7":"refused: bus out of range","8":"refused: Hall table not calibrated","9":"host stop","10":"calibration done","11":"background stall","12":"refused: currents not near zero at standstill","13":"guard clock check failed","14":"over current while stopping"}};</script>
+<script>
+(() => {
+  // ---- the device adapter: everything specific to this motor bench. Another device (shades, a door, a robot) replaces this block. ----
+  const MC = window.MotorConsole, N = MC.N, RPM = MC.RPM_PER_HZ || 15;
+  const env = { now: () => performance.now(), sleep: (ms) => new Promise((r) => setTimeout(r, ms)), every: (ms, fn) => { const h = setInterval(fn, ms); return () => clearInterval(h); } };
+  let port = null, reader = null, writer = null, session = null, ctl = null, pending = null;
+  const device = {
+    get up() { return !!(ctl && ctl.up && !ctl.linkLost); },
+    v() { return ctl ? ctl.v : {}; },
+    async connect() {
+      port = await navigator.serial.requestPort();
+      await port.open({ baudRate: 9200000, bufferSize: 1 << 20 });
+      writer = port.writable.getWriter(); reader = port.readable.getReader();
+      session = new MC.Session({ vars: MC.makeVars(window.MC_VARS), env, write: (u8) => writer.write(u8) });
+      ctl = new MC.Controller({ session, env, onEvent: (e) => ui.event(e) });
+      (async () => { try { for (;;) { const { value, done } = await reader.read(); if (done) break; session.feed(value); } } catch (e) { ui.event({ linkLost: true, message: "Link lost: " + e.message }); } })();
+      await ctl.connect();
+      if (ctl.locked) throw new Error("This board's firmware does not match this page; controls stay off.");
+    },
+    async disconnect() { try { await ctl.disconnect(); reader.cancel(); reader.releaseLock(); writer.releaseLock(); await port.close(); } catch (e) { /* closing */ } ctl = session = null; },
+    running() { return !!(ctl && ctl.active === "run"); },
+    calibrating() { return !!(ctl && ctl.active === "cal"); },
+    closed() { const r = ctl && ctl.run; return !!(r && r.states.some((s) => s === 11 || s === 12)); },
+    speedMaxHz() { return this.v()[N.gSpeedMax] || 40; },
+    async start(rpm, dir) { pending = null; await ctl.start("run", { speedHz: dir * rpm / RPM, capS: MC.CAP_MAX_S }); },
+    async setSpeed(rpm, dir) {   // live change: the firmware accepts a new reference once its loop is closed
+      if (!this.running()) return;
+      if (!this.closed()) { pending = rpm; return; }
+      const r = ctl.run, from = r.curRef === undefined ? r.speedHz : r.curRef, to = dir * rpm / RPM;
+      if (Math.abs(to - from) > 0.01) await ctl.step(to - from);
+    },
+    tick(dir) { if (pending !== null && this.closed()) { const p = pending; pending = null; this.setSpeed(p, dir).catch((e) => ui.say(e.message)); } },
+    async brake(dir) {   // ramp down through the firmware's speed loop (a regenerative decel), then stop
+      if (this.closed()) { await this.setSpeed(150, dir); for (let i = 0; i < 40 && Math.abs(this.v()[N.spd] || 0) > 11; i++) await env.sleep(100); }
+      await ctl.stop();
+    },
+    stop() { return ctl ? ctl.stop() : Promise.resolve(); },
+    calibrate() { return ctl.start("cal"); },
+    clearFault() { return ctl.clearFaults(); },
+    words() {
+      const v = this.v(), D = window.MC_VARS;
+      return { state: D.states[v[N.state]] || "-", guard: D.guard_states[v[N.gState]] || "-", reason: D.guard_reasons[v[N.gReason]] || "",
+        faults: (D.fault_bits || []).filter((_, b) => ((v[N.fault] || 0) >> b) & 1) };
+    },
+  };
+
+  // ---- the remote UI: generic controls bound to the adapter ----
+  const $ = (id) => document.getElementById(id);
+  let dir = 1, busy = false, lastSent = 0, connected = false;
+  const ui = {
+    say(t) { $("status").textContent = t; },
+    event(e) {
+      if (e.linkLost) { connected = false; ui.say(e.message || "Link lost."); $("dot").className = "dot bad"; }
+      if (e.ended) { const r = e.ended; ui.say("Stopped: " + (window.MC_VARS.guard_reasons[r.reason] || "done") + (r.peak ? ", peak " + r.peak.toFixed(2) + " A" : "") + "."); }
+      if (e.error) ui.say(e.error);
+    },
+  };
+  const act = async (fn) => { if (busy) return; busy = true; try { await fn(); } catch (e) { ui.say(e.message); } busy = false; render(); };
+  $("connect").onclick = () => act(async () => {
+    if (connected) { await device.disconnect(); connected = false; ui.say("Disconnected."); return; }
+    ui.say("Connecting..."); await device.connect(); connected = true; ui.say("Connected.");
+    const max = Math.round(device.speedMaxHz() * RPM / 15) * 15; $("speed").max = Math.min(max, 1500);
+  });
+  $("fwd").onclick = () => { if (!device.running()) { dir = 1; render(); } };
+  $("rev").onclick = () => { if (!device.running()) { dir = -1; render(); } };
+  $("speed").oninput = () => { $("target").textContent = $("speed").value + " rpm"; const now = performance.now(); if (now - lastSent > 300) { lastSent = now; device.setSpeed(+$("speed").value, dir).catch((e) => ui.say(e.message)); } };
+  $("speed").onchange = () => device.setSpeed(+$("speed").value, dir).catch((e) => ui.say(e.message));
+  $("start").onclick = () => act(async () => { await device.start(+$("speed").value, dir); ui.say("Starting: aligning, then ramping up..."); });
+  $("brake").onclick = () => act(async () => { ui.say("Slowing down..."); await device.brake(dir); });
+  $("stop").onclick = () => { device.stop().catch((e) => ui.say(e.message)); };
+  $("cal").onclick = () => act(async () => { await device.calibrate(); ui.say("Calibrating, about 3 minutes..."); });
+  $("clear").onclick = () => act(() => device.clearFault());
+
+  function render() {
+    const up = connected && device.up, v = device.v(), w = device.words(), run = device.running(), cal = device.calibrating();
+    $("dot").className = "dot" + (up ? " on" : connected ? " bad" : "");
+    $("connect").textContent = connected ? "Disconnect" : "Connect";
+    const hz = v[N.spd] || 0, id = v[N.id] || 0, iq = v[N.iq] || 0;
+    $("rpm").firstChild.textContent = up ? Math.round(Math.abs(hz) * RPM) : 0;
+    $("amps").textContent = up ? Math.hypot(id, iq).toFixed(2) : "0.00";
+    $("bus").textContent = up && v[N.bus] ? v[N.bus].toFixed(1) : "-";
+    $("peak").textContent = up && typeof v[N.gPeak] === "number" ? v[N.gPeak].toFixed(2) : "-";
+    $("state").textContent = !up ? "Not connected" : cal ? "Calibrating" : run ? (device.closed() ? "Running " + (dir > 0 ? "forward" : "in reverse") : "Starting (" + w.state + ")") : "Idle";
+    const capMs = (v[N.gCap] || MC.CAP_MAX_S * 1000), runMs = v[N.gRunMs] || 0;
+    $("capbar").style.width = run ? Math.min(100, 100 * runMs / capMs) + "%" : "0%";
+    $("fwd").className = dir > 0 ? "sel" : ""; $("rev").className = dir < 0 ? "sel" : "";
+    $("fwd").disabled = $("rev").disabled = run || cal;
+    const calOk = !!v[N.calValid], fault = w.faults.length > 0;
+    $("calbanner").style.display = up && !calOk && !cal ? "block" : "none";
+    $("faultbanner").style.display = up && fault && !run ? "block" : "none";
+    $("faulttext").textContent = fault ? "Fault: " + w.faults.join(", ") + ". " : "";
+    $("start").disabled = !up || run || cal || !calOk || fault || busy;
+    $("brake").disabled = !up || !run;
+    $("stop").disabled = !connected;
+    if (up && run && device.closed() && /^Starting/.test($("status").textContent)) ui.say("Running. Drag the slider to change speed.");
+    if (up && run) device.tick(dir);
+  }
+  // the bench camera, when the page is served by the phone bridge (tools/motorlink/phone_console.mjs); never otherwise
+  if (window.FRL_BRIDGE && window.FRL_BRIDGE.cam) {
+    let camOn = true;
+    const show = () => { $("cam").src = camOn ? window.FRL_BRIDGE.cam + "?n=" + Date.now() : ""; $("cam").style.display = camOn ? "block" : "none";
+      $("campanel").style.aspectRatio = camOn ? "16 / 9" : "auto"; $("camtoggle").textContent = camOn ? "Hide camera" : "Show camera"; };
+    $("campanel").style.display = "block"; $("camtoggle").onclick = () => { camOn = !camOn; show(); }; show();
+    document.addEventListener("visibilitychange", () => { if (!document.hidden && camOn) show(); });
+  }
+  setInterval(render, 150);
+  if (!("serial" in navigator)) ui.say("This browser cannot open a serial port. Open the phone link the bench Mac prints (tools/motorlink/phone_console.mjs).");
+})();
+</script>
+</body>
+</html>

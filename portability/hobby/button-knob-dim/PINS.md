@@ -13,7 +13,6 @@ Serial, nothing to wire: 115200 8N1 on the probe's first serial port (J4 pins 34
 | Function | Signal | Pin on the board | Notes |
 |---|---|---|---|
 | digital input, internal pull-up | BTN_A | J4 pin 40 (PB3) | S2 button on the board (to ground); an outside button between this pin and ground works too |
-| digital input, internal pull-up | BTN_B | J2 pin 15 (PB8) | second button, other side to GND |
 | timer PWM output | LED | J3 pin 28 (PB27) | LED2 green on the board; an outside LED (anode to the pin, 330 ohm in series, cathode to GND) works too |
 | ADC input | POT1 | J1 pin 2 (PA14) | potentiometer 1 wiper |
 
@@ -24,7 +23,6 @@ Serial, nothing to wire: 115200 8N1 on the probe's first serial port (J4 pins 34
 | Function | Signal | Pin on the board | Notes |
 |---|---|---|---|
 | digital input, internal pull-up | BTN_A | onboard (PB21) | S2 button on the board (to ground, on the QEI connector J27 pin 4); no wire needed |
-| digital input, internal pull-up | BTN_B | J2 pin 15 (PB8) | second button, other side to GND |
 | timer PWM output | LED | J4 pin 40 (PB4) | LED anode, 330 ohm in series, cathode to GND |
 | ADC input | POT1 | J1 pin 2 (PA25) | potentiometer 1 wiper |
 
@@ -35,7 +33,6 @@ Serial, nothing to wire: 115200 8N1 on the probe's first serial port (J1 pins 4 
 | Function | Signal | Pin on the board | Notes |
 |---|---|---|---|
 | digital input, internal pull-up | BTN_A | onboard (PA14) | S2 button on the board (to ground); no wire needed |
-| digital input, internal pull-up | BTN_B | J2 pin 15 (PA5) | second button, other side to GND |
 | timer PWM output | LED | J4 pin 40 (PA12) | LED anode, 330 ohm in series, cathode to GND |
 | ADC input | POT1 | J1 pin 2 (PA25) | potentiometer 1 wiper |
 

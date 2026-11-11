@@ -1,0 +1,59 @@
+
+/var/folders/0g/p8nlbp9n2kd_tvgg9ksgk97m0000gn/T/tmp.kYKzz0kuIN/l.o:	file format elf32-littlearm
+
+Disassembly of section .text.entry:
+
+00000000 <entry>:
+       0: b083         	sub	sp, #0xc
+       2: 9302         	str	r3, [sp, #0x8]
+       4: 9000         	str	r0, [sp]
+       6: b672         	cpsid i
+       8: 9201         	str	r2, [sp, #0x4]
+       a: 2a00         	cmp	r2, #0x0
+       c: d026         	beq	0x5c <entry+0x5c>       @ imm = #0x4c
+       e: 4c15         	ldr	r4, [pc, #0x54]         @ 0x64 <entry+0x64>
+      10: 2600         	movs	r6, #0x0
+      12: 4f16         	ldr	r7, [pc, #0x58]         @ 0x6c <entry+0x6c>
+      14: 2205         	movs	r2, #0x5
+      16: 607a         	str	r2, [r7, #0x4]
+      18: 2201         	movs	r2, #0x1
+      1a: 603a         	str	r2, [r7]
+      1c: 6823         	ldr	r3, [r4]
+      1e: 075b         	lsls	r3, r3, #0x1d
+      20: d4fc         	bmi	0x1c <entry+0x1c>       @ imm = #-0x8
+      22: 2300         	movs	r3, #0x0
+      24: 4810         	ldr	r0, [pc, #0x40]         @ 0x68 <entry+0x68>
+      26: 6003         	str	r3, [r0]
+      28: 6043         	str	r3, [r0, #0x4]
+      2a: 607a         	str	r2, [r7, #0x4]
+      2c: 9802         	ldr	r0, [sp, #0x8]
+      2e: 6278         	str	r0, [r7, #0x24]
+      30: 9800         	ldr	r0, [sp]
+      32: 1835         	adds	r5, r6, r0
+      34: 623d         	str	r5, [r7, #0x20]
+      36: 6808         	ldr	r0, [r1]
+      38: 6338         	str	r0, [r7, #0x30]
+      3a: 6848         	ldr	r0, [r1, #0x4]
+      3c: 6378         	str	r0, [r7, #0x34]
+      3e: 603a         	str	r2, [r7]
+      40: 6822         	ldr	r2, [r4]
+      42: 07d0         	lsls	r0, r2, #0x1f
+      44: d0fc         	beq	0x40 <entry+0x40>       @ imm = #-0x8
+      46: 0790         	lsls	r0, r2, #0x1e
+      48: d505         	bpl	0x56 <entry+0x56>       @ imm = #0xa
+      4a: 3608         	adds	r6, #0x8
+      4c: 3108         	adds	r1, #0x8
+      4e: 9801         	ldr	r0, [sp, #0x4]
+      50: 4286         	cmp	r6, r0
+      52: 461d         	mov	r5, r3
+      54: d3de         	blo	0x14 <entry+0x14>       @ imm = #-0x44
+      56: 4628         	mov	r0, r5
+      58: be00         	bkpt	#0x0
+      5a: e7fd         	b	0x58 <entry+0x58>       @ imm = #-0x6
+      5c: 2500         	movs	r5, #0x0
+      5e: 4628         	mov	r0, r5
+      60: be00         	bkpt	#0x0
+      62: e7fd         	b	0x60 <entry+0x60>       @ imm = #-0x6
+      64: d0 e3 0c 40  	.word	0x400ce3d0
+      68: d0 e1 0c 40  	.word	0x400ce1d0
+      6c: 00 e1 0c 40  	.word	0x400ce100

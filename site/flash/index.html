@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blink from the browser</title>
+<meta name="description" content="Flash TI's LED example onto an LP-MSPM0L1306 LaunchPad kit from Chrome or Edge, with nothing installed, and check it through the board's own debugger.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#fff; --fg:#1b1b1b; --muted:#5a5a5a; --line:#e3e1dd; --card:#faf8f5; --accent:#B42418; --ok:#1d6b35; --bad:#a3271b; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#141414; --fg:#eeeae4; --muted:#a9a49c; --line:#333; --card:#1d1c1a; --accent:#e0533f; --ok:#5cc07c; --bad:#ef7a6c; } }
+:root[data-theme="dark"] { --bg:#141414; --fg:#eeeae4; --muted:#a9a49c; --line:#333; --card:#1d1c1a; --accent:#e0533f; --ok:#5cc07c; --bad:#ef7a6c; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:17px/1.55 Barlow, system-ui, sans-serif; }
+main { max-width:760px; margin:0 auto; padding:28px 16px 64px; }
+h1 { font-size:2rem; line-height:1.2; margin:.2em 0 .3em; }
+h2 { font-size:1.25rem; margin:2em 0 .5em; }
+p { margin:.6em 0; }
+.lede { font-size:1.1rem; color:var(--muted); }
+code, pre, .mono { font-family:"JetBrains Mono", ui-monospace, monospace; font-size:.9em; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin:14px 0; }
+button { font:600 1rem Barlow, sans-serif; border:0; border-radius:8px; padding:12px 18px; cursor:pointer; background:var(--accent); color:#fff; }
+button.quiet { background:transparent; color:var(--accent); border:1px solid var(--accent); padding:8px 12px; font-size:.95rem; }
+button:disabled { opacity:.45; cursor:default; }
+.steps { list-style:none; padding:0; margin:10px 0 0; font-family:"JetBrains Mono", monospace; font-size:.85rem; color:var(--muted); max-height:9.5em; overflow:auto; }
+.result { font-size:1.1rem; font-weight:600; }
+.result.ok { color:var(--ok); } .result.bad { color:var(--bad); }
+.levels { display:flex; gap:2px; height:22px; margin:10px 0; }
+.levels span { display:block; height:100%; border-radius:2px; }
+.levels .on { background:var(--accent); } .levels .off { background:var(--line); }
+pre { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:12px; white-space:pre-wrap; word-break:break-word; margin:8px 0; }
+.row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+table { border-collapse:collapse; width:100%; font-size:.95rem; }
+td, th { border-top:1px solid var(--line); padding:8px 6px; vertical-align:top; text-align:left; }
+.small { font-size:.88rem; color:var(--muted); }
+.hidden { display:none; }
+</style>
+</head>
+<body>
+<main>
+<h1>Blink your LP-MSPM0L1306 from this page</h1>
+<p class="lede">Plug the board in and press one button. The page saves what is on the board, writes TI's LED example to it through the board's own debugger, then times the LED to prove it worked. Nothing to install.</p>
+
+<div id="unsupported" class="card hidden">
+  <p class="result bad">This browser cannot reach USB devices.</p>
+  <p>Open this page in Chrome or Edge on a Mac, Windows or ChromeOS computer. Safari, Firefox and phones do not offer it. Or skip the browser and use the terminal route below.</p>
+</div>
+
+<div class="card">
+  <p><b>You need:</b> the LP-MSPM0L1306 LaunchPad kit as it came (its jumpers on) and a USB cable that carries data, plugged into the connector on the top half of the board, straight into the computer.</p>
+  <div class="row">
+    <button id="go">Connect, save a copy, and flash the blink</button>
+  </div>
+  <p class="small">Chrome asks which device to use. Pick <span class="mono">XDS110 … CMSIS-DAP</span>; with other boards plugged in, unplug them first, since every XDS110 has the same name there. The page asks for a place to save a copy of the board's flash (about 90 KB) before it writes anything.</p>
+  <ul id="steps" class="steps"></ul>
+</div>
+
+<div id="result" class="card hidden">
+  <p id="verdict" class="result"></p>
+  <div id="bars" class="levels" aria-hidden="true"></div>
+  <p id="detail"></p>
+  <p id="next" class="small"></p>
+</div>
+
+<h2>Go further</h2>
+<p>Change the pattern, print your own message, or build anything else on this board. This page only flashes the one prebuilt demo; building needs TI's free tools on your computer. Two ways in:</p>
+<div class="card">
+  <p><b>In a terminal</b> (Mac or Linux): clone the project and run its one command. It lists what to install, with sizes, before anything else.</p>
+  <pre id="cmd">git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git
+cd fox-red-labs
+./start.sh mspm0l1306 blink</pre>
+  <button class="quiet" data-copy="cmd">Copy the commands</button>
+</div>
+<div class="card">
+  <p><b>With an AI assistant</b> (Claude Code or Codex): paste this, and it walks you through the same steps, asking before it installs anything.</p>
+  <pre id="prompt">Set up my TI LaunchPad with Fox Red Labs. Run git clone --depth 1 --filter=blob:none --sparse https://github.com/Fox-Red-Labs/fox-red-labs.git, then read fox-red-labs/START.md in full and follow it. Ask me before installing anything or writing to the board. It is an LP-MSPM0L1306.</pre>
+  <button class="quiet" data-copy="prompt">Copy the prompt</button>
+</div>
+
+<h2>Put back what was there</h2>
+<div class="card">
+  <p>Choose the copy this page saved. It goes back only onto the board it came from.</p>
+  <div class="row"><input id="file" type="file" accept=".json,application/json"><button id="restore" class="quiet" disabled>Put it back</button></div>
+  <ul id="rsteps" class="steps"></ul>
+  <p id="rresult" class="result hidden"></p>
+</div>
+
+<h2>If something goes wrong</h2>
+<table>
+<tr><th>You see</th><th>Do this</th></tr>
+<tr><td>The device list is empty</td><td>Use a cable that carries data (a charge-only cable powers the board but hides it), in the top connector, straight into the computer, not a hub.</td></tr>
+<tr><td>"this board's chip reports DEVICEID …"</td><td>The board is not an LP-MSPM0L1306, and nothing was written. This page flashes only that board.</td></tr>
+<tr><td>"the chip's debug port did not power up"</td><td>The program on the board may be in a deep sleep. Hold S1, press and release S3, keep S1 held two more seconds, then press the button again at once.</td></tr>
+<tr><td>The check says the LED did not follow the pattern</td><td>Look at the board: LED2 should flash red twice, then pause. Check the LED2 jumpers (J2, J3, J12, J13) are on. Then flash again.</td></tr>
+<tr><td>"the debugger stopped answering"</td><td>Unplug the board, plug it back in, reload this page and try again.</td></tr>
+</table>
+
+<p class="small" id="about"></p>
+</main>
+
+<script type="module" src="page.js"></script>
+</body>
+</html>

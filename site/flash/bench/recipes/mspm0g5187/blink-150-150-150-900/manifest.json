@@ -1,0 +1,118 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0g5187",
+ "kit": "LP-MSPM0G5187",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BBBC02F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "blink-pattern",
+ "pattern_ms": [
+  150,
+  150,
+  150,
+  900
+ ],
+ "led": {
+  "label": "LED2 red (PA17)",
+  "bit": 17,
+  "gpio": "0x400a0000"
+ },
+ "active_high": true,
+ "params": {
+  "kind": "params",
+  "format": 1,
+  "addr": "0x0001FC00",
+  "magic": "0x50524C46",
+  "image_id": 1,
+  "items": [
+   {
+    "id": "on1",
+    "label": "LED on, part 1",
+    "unit": "ms",
+    "min": 10,
+    "max": 5000,
+    "default": 150,
+    "step": 10,
+    "note": ""
+   },
+   {
+    "id": "off1",
+    "label": "LED off, part 1",
+    "unit": "ms",
+    "min": 10,
+    "max": 5000,
+    "default": 150,
+    "step": 10,
+    "note": ""
+   },
+   {
+    "id": "on2",
+    "label": "LED on, part 2",
+    "unit": "ms",
+    "min": 10,
+    "max": 5000,
+    "default": 150,
+    "step": 10,
+    "note": ""
+   },
+   {
+    "id": "off2",
+    "label": "LED off, part 2",
+    "unit": "ms",
+    "min": 10,
+    "max": 5000,
+    "default": 900,
+    "step": 10,
+    "note": ""
+   }
+  ]
+ },
+ "image": {
+  "file": "firmware.out",
+  "sha256": "0082aa0f4a58a71a01299c1e99aa88fdb21d9e52bdee35694bcb12e5163566fb",
+  "bytes": 6324,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 560
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/nortos/LP_MSPM0G5187/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/blink.c",
+  "sha256": "538211f4b084994f249de8d794c48ec1c457d95df517a250255b28ab9d7a5c71",
+  "edited_line": "PATTERN_MS = 150,150,150,900",
+  "rebuild": "python3 tools/webflash/build_board.py mspm0g5187 --pattern 150,150,150,900"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.28.0",
+   "validated": false,
+   "source": "override"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "4.4.1_st_20260330-0700",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-22T14:40:20",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}

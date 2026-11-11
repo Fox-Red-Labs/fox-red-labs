@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-10",
+ "generated": "2026-11-11",
  "source": "data/parts.json",
  "what_a_row_is": "one board, kit, module or part a build uses: what it is, hook-up, where to buy, which builds use it",
  "row_fields": [
@@ -65,7 +65,7 @@
    "use_for": [
     "Showing what fits in a 65-cent chip (1,000-unit price)",
     "Simple sensor and LED projects",
-    "Small AI models (handwritten digits, room occupancy)"
+    "Edge AI models (handwritten digits, room occupancy)"
    ],
    "connect": "One USB cable. 40-pin header, 3.3 V logic. J16 and J17 choose whether the serial pins go to USB or to the header.",
    "buy": [

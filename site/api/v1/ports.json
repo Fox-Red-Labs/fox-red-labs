@@ -1,6 +1,6 @@
 {
  "schema_version": "1.0",
- "generated": "2026-11-10",
+ "generated": "2026-11-11",
  "source": "site/data/ports.json",
  "what_a_row_is": "one port of another ecosystem's code onto a TI chip, with what ran and its limits",
  "row_fields": [

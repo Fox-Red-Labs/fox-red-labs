@@ -1,0 +1,102 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0l1306",
+ "kit": "LP-MSPM0L1306",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BB8202F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "color-player",
+ "table": {
+  "addr": "0x0000FC00",
+  "magic": "0x52434C46",
+  "max_steps": 32,
+  "min_ms": 20,
+  "max_ms": 10000,
+  "bits": {
+   "red": 0,
+   "green": 1,
+   "blue": 2
+  },
+  "pins": {
+   "red": {
+    "label": "LED2 red (PA26)",
+    "bit": 26
+   },
+   "green": {
+    "label": "LED2 green (PA13)",
+    "bit": 13
+   },
+   "blue": {
+    "label": "LED2 blue (PA27)",
+    "bit": 27
+   }
+  },
+  "default": [
+   [
+    1,
+    300
+   ],
+   [
+    2,
+    300
+   ],
+   [
+    4,
+    300
+   ],
+   [
+    0,
+    300
+   ]
+  ]
+ },
+ "image": {
+  "file": "firmware.out",
+  "sha256": "2fa99a8b558f7142f414794150172b072778af8fbe1ca3f31c97a12d1c0f0928",
+  "bytes": 6676,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 960
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "22383f374af64f85f2ec462c950f6d745475da99",
+  "example": "examples/nortos/LP_MSPM0L1306/driverlib/gpio_toggle_output",
+  "file": "mspm0l1306/color-player/color_player.c",
+  "sha256": "d129dac9ce1eeccc92a7452497cdf42fd314310438796b0ad94cae4c6ac2cdc9",
+  "edited_line": "the example's main source replaced by the color player",
+  "rebuild": "python3 tools/webflash/build_player.py"
+ },
+ "tools": {
+  "sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.26.3",
+   "validated": true,
+   "source": "discovered"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "3.81",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "expect": "LED2 plays the color sequence in the table at 0x0000FC00 (red, green, blue, off at 300 ms each when there is none)",
+ "made": "2026-10-14T21:39:00",
+ "release_cleared": false,
+ "release_note": "Built on TI's example (BSD-3-Clause, NOTICE.txt) with TI DriverLib, linked with TI Arm Clang's runtime (permissive licenses per its SPDX file, not reviewed line by line). Not cleared for public distribution."
+}

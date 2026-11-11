@@ -1,0 +1,69 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0l1306",
+ "kit": "LP-MSPM0L1306",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BB8202F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "blink-pattern",
+ "pattern_ms": [
+  150,
+  150,
+  150,
+  900
+ ],
+ "image": {
+  "file": "firmware.out",
+  "sha256": "af10863eba8985661291d7522ba8b53959567b0916ef2deb91656bbd2ccfa050",
+  "bytes": 5928,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 440
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "d7251bc27a01a153c486b1195bb8b0dd9648c46e",
+  "example": "examples/nortos/LP_MSPM0L1306/driverlib/gpio_toggle_output",
+  "file": "gpio_toggle_output.c",
+  "sha256": "bdbe53f1ba07f8ed3b170b45a3988e01e16bb465752c714b250ce4310ba8931c",
+  "edited_line": "static const uint32_t pattern_ms[] = {150, 150, 150, 900};",
+  "rebuild": "python3 tools/frl/frl.py run --board mspm0l1306 --pattern 150,150,150,900 --probe <serial>"
+ },
+ "tools": {
+  "sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.26.3",
+   "validated": true,
+   "source": "discovered"
+  },
+  "compiler": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "3.81",
+   "validated": true,
+   "source": "discovered"
+  },
+  "openocd": {
+   "version": "0.12.0+dev-02228",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "expect": "LED2 red (PA26) repeats on/off 150,150,150,900 ms; frl verify checks it",
+ "made": "2026-10-14T14:44:11",
+ "release_cleared": false,
+ "release_note": "TI example (BSD-3-Clause, NOTICE.txt) linked with TI Arm Clang's runtime (permissive licenses per its SPDX file, not reviewed line by line). Not cleared for public distribution."
+}

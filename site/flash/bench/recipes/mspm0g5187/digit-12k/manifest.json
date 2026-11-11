@@ -1,0 +1,99 @@
+{
+ "format": "frl-prebuilt-1",
+ "board": "mspm0g5187",
+ "kit": "LP-MSPM0G5187",
+ "revisions_tested": [
+  "unknown: the board revision was not recorded for this build"
+ ],
+ "chip": {
+  "deviceid": "0x0BBBC02F",
+  "mask": "0x0FFFFFFF"
+ },
+ "recipe": "digit",
+ "digit": {
+  "addr": "0x20200000",
+  "magic": "0xD1617001",
+  "model": "12k",
+  "input": "16 x 16 int8, BitNetMCU's format",
+  "layout": [
+   "magic",
+   "cpuclk_hz",
+   "selftest",
+   "n_test",
+   "seq_in",
+   "seq_out",
+   "pred",
+   "cycles",
+   "input[256]"
+  ]
+ },
+ "memory": {
+  "flash_b": 19840,
+  "ram_b": 1824,
+  "from": "the linker map of this image: bytes used in FLASH and SRAM, test program, driver library, model and stack included"
+ },
+ "params": {
+  "kind": "params",
+  "format": 1,
+  "addr": "0x0001FC00",
+  "magic": "0x50524C46",
+  "image_id": 4,
+  "items": [
+   {
+    "id": "led_ms",
+    "label": "LED flash per answer",
+    "unit": "ms",
+    "min": 0,
+    "max": 1000,
+    "default": 80,
+    "step": 10,
+    "note": "0 turns the flash off"
+   }
+  ]
+ },
+ "expect": "self-test 10 of 10, then one answer per drawing the page writes; LED2 red flashes once per answer",
+ "image": {
+  "file": "firmware.out",
+  "sha256": "4788520af6629af6cb46ceed787b84d1d8613931000768abde948b7d0a528391",
+  "bytes": 26544,
+  "segments": [
+   {
+    "addr": "0x00000000",
+    "bytes": 19840
+   }
+  ]
+ },
+ "source": {
+  "repo_commit": "4d1b3c083928bb53eee8cf3d6b203dd8c751f45d",
+  "example": "examples/nortos/LP_MSPM0G5187/driverlib/gpio_toggle_output",
+  "file": "tools/webflash/player/digit.c",
+  "sha256": "89455b0e1bb3d5afa8e667371839fb2128143b36ebfb90ca990ce965fdc8cf65",
+  "edited_line": "the example's main source replaced by the draw-a-digit program with BitNetMCU 12k; stack 1536 bytes",
+  "rebuild": "python3 tools/webflash/build_digit.py --model 12k mspm0g5187"
+ },
+ "tools": {
+  "mspm0_sdk": {
+   "version": "2.11.00.07",
+   "validated": true,
+   "source": "discovered"
+  },
+  "sysconfig": {
+   "version": "1.28.0",
+   "validated": false,
+   "source": "override"
+  },
+  "ticlang": {
+   "version": "5.1.1.LTS",
+   "validated": true,
+   "source": "discovered"
+  },
+  "make": {
+   "version": "4.4.1_st_20260330-0700",
+   "validated": true,
+   "source": "discovered"
+  }
+ },
+ "made": "2026-10-22T14:47:13",
+ "release_cleared": false,
+ "release_note": "GPL-3.0 as a whole: BitNetMCU's inference code and model (GPL-3.0) on TI's example (BSD-3-Clause), both notices in NOTICE.txt, linked with TI Arm Clang's runtime. Not cleared for public distribution."
+}
