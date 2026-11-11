@@ -465,8 +465,10 @@ html.hm-js.words-on .wall li, html.hm-js.words-on .plate { opacity: 1; transform
 #splash { position: fixed; inset: 0; z-index: 9999; background: #141110; display: grid; place-items: center; transition: opacity .5s ease; cursor: pointer; }
 #splash.gone { opacity: 0; pointer-events: none; }
 #splash svg { width: min(48vw, 250px); height: auto; display: block; }
-#splash .mark { fill: #F0563F; }
+#splash svg { overflow: visible; }
+#splash .mark { fill: #F7F3EC; animation: hm-mark 1.7s steps(1, end) forwards; }
 #splash .led { fill: #F0563F; opacity: 0; animation: hm-led 1.7s steps(1, end) forwards; }
+@keyframes hm-mark { 0%, 11% { fill: #F7F3EC; filter: none } 12%, 24% { fill: #F0563F; filter: drop-shadow(0 0 14px rgba(240,86,63,.55)) } 25%, 36% { fill: #F7F3EC; filter: none } 37%, 49% { fill: #F0563F; filter: drop-shadow(0 0 14px rgba(240,86,63,.55)) } 50%, 61% { fill: #F7F3EC; filter: none } 62%, 74% { fill: #F0563F; filter: drop-shadow(0 0 14px rgba(240,86,63,.55)) } 75%, 86% { fill: #F7F3EC; filter: none } 87%, 100% { fill: #F0563F; filter: drop-shadow(0 0 14px rgba(240,86,63,.55)) } }
 @keyframes hm-led { 0%, 11% { opacity: 0 } 12%, 24% { opacity: 1 } 25%, 36% { opacity: 0 } 37%, 49% { opacity: 1 } 50%, 61% { opacity: 0 } 62%, 74% { opacity: 1 } 75%, 86% { opacity: 0 } 87%, 100% { opacity: 1 } }
 #splash p { position: absolute; bottom: 28px; left: 0; right: 0; margin: 0; text-align: center; font: 500 13px/18px var(--frl-font); color: rgba(247,243,236,.4); }
 @media (max-width: 960px) { .wall { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: calc((100vh - 112px) / 5); grid-auto-rows: calc((100svh - 112px) / 5); gap: 2px; }   /* ten of the twelve tiles show on a phone; the last row sits under the fold of the fixed-height hero */ .plate { padding: 22px 18px 20px; } .plate .wm { margin-bottom: 8px; } .plate .acts .btn { padding: 9px 12px; } }

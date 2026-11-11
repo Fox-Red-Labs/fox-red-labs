@@ -128,6 +128,6 @@ Every number for a board of this family is a row in its results file (`data/READ
 |---|--:|---|
 | [mspm0c1104](../../../data/results/mspm0c1104.csv) | 270 | measured 119, not_run 93, does_not_fit 43, not_supported 4, not_applicable 4, waiting 4, failed 3 |
 | [mspm0l1306](../../../data/results/mspm0l1306.csv) | 306 | measured 244, does_not_fit 30, waiting 13, not_applicable 9, not_run 5, computed 3, not_supported 2 |
-| [mspm0g3507](../../../data/results/mspm0g3507.csv) | 281 | measured 239, waiting 19, does_not_fit 7, not_supported 7, not_run 6, computed 2, not_applicable 1 |
+| [mspm0g3507](../../../data/results/mspm0g3507.csv) | 283 | measured 241, waiting 19, does_not_fit 7, not_supported 7, not_run 6, computed 2, not_applicable 1 |
 | [mspm0g3519](../../../data/results/mspm0g3519.csv) | 604 | measured 511, waiting 42, computed 21, not_supported 11, failed 8, not_run 8, does_not_fit 3 |
 | [mspm0g5187](../../../data/results/mspm0g5187.csv) | 643 | measured 471, waiting 70, not_run 42, computed 27, does_not_fit 13, failed 12, not_applicable 5, not_supported 3 |

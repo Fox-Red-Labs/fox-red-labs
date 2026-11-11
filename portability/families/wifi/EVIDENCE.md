@@ -57,4 +57,4 @@ Every number for a board of this family is a row in its results file (`data/READ
 
 | Board | Rows | By status |
 |---|--:|---|
-| [cc35x1](../../../data/results/cc35x1.csv) | 263 | measured 174, waiting 40, failed 28, not_run 12, does_not_fit 6, not_supported 2, computed 1 |
+| [cc35x1](../../../data/results/cc35x1.csv) | 265 | measured 176, waiting 40, failed 28, not_run 12, does_not_fit 6, not_supported 2, computed 1 |

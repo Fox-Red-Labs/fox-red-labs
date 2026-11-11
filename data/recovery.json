@@ -48,6 +48,34 @@
      "data/results/mspm0g3507.csv"
     ]
    },
+   "memory": {
+    "arch": "arm",
+    "regions": [
+     [
+      "FLASH",
+      "0x0",
+      131072
+     ],
+     [
+      "SRAM",
+      "0x20200000",
+      32768
+     ]
+    ],
+    "config": [
+     [
+      "BCR_CONFIG",
+      "0x41C00000",
+      255
+     ],
+     [
+      "BSL_CONFIG",
+      "0x41C00100",
+      128
+     ]
+    ],
+    "source": "mspm0g3507 linker map (SDK 2.11.00.07, portability/holiday-lights/boards/mspm0g3507 build, 2026-11-11)"
+   },
    "debug_pins": {
     "swdio": "PA19",
     "swclk": "PA20",

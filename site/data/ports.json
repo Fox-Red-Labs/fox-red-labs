@@ -5876,6 +5876,47 @@
    "upstream": {
     "state": "none"
    }
+  },
+  {
+   "id": "holiday-lights",
+   "group": "smart-home",
+   "name": "Holiday light show engine: one plain-C engine on the LP-MSPM0G3507 (button, UART) and the LP-EM-CC35X1 (WLED app, xLights)",
+   "boards": [
+    "mspm0g3507",
+    "cc35x1"
+   ],
+   "status": "builds",
+   "headline": "Ten light modes and a schedule wrapper in plain C, previewed as GIFs on the Mac, with a WS2812 driver on SPI1 for the LP-MSPM0G3507 and a WLED-compatible JSON API plus DDP for the LP-EM-CC35X1. Both images build; neither has run on a board yet.",
+   "code": "portability/holiday-lights",
+   "writeup": "portability/holiday-lights/README.md",
+   "source": "portability/holiday-lights/README.md",
+   "public": false,
+   "from": "Written here; the WS2812 frame encoding is the method of this repo's Halloween ring driver, the JSON API follows WLED's published documentation",
+   "changed": "The CC35X1 image is a patched copy of TI's mqtt_client demo (Wi-Fi join) with the engine, a socket server and an SPI output added",
+   "broke": "Nothing run yet. SPI clock accuracy against the pixel timing is unmeasured on both boards",
+   "tag": "Tool or docs",
+   "page": "hub-smart-home.html",
+   "compat": {
+    "mspm0g3507": {
+     "build": {
+      "level": "builds",
+      "note": "engine, WS2812 over SPI1 PB8, button and UART commands: 12,880 B flash, 3,012 B RAM",
+      "evidence": "portability/holiday-lights/README.md"
+     }
+    },
+    "cc35x1": {
+     "build": {
+      "level": "builds",
+      "note": "WLED JSON API, DDP, SPI pixel output on a copy of TI's mqtt_client",
+      "evidence": "portability/holiday-lights/README.md"
+     }
+    }
+   },
+   "command": "portability/holiday-lights/host/run.sh --gifs out/gifs",
+   "see": "Eleven animated GIFs, one per mode, a 50-pixel string above a 24-pixel ring; 49 WLED-layer checks and 912,194 engine checks pass.",
+   "upstream": {
+    "state": "none"
+   }
   }
  ],
  "terms": [

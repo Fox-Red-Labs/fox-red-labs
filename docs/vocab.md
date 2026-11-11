@@ -689,3 +689,23 @@ One line each, in the order a newcomer meets them. If a word in any doc in this 
 **Static module / LLEXT.** Two ways to add code to a Zephyr image. A static module (`-DZEPHYR_EXTRA_MODULES`) is compiled into the image with everything else. LLEXT (loadable extensions) loads a separate piece of code at run time. The Arduino folder uses the first.
 
 **nRST.** The chip's reset pin. Pulsing it low restarts the chip. After a DSLite flash the LP-MSPM0G3519 only runs a Zephyr image once nRST has been pulsed.
+
+**Tinning.** Putting a thin layer of solder on a pad or on the stripped end of a wire before you join them.
+
+**Cold joint.** A solder joint that did not get hot enough: it looks dull or like a ball sitting on the pad, and can fail to conduct. Reheat it.
+
+**Continuity.** A meter setting that beeps when two points are joined by a wire or a solder joint. Used to find shorts and broken wires.
+
+**Heat-shrink.** A plastic tube that shrinks when warmed. Slid over a joint before heating, it covers the bare solder.
+
+**Lever nut.** A small connector with levers that clamps two to five wires together without screws or solder (for example the WAGO 221 series).
+
+**Cable gland.** A fitting in a box wall that grips a cable and seals the hole around it. A drip loop is the dip a cable makes below the gland before it runs on, so rain drips off the low point.
+
+**GFCI.** A ground-fault circuit interrupter: an outlet that cuts power when it senses current leaking where it should not go. Recommended for outdoor outlets.
+
+**Level shifter.** A chip that lifts a 3.3 V signal to 5 V (or back). The holiday lights builds use a 74AHCT125 so a 3.3 V board can drive 5 V pixels.
+
+**GRB order.** WS2812B pixels take their color data as green, then red, then blue. A program written for RGB shows red and green swapped until it uses GRB.
+
+**Breadboard rail.** A long strip of connected holes along the edge of a breadboard, used for power or ground. Holes in the same column of five are connected; the two halves of the board are separate.

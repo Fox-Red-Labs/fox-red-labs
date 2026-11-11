@@ -24436,6 +24436,251 @@
      }
     }
    }
+  },
+  {
+   "group": "Sensors and screens",
+   "t": "Holiday lights: first light with a button",
+   "radio": "",
+   "cells": {
+    "g3507": {
+     "st": "untested"
+    },
+    "cc2340r5": {
+     "st": "untested"
+    },
+    "l1306": {
+     "st": "untested"
+    },
+    "f2800137": {
+     "st": "untested"
+    }
+   },
+   "slug": "holiday-lights-button",
+   "tier": "medium",
+   "what": "A 12-pixel WS2812B ring runs a few holiday light modes on an LP-MSPM0G3507. The board's S2 button steps through the modes and an optional knob sets the brightness.",
+   "time": "One evening, not yet timed",
+   "hardware": [
+    "lp-mspm0g3507",
+    "ws2812b-ring-12-diymall",
+    "bridgold-sn74ahct125n",
+    "resistors-330-ohm",
+    "breadboard-400",
+    "multimeter-basic"
+   ],
+   "q": "light a WS2812B LED ring for the holidays with a button on a LaunchPad",
+   "topics": [
+    "display"
+   ],
+   "headline": "Draft, not released.",
+   "outcome": "sound-light",
+   "card": {
+    "setup": [
+     "WS2812B ring",
+     "SPI data",
+     "LP-MSPM0G3507",
+     "74AHCT125"
+    ],
+    "outcome": "Press S2 to change the light show on the ring.",
+    "merit": {
+     "text": "not run"
+    }
+   },
+   "glance": {
+    "difficulty": "Medium. Soldering three wires, a chip on a breadboard and a meter check before power.",
+    "time": "One evening, not yet timed"
+   },
+   "how": [
+    "Each WS2812B pixel reads 24 bits of color from the wire, keeps its own and passes the rest on to the next pixel. The program sends those bits from the SPI hardware, so the timing comes from the SPI clock and the program does not count cycles.",
+    "The LaunchPad kit's data pin sends 3.3 V pulses and a WS2812B wants a high of at least 0.7 times its 5 V supply, which is 3.5 V. A 74AHCT125 chip on a breadboard reads the 3.3 V pulse as a high and sends a 5 V one on to the ring through a 330 ohm resistor."
+   ],
+   "recipe": {
+    "outcome": "Holiday light show on a ring, changed with a button",
+    "one_line": "A WS2812B ring and a 74AHCT125 level shifter on a LaunchPad, with a button for the modes.",
+    "default": "main",
+    "learn": "Driving addressable lights from 3.3 V logic, and checking wiring with a meter before power.",
+    "variants": [
+     {
+      "id": "main",
+      "name": "12-pixel ring and a button",
+      "short": "One ring, a level shifter and S2.",
+      "boards": [
+       "g3507"
+      ],
+      "status": "planned",
+      "learn": "Driving addressable lights from 3.3 V logic, and checking wiring with a meter before power.",
+      "parts": [
+       {
+        "id": "lp-mspm0g3507",
+        "qty": "1",
+        "role": "the board, with the S2 button the build reads",
+        "included": "A built-in USB debugger and a micro-USB cable."
+       },
+       {
+        "id": "ws2812b-ring-12-diymall",
+        "qty": "1",
+        "role": "the 12-pixel ring; solder three wires to it (tutorial 1)",
+        "name": "DIYmall 12-pixel WS2812B ring (2 rings)"
+       },
+       {
+        "id": "bridgold-sn74ahct125n",
+        "qty": "1",
+        "role": "the level shifter that lifts 3.3 V data to 5 V",
+        "name": "Bridgold SN74AHCT125N quad buffer, 10 pack (TI part, DIP-14)"
+       },
+       {
+        "id": "resistors-330-ohm",
+        "qty": "1",
+        "role": "in the data line, next to the ring",
+        "name": "330 ohm resistors, three"
+       },
+       {
+        "id": "breadboard-400",
+        "qty": "1",
+        "role": "holds the chip and the resistor, with jumper wires",
+        "separate": "Still to buy unless you have one.",
+        "name": "Breadboard with power rails (400 tie-point) and jumper wires"
+       },
+       {
+        "id": "multimeter-basic",
+        "qty": "1",
+        "role": "checks the ring for shorts before power",
+        "name": "Multimeter"
+       }
+      ],
+      "prereqs": [
+       "The code is in this repository. Clone it first: `git clone --depth 1 https://github.com/Fox-Red-Labs/fox-red-labs.git`. This page calls the folder you clone it into `<repository folder>`.",
+       "Three free TI tools from ti.com: the MSPM0 SDK, SysConfig and TI Arm Clang.",
+       "Four short guides in `docs/guides/holiday-lights/`: [1 solder wires to an LED ring](https://github.com/Fox-Red-Labs/fox-red-labs/blob/main/docs/guides/holiday-lights/1-solder-wires-to-an-led-ring.md), [2 read your light string](https://github.com/Fox-Red-Labs/fox-red-labs/blob/main/docs/guides/holiday-lights/2-read-your-light-string.md), [3 wire the low-voltage box (not needed for this build)](https://github.com/Fox-Red-Labs/fox-red-labs/blob/main/docs/guides/holiday-lights/3-wire-the-outdoor-box.md) and [4 first light on the table](https://github.com/Fox-Red-Labs/fox-red-labs/blob/main/docs/guides/holiday-lights/4-first-light-on-the-table.md). This build needs guides 1 and 4."
+      ],
+      "wiring": {
+       "head": [
+        "Part pin",
+        "LaunchPad pin"
+       ],
+       "alt": "Pin table for the ring, the level shifter and the knob",
+       "note": "The chip sits on a breadboard with the notch to the left; guide 4 draws every jumper by column and row. Read your ring's own pad labels: the printing differs between makers.",
+       "table": "open",
+       "pins": [
+        [
+         "74AHCT125 pins 2, 5 and 9",
+         "J2 pin 15 (PB8)",
+         "SPI data out, 3.3 V",
+         "required"
+        ],
+        [
+         "74AHCT125 pin 14 (VCC)",
+         "J3 pin 21 (5V)",
+         "5 V from the board's USB power; an output, never feed 5 V into it",
+         "required"
+        ],
+        [
+         "74AHCT125 pins 1, 4, 7, 10, 12 and 13",
+         "J2 pin 20 (GND)",
+         "ground and output enables",
+         "required"
+        ],
+        [
+         "Ring DIN, from chip pin 8 through 330 ohm",
+         "(breadboard)",
+         "data to the ring",
+         "required"
+        ],
+        [
+         "Ring 5V",
+         "J3 pin 21 (5V)",
+         "power for one 12-pixel ring at low brightness; the pin's current limit is unknown",
+         "required"
+        ],
+        [
+         "Ring GND",
+         "J2 pin 20 (GND)",
+         "ground",
+         "required"
+        ],
+        [
+         "Button S2",
+         "onboard (PB21)",
+         "no wire needed",
+         "required"
+        ],
+        [
+         "Knob wiper",
+         "J1 pin 2 (PA25)",
+         "brightness, with the knob's ends on J1 pin 1 (3V3) and J2 pin 20 (GND)",
+         "optional"
+        ]
+       ]
+      },
+      "steps": [
+       {
+        "n": 1,
+        "app": "Bench",
+        "title": "Solder wires to the ring",
+        "do": "Solder red, black and yellow wires to the ring's 5V, GND and DIN pads, then check for shorts with the meter (guide 1).",
+        "see": "No beep between 5V and GND, DIN and GND, or DIN and 5V.",
+        "if": "If your ring's pads have other names, read its own labels and match them by what each pad does: power, ground, data in."
+       },
+       {
+        "n": 2,
+        "app": "Bench",
+        "title": "Wire the level shifter",
+        "do": "With the USB cable unplugged, build the circuit in guide 4, steps 1 and 2.",
+        "see": "Three wires from the LaunchPad to the breadboard, one chip, one resistor, the ring. Nothing is lit.",
+        "if": "If the ring's data wire is on DOUT, move it to DIN."
+       },
+       {
+        "n": 3,
+        "app": "Terminal",
+        "title": "Build and flash the program",
+        "do": "The program and its command are to be confirmed on the bench. Plug the board into your computer first.",
+        "see": "To be confirmed: the build finishes and the flash reports done.",
+        "if": "To be confirmed on the bench."
+       },
+       {
+        "n": 4,
+        "app": "Bench",
+        "title": "Watch the ring",
+        "do": "Look at the ring after the flash.",
+        "see": "To be confirmed: the first 10 pixels glow dimly.",
+        "if": "If nothing lights, follow the order in guide 4: ground, data on DIN not DOUT, the chip's 5 V and output enables, the 330 ohm resistor."
+       },
+       {
+        "n": 5,
+        "app": "Bench",
+        "title": "Press S2",
+        "do": "Press the board's S2 button.",
+        "see": "To be confirmed: the ring steps to the next mode.",
+        "if": "To be confirmed on the bench."
+       },
+       {
+        "n": 6,
+        "app": "Bench",
+        "title": "Make it yours",
+        "do": "Change the colors, the speed or the number of pixels lit in the program.",
+        "see": "To be confirmed.",
+        "if": "To be confirmed on the bench."
+       }
+      ],
+      "expect": "The first 10 pixels glow dimly at the first light, and S2 steps through the modes. Neither has run on these parts yet; frame rate and current: measured at the first run.",
+      "shows": [
+       "A WS2812B ring can be driven from a 3.3 V board through a level shifter and a resistor, by the design in the tutorials."
+      ],
+      "not_shows": [
+       "That the program runs: nobody has run this build yet.",
+       "The current the ring draws from the board's 5 V pin: the pin's limit is not stated in the board's user guide."
+      ],
+      "limits": [
+       "A full-white 12-pixel ring can draw up to 0.72 A (60 mA per pixel at full white, Adafruit); keep the brightness low.",
+       "The wire colors on your light strings and the label ratings are the maker's claims: read your label.",
+       "The tutorials assume the strings are 12 V, three wires and take 5 V-level data: read your label and the maker's page. Wire colors differ between makers."
+      ],
+      "folders": [
+       "docs/guides/holiday-lights/"
+      ]
+     }
+    ],
+    "compat": {}
+   }
   }
  ],
  "tiers": [
@@ -25537,7 +25782,8 @@
    },
    "items": [
     "jack-o-lantern-jukebox",
-    "hobby-led-strip"
+    "hobby-led-strip",
+    "holiday-lights-button"
    ]
   },
   {

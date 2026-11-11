@@ -806,6 +806,19 @@
     "mspm0l1306": "untested",
     "cc35x1": "yes"
    }
+  },
+  {
+   "slug": "holiday-lights-button",
+   "t": "Holiday lights: first light with a button",
+   "tier": "medium",
+   "what": "A 12-pixel WS2812B ring runs a few holiday light modes on an LP-MSPM0G3507. The board's S2 button steps through the modes and an optional knob sets the brightness.",
+   "time": "One evening, not yet timed",
+   "href": "../../project-holiday-lights-button.html",
+   "boards": {
+    "mspm0g3507": "untested",
+    "cc2340r5": "untested",
+    "mspm0l1306": "untested"
+   }
   }
  ]
 }
