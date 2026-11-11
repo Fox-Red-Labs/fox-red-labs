@@ -94,6 +94,26 @@ Nothing replaces it in TI's linker (`tiarmlnk`). If you only need the wrapped ca
 
 Include `zb_mem_config_lprf3.h` in the file with your `main`. TI's `on_off_light.c` includes it, and it sets how big ZBOSS's tables are; without it they take the large default (47.6 kB of RAM instead of 33.6 kB in the ESPHome link test, 14 kB more).
 
+### `esphome logs` shows nothing, though the board runs. What do you check?
+
+`logger:` must be in the YAML, and the platform must pass ESPHome's build flags to the compiler. ESPHome sets the log level as a compiler flag (`ESPHOME_LOG_LEVEL`), not in a header; a build that drops the flag compiles every log call out and the UART stays silent, though a direct write to it works. Use this folder's `ports/esphome-ti` from 2026-11-10 or later, open the probe's first serial port (`/dev/cu.usbmodem<probe serial>1`) at 115200 baud, and run `esphome logs <yaml> --device <port>` ([E319](../docs/experiments/2026-11-10-esphome-ti-logger.md)).
+
+### ESPHome says "This feature is only available on [esp32, esp8266, rp2, nrf52, host]" for `i2c:` or `spi:`. What do you do?
+
+For `i2c:`, use this folder's ESPHome platform from 2026-11-10 or later; it lets its names through that check. `spi:` and `uart:` are not supported yet, and `spi:` has no nrf52 entry to follow ([E321](../docs/experiments/2026-11-10-esphome-ti-buses.md)).
+
+### SysConfig says "CONFIG_GPIO_RLED ... Resource conflict. DIO14/39 is currently in use by CONFIG_FRL_PWM_0". What do you change?
+
+Nothing in the YAML: the platform drops TI's LED or button GPIO instance when a driver takes that pin. If you wrote your own SysConfig file, remove the `LED_R` instance and define `CONFIG_GPIO_RLED` as the DIO number; the GPIO driver indexes by DIO.
+
+### The compiler says "static assertion failed ... is_iec559" in light_color_values.h. What do you change?
+
+Build with this folder's platform, which removes that assertion in the build copy. TI Arm Clang's C++ library reports `numeric_limits<float>::is_iec559` as false although the chip does single-precision IEEE 754; any ESPHome `light` fails the check otherwise.
+
+### SysConfig says "DIO21 is not a pin name" for an ADC pin on the CC2755P10. What do you write?
+
+The name with its analog suffix, `DIO21_A4`. The platform does this from its pin table; write `DIO21` in the YAML.
+
 ## Mistakes to avoid
 
 - A chip erase on a CC27xx to clear a connect error closed the debug port until a full image was programmed over SACI (the entries above). On a CC27xx, never erase to reset; reset with the probe and replug.

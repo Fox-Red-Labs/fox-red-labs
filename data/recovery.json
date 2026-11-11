@@ -1743,12 +1743,12 @@
       "beagley-ai/bench/seam/v4l2-after-reboot.log"
      ],
      "date": "2026-11-03",
-     "note": "clears a hung C7x; not needed for the Wave5 pipelines, which recover when the process is killed"
+     "note": "after a Wave5 decode failure the reboot cleared it; a hung C7x was cleared this way once and that hang was not logged; the Wave5 pipelines recover when the process is killed"
     },
     {
      "method": "Run one model per process with a timeout so a hung load costs one model",
      "kind": "remote",
-     "status": "proven",
+     "status": "untested",
      "evidence": [
       "beagley-ai/bench/zoo/zoo_bench.py"
      ],

@@ -144,7 +144,6 @@ A press of S2 or the `s` key and a spoken question give a spoken answer, first a
 
 ### Limits
 
-- That the speaker sounds clean: it was not judged by ear.
 - That S2 works by hand: the press was sent from the console.
 - Power use: the radio is kept always on and power was not measured.
 - A real room: the questions came from a Mac speaker 30 cm away, in a quiet room.

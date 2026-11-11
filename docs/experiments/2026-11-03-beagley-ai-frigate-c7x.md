@@ -9,7 +9,7 @@ stop: webcam input, on the camera's USB supply; a recorded clip stands in
 -->
 # Can Frigate use the BeagleY-AI's C7x accelerator as its object detector?
 
-Terms: [docs/vocab.md](../vocab.md), BeagleY-AI FAQ. **Frigate** is the open-source home camera recorder behind many Home Assistant setups. 1 kB = 1,024 bytes.
+Terms: [docs/vocab.md](../vocab.md), [BeagleY-AI FAQ](../../beagley-ai/FAQ.md). **Frigate** is the open-source home camera recorder behind many Home Assistant setups. 1 kB = 1,024 bytes.
 
 **Short answer.** Yes, with a small server on the board between Frigate and the C7x. With the detector on the C7x Frigate reports 64.46 ms per detection and 6.6 detections a second without dropping a frame; its own CPU detector reports 184.56 ms, 4.5 a second and drops about 2 frames a second. The webcam did not work as the input, so the demo runs on a recorded clip.
 

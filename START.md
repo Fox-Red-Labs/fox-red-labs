@@ -94,6 +94,7 @@ Each row: the name printed on the board, the id the tools use, the folder to fet
 
 | Board | Id | Folder | Backup | Projects |
 |---|---|---|---|---|
+| BeagleY-AI | `beagley-ai` | `beagley-ai` | see its `AGENTS.md` | ran on this board: Get Linux running from the box, TI's model zoo on the C7x accelerator, The Pop the bubbles pose game, A language model and speech to text on the Arm cores, Smart-home containers in Docker |
 | IWRL6432AOPEVM | `iwrl6432aop` | `iwrl6432boost` | see its `AGENTS.md` | its README's ten-minute path |
 | LAUNCHXL-F2800137 | `f2800137` | `c2000-launchpad` | tested (`backup.py`) | tested: Recognize a handwritten digit on the chip, Measure a board's current draw, for battery life, Build and flash from the terminal in one command |
 | LAUNCHXL-F28P65X | `f28p65x` | `c2000-launchpad` | see its `AGENTS.md` | ran on this board: Room-occupancy neural nets (500 to 30k weights), Dhrystone 2.1, GPIO toggle and interrupt latency |
@@ -113,7 +114,6 @@ Each row: the name printed on the board, the id the tools use, the folder to fet
 | LP-MSPM33C321A | `mspm33c321a` | `mspm33c321a` | tested (`backup.py`) | ran on this board: CoreMark, Dhrystone 2.1, Post-quantum and public-key crypto, TI's examples, Hardware AES and CRC, Room-occupancy neural nets (500 to 30k weights), plain C |
 | SK-TDA4VM | `tda4` | `tda4` | see its `AGENTS.md` | ran on this board: Get Linux running from the box, TI's model zoo on the deep-learning accelerator, Video into a model with no CPU copy |
 | am62l-evm | `am62l-evm` | `am62l-evm` | see its `AGENTS.md` | its README's ten-minute path |
-| beagley-ai | `beagley-ai` | `beagley-ai` | see its `AGENTS.md` | its README's ten-minute path |
 <!-- /start:boards -->
 
 ## When something goes wrong

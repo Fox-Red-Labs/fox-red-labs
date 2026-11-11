@@ -9,7 +9,7 @@ Terms: [vocab](../docs/vocab.md). Problems and fixes: [FAQ](FAQ.md). 1 kB = 1,02
 ## What is in this folder
 
 <!-- folder-contents -->
-**In this folder:** this README; `AGENTS.md` (notes for an AI assistant, every line from a run); `FAQ.md` (every error hit, with its exact text and the fix). Folders: `captures/` captured radar frames, `eval/` evaluation scripts and configs, `img/` pictures, `tools/` helper scripts for this board, `zones/` the room-zone experiment. Results are rows in `data/results/iwrl6432boost.csv` at the top of the repository, not in this folder.
+**In this folder:** this README; `AGENTS.md` (notes for an AI assistant, every line from a run); `FAQ.md` (every error hit, with its exact text and the fix). Folders: `cc1407p/` a transmit app for the sub-1 GHz radio BoosterPack on the radar's own processor (built, not run), `captures/` captured radar frames, `eval/` evaluation scripts and configs, `img/` pictures, `tools/` helper scripts for this board, `zones/` the room-zone experiment. Results are rows in `data/results/iwrl6432boost.csv` at the top of the repository, not in this folder.
 
 **Not in this folder:** TI's SDK, CCStudio, SysConfig and the compilers (you install them; the versions are under "Where these facts come from"); the radar's firmware images (it streams out of the box, so nothing here builds one).
 

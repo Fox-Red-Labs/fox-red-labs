@@ -1,0 +1,46 @@
+diff --git a/engines/scumm/script.cpp b/engines/scumm/script.cpp
+index bd3c285c..bc5c7173 100644
+--- a/engines/scumm/script.cpp
++++ b/engines/scumm/script.cpp
+@@ -815,12 +815,29 @@ void ScummEngine::writeVar(uint var, int value) {
+ 	error("Illegal varbits (w)");
+ }
+ 
++// Steam re-releases of the Backyard games (ticket #15412) run scripts that pop
++// past the bottom of the stack and push back up again. The original program has
++// no bounds check, so model the slots below zero with a small shadow area.
++static int g_vmStackUnder[256];
++
+ void ScummEngine::push(int a) {
++	if (_scummStackPos < 0 && _scummStackPos >= -(int)ARRAYSIZE(g_vmStackUnder)) {
++		g_vmStackUnder[-_scummStackPos - 1] = a;
++		_scummStackPos++;
++		return;
++	}
+ 	assert(_scummStackPos >= 0 && _scummStackPos < ARRAYSIZE(_vmStack));
+ 	_vmStack[_scummStackPos++] = a;
+ }
+ 
+ int ScummEngine::pop() {
++	if (_scummStackPos <= 0 && _scummStackPos > -(int)ARRAYSIZE(g_vmStackUnder)) {
++		static int warned = 0;
++		if (warned++ < 5)
++			warning("pop: stack underflow (pos %d), original program tolerated it", _scummStackPos);
++		--_scummStackPos;
++		return g_vmStackUnder[-_scummStackPos - 1];
++	}
+ 	assert(_scummStackPos >= 1 && _scummStackPos <= ARRAYSIZE(_vmStack));
+ 	return _vmStack[--_scummStackPos];
+ }
+diff --git a/engines/scumm/scumm-md5.h b/engines/scumm/scumm-md5.h
+index f2a5530f..e2fd85b5 100644
+--- a/engines/scumm/scumm-md5.h
++++ b/engines/scumm/scumm-md5.h
+@@ -836,6 +836,7 @@ static const MD5Table md5table[] = {
+ 	{ "ff05c07990061d97647f059c48c1d05a", "zak", "V2", "V2", -1, Common::DE_DEU, Common::kPlatformAtariST },
+ 	{ "ff678e9ef8e4af2a37ca8658833c795a", "maniac", "Remastered", "Remastered", -1  , Common::EN_ANY, Common::kPlatformDOS },
+ 	{ "ff90541cd06403ebea117274a3203c49", "baseball", "", "Steam", -1, Common::EN_ANY, Common::kPlatformWindows },
++	{ "b855daca2b7c40fc45592cdf5ce54f86", "baseball", "", "Steam", -1, Common::EN_ANY, Common::kPlatformWindows },
+ 	{ 0, 0, 0, 0, 0, Common::UNK_LANG, Common::kPlatformUnknown }
+ };
+ 

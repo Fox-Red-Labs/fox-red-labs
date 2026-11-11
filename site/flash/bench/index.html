@@ -1052,12 +1052,13 @@ main pre { overflow-x: auto; max-width: 100%; }
 <script src="own-tools.js?v=20261025"></script>
 <script type="module" src="lab.js"></script>
 <script src="xlsx.js"></script>
+<script src="../../popularity.js?v=20261110" defer></script>
 <script>
 (async () => {
   const panel = document.getElementById("startup");
   try {
     if (location.protocol === "file:") throw new Error("Opened directly from a file. Start the local server and open its localhost address.");
-    const bench = await import("./bench.js?v=20261022-ai11");
+    const bench = await import("./bench.js?v=20261110-pop");
     await bench.ready;
     panel.classList.add("hidden");
   } catch (error) {

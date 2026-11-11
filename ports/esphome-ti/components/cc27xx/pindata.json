@@ -1,0 +1,620 @@
+{
+ "LP_EM_CC2340R5": {
+  "chip": "CC2340R5RKP",
+  "pins": {
+   "0": {
+    "header": 10,
+    "name": "DIO0_A5",
+    "signals": [
+     "ADC5",
+     "I2C0SDA",
+     "LGPT3C2",
+     "SPI0CSN"
+    ],
+    "use": []
+   },
+   "1": {
+    "header": 25,
+    "name": "DIO1_A4",
+    "signals": [
+     "ADC4",
+     "LGPT1F",
+     "LGPT3C1",
+     "UART0RTS"
+    ],
+    "use": []
+   },
+   "10": {
+    "header": 13,
+    "name": "DIO10",
+    "signals": [
+     "LGPT2PE",
+     "LGPT3C0N"
+    ],
+    "use": [
+     "button BTN-1"
+    ]
+   },
+   "11": {
+    "header": 18,
+    "name": "DIO11",
+    "signals": [
+     "LGPT0C0",
+     "LGPT1C2N",
+     "SPI0CSN",
+     "SPI0MISO"
+    ],
+    "use": [
+     "BoosterPack SPI chip select"
+    ]
+   },
+   "12": {
+    "header": 14,
+    "name": "DIO12",
+    "signals": [
+     "I2C0SDA",
+     "LGPT1C1",
+     "SPI0MISO",
+     "SPI0MOSI",
+     "UART0RXD"
+    ],
+    "use": [
+     "SPI flash and BoosterPack SPI data in"
+    ]
+   },
+   "13": {
+    "header": 15,
+    "name": "DIO13",
+    "signals": [
+     "LGPT0C0N",
+     "LGPT1F",
+     "SPI0MISO",
+     "SPI0MOSI",
+     "UART0TXD"
+    ],
+    "use": [
+     "SPI flash and BoosterPack SPI data out"
+    ]
+   },
+   "14": {
+    "header": 39,
+    "name": "DIO14",
+    "signals": [
+     "LGPT1C2N",
+     "LGPT1F",
+     "LGPT3C2"
+    ],
+    "use": [
+     "red LED"
+    ]
+   },
+   "15": {
+    "header": 40,
+    "name": "DIO15",
+    "signals": [
+     "LGPT2C0N",
+     "UART0RXD"
+    ],
+    "use": [
+     "green LED"
+    ]
+   },
+   "16": {
+    "header": null,
+    "name": "DIO16_SWDIO",
+    "signals": [
+     "I2C0SDA",
+     "LGPT1C0N",
+     "LGPT1C2",
+     "SPI0MOSI",
+     "UART0RXD"
+    ],
+    "use": [
+     "SWD (debug)"
+    ]
+   },
+   "17": {
+    "header": null,
+    "name": "DIO17_SWDCK",
+    "signals": [
+     "I2C0SCL",
+     "LGPT0C2",
+     "LGPT1C1N",
+     "SPI0SCLK",
+     "UART0TXD"
+    ],
+    "use": [
+     "SWD (debug)"
+    ]
+   },
+   "18": {
+    "header": 7,
+    "name": "DIO18",
+    "signals": [
+     "LGPT3C0",
+     "SPI0SCLK",
+     "UART0TXD"
+    ],
+    "use": [
+     "SPI flash and BoosterPack SPI clock"
+    ]
+   },
+   "19": {
+    "header": 17,
+    "name": "DIO19",
+    "signals": [
+     "LGPT2PE",
+     "LGPT3C1",
+     "SPI0MOSI"
+    ],
+    "use": []
+   },
+   "2": {
+    "header": 26,
+    "name": "DIO2_A3",
+    "signals": [
+     "ADC3",
+     "LGPT0PE",
+     "LGPT2C1N",
+     "UART0CTS"
+    ],
+    "use": []
+   },
+   "20": {
+    "header": 4,
+    "name": "DIO20_A11",
+    "signals": [
+     "ADC11",
+     "LGPT1C0",
+     "SPI0MISO",
+     "UART0RXD",
+     "UART0TXD"
+    ],
+    "use": [
+     "backchannel UART: chip TX"
+    ]
+   },
+   "21": {
+    "header": 37,
+    "name": "DIO21_A10",
+    "signals": [
+     "ADC10",
+     "LGPT0C1",
+     "LGPT1C1N",
+     "SPI0MISO",
+     "UART0CTS"
+    ],
+    "use": []
+   },
+   "22": {
+    "header": 3,
+    "name": "DIO22_A9",
+    "signals": [
+     "ADC9",
+     "LGPT2C0",
+     "LGPT3C1N",
+     "UART0RXD"
+    ],
+    "use": [
+     "backchannel UART: chip RX"
+    ]
+   },
+   "23": {
+    "header": 23,
+    "name": "DIO23_A8",
+    "signals": [
+     "ADC8",
+     "LGPT2C1",
+     "LGPT3C2N"
+    ],
+    "use": []
+   },
+   "24": {
+    "header": 9,
+    "name": "DIO24_A7",
+    "signals": [
+     "ADC7",
+     "I2C0SCL",
+     "LGPT0PE",
+     "LGPT1C0",
+     "LGPT3C0",
+     "SPI0SCLK"
+    ],
+    "use": []
+   },
+   "25": {
+    "header": 24,
+    "name": "DIO25_A6",
+    "signals": [
+     "ADC6",
+     "I2C0SCL",
+     "LGPT2C2N",
+     "SPI0MISO"
+    ],
+    "use": []
+   },
+   "3": {
+    "header": null,
+    "name": "DIO3_X32P",
+    "signals": [
+     "LGPT0C1N",
+     "LGPT1C2",
+     "LGPT3C1"
+    ],
+    "use": [
+     "32 kHz crystal pad"
+    ]
+   },
+   "4": {
+    "header": null,
+    "name": "DIO4_X32N",
+    "signals": [
+     "LGPT0C2",
+     "LGPT0C2N",
+     "SPI0MOSI",
+     "UART0TXD"
+    ],
+    "use": [
+     "32 kHz crystal pad"
+    ]
+   },
+   "5": {
+    "header": 27,
+    "name": "DIO5_A2",
+    "signals": [
+     "ADC2",
+     "LGPT2C2"
+    ],
+    "use": []
+   },
+   "6": {
+    "header": 38,
+    "name": "DIO6_A1_AR+",
+    "signals": [
+     "ADC1",
+     "I2C0SCL",
+     "LGPT1C2",
+     "SPI0CSN",
+     "UART0TXD"
+    ],
+    "use": [
+     "SPI flash chip select"
+    ]
+   },
+   "7": {
+    "header": 28,
+    "name": "DIO7_A0_AR-",
+    "signals": [
+     "ADC0",
+     "LGPT3C1"
+    ],
+    "use": []
+   },
+   "8": {
+    "header": 36,
+    "name": "DIO8",
+    "signals": [
+     "I2C0SDA",
+     "LGPT0C0N",
+     "LGPT1C0N",
+     "SPI0SCLK",
+     "UART0RTS"
+    ],
+    "use": []
+   },
+   "9": {
+    "header": 12,
+    "name": "DIO9",
+    "signals": [
+     "LGPT3C0"
+    ],
+    "use": [
+     "button BTN-2"
+    ]
+   }
+  }
+ },
+ "LP_EM_CC2755P10": {
+  "chip": "CC2755P105RHA",
+  "pins": {
+   "0": {
+    "header": 40,
+    "name": "DIO0",
+    "signals": [
+     "LGPT0C0",
+     "LGPT1C0",
+     "LGPT1F",
+     "LGPT3C0N"
+    ],
+    "use": [
+     "button BTN-2"
+    ]
+   },
+   "1": {
+    "header": 4,
+    "name": "DIO1",
+    "signals": [
+     "CAN0TX",
+     "LGPT1C0",
+     "LGPT1C1",
+     "LGPT2C0",
+     "UART0TXD"
+    ],
+    "use": [
+     "backchannel UART: chip TX"
+    ]
+   },
+   "10": {
+    "header": 33,
+    "name": "DIO10_SWDCK",
+    "signals": [
+     "I2C0SDA",
+     "I2S0SD1",
+     "LGPT0C2",
+     "LGPT2C1N",
+     "LGPT2PE"
+    ],
+    "use": [
+     "SWD (debug)"
+    ]
+   },
+   "11": {
+    "header": 39,
+    "name": "DIO11",
+    "signals": [
+     "LGPT1F",
+     "LGPT3C0",
+     "SPI1MISO",
+     "SPI1MOSI"
+    ],
+    "use": []
+   },
+   "12": {
+    "header": 19,
+    "name": "DIO12",
+    "signals": [
+     "LGPT2C2N",
+     "LGPT3C1",
+     "LGPT3C2",
+     "SPI1MISO",
+     "SPI1MOSI"
+    ],
+    "use": [
+     "green LED"
+    ]
+   },
+   "15": {
+    "header": 35,
+    "name": "DIO15",
+    "signals": [
+     "LGPT1C0N",
+     "LGPT3C1",
+     "LGPT3C2",
+     "SPI1SCLK"
+    ],
+    "use": []
+   },
+   "16": {
+    "header": 36,
+    "name": "DIO16",
+    "signals": [
+     "I2S0MCLK",
+     "LGPT1F",
+     "LGPT3C0",
+     "SPI1CSN"
+    ],
+    "use": [
+     "red LED"
+    ]
+   },
+   "17": {
+    "header": 32,
+    "name": "DIO17_A8",
+    "signals": [
+     "ADC8",
+     "CAN0TX",
+     "I2S0SCLK",
+     "LGPT0C0",
+     "UART0RTS"
+    ],
+    "use": []
+   },
+   "18": {
+    "header": 31,
+    "name": "DIO18_A7",
+    "signals": [
+     "ADC7",
+     "CAN0RX",
+     "I2S0WS",
+     "LGPT0C1",
+     "UART0CTS"
+    ],
+    "use": []
+   },
+   "19": {
+    "header": 38,
+    "name": "DIO19_A6",
+    "signals": [
+     "ADC6",
+     "I2S0SD0",
+     "SPI0CSN",
+     "UART0RXD",
+     "UART0TXD"
+    ],
+    "use": [
+     "SPI flash chip select"
+    ]
+   },
+   "2": {
+    "header": 3,
+    "name": "DIO2",
+    "signals": [
+     "CAN0RX",
+     "LGPT0PE",
+     "LGPT1C1",
+     "LGPT1C2",
+     "UART0RXD"
+    ],
+    "use": [
+     "backchannel UART: chip RX"
+    ]
+   },
+   "20": {
+    "header": 30,
+    "name": "DIO20_A5",
+    "signals": [
+     "ADC5",
+     "I2S0SD1",
+     "SPI0SCLK",
+     "UART0RXD",
+     "UART0TXD"
+    ],
+    "use": [
+     "button BTN-1"
+    ]
+   },
+   "21": {
+    "header": 2,
+    "name": "DIO21_A4",
+    "signals": [
+     "ADC4",
+     "I2C0SCL",
+     "LGPT1C1N",
+     "SPI0MOSI",
+     "UART1TXD"
+    ],
+    "use": []
+   },
+   "22": {
+    "header": 6,
+    "name": "DIO22_A3",
+    "signals": [
+     "ADC3",
+     "I2C0SDA",
+     "LGPT1C2N",
+     "SPI0MISO",
+     "UART1RXD"
+    ],
+    "use": []
+   },
+   "23": {
+    "header": null,
+    "name": "DIO23_X32P",
+    "signals": [
+     "LGPT0C2",
+     "LGPT1C0",
+     "SPI1CSN",
+     "UART1RTS"
+    ],
+    "use": [
+     "32 kHz crystal pad"
+    ]
+   },
+   "24": {
+    "header": null,
+    "name": "DIO24_X32N",
+    "signals": [
+     "LGPT0C0",
+     "LGPT0C0N",
+     "SPI1SCLK",
+     "UART1CTS"
+    ],
+    "use": [
+     "32 kHz crystal pad"
+    ]
+   },
+   "27": {
+    "header": 9,
+    "name": "DIO27_A1",
+    "signals": [
+     "ADC1",
+     "I2C0SCL",
+     "LGPT0C1N",
+     "SPI1MOSI"
+    ],
+    "use": []
+   },
+   "28": {
+    "header": 10,
+    "name": "DIO28_A0",
+    "signals": [
+     "ADC0",
+     "I2C0SDA",
+     "LGPT0C2N",
+     "LGPT3C0N",
+     "SPI1MISO"
+    ],
+    "use": []
+   },
+   "3": {
+    "header": 7,
+    "name": "DIO3",
+    "signals": [
+     "I2S0SCLK",
+     "LGPT2C0",
+     "LGPT2PE",
+     "SPI0SCLK",
+     "UART1TXD"
+    ],
+    "use": [
+     "SPI flash and BoosterPack SPI clock"
+    ]
+   },
+   "4": {
+    "header": 14,
+    "name": "DIO4",
+    "signals": [
+     "LGPT1C2",
+     "LGPT2C1",
+     "SPI0MISO",
+     "SPI0MOSI",
+     "UART1RXD"
+    ],
+    "use": [
+     "SPI flash and BoosterPack SPI data in"
+    ]
+   },
+   "5": {
+    "header": 15,
+    "name": "DIO5",
+    "signals": [
+     "LGPT2C1",
+     "LGPT2C2",
+     "LGPT3C1N",
+     "SPI0MISO",
+     "SPI0MOSI"
+    ],
+    "use": [
+     "SPI flash and BoosterPack SPI data out"
+    ]
+   },
+   "7": {
+    "header": 18,
+    "name": "DIO7",
+    "signals": [
+     "I2S0WS",
+     "LGPT2C2",
+     "LGPT3C2N",
+     "SPI0CSN"
+    ],
+    "use": [
+     "BoosterPack SPI chip select"
+    ]
+   },
+   "9": {
+    "header": 34,
+    "name": "DIO9_SWDIO",
+    "signals": [
+     "I2C0SCL",
+     "I2S0SD0",
+     "LGPT0C1",
+     "LGPT0PE",
+     "LGPT2C0N"
+    ],
+    "use": [
+     "SWD (debug)"
+    ]
+   }
+  }
+ }
+}

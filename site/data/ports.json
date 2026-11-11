@@ -235,7 +235,7 @@
    ],
    "status": "runs",
    "headline": "An ESPHome YAML with cc27xx: builds and flashes a Zigbee device that joins Home Assistant on the LP-EM-CC2755P10.",
-   "changed": "An ESPHome external platform plus a 388-line shim for the Nordic and Zephyr calls ESPHome's Zigbee code makes; no ESPHome file changed",
+   "changed": "An ESPHome external platform plus a shim for the Nordic and Zephyr calls ESPHome's Zigbee code makes; no ESPHome file changed. Since 2026-11-10 also the logger (esphome logs), every DIO as a checked pin, I2C, ADC and PWM on TI's drivers, and saved settings in flash",
    "effort": "About 1 min from esphome compile to a joined device",
    "broke": "A second flash with the old device still listed in Home Assistant never rejoined; removing the device first fixed it (cause unknown)",
    "page": "project-esphome.html",
@@ -253,8 +253,8 @@
      },
      "memory": {
       "level": "runs",
-      "note": "262.7 kB flash; 124.4 kB RAM free",
-      "evidence": "docs/experiments/2026-10-13-esphome-cc27xx-platform.md"
+      "note": "router with logger, GPIO and saved settings: 281.9 kB flash, 39.7 kB of 165.9 kB RAM; with ADC and PWM 290.2 kB and 40.7 kB",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-logger.md"
      },
      "function": {
       "level": "runs",
@@ -263,8 +263,8 @@
      },
      "gpio": {
       "level": "runs",
-      "note": "LED switched from Home Assistant",
-      "evidence": "docs/experiments/2026-10-13-esphome-cc27xx-platform.md"
+      "note": "all 23 DIOs mapped; 19 read back with pull-up, pull-down and output in a self test",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-pins.md"
      },
      "radio": {
       "level": "runs",
@@ -279,6 +279,11 @@
      "low_power": {
       "level": "untried",
       "note": "not measured"
+     },
+     "adc": {
+      "level": "gap",
+      "note": "TI ADC component reads a pin; no reference voltage applied yet (jumper test open)",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-buses.md"
      }
     }
    },
@@ -303,7 +308,7 @@
    ],
    "status": "runs",
    "headline": "The same YAML with cc23xx: runs a Zigbee end device on the LP-EM-CC2340R5.",
-   "changed": "The cc23xx platform beside cc27xx, sharing the shim",
+   "changed": "The cc23xx platform beside cc27xx, sharing the shim. Since 2026-11-10 also the logger, every DIO as a checked pin, I2C and PWM on TI's drivers, and saved settings in flash",
    "broke": "The chip temperature reads about 10 C low (cause unknown); 7 of 100 first commands timed out",
    "page": "project-esphome.html",
    "code": "ports/esphome-ti",
@@ -320,8 +325,8 @@
      },
      "memory": {
       "level": "runs",
-      "note": "32.0 of 36 kB RAM used, 4.0 kB free; router role runs only with the heap cut by 2 kB",
-      "evidence": "docs/experiments/2026-10-13-esphome-cc27xx-platform.md"
+      "note": "end device with logger, I2C, PWM and saved settings: 252.3 kB flash, 35.6 of 36.9 kB RAM at link time, heap 1.4 kB free at run time; router role runs only with the heap cut by 2 kB",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-logger.md"
      },
      "function": {
       "level": "runs",
@@ -341,6 +346,11 @@
      "timing": {
       "level": "untried",
       "note": "no latency figure recorded"
+     },
+     "gpio": {
+      "level": "runs",
+      "note": "all DIOs mapped from TI's board data; counter kept over 3 resets",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-saved-settings.md"
      }
     }
    },
@@ -366,7 +376,7 @@
    "status": "runs",
    "headline": "A Wi-Fi ESPHome device runs on the LP-EM-CC35X1 with ESPHome's native API: a client on the board got 20 of 20 switch commands confirmed.",
    "changed": "A cc35xx platform on TI's Wi-Fi SDK and lwIP; ESPHome's API encryption is refused until the chip's hardware random number generator is wired in",
-   "broke": "The only network available isolates its clients from the rest of the local network, so Home Assistant could not reach the board",
+   "broke": "The only network available isolates its clients from the rest of the local network, so Home Assistant could not reach the board. Not advanced on 2026-11-10: the board was not on USB; the Noise library compiles to 25.5 kB of flash, not wired in",
    "page": "project-esphome.html",
    "code": "ports/esphome-ti",
    "writeup": "docs/experiments/2026-10-13-esphome-cc35xx-platform.md",
@@ -1694,6 +1704,44 @@
       "level": "builds",
       "note": "5.1 kB RAM with 24 buffers",
       "evidence": "portability/cc1407p-host/README.md"
+     },
+     "radio": {
+      "level": "untried",
+      "note": "no packet sent"
+     }
+    }
+   },
+   "upstream": {
+    "state": "no-channel",
+    "to": "the CC1407P host driver"
+   }
+  },
+  {
+   "id": "cc1407p-iwrl6432",
+   "group": "radio",
+   "name": "CC1407P host driver on the IWRL6432BOOST radar's own processor",
+   "boards": [
+    "iwrl6432boost"
+   ],
+   "status": "builds",
+   "public": false,
+   "headline": "A transmit app for the radar chip's Cortex-M4F builds with TI's host driver and the repo's bare-metal layer: a 47.9 kB boot image and 24.3 kB of RAM, the radio on the board's SPI A pins. Built only: the radar's shipped flash image cannot be read back, so the flash write waits for a go, and no packet has been sent.",
+   "page": "project-radio-range.html",
+   "code": "iwrl6432boost/cc1407p",
+   "writeup": "docs/experiments/2026-11-10-iwrl6432boost-cc1407p-radio.md",
+   "source": "iwrl6432boost/cc1407p/README.md",
+   "from": "TI's CC1407P BoosterPack host driver",
+   "compat": {
+    "iwrl6432boost": {
+     "build": {
+      "level": "builds",
+      "note": "47,876 B boot image on MMWAVE-L-SDK 05.05.04.02",
+      "evidence": "iwrl6432boost/cc1407p/README.md"
+     },
+     "memory": {
+      "level": "builds",
+      "note": "24,280 B of RAM with 24 buffers",
+      "evidence": "iwrl6432boost/cc1407p/README.md"
      },
      "radio": {
       "level": "untried",

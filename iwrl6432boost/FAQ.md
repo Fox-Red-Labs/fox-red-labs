@@ -32,6 +32,18 @@ Write the name back with `xdsdfu -n RI32`. After a DSLite run updated the probe 
 
 Run `bash portability/radar-family/build/build.sh <work dir>`. TI lists Windows 10 or Ubuntu as the MMWAVE-L-SDK host, but its makefiles build on a Mac when the Unix helpers are passed in (`"MKDIR=mkdir -p"`, `RM`, `COPY`, `CAT`, `TOUCH`). The boot image needs TI's `out2rprc.exe` under mono in an arm64 Debian container (mono crashes under amd64 emulation) and its x86-64 image tools in an amd64 one. All four variants of the 05.05.04.02 presence and tracking demo built this way on 2026-11-03, within 192 B of TI's prebuilt images; none has been flashed yet. Source: `portability/radar-family/README.md`.
 
+### SysConfig stops with `Missing argument: --board or --device must be specified`. What now?
+
+Put the SDK example's header comment at the top of your `.syscfg`: `@cliArgs --device "XWRL64XX" --package "FCCSP" --part "Default" --context "m4fss0-0" --product "MMWAVE-L-SDK@05.00.00"`. A `.syscfg` copied without that comment has no device, and the SDK makefile passes none. `iwrl6432boost/cc1407p/example.syscfg` carries it. Hit 2026-11-10 on the first build of the CC1407P transmit app.
+
+### `preflight_image.py` prints `REFUSE (c) segment load range 0x00400000-0x00400140 is outside this chip's flash and SRAM`. Is the image bad?
+
+No. The check assumes an MSPM0-style map (flash at 0x0, RAM at 0x20000000) because `data/boards.csv` has no memory map for this board, so every segment of a radar image is refused. This chip's ROM loads the image into the Cortex-M4F's RAM at 0x00400000, which is where TI's own linker file puts every example. Read the load ranges against `linker.cmd` yourself; the tool is no gate for this board. Hit 2026-11-10 on the CC1407P transmit app image.
+
+### Can I back up the radar's flash before I write an image?
+
+No tool found. `arprog_cmdline.py` takes `-e` (erase), `-f` (write) and `-fr` (format) and has no read option, so the shipped image cannot be saved. The way back is TI's public prebuilt demo image, flashed with the same command. Checked 2026-11-10 against the script's argument list in MMWAVE-L-SDK 05.05.04.02.
+
 ### Where is the flasher for TI's other demos? Radar Toolbox has only images
 
 Radar Toolbox 4.00.00.05 holds prebuilt images but no flasher; `arprog_cmdline.py` comes with the mmWave L SDK. Start the script only after S1 position 1 is OFF and NRST is pressed, because it reads any 0xCC byte as the board's answer. Source: `iwrl6432boost/README.md`.

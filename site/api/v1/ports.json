@@ -44,7 +44,7 @@
    ],
    "status": "runs",
    "headline": "An ESPHome YAML with cc27xx: builds and flashes a Zigbee device that joins Home Assistant on the LP-EM-CC2755P10.",
-   "changed": "An ESPHome external platform plus a 388-line shim for the Nordic and Zephyr calls ESPHome's Zigbee code makes; no ESPHome file changed",
+   "changed": "An ESPHome external platform plus a shim for the Nordic and Zephyr calls ESPHome's Zigbee code makes; no ESPHome file changed. Since 2026-11-10 also the logger (esphome logs), every DIO as a checked pin, I2C, ADC and PWM on TI's drivers, and saved settings in flash",
    "effort": "About 1 min from esphome compile to a joined device",
    "broke": "A second flash with the old device still listed in Home Assistant never rejoined; removing the device first fixed it (cause unknown)",
    "page": "project-esphome.html",
@@ -62,8 +62,8 @@
      },
      "memory": {
       "level": "runs",
-      "note": "262.7 kB flash; 124.4 kB RAM free",
-      "evidence": "docs/experiments/2026-10-13-esphome-cc27xx-platform.md"
+      "note": "router with logger, GPIO and saved settings: 281.9 kB flash, 39.7 kB of 165.9 kB RAM; with ADC and PWM 290.2 kB and 40.7 kB",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-logger.md"
      },
      "function": {
       "level": "runs",
@@ -72,8 +72,8 @@
      },
      "gpio": {
       "level": "runs",
-      "note": "LED switched from Home Assistant",
-      "evidence": "docs/experiments/2026-10-13-esphome-cc27xx-platform.md"
+      "note": "all 23 DIOs mapped; 19 read back with pull-up, pull-down and output in a self test",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-pins.md"
      },
      "radio": {
       "level": "runs",
@@ -88,6 +88,11 @@
      "low_power": {
       "level": "untried",
       "note": "not measured"
+     },
+     "adc": {
+      "level": "gap",
+      "note": "TI ADC component reads a pin; no reference voltage applied yet (jumper test open)",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-buses.md"
      }
     }
    },
@@ -112,7 +117,7 @@
    ],
    "status": "runs",
    "headline": "The same YAML with cc23xx: runs a Zigbee end device on the LP-EM-CC2340R5.",
-   "changed": "The cc23xx platform beside cc27xx, sharing the shim",
+   "changed": "The cc23xx platform beside cc27xx, sharing the shim. Since 2026-11-10 also the logger, every DIO as a checked pin, I2C and PWM on TI's drivers, and saved settings in flash",
    "broke": "The chip temperature reads about 10 C low (cause unknown); 7 of 100 first commands timed out",
    "page": "project-esphome.html",
    "code": "ports/esphome-ti",
@@ -129,8 +134,8 @@
      },
      "memory": {
       "level": "runs",
-      "note": "32.0 of 36 kB RAM used, 4.0 kB free; router role runs only with the heap cut by 2 kB",
-      "evidence": "docs/experiments/2026-10-13-esphome-cc27xx-platform.md"
+      "note": "end device with logger, I2C, PWM and saved settings: 252.3 kB flash, 35.6 of 36.9 kB RAM at link time, heap 1.4 kB free at run time; router role runs only with the heap cut by 2 kB",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-logger.md"
      },
      "function": {
       "level": "runs",
@@ -150,6 +155,11 @@
      "timing": {
       "level": "untried",
       "note": "no latency figure recorded"
+     },
+     "gpio": {
+      "level": "runs",
+      "note": "all DIOs mapped from TI's board data; counter kept over 3 resets",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-saved-settings.md"
      }
     }
    },
@@ -175,7 +185,7 @@
    "status": "runs",
    "headline": "A Wi-Fi ESPHome device runs on the LP-EM-CC35X1 with ESPHome's native API: a client on the board got 20 of 20 switch commands confirmed.",
    "changed": "A cc35xx platform on TI's Wi-Fi SDK and lwIP; ESPHome's API encryption is refused until the chip's hardware random number generator is wired in",
-   "broke": "The only network available isolates its clients from the rest of the local network, so Home Assistant could not reach the board",
+   "broke": "The only network available isolates its clients from the rest of the local network, so Home Assistant could not reach the board. Not advanced on 2026-11-10: the board was not on USB; the Noise library compiles to 25.5 kB of flash, not wired in",
    "page": "project-esphome.html",
    "code": "ports/esphome-ti",
    "writeup": "docs/experiments/2026-10-13-esphome-cc35xx-platform.md",

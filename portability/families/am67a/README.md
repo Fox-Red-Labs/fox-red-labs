@@ -12,7 +12,7 @@ Contents: the part, the answers to four porting questions (what moves from the A
 |---|---|---|---|---|---|
 | AM67A (J722S) | BeagleY-AI 4 GB | four Cortex-A53 at 1.4 GHz, two C7x with MMA, R5F cores | 4 GB LPDDR4 (2,529 MB visible to Linux), microSD | Gigabit Ethernet, Wi-Fi and Bluetooth LE, micro-HDMI, Wave5 codec, 40-pin header, LEDs `ACT` and `PWR`; USB-C is power only on the Edge AI image | `beagley-ai/FIRST-BOOT.log`, `beagley-ai/bench/portability/os-survey.log` |
 
-Board folder: `beagley-ai/`.
+Board folder: [`beagley-ai/`](../../../beagley-ai/README.md).
 
 ### Part-to-part map: the AM67A against the other Linux parts held
 
@@ -76,7 +76,7 @@ The boundary that exists is the five-call contract in `portability/three-ways/co
 
 ## Ten-minute path
 
-Run the seam app on a BeagleY-AI that already boots the Edge AI image (steps to boot it: `beagley-ai/README.md`). The commands are from `beagley-ai/bench/seam/README.md`.
+Run the seam app on a BeagleY-AI that already boots the Edge AI image (steps to boot it: [`beagley-ai/README.md`](../../../beagley-ai/README.md)). The commands are from `beagley-ai/bench/seam/README.md`.
 
 1. Mac, terminal. Copy the app and the clip's folder is already on the board:
 

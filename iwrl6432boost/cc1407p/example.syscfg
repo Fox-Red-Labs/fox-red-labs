@@ -1,0 +1,67 @@
+/**
+ * @cliArgs --device "XWRL64XX" --package "FCCSP" --part "Default" --context "m4fss0-0" --product "MMWAVE-L-SDK@05.00.00"
+ */
+
+/*
+ * CC1407P host on the IWRL6432BOOST: McSPI A (the board's SPI header nets), reset on the nERROR pad,
+ * SPI_INT on the HOST_INTR pad, console on UARTB (the board's USB serial port ending in 1).
+ */
+const mcspi      = scripting.addModule("/drivers/mcspi/mcspi", {}, false);
+const mcspi1     = mcspi.addInstance();
+const gpio       = scripting.addModule("/drivers/gpio/gpio", {}, false);
+const gpio1      = gpio.addInstance();
+const gpio2      = gpio.addInstance();
+const debug_log  = scripting.addModule("/kernel/dpl/debug_log");
+const mpu_armv7  = scripting.addModule("/kernel/dpl/mpu_armv7", {}, false);
+const mpu_armv71 = mpu_armv7.addInstance();
+const mpu_armv72 = mpu_armv7.addInstance();
+const mpu_armv73 = mpu_armv7.addInstance();
+
+mcspi1.$name                 = "CONFIG_MCSPI0";
+mcspi1.intrEnable            = "POLLED";
+mcspi1.MCSPI.$assign         = "MCSPIA";
+mcspi1.mcspiChannel[0].$name = "CONFIG_MCSPI_CH0";
+mcspi1.mcspiChannel[0].bitRate = 1000000;
+
+gpio1.pinDir               = "OUTPUT";
+gpio1.$name                = "GPIO_RADIO_RESET";
+gpio1.GPIO.$assign         = "GPIO";
+gpio1.GPIO.gpioPin.$assign = "ball.K11";
+
+gpio2.$name                = "GPIO_RADIO_INT";
+gpio2.trigType             = "FALL_EDGE";
+gpio2.GPIO.$assign         = "GPIO";
+gpio2.GPIO.gpioPin.$assign = "ball.J10";
+
+debug_log.enableUartLog           = true;
+debug_log.uartLog.$name           = "CONFIG_UART0";
+debug_log.uartLog.UART.RX.$assign = "ball.F11";
+debug_log.uartLog.UART.TX.$assign = "ball.E10";
+
+const edma                         = scripting.addModule("/drivers/edma/edma", {}, false);
+const edma1                        = edma.addInstance({}, false);
+edma1.$name                        = "CONFIG_EDMA0";
+debug_log.uartLog.edmaConfig       = edma1;
+edma1.edmaRmDmaCh[0].$name         = "CONFIG_EDMA_RM0";
+edma1.edmaRmQdmaCh[0].$name        = "CONFIG_EDMA_RM1";
+edma1.edmaRmTcc[0].$name           = "CONFIG_EDMA_RM2";
+edma1.edmaRmParam[0].$name         = "CONFIG_EDMA_RM3";
+edma1.edmaRmReservedDmaCh[0].$name = "CONFIG_EDMA_RM4";
+
+mpu_armv71.$name        = "CONFIG_MPU_REGION0";
+mpu_armv71.attributes   = "Device";
+mpu_armv71.allowExecute = false;
+
+mpu_armv72.$name    = "CONFIG_MPU_REGION1";
+mpu_armv72.baseAddr = 0x400000;
+mpu_armv72.size     = 19;
+
+mpu_armv73.$name    = "CONFIG_MPU_REGION2";
+mpu_armv73.baseAddr = 0x22400000;
+mpu_armv73.size     = 19;
+
+mcspi1.MCSPI.CLK.$suggestSolution           = "ball.D10";
+mcspi1.MCSPI.MOSI.$suggestSolution          = "ball.B12";
+mcspi1.MCSPI.MISO.$suggestSolution          = "ball.C11";
+mcspi1.mcspiChannel[0].CSn.$suggestSolution = "ball.D11";
+debug_log.uartLog.UART.$suggestSolution     = "UARTB";

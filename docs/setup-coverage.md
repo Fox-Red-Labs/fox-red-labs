@@ -174,7 +174,7 @@ No guided route. Start with `bash mac-setup/bootstrap.sh --check` for the tools,
 | LP-AM243 | `am243x` | [`am243x/README.md`](../am243x/README.md) | none | none |
 | LP-AM263P | `am263p` | [`am263p/README.md`](../am263p/README.md) | none | 1 |
 | TMDS62LEVM (AM62L EVM) | `am62l-evm` | [`am62l-evm/README.md`](../am62l-evm/README.md) | none | 4 |
-| BeagleY-AI | `beagley-ai` | | none | 2 |
+| BeagleY-AI | `beagley-ai` | [`beagley-ai/README.md`](../beagley-ai/README.md) | none | 1 |
 | CC3200-LAUNCHXL | `cc3200` | [`cc3200-launchxl/README.md`](../cc3200-launchxl/README.md) | none | none |
 | ESP32-C6-DevKitC-1-N8 | `esp32c6` | [`esp32c6/README.md`](../esp32c6/README.md) | none | 2 |
 | LAUNCHXL-F28P65X | `f28p65x` | [`c2000-launchpad/README.md`](../c2000-launchpad/README.md) | none | none |

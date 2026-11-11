@@ -297,6 +297,7 @@ beagley-ai/bench/camera-usb-drops-2026-11-03.log
 beagley-ai/bench/docker/ha-and-pull.log
 beagley-ai/bench/docker/mosquitto.log
 beagley-ai/bench/docker/pihole.log
+beagley-ai/bench/gamestream/stream1-top.txt
 beagley-ai/bench/llm/llama-bench.log
 beagley-ai/bench/portability/lse-trap-run.log
 beagley-ai/bench/portability/moonlight-build.log
@@ -313,7 +314,6 @@ beagley-ai/bench/whisper/whisper-bench.log
 beagley-ai/bench/zoo/clocks-2026-11-04.log
 beagley-ai/bench/zoo/zoo_cpu.log
 beagley-ai/bench/zoo/zoo_tidl.log
-beagley-ai/frigate/README.md
 beagley-ai/frigate/logs/cpu-tflite-clip.log
 beagley-ai/frigate/logs/onnx-a53-clip-t3.log
 beagley-ai/frigate/logs/server-stats.log

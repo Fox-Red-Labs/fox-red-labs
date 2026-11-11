@@ -1,0 +1,34 @@
+# Frigate 0.18.2 on the BeagleY-AI, detector = Frigate's bundled CPU detector (TFLite ssdlite mobilenet v2 300x300), the comparison run, input = a recorded H.264 clip (TI's sample clip video1_1280_768.h264 (two people and a dog, 409 frames) repeated 30 times, built by cat)
+mqtt:
+  enabled: false
+auth:
+  enabled: false
+detectors:
+  cpu1:
+    type: cpu
+    num_threads: 3
+cameras:
+  yard:
+    ffmpeg:
+      inputs:
+        - path: /media/yard30.h264
+          input_args: -re -f h264 -r 30
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 1280
+      height: 768
+      fps: 5
+    motion:
+      threshold: 100
+      contour_area: 600
+      improve_contrast: false
+    objects:
+      track:
+        - person
+        - dog
+    record:
+      enabled: false
+    snapshots:
+      enabled: false

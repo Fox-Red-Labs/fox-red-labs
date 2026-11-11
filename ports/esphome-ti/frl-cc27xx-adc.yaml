@@ -1,0 +1,47 @@
+# LP-EM-CC2755P10: two analog inputs through the TI ADC driver (DIO21 is header pin 2, DIO22 is header pin 6), the PWM
+# output on the red LED (DIO16), and saved settings. Header pin 2 to 3V3 should read about 3.3 V; header pin 6 to GND about 0 V.
+esphome:
+  name: frl-cc27xx-adc
+
+external_components:
+  - source: {type: local, path: components}
+    components: [cc27xx, die_temperature, ti_adc, ti_pwm]
+
+cc27xx:
+  board: LP_EM_CC2755P10
+  # probe_serial: XXXXXXXX
+
+zigbee:
+  router: true
+  model: "FRL adc"
+
+logger:
+  level: DEBUG
+
+preferences:
+  flash_write_interval: 60s
+
+output:
+  - platform: ti_pwm
+    id: pwm_led
+    pin: DIO16
+    frequency: 1kHz
+
+light:
+  - platform: monochromatic
+    name: "Red LED"
+    output: pwm_led
+    restore_mode: RESTORE_DEFAULT_OFF
+
+sensor:
+  - platform: ti_adc
+    pin: DIO21
+    name: "ADC DIO21"
+    update_interval: 10s
+  - platform: ti_adc
+    pin: DIO22
+    name: "ADC DIO22"
+    update_interval: 10s
+  - platform: die_temperature
+    name: "Chip temperature"
+    update_interval: 60s

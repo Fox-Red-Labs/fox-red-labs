@@ -5,8 +5,8 @@
 #include "esphome/core/helpers.h"
 #include "esphome/core/wake.h"
 #include "esphome/core/preferences.h"
-#include "esphome/components/zephyr/gpio.h"
-#include "esphome/components/zephyr/preferences.h"
+#include <esphome/components/zephyr/gpio.h>
+#include <esphome/components/zephyr/preferences.h>
 #if __has_include("esphome/components/internal_temperature/internal_temperature.h")
 #include "esphome/components/internal_temperature/internal_temperature.h"
 #define FRL_HAVE_INTERNAL_TEMPERATURE 1
@@ -21,6 +21,8 @@ void ti_fcfg_mac(uint8_t out[8]);
 void ti_reset_system(void);
 int32_t ti_die_temperature_c(void);
 #include "ti_drivers_config.h"
+extern const uint_least8_t GPIO_pinLowerBound;
+extern const uint_least8_t GPIO_pinUpperBound;
 }
 
 namespace esphome {
@@ -82,38 +84,29 @@ void wakeable_delay(uint32_t ms) {
 }
 }  // namespace internal
 
-// ---- preferences (stubbed) ----
-ESPPreferences *global_preferences = nullptr;
+// ---- gpio.cpp: every DIO, through TI's GPIO driver ----
+// SysConfig's GPIO table (gpioPinConfigs) has one entry per DIO and the driver indexes it by DIO number (GPIO_pinUpperBound
+// is the last one), so ESPHome's pin number is the driver index. SWD and other pins SysConfig marks DO_NOT_CONFIG are refused.
 namespace zephyr {
-static ESPPreferences prefs_instance;
-void setup_preferences() { global_preferences = &prefs_instance; }
-
-// ---- gpio.cpp: LED pins only; DIO number -> GPIO driver config index from sysconfig ----
-static int cfg_index(uint8_t dio) {
-  switch (dio) {
-#ifdef FRL_BOARD_CC2340R5
-    case 14: return CONFIG_GPIO_RLED;  // LP-EM-CC2340R5: red LED on DIO14, green on DIO15 (checked in the generated ti_drivers_config.c)
-    case 15: return CONFIG_GPIO_GLED;
-#endif
-    case 16: return CONFIG_GPIO_RLED;
-    case 12: return CONFIG_GPIO_GLED;
-    default: return -1;
-  }
+static bool dio_ok(uint8_t dio) {
+  return dio >= GPIO_pinLowerBound && dio <= GPIO_pinUpperBound;
 }
 void ZephyrGPIOPin::setup() { this->pin_mode(this->flags_); }
 void ZephyrGPIOPin::pin_mode(gpio::Flags flags) {
-  int i = cfg_index(this->pin_);
-  if (i < 0) return;
-  if (flags & gpio::FLAG_OUTPUT) GPIO_setConfig(i, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
-  else GPIO_setConfig(i, GPIO_CFG_IN_PU);
+  if (!dio_ok(this->pin_)) return;
+  if (flags & gpio::FLAG_OUTPUT) {
+    GPIO_setConfig(this->pin_, GPIO_CFG_OUT_STD | GPIO_CFG_OUT_LOW);
+  } else if (flags & gpio::FLAG_PULLUP) {
+    GPIO_setConfig(this->pin_, GPIO_CFG_IN_PU);
+  } else if (flags & gpio::FLAG_PULLDOWN) {
+    GPIO_setConfig(this->pin_, GPIO_CFG_IN_PD);
+  } else {
+    GPIO_setConfig(this->pin_, GPIO_CFG_IN_NOPULL);
+  }
 }
-bool ZephyrGPIOPin::digital_read() {
-  int i = cfg_index(this->pin_);
-  return (i >= 0 ? GPIO_read(i) != 0 : false) != this->inverted_;
-}
+bool ZephyrGPIOPin::digital_read() { return (dio_ok(this->pin_) ? GPIO_read(this->pin_) != 0 : false) != this->inverted_; }
 void ZephyrGPIOPin::digital_write(bool value) {
-  int i = cfg_index(this->pin_);
-  if (i >= 0) GPIO_write(i, value != this->inverted_);
+  if (dio_ok(this->pin_)) GPIO_write(this->pin_, value != this->inverted_);
 }
 size_t ZephyrGPIOPin::dump_summary(char *buffer, size_t len) const { return snprintf(buffer, len, "DIO%u", this->pin_); }
 }  // namespace zephyr

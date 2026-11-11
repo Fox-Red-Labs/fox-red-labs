@@ -57,4 +57,4 @@ Every number for a board of this family is a row in its results file (`data/READ
 
 | Board | Rows | By status |
 |---|--:|---|
-| [iwrl6432boost](../../../data/results/iwrl6432boost.csv) | 88 | measured 40, waiting 31, not_supported 11, not_run 5, failed 1 |
+| [iwrl6432boost](../../../data/results/iwrl6432boost.csv) | 92 | measured 43, waiting 32, not_supported 11, not_run 5, failed 1 |

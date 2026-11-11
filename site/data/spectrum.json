@@ -149,10 +149,11 @@
     "Two CAN-FD controllers"
    ],
    "drops": [
-    "No AI accelerator and no math accelerator on the chip",
+    "No AI accelerator on this chip (the family's MSPM33C34 series has a TinyEngine NPU; this kit's MSPM33C321A does not, per its ti.com page)",
     "No radio"
    ],
-   "line": "A 160 MHz Cortex-M33 with 256 kB of RAM, 1 MB of flash and a hardware security block, for devices that hold keys. No AI accelerator."
+   "ai_source": "ti.com/product/MSPM33C321A: hardware accelerators are TrustZone, CPU only, FPU; TI Tiny ML ModelZoo 1.5.0 lists the MSPM33C34 as the family's hardware-NPU part",
+   "line": "A 160 MHz Cortex-M33 with 256 kB of RAM, 1 MB of flash and a hardware security block, for devices that hold keys. No AI accelerator on this chip; the family's C34 series has one."
   },
   {
    "part": "CC2340R52",

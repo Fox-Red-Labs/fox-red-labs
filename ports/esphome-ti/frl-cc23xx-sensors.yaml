@@ -1,0 +1,53 @@
+# LP-EM-CC2340R5 with the BP-BASSENSORSMKII sensors BoosterPack plugged on (no wires): ESPHome's own hdc2080 and opt3001
+# components over the TI I2C driver (SDA DIO0, SCL DIO24, the BoosterPack header's I2C pins), and the red LED (DIO14)
+# dimmed by PWM through ESPHome's `output` and `light: monochromatic`.
+esphome:
+  name: frl-cc23xx-sensors
+
+external_components:
+  - source: {type: local, path: components}
+    components: [cc27xx, cc23xx, die_temperature, ti_adc, ti_pwm]
+
+cc23xx:
+  board: LP_EM_CC2340R5
+  # probe_serial: XXXXXXXX
+
+zigbee:
+  router: false
+  model: "FRL sensors"
+
+logger:
+  level: DEBUG
+  tx_buffer_size: 256
+
+preferences:
+  flash_write_interval: 60s
+
+i2c:
+  sda: DIO0
+  scl: DIO24
+  scan: true
+
+output:
+  - platform: ti_pwm
+    id: pwm_led
+    pin: DIO14
+    frequency: 1kHz
+
+light:
+  - platform: monochromatic
+    name: "Red LED"
+    output: pwm_led
+    restore_mode: RESTORE_DEFAULT_OFF
+
+sensor:
+  - platform: hdc2080
+    temperature: {name: "Temperature"}
+    humidity: {name: "Humidity"}
+    update_interval: 30s
+  - platform: opt3001
+    name: "Light"
+    update_interval: 30s
+  - platform: die_temperature
+    name: "Chip temperature"
+    update_interval: 60s

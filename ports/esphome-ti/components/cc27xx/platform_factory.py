@@ -13,6 +13,7 @@ import re
 from pathlib import Path
 
 from esphome import pins
+import voluptuous as vol
 import esphome.codegen as cg
 from esphome.components.zephyr import zephyr_set_core_data, zephyr_to_code, zephyr_setup_preferences
 from esphome.components.zephyr.const import KEY_BOOTLOADER, zephyr_ns
@@ -30,7 +31,7 @@ from esphome.const import (
 from esphome.core import CORE, EsphomeError
 from esphome.coroutine import CoroPriority, coroutine_with_priority
 
-from . import ti_build
+from . import periph, ti_build
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,6 +43,45 @@ CONF_PROBE_SERIAL = "probe_serial"
 CONF_HEAP_SIZE = "heap_size"
 
 ZephyrGPIOPin = zephyr_ns.class_("ZephyrGPIOPin", cg.InternalGPIOPin)
+
+_TI_PLATFORMS = ("cc27xx", "cc23xx", "cc35xx")
+
+
+def _let_ti_platforms_pass_nrf52_gates():
+    """ESPHome gates i2c, spi, uart and other buses with cv.only_on([... "nrf52" ...]) and builds their Zephyr code
+    for the "nrf52" target. This platform builds the same generated surface (see the shim), so the gate lets the TI
+    platform names through wherever it lets nrf52 through. It has to run before those components are imported."""
+    if getattr(cv, "_ti_only_on_patched", False):
+        return
+    original = cv.only_on
+    original_default = cv.SplitDefault.default
+
+    def only_on(platforms):
+        plist = platforms if isinstance(platforms, list) else [platforms]
+        if "nrf52" in plist:
+            plist = plist + [p for p in _TI_PLATFORMS if p not in plist]
+        return original(plist)
+
+    cv.only_on = only_on
+
+    def split_default(self):
+        """Per-platform defaults (SplitDefault) have no entry for a TI platform name. Use the nrf52 entry, whose Zephyr
+        build this surface follows, except that GPIO interrupts are not wired up here, so use_interrupt defaults to false
+        (the binary_sensor polls the pin in ESPHome's loop)."""
+        if CORE.data.get(KEY_CORE, {}).get(KEY_TARGET_PLATFORM) in _TI_PLATFORMS:
+            if self.schema == "use_interrupt":
+                return vol.default_factory(False)
+            if self.schema == "hardware_uart":  # the logger's UART choice: nrf52's USB CDC does not exist here
+                return vol.default_factory(vol.UNDEFINED)
+            if "nrf52" in self._defaults:
+                return self._defaults["nrf52"]
+        return original_default.fget(self)
+
+    cv.SplitDefault.default = property(split_default, original_default.fset)
+    cv._ti_only_on_patched = True
+
+
+_let_ti_platforms_pass_nrf52_gates()
 
 
 def _pin_number(value):
@@ -63,15 +103,46 @@ def _pin_number(value):
 
 def _validate_pin(value):
     n = _pin_number(value)
-    if n < 0 or n > 31:
-        raise cv.Invalid(f"Invalid DIO number: {n}")
+    board = CORE.data.get("ti_f3_board")
+    if board is None:
+        return n
+    table = periph.board_pins(board)
+    if n not in table:
+        raise cv.Invalid(f"DIO{n} does not exist on {board}; the chip has {', '.join('DIO%d' % d for d in sorted(table))}")
+    info = table[n]
+    for use in info["use"]:
+        if use.startswith("SWD") or use.startswith("32 kHz"):
+            raise cv.Invalid(f"DIO{n} is the {use} on {board} and cannot be used as a GPIO here")
+    shared = [u for u in info["use"] if "LED" not in u and "button" not in u]
+    if shared:
+        _LOGGER.warning("DIO%d is also used on %s for: %s (BoosterPack header pin %s)", n, board, ", ".join(shared), info["header"])
     return n
+
+
+def _logger_uart_selection_for_ti(platform):
+    """ESPHome's logger asks the platform which UART it offers and has no answer for an out-of-tree platform (it raises
+    NotImplementedError). Here the log always goes to the LaunchPad kit's backchannel UART (the XDS110 application port),
+    so a hardware_uart: choice is refused and the logger's own default is used."""
+    from esphome.components import logger as _logger
+
+    if getattr(_logger, "_ti_uart_selection_patched", False):
+        return
+    original = _logger.uart_selection
+
+    def uart_selection(value):
+        if CORE.data.get(KEY_CORE, {}).get(KEY_TARGET_PLATFORM) in _TI_PLATFORMS:
+            raise cv.Invalid(f"{platform} logs to the board's backchannel UART; hardware_uart is not used")
+        return original(value)
+
+    _logger.uart_selection = uart_selection
+    _logger._ti_uart_selection_patched = True
 
 
 def make_platform(platform: str, boards: dict[str, str], default_board: str) -> dict:
     """Return the module-level names ESPHome looks for in esphome.components.<platform>."""
 
     def _set_core_data(config):
+        CORE.data["ti_f3_board"] = config[CONF_BOARD]
         zephyr_set_core_data({CONF_BOARD: config[CONF_BOARD], KEY_BOOTLOADER: ""})
         CORE.data[KEY_CORE][KEY_TARGET_PLATFORM] = platform
         CORE.data[KEY_CORE][KEY_TARGET_FRAMEWORK] = "zephyr"
@@ -86,6 +157,8 @@ def make_platform(platform: str, boards: dict[str, str], default_board: str) -> 
         if key not in boards:
             raise cv.Invalid(f"{platform} supports {', '.join(boards)}; got {value}")
         return key
+
+    _logger_uart_selection_for_ti(platform)
 
     config_schema = cv.All(
         cv.Schema(
@@ -160,6 +233,10 @@ def make_platform(platform: str, boards: dict[str, str], default_board: str) -> 
             raise EsphomeError(f"{platform} needs the zigbee: component")
         router = bool(zb.get("router"))
         board = conf[CONF_BOARD]
+        try:
+            per = periph.collect(config, board)
+        except ValueError as err:
+            raise EsphomeError(str(err)) from err
         out_dir = CORE.relative_pioenvs_path(CORE.name)
         try:
             res = ti_build.build(
@@ -172,6 +249,10 @@ def make_platform(platform: str, boards: dict[str, str], default_board: str) -> 
                 sleepy=bool(zb.get("sleepy")),
                 heap_size=conf.get(CONF_HEAP_SIZE),
                 conf=conf,
+                per=per,
+                # ESPHome hands some options (the log level, feature switches) to the compiler as build flags, which other
+                # platforms pass through PlatformIO; here they go straight to TI Arm Clang. Only defines and undefines are taken.
+                esphome_flags=sorted(f for f in CORE.build_flags if f.startswith(("-D", "-U"))),
             )
         except ti_build.BuildError as err:
             hint = ""

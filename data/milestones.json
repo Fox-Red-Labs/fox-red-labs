@@ -1687,7 +1687,7 @@
       "area": "ecosystems",
       "number": "43.1 ms pose on the C7x, 4.48 s on the Arm cores",
       "title": "The BeagleY-AI runs 11 precompiled vision models on its C7x accelerator, 2 to 4 times slower than the SK-TDA4VM and 15 to 100 times faster than its own Arm cores",
-      "says": "On BeagleBoard's Edge AI image 11.00.00.08 the body-pose model takes 43.13 ms with all 274 nodes offloaded, the classifier 5.95 ms and the object detector 10.15 ms; the same pose model takes 4,475.57 ms on the four Cortex-A53 cores. Hardware H.264 decode of 1080p runs at 255.9 fps under a third of one core, hardware encode at 110.1 fps, and Home Assistant, Pi-hole and Mosquitto run in Docker.",
+      "says": "On BeagleBoard's Edge AI image 11.00.00.08 the body-pose model takes 43.13 ms with all 274 nodes offloaded, the classifier 5.95 ms and the object detector 10.15 ms; the same pose model takes 4,475.57 ms on the Cortex-A53 cores with two threads. Hardware H.264 decode of 1080p runs at 255.9 fps using 27 to 29 percent of the four cores' time, hardware encode at 110.1 fps, and Home Assistant, Pi-hole and Mosquitto run in Docker.",
       "limits": "One board, no fan (80 to 87 degrees C), no display or camera attached. Pose took 43 ms where 25 to 30 ms was expected. Decode and encode chained ran at 35 fps and the cause is not found. FFmpeg's V4L2 encoder hangs; GStreamer's works.",
       "level": "measured",
       "page": "",
@@ -2194,6 +2194,53 @@
       "home": false,
       "tag": "",
       "why": "A 32 MHz Cortex-M0+ with a segment LCD runs the same edge AI models as the bigger MSPM0 boards."
+    },
+    {
+      "id": "m-esphome-useful",
+      "date": "2026-11-10",
+      "area": "ecosystems",
+      "number": "4 saved, 1 logged, every pin",
+      "title": "ESPHome on the TI Zigbee boards gets a logger, every pin, buses and saved settings",
+      "says": "`esphome logs` reads the CC2755P10 and CC2340R5. Every DIO of both chips is a checked ESPHome pin. I2C, ADC and PWM run on TI's drivers (PWM verified in the timer registers), and ESPHome's saved settings survive a reset: a counter read 1, 2, 3, 4 over three resets on both boards.",
+      "limits": "No SPI or UART bus. The I2C and ADC readings wait for the sensors BoosterPack and two jumpers. The Wi-Fi board was not on USB, so encryption, runtime credentials, Home Assistant adoption and over-the-air updates are open.",
+      "level": "ran",
+      "page": "project-esphome.html",
+      "evidence": "docs/experiments/2026-11-10-esphome-ti-logger.md",
+      "also_evidence": [
+        "docs/experiments/2026-11-10-esphome-ti-pins.md",
+        "docs/experiments/2026-11-10-esphome-ti-buses.md",
+        "docs/experiments/2026-11-10-esphome-ti-saved-settings.md"
+      ],
+      "tag": "Setup or handling",
+      "why": "ESPHome on these boards now behaves like ESPHome on others: logs, pins, saved state."
+    },
+    {
+      "id": "m-radar-cc1407p-host-builds",
+      "date": "2026-11-10",
+      "area": "portability",
+      "number": "47.9 kB boot image",
+      "title": "The radar chip's own processor can host TI's sub-1 GHz radio driver: the transmit app builds, nothing has been sent",
+      "says": "TI's CC1407P radio driver, with this repo's bare-metal layer and seven functions on the radar SDK's SPI, GPIO and clock calls, builds on a Mac for the IWRL6432BOOST's Cortex-M4F: 46.8 kB boot image, 23.7 kB of RAM. Every wire is traced to a TI document (SPI A pads on the board's SPI header, reset on the nERROR pad) except which end of the header is pin 1.",
+      "limits": "Built, not flashed, not run. The radar's shipped flash image cannot be read back, so writing the transmit image replaces the shipped demo; that write is held until the restore path is confirmed. No packet has been sent from the radar.",
+      "level": "built",
+      "tag": "Our work",
+      "evidence": "iwrl6432boost/cc1407p/README.md",
+      "page": "",
+      "why": "Shows whether one radar board can both sense and transmit to a hub, which a roadside speed sign needs."
+    },
+    {
+      "id": "m-beagley-moonlight-stream",
+      "date": "2026-11-10",
+      "area": "portability",
+      "number": "720p60 in software",
+      "title": "The BeagleY-AI plays a Moonlight game stream from a Mac",
+      "says": "moonlight-embedded, built on the board in 76 s, pairs with Sunshine on a MacBook and plays its desktop at 1280x720, 60 fps, 10 Mbit/s H.264 over Ethernet: video, audio and input up in about 100 ms, decoded in software on the four A53 cores.",
+      "limits": "One 25 s run and one CPU sample (2.8 of 4 cores); frame rate, dropped frames and the picture on the monitor not yet checked. The Wave5 hardware decoder is not used yet.",
+      "level": "measured",
+      "tag": "Our work",
+      "evidence": "beagley-ai/bench/gamestream/stream1.log",
+      "page": "",
+      "why": "Shows a TI Linux board can be the box at the TV for a game stream, the first record of Moonlight on a TI board we found."
     }
   ],
   "faq": [

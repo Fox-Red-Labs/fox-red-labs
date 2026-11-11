@@ -1,6 +1,6 @@
 # Fox Red Labs: all reader pages
 
-Every reader page concatenated, for AI assistants. 212 files. Each starts with a line giving its path and heading. Links inside keep the paths they have in the repo.
+Every reader page concatenated, for AI assistants. 217 files. Each starts with a line giving its path and heading. Links inside keep the paths they have in the repo.
 
 ==============================================================================
 FILE: README.md | Portable code and fast first demos on TI LaunchPad development kits
@@ -9396,6 +9396,10 @@ Status words on the site: **Works**, **Line found** (where it stops and why was 
 | 2026-10-13 | Does ESPHome's Zigbee router, a switch and a temperature sensor, built on TI's own Zigbee libraries, run on the LP-EM-CC2755P10? | Yes: with a 388-line shim and no ESPHome file edited it joined the house ZHA network within 8 s, switched the LED 20 of 20 (median 87 ms) and reported temperature; 263 kB of flash, 37.6 kB of RAM, 124.4 kB free | Nothing stopped it; two joins and one day, no soak | [E105](2026-10-13-cc2755p10-esphome-fit.md) |
 | 2026-10-13 | Does ESPHome's Zigbee code fit on the LP-EM-CC2340R5's 36 kB of RAM? | As an end device yes (32.0 kB of RAM, 4.0 kB left, 219.8 kB of flash); as a router no, 1.3 kB over | Link reached for the end device; router stops on RAM; not flashed | [E191](2026-10-13-cc2340r5-esphome-fit.md) |
 | 2026-10-13 | Can a maker run `esphome compile` and `esphome upload` for the LP-EM-CC2755P10 and LP-EM-CC2340R5 through a real ESPHome platform? | Yes: 35 s cold build, 15 s flash, joins Home Assistant's Zigbee network 5 to 6 s later and switches the LED 32 of 32 times; CC2340R5 end device builds the same way, not flashed | None reached; a second flash while the old device was still listed in ZHA did not rejoin | [E192](2026-10-13-esphome-cc27xx-platform.md) |
+| 2026-11-10 | Can ESPHome's logger and `esphome logs` work on the Zigbee platforms? | Yes, over the backchannel UART at 115200 baud | None reached; a missing compiler flag hid every log line at first | [esphome-ti-logger](2026-11-10-esphome-ti-logger.md) |
+| 2026-11-10 | Can every DIO of the LP-EM-CC2755P10 and LP-EM-CC2340R5 be an ESPHome pin, with the board's own pins marked? | Yes: table from TI's board and device data; 19 DIOs self-tested on the CC2755P10 | None reached | [esphome-ti-pins](2026-11-10-esphome-ti-pins.md) |
+| 2026-11-10 | Can ESPHome's stock components run on TI's I2C, ADC and PWM drivers? | PWM verified in the timer registers; I2C and ADC run, readings wait for the sensors BoosterPack and two jumpers; no SPI or UART bus | Hardware: parts not on the boards | [esphome-ti-buses](2026-11-10-esphome-ti-buses.md) |
+| 2026-11-10 | Can ESPHome's saved settings survive a reset on the TI platforms? | Yes: a counter read 1, 2, 3, 4 over three resets on both boards | None reached | [esphome-ti-saved-settings](2026-11-10-esphome-ti-saved-settings.md) |
 | 2026-10-13 | Can ESPHome's own commands build and flash the LP-EM-CC35X1 as a Wi-Fi device? | Yes, up to the last step | ESPHome builds, flashes and runs on the LP-EM-CC35X1 through an external platform `cc35xx`. `esphome compile` takes 56 s cold and 23 s warm, and `esphome upload` takes 60 s with a full erase | [esphome-cc35xx-platform](2026-10-13-esphome-cc35xx-platform.md) |
 | 2026-10-13 | Can the LP-MSPM0G5187's NPU learn your smoke or CO alarm by ear and ignore every other sound? | Partly | A 13.8k-parameter model on the LP-MSPM0G5187's NPU, listening through the onboard microphone, reported a smoke alarm pattern from a laptop speaker 9.4 s after it started, kept 14 of 16 look-alike sounds silent with nothing learned, and gave 0 alarms in 3.4 hours of a quiet room; learning has run only on audio over USB, and a real smoke alarm's horn has not been tried | [mspm0g5187-alarm-listener](2026-10-13-mspm0g5187-alarm-listener.md) |
 | 2026-10-15 | Can the LP-AM13E230 spin a Hall-sensor brushless motor through TI's DRV8376EVM, with no motor BoosterPack and no C2000? | Yes | The DRV8376EVM plugs straight onto the LP-AM13E230 and a 350-line six-step program spun an Anaheim BLY171S-24V-4000 at 924, 2,312 and 3,632 rpm (medians of three runs) at 20, 40 and 60 percent duty on a 12.4 V bus, both directions, with the Hall table learned by the program itself | [am13e230-bldc-drv8376evm](2026-10-15-am13e230-bldc-drv8376evm.md) |
@@ -17377,6 +17381,246 @@ What the debug port reads, and what needs help from the program:
 **Next moves.** Read the other three R5F cores and the M4F. Try the cycle-counter method on Zephyr. Find a firewall setting that exposes `PMSTAT` to the debug port.
 
 **Limits.** One board, one core, one program. The bare-metal load rows are from one run each; the busy-program rows come from a 113-sample run. No power was measured, and the debug connection may change what the chip does in deep sleep.
+
+==============================================================================
+FILE: docs/experiments/2026-11-10-esphome-ti-buses.md | Can ESPHome's stock sensor and output components run on TI's I2C, ADC and PWM drivers?
+==============================================================================
+
+<!-- experiment
+id: E321
+board: LP-EM-CC2340R5
+date: 2026-11-10
+status: waiting
+reached: run
+line: ESPHome's `i2c:` bus, a new `ti_adc` sensor and a new `ti_pwm` output now build and run on TI's I2C, ADC and PWM drivers on the cc27xx and cc23xx platforms. PWM is verified on the LP-EM-CC2755P10: a 1 kHz timer period of 47,999 counts held compare values of 11,999 and 35,999 for 25 percent and 75 percent. The I2C bus scans and the HDC2080 and OPT3001 drivers start, but no reading was taken because the sensors BoosterPack was not on the board when the test ran; the ADC reads a floating pin (1.0 to 1.8 V) and the jumper test was not done. SPI and UART buses were not done.
+stop: hardware
+-->
+# Can ESPHome's stock sensor and output components run on TI's I2C, ADC and PWM drivers?
+
+**Short answer.** The software side works; the I2C and ADC proofs need a connected part. `i2c:` runs on TI's I2C driver and ESPHome's own `hdc2080` and `opt3001` components load on it. `ti_pwm` drives an LGPT timer through TI's PWM driver for `output:` and `light: monochromatic`, and the timer's compare register shows the right duty. `ti_adc` reads an analog-capable DIO through TI's ADC driver. ESPHome's `adc`, `zephyr_pwm` and `i2c` code is built for nRF devicetree, so `ti_adc` and `ti_pwm` are new components and `i2c:` reuses ESPHome's class with a TI driver underneath.
+
+Terms: [vocab](../vocab.md). PWM is pulse-width modulation. LGPT is the chip's general-purpose timer. The sensors BoosterPack is [BP-BASSENSORSMKII](../../mspm0g5187/bench/bassens/README.md).
+
+**Question.** Do `i2c:`, an analog input and a PWM output work from an ESPHome YAML on the TI platforms, with ESPHome's own components on top?
+
+**What was expected.** TI's drivers are configured by SysConfig, so each bus and pin has to be a SysConfig instance generated from the YAML. With the BoosterPack on the LP-EM-CC2340R5 (no wires), the HDC2080 at 0x40 and the OPT3001 at 0x44 should answer on DIO0 and DIO24 (the header's I2C pins). A pin tied to 3V3 should read near 3.3 V. ESPHome's `i2c`, `spi` and `uart` components are limited to a list of platforms, so the platform has to let its names through.
+
+**What was tried.**
+
+1. `periph.py` turns `i2c:`, `ti_adc` and `ti_pwm` entries into SysConfig instances with the pins from the YAML, checked against the pin table (a signal the pin cannot carry is refused), and writes a header the shim reads.
+2. `shim/i2c_bus_f3.cpp` implements ESPHome's `ZephyrI2CBus` class on `I2C_transfer`; `shim/ti_periph.cpp` has the ADC and PWM calls the two components use.
+3. PWM on the LP-EM-CC2755P10 red LED (DIO16, LGPT3): light cycled between 25 percent and 75 percent with gamma off, the timer registers read with DSLite.
+4. I2C on the LP-EM-CC2340R5 with nothing plugged on, then ADC on the LP-EM-CC2755P10 with DIO21 and DIO22 open.
+5. SPI and UART buses: ESPHome's schemas for both name their platforms in the schema itself and the generated code needs a platform class; not attempted past reading them.
+
+**How far it got.** PWM verified; I2C and ADC ran without a connected part.
+
+| Step | Result | Cause tag | What fixed it |
+|---|---|---|---|
+| `i2c:` in the YAML | `This feature is only available on [esp32, esp8266, rp2, nrf52, host]` | Third-party behavior | The platform wraps ESPHome's platform gate so its names pass wherever nrf52 does |
+| `spi:` | The same message, and the list has no nrf52 | Third-party behavior | Not fixed: the generated code needs an SPI class for the platform |
+| SysConfig, ADC pin | `DIO21` is not a pin name on the CC2755P10 | Our mistake | Use the name with its analog suffix, `DIO21_A4` |
+| SysConfig, PWM on DIO14 | Resource conflict with TI's red LED GPIO instance | Tool or docs | Drop that instance when a driver takes the pin; keep its macro as the DIO number |
+| Compile, `light` | `static assertion failed: std::numeric_limits<float>::is_iec559` | Third-party behavior | TI's C++ library reports false for IEEE float; the assertion is removed in the build copy |
+| PWM, CC2755P10 | Period 0xBB7F (47,999), compare 0x2EDF at 25 percent and 0x8C9F at 75 percent, matching 11,999 and 35,999 | | |
+| I2C scan, CC2340R5, no BoosterPack | Reports one device at 0x3C; the HDC2080 start fails with "Communication failed" | Setup or handling | The zero-length address probe is a one-byte write; with no pull-ups the bus floats. A reading needs the BoosterPack |
+| ADC, CC2755P10, open pins | 1.01 to 1.84 V from DIO21 and DIO22, drifting | Setup or handling | Floating inputs; a jumper to 3V3 and to GND is the test |
+
+**What this does not establish.** No humidity, light or voltage reading checked against anything. The I2C probe for a bus scan may report false devices on a bus with no pull-ups. One PWM output per timer, so at most as many as the chip has LGPT timers. No SPI and no UART bus.
+
+**Ask.** Can ESPHome's bus components declare their platform support through a hook, not through `only_on` lists in each schema?
+
+**Effort.** About 3 hours to the first run of all three; the I2C and ADC proofs wait for the bench step.
+
+**Verdict.** Partly done. The drivers work from a YAML; the reading proofs are the next step.
+
+==============================================================================
+FILE: docs/experiments/2026-11-10-esphome-ti-logger.md | Can ESPHome's logger and `esphome logs` work on the Zigbee platforms?
+==============================================================================
+
+<!-- experiment
+id: E319
+board: LP-EM-CC2755P10
+date: 2026-11-10
+status: works
+reached: verified
+line: `logger:` in an ESPHome YAML on the cc27xx and cc23xx platforms writes ESPHome's log to the LaunchPad kit's backchannel UART at 115200 baud, and `esphome logs` shows it. The first build printed nothing because ESPHome's log level reaches the compiler as a build flag the platform did not pass on; with the flag passed, the whole boot log, component dumps and sensor lines arrive. The CC2755P10 image grew by 4.5 kB of flash and 8 B of RAM.
+stop: none
+-->
+# Can ESPHome's logger and `esphome logs` work on the Zigbee platforms?
+
+**Short answer.** Yes. With `logger:` in the YAML, the cc27xx platform (LP-EM-CC2755P10) and the cc23xx platform (LP-EM-CC2340R5) print ESPHome's log on the probe's first serial port at 115200 baud (`/dev/cu.usbmodem<probe serial>1`), and `esphome logs <yaml> --device <port>` reads it with no extra step. The boot lines, every component's `dump_config`, the Zigbee signals and each sensor update arrive, for example `[I][logger:036]: Log initialized` and `[D][zigbee.sensor:020]: Set attribute endpoint: 4, present_value 19.437500`. ESPHome's stack-trace decoding says "no compatible analyzer found for target platform cc27xx", which is harmless.
+
+Terms: [vocab](../vocab.md). The platforms are in [ports/esphome-ti](../../ports/esphome-ti/README.md); the first proof was [E192](2026-10-13-esphome-cc27xx-platform.md), which had no logger.
+
+**Question.** Can `esphome logs` read a TI LaunchPad running the cc27xx or cc23xx platform, as it does for other ESPHome boards?
+
+**What was expected, written down before the build.** ESPHome's own Zephyr logger needs Zephyr's UART API, so the platform would need a replacement `write_msg_` on TI's UART2 driver, as the cc35xx platform already had for the Wi-Fi board. The UART instance has to be a SysConfig entry on the backchannel pins (DIO1 and DIO2 on the CC2755P10). Expected cost: a few kB of flash. Expected trouble: the logger's schema asks the platform which UARTs it has and raises `NotImplementedError` for a platform outside ESPHome's tree.
+
+**What was tried.**
+
+1. Copied ESPHome's logger sources into the build with the Zephyr branch switched off, and added `shim/logger_f3.cpp` (UART2 open in `pre_setup`, `write_msg_` through a mutex because two tasks log). `periph.py` adds the UART2 instance to the Zigbee SysConfig file when the YAML has `logger:`.
+2. First flash: only a debug line written straight to the UART appeared; ESPHome's own lines did not. A register read showed a counter added to `write_msg_` at 0: nothing reached it. Cause: ESPHome sets `ESPHOME_LOG_LEVEL` as a compiler flag, not in `defines.h`, so every `ESP_LOG` call was compiled out. The platform now passes ESPHome's `-D` build flags to TI Arm Clang.
+3. Second flash: the full log. `esphome logs` worked on the first try.
+
+**How far it got.** Verified on both boards.
+
+| Step | Result | Cause tag | What fixed it |
+|---|---|---|---|
+| `logger:` with a default `hardware_uart` | `NotImplementedError` in ESPHome's `uart_selection` | Third-party behavior | The platform answers "no choice" for that option and gives no default |
+| Log lines after the first flash | None, only a direct UART write | Third-party behavior | Pass ESPHome's build flags to the compiler |
+| Log on the CC2755P10, 2026-11-10 | Boot, dump and sensor lines, 2.3 kB in the first 40 s | | |
+| Log on the CC2340R5 | The same, with `tx_buffer_size: 256` | | |
+
+**The line.** None reached. Cost on the CC2755P10 router: flash 276.4 kB to 280.9 kB with the log strings in, RAM +8 B (the logger's buffer is part of the object ESPHome already allocates). On the CC2340R5 end device with the logger, I2C, PWM and settings: 35.6 kB of 36.9 kB used at link time, and the FreeRTOS heap showed 1.4 kB free and 1.4 kB lowest ever over four boots.
+
+**What this does not establish.** Two tasks write to one buffer, so a rare interleaved line is possible; not seen in about 100 kB of log. Baud rates other than 115200 were not tried. Only macOS.
+
+**Ask.** Can ESPHome's logger take its build flags into account for external platforms, or list the platform's UARTs through a hook?
+
+**Effort.** About 1 hour 15 minutes, of which 25 minutes went to the missing log level flag.
+
+**Verdict.** Good. One new shim file and one SysConfig entry; the cost was the compile flag that hid every log call.
+
+==============================================================================
+FILE: docs/experiments/2026-11-10-esphome-ti-pins.md | Can every DIO of the TI LaunchPad kits be an ESPHome pin, with the pins the board already uses marked?
+==============================================================================
+
+<!-- experiment
+id: E320
+board: LP-EM-CC2755P10
+date: 2026-11-10
+status: works
+reached: verified
+line: Every DIO of the LP-EM-CC2755P10 (23 pins) and LP-EM-CC2340R5 (26 pins) is now a valid ESPHome pin on the cc27xx and cc23xx platforms, with a table of header pin, board use and signals made from TI's board and device data. On the CC2755P10, 19 DIOs read 1 with a pull-up and 0 with a pull-down and followed an output in a self test; SWD and the 32 kHz crystal pads are refused.
+stop: none
+-->
+# Can every DIO of the TI LaunchPad kits be an ESPHome pin, with the pins the board already uses marked?
+
+**Short answer.** Yes. The first platforms mapped two LED pins and ignored the rest. The TI GPIO driver on these chips indexes its pin table by DIO number, so the platform's pin number is the driver index and every DIO works with no extra SysConfig entry. A table (`components/cc27xx/pindata.json`, printed in the README) lists each DIO, its BoosterPack header pin, what the LaunchPad already uses it for and which peripheral signals the chip can route to it; ESPHome's pin validation uses it, so a pin that does not exist or is the debug port gets an error naming the board. A self test on the LP-EM-CC2755P10 set 19 DIOs to input with pull-up, input with pull-down, and output high and low, and read each back: 18 gave 1, 0, 1, 0 as expected; DIO16 (the red LED) read 0 with the pull-up because the LED loads the pin, and DIO19 (the SPI flash's chip select) read 1 with both pulls because the flash holds it.
+
+Terms: [vocab](../vocab.md). Board facts: [CC2755P10](../../cc2755p10/README.md), [CC2340R5](../../cc2340r5/README.md).
+
+**Question.** Which DIOs can an ESPHome YAML name on each board, and which are the board's own?
+
+**What was expected.** The user guides name the header pins; TI's SDK carries the same data in `source/ti/boards/.meta/<board>.syscfg.json`, and SysConfig's device files list which signals each pin can carry. Combining them gives the table. The CC2340R5 board file is for the 40-pin RKP package, not the 32-pin RHB package in the SDK's default device name.
+
+**What was tried.**
+
+1. `gen_pins.py` reads the two TI files and writes the JSON. First run used the wrong package for the CC2340R5 (RHB), which put the LEDs on DIO17 and DIO18; the quick start guide (SWRU588A) has them on DIO14 and DIO15, buttons on DIO10 and DIO9, flash select on DIO6, UART on DIO20 and DIO22, I2C on DIO0 and DIO24. The RKP package matches all of those.
+2. Pin validation in the platform; GPIO mapping in the shim for any DIO between the driver's lower and upper bound.
+3. Self test on the CC2755P10 (in a YAML `interval` lambda, 19 pins).
+
+**How far it got.** Verified on the CC2755P10; the CC2340R5 uses the same code, checked against the guide's table and not self-tested pin by pin.
+
+| Check | Result | Cause tag | What fixed it |
+|---|---|---|---|
+| Table for the CC2340R5 with the SDK's default package | LEDs on DIO17, DIO18 | Our mistake | Use the RKP package the LaunchPad carries |
+| `binary_sensor: gpio` default | `KeyError: 'use_interrupt'` | Third-party behavior | Per-platform defaults have no entry for the TI names; the platform uses nrf52's, with interrupts off |
+| Self test, 19 DIOs | 17 of 19 gave pull-up 1, pull-down 0, out high 1, out low 0; DIO16 pull-up 0 (LED); DIO19 pull-down 1 (flash) | | Both explained by the board |
+
+**What this does not establish.** The read-back tests the driver and the input buffer, not a connected circuit. GPIO interrupts are not wired up, so a button is polled (16 ms loop). The SPI-flash pins share the BoosterPack SPI bus. No pin was checked against a scope.
+
+**Ask.** None.
+
+**Effort.** 50 minutes.
+
+**Verdict.** Good. The pin table is the useful part; the GPIO code was already almost right.
+
+==============================================================================
+FILE: docs/experiments/2026-11-10-esphome-ti-saved-settings.md | Can ESPHome's saved settings survive a reset on the TI platforms?
+==============================================================================
+
+<!-- experiment
+id: E322
+board: LP-EM-CC2755P10
+date: 2026-11-10
+status: works
+reached: verified
+line: ESPHome's saved settings (`preferences:`, `restore_mode`, `globals: restore_value`) are now kept in a flash region through TI's NVS driver on the cc27xx and cc23xx platforms. A counter kept over three software resets on both the LP-EM-CC2755P10 and the LP-EM-CC2340R5 (1, 2, 3, 4). The region costs 8 kB of the application flash.
+stop: none
+-->
+# Can ESPHome's saved settings survive a reset on the TI platforms?
+
+**Short answer.** Yes. Before, the platform stubbed ESPHome's preferences, so a `restore_mode: RESTORE_DEFAULT_OFF` switch or a `globals` value with `restore_value: yes` started from its default every boot. Now the settings are written to an 8 kB region just under the Zigbee stack's own flash area, through TI's NVS driver. A `globals` counter incremented at every boot read 1, 2, 3 and 4 over three software resets on the CC2755P10 and on the CC2340R5, and the log line `Loaded 1 settings` (or 2) appeared at each restart.
+
+Terms: [vocab](../vocab.md). NVS is TI's non-volatile storage driver. A software reset is `App.safe_reboot()`.
+
+**Question.** Can an ESPHome device on these chips keep a value across a reset?
+
+**What was expected.** ESPHome's preferences need a backend that stores keyed byte strings. TI's NVS driver erases by sector and writes in aligned blocks, so a small log-structured store with two halves (so a power cut during a rewrite never loses the data) should do. The region must come out of the application flash, so the linker file's flash length has to shrink by the same amount.
+
+**What was tried.** A new shim (`preferences_f3.cpp`, ESPHome's class names, an append log with a checksum per record and a compaction into the other half when full), a SysConfig NVS instance at 0xE4000 (CC2755P10) and 0x7D000 (CC2340R5), and the linker file patched in the build copy. The test YAML counts boots in a persisted global and restarts itself until the count is a multiple of 4.
+
+**How far it got.** Verified on both boards.
+
+| Step | Result | Cause tag | What fixed it |
+|---|---|---|---|
+| Compile | `redefinition of 'ZephyrPreferences'` | Our mistake | The shim headers were included twice by two paths; include them from the build folder |
+| CC2755P10 | `boot_count` 1, 2, 3, 4; "Loaded 2 settings" at each restart | | |
+| CC2340R5 | `boot_count` 1, 2, 3, 4; "Loaded 1 settings" at each restart | | |
+
+**What this does not establish.** Only software resets. No power cut during a write, no wear test, and the compaction path (a full half) was not exercised. `esphome upload` erases the whole application flash, so a new image starts with empty settings, and the Zigbee network state is cleared with them.
+
+**Ask.** None.
+
+**Effort.** 1 hour 20 minutes.
+
+**Verdict.** Good. 330 lines of shim and an 8 kB region.
+
+==============================================================================
+FILE: docs/experiments/2026-11-10-iwrl6432boost-cc1407p-radio.md | Can the IWRL6432BOOST radar host the BP-CC1407P-9-FE sub-1 GHz radio, so one board senses and transmits?
+==============================================================================
+
+<!-- experiment
+id: E323
+board: IWRL6432BOOST
+date: 2026-11-10
+status: waiting
+reached: link
+line: The IWRL6432BOOST radar chip's Cortex-M4F can host TI's CC1407P radio driver: a transmit app builds for it on a Mac (46.8 kB boot image, 23.7 kB of RAM), with the radio on the board's SPI A pins, but nothing has been flashed or sent, because the radar's shipped flash image cannot be read back and the eight wires are not on.
+stop: unknown
+-->
+# Can the IWRL6432BOOST radar host the BP-CC1407P-9-FE sub-1 GHz radio, so one board senses and transmits?
+
+**Short answer.** Not run yet. A transmit app for the radar's M4F builds with TI's host driver and this repo's bare-metal layer, and every wire is traced to a TI document except one pin-1 marking. The flash write and the packet count wait on a confirmed restore path and on eight wires.
+
+Terms: [vocab](../vocab.md). 1 kB = 1,024 bytes. Code and wiring: [iwrl6432boost/cc1407p](../../iwrl6432boost/cc1407p/README.md).
+
+**Question.** A roadside speed sign needs a radar and a radio. Can the radar board's own processor drive TI's CC1407P radio over SPI, with no second MCU, and reach a CC1354P10 hub indoors?
+
+**Vendor position.** TI's CC1407P BoosterPack guide (SWRU633A, 2026-10-15) says its TRX host driver "can be ported to other MCUs" and lists LaunchPad hosts; the radar board guide (SWRU596) lists the J8 and J9 BoosterPack connectors "for the connectivity option with other TI LaunchPad boards". Neither names this pairing, and TI ships no example of it. **Tag: Tool or docs.**
+
+**What was tried.**
+
+- **Wiring.** Read from TI's PROC117B schematic (SWRR180) and SWRU633A. The chip's SPI A port (pads AG, AI, AJ, AH: balls D10, B12, C11, D11) and the interrupt pad AV (J10, GPIO5) reach the SPI header J2 and the sockets J8 and J9. The reset line has no J2 pin; the only free output on a header is the nERROR pad (K11, GPIO4) on J9 pin 1. J8 and J9 give no 3.3 V out as built, so power comes from J2 pin 1. The table is in the folder's README.
+- **Firmware.** Seven `hb_*` functions on MMWAVE-L-SDK 05.05.04.02: McSPI A polled at 1 MHz, GPIO, pinmux, ClockP. Chip select is the McSPI's own CS0 (pad D11 has no GPIO function) held with the channel's FORCE bit; MISO is read as a level by flipping pad C11 to GPIO1 while chip select is low. The SDK's `MCSPI_open` already writes SYSCONFIG with smart idle off (SIDLEMODE no idle, AUTOIDLE off), and the app prints the register so a run shows it.
+- **Build.** The SDK's `empty` no-RTOS example folder, with the SDK's makefile and the Unix helpers passed in, as for the people-counter build in `portability/radar-family/`.
+
+**How far it got.** Compile, link and the boot image. Not flashed.
+
+| Measure | Value |
+|---|---|
+| Boot image | 46.8 kB |
+| Code and constants | 41.4 kB |
+| Initialized data | 1.6 kB |
+| RAM (bss) | 23.7 kB |
+| Packets received | not run |
+
+Rows: `host_fit` and `packet_loss_1h` in `data/results/iwrl6432boost.csv`.
+
+**The line.** Not reached. Two things stand in front of the first packet.
+
+- **The radar's flash cannot be backed up.** TI's flash tool (`arprog_cmdline.py`) has write, erase and format commands and no read command, and no other tool was found that reads the 16 Mbit serial flash back. Writing the transmit image replaces the shipped demo. The restore is TI's public prebuilt demo image, flashed the same way; the chip's ROM flasher is not touched. This is a write to a board that does not read back, so it is held until the restore path is confirmed. **Tag: Tool or docs.**
+- **The eight wires are not on**, and the LP-CC1354P10-1 receiver is off USB.
+
+**Things that went wrong on the way, with the fix.**
+
+- `Missing argument: --board or --device must be specified` from SysConfig on the first build: the `.syscfg` file had no `@cliArgs --device "XWRL64XX" --package "FCCSP" ...` header. **Tag: Our mistake.** Keep the header the SDK's example files carry.
+- `python3 tools/preflight_image.py iwrl6432boost <image>.out` printed `REFUSE (c) segment load range 0x00400000-0x00400140 is outside this chip's flash and SRAM` for every segment, and `REFUSE: do not flash this image to this board`. **Tag: Tool or docs.** The tool assumes an MSPM0-style map (flash at 0x0, RAM at 0x20000000) because `data/boards.csv` has no memory map for this board. This chip's ROM loads the image into M4F RAM at 0x00400000, and the load ranges are the ones TI's own linker file gives every example. The refusal is not about the image; it also means the preflight is no gate for this board yet.
+- No picture of the bench was taken before the wiring plan was written; the plan rests on the board documents alone.
+
+**What happens next.** Once the restore path is confirmed and the wires are on: flash the image (S1 position 1 OFF, NRST, `arprog_cmdline.py ... -t META_IMAGE1`, S1 position 1 back ON, NRST), read the radio's version line on the radar's serial port, count packets at the CC1354P10 over at least 5 minutes, then the second build that keeps the radar demo running and sends one packet per frame.
 
 ==============================================================================
 FILE: docs/hardware.md | Hardware: development kits and the parts builds use
@@ -25370,7 +25614,6 @@ A press of S2 or the `s` key and a spoken question give a spoken answer, first a
 
 ### Limits
 
-- That the speaker sounds clean: it was not judged by ear.
 - That S2 works by hand: the press was sent from the console.
 - Power use: the radio is kept always on and power was not measured.
 - A real room: the questions came from a Mac speaker 30 cm away, in a quiet room.
@@ -28083,6 +28326,10 @@ The harness started timing 50 ms after boot, and something interrupts once at ab
 ### Why does the `rtos-heap` bench report `I,heap,total 8192` when the heap is bigger?
 
 The line prints TI's default heap size, not the one the image links. **Tag: Our mistake.** That file is compiled without this project's heap setting; the linker map shows the real heap, 25.7 kB (`.bss.ucHeap`). The 41-task result is unaffected.
+
+### The CC2340R5 ESPHome image has about 1.4 kB of heap left. What can you change?
+
+Use `logger: tx_buffer_size: 256` and keep entities few. **Tag: Chip limit.** With the logger, I2C, a PWM light and saved settings the end-device image linked with 1.2 kB of RAM free and ran with 1.4 kB of FreeRTOS heap free (lowest 1.38 kB) over four boots ([E319](../docs/experiments/2026-11-10-esphome-ti-logger.md)). A router does not fit with the logger.
 
 ### Why does an ESPHome or other Zigbee router image fail to link with "run placement with alignment fails for section ".data""?
 

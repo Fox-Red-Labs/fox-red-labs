@@ -1,0 +1,4 @@
+# Gives the first USB webcam the name TI's Edge AI apps expect (/dev/video-usb-cam0) on every plug-in,
+# not only when setup_cameras.sh runs at boot, and sets the mains frequency to 60 Hz so lights do not band.
+# Installed by setup.sh to /etc/udev/rules.d/ on the BeagleY-AI.
+SUBSYSTEM=="video4linux", KERNEL=="video*", DRIVERS=="uvcvideo", ATTR{index}=="0", SYMLINK+="video-usb-cam0", RUN+="/usr/bin/v4l2-ctl -d /dev/%k -c power_line_frequency=2"

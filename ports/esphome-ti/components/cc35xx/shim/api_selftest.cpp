@@ -161,7 +161,7 @@ void run_once(int round);
 void selftest_task(void *) {
   for (int round = 1;; round++) {
     run_once(round);
-    vTaskDelay(pdMS_TO_TICKS(300000));  // again in 5 minutes: a soak while nobody is at the bench
+    vTaskDelay(pdMS_TO_TICKS(300000));  // again in 5 minutes: a long-run soak
   }
 }
 

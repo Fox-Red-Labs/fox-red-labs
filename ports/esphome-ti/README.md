@@ -48,7 +48,7 @@ sensor:
   - {platform: die_temperature, name: "Chip temperature"}
 ```
 
-`cc27xx` and `cc23xx` are target platforms like `esp32:` and `nrf52:`. Zigbee is the only radio stack. `die_temperature` is this repo's sensor (ESPHome's `internal_temperature` accepts only its own platform list). Pins are written as the DIO number (`DIO16`, or `16`). On the CC2755P10 the red LED is DIO16 and the green is DIO12; on the CC2340R5 the red is DIO14 and the green is DIO15. Other pins are not mapped.
+`cc27xx` and `cc23xx` are target platforms like `esp32:` and `nrf52:`. Zigbee is the only radio stack. `die_temperature` is this repo's sensor (ESPHome's `internal_temperature` accepts only its own platform list). Pins are written as the DIO number (`DIO16`, or `16`). Every DIO of both chips works, with the header pin, the board's own use and the signals each pin can carry in the tables below (from `components/cc27xx/pindata.json`; `gen_pins.py` rebuilds it from TI's board and device data). On the CC2755P10 the red LED is DIO16 and the green is DIO12; on the CC2340R5 the red is DIO14 and the green is DIO15.
 
 ## If you see ... do
 
@@ -89,7 +89,77 @@ Overrides: `ESPHOME_TI_WIFI_SDK`, `ESPHOME_TI_CGT`, `ESPHOME_TI_SYSCONFIG_WIFI`,
 | The log stops after `Starting scan` | Use ESPHome 2026.9.1 with this platform's current Wi-Fi backend (scanning was added after the first version) |
 | Nothing on the serial port after programming | Read the port at 115200; programs from the Toolbox start by themselves after a full erase. An image programmed over TI's Wi-Fi CSI image without the erase stays silent (see the CC35X1 FAQ) |
 
-Limits today: the API runs without encryption, settings do not survive a reset, the network name and password are built into the image, and there are no over-the-air updates.
+Limits today: the API runs without encryption (the Noise library, noise-c, compiles to 25.5 kB of flash for a Cortex-M33 with TI Arm Clang at -Oz, so size is not the blocker; the random number source and the wiring into the build are not done), settings do not survive a reset, the network name and password are built into the image, Home Assistant adoption was not run, and there are no over-the-air updates. The board was not on USB for the 2026-11-10 round, so the Wi-Fi items stay open (see docs/next-session.md).
+
+## Since 2026-11-10: logger, pins, buses, saved settings
+
+- `logger:` works on `cc27xx` and `cc23xx`: the log goes to the probe's first serial port at 115200 baud and `esphome logs <yaml> --device /dev/cu.usbmodem<probe serial>1` reads it ([E319](../../docs/experiments/2026-11-10-esphome-ti-logger.md)). Use `logger: tx_buffer_size: 256` on the CC2340R5.
+- Pins: all DIOs, checked against the table below; SWD and the 32 kHz crystal pads are refused ([E320](../../docs/experiments/2026-11-10-esphome-ti-pins.md)). `python3 ports/esphome-ti/pins_markdown.py` prints the tables.
+- Buses ([E321](../../docs/experiments/2026-11-10-esphome-ti-buses.md)): `i2c:` on TI's I2C driver (ESPHome's own `hdc2080` and `opt3001` load on it), `ti_adc` sensor, `ti_pwm` output for `light: monochromatic`. PWM is verified in the timer registers; the I2C and ADC readings wait for the sensors BoosterPack and two jumpers. No `spi:` or `uart:` bus.
+- Saved settings: `preferences:`, `restore_mode` and `globals: restore_value` survive a reset through TI's NVS driver, 8 kB under the Zigbee NVRAM ([E322](../../docs/experiments/2026-11-10-esphome-ti-saved-settings.md)).
+- Examples: `frl-cc23xx-sensors.yaml` (I2C sensors and a PWM light), `frl-cc27xx-adc.yaml` (ADC and PWM).
+- SysConfig 1.27.0 builds these as well as 1.26.3.
+
+#### LP-EM-CC2340R5 (cc23xx)
+
+| DIO | Header pin | Already used on the board for | Analog in | PWM (timer, channel) | Other signals |
+|---|---|---|---|---|---|
+| 0 | 10 | free | ADC5 | LGPT3 ch2 | I2C0SDA SPI0CSN |
+| 1 | 25 | free | ADC4 | LGPT3 ch1 | UART0RTS |
+| 2 | 26 | free | ADC3 |  | UART0CTS |
+| 3 | not on the header | 32 kHz crystal pad |  | LGPT1 ch2, LGPT3 ch1 |  |
+| 4 | not on the header | 32 kHz crystal pad |  | LGPT0 ch2 | SPI0MOSI UART0TXD |
+| 5 | 27 | free | ADC2 | LGPT2 ch2 |  |
+| 6 | 38 | SPI flash chip select | ADC1 | LGPT1 ch2 | I2C0SCL SPI0CSN UART0TXD |
+| 7 | 28 | free | ADC0 | LGPT3 ch1 |  |
+| 8 | 36 | free |  |  | I2C0SDA SPI0SCLK UART0RTS |
+| 9 | 12 | button BTN-2 |  | LGPT3 ch0 |  |
+| 10 | 13 | button BTN-1 |  |  |  |
+| 11 | 18 | BoosterPack SPI chip select |  | LGPT0 ch0 | SPI0CSN SPI0MISO |
+| 12 | 14 | SPI flash and BoosterPack SPI data in |  | LGPT1 ch1 | I2C0SDA SPI0MISO SPI0MOSI UART0RXD |
+| 13 | 15 | SPI flash and BoosterPack SPI data out |  |  | SPI0MISO SPI0MOSI UART0TXD |
+| 14 | 39 | red LED |  | LGPT3 ch2 |  |
+| 15 | 40 | green LED |  |  | UART0RXD |
+| 16 | not on the header | SWD (debug) |  | LGPT1 ch2 | I2C0SDA SPI0MOSI UART0RXD |
+| 17 | not on the header | SWD (debug) |  | LGPT0 ch2 | I2C0SCL SPI0SCLK UART0TXD |
+| 18 | 7 | SPI flash and BoosterPack SPI clock |  | LGPT3 ch0 | SPI0SCLK UART0TXD |
+| 19 | 17 | free |  | LGPT3 ch1 | SPI0MOSI |
+| 20 | 4 | backchannel UART: chip TX | ADC11 | LGPT1 ch0 | SPI0MISO UART0RXD UART0TXD |
+| 21 | 37 | free | ADC10 | LGPT0 ch1 | SPI0MISO UART0CTS |
+| 22 | 3 | backchannel UART: chip RX | ADC9 | LGPT2 ch0 | UART0RXD |
+| 23 | 23 | free | ADC8 | LGPT2 ch1 |  |
+| 24 | 9 | free | ADC7 | LGPT1 ch0, LGPT3 ch0 | I2C0SCL SPI0SCLK |
+| 25 | 24 | free | ADC6 |  | I2C0SCL SPI0MISO |
+
+#### LP-EM-CC2755P10 (cc27xx)
+
+| DIO | Header pin | Already used on the board for | Analog in | PWM (timer, channel) | Other signals |
+|---|---|---|---|---|---|
+| 0 | 40 | button BTN-2 |  | LGPT0 ch0, LGPT1 ch0 |  |
+| 1 | 4 | backchannel UART: chip TX |  | LGPT1 ch0, LGPT1 ch1, LGPT2 ch0 | CAN0TX UART0TXD |
+| 2 | 3 | backchannel UART: chip RX |  | LGPT1 ch1, LGPT1 ch2 | CAN0RX UART0RXD |
+| 3 | 7 | SPI flash and BoosterPack SPI clock |  | LGPT2 ch0 | I2S0SCLK SPI0SCLK UART1TXD |
+| 4 | 14 | SPI flash and BoosterPack SPI data in |  | LGPT1 ch2, LGPT2 ch1 | SPI0MISO SPI0MOSI UART1RXD |
+| 5 | 15 | SPI flash and BoosterPack SPI data out |  | LGPT2 ch1, LGPT2 ch2 | SPI0MISO SPI0MOSI |
+| 7 | 18 | BoosterPack SPI chip select |  | LGPT2 ch2 | I2S0WS SPI0CSN |
+| 9 | 34 | SWD (debug) |  | LGPT0 ch1 | I2C0SCL I2S0SD0 |
+| 10 | 33 | SWD (debug) |  | LGPT0 ch2 | I2C0SDA I2S0SD1 |
+| 11 | 39 | free |  | LGPT3 ch0 | SPI1MISO SPI1MOSI |
+| 12 | 19 | green LED |  | LGPT3 ch1, LGPT3 ch2 | SPI1MISO SPI1MOSI |
+| 15 | 35 | free |  | LGPT3 ch1, LGPT3 ch2 | SPI1SCLK |
+| 16 | 36 | red LED |  | LGPT3 ch0 | I2S0MCLK SPI1CSN |
+| 17 | 32 | free | ADC8 | LGPT0 ch0 | CAN0TX I2S0SCLK UART0RTS |
+| 18 | 31 | free | ADC7 | LGPT0 ch1 | CAN0RX I2S0WS UART0CTS |
+| 19 | 38 | SPI flash chip select | ADC6 |  | I2S0SD0 SPI0CSN UART0RXD UART0TXD |
+| 20 | 30 | button BTN-1 | ADC5 |  | I2S0SD1 SPI0SCLK UART0RXD UART0TXD |
+| 21 | 2 | free | ADC4 |  | I2C0SCL SPI0MOSI UART1TXD |
+| 22 | 6 | free | ADC3 |  | I2C0SDA SPI0MISO UART1RXD |
+| 23 | not on the header | 32 kHz crystal pad |  | LGPT0 ch2, LGPT1 ch0 | SPI1CSN UART1RTS |
+| 24 | not on the header | 32 kHz crystal pad |  | LGPT0 ch0 | SPI1SCLK UART1CTS |
+| 27 | 9 | free | ADC1 |  | I2C0SCL SPI1MOSI |
+| 28 | 10 | free | ADC0 |  | I2C0SDA SPI1MISO |
+
+
 
 ## What is here
 
@@ -106,4 +176,4 @@ Limits today: the API runs without encryption, settings do not survive a reset, 
 
 ESPHome 2026.9.1 lets an external component be a target platform (`IS_TARGET_PLATFORM`) with its own `run_compile` and `upload_program`. The platform runs ESPHome's code generation as usual, then builds ESPHome's generated C++, this repo's shim, and TI's FreeRTOS and ZBOSS libraries with TI's compiler, in parallel with unchanged files skipped on the next run. Four workarounds, each in the code with its reason: the platform adds `nrf52` to the loaded integrations because ESPHome's Zigbee component switches its switch support on by that name; it removes the validated-config cache because `esphome upload` otherwise skips loading external components; it passes `-DUSE_ZEPHYR -DUSE_NRF52` because the Zigbee sources are guarded by them; and the shim stands in for Zephyr.
 
-Known limits: two boards flashed (CC2755P10: two joins, 32 toggles; CC2340R5: four joins, 190 commands, a 7-minute router run), no long soak test; random bytes and ESPHome's saved preferences are stubs; no logging, so `esphome logs` has nothing to read; ESPHome's four `--wrap` hooks are not applied because TI's linker has no `--wrap`; only the Zigbee components the CC2755P10 link test exercised (switch, sensor) were run.
+Known limits: two boards flashed (CC2755P10: two joins, 32 toggles; CC2340R5: four joins, 190 commands, a 7-minute router run), no long soak test; random bytes are a stub; ESPHome's four `--wrap` hooks are not applied because TI's linker has no `--wrap`; only the Zigbee components the CC2755P10 link test exercised (switch, sensor) were run.

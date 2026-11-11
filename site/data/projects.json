@@ -10934,6 +10934,11 @@
      "st": "no",
      "why": "Zephyr's upstream blinky builds and flashes, then stops in the non-maskable interrupt handler (SRAM ECC error)",
      "source": "docs/experiments/2026-10-08-zephyr-lp-mspm0g3519.md"
+    },
+    "beagley-ai": {
+     "st": "yes",
+     "why": "Upstream Zephyr runs the portable app on the MCU R5F core, loaded from Linux: a 21,372-byte image, 16 lines one second apart",
+     "source": "beagley-ai/bench/portability/r5f-app-2026-11-04.log"
     }
    },
    "outcome": "rtos",
@@ -24046,7 +24051,7 @@
     "cc35x1": {
      "st": "yes",
      "proof": "checked",
-     "why": "Ran on the LP-EM-CC35X1 with the Audio BoosterPack: three spoken questions were transcribed word for word and the first reply audio started 2.28 to 2.67 s after each question (2026-10-29, Claude Haiku). Not judged by ear: the speaker's sound. The screen with its four looks runs on the same image.",
+     "why": "Ran on the LP-EM-CC35X1 with the Audio BoosterPack: three spoken questions were transcribed word for word and the first reply audio started 2.28 to 2.67 s after each question (2026-10-29, Claude Haiku). The spoken reply was heard clean on the pack's speaker on 2026-11-04. The screen with its four looks runs on the same image.",
      "source": "data/results/cc35x1.csv"
     }
    },
@@ -24129,7 +24134,7 @@
       "status": "tested",
       "evidence": [
        {
-        "text": "Three questions spoken by a Mac about 30 cm from the pack were each transcribed word for word; the first reply audio started 2.28 to 2.67 s (median 2.47 s) after the question ended, with Claude Haiku as the language model. Measured on 2026-10-29. The speaker's sound quality was not judged by ear; the counters say every decoded sample played.",
+        "text": "Three questions spoken by a Mac about 30 cm from the pack were each transcribed word for word; the first reply audio started 2.28 to 2.67 s (median 2.47 s) after the question ended, with Claude Haiku as the language model. Measured on 2026-10-29. The counters say every decoded sample played, and the reply was heard clean on the speaker on 2026-11-04.",
         "source": "data/results/cc35x1.csv"
        },
        {
@@ -24381,7 +24386,6 @@
        "The four looks, touch navigation, the settings strip, a Wi-Fi motion score and offline kids' games run in the same image over the air-updatable slot."
       ],
       "not_shows": [
-       "That the speaker sounds clean: it was not judged by ear.",
        "That S2 works by hand: the press was sent from the console.",
        "Power use: the radio is kept always on and power was not measured.",
        "A real room: the questions came from a Mac speaker 30 cm away, in a quiet room."
@@ -24546,7 +24550,7 @@
   {
    "id": "beagley-ai",
    "name": "BeagleY-AI",
-   "page": "board-am67a.html",
+   "page": "board-beagley-ai.html",
    "part": "AM67A",
    "family": "tda4"
   }

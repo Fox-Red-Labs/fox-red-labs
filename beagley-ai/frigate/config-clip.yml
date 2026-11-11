@@ -1,0 +1,39 @@
+# Frigate 0.18.2 on the BeagleY-AI, detector = the TIDL server in this folder, input = a recorded H.264 clip (TI's sample clip video1_1280_768.h264 (two people and a dog, 409 frames) repeated 30 times, built by cat)
+mqtt:
+  enabled: false
+auth:
+  enabled: false
+detectors:
+  deepstack:
+    type: deepstack
+    api_url: http://127.0.0.1:5100/v1/vision/detection
+    api_timeout: 0.5
+model:
+  width: 416
+  height: 416
+  input_pixel_format: rgb
+cameras:
+  yard:
+    ffmpeg:
+      inputs:
+        - path: /media/yard30.h264
+          input_args: -re -f h264 -r 30
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 1280
+      height: 768
+      fps: 5
+    motion:
+      threshold: 100
+      contour_area: 600
+      improve_contrast: false
+    objects:
+      track:
+        - person
+        - dog
+    record:
+      enabled: false
+    snapshots:
+      enabled: false

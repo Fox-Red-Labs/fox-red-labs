@@ -808,8 +808,8 @@
    "flash_label": "microSD card",
    "ram_kb": 4194304,
    "radios": [
-    "Wi-Fi 6",
-    "Bluetooth LE"
+    "Wi-Fi 6 (present, not tested)",
+    "Bluetooth LE (present, not tested)"
    ],
    "extras": [
     "Deep-learning accelerator (C7x and MMA)",
@@ -817,11 +817,14 @@
     "Gigabit Ethernet",
     "Micro-SD boot"
    ],
-   "board_price": "$70 (data/boards.csv)",
+   "board_price": "$70 (Seeed Studio, 2026-11-10)",
    "probe": "none; a serial port and JTAG pads",
    "board_note": "Not sold on TI.com; made by BeagleBoard.org",
    "zephyr": null,
    "sources": [
+    "https://www.beagleboard.org/boards/beagley-ai",
+    "https://www.seeedstudio.com/BeagleYr-AI-TI-AM67A.html",
+    "https://www.ti.com/product/AM67A",
     "beagley-ai/README.md",
     "data/boards.csv",
     "docs/arrivals/beagley-ai.md"

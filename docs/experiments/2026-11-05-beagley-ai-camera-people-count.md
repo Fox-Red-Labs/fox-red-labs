@@ -9,7 +9,7 @@ stop: none
 -->
 # Does TI's people-count camera demo run on a USB webcam at 30 fps on the BeagleY-AI (AM67A)?
 
-Terms: [docs/vocab.md](../vocab.md), BeagleY-AI FAQ. **C7x** is the AM67A's AI accelerator core. 1 kB = 1,024 bytes. Setup: BeagleY-AI 4 GB, BeagleBoard Edge AI image 11.00.00.08 (Linux 6.12.33), an Insta360 Link 2 Pro webcam at 720p, TI's `app_edgeai.py` detection demo.
+Terms: [docs/vocab.md](../vocab.md), [BeagleY-AI FAQ](../../beagley-ai/FAQ.md). **C7x** is the AM67A's AI accelerator core. 1 kB = 1,024 bytes. Setup: BeagleY-AI 4 GB, BeagleBoard Edge AI image 11.00.00.08 (Linux 6.12.33), an Insta360 Link 2 Pro webcam at 720p, TI's `app_edgeai.py` detection demo.
 
 **Short answer.** Yes for the detector: on a rated 5 V 3 A USB-C supply it ran at 28.0 to 29.4 fps and the board stayed up through five 60 s starts. No person has been counted yet: the on-screen count was 0 because the camera faced the bench, not a person. On the earlier wall supply the board rebooted; the supply is the suspected cause, not a measured one.
 

@@ -3,19 +3,19 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BeagleY-AI Board</title>
-<meta name="description" content="The BeagleY-AI is made by BeagleBoard.org around TI&#x27;s AM67A. A small Linux computer with a vision accelerator, for camera and detection projects.">
+<title>BeagleY-AI: errors and fixes</title>
+<meta name="description" content="Every error seen on the BeagleY-AI and its fix, with the exact error text.">
 <!-- seo -->
-<link rel="canonical" href="https://foxredlabs.dev/board-am67a.html">
+<link rel="canonical" href="https://foxredlabs.dev/faq-beagley-ai.html">
 <meta property="og:site_name" content="Fox Red Labs">
 <meta property="og:type" content="article">
-<meta property="og:title" content="BeagleY-AI Board">
-<meta property="og:description" content="The BeagleY-AI is made by BeagleBoard.org around TI&#x27;s AM67A. A small Linux computer with a vision accelerator, for camera and detection projects.">
-<meta property="og:url" content="https://foxredlabs.dev/board-am67a.html">
-<meta property="og:image" content="https://foxredlabs.dev/media/cards/real-linux-vision.png">
+<meta property="og:title" content="BeagleY-AI: errors and fixes">
+<meta property="og:description" content="Every error seen on the BeagleY-AI and its fix, with the exact error text.">
+<meta property="og:url" content="https://foxredlabs.dev/faq-beagley-ai.html">
+<meta property="og:image" content="https://foxredlabs.dev/media/og-image.png">
 <meta name="twitter:card" content="summary">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "BeagleY-AI Board", "description": "The BeagleY-AI is made by BeagleBoard.org around TI's AM67A. A small Linux computer with a vision accelerator, for camera and detection projects.", "url": "https://foxredlabs.dev/board-am67a.html", "author": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "publisher": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "license": "https://creativecommons.org/licenses/by/4.0/", "isPartOf": {"@type": "WebSite", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "BeagleY-AI (AM67A)", "description": "The BeagleY-AI is made by BeagleBoard.org around TI's AM67A. A small Linux computer with a vision accelerator, for camera and detection projects.", "url": "https://foxredlabs.dev/board-am67a.html", "brand": {"@type": "Brand", "name": "Texas Instruments"}, "additionalProperty": [{"@type": "PropertyValue", "name": "Board", "value": "BeagleY-AI (made by BeagleBoard.org)"}, {"@type": "PropertyValue", "name": "Chip", "value": "AM67A"}, {"@type": "PropertyValue", "name": "Core", "value": "4x Cortex-A53 at 1.4 GHz, C7x DSP with matrix accelerator (MMA), R5F cores"}, {"@type": "PropertyValue", "name": "Clock", "value": "1.4 GHz"}, {"@type": "PropertyValue", "name": "Flash", "value": "microSD card"}, {"@type": "PropertyValue", "name": "RAM", "value": "4 GB"}, {"@type": "PropertyValue", "name": "Radio", "value": "Wi-Fi 6, Bluetooth LE"}, {"@type": "PropertyValue", "name": "Notable peripherals", "value": "Deep-learning accelerator (C7x and MMA); Hardware H.264 and H.265 decode and encode (Wave5); Gigabit Ethernet; Micro-SD boot"}, {"@type": "PropertyValue", "name": "On-board debug probe", "value": "None; a serial port and JTAG pads"}, {"@type": "PropertyValue", "name": "Toolchains that ran", "value": "GCC, Zephyr, Linux"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "TechArticle", "headline": "BeagleY-AI: errors and fixes", "description": "Every error seen on the BeagleY-AI and its fix, with the exact error text.", "url": "https://foxredlabs.dev/faq-beagley-ai.html", "author": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "publisher": {"@type": "Organization", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}, "license": "https://creativecommons.org/licenses/by/4.0/", "isPartOf": {"@type": "WebSite", "name": "Fox Red Labs", "url": "https://foxredlabs.dev"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "The Mac will not write to the card: \"refusing disk4: not removable\", or the write ends with an error", "acceptedAnswer": {"@type": "Answer", "text": "Use the current beagley-ai/tools/write-card.sh: it accepts a card in the Mac's built-in SD slot, which lists as an internal, fixed disk, while still refusing the Mac's system disk and anything outside 16 to 512 GB. It unpacks the image to a file and pads it to whole 512-byte sectors before the raw write, because a raw write to /dev/rdiskN ending in a partial sector fails. It needs about 11 GB free in the work folder (third argument). The script's checks were run against the system disk and a 2 TB USB drive (both refused); a full card write with this version has not been run."}}, {"@type": "Question", "name": "The board is powered from my computer's USB-C port but never shows up as a network adapter", "acceptedAnswer": {"@type": "Answer", "text": "Reach the board over Ethernet. On the Edge AI image the USB-C port carries power only: there is no USB gadget, so no serial or network device appears on the Mac. Find the address in the router's client list (the board's host name is j722s-evm)."}}, {"@type": "Question", "name": "A model load never returns, and the next models hang too", "acceptedAnswer": {"@type": "Answer", "text": "Reboot the board. Run one model per process with a timeout, as beagley-ai/bench/zoo/zoo_bench.py does with ONLY=<model folder> timeout 300 python3 zoo_bench.py 30, so a hung load costs one model and not the session. Seen once on 2026-11-03; no log of the hang was kept and the cause is not known."}}, {"@type": "Question", "name": "Pose takes 43 ms; the SK-TDA4VM's numbers suggested 25 to 30 ms", "acceptedAnswer": {"@type": "Answer", "text": "Nothing is wrong; the 25 to 30 ms was our guess, scaled from the SK-TDA4VM's 13.76 ms and the 4 against 8 TOPS ratio. Both C7x cores report their 1.0 GHz clock (k3conf dump processor), and every one of the model's 274 nodes runs on the accelerator. TI's AM67A datasheet table gives 8.63 ms for YOLOX-nano and 4.94 ms for RegNetX; this board measured 10.15 and 5.95 ms with the Python timing used here, about 19 percent more, which is near TI's published speed but not equal to it; the pose model is not in that table, and about 36 ms is the figure TI's method would give (computed, not run). The SK-TDA4VM (8 TOPS) ran the same model in 13.76 ms."}}, {"@type": "Question", "name": "ffmpeg -c:v h264_v4l2m2m encode never finishes; dmesg prints wave5_vpu_firmware_command_queue_error_check: result not ready: 0x800", "acceptedAnswer": {"@type": "Answer", "text": "Use GStreamer for hardware encode: v4l2h264enc ran at 110.1 fps on a raw 1088p file. FFmpeg's h264_v4l2m2m encoder did not finish in over 100 s, and on a second try waited in poll for over 3.5 minutes, ignored timeout's SIGTERM and wrote 48 bytes; kill -9 ends it and the codec still works afterwards."}}, {"@type": "Question", "name": "FFmpeg hardware decode gives 3 frames and then stops when the output is scaled and piped", "acceptedAnswer": {"@type": "Answer", "text": "Decode with GStreamer (v4l2h264dec) when the frames go to a program. ffmpeg -c:v h264_v4l2m2m -i clip.h264 -f null - decodes the whole clip (1.1 s for 300 frames at 1280x768), but with -vf scale=224:224 -pix_fmt rgb24 -f rawvideo - it delivered 441 kB (3 frames of 224x224x3) and then waited about 20 s with no error text."}}, {"@type": "Question", "name": "GStreamer v4l2h264dec ! videoconvert to a pipe runs at 6 fps, or seems to hang", "acceptedAnswer": {"@type": "Answer", "text": "Scale the decoded frame before converting it: v4l2h264dec ! videoscale n-threads=4 ! video/x-raw,width=224,height=224 ! videoconvert ! video/x-raw,format=RGB. That ran 300 frames of the 1280x768 clip in 3.92 s (76.5 fps, 5 of 5 runs), and the seam app then ran at 61.3 fps with the classifier on the C7x. The other order, videoconvert on the full frame first, ran at 6.5 fps: the likely cause is that the CPU reads every pixel of the decoder's output buffers and those reads are slow (suspected; not measured on its own). At that rate 100 frames plus a model load overran the 90 s timeouts, which is what the earlier \"failed\" runs were. Leave capture-io-mode at its default and do not set n-threads on videoconvert after the decoder: both crash gst-launch-1.0 with Caught SIGSEGV, after which it waits for a debugger instead of exiting."}}, {"@type": "Question", "name": "dmesg prints wave5_vpu_firmware_command_queue_error_check: result not ready: 0x800", "acceptedAnswer": {"@type": "Answer", "text": "Ignore it on its own: the driver prints it once at the end of every decode, including runs that finish with every frame."}}, {"@type": "Question", "name": "Decode and encode chained run at 35 fps though each alone runs above 100", "acceptedAnswer": {"@type": "Answer", "text": "Give the encoder the decoder's buffers: v4l2h264dec ! v4l2h264enc output-io-mode=dmabuf-import. That transcoded 600 frames at 1920x1088 in 4.44 s (135.1 fps, 3 of 3 runs) against 17.09 s (35.1 fps) with the default, which copies every frame through the CPU."}}, {"@type": "Question", "name": "The webcam drops off USB: Non-zero status (-71) in video completion handler, then USB disconnect", "acceptedAnswer": {"@type": "Answer", "text": "Power the board from a 5 V 3 A USB-C supply (BeagleBoard's requirement; it has no USB-PD and warns against unpowered hubs) and if the camera still drops, give it a powered USB hub (Insta360 lists the Link 2 Pro at 5 V 1 A); on a rated 5 V 3 A supply it held on the board's own hub in five 60 s starts. On a board fed from a hub port, the Insta360 Link 2 Pro dropped off at 1080p 7 of 7 times (MJPEG and H.264, with USB autosuspend off too) and after a gimbal move; 720p held 3 of 3 with the board idle but dropped once the board ran a Frigate container, and so did a microphone recording. It comes back about 5 s later with pan, tilt and zoom reset. Software settings did not change it; that it is the supply is the likely cause, not measured (no meter on the port)."}}, {"@type": "Question", "name": "Apps cannot find /dev/video-usb-cam0 after the webcam is plugged in", "acceptedAnswer": {"@type": "Answer", "text": "TI's setup_cameras.sh makes that name only at boot. Install the udev rule from a Mac with beagley-ai/tools/camera/setup.sh <board address>: it names the first UVC camera /dev/video-usb-cam0 on every plug-in and sets its mains frequency to 60 Hz."}}, {"@type": "Question", "name": "TI's Edge AI app runs at 1 fps with c7x_1: 0%; its log says SOC env var not specified. Defaulting target to arm", "acceptedAnswer": {"@type": "Answer", "text": "Set SOC=j722s before starting app_edgeai.py. A login shell sets it from /etc/profile; a command run as ssh root@<board> \"...\" does not, and the app then runs the model on the Arm cores (737 to 809 ms a frame, 1.3 fps) and decodes in software. With SOC set, the people-count demo ran at 30.0 fps with the C7x 27 percent busy. beagley-ai/bench/camdetect/board_start.sh sets it. Also start the app with -n when it has no terminal (_curses.error: setupterm: could not find terminal)."}}, {"@type": "Question", "name": "TI's detection demo crashes: IndexError: index 5 is out of bounds for axis 1 with size 1 in post_process.py", "acceptedAnswer": {"@type": "Answer", "text": "Apply beagley-ai/bench/camdetect/people_count.patch: np.squeeze in PostProcessDetection also removes the box axis when a frame holds exactly one detection. The patch reshapes each output to one row per detection."}}, {"@type": "Question", "name": "The board drops off Ethernet and reboots a few seconds after TI's camera demo starts", "acceptedAnswer": {"@type": "Answer", "text": "Power the board from a rated 5 V 3 A USB-C supply and start the demo again."}}, {"@type": "Question", "name": "How do I check that my USB-C supply is 5 V 3 A?", "acceptedAnswer": {"@type": "Answer", "text": "Read the output line on the supply's label (for example 5V 3A, or 5V 3A among several USB-PD steps) and use a supply with a single output, since many dual-port chargers drop each port to 1.5 A when both are in use."}}, {"@type": "Question", "name": "TI's people-count demo shows a count of 0 with a person in the room", "acceptedAnswer": {"@type": "Answer", "text": "Aim the camera at the person and check the stream's picture first."}}, {"@type": "Question", "name": "Do I need a powered USB hub for the webcam?", "acceptedAnswer": {"@type": "Answer", "text": "Not on a rated 5 V 3 A supply at 720p: the Insta360 Link 2 Pro on the board's own USB hub did not drop in five 60 s starts of TI's camera demo, or in a 60 s run of Pop the bubbles."}}, {"@type": "Question", "name": "The camera demo's start script prints STREAM FAILED", "acceptedAnswer": {"@type": "Answer", "text": "Run pkill -f server.js on the board, then start again."}}, {"@type": "Question", "name": "Pi-hole starts but DNS queries time out: failed to create listening socket for port 53: Address in use", "acceptedAnswer": {"@type": "Answer", "text": "systemd-resolved holds 127.0.0.53:53. Start the container with FTLCONF_dns_listeningMode=BIND and dns.interface=eth0; dig @<board address> doubleclick.net then answered 0.0.0.0."}}, {"@type": "Question", "name": "The board reads 80 to 87 degrees C during long runs", "acceptedAnswer": {"@type": "Answer", "text": "The 4-pin fan connector was empty. Fit a fan for runs longer than a few minutes. No run was made with a fan and throttling was not checked, so any number here may be low."}}, {"@type": "Question", "name": "cannot find -lc when linking with -static", "acceptedAnswer": {"@type": "Answer", "text": "The image has no libc.a. Link dynamically; the stripped portable app is 66.1 kB."}}, {"@type": "Question", "name": "A program dies with Illegal instruction", "acceptedAnswer": {"@type": "Answer", "text": "The Cortex-A53 has no ARMv8.1 atomics. Preload the trap library from am62l-evm/steam/lse_trap/ (built on this board with gcc -O2 -march=armv8-a -mno-outline-atomics -fPIC -shared -o lse_trap.so lse_trap.c -ldl; its two tests print PASS)."}}, {"@type": "Question", "name": "/dev/kvm and /dev/fb0 do not exist", "acceptedAnswer": {"@type": "Answer", "text": "The stock kernel is built without KVM (# CONFIG_KVM is not set), so a virtual machine needs a rebuilt kernel; Android's binder and binfmt_misc are off as well. /dev/fb0 appears only when a display is attached: the kernel has framebuffer emulation on top of DRM (CONFIG_DRM_FBDEV_EMULATION=y, tidss), and no display was attached in any run, so only /dev/dri/card0 exists."}}, {"@type": "Question", "name": "Frigate's nginx exits with bind() to 0.0.0.0:5000 failed (98: Address already in use)", "acceptedAnswer": {"@type": "Answer", "text": "Move your own service off port 5000: Frigate's nginx takes it when the container uses host networking. The detection server in beagley-ai/frigate/ listens on 5100."}}, {"@type": "Question", "name": "Frigate shows detection_fps 0.0 and the detector never gets a request", "acceptedAnswer": {"@type": "Answer", "text": "Frigate's motion detector is still calibrating, and it only sends regions to the detector when it is not. It leaves calibration when a frame has under 5 percent changed area and 4 or fewer motion boxes, so a busy or moving scene never does. Set motion.threshold: 100 and contour_area: 600 for such a clip (a fixed camera does not need it)."}}, {"@type": "Question", "name": "Frigate logs Error calling deepstack API: ... Read timed out", "acceptedAnswer": {"@type": "Answer", "text": "The model takes longer than api_timeout (0.5 s in the sample config). The Arm-core model took 648 ms; set api_timeout: 3.0."}}, {"@type": "Question", "name": "Frigate's camera input dies: Error during demuxing: No such device", "acceptedAnswer": {"@type": "Answer", "text": "On 2026-11-03 the webcam dropped off USB (-71, then USB disconnect) within seconds of Frigate's ffmpeg opening it at 1280x720 MJPEG, in 2 of 2 tries, on the board's earlier power setup; with docker run --device the container's device file then stays stale. On 2026-11-07, on a rated 5 V 3 A supply, Frigate read the same webcam for 130 s at 59.71 ms per detection, so the supply is the likely cause (the same as the webcam entry above, not isolated here). Start the container with -v /dev:/dev so it sees the camera."}}]}</script>
 <!-- /seo -->
 <link rel="icon" href="media/favicon.svg">
 <link rel="stylesheet" href="fonts/fonts.css">
@@ -577,512 +577,44 @@ body.has-otp [id] { scroll-margin-top: 132px; }
 </script>
 </header>
 <main><div class="wrap">
-<style>
-.bh { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 32px; align-items: start; margin-top: 8px; }
-.bh > * { min-width: 0; } .bh figure { margin: 0; } .bh figure img { max-width: 100%; height: auto; display: block; }
-.bh h1 { margin: 6px 0 10px; } .bh .bline { font-size: 20px; line-height: 30px; margin: 0 0 18px; max-width: 640px; }
-.bh .brow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
-.bh .brow .btn { white-space: normal; text-align: left; max-width: 100%; height: auto; min-height: 44px; padding-top: 10px; padding-bottom: 10px; }
-.bh .brow .gl { font-size: 15px; line-height: 22px; color: var(--frl-stone); }
-.bh figure { margin: 0; } .bh figure img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; border-radius: 12px; border: 1px solid var(--frl-line); }
-.bh figure.fitbox img { object-fit: contain; background: #fff; padding: 16px; box-sizing: border-box; }
-.bh figure.wirebox img { aspect-ratio: auto; background: #fff; }
-.bh figcaption { font-size: 13px; line-height: 18px; margin-top: 6px; color: var(--frl-stone); }
-.btabs { display: flex; gap: 22px; margin: 14px 0 0; border-bottom: 1px solid var(--frl-line); }
-.btabs a { font-weight: 600; font-size: 16px; color: var(--frl-stone); text-decoration: none; padding: 8px 0 10px; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-.btabs a:hover { color: var(--frl-ink); } .btabs a[aria-current="page"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
-.lcard { background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 12px; padding: 20px 22px; }
-.lcs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }
-.lc-n { margin: 8px 0 0; font-size: 12px; line-height: 17px; color: var(--frl-stone); }
-.lc h3 { font-size: 13px; line-height: 18px; letter-spacing: .08em; text-transform: uppercase; color: var(--frl-stone); margin: 0 0 10px; }
-.lr { display: grid; grid-template-columns: 74px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 3px 0; font-size: 13px; line-height: 18px; }
-.lr-n { color: var(--frl-stone); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lr-t { display: block; height: 12px; } .lr-t i { display: block; height: 12px; background: #F4EFE9; border-radius: 0 3px 3px 0; }
-.lr-v { font: 500 12px/18px var(--frl-mono, 'JetBrains Mono', monospace); color: var(--frl-ink); white-space: nowrap; } .lr-na { color: var(--frl-stone); font-weight: 400; }
-.lr.me .lr-t i { background: var(--frl-red); } .lr.me .lr-n, .lr.me .lr-v { color: var(--frl-red); font-weight: 700; }
-.lnote { margin: 16px 0 0; font-size: 17px; line-height: 26px; }
-.bcs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.bc { display: flex; flex-direction: column; gap: 6px; background: var(--frl-cream); border: 1px solid var(--frl-line); border-radius: 12px; overflow: hidden; color: var(--frl-ink); text-decoration: none; padding-bottom: 16px; }
-.bc:hover { border-color: var(--frl-stone); } .bc img, .bc .bc-none { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; background: #F4EFE9; }
-.bc b, .bc span { padding: 0 16px; } .bc .bc-t { font-size: 17px; line-height: 24px; margin-top: 6px; }
-.bc .bc-n { font: 700 34px/40px var(--frl-font); color: var(--frl-red); } .bc .bc-l { font-size: 13px; line-height: 18px; color: var(--frl-ink); margin-top: -4px; } .bc .bc-w { font-size: 14px; line-height: 20px; color: var(--frl-stone); }
-.scard { background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 6px 20px; }
-.sr { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; align-items: start; padding: 14px 0; border-top: 1px solid var(--frl-line); }
-.sr:first-child { border-top: 0; } .sr .chip { justify-self: start; margin-top: 2px; } .sr p { margin: 0; font-size: 16px; line-height: 26px; overflow-wrap: anywhere; }
-.sr a { color: var(--frl-ink); } .sr details.inl summary { cursor: pointer; } .sr details.inl p { margin-top: 8px; }
-.sr details.ev { margin-top: 6px; } .sr details.ev summary { font-size: 14px; line-height: 22px; color: var(--frl-stone); }
-.sr .evl { margin: 8px 0 0; padding-left: 20px; font-size: 14px; line-height: 22px; } .sr .evl li { margin: 0 0 6px; } .sr .ev-src { font: 12px var(--frl-mono, monospace); color: var(--frl-stone); overflow-wrap: anywhere; }
-.rks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
-.rkt { display: flex; flex-direction: column; gap: 4px; background: var(--frl-ink); color: #fff; border-radius: 12px; padding: 18px 20px; text-decoration: none; }
-.rkt .rk-e { font: 700 12px/18px var(--frl-font); letter-spacing: .1em; text-transform: uppercase; color: #F7F3EC; }
-.rkt b { font-size: 26px; line-height: 32px; font-weight: 700; } .rkt .rk-s { font-size: 15px; line-height: 22px; color: rgba(247,243,236,.72); }
-.rkt.cream { background: var(--frl-cream); color: var(--frl-ink); border: 1px solid var(--frl-line); } .rkt.cream .rk-e { color: var(--frl-red); } .rkt.cream .rk-s { color: var(--frl-stone); }
-.rkt.arc { position: relative; padding-right: 112px; } .rkt .rk-arc { position: absolute; right: 18px; top: 50%; width: 76px; height: 76px; margin-top: -38px; }
-html:not(.js) .rkt .m-arc { stroke-dashoffset: var(--dash, 0); }
-.rkt.cream b { font-size: 20px; line-height: 26px; }
-.deeper .fold { margin-top: 10px; } .deeper .fold > .blk { margin-top: 0; padding-top: 0; }
-@media (max-width: 1100px) { .lcs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 860px) { .bh { grid-template-columns: 1fr; gap: 20px; } .bh figure { order: 2; max-width: 420px; } .lcs { grid-template-columns: 1fr; gap: 20px; } .bcs, .rks { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .sr { grid-template-columns: 1fr; gap: 6px; } .bh .bline { font-size: 18px; line-height: 28px; } }
+<p class="crumb"><a href="index.html">Fox Red Labs</a> / <a href="hardware.html">Hardware</a> / <a href="board-beagley-ai.html">BeagleY-AI</a> / Errors and fixes</p><h1 class="q">BeagleY-AI: errors and fixes</h1><p class="q-sub">BeagleY-AI: errors and fixes</p><div id="errors" class="faqblk"><style>
+main h2 { font-size:20px; margin:36px 0 10px; font-weight:600; border-bottom:1px solid var(--frl-line); padding-bottom:6px; }
+.lede { color:var(--frl-stone); margin:0 0 16px; }
+a { color:var(--frl-red); }
+.mono, code { font-family:var(--frl-mono); font-size:13px; }
+code { background:var(--frl-cream); padding:0 4px; border-radius:3px; overflow-wrap:anywhere; }
+.legend { list-style:none; padding:0; margin:0 0 8px; display:flex; flex-wrap:wrap; gap:8px 16px; font-size:14px; }
+.legend b { margin-left:6px; }
+.qa { background:#fff; border:1px solid var(--frl-line); border-radius:8px; margin:8px 0; padding:0 14px; }
+.qa summary { cursor:pointer; padding:12px 0; display:flex; flex-wrap:wrap; gap:6px 10px; align-items:baseline; list-style:none; }
+.qa summary::-webkit-details-marker { display:none; }
+.qa summary::before { content:"+"; color:var(--frl-stone); font-weight:700; width:12px; }
+.qa[open] summary::before { content:"–"; }
+@media (max-width:700px) { .qa summary h3.q { flex:1 1 calc(100% - 22px); min-width:0; overflow-wrap:break-word; } .qa summary .pill { margin-left:22px; } }
+h1.q { margin:0 0 14px; flex:none; }
+.q-sub + .lede { margin-top:16px; }
+.q { font-weight:600; font-size:17px; margin:0; flex:1 1 60%; min-width:0; overflow-wrap:anywhere; }
+.a { font-weight:600; }
+.qa p, .qa li { font-size:15px; margin:0 0 10px; }
+.pill { display:inline-block; font-size:12px; line-height:17px; font-weight:600; padding:1px 6px; border-radius:3px; border:1.5px solid var(--c); color:var(--c); white-space:normal; max-width:100%; overflow-wrap:anywhere; }
+.t-ours { --c:var(--frl-red); } .t-setup { --c:var(--frl-amber); } .t-default { --c:var(--frl-stone); } .t-tool { --c:var(--frl-ink); }
+.t-chip { --c:var(--frl-ink); } .t-third { --c:var(--frl-ok); } .t-radio { --c:var(--frl-stone); } .t-unknown { --c:var(--frl-stone); }
+.ours ul { padding-left:20px; }
+.ffind { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:12px 0 4px; }
+.ffind input { flex:1 1 260px; font:500 16px var(--frl-font); height:44px; padding:0 14px; border:1.5px solid var(--frl-ink); border-radius:6px; background:#fff; color:var(--frl-ink); min-width:0; }
+.ffbtns { display:flex; gap:8px; flex:1 1 100%; }
+.ffind button { font:500 14px var(--frl-font); height:36px; padding:0 14px; border-radius:4px; border:1.5px solid var(--frl-line); background:#fff; color:var(--frl-ink); cursor:pointer; }
+.ffind button:hover { border-color:var(--frl-ink); }
+.fcount { font-size:14px; color:var(--frl-stone); min-height:20px; margin:0 0 4px; }
 
-.taps { margin-top: 8px; }
-.taps figure { margin: 0; background: #fff; border: 1px solid var(--frl-line); border-radius: 12px; padding: 22px 26px 8px; }
-.to-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--frl-line); padding-bottom: 14px; }
-.to-head h2 { margin: 0; } .to-head p { margin: 0; font-size: 15px; color: var(--frl-stone); }
-.to-row { display: grid; grid-template-columns: 200px minmax(0, 1fr) 260px; gap: 28px; align-items: center; padding: 22px 0; border-top: 1px solid var(--frl-line); }
-.to-row:first-of-type { border-top: 0; }
-.to-job h3 { margin: 0; font: 700 22px/1 "Barlow Condensed", var(--frl-font); text-transform: uppercase; letter-spacing: .01em; }
-.to-job p { margin: 6px 0 0; font-size: 14px; line-height: 20px; color: var(--frl-stone); }
-.to-v p { margin: 0; font-size: 16px; line-height: 24px; } .to-v .to-n { display: inline-block; margin-top: 6px; font-size: 14px; }
-svg.ru { width: 100%; height: auto; display: block; overflow: visible; font-family: var(--frl-mono); }
-.ru-base { stroke: var(--frl-ink); stroke-width: 1.5; } .ru-tl { font-size: 11px; fill: var(--frl-stone); }
-.ru-band { fill: rgba(180,36,24,.12); stroke: var(--frl-red); stroke-width: 1.2; } .ru-bl { font-size: 11px; fill: var(--frl-red); }
-.ru-m { stroke: color-mix(in srgb,#6B625B 45%,#fff); stroke-width: 1.2; stroke-dasharray: 3 3; } .ru-ml { font-size: 10.5px; fill: var(--frl-stone); }
-.ru-o { fill: #fff; stroke: color-mix(in srgb,#6B625B 45%,#fff); stroke-width: 1.5; } .ru-me { fill: var(--frl-red); stroke: #fff; stroke-width: 3; }
-.ru-v { font-size: 14px; font-weight: 700; fill: var(--frl-red); paint-order: stroke; stroke: #fff; stroke-width: 4px; }
-.rps { display: flex; flex-wrap: wrap; gap: 8px; } .rps .rp { font: 400 13px var(--frl-mono); padding: 7px 12px; border-radius: 4px; border: 1.5px solid #E2D8C9; color: #6B625B; }
-.rps .rp.on { border-color: var(--frl-ink); color: var(--frl-ink); background: var(--frl-cream); }
-@media (max-width: 900px) { .to-row { grid-template-columns: minmax(0, 1fr); gap: 10px; } .taps figure { padding: 18px 16px 4px; } }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-</style><style>
-.tw { overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }   /* wide evidence tables scroll inside their fold, not the page */
-.t-sec { margin: 44px 0 0; } h2.t-h { font: 700 26px/32px var(--frl-font); margin: 0 0 12px; }
-.t-hero { display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px; align-items: center; margin-top: 16px; }
-.t-hero > * { min-width: 0; }
-.t-hero h1 { font: 700 40px/46px var(--frl-font); margin: 4px 0 10px; }
-.t-hero .lead { font-size: 19px; line-height: 28px; margin: 0 0 14px; }
-.t-pic figure { margin: 0; } .t-pic img, .t-pic svg.t-bd { width: 100%; height: auto; border-radius: 12px; display: block; }
-.t-pic figure img { aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid var(--frl-line); }
-.t-pic figure.fitbox img { object-fit: contain; background: #fff; padding: 16px; box-sizing: border-box; }
-.t-pic figure.wirebox img { aspect-ratio: auto; background: #fff; }
-.t-pic figcaption { font-size: 13px; line-height: 18px; margin-top: 6px; color: var(--frl-stone); }
-.t-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 0 14px; }
-.t-stats > div { border: 1.5px solid var(--frl-line); border-radius: 10px; padding: 8px 10px; background: #fff; min-width: 0; }
-.t-stats b { display: block; font: 700 20px/24px var(--frl-font); overflow-wrap: anywhere; } .t-stats b a { color: inherit; }
-.t-stats span { font-size: 13px; color: var(--frl-stone); }
-.t-btns { display: flex; flex-wrap: wrap; gap: 10px; }
-.t-label { font-size: 14px; color: var(--frl-stone); margin: 0 0 6px; }
-.t-open { font-size: 15px; color: var(--frl-stone); margin: 14px 0 0; }
-.t-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.t-pcard { display: block; border: 1.5px solid var(--frl-line); border-radius: 12px; overflow: hidden; text-decoration: none; color: var(--frl-ink); background: #fff; transition: border-color var(--frl-ease); }
-.t-pcard:hover { border-color: var(--frl-ink); }
-.t-pcard .pic { height: 170px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--frl-ink); position: relative; }
-.t-pcard .pic > img { width: 100%; height: 100%; object-fit: cover; }
-.t-pcard .t { padding: 10px 14px 14px; font-weight: 600; font-size: 16px; line-height: 22px; }
-.t-pcard .t small { display: block; font-weight: 400; color: var(--frl-stone); font-size: 14px; line-height: 20px; }
-.t-pcard .st { color: var(--ok); font-weight: 600; } .t-pcard.maybe .st { color: var(--frl-stone); } .t-h3 { margin: 24px 0 8px; font-size: 18px; }
-.t-none { color: var(--frl-cream); font-weight: 600; padding: 16px; text-align: center; }
-.t-wireless { margin: 16px 0 0; font-size: 16px; }
-.t-fam { display: grid; grid-template-columns: 1fr 1.2fr; gap: 28px; align-items: start; } .t-fam > * { min-width: 0; }
-.t-chip { width: 100%; height: auto; display: block; }
-.t-bars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 22px; } .t-bars > * { min-width: 0; }
-.t-bars h3 { font: 600 14px var(--frl-font); color: var(--frl-stone); margin: 0 0 6px; text-transform: uppercase; letter-spacing: .04em; }
-.t-row { display: grid; grid-template-columns: 66px minmax(0, 1fr) auto; gap: 6px; align-items: center; font-size: 13px; margin: 3px 0; }
-.t-row > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.t-trk { display: block; position: relative; height: 10px; } .t-bar { display: block; height: 10px; border-radius: 3px; background: #CFC3B2; transform-origin: left center; }
-.t-row.me { font-weight: 700; } .t-row.me .t-bar { background: var(--frl-red); } .t-row .v { text-align: right; white-space: nowrap; }
-.t-anim .t-row .t-bar { transform: scaleX(0); transition: transform .9s cubic-bezier(.2,0,0,1); transition-delay: calc(var(--i) * 70ms); }
-.t-anim .t-go .t-row .t-bar { transform: scaleX(1); }
-.t-take { margin: 14px 0 0; font-size: 16px; }
-.t-fix { width: 100%; border-collapse: collapse; } .t-fix td { padding: 10px 8px; border-top: 1px solid var(--frl-line); vertical-align: top; font-size: 16px; }
-.t-fix td:first-child { width: 42%; font-weight: 600; }
-.t-fold { border: 1.5px solid var(--frl-line); border-radius: 12px; padding: 14px 18px; background: #fff; } .t-fold + .t-fold { margin-top: 10px; }
-.t-fold > summary { cursor: pointer; font-weight: 600; font-size: 17px; } .t-fold > summary small { display: block; font-weight: 400; color: var(--frl-stone); font-size: 15px; margin-top: 2px; }
-.t-fold > .blk, .t-fold .blk:first-child { margin-top: 12px; padding-top: 0; }
-.t-fold .fold { margin-top: 10px; }
-.t-fold .t-sub { margin: 16px 0 6px; font-size: 17px; line-height: 24px; }
-main { --frl-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
-.il-svg { display: block; font-family: var(--frl-font); }
-.il-stroke { stroke-dasharray: 240; animation: frl-draw 4s ease-in-out 3; animation-fill-mode: forwards; }
-.il-badge { position: absolute; right: 14px; bottom: 12px; background: var(--frl-red); color: #fff; border-radius: 10px; padding: 6px 10px; font: 700 15px/20px var(--frl-font); }
-.pic-il .il-dg { height: 140px; width: 150px; } .il-draw svg, .il-draw img { max-width: 100%; max-height: 170px; }
-@keyframes frl-draw { 0% { stroke-dashoffset: 240 } 45%, 100% { stroke-dashoffset: 0 } }
-.t-hero .k-kit { margin-top: 16px; }
-.k-copy code { overflow-wrap: anywhere; min-width: 0; } .k-steps > li > div { min-width: 0; } .t-sec { min-width: 0; overflow-wrap: anywhere; }
-.t-facts { border-collapse: collapse; width: 100%; max-width: 760px; } .t-facts th, .t-facts td { text-align: left; vertical-align: top; padding: 7px 10px; border-top: 1px solid var(--frl-line); font-size: 16px; line-height: 22px; }
-.t-facts th { width: 34%; font-weight: 600; } .t-blink { font-size: 17px; font-weight: 600; margin: 0 0 12px; }
-.t-res, .t-ran, .t-fixes, .t-start { padding-left: 20px; margin: 0; } .t-start li, .t-res li, .t-ran li, .t-fixes li { margin: 6px 0; line-height: 1.5; }
-.t-m { color: var(--frl-stone); } .t-st { font-weight: 600; color: var(--frl-stone); }
-.t-src { margin: 44px 0 0; font-size: 14px; color: var(--frl-stone); overflow-wrap: anywhere; }
-@media (max-width: 860px) {
-  .t-hero, .t-fam { grid-template-columns: 1fr; } .t-hero h1 { font-size: 32px; line-height: 38px; } .t-pic { order: 2; }
-  .t-stats { grid-template-columns: repeat(2, 1fr); } .t-grid { grid-template-columns: 1fr 1fr; } .t-bars { grid-template-columns: minmax(0, 1fr); }
-  .t-fix td { display: block; width: auto !important; border: 0; padding: 2px 0; } .t-fix tr { display: block; border-top: 1px solid var(--frl-line); padding: 8px 0; }
-}
-@media (max-width: 520px) { .t-grid { grid-template-columns: 1fr; } }
-
-.k-copy { display: flex; align-items: stretch; margin: 8px 0; border: 1.5px solid var(--frl-line); border-radius: 8px; background: var(--frl-cream); overflow: hidden; }
-.k-copy .k-txt { flex: 1; font: 14px/21px var(--frl-code); padding: 10px 12px; white-space: pre-wrap; word-break: break-word; background: none; }
-.k-copy.k-prompt .k-txt { font: 15px/22px var(--frl-font); }
-.k-copy button { border: 0; border-left: 1.5px solid var(--frl-line); background: #fff; font: 600 14px var(--frl-font); padding: 8px 14px; cursor: pointer; white-space: nowrap; }
-.k-tabs { display: flex; flex-wrap: wrap; border-bottom: 1.5px solid var(--frl-line); margin: 4px 0 0; }
-.k-tabs button { border: 0; background: none; font: 600 16px var(--frl-font); padding: 10px 16px; cursor: pointer; color: var(--frl-stone); border-bottom: 3px solid transparent; margin-bottom: -1.5px; text-align: left; }
-.k-tabs button[aria-selected="true"] { color: var(--frl-ink); border-bottom-color: var(--frl-red); }
-.k-tabs button small { display: block; font-weight: 400; font-size: 12px; }
-.k-panel { padding: 18px 0 0; } .k-panel[hidden] { display: none; } .k-panel > p:first-child { margin-top: 0; }
-.k-steps { list-style: none; counter-reset: s; padding: 0; margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
-.k-steps > li { counter-increment: s; display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 12px; }
-.k-steps > li > div { min-width: 0; } .k-steps code { overflow-wrap: anywhere; }
-.k-steps > li::before { content: counter(s); width: 30px; height: 30px; border-radius: 50%; background: var(--frl-ink); color: #fff; font: 700 15px/30px var(--frl-font); text-align: center; }
-.k-steps p { margin: 2px 0 6px; }
-.k-see { color: var(--ok); font-size: 15px; margin: 6px 0 0; } .k-see b { font-weight: 600; }
-.k-note { font-size: 14px; color: var(--frl-stone); margin: 4px 0 0; }
-.k-way { font-weight: 600; margin: 4px 0; }
-.k-kit { margin: 16px 0 0; padding: 14px 16px; border-radius: 10px; background: var(--frl-cream); border: 1.5px solid var(--frl-line); }
-.k-kit-h { font-weight: 700; margin: 0 0 8px; font-size: 16px; }
-.k-kit label { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 21px; margin: 6px 0; cursor: pointer; }
-.k-kit label small { color: var(--frl-stone); display: block; font-size: 13px; }
-.k-kit input { margin-top: 3px; accent-color: var(--frl-red); width: 16px; height: 16px; }
-.k-os { display: inline-flex; border: 1.5px solid var(--frl-ink); border-radius: 8px; overflow: hidden; margin: 0 0 8px; }
-.k-os button { border: 0; background: #fff; font: 600 14px var(--frl-font); padding: 6px 14px; cursor: pointer; }
-.k-os button + button { border-left: 1.5px solid var(--frl-ink); }
-.k-os button[aria-pressed="true"] { background: var(--frl-ink); color: #fff; }
-.k-prev-h { font: 600 12px var(--frl-font); text-transform: uppercase; letter-spacing: .04em; color: var(--frl-stone); margin: 12px 0 4px; }
-.k-prev { margin: 0; padding: 10px 12px; background: #fff; border: 1.5px dashed var(--frl-line); border-radius: 8px; font-size: 14px; line-height: 21px; }
-.k-go { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
-.k-go button { border: 0; background: var(--frl-ink); color: #fff; border-radius: 8px; font: 600 15px var(--frl-font); padding: 10px 16px; cursor: pointer; }
-.k-go a { font-size: 14px; }
-@media (max-width: 760px) { .k-tabs button { padding: 8px 10px; font-size: 15px; } }
-
-.ca-two { position: relative; cursor: pointer; } .ca-two .ca-svg { transition: opacity .35s; }
-.ca-two .ca-3d { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .35s; }
-.ca-two:hover .ca-3d, .ca-two.ca-on .ca-3d { opacity: 1; } .ca-two:hover .ca-svg, .ca-two.ca-on .ca-svg { opacity: 0; }
-.ca-hint { position: absolute; top: 8px; right: 8px; font: 700 11px/1 var(--frl-font); color: #F7F3EC; border: 1px solid rgba(247,243,236,.5); border-radius: 6px; padding: 2px 5px; }
-.ca-two:hover .ca-hint, .ca-two.ca-on .ca-hint { display: none; }
-@media (prefers-reduced-motion: reduce) { .ca-two .ca-3d, .ca-hint { display: none; } }
-.il-photo { display: block; width: 100%; height: 100%; } .il-photo img, .il-photo video { display: block; width: 100%; height: 100%; object-fit: cover; }
-.ca-svg { display: block; height: 150px; width: auto; max-width: 100%; font-family: var(--frl-font); }
-.ca-s { fill: none; stroke: #F7F3EC; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.ca-f { fill: #F7F3EC; } .ca-r { fill: var(--frl-red); } .ca-rs { stroke: var(--frl-red); } .ca-dim { opacity: .45; }
-.ca-ring, .ca-bar, .ca-merc, .ca-fillbar, .ca-prog, .ca-blk, .ca-newdot, .ca-led-halo { transform-box: fill-box; }
-.ca-ring { transform-origin: center; transform: scale(var(--s, 1)); opacity: var(--o, .6); }
-.ca-hop { opacity: .85; } .ca-z { opacity: .55; }
-.ca-merc { transform-origin: bottom; } .ca-bar { transform-origin: left center; } .ca-fillbar, .ca-prog { transform-origin: left center; }
-.ca-led-halo { transform-origin: center; opacity: .6; }
-.ca-coil { opacity: var(--base, 1); } .ca-coil:not(.ca-r) { --base: .4; }
-.ca-rotor { transform-box: view-box; transform-origin: 100px 75px; transform: rotate(35deg); }
-.ca-glow { opacity: .75; }
-.ca-tr { stroke-dasharray: 1; } .ca-scroll { transform: none; }
-@media (prefers-reduced-motion: no-preference) {
-  .ca-go .ca-wake { animation: ca-wake 4s ease-in-out infinite; }
-  .ca-go .ca-merc { animation: ca-merc 4s ease-in-out infinite; }
-  .ca-go .ca-hop { animation: ca-hop 2s ease-out infinite; animation-delay: var(--d, 0s); }
-  .ca-go .ca-sensor .ca-hop { animation: ca-hop-s 4s ease-out infinite; animation-delay: var(--d, 0s); }
-  .ca-go .ca-sensor .ca-got { animation: ca-got 4s steps(1) infinite; }
-  .ca-go .ca-sensor .ca-z { animation: ca-z 4s ease-out infinite; animation-delay: var(--d, 0s); }
-  .ca-go .ca-hb { animation-delay: calc(var(--d, 0s) + 1s); } .ca-go .ca-ha { animation-delay: var(--d, 0s); }
-  .ca-go .ca-radio .ca-got { animation: ca-got 2s steps(1) infinite; animation-delay: .7s; }
-  .ca-go .ca-ring { animation: ca-ring 2.4s ease-out infinite; animation-delay: var(--d, 0s); }
-  .ca-go .ca-rxn { animation: ca-hit 2.4s ease-out infinite; }
-  .ca-go .ca-fillbar { animation: ca-fill 2s ease-out infinite; }
-  .ca-go .ca-coil { animation: ca-coil 1.6s steps(1) calc(var(--p) * .53s) 1, ca-coil .75s steps(1) calc(1.6s + var(--p) * .25s) infinite; }
-  .ca-go .ca-rotor { animation: ca-up 1.6s cubic-bezier(.55, 0, 1, .8) 1, ca-spin .75s linear 1.6s infinite; }
-  .ca-go .ca-led, .ca-go .ca-led-halo { animation: ca-blinkled 1.6s steps(1) infinite; }
-  .ca-go .ca-join { stroke-dasharray: 1; animation: ca-join 4s ease-out infinite; animation-delay: var(--d, 0s); }
-  .ca-go .ca-newdot { animation: ca-newdot 4s steps(1) infinite; } .ca-go .ca-newring { animation: ca-newring 4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
-  .ca-go .ca-bar { animation: ca-race 3.4s linear 1 both; }
-  .ca-go .ca-lead { animation: ca-race 3.4s linear 1 both, ca-lead 3.4s steps(1) 1 both; }
-  .ca-go .ca-tr { animation: ca-draw 5s linear infinite; } .ca-go .ca-tr2 { animation-name: ca-draw; }
-  .ca-go .ca-gap { animation: ca-gap 5s steps(1) infinite; }
-  .ca-go .ca-cell0 { animation: ca-cell0 9s steps(1) infinite; }
-  .ca-go .ca-cell1 { animation: ca-cell1 9s steps(1) infinite; }
-  .ca-go .ca-cell2 { animation: ca-cell2 9s steps(1) infinite; }
-  .ca-go .ca-cell3 { animation: ca-cell3 9s steps(1) infinite; }
-  .ca-go .ca-cell4 { animation: ca-cell4 9s steps(1) infinite; }
-  .ca-go .ca-scroll { animation: ca-scroll 2.4s linear infinite; }
-  .ca-go .ca-blk { animation: ca-blk 4s linear infinite; animation-delay: var(--d, 0s); }
-  .ca-go .ca-prog { animation: ca-prog 4s linear infinite; } .ca-go .ca-ok { animation: ca-ok 4s steps(1) infinite; }
-  .ca-go .ca-pw { stroke: var(--frl-red); stroke-dasharray: 1; animation: ca-draw2 4s linear infinite; }
-  .ca-go .ca-glow { animation: ca-glow 4s ease-in-out infinite; }
-}
-@keyframes ca-wake { 0%, 4% { opacity: .35 } 10%, 40% { opacity: 1 } 48%, 100% { opacity: .35 } }
-@keyframes ca-merc { 0%, 6% { transform: scaleY(.1) } 22%, 40% { transform: scaleY(1) } 48%, 100% { transform: scaleY(.1) } }
-@keyframes ca-hop { 0% { opacity: 0 } 20% { opacity: 1 } 60%, 100% { opacity: 0 } }
-@keyframes ca-hop-s { 0%, 22% { opacity: 0 } 28%, 38% { opacity: 1 } 46%, 100% { opacity: 0 } }
-@keyframes ca-got { 0%, 42% { opacity: .2 } 46%, 62% { opacity: 1 } 63%, 100% { opacity: .2 } }
-@keyframes ca-z { 0%, 50% { opacity: 0; transform: translate(0, 0) } 62% { opacity: .9 } 100% { opacity: 0; transform: translate(8px, -12px) } }
-@keyframes ca-ring { from { transform: scale(.06); opacity: .9 } to { transform: scale(1); opacity: 0 } }
-@keyframes ca-hit { 0%, 45% { opacity: .35 } 62%, 85% { opacity: 1 } 100% { opacity: .35 } }
-@keyframes ca-fill { 0%, 45% { transform: scaleX(.1) } 75%, 100% { transform: scaleX(1) } }
-@keyframes ca-coil { 0% { opacity: 1 } 33.3%, 100% { opacity: var(--base, 1) } }
-@keyframes ca-up { to { transform: rotate(395deg) } }
-@keyframes ca-spin { from { transform: rotate(35deg) } to { transform: rotate(395deg) } }
-@keyframes ca-blinkled { 0%, 49% { opacity: 1 } 50%, 100% { opacity: .15 } }
-@keyframes ca-join { 0%, 10% { stroke-dashoffset: 1 } 40%, 100% { stroke-dashoffset: 0 } }
-@keyframes ca-newdot { 0%, 45% { opacity: .15 } 50%, 100% { opacity: 1 } }
-@keyframes ca-newring { 0% { transform: scale(.7); opacity: .9 } 40%, 100% { transform: scale(1.5); opacity: 0 } }
-@keyframes ca-race { from { transform: scaleX(0) } to { transform: scaleX(1) } }
-@keyframes ca-lead { 0%, 99% { fill: #F7F3EC } 100% { fill: var(--frl-red) } }
-@keyframes ca-draw { 0% { stroke-dashoffset: 1 } 60%, 100% { stroke-dashoffset: 0 } }
-@keyframes ca-draw2 { 0% { stroke-dashoffset: 1 } 85%, 100% { stroke-dashoffset: 0 } }
-@keyframes ca-gap { 0%, 58% { opacity: 0 } 60%, 100% { opacity: 1 } }
-@keyframes ca-cell0 { 0% { opacity: 1 } 83.3% { opacity: .25 } 100% { opacity: .25 } }
-@keyframes ca-cell1 { 0% { opacity: 1 } 66.7% { opacity: .25 } 100% { opacity: .25 } }
-@keyframes ca-cell2 { 0% { opacity: 1 } 50.0% { opacity: .25 } 100% { opacity: .25 } }
-@keyframes ca-cell3 { 0% { opacity: 1 } 33.3% { opacity: .25 } 100% { opacity: .25 } }
-@keyframes ca-cell4 { 0% { opacity: 1 } 16.7% { opacity: .25 } 100% { opacity: .25 } }
-@keyframes ca-scroll { to { transform: translateX(-120px) } }
-@keyframes ca-blk { 0% { transform: translateX(0); opacity: 0 } 10% { opacity: 1 } 80% { opacity: 1 } 100% { transform: translateX(34px); opacity: 0 } }
-@keyframes ca-prog { 0%, 25% { transform: scaleX(.05) } 85%, 100% { transform: scaleX(1) } }
-@keyframes ca-ok { 0%, 85% { opacity: .2 } 86%, 100% { opacity: 1 } }
-@keyframes ca-glow { 0%, 100% { opacity: .15 } 50% { opacity: 1 } }
-.cb-s { fill: none; stroke: #F7F3EC; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-.cb-f { fill: #F7F3EC; } .cb-r { fill: var(--frl-red, #B42418); } .cb-rs { stroke: var(--frl-red, #B42418); } .cb-dim { opacity: .45; }
-.cb-t { fill: #F7F3EC; font: 600 11px Barlow, "Helvetica Neue", Arial, sans-serif; } .cb-tl { font-size: 10px; opacity: .7; }
-/* still frame: the story without motion */
-.cb-b1, .cb-c1 { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418); }
-.cb-tick { opacity: 1; } .cb-slice { opacity: .25; } .cb-slice.cb-now { fill: var(--frl-red, #B42418); opacity: 1; }
-.cb-cursor { transform: translateX(10px); } .cb-led { opacity: 1; }
-.cb-blk { opacity: 0; } .cb-prog { transform-box: fill-box; transform-origin: left center; transform: scaleX(.6); }
-.cb-reply, .cb-back { opacity: 1; }
-@media (prefers-reduced-motion: no-preference) {
-  .ca-go .cb-b1 { animation: cb-press 4s steps(1) infinite; } .ca-go .cb-b2 { animation: cb-press 4s steps(1) 2s infinite; }
-  .ca-go .cb-c1 { animation: cb-lit 4s steps(1) infinite; } .ca-go .cb-c2 { animation: cb-lit 4s steps(1) 2s infinite; }
-  .ca-go .cb-wave { animation: cb-wave 2s ease-out infinite; animation-delay: var(--d); }
-  .ca-go .cb-rot { animation: cb-spin 6s linear infinite; animation-delay: calc(var(--t) - 6s); }
-  .ca-go .cb-tagled { animation: cb-flash 6s steps(1) infinite; animation-delay: calc(var(--t) - 6s); }
-  .ca-go .cb-burst { animation: cb-burst 6s ease-out infinite; }
-  .ca-go .cb-burst0 { animation-delay: calc(var(--d) - 6s); } .ca-go .cb-burst1 { animation-delay: calc(var(--d) - 4s); } .ca-go .cb-burst2 { animation-delay: calc(var(--d) - 2s); }
-  .ca-go .cb-hubled { animation: cb-hub 2s steps(1) infinite; }
-  .ca-go .cb-tick { animation: cb-tick 6s steps(1) infinite; animation-delay: calc(var(--t) - 6s); }
-  .ca-go .cb-cursor { animation: cb-sweep 3.2s linear infinite; }
-  .ca-go .cb-led, .ca-go .cb-halo { animation: cb-blink 3.2s steps(1) infinite; }
-  .ca-go .cb-type { animation: cb-type 5s steps(1) infinite; animation-delay: var(--d); }
-  .ca-go .cb-done { animation: cb-done 5s steps(1) infinite; }
-  .ca-go .cb-blk { animation: cb-blk 5s linear infinite; animation-delay: var(--d); }
-  .ca-go .cb-prog { animation: cb-prog 5s linear infinite; }
-  .ca-go .cb-build .cb-led { animation: cb-on 5s steps(1) infinite; }
-  .ca-go .cb-word { animation: cb-word 5s steps(1) infinite; animation-delay: var(--d); }
-  .ca-go .cb-reply { animation: cb-reply 5s steps(1) infinite; }
-  .ca-go .cb-back { animation: cb-back 5s linear infinite; }
-  .ca-go .cb-print .cb-led { animation: cb-ans 5s steps(1) infinite; }
-  .ca-go .cb-slice { animation: cb-slice 4.8s steps(1) infinite; animation-delay: calc(var(--d) - 4.8s); }
-}
-@keyframes cb-press { 0%, 4% { fill: none; stroke: #F7F3EC } 5%, 22% { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418) } 23%, 100% { fill: none; stroke: #F7F3EC } }
-@keyframes cb-lit { 0%, 17% { fill: none; stroke: #F7F3EC } 18%, 40% { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418) } 41%, 100% { fill: none; stroke: #F7F3EC } }
-@keyframes cb-wave { 0%, 100% { opacity: .15 } 15% { opacity: 1 } 45% { opacity: .15 } }
-@keyframes cb-spin { 0% { transform: rotate(0) } 33.3%, 100% { transform: rotate(720deg) } }
-@keyframes cb-flash { 0%, 4% { opacity: .25 } 5%, 30% { opacity: 1 } 31%, 100% { opacity: .25 } }
-@keyframes cb-burst { 0%, 18% { opacity: 0 } 22% { opacity: 1 } 34%, 100% { opacity: 0 } }
-@keyframes cb-hub { 0%, 4% { opacity: .3; fill: #F7F3EC } 5%, 25% { opacity: 1; fill: var(--frl-red, #B42418) } 26%, 100% { opacity: .3; fill: #F7F3EC } }
-@keyframes cb-tick { 0%, 41% { opacity: 0 } 42%, 100% { opacity: 1 } }
-@keyframes cb-sweep { from { transform: translateX(0) } to { transform: translateX(160px) } }
-@keyframes cb-blink { 0% { opacity: 1 } 25% { opacity: .12 } 50% { opacity: 1 } 75% { opacity: .12 } }
-@keyframes cb-type { 0% { opacity: 0 } 6%, 100% { opacity: .45 } }
-@keyframes cb-done { 0%, 27% { opacity: 0 } 28%, 100% { opacity: 1 } }
-@keyframes cb-blk { 0%, 30% { transform: translateX(0); opacity: 0 } 32% { opacity: 1 } 55% { transform: translateX(22px); opacity: 1 } 56%, 100% { opacity: 0 } }
-@keyframes cb-prog { 0%, 34% { transform: scaleX(0) } 72%, 100% { transform: scaleX(1) } }
-@keyframes cb-on { 0%, 74% { opacity: .15 } 75%, 100% { opacity: 1 } }
-@keyframes cb-word { 0% { opacity: 0 } 8%, 100% { opacity: 1 } }
-@keyframes cb-reply { 0%, 44% { opacity: 0 } 45%, 100% { opacity: 1 } }
-@keyframes cb-back { 0%, 52% { transform: translateX(0); opacity: 0 } 54% { opacity: 1 } 70% { transform: translateX(-24px); opacity: 1 } 71%, 100% { opacity: 0 } }
-@keyframes cb-ans { 0%, 70% { opacity: .15 } 71%, 90% { opacity: 1 } 91%, 100% { opacity: .15 } }
-@keyframes cb-slice { 0% { fill: var(--frl-red, #B42418); opacity: 1 } 8.33%, 100% { fill: #F7F3EC; opacity: .25 } }
-.cb-code { fill: #F7F3EC; font: 600 12px var(--frl-font, Barlow, sans-serif); }
-.cb-pyoff { opacity: 0; } .cb-heard { opacity: 1; } .cb-orbit { offset-distance: 50%; offset-rotate: 0deg; }
-@media (prefers-reduced-motion: no-preference) {
-  .ca-go .cb-pyon { animation: cb-pya 4s steps(1) infinite; } .ca-go .cb-pyoff { animation: cb-pyb 4s steps(1) infinite; }
-  .ca-go .cb-py .cb-led, .ca-go .cb-pyhalo { animation: cb-pyled 4s steps(1) infinite; }
-  .ca-go .cb-orbit { animation: cb-orbit 9s linear infinite; } .ca-go .cb-heard { animation: cb-heard 9s steps(1) infinite; }
-  .ca-go .cb-sweep { animation: cb-sweep 3s ease-in-out infinite alternate; }
-}
-@keyframes cb-pya { 0%, 49% { opacity: 1 } 50%, 100% { opacity: 0 } }
-@keyframes cb-pyb { 0%, 49% { opacity: 0 } 50%, 100% { opacity: 1 } }
-@keyframes cb-pyled { 0%, 9% { opacity: .15 } 10%, 49% { opacity: 1 } 50%, 100% { opacity: .15 } }
-@keyframes cb-orbit { from { offset-distance: 0% } to { offset-distance: 100% } }
-@keyframes cb-heard { 0%, 39% { opacity: .2 } 40%, 62% { opacity: 1 } 63%, 100% { opacity: .2 } }
-@keyframes cb-sweep { from { transform: rotate(-30deg) } to { transform: rotate(30deg) } }
-.cb-sig { fill: var(--frl-red, #B42418); } .cb-sig3 { fill: #F7F3EC; opacity: .25; }
-.cb-walk { transform: translateX(30px); }
-.cb-beam { stroke: var(--frl-red, #B42418); } .cb-zhalo, .cb-zhalo2, .cb-halo2 { opacity: .8; }
-.cb-zn { opacity: .3; } .cb-zf { opacity: 0; }
-.cb-hopn { opacity: 0; } .cb-hopn.cb-h0 { opacity: 1; }
-.cb-pkt { opacity: 1; } .cb-eq { transform-box: fill-box; transform-origin: center; }
-.cb-ota .cb-prog { transform-box: fill-box; transform-origin: left center; transform: scaleX(.6); }
-@media (prefers-reduced-motion: no-preference) {
-  .ca-go .cb-walk { animation: cb-walk 8s ease-in-out infinite; }
-  .ca-go .cb-sig1 { animation: cb-sig1 8s steps(1) infinite; } .ca-go .cb-sig2 { animation: cb-sig2 8s steps(1) infinite; }
-  .ca-go .cb-sig3 { animation: cb-sig3 8s steps(1) infinite; }
-  .ca-go .cb-knob { animation: cb-knob 4s ease-in-out infinite; } .ca-go .cb-zl .cb-led, .ca-go .cb-zhalo { animation: cb-follow 4s steps(1) infinite; }
-  .ca-go .cb-btnled .cb-b1 { animation: cb-hold 4s steps(1) infinite; } .ca-go .cb-btnled .cb-b2 { animation: none; }
-  .ca-go .cb-btnled .cb-led, .ca-go .cb-halo2 { animation: cb-hold-led 4s steps(1) infinite; }
-  .ca-go .cb-turn { animation: cb-turn 4s ease-in-out infinite alternate; }
-  .ca-go .cb-temp .cb-type { animation: cb-lines 4s steps(1) infinite; animation-delay: var(--d); }
-  .ca-go .cb-pkt { animation: cb-pkt 1.5s linear infinite; animation-delay: var(--d); }
-  .ca-go .cb-sg .cb-led { animation: cb-blinkfast 1.5s steps(1) infinite; }
-  .ca-go .cb-enter { animation: cb-enter 5s ease-in-out infinite; }
-  .ca-go .cb-beam { animation: cb-beam 5s steps(1) infinite; } .ca-go .cb-wp .cb-led { animation: cb-beamled 5s steps(1) infinite; }
-  .ca-go .cb-hopn { animation: cb-hopn 1.5s steps(1) infinite; animation-delay: var(--d); }
-  .ca-go .cb-ard .cb-led { animation: ca-blinkled 1.6s steps(1) infinite; }
-  .ca-go .cb-knob2 { animation: cb-knob2 5s ease-in-out infinite; } .ca-go .cb-esp .cb-led, .ca-go .cb-zhalo2 { animation: cb-follow2 5s steps(1) infinite; }
-  .ca-go .cb-esp .cb-blk { animation: cb-blk 5s linear infinite; animation-delay: var(--d); }
-  .ca-go .cb-eq { animation: cb-eq .9s ease-in-out infinite alternate; animation-delay: var(--d); }
-  .ca-go .cb-alert { animation: cb-alert 3s steps(1) infinite; }
-  .ca-go .cb-ota .cb-prog { animation: cb-prog 5s linear infinite; } .ca-go .cb-ota .cb-led { animation: cb-on3 5s steps(1) infinite; }
-  .ca-go .cb-move { animation: cb-move 7s ease-in-out infinite; }
-  .ca-go .cb-zn { animation: cb-zn 7s steps(1) infinite; } .ca-go .cb-zf { animation: cb-zf 7s steps(1) infinite; }
-}
-@keyframes cb-walk { 0%, 20% { transform: translateX(0) } 25%, 45% { transform: translateX(30px) } 50%, 70% { transform: translateX(60px) } 75%, 95% { transform: translateX(90px) } 100% { transform: translateX(0) } }
-@keyframes cb-sig3 { 0%, 24% { fill: var(--frl-red, #B42418); opacity: 1 } 25%, 100% { fill: #F7F3EC; opacity: .25 } }
-@keyframes cb-sig2 { 0%, 49% { fill: var(--frl-red, #B42418); opacity: 1 } 50%, 100% { fill: #F7F3EC; opacity: .25 } }
-@keyframes cb-sig1 { 0%, 74% { fill: var(--frl-red, #B42418); opacity: 1 } 75%, 100% { fill: #F7F3EC; opacity: .25 } }
-@keyframes cb-knob { 0%, 15% { transform: translateX(-18px) } 30%, 75% { transform: translateX(0) } 90%, 100% { transform: translateX(-18px) } }
-@keyframes cb-follow { 0%, 29% { opacity: .15 } 30%, 79% { opacity: 1 } 80%, 100% { opacity: .15 } }
-@keyframes cb-hold { 0%, 14% { fill: none; stroke: #F7F3EC } 15%, 60% { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418) } 61%, 100% { fill: none; stroke: #F7F3EC } }
-@keyframes cb-hold-led { 0%, 15% { opacity: .15 } 16%, 60% { opacity: 1 } 61%, 100% { opacity: .15 } }
-@keyframes cb-turn { from { transform: rotate(-60deg) } to { transform: rotate(60deg) } }
-@keyframes cb-lines { 0% { opacity: 0 } 5%, 100% { opacity: .55 } }
-@keyframes cb-pkt { 0% { transform: translateX(0); opacity: 0 } 10%, 85% { opacity: 1 } 100% { transform: translateX(var(--dx)); opacity: 0 } }
-@keyframes cb-blinkfast { 0%, 15% { opacity: 1 } 16%, 100% { opacity: .2 } }
-@keyframes cb-enter { 0%, 15% { transform: translateY(-48px); opacity: 0 } 30%, 70% { transform: translateY(0); opacity: 1 } 85%, 100% { transform: translateY(-48px); opacity: 0 } }
-@keyframes cb-beam { 0%, 31% { stroke: #F7F3EC; opacity: .45 } 32%, 69% { stroke: var(--frl-red, #B42418); opacity: 1 } 70%, 100% { stroke: #F7F3EC; opacity: .45 } }
-@keyframes cb-beamled { 0%, 33% { opacity: .15 } 34%, 69% { opacity: 1 } 70%, 100% { opacity: .15 } }
-@keyframes cb-hopn { 0%, 30% { opacity: 1 } 31%, 100% { opacity: 0 } }
-@keyframes cb-knob2 { 0%, 45% { transform: translateX(-14px) } 55%, 90% { transform: translateX(0) } 100% { transform: translateX(-14px) } }
-@keyframes cb-follow2 { 0%, 53% { opacity: .15 } 54%, 90% { opacity: 1 } 91%, 100% { opacity: .15 } }
-@keyframes cb-eq { from { transform: scaleY(.25) } to { transform: scaleY(1) } }
-@keyframes cb-alert { 0%, 49% { opacity: .25 } 50%, 85% { opacity: 1 } 86%, 100% { opacity: .25 } }
-@keyframes cb-move { 0%, 40% { transform: translateX(0) } 50%, 90% { transform: translateX(54px) } 100% { transform: translateX(0) } }
-@keyframes cb-on3 { 0%, 74% { opacity: .15 } 75%, 100% { opacity: 1 } }
-@keyframes cb-zn { 0%, 44% { opacity: .3 } 45%, 95% { opacity: 0 } 96%, 100% { opacity: .3 } }
-@keyframes cb-zf { 0%, 47% { opacity: 0 } 48%, 93% { opacity: .3 } 94%, 100% { opacity: 0 } }
-.cb-hglow { fill: #E8742A; opacity: .55; } .cb-pack { fill: var(--frl-ink, #1F1B1A); } .cb-note { opacity: 1; }
-@media (prefers-reduced-motion: no-preference) {
-  .ca-go .cb-hglow { animation: cb-hglow 6s ease-in-out infinite; }
-  .ca-go .cb-note { animation: cb-note 3.6s ease-out infinite; animation-delay: var(--d); }
-}
-@keyframes cb-hglow { 0%, 22% { fill: #E8742A; opacity: .6 } 33%, 55% { fill: #8E4FD6; opacity: .55 } 66%, 88% { fill: #9FE6A0; opacity: .45 } 100% { fill: #E8742A; opacity: .6 } }
-@keyframes cb-note { 0% { transform: translate(-8px, 10px); opacity: 0 } 15% { opacity: 1 } 75% { opacity: 1 } 100% { transform: translate(4px, -14px); opacity: 0 } }
-
-/* 2026-10-26 drawings: post-quantum, audio-boosterpack, codecs, walkie-talkies, sub-ghz-demos, dns-ad-blocker, ulisp */
-.cb-lockb { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418); stroke-width: 2; } .cb-shc { opacity: 0; } .cb-sho { opacity: 1; stroke: var(--frl-red, #B42418); }
-.cb-spk { transform-box: fill-box; transform-origin: center; } .cb-pitch { transform-box: fill-box; transform-origin: bottom; }
-.cb-fa { opacity: .85; } .cb-fa1 { stroke: var(--frl-red, #B42418); }
-.cb-cd .cb-blk { opacity: 1; }
-@media (prefers-reduced-motion: no-preference) {
-  .ca-go .cb-kx1 { animation: cb-kx1 6s linear infinite; } .ca-go .cb-kx2 { animation: cb-kx2 6s linear infinite; }
-  .ca-go .cb-lockb { animation: cb-lockb 6s steps(1) infinite; } .ca-go .cb-shc { animation: cb-shc 6s steps(1) infinite; } .ca-go .cb-sho { animation: cb-sho 6s steps(1) infinite; }
-  .ca-go .cb-spk { animation: cb-spk .5s ease-in-out infinite alternate; }
-  .ca-go .cb-pitch { animation: cb-pitch 3s ease-in-out infinite; }
-  .ca-go .cb-fa1 { animation: cb-fa1 8s steps(1) infinite; } .ca-go .cb-fa2 { animation: cb-fa2 8s steps(1) infinite; } .ca-go .cb-fa3 { animation: cb-fa3 8s steps(1) infinite; }
-  .ca-go .cb-fx .cb-sig3 { animation: cb-sig3 8s steps(1) infinite; } .ca-go .cb-fx .cb-sig2 { animation: cb-sig2 8s steps(1) infinite; } .ca-go .cb-fx .cb-sig1 { animation: cb-sig1 8s steps(1) infinite; }
-  .ca-go .cb-dA { animation: cb-dA 6s linear infinite; } .ca-go .cb-dA2 { animation: cb-dA2 6s linear infinite; }
-  .ca-go .cb-dB { animation: cb-dB 6s linear infinite; } .ca-go .cb-dR { animation: cb-dR 6s linear infinite; }
-}
-@keyframes cb-kx1 { 0% { transform: translateX(0); opacity: 0 } 4% { opacity: 1 } 26% { transform: translateX(56px); opacity: 1 } 28%, 100% { opacity: 0 } }
-@keyframes cb-kx2 { 0%, 30% { transform: translateX(0); opacity: 0 } 34% { opacity: 1 } 56% { transform: translateX(-56px); opacity: 1 } 58%, 100% { opacity: 0 } }
-@keyframes cb-lockb { 0%, 62% { fill: none; stroke: #F7F3EC } 63%, 100% { fill: var(--frl-red, #B42418); stroke: var(--frl-red, #B42418) } }
-@keyframes cb-shc { 0%, 62% { opacity: 1 } 63%, 100% { opacity: 0 } } @keyframes cb-sho { 0%, 62% { opacity: 0 } 63%, 100% { opacity: 1 } }
-@keyframes cb-spk { from { transform: scale(.7) } to { transform: scale(1.25) } }
-@keyframes cb-pitch { 0%, 100% { transform: scaleY(.3) } 50% { transform: scaleY(1) } }
-@keyframes cb-fa1 { 0%, 74% { opacity: .9 } 75%, 100% { opacity: .1 } } @keyframes cb-fa2 { 0%, 49% { opacity: .9 } 50%, 100% { opacity: .1 } } @keyframes cb-fa3 { 0%, 24% { opacity: .9 } 25%, 100% { opacity: .1 } }
-@keyframes cb-dA { 0% { transform: translateX(0); opacity: 0 } 3% { opacity: 1 } 17% { transform: translateX(24px); opacity: 1 } 19%, 100% { opacity: 0 } }
-@keyframes cb-dA2 { 0%, 20% { transform: translateX(0); opacity: 0 } 23% { opacity: 1 } 37% { transform: translateX(18px); opacity: 1 } 39%, 100% { opacity: 0 } }
-@keyframes cb-dB { 0%, 50% { transform: translateX(0); opacity: 0 } 53% { opacity: 1 } 67% { transform: translateX(24px); opacity: 1 } 69%, 100% { opacity: 0 } }
-@keyframes cb-dR { 0%, 70% { transform: translateX(0); opacity: 0 } 72% { opacity: 1 } 88% { transform: translateX(-24px); opacity: 1 } 90%, 100% { opacity: 0 } }
-/* 2026-10-26 arcade: the tile slides two cells right and the merged tile is the red mark; still frame shows the merge */
-.cb-arc .cb-ar-slide { transform-box: fill-box; opacity: 0; } .cb-arc .cb-ar-merge { fill: var(--frl-red, #B42418); }
-@media (prefers-reduced-motion: no-preference) {
-  .ca-go .cb-arc .cb-ar-slide { animation: cb-ar-slide 4s linear infinite; } .ca-go .cb-arc .cb-ar-merge { animation: cb-ar-merge 4s steps(1) infinite; }
-}
-@keyframes cb-ar-slide { 0%, 20% { transform: translateX(0); opacity: 1 } 45% { transform: translateX(40px); opacity: 1 } 46%, 100% { opacity: 0 } }
-@keyframes cb-ar-merge { 0%, 45% { fill: #F7F3EC; opacity: .45 } 46%, 100% { fill: var(--frl-red, #B42418); opacity: 1 } }
-</style><p class="crumb"><a href="hardware.html">Hardware</a> / Runs Linux / Step 3 of 3</p>
-<section class="t-hero">
-  <div>
-    <h1>BeagleY-AI (AM67A)</h1>
-    <p class="lead">The AM67A is a processor in TI's Jacinto 7 (J722S) family: 4x Cortex-A53 at 1.4 GHz, microsd card flash, 4 GB of RAM, Wi-Fi 6, Bluetooth LE.</p>
-    <div class="t-btns"><a class="btn btn-primary" href="#run">Get it running</a></div>
-  </div>
-  <div class="t-pic"><svg class="t-bd" viewBox="0 0 400 300" role="img" aria-label="Drawing of the BeagleY-AI, seen from above"><g font-family="Barlow, sans-serif"><rect x="10" y="10" width="380" height="280" rx="14" fill="#161312"/><rect x="10" y="118" width="46" height="64" rx="4" fill="#CFC3B2"/><g fill="none" stroke="#CFC3B2" stroke-width="2"><path d="M80 34 H370 M80 52 H370 M80 248 H370 M80 266 H370" stroke-dasharray="3 6"/></g><rect x="150" y="100" width="100" height="100" rx="8" fill="#B42418"/><text x="200" y="146" text-anchor="middle" fill="#fff" font-size="15" font-weight="700">AM67A</text><text x="200" y="168" text-anchor="middle" fill="#fff" font-size="12">1.4 GHz</text><text x="200" y="284" text-anchor="middle" fill="#F7F3EC" font-size="14" font-weight="600">BeagleY-AI</text></g></svg></div>
-</section>
-
-<section class="t-sec" id="facts">
-  <h2 class="t-h">Quick facts</h2>
-  <table class="t-facts"><tr><th scope="row">Board</th><td><b>BeagleY-AI</b> (made by BeagleBoard.org)</td></tr><tr><th scope="row">Chip</th><td>AM67A</td></tr><tr><th scope="row">Core</th><td>4x Cortex-A53 at 1.4 GHz, C7x DSP with matrix accelerator (MMA), R5F cores</td></tr><tr><th scope="row">Clock</th><td>1.4 GHz</td></tr><tr><th scope="row">Flash</th><td>microSD card</td></tr><tr><th scope="row">RAM</th><td>4 GB</td></tr><tr><th scope="row">Radio</th><td>Wi-Fi 6, Bluetooth LE</td></tr><tr><th scope="row">Notable peripherals</th><td>Deep-learning accelerator (C7x and MMA); Hardware H.264 and H.265 decode and encode (Wave5); Gigabit Ethernet; Micro-SD boot</td></tr><tr><th scope="row">On-board debug probe</th><td>None; a serial port and JTAG pads</td></tr><tr><th scope="row">Toolchains that ran</th><td>GCC, Zephyr, Linux</td></tr></table>
-</section>
-
-<section class="t-sec" id="run">
-  <h2 class="t-h">Get it running</h2>
-  <p class="t-blink">First blink: Works; TI&#x27;s blink example builds in 2.288 s.</p>
-</section>
-
-
-
-<section class="t-sec" id="builds">
-  <h2 class="t-h">What you can build</h2>
-  <span id="demos"></span><div class="t-grid"><a class="t-pcard" href="project-linux-vision.html"><div class="pic"><span class="pic-il il-card il-photo ca" aria-hidden="true"><video src="media/cards/real-linux-vision.mp4" poster="media/cards/real-linux-vision.png" muted loop playsinline preload="none"></video></span></div><div class="t"><span class="nm">Run a vision model on a Linux board</span><small><span class="st">Works</span> · 43.1 ms per model on the C7x accelerator</small></div></a></div>
-</section>
-
-
-
-
-
-<section class="t-sec" id="ai">
-  <h2 class="t-h">For AI assistants</h2>
-  <p>Point your assistant at <a href="https://github.com/Fox-Red-Labs/fox-red-labs/blob/main/llms.txt">the repository's llms.txt</a> (the index).</p>
-</section>
-<p class="t-src">Sources: data/results/beagley-ai.csv, site/data/portfolio.json, site/data/projects.json.</p>
-
-<script>
-(function () {
-  function flash(b, msg) { var o = b.textContent; b.textContent = msg; setTimeout(function () { b.textContent = o; }, 2000); }
-  function put(t, b, msg) { if (navigator.clipboard) navigator.clipboard.writeText(t).then(function () { flash(b, msg); }); }
-  document.querySelectorAll('.k-copy button').forEach(function (b) {
-    b.addEventListener('click', function () { put(b.previousElementSibling.textContent, b, 'Copied'); });
-  });
-  document.querySelectorAll('.k-tabs').forEach(function (tl) {
-    var bs = tl.querySelectorAll('button');
-    bs.forEach(function (b) { b.addEventListener('click', function () {
-      bs.forEach(function (x) { x.setAttribute('aria-selected', x === b); var p = document.getElementById(x.getAttribute('aria-controls')); if (p) p.hidden = x !== b; });
-    }); });
-  });
-  var guess = /Win/.test(navigator.platform) ? 'win' : (/Linux/.test(navigator.platform) ? 'linux' : 'mac');
-  document.querySelectorAll('.k-kit').forEach(function (k) {
-    var b = k.querySelector('.k-go button'), prev = k.querySelector('.k-prev'), os = guess;
-    function text() {
-      var parts = [];
-      k.querySelectorAll('input:checked').forEach(function (i) { var t = i.getAttribute('data-p-' + os) || i.getAttribute('data-p-all'); if (t) parts.push(t); });
-      return parts.join(' ');
-    }
-    function show() { prev.textContent = text(); }
-    k.querySelectorAll('.k-os button').forEach(function (ob) {
-      ob.setAttribute('aria-pressed', ob.dataset.os === os);
-      ob.addEventListener('click', function () { os = ob.dataset.os; k.querySelectorAll('.k-os button').forEach(function (x) { x.setAttribute('aria-pressed', x === ob); }); show(); });
-    });
-    k.querySelectorAll('input').forEach(function (i) { i.addEventListener('change', show); });
-    show();
-    b.addEventListener('click', function () { put(text(), b, 'Copied. Paste it into your assistant'); });
-  });
-})();
-</script>
-
-<script>
-(function () {
-  document.documentElement.classList.add('t-anim');
-  document.querySelectorAll('.k-tabs').forEach(function (tl) {   // a copy without the bench drops the Browser tab: open the first one left
-    var bs = tl.querySelectorAll('button');
-    if (bs.length && !tl.querySelector('[aria-selected="true"]')) bs[0].click();
-  });
-  var els = document.querySelectorAll('.t-bars, .ca');
-  if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('t-go', 'ca-go'); }); }
-  else {
-    var io = new IntersectionObserver(function (es) { es.forEach(function (e) {
-      if (e.target.classList.contains('ca')) e.target.classList.toggle('ca-go', e.isIntersecting);
-      else if (e.isIntersecting) e.target.classList.add('t-go');
-    }); }, { threshold: 0.3 });
-    els.forEach(function (e) { io.observe(e); });
-  }
-  function openTo() {   // a link to anything inside a fold opens the fold
-    var id = decodeURIComponent(location.hash.slice(1)); if (!id) return;
-    var t = document.getElementById(id); if (!t) return;
-    var d = t.closest('details'); while (d) { d.open = true; d = d.parentElement && d.parentElement.closest('details'); }
-    if (t.tagName === 'DETAILS') t.open = true; t.scrollIntoView();
-  }
-  window.addEventListener('hashchange', openTo); openTo();
-})();
-</script>
-
+table { border-collapse:collapse; width:100%; font-size:14px; margin:6px 0; }
+.tw { overflow-x:auto; }
+th, td { text-align:left; padding:4px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+th { font-weight:600; color:var(--stone); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+.glossary dl { display:grid; grid-template-columns:minmax(120px,max-content) 1fr; gap:6px 16px; font-size:15px; }
+.glossary summary { cursor:pointer; font-weight:600; color:var(--frl-ink, #161312); margin:2px 0 12px; } .glossary dt { font-weight:600; } .glossary dd { margin:0; color:var(--stone); }
+@media (max-width:560px) { .glossary dl { grid-template-columns:1fr; } .glossary dd { margin-bottom:8px; } }
+</style><nav class="jump fs-jump" aria-label="In this section"><a href="#g-getting-started">Getting started</a><a href="#g-models-on-the-c7x">Models on the C7x</a><a href="#g-video-decode-and-encode">Video decode and encode</a><a href="#g-the-usb-webcam-the-camera-demo-and-power">The USB webcam, the camera demo and power</a><a href="#g-containers-programs-and-the-operating-system">Containers, programs and the operating system</a><a href="#g-frigate">Frigate</a><a href="#g-when-the-board-stops-answering">When the board stops answering</a></nav><p class=lede>Problems hit bringing up one BeagleY-AI 4 GB from a Mac on 2026-11-03. Versions: BeagleBoard Edge AI image 11.00.00.08 (built 2025-09-06), Linux 6.12.33, GCC 13.3.0, onnxruntime 1.15.0, GStreamer and FFmpeg as shipped on that image. 1 kB = 1,024 bytes.</p><p class=lede>Each answer starts with the fix.</p><ul class=legend></ul><div class=ffind role=search><input id=ffq type=search placeholder="Find a question" aria-label="Find a question in this section" autocomplete=off><div class=ffbtns><button type=button id=ffopen>Open all</button><button type=button id=ffclose>Close all</button></div></div><p class=fcount id=ffcount aria-live=polite></p><section id="g-getting-started"><h2>Getting started</h2><details class=qa id="the-mac-will-not-write-to-the-card-refusing-disk4-not-remova"><summary><h3 class=q>The Mac will not write to the card: &quot;refusing disk4: not removable&quot;, or the write ends with an error</h3></summary><p class=a>Use the current <code>beagley-ai/tools/write-card.sh</code>: it accepts a card in the Mac&#x27;s built-in SD slot, which lists as an internal, fixed disk, while still refusing the Mac&#x27;s system disk and anything outside 16 to 512 GB. It unpacks the image to a file and pads it to whole 512-byte sectors before the raw write, because a raw write to <code>/dev/rdiskN</code> ending in a partial sector fails. It needs about 11 GB free in the work folder (third argument). The script&#x27;s checks were run against the system disk and a 2 TB USB drive (both refused); a full card write with this version has not been run.</p><p>No log was kept of the failed attempts; the script is <code>beagley-ai/tools/write-card.sh</code>.</p></details><details class=qa id="the-board-is-powered-from-my-computer-s-usb-c-port-but-never"><summary><h3 class=q>The board is powered from my computer&#x27;s USB-C port but never shows up as a network adapter</h3></summary><p class=a>Reach the board over Ethernet. On the Edge AI image the USB-C port carries power only: there is no USB gadget, so no serial or network device appears on the Mac. Find the address in the router&#x27;s client list (the board&#x27;s host name is <code>j722s-evm</code>).</p><p>Source: <code>beagley-ai/FIRST-BOOT.log</code>.</p></details></section><section id="g-models-on-the-c7x"><h2>Models on the C7x</h2><details class=qa id="a-model-load-never-returns-and-the-next-models-hang-too"><summary><h3 class=q>A model load never returns, and the next models hang too</h3></summary><p class=a>Reboot the board. Run one model per process with a timeout, as <code>beagley-ai/bench/zoo/zoo_bench.py</code> does with <code>ONLY=&lt;model folder&gt; timeout 300 python3 zoo_bench.py 30</code>, so a hung load costs one model and not the session. Seen once on 2026-11-03; no log of the hang was kept and the cause is not known.</p></details><details class=qa id="pose-takes-43-ms-the-sk-tda4vm-s-numbers-suggested-25-to-30-"><summary><h3 class=q>Pose takes 43 ms; the SK-TDA4VM&#x27;s numbers suggested 25 to 30 ms</h3></summary><p class=a>Nothing is wrong; the 25 to 30 ms was our guess, scaled from the SK-TDA4VM&#x27;s 13.76 ms and the 4 against 8 TOPS ratio. Both C7x cores report their 1.0 GHz clock (<code>k3conf dump processor</code>), and every one of the model&#x27;s 274 nodes runs on the accelerator. TI&#x27;s AM67A datasheet table gives 8.63 ms for YOLOX-nano and 4.94 ms for RegNetX; this board measured 10.15 and 5.95 ms with the Python timing used here, about 19 percent more, which is near TI&#x27;s published speed but not equal to it; the pose model is not in that table, and about 36 ms is the figure TI&#x27;s method would give (computed, not run). The SK-TDA4VM (8 TOPS) ran the same model in 13.76 ms.</p><p>Source: <code>beagley-ai/bench/zoo/clocks-2026-11-04.log</code>, <code>beagley-ai/bench/zoo/zoo_tidl.log</code>.</p></details></section><section id="g-video-decode-and-encode"><h2>Video decode and encode</h2><details class=qa id="ffmpeg-c-v-h264-v4l2m2m-encode-never-finishes-dmesg-prints-w"><summary><h3 class=q><code>ffmpeg -c:v h264_v4l2m2m</code> encode never finishes; <code>dmesg</code> prints <code>wave5_vpu_firmware_command_queue_error_check: result not ready: 0x800</code></h3></summary><p class=a>Use GStreamer for hardware encode: <code>v4l2h264enc</code> ran at 110.1 fps on a raw 1088p file. FFmpeg&#x27;s <code>h264_v4l2m2m</code> encoder did not finish in over 100 s, and on a second try waited in <code>poll</code> for over 3.5 minutes, ignored <code>timeout</code>&#x27;s SIGTERM and wrote 48 bytes; <code>kill -9</code> ends it and the codec still works afterwards.</p><p>The cause is in the FFmpeg wrapper for the Wave5 driver. Source: <code>beagley-ai/bench/video/ffmpeg-encode-hang-dmesg.log</code>, <code>beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log</code>.</p></details><details class=qa id="ffmpeg-hardware-decode-gives-3-frames-and-then-stops-when-th"><summary><h3 class=q>FFmpeg hardware decode gives 3 frames and then stops when the output is scaled and piped</h3></summary><p class=a>Decode with GStreamer (<code>v4l2h264dec</code>) when the frames go to a program. <code>ffmpeg -c:v h264_v4l2m2m -i clip.h264 -f null -</code> decodes the whole clip (1.1 s for 300 frames at 1280x768), but with <code>-vf scale=224:224 -pix_fmt rgb24 -f rawvideo -</code> it delivered 441 kB (3 frames of 224x224x3) and then waited about 20 s with no error text.</p><p>Source: <code>beagley-ai/bench/seam/run-2026-11-03.log</code>.</p></details><details class=qa id="gstreamer-v4l2h264dec-videoconvert-to-a-pipe-runs-at-6-fps-o"><summary><h3 class=q>GStreamer <code>v4l2h264dec ! videoconvert</code> to a pipe runs at 6 fps, or seems to hang</h3></summary><p class=a>Scale the decoded frame before converting it: <code>v4l2h264dec ! videoscale n-threads=4 ! video/x-raw,width=224,height=224 ! videoconvert ! video/x-raw,format=RGB</code>. That ran 300 frames of the 1280x768 clip in 3.92 s (76.5 fps, 5 of 5 runs), and the seam app then ran at 61.3 fps with the classifier on the C7x. The other order, <code>videoconvert</code> on the full frame first, ran at 6.5 fps: the likely cause is that the CPU reads every pixel of the decoder&#x27;s output buffers and those reads are slow (suspected; not measured on its own). At that rate 100 frames plus a model load overran the 90 s timeouts, which is what the earlier &quot;failed&quot; runs were. Leave <code>capture-io-mode</code> at its default and do not set <code>n-threads</code> on <code>videoconvert</code> after the decoder: both crash <code>gst-launch-1.0</code> with <code>Caught SIGSEGV</code>, after which it waits for a debugger instead of exiting.</p><p>Source: <code>beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log</code>.</p></details><details class=qa id="dmesg-prints-wave5-vpu-firmware-command-queue-error-check-re"><summary><h3 class=q><code>dmesg</code> prints <code>wave5_vpu_firmware_command_queue_error_check: result not ready: 0x800</code></h3></summary><p class=a>Ignore it on its own: the driver prints it once at the end of every decode, including runs that finish with every frame.</p><p>Source: <code>beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log</code>.</p></details><details class=qa id="decode-and-encode-chained-run-at-35-fps-though-each-alone-ru"><summary><h3 class=q>Decode and encode chained run at 35 fps though each alone runs above 100</h3></summary><p class=a>Give the encoder the decoder&#x27;s buffers: <code>v4l2h264dec ! v4l2h264enc output-io-mode=dmabuf-import</code>. That transcoded 600 frames at 1920x1088 in 4.44 s (135.1 fps, 3 of 3 runs) against 17.09 s (35.1 fps) with the default, which copies every frame through the CPU.</p><p>Source: <code>beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log</code>.</p></details></section><section id="g-the-usb-webcam-the-camera-demo-and-power"><h2>The USB webcam, the camera demo and power</h2><details class=qa id="the-webcam-drops-off-usb-non-zero-status-71-in-video-complet"><summary><h3 class=q>The webcam drops off USB: <code>Non-zero status (-71) in video completion handler</code>, then <code>USB disconnect</code></h3></summary><p class=a>Power the board from a 5 V 3 A USB-C supply (BeagleBoard&#x27;s requirement; it has no USB-PD and warns against unpowered hubs) and if the camera still drops, give it a powered USB hub (Insta360 lists the Link 2 Pro at 5 V 1 A); on a rated 5 V 3 A supply it held on the board&#x27;s own hub in five 60 s starts. On a board fed from a hub port, the Insta360 Link 2 Pro dropped off at 1080p 7 of 7 times (MJPEG and H.264, with USB autosuspend off too) and after a gimbal move; 720p held 3 of 3 with the board idle but dropped once the board ran a Frigate container, and so did a microphone recording. It comes back about 5 s later with pan, tilt and zoom reset. Software settings did not change it; that it is the supply is the likely cause, not measured (no meter on the port).</p><p>Source: <code>beagley-ai/bench/camera-usb-drops-2026-11-03.log</code>.</p></details><details class=qa id="apps-cannot-find-dev-video-usb-cam0-after-the-webcam-is-plug"><summary><h3 class=q>Apps cannot find <code>/dev/video-usb-cam0</code> after the webcam is plugged in</h3></summary><p class=a>TI&#x27;s <code>setup_cameras.sh</code> makes that name only at boot. Install the udev rule from a Mac with <code>beagley-ai/tools/camera/setup.sh &lt;board address&gt;</code>: it names the first UVC camera <code>/dev/video-usb-cam0</code> on every plug-in and sets its mains frequency to 60 Hz.</p><p>Source: <code>beagley-ai/tools/camera/99-usb-cam.rules</code>.</p></details><details class=qa id="ti-s-edge-ai-app-runs-at-1-fps-with-c7x-1-0-its-log-says-soc"><summary><h3 class=q>TI&#x27;s Edge AI app runs at 1 fps with <code>c7x_1: 0%</code>; its log says <code>SOC env var not specified. Defaulting target to arm</code></h3></summary><p class=a>Set <code>SOC=j722s</code> before starting <code>app_edgeai.py</code>. A login shell sets it from <code>/etc/profile</code>; a command run as <code>ssh root@&lt;board&gt; &quot;...&quot;</code> does not, and the app then runs the model on the Arm cores (737 to 809 ms a frame, 1.3 fps) and decodes in software. With <code>SOC</code> set, the people-count demo ran at 30.0 fps with the C7x 27 percent busy. <code>beagley-ai/bench/camdetect/board_start.sh</code> sets it. Also start the app with <code>-n</code> when it has no terminal (<code>_curses.error: setupterm: could not find terminal</code>).</p><p>Source: <code>beagley-ai/bench/camdetect/clip-run-2026-11-04.log</code>.</p></details><details class=qa id="ti-s-detection-demo-crashes-indexerror-index-5-is-out-of-bou"><summary><h3 class=q>TI&#x27;s detection demo crashes: <code>IndexError: index 5 is out of bounds for axis 1 with size 1</code> in <code>post_process.py</code></h3></summary><p class=a>Apply <code>beagley-ai/bench/camdetect/people_count.patch</code>: <code>np.squeeze</code> in <code>PostProcessDetection</code> also removes the box axis when a frame holds exactly one detection. The patch reshapes each output to one row per detection.</p><p>Source: <code>beagley-ai/bench/camdetect/clip-run-2026-11-04.log</code>.</p></details><details class=qa id="the-board-drops-off-ethernet-and-reboots-a-few-seconds-after"><summary><h3 class=q>The board drops off Ethernet and reboots a few seconds after TI&#x27;s camera demo starts</h3></summary><p class=a>Power the board from a rated 5 V 3 A USB-C supply and start the demo again.</p><p>On a wall supply of unread rating, 4 of 5 starts ended with the board off the network and rebooting 5 to 15 s in (the fifth hung with an empty log; the first start streamed 29.9 fps for 5 s). On a rated 5 V 3 A supply, 5 of 5 starts held 60 s at 28.0 to 29.4 fps and the board stayed up. The cause is suspected to be the supply, not measured: the board has no console, no power meter and keeps no log. The boot log also prints <code>tps65219 2-0030: Error IRQ trap undervoltage for LDO2</code> and <code>BUCK2</code>, on the rated supply as well, with no reboot after them. Source: <code>beagley-ai/bench/camera-power/probe-2026-11-05.log</code>, <code>beagley-ai/bench/camera-power/e294-five-starts-2026-11-07.log</code>, <code>beagley-ai/bench/camera-power/supply-check-2026-11-07.log</code>.</p></details><details class=qa id="how-do-i-check-that-my-usb-c-supply-is-5-v-3-a"><summary><h3 class=q>How do I check that my USB-C supply is 5 V 3 A?</h3></summary><p class=a>Read the output line on the supply&#x27;s label (for example <code>5V 3A</code>, or <code>5V 3A</code> among several USB-PD steps) and use a supply with a single output, since many dual-port chargers drop each port to 1.5 A when both are in use.</p><p>The board has no USB-PD, so it needs a supply that offers 5 V at 3 A without negotiating. Nothing on the board reports the supply&#x27;s rating; <code>dmesg | grep tps65219</code> shows undervoltage lines, which do not name the supply behind them. For the 2026-11-07 runs the supply&#x27;s rating is the bench owner&#x27;s statement; the label was not photographed.</p></details><details class=qa id="ti-s-people-count-demo-shows-a-count-of-0-with-a-person-in-t"><summary><h3 class=q>TI&#x27;s people-count demo shows a count of 0 with a person in the room</h3></summary><p class=a>Aim the camera at the person and check the stream&#x27;s picture first.</p><p>In the 2026-11-07 runs the Insta360 Link 2 Pro faced the bench, so the on-screen count was 0 while the detector ran at 28.0 to 29.4 fps; no person has been counted with this camera yet. Save a frame (<code>beagley-ai/bench/camdetect/grab_stream.py</code>) to see what the camera sees. Source: <code>beagley-ai/bench/camera-power/camera-frame-e294-start1-2026-11-07.jpg</code>.</p></details><details class=qa id="do-i-need-a-powered-usb-hub-for-the-webcam"><summary><h3 class=q>Do I need a powered USB hub for the webcam?</h3></summary><p class=a>Not on a rated 5 V 3 A supply at 720p: the Insta360 Link 2 Pro on the board&#x27;s own USB hub did not drop in five 60 s starts of TI&#x27;s camera demo, or in a 60 s run of Pop the bubbles.</p><p>The earlier advice came from a board fed through a USB hub port, where the camera dropped at 1080p and under load (see the webcam entry above). Try the board&#x27;s own hub first on a rated supply; add a powered hub if the camera still drops. Source: <code>beagley-ai/bench/camera-power/e294-five-starts-2026-11-07.log</code>, <code>beagley-ai/bench/camera-power/p63-browser-60s-2026-11-07.log</code>.</p></details><details class=qa id="the-camera-demo-s-start-script-prints-stream-failed"><summary><h3 class=q>The camera demo&#x27;s start script prints <code>STREAM FAILED</code></h3></summary><p class=a>Run <code>pkill -f server.js</code> on the board, then start again.</p><p>A <code>node server.js</code> left from an earlier start keeps port 8081, and the start script&#x27;s own <code>pkill</code> pattern (<code>remote_streaming/server.js</code>) does not match that command line. Source: <code>beagley-ai/bench/camdetect/board_start.sh</code>.</p></details></section><section id="g-containers-programs-and-the-operating-system"><h2>Containers, programs and the operating system</h2><details class=qa id="pi-hole-starts-but-dns-queries-time-out-failed-to-create-lis"><summary><h3 class=q>Pi-hole starts but DNS queries time out: <code>failed to create listening socket for port 53: Address in use</code></h3></summary><p class=a><code>systemd-resolved</code> holds 127.0.0.53:53. Start the container with <code>FTLCONF_dns_listeningMode=BIND</code> and <code>dns.interface=eth0</code>; <code>dig @&lt;board address&gt; doubleclick.net</code> then answered <code>0.0.0.0</code>.</p><p>Source: <code>beagley-ai/bench/docker/pihole-attempt1-LOCAL-mode-failed.log</code>, <code>beagley-ai/bench/docker/pihole.log</code>.</p></details><details class=qa id="the-board-reads-80-to-87-degrees-c-during-long-runs"><summary><h3 class=q>The board reads 80 to 87 degrees C during long runs</h3></summary><p class=a>The 4-pin fan connector was empty. Fit a fan for runs longer than a few minutes. No run was made with a fan and throttling was not checked, so any number here may be low.</p><p>No temperature log was kept; the readings were taken by hand during the runs.</p></details><details class=qa id="cannot-find-lc-when-linking-with-static"><summary><h3 class=q><code>cannot find -lc</code> when linking with <code>-static</code></h3></summary><p class=a>The image has no <code>libc.a</code>. Link dynamically; the stripped portable app is 66.1 kB.</p><p>Source: <code>beagley-ai/bench/portability/three-ways-run.log</code>.</p></details><details class=qa id="a-program-dies-with-illegal-instruction"><summary><h3 class=q>A program dies with <code>Illegal instruction</code></h3></summary><p class=a>The Cortex-A53 has no ARMv8.1 atomics. Preload the trap library from <code>am62l-evm/steam/lse_trap/</code> (built on this board with <code>gcc -O2 -march=armv8-a -mno-outline-atomics -fPIC -shared -o lse_trap.so lse_trap.c -ldl</code>; its two tests print PASS).</p><p>Source: <code>beagley-ai/bench/portability/lse-trap-run.log</code>.</p></details><details class=qa id="dev-kvm-and-dev-fb0-do-not-exist"><summary><h3 class=q><code>/dev/kvm</code> and <code>/dev/fb0</code> do not exist</h3></summary><p class=a>The stock kernel is built without KVM (<code># CONFIG_KVM is not set</code>), so a virtual machine needs a rebuilt kernel; Android&#x27;s binder and <code>binfmt_misc</code> are off as well. <code>/dev/fb0</code> appears only when a display is attached: the kernel has framebuffer emulation on top of DRM (<code>CONFIG_DRM_FBDEV_EMULATION=y</code>, <code>tidss</code>), and no display was attached in any run, so only <code>/dev/dri/card0</code> exists.</p><p>Source: <code>beagley-ai/bench/portability/os-survey.log</code>.</p></details></section><section id="g-frigate"><h2>Frigate</h2><details class=qa id="frigate-s-nginx-exits-with-bind-to-0-0-0-0-5000-failed-98-ad"><summary><h3 class=q>Frigate&#x27;s <code>nginx</code> exits with <code>bind() to 0.0.0.0:5000 failed (98: Address already in use)</code></h3></summary><p class=a>Move your own service off port 5000: Frigate&#x27;s nginx takes it when the container uses host networking. The detection server in <code>beagley-ai/frigate/</code> listens on 5100.</p><p>Source: <code>beagley-ai/frigate/README.md</code>.</p></details><details class=qa id="frigate-shows-detection-fps-0-0-and-the-detector-never-gets-"><summary><h3 class=q>Frigate shows <code>detection_fps</code> 0.0 and the detector never gets a request</h3></summary><p class=a>Frigate&#x27;s motion detector is still calibrating, and it only sends regions to the detector when it is not. It leaves calibration when a frame has under 5 percent changed area and 4 or fewer motion boxes, so a busy or moving scene never does. Set <code>motion.threshold: 100</code> and <code>contour_area: 600</code> for such a clip (a fixed camera does not need it).</p><p>Source: <code>beagley-ai/frigate/logs/tidl-c7x-clip.log</code>, <code>frigate/motion/improved_motion.py</code> at v0.18.2.</p></details><details class=qa id="frigate-logs-error-calling-deepstack-api-read-timed-out"><summary><h3 class=q>Frigate logs <code>Error calling deepstack API: ... Read timed out</code></h3></summary><p class=a>The model takes longer than <code>api_timeout</code> (0.5 s in the sample config). The Arm-core model took 648 ms; set <code>api_timeout: 3.0</code>.</p><p>Source: <code>beagley-ai/frigate/logs/onnx-a53-clip.log</code>.</p></details><details class=qa id="frigate-s-camera-input-dies-error-during-demuxing-no-such-de"><summary><h3 class=q>Frigate&#x27;s camera input dies: <code>Error during demuxing: No such device</code></h3></summary><p class=a>On 2026-11-03 the webcam dropped off USB (<code>-71</code>, then <code>USB disconnect</code>) within seconds of Frigate&#x27;s ffmpeg opening it at 1280x720 MJPEG, in 2 of 2 tries, on the board&#x27;s earlier power setup; with <code>docker run --device</code> the container&#x27;s device file then stays stale. On 2026-11-07, on a rated 5 V 3 A supply, Frigate read the same webcam for 130 s at 59.71 ms per detection, so the supply is the likely cause (the same as the webcam entry above, not isolated here). Start the container with <code>-v /dev:/dev</code> so it sees the camera.</p><p>Suspected: the power supply.</p><p>Source: <code>beagley-ai/frigate/logs/webcam-run.log</code>, <code>data/results/beagley-ai.csv</code> (<code>frigate-deepstack-yolox-nano-416-c7x-usb-webcam</code>).</p></details></section><section class=ours id="g-when-the-board-stops-answering"><h2>When the board stops answering</h2><p>Checked 2026-11-08. Before flashing a risky image, run <code>python3 tools/preflight_image.py &lt;board id&gt; &lt;image.out&gt;</code>. Narrative and commands: <code>docs/remote-board-recovery.md</code>.</p><p>How it locks up:</p><ul><li>A model load on the C7x never returns and later model loads hang too; seen once (<code>beagley-ai/FAQ.md</code>, 2026-11-03)</li><li>ffmpeg h264_v4l2m2m encode does not finish and ignores SIGTERM; kill -9 ends it and the codec still works (<code>beagley-ai/bench/video/ffmpeg-encode-hang-dmesg.log</code>, <code>beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log</code>, <code>beagley-ai/FAQ.md</code>, 2026-11-03)</li><li>gst-launch-1.0 prints &#x27;Caught SIGSEGV&#x27; and waits instead of exiting when v4l2h264dec has capture-io-mode set or the videoconvert after it has n-threads; a pipeline that converts before it scales runs at 6.5 fps and looks hung (<code>beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log</code>, <code>beagley-ai/bench/seam/v4l2-after-reboot.log</code>, <code>beagley-ai/FAQ.md</code>, 2026-11-03)</li><li>The USB webcam drops off USB (-71, then disconnect) at 1080p or on a gimbal move, and returns about 5 s later with its aim reset; 7 drops in 35 min (<code>beagley-ai/bench/camera-usb-drops-2026-11-03.log</code>, 2026-11-03)</li><li>Killing app_edgeai.py with pkill while it read an RTSP stream left it in uninterruptible sleep inside the Wave5 decoder release; dmesg showed &#x27;wave5_vpu_firmware_command_queue_error_check: result not ready&#x27; and the next start failed with &#x27;Error pulling tensor from GST Pipeline&#x27;; stopping with SIGINT and waiting 6 s did not hang (<code>beagley-ai/bench/camera-lan/results-2026-11-08.log</code>, 2026-11-08)</li></ul><p>Try in this order. Remote means the Mac does it with the board in place; hands means a person unplugs, presses or moves something.</p><div class=tw><table><thead><tr><th>Method</th><th>Remote or hands</th><th>Status</th><th>Evidence</th></tr></thead><tbody><tr><td>Reboot over ssh (<code>reboot</code>); the board answered ssh again about 45 s later (after a Wave5 decode failure the reboot cleared it; a hung C7x was cleared this way once and that hang was not logged; the Wave5 pipelines recover when the process is killed)</td><td>remote</td><td>proven</td><td><code>beagley-ai/bench/seam/v4l2-after-reboot.log</code>, 2026-11-03</td></tr></tbody></table></div></section></div><p style="margin-top:24px"><a href="board-beagley-ai.html">Back to the BeagleY-AI page</a></p>
 </div></main>
 <footer>
   <div class="wrap" style="--fcols:4">
@@ -1102,62 +634,27 @@ document.addEventListener('mousemove', e => {
 });
 
 (function () {
-  const kb = n => n < 1000 ? Math.round(n) + ' B' : (n / 1024 >= 1000 ? +(n / 1048576).toFixed(1) + ' MB' : +(n / 1024).toFixed(1) + ' kB');
-  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
-  function restore(root, app) {
-    // once, on load: the link's query wins, then this browser's last choice, then the page default
-    const q = new URLSearchParams(location.search);
-    let saved = {};
-    try { saved = JSON.parse(localStorage.getItem('frl-app-' + app) || '{}'); } catch (e) {}
-    root.querySelectorAll('select[data-opt]').forEach(s => {
-      const want = q.get(s.dataset.opt) || saved[s.dataset.opt];
-      if (want && [...s.options].some(o => o.value === want)) s.value = want;
+  var q = document.getElementById('ffq'); if (!q) return;
+  var qs = Array.prototype.slice.call(document.querySelectorAll('details.qa')), cnt = document.getElementById('ffcount');
+  var low = function (s) { return s.toLowerCase(); };
+  qs.forEach(function (d) { d._t = low(d.textContent); });
+  function run() {
+    var words = low(q.value).split(/\s+/).filter(Boolean), shown = 0;
+    qs.forEach(function (d) {
+      var ok = words.every(function (w) { return d._t.indexOf(w) >= 0; });
+      d.hidden = !ok; if (ok) shown++;
+      if (words.length && q.value.trim().length >= 3) d.open = ok;
     });
+    document.querySelectorAll('section[id^="g-"]').forEach(function (s) {
+      var any = s.querySelector('details.qa'); if (!any) { s.hidden = words.length > 0; return; }
+      s.hidden = !s.querySelector('details.qa:not([hidden])');
+    });
+    cnt.textContent = words.length ? shown + ' of ' + qs.length + ' questions match' : '';
   }
-  function sel(root) {
-    const out = {};
-    root.querySelectorAll('select[data-opt]').forEach(s => { out[s.dataset.opt] = s.value; });
-    return out;
-  }
-  function save(app, v) { try { localStorage.setItem('frl-app-' + app, JSON.stringify(v)); } catch (e) {} }
-  function qs(v) { return '?' + Object.entries(v).map(([k, x]) => k + '=' + encodeURIComponent(x)).join('&'); }
-  function bar(name, used, total) {
-    if (!used || !total) return '';
-    const pct = Math.min(100, 100 * used / total), over = used > total;
-    return '<div class="abar-l"><b>' + name + '</b><span class="note">' + kb(used) + ' of ' + kb(total) + (over ? ', over by ' + kb(used - total) : '') + '</span></div>'
-      + '<div class="abar" role="img" aria-label="' + name + ': ' + kb(used) + ' of ' + kb(total) + '"><i class="' + (over ? 'over' : '') + '" style="width:' + pct.toFixed(1) + '%"></i></div>';
-  }
-  document.querySelectorAll('.appblk[data-board]').forEach(root => {
-    const D = JSON.parse(root.querySelector('script.app-data').textContent), out = root.querySelector('.app-out');
-    const sw = root.querySelector('.app-switch'), cmp = root.querySelector('.app-compare');
-    function render() {
-      const v = sel(root); save(D.app, v);
-      const c = D.cells[v.model + '|' + v.impl];
-      out.innerHTML = '<p><b class="app-st">' + esc(c.label) + '.</b> ' + esc(c.words) + '</p>'
-        + (c.flash ? bar('Flash, whole image', c.flash, D.flash_b) + bar('RAM, whole image', c.ram, D.ram_b) : '')
-        + (c.source ? '<p class="note">Source: <a href="../' + esc(c.source) + '">' + esc(c.source) + '</a></p>' : '');
-      cmp.href = 'applications.html' + qs(v);
-    }
-    restore(root, D.app);
-    root.querySelectorAll('select[data-opt]').forEach(s => s.addEventListener('change', () => { history.replaceState(null, '', qs(sel(root)) + '#apps'); render(); }));
-    sw.addEventListener('change', () => { if (sw.value) location.href = sw.value + qs(sel(root)) + '#apps'; });
-    render();
-  });
-  document.querySelectorAll('.appcat').forEach(root => {
-    const D = JSON.parse(root.querySelector('script.app-data').textContent), body = root.querySelector('tbody');
-    const order = {tested: 0, ran_unchecked: 1, estimated: 2, failed: 3, does_not_fit: 4, unknown: 5, unavailable: 6};
-    function render() {
-      const v = sel(root); save(D.app, v);
-      const rows = Object.entries(D.targets).map(([id, t]) => [id, t, t.cells[v.model + '|' + v.impl]]);
-      rows.sort((a, b) => order[a[2].state] - order[b[2].state] || (a[2].ms || 1e9) - (b[2].ms || 1e9) || a[1].name.localeCompare(b[1].name));
-      body.innerHTML = rows.map(([id, t, c]) => '<tr><td>' + (t.href ? '<a href="' + t.href + qs(v) + (t.href.indexOf('board-') === 0 ? '' : '#apps') + '">' + esc(t.name) + '</a>' : esc(t.name))
-        + '<br><span class="note">' + esc(t.core) + '</span></td><td><b>' + esc(c.label) + '</b></td><td>'
-        + (c.ms != null ? esc(c.ms) + ' ms' : '') + '</td><td>' + esc(c.words) + '</td></tr>').join('');
-    }
-    restore(root, D.app);
-    root.querySelectorAll('select[data-opt]').forEach(s => s.addEventListener('change', () => { history.replaceState(null, '', qs(sel(root))); render(); }));
-    render();
-  });
+  var tm; q.addEventListener('input', function () { clearTimeout(tm); tm = setTimeout(run, 120); });
+  document.getElementById('ffopen').addEventListener('click', function () { qs.forEach(function (d) { if (!d.hidden) d.open = true; }); });
+  document.getElementById('ffclose').addEventListener('click', function () { qs.forEach(function (d) { d.open = false; }); });
+  if (location.hash) { var t = document.getElementById(decodeURIComponent(location.hash.slice(1))); if (t && t.tagName === 'DETAILS') t.open = true; }
 })();
 
 

@@ -1198,6 +1198,7 @@ function strip(box, levels, color, faded) {
 // extra: {asked: levels the person asked for, askedText, didText, stats: [[value, label], ...]}
 function show(ok, verdict, measured, next, levels, color, extra = {}) {
   resultState(ok ? "pass" : "fail");
+  if (ok && flashArmed) { try { if (window.frlPop) window.frlPop.flash(flashArmed); } catch (e) { /* counting is optional */ } flashArmed = null; }
   const at = [...$("chips").children].findIndex((li) => li.className !== "done" && li.className !== "skip");
   chipAt(ok ? 4 : Math.max(0, at), ok ? "" : "bad");
   scene(ok ? "pass" : "fail", [null, null, null, null, ok ? "PASS" : "FAIL"]);
@@ -1695,7 +1696,9 @@ async function readSerial(port, baud, seconds, enough) {
 
 // CC27xx: write a program through TI's SACI mailbox (../cc-saci.js). The chip checks the image itself first (CRC32);
 // if it already holds it, nothing is written. Otherwise the page saves the board's flash, then erases and writes.
+let flashArmed = null;   // the build slug of a program write in progress; the first passing result counts one flash (popularity.js)
 async function goCc(r) {
+  flashArmed = r.project || null;
   const log = $("log"); log.innerHTML = ""; resultState("run"); $("go").disabled = true;
   const t0 = performance.now(), secs = () => ((performance.now() - t0) / 1000).toFixed(1);
   let t = null, dap = null, sc = null, writing = false, savedBins = false;
@@ -1795,7 +1798,7 @@ async function go() {
   await conClose(); $("c-plan").hidden = true;
   if (thermo.s) { thermoStop(); while (thermo.s) await ui.sleep(50); }   // let the live reader release the debugger first
   if (chosen && (chosen.hex || chosen.check.kind === "ble")) return goCc(chosen);
-  const r = chosen, log = $("log"); log.innerHTML = ""; resultState("run");
+  const r = chosen, log = $("log"); log.innerHTML = ""; resultState("run"); flashArmed = r.project || null;
   phase = "idle"; phaseSaved = false; lost = null; trail.add("run", { demo: r.id, kind: r.check.kind, image: r.sha256 && r.sha256.slice(0, 12) });
   $("go").disabled = true; if (!["ble"].includes(r.check.kind)) estStart(r);
   const t0 = performance.now();

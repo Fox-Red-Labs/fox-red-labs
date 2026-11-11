@@ -260,7 +260,7 @@
    "browserFlash": false,
    "demos": 0,
    "readme": "beagley-ai/README.md",
-   "page": null,
+   "page": "board-beagley-ai.html",
    "status": "Use the board instructions; no browser connection yet",
    "note": "This page does not identify or flash this board over USB. Use its existing board notes and instructions."
   },

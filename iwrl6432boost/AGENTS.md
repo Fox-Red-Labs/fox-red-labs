@@ -73,7 +73,9 @@ It prints one line per frame. `--selftest` runs it with no board. Frames start w
 - Home Assistant bridge `iwrl6432boost/tools/ha_bridge.py` passed its self test and a replay of the 15 s capture. The live latency run was not finished (`iwrl6432boost/README.md`).
 - 2026-11-03, radar family: the 05.05.04.02 demo builds on the Mac for the xwrL64xx-evm (IWRL6432, AWRL6432), -aop, -wcsp and xwrL14xx-evm (IWRL1432, AWRL1432) variants; boot images 192 B smaller than TI's prebuilt ones, same header layout. Every build writes platform 0xA6432, so the host cannot tell the chips apart (`portability/radar-family/README.md`, matrix X59 to X63).
 - 2026-11-03, third-party readers on `guiMonitor 1` streams (re-encoded walk recordings): ibaiGorordo's SDK 3 Python reader read every point (NumPy 1.x); radar-lab/ti_mmwave_rospkg published every point with frames 50 ms apart and none at 250 ms; the top gesture recognizer read no frame (`ports/radar-host/README.md`, E299 to E301, `radar_host_points_delivered` rows).
-- Not done: flashing TI's other demos, the 1.25 Mbaud rows, power rows, CoreMark, any custom firmware.
+- 2026-11-10, CC1407P radio on this board: a transmit app for the M4F (TI's host driver, `portability/cc1407p-host/hal_bare.c`, `iwrl6432boost/cc1407p/hooks_iwrl6432.c`) builds on a Mac with `iwrl6432boost/cc1407p/build.sh`: 47,876 B boot image, 42,360 B text, 1,598 B data, 24,280 B bss (`host_fit` rows). The SDK's `mcspi_loopback` example and its device data put McSPI A on balls D10 (CLK), B12 (MOSI), C11 (MISO), D11 (CS0); the schematic carries the same nets to header J2 (pins 2 to 6) and sockets J8 and J9. Built, not flashed (`iwrl6432boost/cc1407p/README.md`).
+- 2026-11-10: `arprog_cmdline.py` has erase, write and format options and no read option, so the flash image cannot be backed up before a write. `preflight_image.py iwrl6432boost <image>.out` refuses every segment because it assumes an MSPM0 memory map (`iwrl6432boost/FAQ.md`).
+- Not done: flashing TI's other demos, the 1.25 Mbaud rows, power rows, CoreMark, flashing or running any custom firmware (the CC1407P app is built only).
 
 ## Which routes reach this chip
 
@@ -86,7 +88,8 @@ On a Mac, TI's SDK makefiles build the demo when the Unix helpers are passed in 
 1. **Radar Toolbox has no flasher;** `arprog_cmdline.py` ships with the mmWave L SDK (`iwrl6432boost/README.md`).
 2. **`trackingCfg` changed between SDKs:** 7 values on the shipped 05.04 image, 4 plus an optional boresight flag on 05.05.04.02 (`portability/radar-family/README.md`).
 3. **Frame period cuts both ways:** ti_mmwave_rospkg needs frames under 100 ms apart, and TI's 100 ms tracking cfg hung the shipped 05.04 image after about 31 frames. A faster cfg needs a hang check before any reader run (`docs/experiments/2026-11-03-iwrl6432boost-ti-mmwave-rospkg.md`, `iwrl6432boost/live/README.md`).
-4. **Do not try 1.25 Mbaud blind.** It sits behind `ENABLE_UART_HIGH_BAUD_RATE_DYNAMIC_CFG`; a failed switch could leave the link at a rate the Mac cannot follow (`iwrl6432boost/README.md`).
+4. **Do not trust `preflight_image.py` on this board.** It refuses every radar image (it assumes an MSPM0 map); check the load ranges against the SDK's `linker.cmd` instead (`iwrl6432boost/FAQ.md`).
+5. **Do not try 1.25 Mbaud blind.** It sits behind `ENABLE_UART_HIGH_BAUD_RATE_DYNAMIC_CFG`; a failed switch could leave the link at a rate the Mac cannot follow (`iwrl6432boost/README.md`).
 
 <!-- ports:start (tools/render_ports.py) -->
 ## Ports that ran here

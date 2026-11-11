@@ -1,0 +1,387 @@
+{
+ "id": "beagley-ai",
+ "board": "BeagleY-AI",
+ "part": "AM67A",
+ "family": "Jacinto 7 (J722S)",
+ "title": "Is the BeagleY-AI, BeagleBoard.org's Linux board with TI's AM67A, the right board for a vision project?",
+ "short": "The BeagleY-AI is a Linux board from BeagleBoard.org (not TI) built around TI's AM67A: four Cortex-A53 cores at 1.4 GHz, a 4 TOPS C7x accelerator, 4 GB of RAM and a hardware H.264 and H.265 codec. 11 precompiled zoo models ran on the accelerator in 5.4 to 49.1 ms; the pose model takes 43.1 ms there and 4.48 s on the Arm cores with two threads. Hardware decode of 1080p H.264 runs at 255.9 fps and hardware encode at 110.1 fps. TI's people-count demo ran at 28.0 to 29.4 fps from a USB webcam on a rated 5 V 3 A supply. These are one board's numbers, taken with no fan.",
+ "meet": {
+  "what": "A Linux board from BeagleBoard.org, not from TI, around TI's AM67A vision processor. The C7x is TI's DSP core and the MMA beside it is the matrix accelerator that runs neural nets; TIDL is TI's runtime that offloads a network to it; Wave5 is the video codec block. It runs BeagleBoard's Edge AI image (TI's Edge AI Linux release, built for this board) from a microSD card, and every run here went over Ethernet and ssh: no serial adapter, display or debug probe was needed. Ours is the 4 GB model. The USB-C port is power only on this image, and the board needs a 5 V 3 A supply that is not in the box.",
+  "facts": [
+   [
+    "Chip",
+    "AM67A (J722S)"
+   ],
+   [
+    "CPU",
+    "Four Cortex-A53 at up to 1.4 GHz, without ARMv8.1 atomics (a program built with them dies with Illegal instruction); R5F cores at up to 800 MHz (TI AM67A product page, read 2026-11-10)"
+   ],
+   [
+    "Accelerators",
+    "Two C7x DSPs with MMA, up to 4 TOPS combined; both reported a 1.0 GHz clock on our board (k3conf). Hardware H.264 and H.265 encode and decode (Wave5), rated by TI up to 4K at 60 fps; GPU, IMG BXS-4-64 (TI AM67A product page; not tried here)"
+   ],
+   [
+    "Memory",
+    "4 GB LPDDR4; Linux on this image sees 2,529 MB, the rest is reserved for the accelerators and firmware; no swap"
+   ],
+   [
+    "Storage",
+    "microSD only; a 128 GB card gave a 119 GB root partition"
+   ],
+   [
+    "Connections",
+    "Gigabit Ethernet (used for every run), four USB 3.0 Type-A host ports (a USB webcam), one USB-C port (power only on this image), micro-HDMI, two MIPI CSI camera connectors, a 40-pin header, a 4-pin fan connector (BeagleBoard.org, read 2026-11-10). We did not use HDMI, the CSI cameras or the header"
+   ],
+   [
+    "Radios",
+    "Wi-Fi 6 and Bluetooth LE 5.4 on a BM3301 module (TI CC3301); not used in any run"
+   ],
+   [
+    "Debug",
+    "None used. The JTAG pads (Tag-Connect) and a 3-pin debug UART exist; we reached the board over Ethernet and ssh as root with no password"
+   ],
+   [
+    "Software",
+    "BeagleBoard Edge AI image 11.00.00.08 (built 2025-09-06): Arago 2025.01, Linux 6.12.33, GCC 13.3.0, Python 3.12.9, onnxruntime 1.15.0 with the TIDL provider, GStreamer, FFmpeg, Docker; no libc.a, no KVM"
+   ],
+   [
+    "Power",
+    "USB-C, 5 V at 3 A; the board does no USB-PD negotiation (BeagleBoard.org). A wall supply of unread rating let the board reboot under the camera demo; a rated 5 V 3 A supply did not"
+   ]
+  ],
+  "source": "beagley-ai/README.md"
+ },
+ "projects": [
+  {
+   "t": "Get Linux running from the box",
+   "st": "works",
+   "result": "Edge AI image 11.00.00.08 written to a microSD card from a Mac (the card-write script needed two fixes first: the Mac's built-in SD reader lists the card as an internal disk, and a raw write must end on a whole 512-byte sector), then ssh as root with no password over Ethernet on first boot, 2026-11-03. The time from box to login was not recorded",
+   "source": "beagley-ai/TIMELINE.md"
+  },
+  {
+   "t": "TI's model zoo on the C7x accelerator",
+   "st": "works",
+   "result": "11 of the 14 model folders ran on the accelerator, 5.42 to 49.09 ms each; the pose model took 43.13 ms with 274 of 274 nodes offloaded. The 8 models also run on the Arm cores (2 threads) took 15 to 111 times longer (pose 4,475.57 ms). The other 3 folders were not run. Against the SK-TDA4VM the same models were 2 to 4 times slower",
+   "source": "data/results/beagley-ai.csv"
+  },
+  {
+   "t": "Hardware video decode and encode",
+   "st": "partial",
+   "result": "Through GStreamer: H.264 decode of 1080p at 255.9 fps using 27 to 29 percent of the four cores' time (47.1 fps in software), H.264 encode at 110.1 fps, decode chained into encode at 135.1 fps. Decode into a program needs the frame scaled before it is converted (76.5 fps, against 6.5 fps the other way round). FFmpeg's hardware encoder hung and its decode into a pipe stopped after 3 frames",
+   "source": "beagley-ai/FAQ.md"
+  },
+  {
+   "t": "Camera people count with TI's Edge AI demo",
+   "st": "partial",
+   "result": "On a rated 5 V 3 A supply the detector ran at 28.0 to 29.4 fps from a USB webcam at 720p, 5 of 5 starts held 60 s, and 29.7 fps for 60 s from a network camera; on a recorded clip 30.0 fps. On the earlier wall supply 0 of 5 camera starts held 15 s and the board rebooted (cause suspected to be the supply, not measured). No person has been counted from a camera: the on-screen count was 0 because the camera faced the bench",
+   "source": "docs/experiments/2026-11-05-beagley-ai-camera-people-count.md"
+  },
+  {
+   "t": "Frigate object detection on the C7x",
+   "st": "partial",
+   "result": "Frigate 0.18.2 sent its detections to a 100-line server running the zoo's YOLOX-nano on the C7x: 64.46 ms per detection against 184.56 ms on Frigate's own CPU detector (a different, smaller model), tracking two people and a dog in a recorded clip. On a rated supply it ran 130 s each from the USB webcam (59.71 ms per detection) and from a network camera (58.01 ms) and detected nobody, because no person was in view. On 2026-11-03 Frigate's ffmpeg dropped the webcam off USB in 2 of 2 tries",
+   "source": "docs/experiments/2026-11-03-beagley-ai-frigate-c7x.md"
+  },
+  {
+   "t": "The Pop the bubbles pose game",
+   "st": "works",
+   "result": "Pose on the C7x drove the game at 29.8 draw frames a second from the USB webcam for 20 s, and in a browser on a rated 5 V 3 A supply it held 60 s at 24.0 fps median (15.4 to 25.2). From a recorded clip at 1280x720 the first run drew 6.3 fps until background caching raised it to 20.6 fps; JPEG encoding for the browser is the remaining limit",
+   "source": "beagley-ai/games/pop-the-bubbles"
+  },
+  {
+   "t": "A language model and speech to text on the Arm cores",
+   "st": "works",
+   "result": "llama.cpp v0.8.0 with Qwen2.5 0.5B Q4_K_M generated 6.87 tokens/s (1.5B: 2.42); whisper.cpp v1.9.5 tiny.en ran at 0.66 to 0.90 times real time and base.en at 1.32 on a 54 s clip. Neither uses the C7x",
+   "source": "data/results/beagley-ai.csv"
+  },
+  {
+   "t": "Smart-home containers in Docker",
+   "st": "works",
+   "result": "Home Assistant answered over HTTP 52.7 s after start (container 531 MB); Mosquitto was ready in 3.4 s; Pi-hole needed FTLCONF_dns_listeningMode=BIND because systemd-resolved holds port 53, then answered in 12.2 s",
+   "source": "data/results/beagley-ai.csv"
+  },
+  {
+   "t": "One portable C app on Linux and on the MCU R5F core",
+   "st": "works",
+   "result": "The AM62L's 66-line Linux glue file built byte-identical with the board's own gcc (2.288 s) and printed 14 lines a second apart, with a 2-line config header. A Zephyr build of the same app (21,372 bytes) loaded onto the MCU R5F core from Linux and printed 16 lines at 1.00 s gaps. The board has no ADC, so every line read 65535, and the LED was not seen",
+   "source": "portability/matrix.csv"
+  }
+ ],
+ "chains": [
+  {
+   "t": "Working with no display, serial adapter or probe",
+   "st": "works",
+   "verdict": "Yes",
+   "why": "Every run went over Ethernet and ssh as root. The one thing to know: the USB-C port is power only, so it never shows up as a network adapter",
+   "source": "beagley-ai/FIRST-BOOT.log"
+  },
+  {
+   "t": "Hardware decode through FFmpeg",
+   "st": "partial",
+   "verdict": "Not through FFmpeg, yes through GStreamer",
+   "why": "FFmpeg's h264_v4l2m2m encode never finished (the kernel printed result not ready: 0x800) and decode into a pipe stopped after 3 frames; GStreamer's v4l2h264enc and v4l2h264dec worked",
+   "source": "beagley-ai/FAQ.md"
+  },
+  {
+   "t": "A USB webcam on a board fed from a hub port",
+   "st": "partial",
+   "verdict": "Only on a rated 5 V 3 A supply",
+   "why": "The Insta360 Link 2 Pro dropped off USB at 1080p 7 of 7 times and after gimbal moves; on a rated 5 V 3 A supply it held at 720p in five 60 s starts",
+   "source": "beagley-ai/bench/camera-usb-drops-2026-11-03.log"
+  },
+  {
+   "t": "Compiling our own models for the C7x",
+   "st": "waiting",
+   "verdict": "Could work",
+   "why": "All 11 models used TI's precompiled artifacts from /opt/model_zoo; TI's compilation tools were not tried on this board",
+   "source": "beagley-ai/README.md"
+  },
+  {
+   "t": "Display, audio, the 40-pin header, Wi-Fi and Bluetooth, the GPU",
+   "st": "waiting",
+   "verdict": "Could work",
+   "why": "Nothing was attached or tried: no display, no audio device and nothing on the header or the radio module",
+   "source": "docs/arrivals/beagley-ai.md"
+  }
+ ],
+ "combine_title": "What else we tried, and how it went",
+ "combine_lede": "Each row is something we tried beyond the standard list. A row that did not work is recorded with its reason, and a row we did not run says so.",
+ "benchmarks": [
+  [
+   "Pose model (YOLOX-S, 640x640) on the C7x / on the Cortex-A53 cores",
+   "43.13 / 4,475.57 ms",
+   "All 274 nodes offloaded; median of 30 runs (3 on the Arm cores); no fan"
+  ],
+  [
+   "Classifier (RegNetX-200MF, 224x224) on the C7x / on the Arm cores",
+   "5.95 / 89.75 ms",
+   "Same method; 15 times faster on the C7x"
+  ],
+  [
+   "Object detector (YOLOX-nano, 416x416) on the C7x / on the Arm cores",
+   "10.15 / 471.83 ms",
+   "TI's datasheet table gives 8.63 ms by its own method"
+  ],
+  [
+   "Zoo models on the C7x, fastest to slowest",
+   "5.42 to 49.09 ms",
+   "11 models"
+  ],
+  [
+   "H.264 decode, 1080p, hardware / software",
+   "255.9 / 47.1 fps",
+   "GStreamer to fakesink; hardware uses 27 to 29 percent of the four cores' time; software on four threads"
+  ],
+  [
+   "H.264 encode, 1080p, hardware",
+   "110.1 fps",
+   "GStreamer v4l2h264enc, raw file in"
+  ],
+  [
+   "Decode chained into encode, with / without dmabuf import",
+   "135.1 / 35.1 fps",
+   "output-io-mode=dmabuf-import on the encoder"
+  ],
+  [
+   "Hardware decode into a program, scale first / convert first",
+   "76.5 / 6.5 fps",
+   "1280x768 to 224x224 RGB"
+  ],
+  [
+   "Decode plus classifier on the C7x, whole app",
+   "61.3 fps",
+   "bench/seam/app.py, hardware decode"
+  ],
+  [
+   "Qwen2.5 0.5B Q4_K_M, generation / prompt",
+   "6.87 tokens/s",
+   "llama.cpp v0.8.0, four threads"
+  ],
+  [
+   "whisper.cpp tiny.en, real-time factor",
+   "0.66 to 0.90",
+   "54 s and 11 s clips, four threads; above 1 is slower than real time"
+  ],
+  [
+   "Home Assistant container, first HTTP answer",
+   "52.7 s",
+   "Container 531 MB"
+  ],
+  [
+   "Frigate detection on the C7x / Frigate's CPU detector",
+   "64.46 / 184.56 ms",
+   "Recorded clip; the CPU detector runs a smaller model"
+  ],
+  [
+   "TI people-count demo from a USB webcam, rated supply",
+   "28.0 to 29.4 fps",
+   "5 starts of 60 s at 720p"
+  ],
+  [
+   "Portable app build on the board",
+   "2.288 s",
+   "66.1 kB stripped, dynamic"
+  ]
+ ],
+ "benchmarks_source": "data/results/beagley-ai.csv",
+ "glance": [
+  [
+   "43.1 ms",
+   "Pose model on the C7x",
+   "4,475.6 ms on the Arm cores (2 threads); all 274 nodes offloaded",
+   "data/results/beagley-ai.csv"
+  ],
+  [
+   "255.9 fps",
+   "1080p H.264 hardware decode",
+   "27 to 29 percent of the four cores' time; 47.1 fps in software on four cores",
+   "beagley-ai/bench/video/video.log"
+  ],
+  [
+   "64.5 ms",
+   "Frigate detection on the C7x",
+   "184.6 ms on Frigate's CPU detector, which runs a smaller model",
+   "docs/experiments/2026-11-03-beagley-ai-frigate-c7x.md"
+  ],
+  [
+   "135.1 fps",
+   "Decode chained into encode, 1080p",
+   "35.1 fps without the encoder importing the decoder's buffers",
+   "beagley-ai/bench/video/wave5-pipe-fix-2026-11-03.log"
+  ],
+  [
+   "6.87 tokens/s",
+   "Qwen2.5 0.5B on the Arm cores",
+   "llama.cpp, four threads; the C7x is not used",
+   "beagley-ai/bench/llm/llama-bench.log"
+  ],
+  [
+   "28.0 to 29.4 fps",
+   "People-count demo from a USB webcam",
+   "720p, 5 of 5 starts held 60 s on a rated 5 V 3 A supply",
+   "docs/experiments/2026-11-05-beagley-ai-camera-people-count.md"
+  ]
+ ],
+ "good_for": [
+  "Camera and vision projects that need a neural net at video rate on a small Linux board: the zoo models ran on the accelerator in 5.4 to 49.1 ms, and the people-count demo held 28 fps from a webcam",
+  "Hardware video through GStreamer: 1080p decode at 255.9 fps and encode at 110.1 fps",
+  "Moving code between boards: the AM62L's Linux glue file built here unchanged, and the same app ran on the MCU R5F core"
+ ],
+ "not_for": [
+  "A bench with no 5 V 3 A USB-C supply: the board needs one, does not negotiate USB-PD, and rebooted under the camera demo on a supply of unread rating",
+  "FFmpeg-based video pipelines: its hardware encoder hung and its decode into a pipe stopped; plan on GStreamer",
+  "Sustained runs without a fan: the board read 70 to 87 degrees C in our runs with the fan connector empty, and no temperature log was kept",
+  "Microcontroller-style analog work: there is no ADC on the board, and no debug probe for the cores",
+  "Judging the chip's ceiling from this page: one board, one image, no fan, and the accelerator is a 4 TOPS part, about half the SK-TDA4VM's"
+ ],
+ "buy": "Made by BeagleBoard.org and not sold on TI.com; the maker's page is beagleboard.org/boards/beagley-ai. In the box: the board with its antenna and a quick-start card. Not in the box: a 5 V 3 A USB-C supply, a USB-C to USB-C cable, a microSD card, a micro-HDMI cable (BeagleBoard.org documentation, read 2026-11-01).",
+ "gotchas": [
+  [
+   "The board is powered from your computer's USB-C port but never shows up as a network adapter",
+   "Reach it over Ethernet. On the Edge AI image the USB-C port carries power only; find the address in your network's client list (host name j722s-evm)"
+  ],
+  [
+   "The Mac refuses the card, or a raw write ends with an error",
+   "Use beagley-ai/tools/write-card.sh: it accepts the Mac's built-in SD slot (which lists as an internal disk) and pads the image to whole 512-byte sectors. A full card write with the current version has not been run"
+  ],
+  [
+   "A model load never returns and the next ones hang too",
+   "Reboot the board and run one model per process with a timeout. Seen once; no log of the hang was kept and the cause is unknown"
+  ],
+  [
+   "Pose takes 43 ms where 25 to 30 ms was expected",
+   "Nothing is wrong (the 25 to 30 ms was our guess from the SK-TDA4VM's 13.76 ms and its 8 against 4 TOPS): every one of the model's 274 nodes runs on the accelerator, and TI's datasheet figures for two other models are near what we measured, about 19 percent slower by the timing used here"
+  ],
+  [
+   "FFmpeg hardware encode never finishes, or decode into a pipe stops after 3 frames",
+   "Use GStreamer: v4l2h264enc for encode, and for decode into a program scale the frame before converting it"
+  ],
+  [
+   "TI's camera demo runs at 1 fps with the C7x idle",
+   "Set SOC=j722s in the environment; a login shell sets it and a plain ssh command does not, and the app then runs the model on the Arm cores"
+  ],
+  [
+   "The board leaves Ethernet and reboots seconds after the camera demo starts",
+   "Power it from a rated 5 V 3 A USB-C supply. On a wall supply of unread rating 4 of 5 starts rebooted within 15 s; on a rated one 5 of 5 held 60 s. Cause suspected, not measured"
+  ],
+  [
+   "A program dies with Illegal instruction",
+   "The Cortex-A53 has no ARMv8.1 atomics; preload the trap library from am62l-evm/steam/lse_trap/"
+  ],
+  [
+   "The board reads 80 to 87 degrees C in long runs",
+   "The fan connector was empty; fit a fan before runs longer than a few minutes. No temperature log was kept"
+  ]
+ ],
+ "faq_page": "faq-beagley-ai.html",
+ "faq_source": "beagley-ai/FAQ.md",
+ "updated": "2026-11-10",
+ "measured_on": "Measured 2026-11-03 to 2026-11-08 on one BeagleY-AI 4 GB from an Apple Mac over Ethernet and ssh. BeagleBoard Edge AI image 11.00.00.08 (built 2025-09-06), Linux 6.12.33, GCC 13.3.0, onnxruntime 1.15.0, microSD boot, no fan, no display. The camera runs used an Insta360 Link 2 Pro; the first camera runs were on a wall supply of unread rating and the later ones on a rated 5 V 3 A supply, as stated per row.",
+ "next": {
+  "title": "What do I do first with the BeagleY-AI?",
+  "steps": [
+   "Get a 5 V 3 A USB-C supply and a C-to-C cable; the board has no USB-PD and the box has neither.",
+   "Write BeagleBoard's Edge AI image to a 32 GB or larger microSD card with beagley-ai/tools/write-card.sh.",
+   "Plug in Ethernet, then power; find the board's address in your network's client list (host name j722s-evm) and ssh in as root, no password.",
+   "Run the pose model on the accelerator with beagley-ai/bench/zoo/zoo_bench.py (43.1 ms), then read the FAQ before any camera or video run."
+  ],
+  "source": "beagley-ai/README.md"
+ },
+ "runs_note": "Most projects in this list are microcontroller projects, such as blinking a pin or reading an ADC. They do not map onto a Linux vision board, so they do not apply here. The board's own tests are in the benchmarks below and on the results page.",
+ "headline": [
+  [
+   "Pose model on the C7x accelerator",
+   "dl_inference_ms",
+   "yolox-s-pose-640-onnxrt-tidl-c7x",
+   "YOLOX-S 640x640, all 274 nodes offloaded; median of 30 runs"
+  ],
+  [
+   "Same pose model on the Arm cores, 2 threads",
+   "dl_inference_ms",
+   "yolox-s-pose-640-onnxrt-a53",
+   "onnxruntime CPU provider, 2 threads; median of 3 runs"
+  ],
+  [
+   "Object detector on the C7x",
+   "dl_inference_ms",
+   "yolox-nano-lite-416-onnxrt-tidl-c7x",
+   "YOLOX-nano 416x416; median of 30 runs"
+  ],
+  [
+   "H.264 decode, 1080p, hardware",
+   "video_decode_fps",
+   "1920x1088-h264-1",
+   "GStreamer to a fake sink; 27 to 29 percent of the four cores' time; 3 runs"
+  ],
+  [
+   "H.264 encode, 1080p, hardware",
+   "video_encode_fps",
+   "1088p-h264-rawfile",
+   "GStreamer, raw file in; 3 runs"
+  ],
+  [
+   "Decode chained into encode, 1080p",
+   "video_encode_fps",
+   "1088p-h264-transcode-dmabuf-import",
+   "encoder imports the decoder's buffers; 3 runs"
+  ],
+  [
+   "Frigate detection on the C7x",
+   "dl_inference_ms",
+   "frigate-deepstack-yolox-nano-416-c7x",
+   "recorded clip; Frigate's own timing, which includes its JPEG encode and the HTTP round trip; its CPU detector ran a different, smaller model (184.56 ms), so this is not a like-for-like speedup"
+  ],
+  [
+   "Qwen2.5 0.5B text generation on the Arm cores",
+   "linux_llm_tok_s",
+   "qwen2.5-0.5b-q4_k_m-gen-t4",
+   "llama.cpp v0.8.0, four threads; the C7x is not used"
+  ],
+  [
+   "People-count demo from a USB webcam",
+   "gst_pipeline_fps",
+   "e294-people-count-usb-webcam-720p-sustained-60s-rated-supply",
+   "median of five 60 s starts at 720p on a rated 5 V 3 A supply; no person was in view, so the count read 0"
+  ]
+ ]
+}

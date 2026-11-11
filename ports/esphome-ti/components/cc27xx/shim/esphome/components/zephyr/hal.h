@@ -11,7 +11,12 @@ extern "C" {
 #define PROGMEM
 // The generated main.cpp passes these to ZephyrGPIOPin; the shim ignores them.
 #define DEVICE_DT_GET_OR_NULL(x) (static_cast<const void *>(nullptr))
+#define DEVICE_DT_GET(x) (static_cast<const struct device *>(nullptr))
 #define DT_NODELABEL(x) 0
+extern "C" {
+size_t frl_heap_free(void);      // FreeRTOS heap bytes free now (shim/ti_periph.cpp)
+size_t frl_heap_min_free(void);  // lowest value since boot
+}
 namespace esphome::zephyr {}
 namespace esphome {
 inline bool in_isr_context() { return false; }

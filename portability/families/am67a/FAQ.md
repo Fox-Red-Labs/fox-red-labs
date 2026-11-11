@@ -1,6 +1,6 @@
 # AM67A family (BeagleY-AI): porting errors, causes and fixes
 
-Problems hit moving code onto the BeagleY-AI on 2026-11-03. Board-bring-up errors are in `beagley-ai/FAQ.md`. Terms: [docs/vocab.md](../../../docs/vocab.md). Cause tags: Setup or handling; Tool or docs; Third-party behavior; Chip limit; Unknown.
+Problems hit moving code onto the BeagleY-AI on 2026-11-03. Board-bring-up errors are in [`beagley-ai/FAQ.md`](../../../beagley-ai/FAQ.md). Terms: [docs/vocab.md](../../../docs/vocab.md). Cause tags: Setup or handling; Tool or docs; Third-party behavior; Chip limit; Unknown.
 
 ### The portable app prints `adc=65535` on every line
 

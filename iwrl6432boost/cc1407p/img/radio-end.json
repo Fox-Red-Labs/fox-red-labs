@@ -1,0 +1,246 @@
+{
+ "image": "../../../docs/arrivals/img/source-bp-cc1407p-9-fe-swru633.png",
+ "margin_left": 980,
+ "margin_right": 980,
+ "label_gap": 110,
+ "tag_size": 24,
+ "title": "Radio to the IWRL6432BOOST radar by eight wires, page 1 of 2: the radio's end",
+ "warning": "Unplug the radar's USB first. Each tag says where that wire's other end goes (page 2). Same colour both ends.",
+ "credit": "Board drawing: TI SWRU633 Figure 2-1, leader lines removed",
+ "steps": [
+  {
+   "label": [
+    [
+     [
+      220,
+      40,
+      40
+     ],
+     "Red: pin 1 (3V3) to the radar's J2 pin 1"
+    ],
+    [
+     [
+      30,
+      30,
+      30
+     ],
+     "Black: pin 20 (GND) to the radar's J2 pin 7"
+    ],
+    "Power first. Pin 1 is the top of the left outer",
+    "row; pin 20 is the top of the right outer row."
+   ],
+   "side": "left",
+   "label_y": 300,
+   "marks": [
+    {
+     "pin": [
+      115,
+      490
+     ],
+     "r": 22,
+     "tag": "1  3V3  to J2 pin 1",
+     "tag_side": "left",
+     "color": [
+      220,
+      40,
+      40
+     ]
+    },
+    {
+     "pin": [
+      905,
+      490
+     ],
+     "r": 22,
+     "tag": "20  GND  to J2 pin 7",
+     "tag_side": "right",
+     "color": [
+      30,
+      30,
+      30
+     ]
+    }
+   ]
+  },
+  {
+   "label": [
+    [
+     [
+      240,
+      200,
+      0
+     ],
+     "Yellow: pin 7 (SCLK) to J2 pin 5"
+    ],
+    [
+     [
+      60,
+      180,
+      60
+     ],
+     "Green: pin 15 (PICO) to J2 pin 2"
+    ],
+    [
+     [
+      40,
+      120,
+      240
+     ],
+     "Blue: pin 14 (POCI) to J2 pin 3"
+    ],
+    [
+     [
+      235,
+      235,
+      235
+     ],
+     "White: pin 18 (CS_N) to J2 pin 4"
+    ],
+    "Pin 7: 7th socket down the left outer row.",
+    "14, 15, 18: count up the right outer row",
+    "from pin 11 at the bottom (20 is the top)."
+   ],
+   "side": "left",
+   "label_y": 600,
+   "marks": [
+    {
+     "pin": [
+      115,
+      749
+     ],
+     "r": 22,
+     "tag": "7  SCLK  to J2 pin 5",
+     "tag_side": "left",
+     "color": [
+      240,
+      200,
+      0
+     ]
+    },
+    {
+     "pin": [
+      905,
+      706
+     ],
+     "r": 22,
+     "tag": "15  PICO  to J2 pin 2",
+     "tag_side": "right",
+     "color": [
+      60,
+      180,
+      60
+     ]
+    },
+    {
+     "pin": [
+      905,
+      749
+     ],
+     "r": 22,
+     "tag": "14  POCI  to J2 pin 3",
+     "tag_side": "right",
+     "color": [
+      40,
+      120,
+      240
+     ]
+    },
+    {
+     "pin": [
+      905,
+      576
+     ],
+     "r": 22,
+     "tag": "18  CS_N  to J2 pin 4",
+     "tag_side": "right",
+     "color": [
+      235,
+      235,
+      235
+     ]
+    }
+   ],
+   "badge": [
+    40,
+    830
+   ]
+  },
+  {
+   "label": [
+    [
+     [
+      240,
+      120,
+      0
+     ],
+     "Orange: pin 36 (RESET_N) to J9 pin 1"
+    ],
+    [
+     [
+      160,
+      60,
+      200
+     ],
+     "Purple: pin 23 (SPI_INT) to J2 pin 6"
+    ],
+    "Pin 23 is the 3rd socket down the left inner row.",
+    "Pin 36 is the 5th down the right inner row.",
+    "Leave the two P2 shunts (LED links) as shipped."
+   ],
+   "side": "left",
+   "label_y": 1010,
+   "marks": [
+    {
+     "pin": [
+      860,
+      663
+     ],
+     "r": 22,
+     "tag": "36  RESET_N  to J9 pin 1",
+     "tag_side": "left",
+     "color": [
+      240,
+      120,
+      0
+     ]
+    },
+    {
+     "pin": [
+      156,
+      577
+     ],
+     "r": 22,
+     "tag": "23  SPI_INT  to J2 pin 6",
+     "tag_side": "right",
+     "color": [
+      160,
+      60,
+      200
+     ]
+    }
+   ],
+   "badge": [
+    600,
+    720
+   ]
+  }
+ ],
+ "board": "../../../docs/boards/bp-cc1407p-9-fe.json",
+ "task_facts": {
+  "head": "For this step",
+  "items": [
+   [
+    "What it does",
+    "Makes the radar chip's Cortex-M4F the radio's host over its own SPI A port, with the radar left alone"
+   ],
+   [
+    "Why wires",
+    "The radar's BoosterPack sockets (J8 and J9) sit on the back and carry no 3.3 V out, so the power and five of the signals come from the SPI header J2 on the top edge"
+   ],
+   [
+    "Expect",
+    "A radio version line on the radar's USB serial port ending in 1, then one packet a second reaching the CC1354P10"
+   ]
+  ]
+ }
+}

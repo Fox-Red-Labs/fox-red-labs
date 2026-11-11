@@ -1,6 +1,6 @@
 # E192: the same device as frl-esphome-fit.yaml, on our own ESPHome platform `cc27xx` instead of the nrf52 template.
 # `esphome compile frl-cc27xx.yaml` builds it with TI's compiler; `esphome upload frl-cc27xx.yaml` flashes it.
-# Pin DIO16 is the red LED on the LP-EM-CC2755P10. No logger, no Wi-Fi, no API, no OTA.
+# Pin DIO16 is the red LED on the LP-EM-CC2755P10. The log goes to the board's serial port (`esphome logs frl-cc27xx.yaml --device /dev/cu.usbmodem<probe serial>1`).
 esphome:
   name: frl-cc27xx
 
@@ -8,11 +8,17 @@ external_components:
   - source:
       type: local
       path: components
-    components: [cc27xx, die_temperature]
+    components: [cc27xx, die_temperature, ti_adc, ti_pwm]
 
 cc27xx:
   board: LP_EM_CC2755P10
   # probe_serial: LB07021W      # the debug probe's serial (xdsdfu -e lists it); or pass --device LB07021W to upload
+
+logger:
+  level: DEBUG
+
+preferences:
+  flash_write_interval: 60s   # settings are written to the board's flash (TI NVS driver) this often
 
 zigbee:
   router: true

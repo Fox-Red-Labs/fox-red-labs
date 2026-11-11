@@ -8,12 +8,19 @@ external_components:
   - source:
       type: local
       path: components
-    components: [cc27xx, cc23xx, die_temperature]
+    components: [cc27xx, cc23xx, die_temperature, ti_adc, ti_pwm]
 
 cc23xx:
   board: LP_EM_CC2340R5
   heap_size: 0x23BC   # 2 kB less heap than the default 0x2BBC: the only way a router fits in 36 kB of RAM, with no heap left over (E192)
   # probe_serial: XXXXXXXX      # your debug probe's serial (xdsdfu -e lists it); or pass --device <serial> to upload
+
+logger:
+  level: DEBUG
+  tx_buffer_size: 256   # the CC2340R5 has 36 kB of RAM
+
+preferences:
+  flash_write_interval: 60s
 
 zigbee:
   router: true

@@ -84,6 +84,6 @@ Every number for a board of this family is a row in its results file (`data/READ
 
 | Board | Rows | By status |
 |---|--:|---|
-| [cc2340r5](../../../data/results/cc2340r5.csv) | 444 | measured 368, waiting 23, not_supported 15, failed 13, does_not_fit 10, not_run 8, not_applicable 4, computed 3 |
-| [cc2755p10](../../../data/results/cc2755p10.csv) | 279 | measured 264, not_run 6, not_supported 2, not_applicable 2, computed 2, waiting 2, does_not_fit 1 |
+| [cc2340r5](../../../data/results/cc2340r5.csv) | 448 | measured 371, waiting 24, not_supported 15, failed 13, does_not_fit 10, not_run 8, not_applicable 4, computed 3 |
+| [cc2755p10](../../../data/results/cc2755p10.csv) | 285 | measured 270, not_run 6, not_supported 2, not_applicable 2, computed 2, waiting 2, does_not_fit 1 |
 | [cc1354p10](../../../data/results/cc1354p10.csv) | 292 | measured 228, not_run 30, waiting 25, not_supported 6, not_applicable 3 |

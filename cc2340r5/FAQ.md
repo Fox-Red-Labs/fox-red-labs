@@ -481,6 +481,10 @@ The harness started timing 50 ms after boot, and something interrupts once at ab
 
 The line prints TI's default heap size, not the one the image links. That file is compiled without this project's heap setting; the linker map shows the real heap, 25.7 kB (`.bss.ucHeap`). The 41-task result is unaffected.
 
+### The CC2340R5 ESPHome image has about 1.4 kB of heap left. What can you change?
+
+Use `logger: tx_buffer_size: 256` and keep entities few. With the logger, I2C, a PWM light and saved settings the end-device image linked with 1.2 kB of RAM free and ran with 1.4 kB of FreeRTOS heap free (lowest 1.38 kB) over four boots ([E319](../docs/experiments/2026-11-10-esphome-ti-logger.md)). A router does not fit with the logger.
+
 ### Why does an ESPHome or other Zigbee router image fail to link with "run placement with alignment fails for section ".data""?
 
 The image needs more than the chip's 36 kB of RAM. The ESPHome router build needed 37.4 kB, 1.3 kB over. Build it as a Zigbee end device instead (it fit with 4.0 kB left), or shrink ZBOSS's tables in SysConfig (not run). Details: `docs/experiments/2026-10-13-cc2340r5-esphome-fit.md`.

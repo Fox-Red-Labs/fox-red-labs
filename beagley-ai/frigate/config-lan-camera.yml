@@ -1,0 +1,35 @@
+# Frigate 0.18.2 on the BeagleY-AI, detector = the TIDL server in this folder, input = an H.264 RTSP stream from a Mac webcam over the LAN (mediamtx on the Mac, 1280x720 30 fps)
+mqtt:
+  enabled: false
+auth:
+  enabled: false
+detectors:
+  deepstack:
+    type: deepstack
+    api_url: http://127.0.0.1:5100/v1/vision/detection
+    api_timeout: 0.5
+model:
+  width: 416
+  height: 416
+  input_pixel_format: rgb
+cameras:
+  netcam:
+    ffmpeg:
+      inputs:
+        - path: rtsp://<mac-address>:8564/cam
+          input_args: -rtsp_transport tcp -fflags nobuffer -flags low_delay
+          roles:
+            - detect
+    detect:
+      enabled: true
+      width: 1280
+      height: 720
+      fps: 5
+    objects:
+      track:
+        - person
+        - dog
+    record:
+      enabled: false
+    snapshots:
+      enabled: false

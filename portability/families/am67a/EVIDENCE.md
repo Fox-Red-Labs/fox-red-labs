@@ -32,7 +32,7 @@ Cells of `data/support-matrix.json` for this family: the compilers, build routes
 | Group | Row | Status | Note | Evidence |
 |---|---|---|---|---|
 | Ways to build and flash | Terminal, no IDE | Works | Native gcc 13.3 on the board built the portable app in 2.3 s |  |
-| Operating systems | Linux | Works | BeagleBoard Edge AI 11.00.00.08 (Arago, kernel 6.12.33): models on the C7x, hardware video codec, Docker | |
+| Operating systems | Linux | Works | BeagleBoard Edge AI 11.00.00.08 (Arago, kernel 6.12.33): models on the C7x, hardware video codec, Docker | [`beagley-ai/README.md`](../../../beagley-ai/README.md) |
 | Smart home | Home Assistant | Works | Container started on the Arm cores; first HTTP answer at 52.7 s, 531 MB |  |
 
 ## Results files
@@ -41,4 +41,4 @@ Every number for a board of this family is a row in its results file (`data/READ
 
 | Board | Rows | By status |
 |---|--:|---|
-| [beagley-ai](../../../data/results/beagley-ai.csv) | 134 | measured 120, failed 12, not_supported 1, computed 1 |
+| [beagley-ai](../../../data/results/beagley-ai.csv) | 135 | measured 121, failed 12, not_supported 1, computed 1 |
