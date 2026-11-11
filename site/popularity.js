@@ -66,9 +66,9 @@
   // the sort control on the builds page
   var cards = [], sel = null;
   var SCORE = {
-    views: function (s) { return counts[s].views; },
-    flashes: function (s) { return counts[s].flashes; },
-    likes: function (s) { return counts[s].likes; },
+    views: function (s) { return ((counts[s] || {}).views | 0); },
+    flashes: function (s) { return ((counts[s] || {}).flashes | 0); },
+    likes: function (s) { return ((counts[s] || {}).likes | 0); },
     trending: function (s) { return week && week[s] ? week[s].views + 3 * week[s].flashes : 0; }
   };
   function sortNow() {

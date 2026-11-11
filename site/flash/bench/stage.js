@@ -162,3 +162,14 @@ export function usedPins(r, board) {
 export function pinCells(pinout, used) {
   return (pinout ? pinout.pins : []).map((p) => ({ n: p.n, name: p.name, used: used.has(p.name) }));
 }
+
+/** Counts one Digital Lab flash only when a program was really written and the run then passed.
+ *  arm(slug) at the start of a run; wrote() when the write happens; verdict(ok) on every result, which always disarms. */
+export function flashLedger(count) {
+  let slug = null, written = false;
+  return {
+    arm(s) { slug = s || null; written = false; },
+    wrote() { written = true; },
+    verdict(ok) { const s = slug, w = written; slug = null; written = false; if (s && ok && w) { try { count(s); } catch (e) { /* counting is optional */ } } },
+  };
+}

@@ -30,3 +30,16 @@ test("the plan names the board, what is written and what the recovery record say
   const p = planRows("LP-MSPM0L1306", "M3010001", { title: "Blink", bytes: 1234 }, [["Saves", "the flash"]]);
   assert.equal(p[0][0], "Board"); assert.match(p[0][1], /M3010001/); assert.match(p[1][1], /1,234 bytes/); assert.deepEqual(p[2], ["Saves", "the flash"]);
 });
+test("a flash counts once, only after a real write and a pass; every verdict disarms", async () => {
+  const { flashLedger } = await import("../../site/flash/bench/stage.js");
+  const hits = []; const L = flashLedger((s) => hits.push(s));
+  L.arm("blink"); L.wrote(); L.verdict(false);   // a failed flash
+  L.verdict(true);                                 // a later settings pass must not count it
+  assert.deepEqual(hits, []);
+  L.arm("blink"); L.verdict(true);                 // already on the board: nothing written
+  assert.deepEqual(hits, []);
+  L.arm("blink"); L.wrote(); L.verdict(true); L.verdict(true);   // a real write that passes counts once
+  assert.deepEqual(hits, ["blink"]);
+  L.arm(null); L.wrote(); L.verdict(true);         // no build slug: nothing to count
+  assert.deepEqual(hits, ["blink"]);
+});

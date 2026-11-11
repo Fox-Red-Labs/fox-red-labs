@@ -9,7 +9,7 @@ import { createTrail, diagnosticRecord, diagnosticName } from "./diagnostics.js?
 import { listDemos, filterSort, levelName } from "./picker.js";
 import { deviceError, asDeviceError, missingApi } from "./device-errors.js?v=20261024-open";
 import { boardRow, listSummary, autoPick } from "./boards-list.js?v=20261022-auto";
-import { tabState, changeNote, shareLink, reportUrl, aiRows, planRows, paramsClamp, paramsWords, paramsLine, aiCompare, aiCardLine, bestFirst, deeperLinks, estimateText, timeLine, usedPins, pinCells } from "./stage.js?v=20261022-ai2";
+import { tabState, changeNote, shareLink, reportUrl, aiRows, planRows, paramsClamp, paramsWords, paramsLine, aiCompare, aiCardLine, bestFirst, deeperLinks, estimateText, timeLine, usedPins, pinCells, flashLedger } from "./stage.js?v=20261111-fl";
 import { mountOta } from "./ota-ui.js?v=20261022-ai";
 import { terminalText, terminalNote, safeSerial, REPO_WEB } from "./take-home.js?v=20261024-source";
 import { packTable, decodeStatus, expectedToggle, verdict as ctlVerdict, rowsToCfg, rowC, pwmSetup, pwmMatches, pwmRegs, pwmJudge, readAnswers, PIN_SLOT, MAX_READS } from "./controls.js";
@@ -1198,7 +1198,7 @@ function strip(box, levels, color, faded) {
 // extra: {asked: levels the person asked for, askedText, didText, stats: [[value, label], ...]}
 function show(ok, verdict, measured, next, levels, color, extra = {}) {
   resultState(ok ? "pass" : "fail");
-  if (ok && flashArmed) { try { if (window.frlPop) window.frlPop.flash(flashArmed); } catch (e) { /* counting is optional */ } flashArmed = null; }
+  flashLedger_.verdict(ok);   // every verdict disarms; only a pass after a real write counts
   const at = [...$("chips").children].findIndex((li) => li.className !== "done" && li.className !== "skip");
   chipAt(ok ? 4 : Math.max(0, at), ok ? "" : "bad");
   scene(ok ? "pass" : "fail", [null, null, null, null, ok ? "PASS" : "FAIL"]);
@@ -1696,9 +1696,9 @@ async function readSerial(port, baud, seconds, enough) {
 
 // CC27xx: write a program through TI's SACI mailbox (../cc-saci.js). The chip checks the image itself first (CRC32);
 // if it already holds it, nothing is written. Otherwise the page saves the board's flash, then erases and writes.
-let flashArmed = null;   // the build slug of a program write in progress; the first passing result counts one flash (popularity.js)
+const flashLedger_ = flashLedger((slug) => { if (window.frlPop) window.frlPop.flash(slug); });   // counts one flash per program written and then passed (popularity.js)
 async function goCc(r) {
-  flashArmed = r.project || null;
+  flashLedger_.arm(r.project);
   const log = $("log"); log.innerHTML = ""; resultState("run"); $("go").disabled = true;
   const t0 = performance.now(), secs = () => ((performance.now() - t0) / 1000).toFixed(1);
   let t = null, dap = null, sc = null, writing = false, savedBins = false;
@@ -1739,7 +1739,7 @@ async function goCc(r) {
       const say = sayTo(log);
       writing = true;
       await sc.program(img, (p) => say(`Writing main flash ${Math.round(p * 100)}%`));
-      writing = false; wrote = true;
+      writing = false; wrote = true; flashLedger_.wrote();
     }
     const st = await sc.bootAndWait();
     if (r.check.kind === "status" || r.check.kind === "uart") {   // the radio demos: a status block in RAM, or a message on the serial port
@@ -1798,7 +1798,7 @@ async function go() {
   await conClose(); $("c-plan").hidden = true;
   if (thermo.s) { thermoStop(); while (thermo.s) await ui.sleep(50); }   // let the live reader release the debugger first
   if (chosen && (chosen.hex || chosen.check.kind === "ble")) return goCc(chosen);
-  const r = chosen, log = $("log"); log.innerHTML = ""; resultState("run"); flashArmed = r.project || null;
+  const r = chosen, log = $("log"); log.innerHTML = ""; resultState("run"); flashLedger_.arm(r.project);
   phase = "idle"; phaseSaved = false; lost = null; trail.add("run", { demo: r.id, kind: r.check.kind, image: r.sha256 && r.sha256.slice(0, 12) });
   $("go").disabled = true; if (!["ble"].includes(r.check.kind)) estStart(r);
   const t0 = performance.now();
@@ -1818,7 +1818,7 @@ async function go() {
     if (r.check.kind === "loop") {
       const has = await s.m.holds(img.segments);
       if (has) step(log, "The loop program is already on the board: nothing to write");
-      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); writing = false; }
+      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); flashLedger_.wrote(); writing = false; }
       await s.run();
       const addr = n(r.check.addr), magic = n(r.check.magic) >>> 0, tw = performance.now();
       while ((await s.dap.read32(addr)) >>> 0 !== magic) { if (performance.now() - tw > 5000) throw new FlashError("other", "the loop program did not start on the chip", "unplug the board, plug it back in and try again"); await ui.sleep(100); }
@@ -1834,7 +1834,7 @@ async function go() {
     if (r.check.kind === "button" || r.check.kind === "breathe") {
       const has = await s.m.holds(img.segments);
       if (has) step(log, "This program is already on the board: nothing to write");
-      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); writing = false; }
+      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); flashLedger_.wrote(); writing = false; }
       await s.run();
       watchReset(r);
       const say = sayTo(log);
@@ -1857,7 +1857,7 @@ async function go() {
     if (r.check.kind === "digit") {
       const has = await s.m.holds(img.segments);
       if (has) step(log, "The digit reader is already on the board: nothing to write");
-      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); writing = false; }
+      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); flashLedger_.wrote(); writing = false; }
       await s.run();
       const addr = n(r.check.addr), magic = n(r.check.magic) >>> 0;
       step(log, "The chip reads its ten test digits first");
@@ -1876,7 +1876,7 @@ async function go() {
     if (r.check.kind === "occ") {
       const has = await s.m.holds(img.segments);
       if (has) step(log, "The model is already on the board: nothing to write");
-      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); writing = false; }
+      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); flashLedger_.wrote(); writing = false; }
       await s.run();
       const addr = n(r.check.addr), magic = n(r.check.magic) >>> 0;
       step(log, "The chip runs its 20 stored windows first");
@@ -1895,7 +1895,7 @@ async function go() {
     if (r.check.kind === "thermo") {
       const has = await s.m.holds(img.segments);
       if (has) step(log, "The thermometer is already on the board: nothing to write");
-      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); writing = false; }
+      else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); flashLedger_.wrote(); writing = false; }
       await s.run();
       const trim = (await s.dap.read32(n(r.check.trim))) & 0xFFF, cal = thermoTrim(r.check, trim);
       thermo.points = []; thermo.lo = thermo.hi = null;
@@ -1912,7 +1912,7 @@ async function go() {
     if (r.check.kind === "controls") {
       const cfg = ctlRead(r);
       const has = await s.m.holds(img.segments);
-      if (!has) { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); writing = false; }
+      if (!has) { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); flashLedger_.wrote(); writing = false; }
       step(log, "Writing your settings to the board's flash (one sector)");
       writing = true;
       await s.m.writeSector(n(r.table.addr), packTable(r.table, cfg));
@@ -1994,7 +1994,7 @@ async function go() {
         keep(await s.save(), id, log); saved = true;
       }
       writing = true;
-      const sent = await s.sendColors(img, r.table, steps);
+      const sent = await s.sendColors(img, r.table, steps); if (sent.flashed) flashLedger_.wrote();
       await s.run();
       const res = await s.checkColors(r.table, steps);
       const secs = ((performance.now() - t0) / 1000).toFixed(1);
@@ -2011,7 +2011,7 @@ async function go() {
     }
     keep(await s.save(), id, log); saved = true;
     writing = true;
-    const flashMs = await s.flashImage(img);
+    const flashMs = await s.flashImage(img); flashLedger_.wrote();
     await s.run();
     const secs = () => ((performance.now() - t0) / 1000).toFixed(1);
     if (r.check.kind === "oob") {
@@ -2175,7 +2175,7 @@ async function sendParams() {
     ({ s, id } = await openBoard(r, sayTo(log)));
     const has = await s.m.holds(img.segments);
     if (has) step(log, "The program is already on the board: only your settings are written");
-    else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); writing = false; }
+    else { keep(await s.save(), id, log); saved = true; writing = true; await s.flashImage(img); flashLedger_.wrote(); writing = false; }
     step(log, "Writing your settings into the last flash sector");
     writing = true;
     await s.m.writeSector(n(p.addr), paramsWords(p, vals));
