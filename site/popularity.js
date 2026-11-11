@@ -78,7 +78,11 @@
       var cs = [].slice.call(g.querySelectorAll('.pc[data-slug]'));
       cs.sort(function (a, b) {
         var ia = +a.dataset.i, ib = +b.dataset.i;
-        if (mode === 'new') return ia - ib;
+        if (mode === 'new') {   // Newest: first recorded run, undated last, ties in shelf order
+          var da = a.dataset.date || '', db = b.dataset.date || '';
+          if (da !== db) return !da ? 1 : !db ? -1 : da < db ? 1 : -1;
+          return ia - ib;
+        }
         var d = SCORE[mode](b.dataset.slug) - SCORE[mode](a.dataset.slug);
         return d || ia - ib;
       });

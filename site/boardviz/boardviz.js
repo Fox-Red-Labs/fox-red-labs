@@ -666,12 +666,60 @@ export function mountAll() {
     if (!webglOk()) { el.classList.add("bviz-nogl"); continue; }
     const data = JSON.parse(src.textContent);
     const card = el.parentElement.querySelector(".bviz-card");
-    const viz = new BoardViz(el, data, { onSelect: d => { if (!card) return; if (!d) { card.hidden = true; return; } card.hidden = false; card.textContent = ""; const b = document.createElement("b"); b.textContent = d.title; card.appendChild(b); if (d.text) { const q = document.createElement("p"); q.textContent = d.text; card.appendChild(q); } } });
+    const viz = new BoardViz(el, data, { showLabels: false, onSelect: d => { if (!card) return; if (!d) { card.hidden = true; return; } card.hidden = false; card.textContent = ""; const b = document.createElement("b"); b.textContent = d.title; card.appendChild(b); if (d.text) { const q = document.createElement("p"); q.textContent = d.text; card.appendChild(q); } } });
     const photo = el.parentElement.querySelector(".bviz-photo");
     el.parentElement.querySelectorAll("[data-bviz]").forEach(b => b.addEventListener("click", () => {
       const a = b.dataset.bviz; if (a === "reset") viz.resetView(); if (a === "top") viz.topView();
       if (a === "photo" && photo) { const show = photo.hidden; photo.hidden = !show; el.hidden = show; b.textContent = show ? "Drawing" : "Photo"; if (!show) viz.resize(); }
     }));
     el.bviz = viz;
+    numberDots(el, viz, data);
   }
+}
+
+// Numbered black dots on the key parts, one tooltip on hover or tap, the key under the picture (the same dots as the home page and the project heroes).
+// A part is numbered when its drawing entry has id, key and label.
+function numberDots(el, viz, data) {
+  const co = (data.parts || []).filter(p => p.id && p.key && p.label).map(p => [p.id, p.label]);
+  if (!co.length) return;
+  const NS = "http://www.w3.org/2000/svg", wrap = el.parentElement;
+  const svg = document.createElementNS(NS, "svg"), tip = document.createElement("div");
+  svg.setAttribute("class", "bviz-dots"); svg.setAttribute("aria-label", "Numbered points on the board; tap one for its name"); tip.className = "bviz-tip"; tip.hidden = true;
+  wrap.appendChild(svg); wrap.appendChild(tip);
+  const mk = (t, c, x) => { const e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; };
+  const line = mk("div"); co.forEach((c, i) => { const s = mk("span"); s.appendChild(mk("b", "", String(i + 1))); s.appendChild(document.createTextNode(" " + c[1])); line.appendChild(s); });
+  const box = mk("div", "bviz-legend-box");
+  if (matchMedia("(max-width: 640px)").matches) { const d = mk("details", "bviz-legend"), sm = mk("summary", "", "Numbers on the board (" + co.length + ")"); d.appendChild(sm); d.appendChild(line); box.appendChild(d); }
+  else { line.className = "bviz-legend"; box.appendChild(line); }
+  el.insertAdjacentElement("afterend", box);
+  let tipI = -1, sig = "";
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function showTip(i, x, y) {
+    tipI = i; if (i < 0) { tip.hidden = true; return; }
+    tip.innerHTML = "<b>" + (i + 1) + "</b>" + esc(co[i][1]); tip.hidden = false;
+    const W = el.clientWidth, w = tip.offsetWidth; let left = x + 16; if (left + w > W - 8) left = Math.max(8, x - 16 - w);
+    tip.style.left = left + "px"; tip.style.top = Math.max(8, y - 14) + "px";
+  }
+  function layout() {
+    box.hidden = el.hidden;
+    if (el.hidden) { svg.style.display = "none"; tip.hidden = true; tipI = -1; return; }
+    svg.style.display = "";
+    if (!viz.size || !viz.size.w) return;
+    const W = viz.size.w, H = viz.size.h, R = W >= 640 ? 11 : 12, pts = [];
+    co.forEach(([id], i) => { const g = viz.byId[id]; if (!g) return; const p = viz.toScreen(viz.worldOf(g)); pts.push({ i, x: p.x, y: p.y }); });
+    const s2 = [W, H, tipI, ...pts.map(p => Math.round(p.x) + "," + Math.round(p.y))].join("|"); if (s2 === sig) return; sig = s2;
+    svg.style.width = W + "px"; svg.style.height = H + "px"; tip.style.maxWidth = Math.min(240, W - 16) + "px";
+    let h = ""; pts.forEach(p => { h += '<g class="dg" data-i="' + p.i + '" role="button" tabindex="0" aria-label="' + (p.i + 1) + " " + esc(co[p.i][1]) + '"><circle cx="' + p.x + '" cy="' + p.y + '" r="' + (R + 8) + '" class="hit"/><circle cx="' + p.x + '" cy="' + p.y + '" r="' + R + '" class="dt' + (p.i === tipI ? " on" : "") + '"/><text x="' + p.x + '" y="' + (p.y + 4) + '" class="dn">' + (p.i + 1) + "</text></g>"; });
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H); svg.innerHTML = h;
+    if (tipI >= 0) { const q = pts.find(z => z.i === tipI); if (q) showTip(tipI, q.x, q.y); }
+  }
+  const at = g => { const c = g.querySelector(".dt"); showTip(+g.dataset.i, +c.getAttribute("cx"), +c.getAttribute("cy")); sig = ""; };
+  const off = () => { showTip(-1); sig = ""; };
+  const flip = g => { if (+g.dataset.i === tipI) off(); else at(g); };
+  svg.addEventListener("click", e => { const g = e.target.closest(".dg"); if (g) { viz.select(null); flip(g); } });
+  svg.addEventListener("mouseover", e => { const g = e.target.closest(".dg"); if (g && +g.dataset.i !== tipI && matchMedia("(hover: hover)").matches) at(g); });
+  svg.addEventListener("mouseout", e => { if (e.target.closest(".dg") && matchMedia("(hover: hover)").matches) off(); });
+  svg.addEventListener("keydown", e => { if (e.key !== "Enter" && e.key !== " ") return; const g = e.target.closest(".dg"); if (g) { e.preventDefault(); flip(g); } });
+  el.addEventListener("pointerdown", () => { if (tipI >= 0) off(); });
+  (function go() { layout(); requestAnimationFrame(go); })();
 }

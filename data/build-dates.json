@@ -1,0 +1,142 @@
+{
+ "arcade": {
+  "date": "2026-10-20",
+  "from": "ports/peanut-gb/README.md"
+ },
+ "arduino": {
+  "date": "2026-10-07",
+  "from": "portability/arduino/README.md"
+ },
+ "audio-boosterpack": {
+  "date": "2026-10-20",
+  "from": "portability/boosterpacks/audio/results/am13e230-20261020/console-run3.log"
+ },
+ "battery-sensor-home-assistant": {
+  "date": "2026-10-07",
+  "from": "cc1354p10/zigbee-sleepy-sensor/README.md"
+ },
+ "bldc-spin": {
+  "date": "2026-10-17",
+  "from": "am13e230/foc-drv8376/results/sensorless-20261017/README.md"
+ },
+ "ble-gamepad": {
+  "date": "2026-10-20",
+  "from": "ports/esp32-ble-gamepad/runs/2026-10-20/live-buttons-mac-hid.txt"
+ },
+ "blink": {
+  "date": "2026-10-06",
+  "from": "c2000-launchpad/README.md"
+ },
+ "build-from-terminal": {
+  "date": "2026-10-06",
+  "from": "c2000-launchpad/README.md"
+ },
+ "codecs": {
+  "date": "2026-10-08",
+  "from": "data/results/am13e230.csv"
+ },
+ "dns-ad-blocker": {
+  "date": "2026-10-20",
+  "from": "ports/dns-sinkhole/README.md"
+ },
+ "doom": {
+  "date": "2026-10-21",
+  "from": "ports/doom/m33-whx/RESULTS-ROWS-wave5.csv"
+ },
+ "esphome": {
+  "date": "2026-10-13",
+  "from": "docs/experiments/2026-10-13-esphome-cc27xx-platform.md"
+ },
+ "handwritten-digits": {
+  "date": "2026-10-06",
+  "from": "data/results/cc2340r5.csv"
+ },
+ "jack-o-lantern-jukebox": {
+  "date": "2026-10-25",
+  "from": "portability/boosterpacks/audio/halloween/README.md"
+ },
+ "linux-vision": {
+  "date": "2026-10-10",
+  "from": "tda4/RESULTS-tda4.md"
+ },
+ "matter-device": {
+  "date": "2026-10-09",
+  "from": "cc35x1/matter/WALKTHROUGH.md"
+ },
+ "micropython": {
+  "date": "2026-10-20",
+  "from": "ports/micropython/README.md"
+ },
+ "ota-update": {
+  "date": "2026-10-08",
+  "from": "data/results/cc35x1.csv"
+ },
+ "post-quantum": {
+  "date": "2026-10-08",
+  "from": "cc1354p10/pqc-join/README.md"
+ },
+ "print-a-message": {
+  "date": "2026-10-06",
+  "from": "data/results/f2800137.csv"
+ },
+ "radar-presence": {
+  "date": "2026-10-10",
+  "from": "docs/experiments/2026-10-10-radar-antenna-eval.md"
+ },
+ "reaction-time": {
+  "date": "2026-10-06",
+  "from": "c2000-launchpad/bench/RESULTS.md"
+ },
+ "run-freertos": {
+  "date": "2026-10-06",
+  "from": "data/results/cc1354p10.csv"
+ },
+ "run-zephyr": {
+  "date": "2026-10-08",
+  "from": "data/results/am13e230.csv"
+ },
+ "small-ai-model": {
+  "date": "2026-10-06",
+  "from": "data/results/cc2340r5.csv"
+ },
+ "small-screen": {
+  "date": "2026-10-27",
+  "from": "mspm0g3507/display-test/README.md"
+ },
+ "sparky-voice-assistant": {
+  "date": "2026-10-08",
+  "from": "data/results/cc35x1.csv"
+ },
+ "speed-test": {
+  "date": "2026-10-06",
+  "from": "cc1354p10/baremetal/README.md"
+ },
+ "sub-ghz-demos": {
+  "date": "2026-10-11",
+  "from": "cc1354p10/radio-rx/README.md"
+ },
+ "sub-ghz-link": {
+  "date": "2026-10-10",
+  "from": "mspm0g5187/radio/README.md"
+ },
+ "thread-device": {
+  "date": "2026-10-06",
+  "from": "cc1354p10/thread/README.md"
+ },
+ "tool-telemetry": {
+  "date": "2026-10-09",
+  "from": "data/results/cc2755p10.csv"
+ },
+ "ulisp": {
+  "date": "2026-10-21",
+  "from": "ports/ulisp/README.md"
+ },
+ "walkie-talkies": {
+  "date": "2026-10-11",
+  "from": "docs/experiments/2026-10-11-subghz-end-user-demos.md"
+ },
+ "zigbee-light": {
+  "date": "2026-10-09",
+  "from": "data/results/cc2755p10.csv"
+ }
+}

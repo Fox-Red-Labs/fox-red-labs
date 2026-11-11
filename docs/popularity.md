@@ -27,7 +27,9 @@ The browser keeps the slugs you hearted in `localStorage` (`frl-liked`) so the h
 
 Nothing, until the worker answers. Hearts and the sort control are in the HTML with the `hidden` attribute and `popularity.js` reveals them after `GET /counts` succeeds. The sort control stays hidden while every count is zero, so the first day shows no numbers; there are none seeded. The count beside a heart is hidden while it is zero. If the worker is down the page looks as it did before; the browser may still log one failed network request, which a script cannot suppress.
 
-Sorts: Default (the page's own order), Most viewed, Most flashed, Most liked, Trending (7 days). They reorder cards inside each subject shelf.
+Sorts: Newest, Most viewed, Most flashed, Most liked, Trending (7 days). They reorder cards inside each subject shelf. The page itself loads in shelf order; Newest only applies when the reader picks it.
+
+Newest reads `data-date` on each card: the build's first recorded run, derived by `tools/build_dates.py` into `data/build-dates.json` (`{slug: {date, from}}`). For each cell (and `also` cell) of the build whose evidence kind is a run (`tools/site_ui.py` `evidence()`), it takes the date of the commit that first added the cell's `source` file; the earliest wins and `from` names that file. A build with no run cell has no date and sorts last. Ties keep shelf order. `python3 tools/build_dates.py --check` fails when the file is stale (run by `site_check.py`); it needs full git history.
 
 Counts come from a 60-second edge cache, so another person's like can take up to a minute to show. Your own tap updates the page at once from the worker's reply. KV has no atomic add, so two writes in the same instant can lose one count; at this traffic that does not matter.
 

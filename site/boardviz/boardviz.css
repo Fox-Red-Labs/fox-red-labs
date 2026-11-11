@@ -66,3 +66,15 @@
 .bviz-print img { width: 100%; height: auto; border: 1px solid #e3e0d6; border-radius: 6px; background: #fbfaf6; }
 .bviz-print figcaption { font-size: 14px; color: #6b6a66; margin-top: 6px; }
 .bviz-pinlab { position: absolute; transform: translate(7px, -125%); font: 700 10px/12px var(--frl-font, Barlow, sans-serif); color: #161312; background: rgba(255, 255, 255, .9); border: 1px solid #161312; border-radius: 3px; padding: 0 3px; white-space: nowrap; pointer-events: none; }
+
+/* numbered dots on the board hero: names on hover or tap, the key under the picture (same look as the home page) */
+.bviz-dots { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 2; }
+.bviz-dots .dg { pointer-events: all; cursor: pointer; outline: none; } .bviz-dots .hit { fill: transparent; }
+.bviz-dots .dt { fill: #161312; stroke: #fff; stroke-width: 2; } .bviz-dots .dt.on { fill: #a8101a; }
+.bviz-dots .dg:focus-visible .dt { stroke: #a8101a; stroke-width: 3; }
+.bviz-dots .dn { fill: #fff; font: 700 11px var(--frl-font, Barlow, sans-serif); text-anchor: middle; pointer-events: none; }
+.bviz-tip { position: absolute; z-index: 5; max-width: 240px; pointer-events: none; background: #161312; color: #f7f3ec; font: 600 14px/18px var(--frl-font, Barlow, sans-serif); padding: 5px 10px; border-radius: 7px; display: flex; gap: 7px; align-items: baseline; }
+.bviz-tip[hidden] { display: none; } .bviz-tip b { font-size: 12px; color: #161312; background: #f7f3ec; border-radius: 50%; min-width: 18px; height: 18px; line-height: 18px; text-align: center; flex: none; }
+.bviz-legend { margin: 8px 0 0; font: 400 13px/18px var(--frl-font, Barlow, sans-serif); color: var(--frl-stone, #6B625B); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bviz-legend b { font-weight: 600; color: #161312; margin-right: 3px; } .bviz-legend span { margin-right: 12px; }
+details.bviz-legend { white-space: normal; } details.bviz-legend summary { cursor: pointer; } details.bviz-legend div { margin-top: 4px; line-height: 20px; } details.bviz-legend div span { display: inline-block; }
