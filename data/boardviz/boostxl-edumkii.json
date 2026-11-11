@@ -1,5 +1,5 @@
 {
- "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up (the user-guide picture, pin 1 at the top left), rot in degrees counterclockwise. The two socket parts j1 and j2 sit underneath (side bottom) at the same pitch as the LaunchPad kit's j1 and j2, so a scene can mate them. Parts of type lcd, joystick, tact, buzzer, mic and rgbled are drawn in site/boardviz/boardviz.js.",
+ "_about": "Drawn 3D board for site/boardviz (docs/how-to-contribute.md, Add a board drawing). Millimeters from the board's bottom-left corner, x right, y up (the user-guide picture, pin 1 at the top left), rot in degrees counterclockwise. The two socket parts j1 and j2 sit underneath (side bottom) at the same pitch as the LaunchPad kit's j1 and j2, so a scene can mate them. Parts of type lcd, joystick, tact, buzzer, mic and rgbled are drawn in site/boardviz/boardviz.js.",
  "board": "BOOSTXL-EDUMKII",
  "id": "boostxl-edumkii",
  "source": "Positions read from the board picture in the BoosterPack's user guide (SLAU599, figure 1-1); scale set from the 2.54 mm header pitch. Pin names from the user guide's header tables.",

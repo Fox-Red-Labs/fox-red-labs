@@ -34,7 +34,7 @@ Every project and board page links the three forms prefilled with that page's bo
 
 ## Send a change by pull request
 
-Fork the repository, make a branch, change the source, run `python3 tools/site_build.py` to rebuild the pages (a sparse clone needs `git sparse-checkout add tools data site` first, or clone without `--sparse`), commit with a sign-off (`git commit -s`, see [Sign-off](#sign-off)), and open a pull request. Say in the pull request which board you ran it on and which version. The sections below say what to change for each kind of work.
+Fork the repository, make a branch, change the source (a data file, a Markdown page or code), commit with a sign-off (`git commit -s`, see [Sign-off](#sign-off)), and open a pull request. Say in the pull request which board you ran it on and which version. The sections below say what to change for each kind of work. Leave the pages under `site/` as they are: they are rebuilt from the sources when your change is taken in.
 
 The public repository is a copy built from a private lab notebook (`.export-source` names the commit), and each update lands as one commit. A merged pull request is applied to the notebook under your name and sign-off, so the next copy carries it. A fork takes an update by rebasing on the newest copy.
 
@@ -42,7 +42,7 @@ A port that changes another project's code (a Zephyr board, an ESPHome platform,
 
 ## Fix a page
 
-Every site page is generated from a data file or a Markdown page; the HTML is never edited by hand. Change the source named at the bottom of the page ("Where these facts come from"), run the renderer it names in `tools/`, then `python3 tools/content_lint.py <file>` and `python3 tools/site_check.py`. The writing rules are in `docs/writing-for-ai-search.md`: lead with the answer, exact errors in backticks, versions and dates, which machine, no marketing words.
+Every site page is generated from a data file or a Markdown page; the HTML is never edited by hand. Change the source named at the bottom of the page ("Where these facts come from") and send that; the page is rebuilt from it. The writing rules are in `docs/writing-for-ai-search.md`: lead with the answer, exact errors in backticks, versions and dates, which machine, no marketing words.
 
 ## Add a number
 
@@ -54,11 +54,24 @@ Each board folder has an `AGENTS.md`, the file a reader copies into their own pr
 
 ## Add a board
 
-A folder named by its id in `data/boards.csv`, with a `README.md` in the order of readme-standard.md, an `AGENTS.md` where every line cites a run, a `FAQ.md` with exact error text, and rows in `data/results/<id>.csv`. A file a second board would copy unchanged goes in `portability/` or `third-party/`. `python3 tools/readme_check.py` checks the README.
+A folder named by its id in `data/boards.csv`, with a `README.md` in the order of readme-standard.md, an `AGENTS.md` where every line cites a run, a `FAQ.md` with exact error text, and rows in `data/results/<id>.csv`. A file a second board would copy unchanged goes in `portability/` or `third-party/`.
+
+## Add a board drawing
+
+A board page opens with a drawn 3D picture of the board when `data/boardviz/<id>.json` exists. The picture is a table of parts in millimeters, taken from the top-down drawing in the kit's user guide; nothing is modelled in a 3D program.
+
+1. Copy the table of a board with a similar shape (`data/boardviz/mspm0g3507.json` for a LaunchPad kit, `data/boardviz/beagley-ai.json` for a Linux board). Name the file by the board's id and set `id` to the same word, `board` to the board's name, and `source` to the drawing or photo the positions came from.
+2. Set `size` to the board's width and height in millimeters and `holes` to the mounting holes (x, y, diameter), then place the parts. Positions are in millimeters from the bottom-left corner, x to the right, y up, `rot` in degrees counterclockwise. A part with an `id` needs a `label`, a `title` and one line of `text`; `key: true` shows the label without a tap. A header carries its silkscreen pin names.
+   The part types: `qfp`, `qfn`, `soic`, `sop`, `tssop`, `sot23`, `sot223`, `chip` (a two-pad part), `led`, `rgbled`, `crystal`, `xtalbox`, `tantalum`, `bigcap`, `header`, `femaleheader`, `ringheader`, `boxheader`, `fpc`, `hdconn`, `jumper2`, `button`, `tact`, `slideswitch`, `dipswitch`, `microusb`, `usbc`, `usbplug`, `barrel`, `jack35`, `sma`, `terminal`, `standoff`, `ring`, `glass` and `lcd` (screens), `buzzer`, `speaker`, `mic`. Draw a part the list lacks (a card cage, a shield can, an Ethernet jack) as a `block` with `w`, `h` and `d`, and name it in `source`.
+3. `python3 tools/boardviz/pads_from_drawing.py <drawing.png> --crop x0 y0 x1 y1 --scale <pixels per mm> --out parts.json` finds the small two-pad parts from the drawing (it needs `numpy` and `Pillow`). Paste its output in as the table's `decor`.
+4. Look at it: run `python3 -m http.server 8000` in the repository's top folder and open `http://localhost:8000/tools/boardviz/dev.html?board=<id>`. Reload after each change. For an animated build in `data/boardviz/scenes/`, open `tools/boardviz/dev-scene.html?scene=<name>` the same way.
+5. `python3 tools/boardviz/check.py` must print OK. It checks part types, that every part sits on the board, and that the id is a board with a results file or a part in `data/parts.json`. For a board this repository does not hold, the check names that one problem: send the drawing anyway and say so in the pull request.
+
+Say in the pull request which drawing or photo the positions came from. Use the public user guide or your own photo, never design files.
 
 ## Add a demo
 
-Upstream code goes into `third-party/<project>/` with its `SOURCE.md`. Your own code goes into `ports/<project>/`; a port of another project keeps that project's license in its folder and says what was changed. Numbers go in as result rows in `data/results/<board>.csv`. Add an entry in `site/data/ports.json` or `site/data/projects.json`, then run `python3 tools/site_build.py` and open a pull request as described above.
+Upstream code goes into `third-party/<project>/` with its `SOURCE.md`. Your own code goes into `ports/<project>/`; a port of another project keeps that project's license in its folder and says what was changed. Numbers go in as result rows in `data/results/<board>.csv`. Add an entry in `site/data/ports.json` or `site/data/projects.json` and open a pull request as described above.
 
 ## Rules this repo follows
 

@@ -1,5 +1,5 @@
 {
- "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts found by tools/boardviz/pads_from_drawing.py, drawn but never labelled.",
+ "_about": "Drawn 3D board for site/boardviz (docs/how-to-contribute.md, Add a board drawing). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm, pins named top row first, left column first; pins with names become tap targets. decor: two-pad parts found by tools/boardviz/pads_from_drawing.py, drawn but never labelled.",
  "board": "DRV8376EVM",
  "id": "drv8376evm",
  "source": "Positions read from the board drawing in the module's user guide (SLVUD20, figure 2-1), scale set from the 2.54 mm pitch of the two LaunchPad sockets.",

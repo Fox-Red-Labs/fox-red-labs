@@ -1,0 +1,15 @@
+<!doctype html><meta charset="utf-8"><title>boardviz dev</title>
+<link rel="stylesheet" href="../../site/boardviz/boardviz.css">
+<style>body{margin:0;padding:20px;font-family:Barlow,sans-serif;background:#FAFAF7} .bviz{height:760px}</style>
+<div class="bviz-wrap"><div class="bviz" id="v"></div>
+<div class="bviz-tools"><button data-bviz="reset">Reset view</button><button data-bviz="top">Top view</button><span>Drag to turn, scroll to zoom, right-drag to pan. Tap a part.</span></div>
+<div class="bviz-card" hidden></div></div>
+<script type="module">
+import { mountAll } from "../../site/boardviz/boardviz.js";
+const q = new URLSearchParams(location.search); const board = q.get("board") || "mspm0g3507";
+const data = await (await fetch("../../data/boardviz/" + board + ".json")).json();
+const s = document.createElement("script"); s.type = "application/json"; s.id = "bviz-" + board; s.textContent = JSON.stringify(data); document.body.appendChild(s);
+document.getElementById("v").dataset.board = board; mountAll();
+if (q.get("az")) { const v = document.getElementById("v").bviz; v.view.azimuth = +q.get("az"); v.view.elevation = +(q.get("el") || 0.95); v.view.zoom = +(q.get("z") || 1); v.dirty = true; }
+window.vizReady = true;
+</script>

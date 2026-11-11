@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>boardviz scene dev</title>
+<link rel="stylesheet" href="../../site/boardviz/boardviz.css">
+<style>body{margin:0;padding:20px;font-family:Barlow,sans-serif;background:#FAFAF7}</style>
+<div class="bviz-scene bviz-scene-grid" id="w"><div><div class="bviz"></div>
+<div class="bviz-tools"><button data-bviz="play">Play</button><div class="bviz-bar" title="Drag to any step"></div><label class="bviz-speed">Speed <select data-bviz-speed><option value="0.5">0.5x</option><option value="1" selected>1x</option><option value="2">2x</option><option value="4">4x</option></select></label><button data-bviz="top">Pin view</button><button data-bviz="reset">Reset view</button><span>Drag the bar to a step and let go to stop there; Play continues from it. Drag the picture to turn, scroll to zoom. Pin view looks straight down at the step. Tap a step, a part or a pin.</span></div>
+<div class="bviz-card" hidden></div></div><ol class="bviz-steps" id="steps"></ol></div>
+<script type="module">
+import { mountScenes } from "../../site/boardviz/scene.js";
+const q = new URLSearchParams(location.search); const id = q.get("scene") || "bldc-spin";
+const scene = await (await fetch("../../data/boardviz/scenes/" + id + ".json")).json();
+const add = (sid, data) => { const s = document.createElement("script"); s.type = "application/json"; s.id = sid; s.textContent = JSON.stringify(data); document.body.appendChild(s); };
+add("bviz-scene-" + id, scene);
+for (const b of [scene.base, ...(scene.boards || []).map(x => x.id)]) add("bviz-" + b, await (await fetch("../../data/boardviz/" + b + ".json")).json());
+document.getElementById("steps").innerHTML = scene.steps.map((s, i) => `<li><i>${i + 1}</i><span>${s.title}<small>${s.text}</small></span></li>`).join("");
+const w = document.getElementById("w"); w.dataset.scene = id; if (q.get("step")) w.dataset.step = q.get("step"); mountScenes();
+if (q.get("nospin")) { await w.ready; w.sceneViz.spinning.clear(); w.sceneViz.flowing.clear(); w.sceneViz.viz.dirty = true; }   // nospin: a still frame for headless screenshots
+if (q.get("top")) { await w.ready; w.sceneViz.viz.topView(); }
+</script>

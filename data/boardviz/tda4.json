@@ -1,5 +1,5 @@
 {
- "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm. Parts a picture does not show are left out.",
+ "_about": "Drawn 3D board for site/boardviz (docs/how-to-contribute.md, Add a board drawing). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. parts: the hand-placed parts, each with a type the part library knows; a part with an id can carry a label and text shown when tapped. headers: cols x rows at 2.54 mm. Parts a picture does not show are left out.",
  "board": "SK-TDA4VM",
  "id": "tda4",
  "source": "Positions read from the top-side bench photo tda4/img/tda4-top.jpg, scale set from the 2.54 mm pitch of the 40-pin expansion header (20 rows). The board outline (99 x 110 mm) is measured off that photo, not taken from a drawing; positions are good to about 2 mm. Connector counts from docs/arrivals/tda4.md (TI's SK-TDA4VM user's guide). Chips that the photo shows but no document names are drawn without a label. Parts the photo does not show are left out.",

@@ -1,5 +1,5 @@
 {
- "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up. A BoosterPack: j1 and j2 are the sockets that press onto a LaunchPad kit's J1/J3 and J4/J2 headers; t1 and t2 are the stack-through pins on top with the pack's own signal names.",
+ "_about": "Drawn 3D board for site/boardviz (docs/how-to-contribute.md, Add a board drawing). Millimeters from the board's bottom-left corner, x right, y up. A BoosterPack: j1 and j2 are the sockets that press onto a LaunchPad kit's J1/J3 and J4/J2 headers; t1 and t2 are the stack-through pins on top with the pack's own signal names.",
  "board": "BOOSTXL-AUDIO",
  "id": "boostxl-audio",
  "source": "Positions read from the photo in the kit's user guide (SLAU670A, figure 1). The photo has no scale: the header pitch sets millimeters. Pin names from the user guide text and the board's silkscreen.",

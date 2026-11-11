@@ -127,9 +127,11 @@ The guided tools refuse a board they have no notes for (`frl identify` returns `
 
 ## Add a board or a demo
 
-**A board:** a folder named by its id in `data/boards.csv`, with a `README.md` in the order of docs/readme-standard.md, an `AGENTS.md` where every line cites a run, a `FAQ.md` with exact error text, and rows in `data/results/<id>.csv`. A file a second board would copy unchanged goes in `portability/` or `third-party/`. `python3 tools/readme_check.py` checks the README.
+**A board:** a folder named by its id in `data/boards.csv`, with a `README.md` in the order of docs/readme-standard.md, an `AGENTS.md` where every line cites a run, a `FAQ.md` with exact error text, and rows in `data/results/<id>.csv`. A file a second board would copy unchanged goes in `portability/` or `third-party/`.
 
-**A demo or port:** upstream code into `third-party/<project>/` with its `SOURCE.md`, your code into `ports/<project>/`, numbers as result rows, and an entry in `site/data/ports.json` or `site/data/projects.json`. `python3 tools/site_build.py` (a sparse clone needs `git sparse-checkout add tools data site` first) regenerates the pages; `python3 tools/site_build.py links` lists any link or anchor that points nowhere. Reports from your own board go through the issue forms in [docs/how-to-contribute.md](docs/how-to-contribute.md).
+**A board drawing:** the 3D picture on a board page is a table of parts in `data/boardviz/<id>.json`. `python3 tools/boardviz/check.py` checks it, and `tools/boardviz/dev.html?board=<id>` shows it from a local server ([docs/how-to-contribute.md](docs/how-to-contribute.md#add-a-board-drawing)).
+
+**A demo or port:** upstream code into `third-party/<project>/` with its `SOURCE.md`, your code into `ports/<project>/`, numbers as result rows, and an entry in `site/data/ports.json` or `site/data/projects.json`. The pages under `site/` are rebuilt from those sources when the change is taken in. Reports from your own board go through the issue forms in [docs/how-to-contribute.md](docs/how-to-contribute.md).
 
 ## Traps
 

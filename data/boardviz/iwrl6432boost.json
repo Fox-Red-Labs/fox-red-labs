@@ -1,5 +1,5 @@
 {
- "_about": "Drawn 3D board for site/boardviz (tools/boardviz/README.md). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. The USB port is on the top edge and the antenna side is the left, as in the bench photo. Types added for this board: patcharray (antenna window with patches), dipswitch (sliders that move), sop, hdconn, barrel.",
+ "_about": "Drawn 3D board for site/boardviz (docs/how-to-contribute.md, Add a board drawing). Millimeters from the board's bottom-left corner, x right, y up, rot in degrees counterclockwise. The USB port is on the top edge and the antenna side is the left, as in the bench photo. Types added for this board: patcharray (antenna window with patches), dipswitch (sliders that move), sop, hdconn, barrel.",
  "board": "IWRL6432BOOST",
  "id": "iwrl6432boost",
  "source": "Positions read from the bench photos of the board (top and back) and the layout figure in TI's EVM user guide, scale set from the 2.54 mm header pitch and the micro-USB shell width. Millimeters are approximate (about half a millimeter). The debug probe chip sits on the back and is not drawn.",
