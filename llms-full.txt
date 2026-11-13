@@ -82,6 +82,25 @@ Keep the application in a file with no device header. Put the board in a thin gl
 
 Each build is one file in `docs/builds/` (start with [docs/builds/blink.md](docs/builds/blink.md); the list is [docs/builds/README.md](docs/builds/README.md)): parts, pin table and steps, one section per board, each opening with the `git sparse-checkout add` line its steps need. A board is marked tested with this setup, expected to work, needs adaptation or not assessed. The web pages are `site/projects.html`; which build ran where is `site/portability.html#builds`.
 
+### Find it by what you are looking for
+
+| Looking for | Start here |
+|---|---|
+| BLDC motor control on a microcontroller: six-step (trapezoidal) on Hall sensors, Hall FOC, sensorless FOC | [am13e230/bldc-drv8376](am13e230/bldc-drv8376/README.md), [am13e230/foc-drv8376](am13e230/foc-drv8376/README.md) (LP-AM13E230 with the DRV8376EVM); build page [docs/builds/bldc-spin.md](docs/builds/bldc-spin.md) |
+| SimpleFOC, or a motor-control core that moves between chips | [ports/simplefoc](ports/simplefoc/README.md), [portability/motor](portability/motor/README.md) |
+| Arduino libraries and sketches on MSPM0 | [portability/arduino](portability/arduino/README.md) |
+| MicroPython on MSPM0 | [ports/micropython](ports/micropython/README.md) |
+| ESPHome and Home Assistant on TI radio chips | [ports/esphome-ti](ports/esphome-ti/README.md) |
+| Zephyr on MSPM0 and TI radio chips | [portability/zephyr-mspm0](portability/zephyr-mspm0/README.md), [mspm0g3507/zephyr](mspm0g3507/zephyr/README.md), [cc2340r5/zephyr](cc2340r5/zephyr/README.md) |
+| Rust on MSPM0 | [ports/rust-mspm0](ports/rust-mspm0/README.md) |
+| Moving STM32 code to a TI microcontroller | [am13e230/stm32g4-hal](am13e230/stm32g4-hal/README.md) (STM32G4 HAL code), [ports/stm32-bootloader](ports/stm32-bootloader/README.md), [ports/stm32-usart-dma-rx-tx](ports/stm32-usart-dma-rx-tx/README.md) |
+| Moving Raspberry Pi Pico SDK code to MSPM0 | [ports/pico-sdk](ports/pico-sdk/README.md), [portability/pico-on-mspm0](portability/pico-on-mspm0/README.md) |
+| Moving Renesas FSP code to MSPM0 | [ports/renesas-ra-fsp](ports/renesas-ra-fsp/README.md), [portability/fsp-on-mspm0](portability/fsp-on-mspm0/README.md) |
+| Moving an MSP430 project to MSPM0 | [ports/msp430-to-mspm0](ports/msp430-to-mspm0/README.md) |
+| ESP32 or Nordic nRF Bluetooth code on a TI CC2340R5 | [ports/esp32-ble-gamepad](ports/esp32-ble-gamepad/README.md), [ports/nordic-apps](ports/nordic-apps/README.md) |
+| Porting between TI families (MSPM0, MSPM33, AM13, C2000, radio, Wi-Fi) | [portability/families](portability/families/README.md) |
+| Measured numbers: CoreMark, interrupt latency, sleep current | `data/results/*.csv`, section below |
+
 ## Measured numbers, and how to read them
 
 Every measured number is a row in `data/results/<board>.csv`: test, conditions, run count, date, the `source` file and how it was `checked`. A test that could not run is a row too, with a status (`not_run`, `does_not_fit`, `not_supported`, `waiting`, `failed`) and the reason. Timings are medians of three runs. Columns: [data/README.md](data/README.md). The suite of 385 tests: `data/benchmark-suite.json`.

@@ -6,7 +6,7 @@ Terms: [docs/vocab.md](docs/vocab.md). Errors seen on more than one board: [TRAP
 
 **Built it on your kit?** Post it in [Show and tell](https://github.com/Fox-Red-Labs/fox-red-labs/discussions/categories/show-and-tell) with its four parts: what you built or ported, what it runs on, a photo or a clip, and anything that did not work. [How to post](#how-to-post-what-you-built).
 
-Last activity: 2026-11-11.
+Last activity: 2026-11-12.
 
 ## Quick start: a changed blink in about ten minutes
 

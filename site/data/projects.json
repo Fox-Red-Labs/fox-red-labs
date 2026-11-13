@@ -8595,6 +8595,7 @@
     }
    },
    "slug": "speed-test",
+   "search_title": "CoreMark on TI MSPM0L1306 and CC2340R5: measure a microcontroller's speed",
    "tier": "medium",
    "what": "CoreMark and the rest of the suite, the same source on every board, by compiler and operating system.",
    "time": "85 s to rerun; tools need 12 GB free, once",
@@ -9187,6 +9188,7 @@
     }
    },
    "slug": "reaction-time",
+   "search_title": "Interrupt latency on TI MSPM0L1306 and CC2340R5, measured",
    "tier": "medium",
    "what": "Interrupt latency, and a sensor-to-output control step like a motor controller runs.",
    "time": "1 evening; tools need 12 GB free, once",
@@ -10904,6 +10906,7 @@
     }
    },
    "slug": "run-zephyr",
+   "search_title": "Zephyr on the TI LP-MSPM0G3507 LaunchPad from the terminal",
    "tier": "hard",
    "what": "Zephyr's blink from the command line, on the upstream board or on an out-of-tree board file.",
    "time": "about 3 min with this repo's script; 2 GB download, nothing else to install",
@@ -11224,6 +11227,7 @@
    "t": "Run the FreeRTOS real-time operating system",
    "radio": "",
    "slug": "run-freertos",
+   "search_title": "FreeRTOS on TI MSPM0L1306 and CC2340R5 LaunchPad kits",
    "tier": "hard",
    "what": "FreeRTOS tasks on a chip with no TI example, and how many fit.",
    "time": "1 evening; tools need 12 GB free, once",
@@ -11764,6 +11768,7 @@
     }
    },
    "slug": "arduino",
+   "search_title": "Arduino sketches on TI MSPM0 and CC2340R5 LaunchPad kits",
    "tier": "hard",
    "what": "The Arduino API on a TI chip, through the Zephyr-based Arduino core or through this repository's portability layer.",
    "time": "about 80 s a build after a one-time setup of about 5 GB of tools",
@@ -12151,6 +12156,7 @@
     }
    },
    "slug": "micropython",
+   "search_title": "MicroPython on TI LaunchPad kits: CC2340R5, MSPM33 and MSPM0",
    "tier": "hard",
    "what": "MicroPython on a TI chip, through upstream MicroPython's own Zephyr port.",
    "time": "about 3 minutes a build after a one-time setup of about 5 GB of tools",
@@ -12592,6 +12598,7 @@
     }
    },
    "slug": "esphome",
+   "search_title": "ESPHome on TI CC2340R5, CC2755P10 and CC35X1 radio chips",
    "tier": "hard",
    "what": "ESPHome's YAML configuration running on a TI radio chip, built and flashed with ESPHome's own commands.",
    "time": "about 1 min from esphome compile to a running device on the LP-EM-CC2755P10: 35 s build, 15 s upload, 5.7 to 6.3 s to join",
@@ -13942,6 +13949,7 @@
     }
    },
    "slug": "bldc-spin",
+   "search_title": "AM13E230 BLDC motor control: six-step (trapezoidal) and FOC with the DRV8376",
    "tier": "hard",
    "what": "A three-phase brushless motor with Hall sensors, spun three ways from one LaunchPad and one driver board: six-step on the Halls, field-oriented control (FOC) on the Halls, and FOC with the Halls out of the control loop.",
    "time": "1 evening for six-step; a day for the FOC versions; tools need about 10 GB, once",
@@ -14872,7 +14880,7 @@
     }
    },
    "how": [
-    "Three Hall sensors sit around the rotor and report which of six sectors it is in. In six-step drive the program reads the three Hall bits and turns on the two phases that pull the rotor into the next sector, so the motor steps round. Field-oriented control replaces the table with a current loop that keeps the magnetic field 90 degrees ahead of the rotor; sensorless FOC estimates the rotor angle from the phase currents and voltages and leaves the Halls out of the loop.",
+    "Three Hall sensors sit around the rotor and report which of six sectors it is in. In six-step drive, also called trapezoidal control, the program reads the three Hall bits and turns on the two phases that pull the rotor into the next sector, so the motor steps round. Field-oriented control replaces the table with a current loop that keeps the magnetic field 90 degrees ahead of the rotor; sensorless FOC estimates the rotor angle from the phase currents and voltages and leaves the Halls out of the loop.",
     "The same card drawing plays here at full size: Hall bits change, the lit coil pair steps round, the rotor follows. On the measured run, unloaded at 40 Hz, the sensorless loop ran on 0.063 A of phase current, the calibrated Halls on 0.13 A, and the Halls at their best angle shift on 0.087 A."
    ]
   },

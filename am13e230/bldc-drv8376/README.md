@@ -1,8 +1,8 @@
-# LP-AM13E230 with the DRV8376EVM: spin a Hall-sensor brushless motor in six-step and sine modes
+# LP-AM13E230 with the DRV8376EVM: spin a Hall-sensor brushless (BLDC) motor in six-step (trapezoidal) and sine modes
 
 > **Current state, 2026-10-16:** Rotation was restored with a measured DAC current-limit reference and a new Hall table (commissioning revision 17): two unloaded runs of 133 and 279 consecutive forward Hall sectors, no skipped sectors and no driver fault. The speed table below was measured on 2026-10-15, before the repair, and has not been reproduced since. The firmware and steps that restored rotation are in the [FOC port README](../foc-drv8376/README.md).
 
-Terms: [LP-AM13E230 FAQ](../FAQ.md). Six-step: the simplest way to run a three-phase motor, one pair of phases on at a time, switched by the three Hall sensors. Board page: [LP-AM13E230 README](../README.md). Experiment: [E196](../../docs/experiments/2026-10-15-am13e230-bldc-drv8376evm.md).
+Terms: [LP-AM13E230 FAQ](../FAQ.md). Six-step, also called trapezoidal control or 120-degree commutation: the simplest way to run a three-phase motor, one pair of phases on at a time, switched by the three Hall sensors. Board page: [LP-AM13E230 README](../README.md). Experiment: [E196](../../docs/experiments/2026-10-15-am13e230-bldc-drv8376evm.md).
 
 The DRV8376EVM is a 40-pin BoosterPack, so it plugs straight onto the LaunchPad. Its six PWM inputs land on the kit's motor PWM unit (MCPWM4) and its three Hall inputs on plain input pins. The chip is only the power stage: this program does the commutation. You type at a serial terminal: learn the Hall table once, then go, duty, direction, brake.
 

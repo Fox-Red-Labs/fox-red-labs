@@ -1,7 +1,7 @@
 {
  "note": "written by tools/edge_ai_check.py; independent recomputation of the digit comparison from the raw rows, the maps and boards.csv",
  "pass": true,
- "engine_sha": "cc9fd92f98c9e1d4",
+ "engine_sha": "e6f3b9d9c286e21b",
  "cases": [
   {
    "id": "digit-cc1354p10",
@@ -108,26 +108,6 @@
   {
    "id": "size-mspm0l1306-cnn64-32-cnn64-ticlang-o3-32mhz",
    "map": "ports/bitnetmcu/mspm0/build-l1306-cnn_64-O3-32/bitnet.map",
-   "pass": true
-  },
-  {
-   "id": "size-cc1354p10-cnn64-48-cnn64-ticlang-o3-48mhz",
-   "map": "cc1354p10/bench/out/bitnet-cnn_64-O3/image.map",
-   "pass": true
-  },
-  {
-   "id": "size-cc1354p10-1k-48-1k-ticlang-o3-48mhz",
-   "map": "cc1354p10/bench/out/bitnet-1k-O3/image.map",
-   "pass": true
-  },
-  {
-   "id": "size-cc2340r5-cnn64-48-cnn64-ticlang-o3-48mhz",
-   "map": "cc2340r5/bench/out/bitnet-cnn_64-O3/image.map",
-   "pass": true
-  },
-  {
-   "id": "size-cc2340r5-1k-48-1k-ticlang-o3-48mhz",
-   "map": "cc2340r5/bench/out/bitnet-1k-O3/image.map",
    "pass": true
   },
   {
